@@ -175,11 +175,30 @@ MrIceBlock::collision_squished(GameObject& object)
 
   switch (ice_state)
   {
-  case ICESTATE_KICKED:
-  {
-    auto badguy = dynamic_cast<BadGuy*>(&object);
-    if (badguy) {
-      badguy->kill_fall();
+    case ICESTATE_KICKED:
+      {
+        auto badguy = dynamic_cast<BadGuy*>(&object);
+        if (badguy) {
+          badguy->kill_fall();
+          break;
+        }
+      }
+      [[fallthrough]];
+
+    case ICESTATE_NORMAL:
+      {
+        squishcount++;
+        if (squishcount >= MAXSQUISHES) {
+          kill_fall();
+          return true;
+        }
+      }
+
+      SoundManager::current()->play("sounds/stomp.wav", get_pos());
+      m_physic.set_velocity_x(0);
+      m_physic.set_velocity_y(0);
+      set_state(ICESTATE_FLAT);
+      nokick_timer.start(NOKICK_TIME);
       break;
     }
   }

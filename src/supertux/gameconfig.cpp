@@ -170,7 +170,7 @@ Config::load()
   config_mapping.get("custom_mouse_cursor", custom_mouse_cursor);
   config_mapping.get("do_release_check", do_release_check);
 
-  boost::optional<ReaderMapping> config_integrations_mapping;
+  std::optional<ReaderMapping> config_integrations_mapping;
   if (config_mapping.get("integrations", config_integrations_mapping))
   {
     config_integrations_mapping->get("hide_editor_levelnames", hide_editor_levelnames);
@@ -265,7 +265,7 @@ Config::load()
   config_mapping.get("multiplayer_multibind", multiplayer_multibind);
   config_mapping.get("multiplayer_buzz_controllers", multiplayer_buzz_controllers);
 
-  boost::optional<ReaderMapping> config_video_mapping;
+  std::optional<ReaderMapping> config_video_mapping;
   if (config_mapping.get("video", config_video_mapping))
   {
     config_video_mapping->get("fullscreen", use_fullscreen);
@@ -303,7 +303,7 @@ Config::load()
 #endif
   }
 
-  boost::optional<ReaderMapping> config_audio_mapping;
+  std::optional<ReaderMapping> config_audio_mapping;
   if (config_mapping.get("audio", config_audio_mapping))
   {
     config_audio_mapping->get("sound_enabled", sound_enabled);
@@ -312,16 +312,16 @@ Config::load()
     config_audio_mapping->get("music_volume", music_volume);
   }
 
-  boost::optional<ReaderMapping> config_control_mapping;
+  std::optional<ReaderMapping> config_control_mapping;
   if (config_mapping.get("control", config_control_mapping))
   {
-    boost::optional<ReaderMapping> keymap_mapping;
+    std::optional<ReaderMapping> keymap_mapping;
     if (config_control_mapping->get("keymap", keymap_mapping))
     {
       keyboard_config.read(*keymap_mapping);
     }
 
-    boost::optional<ReaderMapping> joystick_mapping;
+    std::optional<ReaderMapping> joystick_mapping;
     if (config_control_mapping->get("joystick", joystick_mapping))
     {
       joystick_config.read(*joystick_mapping);
@@ -331,7 +331,7 @@ Config::load()
     config_control_mapping->get("mobile_controls_scale", m_mobile_controls_scale, 1);
   }
 
-  boost::optional<ReaderCollection> config_addons_mapping;
+  std::optional<ReaderCollection> config_addons_mapping;
   if (config_mapping.get("addons", config_addons_mapping))
   {
     for (auto const& addon_node : config_addons_mapping->get_objects())
