@@ -17,7 +17,7 @@
 
 #include "addon/addon_manager.hpp"
 
-#include <boost/algorithm/string/predicate.hpp>
+#include <sstream>
 #include <physfs.h>
 #include <fmt/format.h>
 
