@@ -1480,6 +1480,26 @@ Player::handle_input()
   if (m_stone)
     apply_friction();
 
+  /* Revert from Stone */
+  if (m_stone && (!m_controller->hold(Control::ACTION) || m_ability_timer.get_timeleft() <= 0.5f)) {
+    m_cooldown_timer.start(m_ability_timer.get_timegone()/2.0f); //The longer stone form is used, the longer until it can be used again
+    m_ability_timer.stop();
+    m_sprite->set_angle(0.0f);
+    m_powersprite->set_angle(0.0f);
+    m_lightsprite->set_angle(0.0f);
+    m_stone = false;
+    for (int i = 0; i < 8; i++)
+    {
+      Vector ppos = Vector(m_col.m_bbox.get_left() + 8.0f + 16.0f * static_cast<float>(static_cast<int>(i / 4)),
+                           m_col.m_bbox.get_top() + 16.0f * static_cast<float>(i % 4));
+      float grey = graphicsRandom.randf(.4f, .8f);
+      Color pcolor = Color(grey, grey, grey);
+      Sector::get().add<Particles>(ppos, -60, 240, 42.0f, 81.0f, Vector(0.0f, 500.0f),
+                                   8, pcolor, 4.0f + graphicsRandom.randf(-0.4f, 0.4f),
+                                   0.8f + graphicsRandom.randf(0.0f, 0.4f), LAYER_OBJECTS + 2);
+    }
+  }
+
   /* Duck or Standup! */
   if ((m_controller->pressed(Control::DOWN) || ((m_duck || m_wants_buttjump) && m_controller->hold(Control::DOWN))) &&
     !m_swimming && !m_sliding && !m_stone) {
@@ -2115,11 +2135,11 @@ Player::collision_solid(const CollisionHit& hit)
       m_on_ground_flag = false;
       Sector::get().add<Particles>(
         m_col.m_bbox.p2(),
-        50, 70, 260, 280, Vector(0, 300), 3,
+        50, 70, 260.0f, 280.0f, Vector(0, 300), 3,
         Color(.4f, .4f, .4f), 3, .8f, LAYER_OBJECTS+1);
       Sector::get().add<Particles>(
         Vector(m_col.m_bbox.get_left(), m_col.m_bbox.get_bottom()),
-        -70, -50, 260, 280, Vector(0, 300), 3,
+        -70, -50, 260.0f, 280.0f, Vector(0, 300), 3,
         Color(.4f, .4f, .4f), 3, .8f, LAYER_OBJECTS+1);
       Sector::get().get_camera().shake(.1f, 0, 5);
     }
