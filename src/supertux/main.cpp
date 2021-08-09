@@ -197,7 +197,7 @@ void PhysfsSubsystem::find_datadir() const
   if (const char* assetpack = getenv("ANDROID_ASSET_PACK_PATH"))
   {
     // Android asset pack has a hardcoded prefix for data files, and PhysFS cannot strip it, so we mount an archive inside an archive
-    if (!PHYSFS_mount(std::filesystem::canonical(assetpack).c_str(), nullptr, 1))
+    if (!PHYSFS_mount(std::filesystem::canonical(assetpack).string().c_str(), nullptr, 1))
     {
       log_warning << "Couldn't add '" << assetpack << "' to physfs searchpath: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
       return;
@@ -253,6 +253,7 @@ void PhysfsSubsystem::find_datadir() const
     }
   }
 
+  // An additional .string() call is necessary as Windows returns const wchar_t* for .c_str()
   if (!PHYSFS_mount(std::filesystem::canonical(datadir).string().c_str(), nullptr, 1))
   {
     log_warning << "Couldn't add '" << datadir << "' to physfs searchpath: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
@@ -308,7 +309,7 @@ if (FileSystem::is_directory(olduserdir)) {
   for (std::filesystem::directory_iterator itr(olduserpath); itr != end_itr; ++itr) {
   try
   {
-    std::filesystem::rename(itr->path().string().c_str(), userpath / itr->path().filename());
+    std::filesystem::rename(itr->path(), userpath / itr->path().filename());
   }
   catch (const std::filesystem::filesystem_error& err)
   {
