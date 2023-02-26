@@ -20,7 +20,6 @@
 #include <memory>
 #include <string>
 
-#include "addon/addon_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "control/input_manager.hpp"
 #include "sprite/sprite_data.hpp"
@@ -100,13 +99,10 @@ private:
   std::unique_ptr<TileManager> m_tile_manager;
   std::unique_ptr<SpriteManager> m_sprite_manager;
   std::unique_ptr<Resources> m_resources;
-  std::unique_ptr<AddonManager> m_addon_manager;
   std::unique_ptr<Console> m_console;
   std::unique_ptr<GameManager> m_game_manager;
   std::unique_ptr<ScreenManager> m_screen_manager;
   std::unique_ptr<Savegame> m_savegame;
-
-  Downloader m_downloader; // Used for getting the version of the latest SuperTux release.
 
 private:
   Main(const Main&) = delete;

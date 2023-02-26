@@ -30,8 +30,6 @@
 #  include <unistd.h>
 #endif
 
-#include "addon/addon_manager.hpp"
-#include "addon/downloader.hpp"
 #include "audio/sound_manager.hpp"
 #include "editor/editor.hpp"
 #include "editor/layer_icon.hpp"
@@ -68,7 +66,6 @@
 #include "supertux/tile_manager.hpp"
 #include "supertux/title_screen.hpp"
 #include "supertux/world.hpp"
-#include "supertux/menu/download_dialog.hpp"
 #include "util/file_system.hpp"
 #include "util/gettext.hpp"
 #include "util/reader_document.hpp"
@@ -128,12 +125,10 @@ Main::Main() :
   m_tile_manager(),
   m_sprite_manager(),
   m_resources(),
-  m_addon_manager(),
   m_console(),
   m_game_manager(),
   m_screen_manager(),
-  m_savegame(),
-  m_downloader() // Used for getting the version of the latest SuperTux release.
+  m_savegame()
 {
 }
 
@@ -470,9 +465,6 @@ Main::launch_game(const CommandLineArguments& args)
   m_tile_manager.reset(new TileManager());
   m_sprite_manager.reset(new SpriteManager());
   m_resources.reset(new Resources());
-
-  s_timelog.log("addons");
-  m_addon_manager.reset(new AddonManager("addons", g_config->addons));
 
   m_console.reset(new Console(*m_console_buffer));
 

@@ -113,7 +113,6 @@ public:
   bool confirmation_dialog;
   bool pause_on_focusloss;
   bool custom_mouse_cursor;
-  bool do_release_check;
 
   bool hide_editor_levelnames;
 

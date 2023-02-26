@@ -18,8 +18,6 @@
 
 #include <assert.h>
 
-#include "supertux/menu/addon_menu.hpp"
-#include "supertux/menu/addon_browse_menu.hpp"
 #include "supertux/menu/cheat_menu.hpp"
 #include "supertux/menu/debug_menu.hpp"
 #include "supertux/menu/contrib_menu.hpp"
@@ -125,20 +123,11 @@ MenuStorage::create(MenuId menu_id)
     case CONTRIB_WORLD_MENU:
       return nullptr; //return new ContribWorldMenu();
 
-    case ADDON_MENU:
-      return std::make_unique<AddonMenu>();
-
-    case LANGPACK_MENU:
-      return std::unique_ptr<Menu>(new AddonMenu(true));
-
     case EDITOR_LEVELSET_SELECT_MENU:
       return std::make_unique<EditorLevelsetSelectMenu>();
 
     case EDITOR_NEW_LEVELSET_MENU:
       return std::make_unique<EditorNewLevelsetMenu>();
-
-    case LANGPACK_AUTO_UPDATE_MENU:
-      return std::unique_ptr<Menu>(new AddonBrowseMenu(true, true));
 
     case EDITOR_LEVEL_SELECT_MENU:
       return std::make_unique<EditorLevelSelectMenu>();

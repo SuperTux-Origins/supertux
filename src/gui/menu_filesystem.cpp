@@ -18,7 +18,6 @@
 
 #include <physfs.h>
 
-#include "addon/addon_manager.hpp"
 #include "gui/menu_item.hpp"
 #include "gui/menu_manager.hpp"
 #include "physfs/util.hpp"
@@ -40,8 +39,6 @@ FileSystemMenu::FileSystemMenu(std::string* filename, const std::vector<std::str
   m_path_relative_to_basedir(path_relative_to_basedir),
   m_callback(std::move(callback))
 {
-  AddonManager::current()->unmount_old_addons();
-
   if (!PHYSFS_exists(m_directory.c_str())) {
     m_directory = "/"; //The filename is probably included in an old add-on.
   }
@@ -51,7 +48,6 @@ FileSystemMenu::FileSystemMenu(std::string* filename, const std::vector<std::str
 
 FileSystemMenu::~FileSystemMenu()
 {
-  AddonManager::current()->mount_old_addons();
 }
 
 void
@@ -84,10 +80,6 @@ FileSystemMenu::refresh_items()
       }
       else
       {
-        if (AddonManager::current()->is_from_old_addon(filepath)) {
-          continue;
-        }
-
         if (has_right_suffix(*file))
         {
           m_files.push_back(*file);
