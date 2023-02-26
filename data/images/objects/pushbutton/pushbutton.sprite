@@ -1,16 +1,12 @@
 (supertux-sprite
   (action
     (name "off")
-    (hitbox 0 0 30 16)
+    (hitbox 1 2 30 12)
     (images "pushbutton-0.png")
   )
   (action
     (name "on")
-    (hitbox 0 0 30 10)
-	(loops 1)
-	(fps 20)
-    (images "pushbutton-1.png"
-			"pushbutton-2.png"
-			"pushbutton-3.png")
+    (hitbox 1 2 30 6)
+    (images "pushbutton-1.png")
   )
 )

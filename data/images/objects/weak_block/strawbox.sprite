@@ -2,32 +2,28 @@
   (action
     (name "normal")
     (images 
-      "strawbox-0.png"
+      "straw.png"
     )
   )
   (action
     (name "burning")
-	(fps 16)
-	(loops 1)
     (images 
-      "strawbox-1.png"
-	  "strawbox-2.png"
-	  "strawbox-3.png"
-	  "strawbox-4.png"
-	  "strawbox-5.png"
+      "straw_01.png"
+      "straw_02.png"
+      "straw_03.png"
+      "straw_04.png"
+      "straw_05.png"
+      "straw_06.png"
     )
   )
   (action
     (name "disintegrating")
-	(fps 16)
-	(loops 1)
     (images 
-      "strawbox-6.png"
-      "strawbox-7.png"
-      "strawbox-8.png"
-      "strawbox-9.png"
-      "strawbox-10.png"
-      "strawbox-11.png"
+      "straw_07.png"
+      "straw_08.png"
+      "straw_09.png"
+      "straw_10.png"
+      "straw_11.png"
     )
   )
 )
