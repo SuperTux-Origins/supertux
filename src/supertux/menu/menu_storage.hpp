@@ -23,7 +23,6 @@ class JoystickMenu;
 class KeyboardMenu;
 class Menu;
 class OptionsMenu;
-class ProfileMenu;
 
 class MenuStorage final
 {
@@ -38,7 +37,6 @@ public:
     MAIN_MENU,
     OPTIONS_MENU,
     INGAME_OPTIONS_MENU,
-    PROFILE_MENU,
     WORLDSET_MENU,
     CONTRIB_MENU,
     CONTRIB_WORLD_MENU,

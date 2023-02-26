@@ -348,12 +348,6 @@ OptionsMenu::OptionsMenu(bool complete) :
     ++cnt_;
   }
 
-  if (complete)
-  {
-    add_submenu(_("Select Profile"), MenuStorage::PROFILE_MENU)
-      .set_help(_("Select a profile to play with"));
-  }
-
 #if !defined(HIDE_NONMOBILE_OPTIONS) && !defined(__EMSCRIPTEN__)
   add_toggle(MNID_FULLSCREEN,_("Window Resizable"), &g_config->window_resizable)
     .set_help(_("Allow window resizing, might require a restart to take effect"));

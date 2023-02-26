@@ -29,7 +29,6 @@
 #include "supertux/menu/multiplayer_menu.hpp"
 #include "supertux/menu/multiplayer_players_menu.hpp"
 #include "supertux/menu/options_menu.hpp"
-#include "supertux/menu/profile_menu.hpp"
 #include "supertux/menu/web_asset_menu.hpp"
 #include "supertux/menu/worldmap_menu.hpp"
 #include "supertux/menu/worldmap_cheat_menu.hpp"
@@ -69,9 +68,6 @@ MenuStorage::create(MenuId menu_id)
 
     case INGAME_OPTIONS_MENU:
       return std::unique_ptr<Menu>(new OptionsMenu(false));
-
-    case PROFILE_MENU:
-      return std::make_unique<ProfileMenu>();
 
     case KEYBOARD_MENU:
       return std::unique_ptr<Menu>(new KeyboardMenu(*InputManager::current()));
