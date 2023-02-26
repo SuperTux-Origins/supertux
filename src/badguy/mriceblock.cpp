@@ -200,43 +200,23 @@ MrIceBlock::collision_squished(GameObject& object)
       set_state(ICESTATE_FLAT);
       nokick_timer.start(NOKICK_TIME);
       break;
-    }
-  }
-  BOOST_FALLTHROUGH;
 
-  case ICESTATE_NORMAL:
-  {
-    squishcount++;
-    if (squishcount >= MAXSQUISHES) {
-      kill_fall();
-      return true;
-    }
-  }
+    case ICESTATE_FLAT:
+    case ICESTATE_WAKING:
+      {
+        auto movingobject = dynamic_cast<MovingObject*>(&object);
+        if (movingobject && (movingobject->get_pos().x < get_pos().x)) {
+          m_dir = Direction::RIGHT;
+        } else {
+          m_dir = Direction::LEFT;
+        }
+      }
+      if (nokick_timer.check()) set_state(ICESTATE_KICKED);
+      break;
 
-  SoundManager::current()->play("sounds/stomp.wav", get_pos());
-  m_physic.set_velocity_x(0);
-  m_physic.set_velocity_y(0);
-  set_state(ICESTATE_FLAT);
-  nokick_timer.start(NOKICK_TIME);
-  break;
-
-  case ICESTATE_FLAT:
-  case ICESTATE_WAKING:
-  {
-    auto movingobject = dynamic_cast<MovingObject*>(&object);
-    if (movingobject && (movingobject->get_pos().x < get_pos().x)) {
-      m_dir = Direction::RIGHT;
-    }
-    else {
-      m_dir = Direction::LEFT;
-    }
-  }
-  if (nokick_timer.check()) set_state(ICESTATE_KICKED);
-  break;
-
-  case ICESTATE_GRABBED:
-    assert(false);
-    break;
+    case ICESTATE_GRABBED:
+      assert(false);
+      break;
   }
 
   if (player) player->bounce(*this);
