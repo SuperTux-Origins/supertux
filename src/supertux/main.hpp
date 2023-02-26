@@ -85,7 +85,6 @@ private:
 
   void launch_game(const CommandLineArguments& args);
   void resave(const std::string& input_filename, const std::string& output_filename);
-  void release_check();
 
 private:
   // Using pointers allows us to initialize them whenever we want
