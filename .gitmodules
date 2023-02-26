@@ -1,6 +1,3 @@
 [submodule "external/sexp-cpp"]
 	path = external/sexp-cpp
 	url = https://github.com/SuperTux/sexp-cpp.git
-[submodule "external/SDL_ttf"]
-	path = external/SDL_ttf
-	url = https://github.com/SuperTux/SDL_ttf
