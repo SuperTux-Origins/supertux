@@ -26,7 +26,6 @@
 #include "gui/menu_manager.hpp"
 #include "gui/mousecursor.hpp"
 #include "object/player.hpp"
-#include "sdk/integration.hpp"
 #include "squirrel/squirrel_virtual_machine.hpp"
 #include "supertux/console.hpp"
 #include "supertux/constants.hpp"
@@ -189,8 +188,6 @@ ScreenManager::set_screen_fade(std::unique_ptr<ScreenFade> screen_fade)
 void
 ScreenManager::quit(std::unique_ptr<ScreenFade> screen_fade)
 {
-  Integration::close_all();
-
 #ifdef __EMSCRIPTEN__
   g_config->save();
 #endif
@@ -573,10 +570,6 @@ ScreenManager::handle_screen_switch()
 
 void ScreenManager::loop_iter()
 {
-  // Useful if screens edit their status without switching screens
-  Integration::update_status_all(m_screen_stack.back()->get_status());
-  Integration::update_all();
-
   Uint32 ticks = SDL_GetTicks();
   elapsed_ticks += ticks - last_ticks;
   last_ticks = ticks;
@@ -664,8 +657,6 @@ static void g_loop_iter() {
 void
 ScreenManager::run()
 {
-  Integration::init_all();
-
   handle_screen_switch();
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(g_loop_iter, -1, 1);

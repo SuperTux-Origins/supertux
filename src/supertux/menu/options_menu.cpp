@@ -469,9 +469,6 @@ OptionsMenu::OptionsMenu(bool complete) :
     .set_help(_("Allows the game to perform checks for new SuperTux releases on startup and notify if any found."));
 #endif
 
-  add_submenu(_("Integrations and presence"), MenuStorage::INTEGRATIONS_MENU)
-      .set_help(_("Manage whether SuperTux should display the levels you play on your social media profiles (Discord)"));
-
   if (g_config->developer_mode)
   {
     add_submenu(_("Menu Customization"), MenuStorage::CUSTOM_MENU_MENU)

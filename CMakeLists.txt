@@ -170,7 +170,6 @@ include(SuperTux/ProvideCurl)
 include(SuperTux/ProvideSquirrel)
 include(SuperTux/ProvideTinygettext)
 include(SuperTux/ProvideSDL2_ttf)
-include(SuperTux/ProvideDiscord)
 include(SuperTux/ProvideSexpcpp)
 include(SuperTux/ProvideSavePNG)
 include(SuperTux/ProvidePartioZip)
@@ -277,10 +276,6 @@ target_link_libraries(supertux-origins_lib PUBLIC wstsound::wstsound)
 
 if(HAVE_OPENGL)
   target_link_libraries(supertux-origins_lib PUBLIC LibOpenGL)
-endif()
-
-if(ENABLE_DISCORD)
-  target_link_libraries(supertux-origins_lib PUBLIC LibDiscord)
 endif()
 
 if(NOT EMSCRIPTEN)

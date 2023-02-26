@@ -47,7 +47,6 @@
 #include "object/spawnpoint.hpp"
 #include "object/tilemap.hpp"
 #include "physfs/util.hpp"
-#include "sdk/integration.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/game_manager.hpp"
 #include "supertux/gameconfig.hpp"
@@ -895,25 +894,6 @@ Editor::redo()
   } else {
     log_info << "redo failed" << std::endl;
   }
-}
-
-IntegrationStatus
-Editor::get_status() const
-{
-  IntegrationStatus status;
-  status.m_details.push_back("In Editor");
-  if (!g_config->hide_editor_levelnames && m_level)
-  {
-    if (m_level->is_worldmap())
-    {
-      status.m_details.push_back("Editing worldmap: " + m_level->get_name());
-    }
-    else
-    {
-      status.m_details.push_back("Editing level: " + m_level->get_name());
-    }
-  }
-  return status;
 }
 
 PHYSFS_EnumerateCallbackResult

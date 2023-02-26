@@ -23,7 +23,6 @@
 #include "object/camera.hpp"
 #include "object/music_object.hpp"
 #include "object/player.hpp"
-#include "sdk/integration.hpp"
 #include "supertux/fadetoblack.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/level.hpp"
@@ -149,14 +148,6 @@ TitleScreen::update(float dt_sec, const Controller& controller)
   {
     MenuManager::instance().set_menu(MenuStorage::MAIN_MENU);
   }
-}
-
-IntegrationStatus
-TitleScreen::get_status() const
-{
-  IntegrationStatus status;
-  status.m_details.push_back("In main menu");
-  return status;
 }
 
 /* EOF */

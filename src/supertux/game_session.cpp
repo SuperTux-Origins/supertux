@@ -29,7 +29,6 @@
 #include "object/level_time.hpp"
 #include "object/music_object.hpp"
 #include "object/player.hpp"
-#include "sdk/integration.hpp"
 #include "supertux/fadetoblack.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/level.hpp"
@@ -567,19 +566,6 @@ GameSession::update(float dt_sec, const Controller& controller)
     for (auto* p : m_currentsector->get_players())
       p->kill(true);
   }
-}
-
-IntegrationStatus
-GameSession::get_status() const
-{
-  IntegrationStatus status;
-  status.m_details.push_back(Editor::current() ? "Testing" : "Playing");
-  if (!Editor::current() || !g_config->hide_editor_levelnames)
-  {
-    const std::string label = get_current_level().is_worldmap() ? "In worldmap: " : "In level: ";
-    status.m_details.push_back(label + get_current_level().get_name());
-  }
-  return status;
 }
 
 void

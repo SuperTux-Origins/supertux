@@ -242,18 +242,6 @@ WorldSelect::update(float dt_sec, const Controller& controller)
   }
 }
 
-IntegrationStatus
-WorldSelect::get_status() const
-{
-  IntegrationStatus status;
-  status.m_details.push_back("In world select");
-  if (!m_worlds.empty())
-  {
-    status.m_details.push_back(m_worlds[m_current_world].name);
-  }
-  return status;
-}
-
 } // namespace worldmap
 
 /* EOF */

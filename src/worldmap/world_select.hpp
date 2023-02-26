@@ -18,6 +18,7 @@
 #define HEADER_SUPERTUX_WORLDMAP_WORLD_SELECT_HPP
 
 #include <memory>
+#include <vector>
 
 #include "supertux/screen.hpp"
 #include "util/currenton.hpp"
@@ -54,7 +55,6 @@ public:
 
   virtual void draw(Compositor& compositor) override;
   virtual void update(float dt_sec, const Controller& controller) override;
-  virtual IntegrationStatus get_status() const override;
 
 private:
   bool m_enabled;

@@ -16,7 +16,6 @@
 
 #include "supertux/game_manager.hpp"
 
-#include "sdk/integration.hpp"
 #include "supertux/levelset_screen.hpp"
 #include "supertux/player_status.hpp"
 #include "supertux/savegame.hpp"

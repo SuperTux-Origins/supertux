@@ -79,6 +79,7 @@ Config::Config() :
   confirmation_dialog(false),
   pause_on_focusloss(true),
   custom_mouse_cursor(true),
+<<<<<<< HEAD
 #ifdef __EMSCRIPTEN__
   do_release_check(false),
 #else
@@ -87,6 +88,8 @@ Config::Config() :
 #ifdef ENABLE_DISCORD
   enable_discord(false),
 #endif
+=======
+>>>>>>> 16e8e81e8 (discord)
   hide_editor_levelnames(false),
   notifications(),
   menubackcolor(ColorScheme::Menu::back_color),
@@ -171,15 +174,6 @@ Config::load()
   config_mapping.get("pause_on_focusloss", pause_on_focusloss);
   config_mapping.get("custom_mouse_cursor", custom_mouse_cursor);
   config_mapping.get("do_release_check", do_release_check);
-
-  std::optional<ReaderMapping> config_integrations_mapping;
-  if (config_mapping.get("integrations", config_integrations_mapping))
-  {
-    config_integrations_mapping->get("hide_editor_levelnames", hide_editor_levelnames);
-#ifdef ENABLE_DISCORD
-    config_integrations_mapping->get("enable_discord", enable_discord);
-#endif
-  }
 
   std::optional<ReaderCollection> config_notifications_mapping;
   if (config_mapping.get("notifications", config_notifications_mapping))
@@ -385,15 +379,6 @@ Config::save()
   writer.write("pause_on_focusloss", pause_on_focusloss);
   writer.write("custom_mouse_cursor", custom_mouse_cursor);
   writer.write("do_release_check", do_release_check);
-
-  writer.start_list("integrations");
-  {
-    writer.write("hide_editor_levelnames", hide_editor_levelnames);
-#ifdef ENABLE_DISCORD
-    writer.write("enable_discord", enable_discord);
-#endif
-  }
-  writer.end_list("integrations");
 
   writer.start_list("notifications");
   for (const auto& notification : notifications)

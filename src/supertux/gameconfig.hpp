@@ -115,9 +115,6 @@ public:
   bool custom_mouse_cursor;
   bool do_release_check;
 
-#ifdef ENABLE_DISCORD
-  bool enable_discord;
-#endif
   bool hide_editor_levelnames;
 
   struct Notification

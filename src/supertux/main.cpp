@@ -56,7 +56,6 @@ extern "C" {
 #include "physfs/physfs_file_system.hpp"
 #include "physfs/physfs_sdl.hpp"
 #include "port/emscripten.hpp"
-#include "sdk/integration.hpp"
 #include "sprite/sprite_data.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/command_line_arguments.hpp"
@@ -506,9 +505,6 @@ Main::launch_game(const CommandLineArguments& args)
   m_tile_manager.reset(new TileManager());
   m_sprite_manager.reset(new SpriteManager());
   m_resources.reset(new Resources());
-
-  s_timelog.log("integrations");
-  Integration::setup();
 
   s_timelog.log("addons");
   m_addon_manager.reset(new AddonManager("addons", g_config->addons));

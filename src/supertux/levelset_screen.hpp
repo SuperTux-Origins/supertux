@@ -46,8 +46,6 @@ public:
   virtual void setup() override;
   virtual void leave() override;
 
-  virtual IntegrationStatus get_status() const override;
-
   void finished_level(bool win);
 
 private:

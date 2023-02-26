@@ -207,16 +207,6 @@ LevelIntro::draw(Compositor& compositor)
   if (!m_level.m_note.empty()) {
     context.color().draw_center_text(Resources::normal_font, m_level.m_note, Vector(0, py), LAYER_FOREGROUND1);
   }
-  
-}
-
-IntegrationStatus
-LevelIntro::get_status() const
-{
-  IntegrationStatus status;
-  status.m_details.push_back("Watching a cutscene");
-  status.m_details.push_back("In level: " + m_level.get_name());
-  return status;
 }
 
 void
