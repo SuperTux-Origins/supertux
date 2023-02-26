@@ -621,6 +621,7 @@
         "physfs-win32": "physfs-win32",
         "sexpcpp": "sexpcpp",
         "squirrel": "squirrel",
+        "strutcpp": "strutcpp",
         "tinycmmc": "tinycmmc_2",
         "tinygettext": "tinygettext",
         "wstsound": "wstsound"
@@ -690,6 +691,29 @@
         "owner": "albertodemichelis",
         "repo": "squirrel",
         "rev": "b31e5bdc213359f6612e77d36bae26fa85424c56",
+        "type": "github"
+      }
+    },
+    "strutcpp": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "tinycmmc": [
+          "tinycmmc"
+        ]
+      },
+      "locked": {
+        "lastModified": 1660505409,
+        "narHash": "sha256-4juFaDnOhUKhIo8bNLeKEFeXQ+bw+iDQ0G22Qr9w7K0=",
+        "owner": "grumbel",
+        "repo": "strutcpp",
+        "rev": "4b00d49250db4e42e46068d5b4e42a2f8c5ccf51",
+        "type": "github"
+      },
+      "original": {
+        "owner": "grumbel",
+        "repo": "strutcpp",
         "type": "github"
       }
     },

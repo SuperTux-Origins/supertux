@@ -68,6 +68,10 @@
     SDL2_ttf-win32.inputs.nixpkgs.follows = "nixpkgs";
     SDL2_ttf-win32.inputs.tinycmmc.follows = "tinycmmc";
 
+    strutcpp.url = "github:grumbel/strutcpp";
+    strutcpp.inputs.nixpkgs.follows = "nixpkgs";
+    strutcpp.inputs.tinycmmc.follows = "tinycmmc";
+
     wstsound.url = "github:WindstilleTeam/wstsound";
     wstsound.inputs.nixpkgs.follows = "nixpkgs";
     wstsound.inputs.flake-utils.follows = "flake-utils";
@@ -86,7 +90,7 @@
               tinycmmc, sexpcpp, tinygettext,
               curl-win32,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf, SDL2_ttf-win32,
-              wstsound, squirrel, glew-win32 }:
+              strutcpp, wstsound, squirrel, glew-win32 }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {
@@ -104,6 +108,7 @@
             squirrel = squirrel.packages.${pkgs.system}.default;
             tinycmmc = tinycmmc.packages.${pkgs.system}.default;
             tinygettext = tinygettext.packages.${pkgs.system}.default;
+            strutcpp = strutcpp.packages.${pkgs.system}.default;
             wstsound = wstsound.packages.${pkgs.system}.default;
 
             physfs = if pkgs.targetPlatform.isWindows

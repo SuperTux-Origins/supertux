@@ -22,6 +22,7 @@
 , squirrel
 , tinycmmc
 , tinygettext
+, strutcpp
 , wstsound
 }:
 
@@ -74,6 +75,7 @@ EOF
        ln -sfv ${physfs}/bin/*.dll $out/bin/
        ln -sfv ${squirrel}/bin/*.dll $out/bin/
        ln -sfv ${tinygettext}/bin/*.dll $out/bin/
+       ln -sfv ${strutcpp}/bin/*.dll $out/bin/
        ln -sfv ${wstsound}/bin/*.dll $out/bin/
     '');
 
@@ -97,6 +99,7 @@ EOF
     squirrel
     tinycmmc
     tinygettext
+    strutcpp
     wstsound
   ];
 }
