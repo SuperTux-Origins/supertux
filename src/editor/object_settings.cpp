@@ -180,7 +180,7 @@ ObjectSettings::add_translatable_text(const std::string& text, std::string* valu
 void
 ObjectSettings::add_multiline_text(const std::string& text, std::string* value_ptr,
                          const std::string& key,
-                         const boost::optional<std::string>& default_value,
+                         const std::optional<std::string>& default_value,
                          unsigned int flags)
 {
   add_option(std::make_unique<StringMultilineObjectOption>(text, value_ptr, key, default_value, flags));
@@ -189,7 +189,7 @@ ObjectSettings::add_multiline_text(const std::string& text, std::string* value_p
 void
 ObjectSettings::add_multiline_translatable_text(const std::string& text, std::string* value_ptr,
                                       const std::string& key,
-                                      const boost::optional<std::string>& default_value,
+                                      const std::optional<std::string>& default_value,
                                       unsigned int flags)
 {
   add_option(std::make_unique<StringMultilineObjectOption>(text, value_ptr, key, default_value,

@@ -241,7 +241,7 @@ StringObjectOption::add_to_menu(Menu& menu) const
 }
 
 StringMultilineObjectOption::StringMultilineObjectOption(const std::string& text, std::string* pointer, const std::string& key,
-                                       boost::optional<std::string> default_value,
+                                       std::optional<std::string> default_value,
                                        unsigned int flags) :
   ObjectOption(text, key, flags),
   m_pointer(pointer),

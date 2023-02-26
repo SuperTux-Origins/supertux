@@ -34,7 +34,7 @@ void
 VideoSystemMenu::refresh()
 {
   add_label(_("Select Video System"));
-  add_inactive(fmt::format(_("Used video system: {}"), VideoSystem::get_video_string(g_config->video)));
+  add_inactive(fmt::format(fmt::runtime(_("Used video system: {}")), VideoSystem::get_video_string(g_config->video)));
   add_hl();
 
   std::vector<std::string> video_systems = VideoSystem::get_available_video_systems();

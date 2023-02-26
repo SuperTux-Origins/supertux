@@ -140,7 +140,7 @@ Config::load()
 
   auto config_mapping = root.get_mapping();
   config_mapping.get("profile", profile);
-  boost::optional<ReaderCollection> config_profiles_mapping;
+  std::optional<ReaderCollection> config_profiles_mapping;
   if (config_mapping.get("profiles", config_profiles_mapping))
   {
     for (auto const& profile_node : config_profiles_mapping->get_objects())
@@ -181,7 +181,7 @@ Config::load()
 #endif
   }
 
-  boost::optional<ReaderCollection> config_notifications_mapping;
+  std::optional<ReaderCollection> config_notifications_mapping;
   if (config_mapping.get("notifications", config_notifications_mapping))
   {
     for (auto const& notification_node : config_notifications_mapping->get_objects())

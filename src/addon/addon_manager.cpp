@@ -454,7 +454,7 @@ void
 AddonManager::install_addon_from_local_file(const std::string& filename)
 {
   const std::string& source_filename = FileSystem::basename(filename);
-  if(!boost::algorithm::ends_with(source_filename, ".zip"))
+  if(!source_filename.ends_with(".zip"))
     return;
 
   const std::string& target_directory = FileSystem::join(PHYSFS_getRealDir(m_addon_directory.c_str()), m_addon_directory);
@@ -743,7 +743,7 @@ AddonManager::add_installed_archive(const std::string& archive, const std::strin
           get_installed_addon(addon_id);
           if(user_install)
           {
-            Dialog::show_message(fmt::format(_("Add-on {} by {} is already installed."),
+            Dialog::show_message(fmt::format(fmt::runtime(_("Add-on {} by {} is already installed.")),
                                              addon->get_title(), addon->get_author()));
           }
         }
@@ -756,7 +756,7 @@ AddonManager::add_installed_archive(const std::string& archive, const std::strin
           if(user_install)
           {
             enable_addon(addon_id);
-            Dialog::show_message(fmt::format(_("Add-on {} by {} successfully installed."),
+            Dialog::show_message(fmt::format(fmt::runtime(_("Add-on {} by {} successfully installed.")),
                                              addon_title, addon_author));
             // if currently opened menu is addons menu refresh it
             AddonMenu* addon_menu = dynamic_cast<AddonMenu*>(MenuManager::instance().current_menu());

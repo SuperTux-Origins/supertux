@@ -96,11 +96,11 @@ public:
                              unsigned int flags = 0);
   void add_multiline_text(const std::string& text, std::string* value_ptr,
                           const std::string& key = {},
-                          const boost::optional<std::string>& default_value = {},
+                          const std::optional<std::string>& default_value = {},
                           unsigned int flags = 0);
   void add_multiline_translatable_text(const std::string& text, std::string* value_ptr,
                                        const std::string& key = {},
-                                       const boost::optional<std::string>& default_value = {},
+                                       const std::optional<std::string>& default_value = {},
                                        unsigned int flags = 0);
   void add_string_select(const std::string& text, int* value_ptr, const std::vector<std::string>& select,
                          const std::optional<int>& default_value = {},

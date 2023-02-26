@@ -17,7 +17,7 @@
 
 #include "gui/item_script_line.hpp"
 
-#include <boost/algorithm/string.hpp>
+#include <strut/split.hpp>
 
 #include "control/input_manager.hpp"
 #include "gui/menu_manager.hpp"
@@ -108,10 +108,9 @@ ItemScriptLine::paste() // Paste with mutli-line support
 {
   update_undo();
 
-  std::vector<std::string> paste_lines;
   char* clipboard_content = SDL_GetClipboardText();
   std::string clipboard_content_str(clipboard_content);
-  boost::split(paste_lines, clipboard_content_str, boost::is_any_of("\n"));
+  std::vector<std::string> paste_lines = strut::split(clipboard_content_str, '\n');
   SDL_free(clipboard_content);
 
   if (paste_lines.empty()) return;

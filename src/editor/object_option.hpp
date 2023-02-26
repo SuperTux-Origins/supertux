@@ -191,7 +191,7 @@ class StringMultilineObjectOption : public ObjectOption
 {
 public:
   StringMultilineObjectOption(const std::string& text, std::string* pointer, const std::string& key,
-                     boost::optional<std::string> default_value,
+                     std::optional<std::string> default_value,
                      unsigned int flags);
 
   virtual void save(Writer& write) const override;
@@ -200,7 +200,7 @@ public:
 
 private:
   std::string* const m_pointer;
-  boost::optional<std::string> m_default_value;
+  std::optional<std::string> m_default_value;
 
 private:
   StringMultilineObjectOption(const StringMultilineObjectOption&) = delete;
