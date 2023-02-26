@@ -154,11 +154,11 @@
       )
 	  (alt-id
         (id 2134)
-        (weight 0.2)
+        (weight 0.4)
       )
 	  (alt-id
         (id 2135)
-        (weight 0.2)
+        (weight 0.4)
       )
       (solid #t)
       (mask "11111***")
@@ -1104,10 +1104,6 @@
       (id 2127)
 	  (alt-id
         (id 2469)
-        (weight 0.5)
-      )
-	  (alt-id
-        (id 4780)
         (weight 0.5)
       )
       (solid #t)

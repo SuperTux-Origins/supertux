@@ -2,11 +2,11 @@
     (action
       (name "default")
       (images "candle-light-2.png")
-      (hitbox 260 280 256 256)
+      (hitbox 256 256 0 0)
     )
     (action
       (name "white")
       (images "candle-light-white-2.png")
-      (hitbox 260 280 256 256)
+      (hitbox 256 256 0 0)
     )
 )
