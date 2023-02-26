@@ -22,6 +22,7 @@
 , squirrel
 , tinycmmc
 , strutcpp
+, miniswig
 , wstsound
 }:
 
@@ -97,6 +98,7 @@ EOF
     squirrel
     tinycmmc
     strutcpp
+    miniswig
     wstsound
   ];
 }

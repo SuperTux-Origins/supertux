@@ -63,6 +63,10 @@
     strutcpp.inputs.nixpkgs.follows = "nixpkgs";
     strutcpp.inputs.tinycmmc.follows = "tinycmmc";
 
+    miniswig.url = "github:WindstilleTeam/miniswig";
+    miniswig.inputs.nixpkgs.follows = "nixpkgs";
+    miniswig.inputs.flake-utils.follows = "flake-utils";
+
     wstsound.url = "github:WindstilleTeam/wstsound";
     wstsound.inputs.nixpkgs.follows = "nixpkgs";
     wstsound.inputs.flake-utils.follows = "flake-utils";
@@ -80,7 +84,7 @@
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, curl-win32,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
-              strutcpp, wstsound, squirrel, glew-win32 }:
+              strutcpp, miniswig, wstsound, squirrel, glew-win32 }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {
@@ -98,6 +102,7 @@
             squirrel = squirrel.packages.${pkgs.system}.default;
             tinycmmc = tinycmmc.packages.${pkgs.system}.default;
             strutcpp = strutcpp.packages.${pkgs.system}.default;
+            miniswig = miniswig.packages.${pkgs.system}.default;
             wstsound = wstsound.packages.${pkgs.system}.default;
 
             physfs = if pkgs.targetPlatform.isWindows
