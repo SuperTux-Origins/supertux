@@ -22,11 +22,6 @@
 
 #include "video/gl.hpp"
 
-#ifdef USE_GLBINDING
-#  include <glbinding/ContextInfo.h>
-#  include <glbinding/gl/extension.h>
-#endif
-
 inline void check_gl_error(const char* filename, int line)
 {
   GLenum error = glGetError();
@@ -79,12 +74,7 @@ inline bool gl_needs_power_of_two()
 #if defined(USE_OPENGLES2)
   return true;
 #else
-#  ifdef USE_GLBINDING
-  static auto extensions = glbinding::ContextInfo::extensions();
-  return extensions.find(GLextension::GL_ARB_texture_non_power_of_two) == extensions.end();
-#  else
   return !GLEW_ARB_texture_non_power_of_two;
-#  endif
 #endif
 }
 

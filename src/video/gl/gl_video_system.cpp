@@ -32,13 +32,6 @@
 #include "video/sdl_surface.hpp"
 #include "video/texture_manager.hpp"
 
-#ifdef USE_GLBINDING
-#  include <glbinding/Binding.h>
-#  include <glbinding/ContextInfo.h>
-#  include <glbinding/gl/extension.h>
-#  include <glbinding/callbacks.h>
-#endif
-
 GLVideoSystem::GLVideoSystem() :
   m_texture_manager(),
   m_renderer(),

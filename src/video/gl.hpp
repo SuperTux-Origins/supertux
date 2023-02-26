@@ -22,13 +22,8 @@
 #if defined(USE_OPENGLES2)
 #  include <SDL_opengles2.h>
 #else
-#  ifdef USE_GLBINDING
-#    include <glbinding/gl/gl.h>
-#    include <glbinding/gl/bitfield.h>
-#  else
 #    include <GL/glew.h>
 #    define GL_NONE_BIT 0
-#  endif
 #endif
 
 #ifdef USE_OPENGLES2
