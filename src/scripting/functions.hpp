@@ -154,12 +154,6 @@ void quit();
 /** Returns a random integer */
 int rand();
 
-/** Record a demo to the given file. */
-void record_demo(const std::string& filename);
-
-/** Play back a demo from the given file. */
-void play_demo(const std::string& filename);
-
 } // namespace scripting
 
 #endif
