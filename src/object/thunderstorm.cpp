@@ -17,7 +17,6 @@
 #include "object/thunderstorm.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
 #include "object/electrifier.hpp"
 #include "supertux/level.hpp"
 #include "supertux/sector.hpp"
@@ -62,23 +61,6 @@ Thunderstorm::Thunderstorm(const ReaderMapping& reader) :
     running = false; // else start() is ignored
     start();
   }
-}
-
-ObjectSettings
-Thunderstorm::get_settings()
-{
-  ObjectSettings result = GameObject::get_settings();
-
-  result.add_int(_("Z-pos"), &layer, "z-pos", LAYER_BACKGROUNDTILES - 1);
-  result.add_bool(_("Running"), &running, "running", true);
-  result.add_float(_("Interval"), &interval, "interval", 10.0f);
-  result.add_text(_("Strike Script"), &m_strike_script, "strike-script");
-
-  result.reorder({"interval", "name", "z-pos" "strike-script"});
-
-  result.add_remove();
-
-  return result;
 }
 
 void

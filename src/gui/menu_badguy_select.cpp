@@ -18,12 +18,13 @@
 
 #include <fmt/format.h>
 
+#include "util/log.hpp"
 #include "gui/dialog.hpp"
 #include "gui/menu_item.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/menu_list.hpp"
 #include "supertux/game_object_factory.hpp"
-#include "editor/editor.hpp"
+
 BadguySelectMenu::BadguySelectMenu(std::vector<std::string>* badguys_) :
   badguys(badguys_),
   selected(),

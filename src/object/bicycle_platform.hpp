@@ -36,8 +36,6 @@ public:
   virtual bool is_saveable() const override { return false; }
   virtual void on_flip(float height) override;
 
-  virtual void editor_delete() override;
-
 private:
   BicyclePlatform& m_parent;
   float m_angle_offset;
@@ -68,10 +66,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Bicycle Platform"); }
   virtual std::string get_display_name() const override { return display_name(); }
-
-  virtual ObjectSettings get_settings() override;
-  virtual void editor_delete() override;
-  virtual void after_editor_set() override;
 
 private:
   Vector m_center; /**< pivot point */

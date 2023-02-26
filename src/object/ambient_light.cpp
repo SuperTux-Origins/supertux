@@ -123,14 +123,4 @@ AmbientLight::fade_to_ambient_light(float red, float green, float blue, float se
   m_target_ambient_light = Color(red, green, blue);
 }
 
-ObjectSettings
-AmbientLight::get_settings()
-{
-  ObjectSettings result = GameObject::get_settings();
-
-  result.add_color(_("Color"), &m_ambient_light, "color");
-
-  return result;
-}
-
 /* EOF */

@@ -16,7 +16,6 @@
 
 #include "supertux/tile_set.hpp"
 
-#include "editor/editor.hpp"
 #include "supertux/autotile_parser.hpp"
 #include "supertux/resources.hpp"
 #include "supertux/tile.hpp"

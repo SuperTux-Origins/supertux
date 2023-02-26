@@ -43,9 +43,6 @@ public:
   static std::string display_name() { return _("Lit object"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
-
   virtual int get_layer() const override { return m_layer; }
 
   virtual void on_flip(float height) override;

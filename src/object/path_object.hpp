@@ -42,7 +42,6 @@ public:
   PathWalker* get_walker() const { return m_walker.get(); }
 
   std::string get_path_ref() const;
-  void editor_set_path_by_ref(const std::string& new_ref);
 
 protected:
   void on_flip();

@@ -16,7 +16,6 @@
 
 #include "object/vertical_stripes.hpp"
 
-#include "editor/editor.hpp"
 #include "math/rect.hpp"
 #include "math/rectf.hpp"
 #include "supertux/sector.hpp"
@@ -38,7 +37,7 @@ VerticalStripes::~VerticalStripes()
 void
 VerticalStripes::update(float dt_sec)
 {
-  m_visible = !Editor::is_active();
+  m_visible = true;
 }
 
 void

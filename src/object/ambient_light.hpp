@@ -38,8 +38,6 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
   virtual const std::string get_icon_path() const override { return "images/engine/editor/ambient_light.png"; }
 
-  virtual ObjectSettings get_settings() override;
-
   void set_ambient_light(const Color& ambient_light);
   Color get_ambient_light() const;
 

@@ -33,7 +33,6 @@ public:
   static std::string display_name() { return _("Bouncing Snowball"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual void after_editor_set() override;
   virtual bool is_snipable() const override { return true; }
 
 protected:

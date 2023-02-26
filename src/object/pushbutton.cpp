@@ -49,27 +49,6 @@ PushButton::PushButton(const ReaderMapping& mapping) :
     FlipLevelTransformer::transform_flip(m_flip);
 }
 
-ObjectSettings
-PushButton::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_script(_("Script"), &script, "script");
-  result.add_bool(_("Upside down"), &m_upside_down, "upside-down");
-
-  result.reorder({"script", "upside-down", "x", "y"});
-
-  return result;
-}
-
-void
-PushButton::after_editor_set()
-{
-  MovingSprite::after_editor_set();
-  if ((m_upside_down && m_flip == NO_FLIP) || (!m_upside_down && m_flip == VERTICAL_FLIP))
-    FlipLevelTransformer::transform_flip(m_flip);
-}
-
 void
 PushButton::update(float /*dt_sec*/)
 {

@@ -18,7 +18,6 @@
 
 #include <optional>
 
-#include "editor/editor.hpp"
 #include "object/path_gameobject.hpp"
 #include "supertux/d_scope.hpp"
 #include "supertux/sector.hpp"
@@ -106,13 +105,6 @@ PathObject::get_path_ref() const
     return {};
   }
   return path_gameobject->get_name();
-}
-
-void
-PathObject::editor_set_path_by_ref(const std::string& new_ref)
-{
-  auto* path_obj = Editor::current()->get_sector()->get_object_by_name<PathGameObject>(new_ref);
-  m_path_uid = path_obj->get_uid();
 }
 
 void

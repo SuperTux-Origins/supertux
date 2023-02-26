@@ -16,11 +16,11 @@
 
 #include "supertux/command_line_arguments.hpp"
 
+#include <iostream>
 #include <fmt/format.h>
 #include <config.h>
 #include <physfs.h>
 
-#include "editor/overlay_widget.hpp"
 #include "physfs/ifile_stream.hpp"
 #include "supertux/gameconfig.hpp"
 #include "util/gettext.hpp"

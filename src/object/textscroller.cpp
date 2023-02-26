@@ -340,27 +340,4 @@ TextScroller::scroll(float offset)
   }
 }
 
-ObjectSettings
-TextScroller::get_settings()
-{
-  ObjectSettings result = GameObject::get_settings();
-
-  result.add_file(_("File"), &m_filename, "file");
-  result.add_script(_("Finish Script"), &m_finish_script, "finish-script");
-  result.add_float(_("Speed"), &m_default_speed, "speed", DEFAULT_SPEED);
-  result.add_float(_("X-offset"), &m_x_offset, "x-offset");
-  result.add_bool(_("Controllable"), &m_controllable, "controllable", true);
-  result.add_enum(_("Anchor"), reinterpret_cast<int*>(&m_x_anchor),
-    { _("Left"), _("Center"), _("Right") },
-    { "left", "center", "right" },
-    static_cast<int>(XAnchor::SCROLLER_ANCHOR_CENTER), "x-anchor");
-  result.add_enum(_("Text Alignment"), reinterpret_cast<int*>(&m_text_align),
-    { _("Left"), _("Center"), _("Right") },
-    { "left", "center", "right" },
-    static_cast<int>(TextAlign::SCROLLER_ALIGN_CENTER), "text-align");
-  result.add_remove();
-
-  return result;
-}
-
 /* EOF */

@@ -16,7 +16,6 @@
 
 #include "object/platform.hpp"
 
-#include "editor/editor.hpp"
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
 #include "supertux/flip_level_transformer.hpp"
@@ -64,23 +63,6 @@ Platform::finish_construction()
   get_walker()->jump_to_node(m_starting_node);
 
   m_col.m_bbox.set_pos(m_path_handle.get_pos(m_col.m_bbox.get_size(), get_path()->get_nodes()[m_starting_node].position));
-}
-
-ObjectSettings
-Platform::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_path_ref(_("Path"), *this, get_path_ref(), "path-ref");
-  result.add_walk_mode(_("Path Mode"), &get_path()->m_mode, {}, {});
-  result.add_bool(_("Adapt Speed"), &get_path()->m_adapt_speed, {}, {});
-  result.add_bool(_("Running"), &get_walker()->m_running, "running", true, 0);
-  result.add_int(_("Starting Node"), &m_starting_node, "starting-node", 0, 0U);
-  result.add_path_handle(_("Handle"), m_path_handle, "handle");
-
-  result.reorder({"running", "name", "path-ref", "starting-node", "sprite", "x", "y"});
-
-  return result;
 }
 
 HitResponse
@@ -133,18 +115,6 @@ Platform::update(float dt_sec)
   m_col.set_movement(movement);
   m_col.propagate_movement(movement);
   m_speed = movement / dt_sec;
-}
-
-void
-Platform::editor_update()
-{
-  if (!get_path()) return;
-  if (!get_path()->is_valid()) return;
-
-  if (m_starting_node >= static_cast<int>(get_path()->get_nodes().size()))
-    m_starting_node = static_cast<int>(get_path()->get_nodes().size()) - 1;
-
-  set_pos(m_path_handle.get_pos(m_col.m_bbox.get_size(), get_path()->get_nodes()[m_starting_node].position));
 }
 
 void

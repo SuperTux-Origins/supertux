@@ -16,7 +16,6 @@
 
 #include "trigger/climbable.hpp"
 
-#include "editor/editor.hpp"
 #include "object/player.hpp"
 #include "supertux/debug.hpp"
 #include "supertux/resources.hpp"
@@ -68,29 +67,6 @@ Climbable::~Climbable()
   trying_to_climb.clear();
 }
 
-ObjectSettings
-Climbable::get_settings()
-{
-  new_size.x = m_col.m_bbox.get_width();
-  new_size.y = m_col.m_bbox.get_height();
-
-  ObjectSettings result = TriggerBase::get_settings();
-
-  // result.add_float(_("Width"), &new_size.x, "width");
-  // result.add_float(_("Height"), &new_size.y, "height");
-
-  result.add_translatable_text(_("Message"), &message, "message");
-
-  result.reorder({"message", "region", "x", "y"});
-
-  return result;
-}
-
-void
-Climbable::after_editor_set() {
-  m_col.m_bbox.set_size(new_size.x, new_size.y);
-}
-
 void
 Climbable::update(float dt_sec)
 {
@@ -139,7 +115,7 @@ Climbable::draw(DrawingContext& context)
     context.color().draw_center_text(Resources::normal_font, _(message), pos, LAYER_HUD, Climbable::text_color);
     context.pop_transform();
   }
-  if (Editor::is_active() || g_debug.show_collision_rects) {
+  if (g_debug.show_collision_rects) {
     context.color().draw_filled_rect(m_col.m_bbox, Color(1.0f, 1.0f, 0.0f, 0.6f),
                              0.0f, LAYER_OBJECTS);
   }

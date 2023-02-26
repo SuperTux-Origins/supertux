@@ -17,6 +17,8 @@
 #ifndef HEADER_SUPERTUX_OBJECT_BONUS_BLOCK_HPP
 #define HEADER_SUPERTUX_OBJECT_BONUS_BLOCK_HPP
 
+#include <sexp/value.hpp>
+
 #include "object/block.hpp"
 #include "supertux/direction.hpp"
 #include "supertux/player_status.hpp"
@@ -56,8 +58,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Bonus Block"); }
   virtual std::string get_display_name() const override { return display_name(); }
-
-  virtual ObjectSettings get_settings() override;
 
   Content get_contents() const { return m_contents; }
   int get_hit_counter() const { return m_hit_counter; }

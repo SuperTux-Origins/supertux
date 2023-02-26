@@ -16,7 +16,6 @@
 
 #include "object/text_object.hpp"
 
-#include "editor/editor.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"

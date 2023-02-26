@@ -17,7 +17,6 @@
 
 #include "object/ispy.hpp"
 
-#include "editor/editor.hpp"
 #include "sprite/sprite.hpp"
 #include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
@@ -36,32 +35,12 @@ Ispy::Ispy(const ReaderMapping& reader) :
   std::string dir_str;
   if (reader.get("direction", dir_str))
     m_dir = string_to_dir(dir_str);
-  else if (!Editor::is_active())
+  else
     m_dir = Direction::LEFT;
 
   if (m_dir == Direction::AUTO)
     log_warning << "Setting an Ispy's direction to AUTO is no good idea." << std::endl;
 
-  set_sprite_action("idle");
-}
-
-ObjectSettings
-Ispy::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_script(_("Script"), &m_script, "script");
-  result.add_direction(_("Direction"), &m_dir, Direction::AUTO, "direction");
-
-  result.reorder({"script", "facing-down", "direction", "x", "y"});
-
-  return result;
-}
-
-void
-Ispy::after_editor_set()
-{
-  MovingSprite::after_editor_set();
   set_sprite_action("idle");
 }
 

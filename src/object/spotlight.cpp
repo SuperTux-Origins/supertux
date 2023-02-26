@@ -92,25 +92,6 @@ Spotlight::~Spotlight()
 {
 }
 
-ObjectSettings
-Spotlight::get_settings()
-{
-  ObjectSettings result = MovingObject::get_settings();
-
-  result.add_float(_("Angle"), &angle, "angle");
-  result.add_color(_("Color"), &color, "color", Color::WHITE);
-  result.add_float(_("Speed"), &speed, "speed", 50.0f);
-  result.add_enum(_("Direction"), reinterpret_cast<int*>(&m_direction),
-                  {_("Clockwise"), _("Counter-clockwise"), _("Stopped")},
-                  {"clockwise", "counter-clockwise", "stopped"},
-                  static_cast<int>(Direction::CLOCKWISE), "r-direction");
-  result.add_int(_("Layer"), &m_layer, "layer", 0);
-
-  result.reorder({"angle", "color", "layer", "x", "y"});
-
-  return result;
-}
-
 void
 Spotlight::update(float dt_sec)
 {

@@ -22,16 +22,6 @@
 #include "supertux/menu/debug_menu.hpp"
 #include "supertux/menu/contrib_menu.hpp"
 #include "supertux/menu/custom_menu_menu.hpp"
-#include "supertux/menu/editor_menu.hpp"
-#include "supertux/menu/editor_level_menu.hpp"
-#include "supertux/menu/editor_level_select_menu.hpp"
-#include "supertux/menu/editor_levelset_menu.hpp"
-#include "supertux/menu/editor_levelset_select_menu.hpp"
-#include "supertux/menu/editor_new_levelset_menu.hpp"
-#include "supertux/menu/editor_objectgroup_menu.hpp"
-#include "supertux/menu/editor_tilegroup_menu.hpp"
-#include "supertux/menu/editor_sector_menu.hpp"
-#include "supertux/menu/editor_sectors_menu.hpp"
 #include "supertux/menu/game_menu.hpp"
 #include "supertux/menu/joystick_menu.hpp"
 #include "supertux/menu/keyboard_menu.hpp"
@@ -39,9 +29,6 @@
 #include "supertux/menu/multiplayer_menu.hpp"
 #include "supertux/menu/multiplayer_players_menu.hpp"
 #include "supertux/menu/options_menu.hpp"
-#include "supertux/menu/particle_editor_menu.hpp"
-#include "supertux/menu/particle_editor_save_as.hpp"
-#include "supertux/menu/particle_editor_open.hpp"
 #include "supertux/menu/profile_menu.hpp"
 #include "supertux/menu/video_system_menu.hpp"
 #include "supertux/menu/web_asset_menu.hpp"
@@ -122,52 +109,6 @@ MenuStorage::create(MenuId menu_id)
 
     case CONTRIB_WORLD_MENU:
       return nullptr; //return new ContribWorldMenu();
-
-    case EDITOR_LEVELSET_SELECT_MENU:
-      return std::make_unique<EditorLevelsetSelectMenu>();
-
-    case EDITOR_NEW_LEVELSET_MENU:
-      return std::make_unique<EditorNewLevelsetMenu>();
-
-    case EDITOR_LEVEL_SELECT_MENU:
-      return std::make_unique<EditorLevelSelectMenu>();
-
-    case EDITOR_MENU:
-      return std::make_unique<EditorMenu>();
-
-    case EDITOR_TILEGROUP_MENU:
-      return std::make_unique<EditorTilegroupMenu>();
-
-    case EDITOR_OBJECTGROUP_MENU:
-      return std::make_unique<EditorObjectgroupMenu>();
-
-    case EDITOR_SECTORS_MENU:
-      return std::make_unique<EditorSectorsMenu>();
-
-    case EDITOR_SECTOR_MENU:
-      return std::make_unique<EditorSectorMenu>();
-
-    case EDITOR_LEVEL_MENU:
-      return std::make_unique<EditorLevelMenu>();
-
-    case EDITOR_LEVELSET_MENU:
-      return std::make_unique<EditorLevelsetMenu>();
-
-    case INTEGRATIONS_MENU:
-      return std::make_unique<IntegrationsMenu>();
-
-    case PARTICLE_EDITOR_MENU:
-      return std::make_unique<ParticleEditorMenu>();
-
-    case PARTICLE_EDITOR_SAVE_AS:
-      throw std::runtime_error("Cannot instantiate ParticleEditorSaveAs dialog "
-        "from MenuStorage::create() or MenuManager::set_menu(), "
-        "as it needs to be bound to a callback. "
-        "Please instantiate ParticleEditorSaveAs directly");
-      //return std::make_unique<ParticleEditorSaveAs>();
-
-    case PARTICLE_EDITOR_OPEN:
-      return std::make_unique<ParticleEditorOpen>();
 
     case ASSET_MENU:
       return std::make_unique<WebAssetMenu>();

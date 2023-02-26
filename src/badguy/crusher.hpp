@@ -56,15 +56,12 @@ public:
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
 
-  virtual void after_editor_set() override;
   virtual bool is_sideways() const { return m_sideways; }
 
   static std::string class_name() { return "crusher"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Crusher"); }
   virtual std::string get_display_name() const override { return display_name(); }
-
-  virtual ObjectSettings get_settings() override;
 
   virtual void on_flip(float height) override;
 

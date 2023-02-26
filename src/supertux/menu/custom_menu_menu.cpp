@@ -38,9 +38,6 @@ enum CustomMenuMenuIDs {
   MNID_LABELTEXTCOLOR,
   MNID_ACTIVETEXTCOLOR,
   MNID_HLCOLOR,
-  MNID_EDITORCOLOR,
-  MNID_EDITORHOVERCOLOR,
-  MNID_EDITORGRABCOLOR,
   MNID_MENUROUNDNESS
 };
 
@@ -56,10 +53,6 @@ CustomMenuMenu::CustomMenuMenu()
   add_color(_("Active Text Color"), &g_config->activetextcolor, MNID_ACTIVETEXTCOLOR);
   add_color(_("Divider Line Color"), &g_config->hlcolor, MNID_HLCOLOR);
   add_floatfield(_("Menu Roundness"), &g_config->menuroundness, MNID_MENUROUNDNESS);
-  add_hl();
-  add_color(_("Editor Interface Color"), &g_config->editorcolor, MNID_EDITORCOLOR);
-  add_color(_("Editor Hover Color"), &g_config->editorhovercolor, MNID_EDITORHOVERCOLOR);
-  add_color(_("Editor Grab Color"), &g_config->editorgrabcolor, MNID_EDITORGRABCOLOR);
   add_hl();
   add_entry(MNID_RESET, _("Reset to defaults"));
   add_back(_("Back"));
@@ -82,9 +75,6 @@ CustomMenuMenu::menu_action(MenuItem& item)
     g_config->labeltextcolor = ColorScheme::Menu::label_color;
     g_config->activetextcolor = ColorScheme::Menu::active_color;
     g_config->hlcolor = ColorScheme::Menu::hl_color;
-    g_config->editorcolor = ColorScheme::Editor::default_color;
-    g_config->editorhovercolor = ColorScheme::Editor::hover_color;
-    g_config->editorgrabcolor = ColorScheme::Editor::grab_color;
     g_config->menuroundness = 16.f;
     break;
 

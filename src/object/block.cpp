@@ -227,21 +227,6 @@ Block::break_me()
   remove_me();
 }
 
-ObjectSettings
-Block::get_settings()
-{
-  ObjectSettings result = MovingObject::get_settings();
-
-  result.add_sprite(_("Sprite"), &m_sprite_name, "sprite", m_default_sprite_name);
-
-  return result;
-}
-
-void Block::after_editor_set()
-{
-  m_sprite = SpriteManager::current()->create(m_sprite_name);
-}
-
 void
 Block::on_flip(float height)
 {

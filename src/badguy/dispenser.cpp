@@ -17,7 +17,6 @@
 #include "badguy/dispenser.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
 #include "math/random.hpp"
 #include "object/bullet.hpp"
 #include "object/player.hpp"
@@ -108,17 +107,15 @@ Dispenser::Dispenser(const ReaderMapping& reader) :
   }
   catch(std::exception&)
   {
-    if (!Editor::is_active())
+    if (type_s.empty())
     {
-      if (type_s.empty())
-      {
-        log_warning << "No dispenser type set, setting to cannon." << std::endl;
-      }
-      else
-      {
-        log_warning << "Unknown type of dispenser:" << type_s << ", setting to cannon." << std::endl;
-      }
+      log_warning << "No dispenser type set, setting to cannon." << std::endl;
     }
+    else
+    {
+      log_warning << "Unknown type of dispenser:" << type_s << ", setting to cannon." << std::endl;
+    }
+
     m_type = DispenserType::CANNON;
   }
 
@@ -127,8 +124,8 @@ Dispenser::Dispenser(const ReaderMapping& reader) :
   reader.get("limit-dispensed-badguys", m_limit_dispensed_badguys, false);
   reader.get("max-concurrent-badguys", m_max_concurrent_badguys, 0);
 
-//  if (badguys.size() <= 0)
-//    throw std::runtime_error("No badguys in dispenser.");
+  //  if (badguys.size() <= 0)
+  //    throw std::runtime_error("No badguys in dispenser.");
 
   set_correct_action();
 
@@ -136,12 +133,12 @@ Dispenser::Dispenser(const ReaderMapping& reader) :
   m_countMe = false;
 }
 
-void
-Dispenser::draw(DrawingContext& context)
-{
-  if (m_type != DispenserType::POINT || Editor::is_active())
-    BadGuy::draw(context);
-}
+  void
+  Dispenser::draw(DrawingContext& context)
+  {
+    if (m_type != DispenserType::POINT)
+      BadGuy::draw(context);
+  }
 
 void
 Dispenser::initialize()
@@ -206,10 +203,10 @@ Dispenser::launch_badguy()
   if (m_frozen) return;
   if (m_limit_dispensed_badguys &&
       m_current_badguys >= m_max_concurrent_badguys)
-      return;
+    return;
 
   //FIXME: Does is_offscreen() work right here?
-  if (!is_offscreen() && !Editor::is_active())
+  if (!is_offscreen())
   {
     Direction launch_dir = m_dir;
     if (!m_autotarget && m_start_dir == Direction::AUTO)
@@ -350,9 +347,9 @@ void
 Dispenser::unfreeze(bool melt)
 {
   /*set_group(colgroup_active);
-  frozen = false;
+    frozen = false;
 
-  sprite->set_color(Color(1.00, 1.00, 1.00f));*/
+    sprite->set_color(Color(1.00, 1.00, 1.00f));*/
   BadGuy::unfreeze(melt);
 
   set_colgroup_active(m_type == DispenserType::POINT ? COLGROUP_DISABLED :
@@ -398,38 +395,6 @@ Dispenser::set_correct_action()
     default:
       break;
   }
-}
-
-ObjectSettings
-Dispenser::get_settings()
-{
-  ObjectSettings result = BadGuy::get_settings();
-
-  result.add_float(_("Interval (seconds)"), &m_cycle, "cycle");
-  result.add_bool(_("Random"), &m_random, "random", false);
-  result.add_badguy(_("Enemies"), &m_badguys, "badguy");
-  result.add_bool(_("Limit dispensed badguys"), &m_limit_dispensed_badguys,
-                  "limit-dispensed-badguys", false);
-  result.add_bool(_("Obey Gravity"), &m_gravity,
-                  "gravity", false);
-  result.add_int(_("Max concurrent badguys"), &m_max_concurrent_badguys,
-                 "max-concurrent-badguys", 0);
-  result.add_enum(_("Type"), reinterpret_cast<int*>(&m_type),
-                  {_("cannon"), _("dropper"), _("invisible")},
-                  {"cannon", "dropper", "point"},
-                  static_cast<int>(DispenserType::CANNON), "type");
-
-  result.reorder({"cycle", "random", "type", "badguy", "direction", "gravity", "limit-dispensed-badguys", "max-concurrent-badguys", "x", "y"});
-
-  return result;
-}
-
-void
-Dispenser::after_editor_set()
-{
-  BadGuy::after_editor_set();
-
-  set_correct_action();
 }
 
 void

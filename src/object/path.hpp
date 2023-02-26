@@ -88,9 +88,6 @@ public:
   /** Moves all nodes by given shift. */
   void move_by(const Vector& shift);
 
-  /** Puts node markers to the nodes to edit them. */
-  void edit_path();
-
   /** Returns false when has no nodes */
   bool is_valid() const;
 

@@ -16,7 +16,6 @@
 
 #include "trigger/scripttrigger.hpp"
 
-#include "editor/editor.hpp"
 #include "supertux/debug.hpp"
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
@@ -64,33 +63,6 @@ ScriptTrigger::ScriptTrigger(const Vector& pos, const std::string& script_) :
   m_col.m_bbox.set_size(32, 32);
 }
 
-ObjectSettings
-ScriptTrigger::get_settings()
-{
-  new_size.x = m_col.m_bbox.get_width();
-  new_size.y = m_col.m_bbox.get_height();
-
-  ObjectSettings result = TriggerBase::get_settings();
-
-  result.add_script(_("Script"), &script, "script");
-  result.add_bool(_("Button"), &must_activate, "button");
-  result.add_bool(_("Oneshot"), &oneshot, "oneshot", false);
-
-  result.reorder({"script", "button", "width", "height", "x", "y"});
-
-  return result;
-}
-
-void
-ScriptTrigger::after_editor_set() {
-  //m_col.m_bbox.set_size(new_size.x, new_size.y);
-  if (must_activate) {
-    triggerevent = EVENT_ACTIVATE;
-  } else {
-    triggerevent = EVENT_TOUCH;
-  }
-}
-
 void
 ScriptTrigger::event(Player& , EventType type)
 {
@@ -108,7 +80,7 @@ ScriptTrigger::event(Player& , EventType type)
 void
 ScriptTrigger::draw(DrawingContext& context)
 {
-  if (Editor::is_active() || g_debug.show_collision_rects) {
+  if (g_debug.show_collision_rects) {
     context.color().draw_filled_rect(m_col.m_bbox, Color(1.0f, 0.0f, 1.0f, 0.6f),
                              0.0f, LAYER_OBJECTS);
   }

@@ -19,7 +19,6 @@
 #include <math.h>
 #include <physfs.h>
 
-#include "editor/editor.hpp"
 #include "math/random.hpp"
 #include "math/util.hpp"
 #include "object/sprite_particle.hpp"
@@ -27,6 +26,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
+#include "util/log.hpp"
 
 MovingSprite::MovingSprite(const Vector& pos, const std::string& sprite_name_,
                            int layer_, CollisionGroup collision_group) :
@@ -166,28 +166,6 @@ MovingSprite::change_sprite(const std::string& new_sprite_name)
   m_sprite = std::move(new_sprite);
   m_sprite_name = new_sprite_name;
   return true;
-}
-
-ObjectSettings
-MovingSprite::get_settings()
-{
-  ObjectSettings result = MovingObject::get_settings();
-
-  result.add_sprite(_("Sprite"), &m_sprite_name, "sprite", m_default_sprite_name);
-
-  result.reorder({"sprite", "x", "y"});
-
-  return result;
-}
-
-void
-MovingSprite::after_editor_set()
-{
-  std::string current_action = m_sprite->get_action();
-  m_sprite = SpriteManager::current()->create(m_sprite_name);
-  m_sprite->set_action(current_action);
-
-  m_col.m_bbox.set_size(m_sprite->get_current_hitbox_width(), m_sprite->get_current_hitbox_height());
 }
 
 void

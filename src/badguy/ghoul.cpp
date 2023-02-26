@@ -16,7 +16,6 @@
 #include "badguy/ghoul.hpp"
 
 #include "object/player.hpp"
-#include "editor/editor.hpp"
 #include "sprite/sprite.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/sector.hpp"
@@ -78,8 +77,6 @@ Ghoul::finish_construction()
 void
 Ghoul::activate()
 {
-  if (Editor::is_active())
-    return;
 }
 
 void
@@ -97,12 +94,6 @@ Ghoul::deactivate()
 void
 Ghoul::active_update(float dt_sec)
 {
-  if (Editor::is_active() && get_path() && get_path()->is_valid()) {
-    get_walker()->update(dt_sec);
-    set_pos(get_walker()->get_pos(m_col.m_bbox.get_size(), m_path_handle));
-    return;
-  }
-
   auto player = get_nearest_player();
   if (!player) 
   return;

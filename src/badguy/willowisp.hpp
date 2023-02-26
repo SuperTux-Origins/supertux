@@ -32,7 +32,6 @@ public:
   WillOWisp(const ReaderMapping& reader);
 
   virtual void finish_construction() override;
-  virtual void after_editor_set() override;
 
   virtual void activate() override;
   virtual void deactivate() override;
@@ -56,7 +55,6 @@ public:
   static std::string display_name() { return _("Will o' Wisp"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual ObjectSettings get_settings() override;
   virtual void move_to(const Vector& pos) override;
 
   virtual void on_flip(float height) override;

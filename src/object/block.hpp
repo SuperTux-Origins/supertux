@@ -39,9 +39,6 @@ public:
 
   virtual std::string get_default_sprite_name() const { return m_default_sprite_name; }
 
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
-
   virtual void on_flip(float height) override;
 
   virtual int get_layer() const override { return LAYER_OBJECTS + 1; }

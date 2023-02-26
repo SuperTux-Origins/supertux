@@ -18,7 +18,6 @@
 
 #include "object/gradient.hpp"
 
-#include "editor/editor.hpp"
 #include "object/camera.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/level.hpp"
@@ -121,45 +120,6 @@ Gradient::Gradient(const ReaderMapping& reader) :
   reader.get_custom("target", m_target, DrawingTarget_from_string);
 }
 
-ObjectSettings
-Gradient::get_settings()
-{
-  ObjectSettings result = GameObject::get_settings();
-
-  if (m_gradient_direction == HORIZONTAL || m_gradient_direction == HORIZONTAL_SECTOR) {
-    result.add_rgba(_("Left Colour"), &m_gradient_top, "left_color");
-    result.add_rgba(_("Right Colour"), &m_gradient_bottom, "right_color");
-  } else {
-    result.add_rgba(_("Top Colour"), &m_gradient_top, "top_color");
-    result.add_rgba(_("Bottom Colour"), &m_gradient_bottom, "bottom_color");
-  }
-
-  result.add_int(_("Z-pos"), &m_layer, "z-pos", LAYER_BACKGROUND0);
-
-  result.add_enum(_("Direction"), reinterpret_cast<int*>(&m_gradient_direction),
-                  {_("Vertical"), _("Horizontal"), _("Vertical (whole sector)"), _("Horizontal (whole sector)")},
-                  {"vertical", "horizontal", "vertical_sector", "horizontal_sector"},
-                  static_cast<int>(VERTICAL));
-
-  result.add_enum(_("Draw target"), reinterpret_cast<int*>(&m_target),
-                  {_("Normal"), _("Lightmap")},
-                  {"normal", "lightmap"},
-                  static_cast<int>(DrawingTarget::COLORMAP),
-                  "target");
-
-  result.add_enum(_("Blend mode"), reinterpret_cast<int*>(&m_blend),
-                  {_("Blend"), _("Additive"), _("Modulate"), _("None")},
-                  {"blend", "add", "mod", "none"},
-                  static_cast<int>(Blend::BLEND),
-                  "blend");
-
-  result.reorder({"blend", "top_color", "bottom_color", "target", "z-pos"});
-
-  result.add_remove();
-
-  return result;
-}
-
 Gradient::~Gradient()
 {
 }
@@ -239,9 +199,6 @@ Gradient::set_direction(const GradientDirection& direction)
 void
 Gradient::draw(DrawingContext& context)
 {
-  if (Editor::is_active() && !g_config->editor_render_background)
-    return;
-
   Rectf gradient_region;
   if (m_gradient_direction != HORIZONTAL && m_gradient_direction != VERTICAL)
   {

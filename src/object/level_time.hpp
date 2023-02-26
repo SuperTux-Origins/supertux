@@ -56,8 +56,6 @@ public:
   static std::string display_name() { return _("Time Limit"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual ObjectSettings get_settings() override;
-
   virtual const std::string get_icon_path() const override { return "images/engine/editor/clock.png"; }
 
 private:

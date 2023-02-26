@@ -103,11 +103,4 @@ BouncingSnowball::collision_badguy(BadGuy& , const CollisionHit& hit)
   return CONTINUE;
 }
 
-void
-BouncingSnowball::after_editor_set()
-{
-  BadGuy::after_editor_set();
-  m_sprite->set_action(m_dir);
-}
-
 /* EOF */

@@ -58,13 +58,8 @@ public:
   static std::string display_name() { return _("Tilemap"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
-
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-
-  virtual void editor_update() override;
 
   virtual void on_flip(float height) override;
 
@@ -216,9 +211,6 @@ private:
 
   void apply_offset_x(int fill_id, int xoffset);
   void apply_offset_y(int fill_id, int yoffset);
-
-public:
-  bool m_editor_active;
 
 private:
   const TileSet* m_tileset;

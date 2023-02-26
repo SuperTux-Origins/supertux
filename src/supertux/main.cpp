@@ -31,12 +31,6 @@
 #endif
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
-#include "editor/layer_icon.hpp"
-#include "editor/object_info.hpp"
-#include "editor/tile_selection.hpp"
-#include "editor/tip.hpp"
-#include "editor/tool_icon.hpp"
 #include "gui/dialog.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/notification.hpp"
@@ -393,29 +387,6 @@ Main::init_video()
 }
 
 void
-Main::resave(const std::string& input_filename, const std::string& output_filename)
-{
-  Editor::s_resaving_in_progress = true;
-  std::ifstream in(input_filename);
-  if (!in) {
-    log_fatal << input_filename << ": couldn't open file for reading" << std::endl;
-  } else {
-    log_info << "loading level: " << input_filename << std::endl;
-    auto level = LevelParser::from_stream(in, input_filename, StringUtil::has_suffix(input_filename, ".stwm"), true);
-    in.close();
-
-    std::ofstream out(output_filename);
-    if (!out) {
-      log_fatal << output_filename << ": couldn't open file for writing" << std::endl;
-    } else {
-      log_info << "saving level: " << output_filename << std::endl;
-      level->save(out);
-    }
-  }
-  Editor::s_resaving_in_progress = false;
-}
-
-void
 Main::launch_game(const CommandLineArguments& args)
 {
   m_sdl_subsystem.reset(new SDLSubsystem());
@@ -433,13 +404,6 @@ Main::launch_game(const CommandLineArguments& args)
 
 #ifndef EMSCRIPTEN
   auto video = g_config->video;
-  if (args.resave && *args.resave) {
-    if (args.video) {
-      video = *args.video;
-    } else {
-      video = VideoSystem::VIDEO_NULL;
-    }
-  }
   s_timelog.log("video");
 
   m_video_system = VideoSystem::create(video);
@@ -491,25 +455,7 @@ Main::launch_game(const CommandLineArguments& args)
       log_debug << "Adding dir: " << dir << std::endl;
       PHYSFS_mount(dir.c_str(), nullptr, true);
 
-      if (args.resave && *args.resave)
-      {
-        resave(start_level, start_level);
-      }
-      else if (args.editor)
-      {
-        if (PHYSFS_exists(start_level.c_str())) {
-          auto editor = std::make_unique<Editor>();
-          editor->set_level(start_level);
-          editor->setup();
-          editor->update(0, Controller());
-          m_screen_manager->push_screen(std::move(editor));
-          MenuManager::instance().clear_menu_stack();
-          m_sound_manager->stop_music(0.5);
-        } else {
-          log_warning << "Level " << start_level << " doesn't exist." << std::endl;
-        }
-      }
-      else if (StringUtil::has_suffix(start_level, ".stwm"))
+      if (StringUtil::has_suffix(start_level, ".stwm"))
       {
         m_screen_manager->push_screen(std::make_unique<worldmap::WorldMapScreen>(
                                      std::make_unique<worldmap::WorldMap>(filename, *m_savegame)));
@@ -553,14 +499,7 @@ Main::launch_game(const CommandLineArguments& args)
   }
   else
   {
-    if (args.editor)
-    {
-      m_screen_manager->push_screen(std::make_unique<Editor>());
-    }
-    else
-    {
-      m_screen_manager->push_screen(std::make_unique<TitleScreen>(*m_savegame));
-    }
+    m_screen_manager->push_screen(std::make_unique<TitleScreen>(*m_savegame));
   }
 
   m_screen_manager->run();

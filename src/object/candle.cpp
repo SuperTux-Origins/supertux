@@ -60,32 +60,6 @@ Candle::Candle(const ReaderMapping& mapping) :
 }
 
 void
-Candle::after_editor_set()
-{
-  MovingSprite::after_editor_set();
-
-  candle_light_1->set_color(lightcolor);
-  candle_light_2->set_color(lightcolor);
-
-  m_sprite->set_action(burning ? "on" : "off");
-}
-
-ObjectSettings
-Candle::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_bool(_("Burning"), &burning, "burning", true);
-  result.add_bool(_("Flicker"), &flicker, "flicker", true);
-  result.add_color(_("Color"), &lightcolor, "color", Color::WHITE);
-  result.add_int(_("Layer"), &m_layer, "layer", 0);
-
-  result.reorder({"burning", "flicker", "name", "sprite", "color", "layer", "x", "y"});
-
-  return result;
-}
-
-void
 Candle::draw(DrawingContext& context)
 {
   // draw regular sprite

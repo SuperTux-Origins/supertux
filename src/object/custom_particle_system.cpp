@@ -19,8 +19,8 @@
 #include <assert.h>
 #include <math.h>
 
+#include "util/writer.hpp"
 #include "collision/collision.hpp"
-#include "editor/particle_editor.hpp"
 #include "gui/menu_manager.hpp"
 #include "math/aatriangle.hpp"
 #include "math/easing.hpp"
@@ -393,146 +393,6 @@ CustomParticleSystem::reinit_textures()
   {
     texture_sum_odds += texture.likeliness;
   }
-}
-
-void
-CustomParticleSystem::save(Writer& writer)
-{
-  for (const auto& tex : m_textures)
-  {
-    writer.start_list("texture");
-    writer.write("surface", tex.texture->get_filename());
-    writer.write("color_r", tex.color.red);
-    writer.write("color_g", tex.color.green);
-    writer.write("color_b", tex.color.blue);
-    writer.write("color_a", tex.color.alpha);
-    writer.write("likeliness", tex.likeliness);
-    writer.write("scale_x", tex.scale.x);
-    writer.write("scale_y", tex.scale.y);
-    writer.end_list("texture");
-  }
-
-  GameObject::save(writer);
-}
-
-ObjectSettings
-CustomParticleSystem::get_settings()
-{
-  ObjectSettings result = ParticleSystem::get_settings();
-
-  result.add_surface(_("Texture"), &m_particle_main_texture, "main-texture");
-
-  result.add_int(_("Amount"), &m_max_amount, "amount", 25);
-  result.add_float(_("Delay"), &m_delay, "delay", 0.1f);
-  result.add_float(_("Lifetime"), &m_particle_lifetime, "lifetime", 5.f);
-  result.add_float(_("Lifetime variation"), &m_particle_lifetime_variation, "lifetime-variation", 0.f);
-  result.add_enum(_("Birth mode"), reinterpret_cast<int*>(&m_particle_birth_mode),
-                  {_("None"), _("Fade"), _("Shrink")},
-                  {"none", "fade", "shrink"},
-                  static_cast<int>(FadeMode::None),
-                  "birth-mode");
-  result.add_enum(_("Birth easing"), reinterpret_cast<int*>(&m_particle_birth_easing),
-                  {
-                    _("No easing"),
-                    _("Quad in"), _("Quad out"), _("Quad in/out"),
-                    _("Cubic in"), _("Cubic out"), _("Cubic in/out"),
-                    _("Quart in"), _("Quart out"), _("Quart in/out"),
-                    _("Quint in"), _("Quint out"), _("Quint in/out"),
-                    _("Sine in"), _("Sine out"), _("Sine in/out"),
-                    _("Circular in"), _("Circular out"), _("Circular in/out"),
-                    _("Exponential in"), _("Exponential out"), _("Exponential in/out"),
-                    _("Elastic in"), _("Elastic out"), _("Elastic in/out"),
-                    _("Back in"), _("Back out"), _("Back in/out"),
-                    _("Bounce in"), _("Bounce out"), _("Bounce in/out")
-                  },
-                  {
-                    "EaseNone",
-                    "EaseQuadIn", "EaseQuadOut", "EaseQuadInOut",
-                    "EaseCubicIn", "EaseCubicOut", "EaseCubicInOut",
-                    "EaseQuartIn", "EaseQuartOut", "EaseQuartInOut",
-                    "EaseQuintIn", "EaseQuintOut", "EaseQuintInOut",
-                    "EaseSineIn", "EaseSineOut", "EaseSineInOut",
-                    "EaseCircularIn", "EaseCircularOut", "EaseCircularInOut",
-                    "EaseExponentialIn", "EaseExponentialOut", "EaseExponentialInOut",
-                    "EaseElasticIn", "EaseElasticOut", "EaseElasticInOut",
-                    "EaseBackIn", "EaseBackOut", "EaseBackInOut",
-                    "EaseBounceIn", "EaseBounceOut", "EaseBounceInOut"
-                  },
-                  0, "birth-easing");
-  result.add_float(_("Birth time"), &m_particle_birth_time, "birth-time", 5.f);
-  result.add_float(_("Birth time variation"), &m_particle_birth_time_variation, "birth-time-variation", 0.f);
-  result.add_enum(_("Death mode"), reinterpret_cast<int*>(&m_particle_death_mode),
-                  {_("None"), _("Fade"), _("Shrink")},
-                  {"none", "fade", "shrink"},
-                  static_cast<int>(FadeMode::None),
-                  "death-mode");
-  result.add_enum(_("Death easing"), reinterpret_cast<int*>(&m_particle_death_easing),
-                  {
-                    _("No easing"),
-                    _("Quad in"), _("Quad out"), _("Quad in/out"),
-                    _("Cubic in"), _("Cubic out"), _("Cubic in/out"),
-                    _("Quart in"), _("Quart out"), _("Quart in/out"),
-                    _("Quint in"), _("Quint out"), _("Quint in/out"),
-                    _("Sine in"), _("Sine out"), _("Sine in/out"),
-                    _("Circular in"), _("Circular out"), _("Circular in/out"),
-                    _("Exponential in"), _("Exponential out"), _("Exponential in/out"),
-                    _("Elastic in"), _("Elastic out"), _("Elastic in/out"),
-                    _("Back in"), _("Back out"), _("Back in/out"),
-                    _("Bounce in"), _("Bounce out"), _("Bounce in/out")
-                  },
-                  {
-                    "EaseNone",
-                    "EaseQuadIn", "EaseQuadOut", "EaseQuadInOut",
-                    "EaseCubicIn", "EaseCubicOut", "EaseCubicInOut",
-                    "EaseQuartIn", "EaseQuartOut", "EaseQuartInOut",
-                    "EaseQuintIn", "EaseQuintOut", "EaseQuintInOut",
-                    "EaseSineIn", "EaseSineOut", "EaseSineInOut",
-                    "EaseCircularIn", "EaseCircularOut", "EaseCircularInOut",
-                    "EaseExponentialIn", "EaseExponentialOut", "EaseExponentialInOut",
-                    "EaseElasticIn", "EaseElasticOut", "EaseElasticInOut",
-                    "EaseBackIn", "EaseBackOut", "EaseBackInOut",
-                    "EaseBounceIn", "EaseBounceOut", "EaseBounceInOut"
-                  },
-                  0, "death-easing");
-  result.add_float(_("Death time"), &m_particle_death_time, "death-time", 5.f);
-  result.add_float(_("Death time variation"), &m_particle_death_time_variation, "death-time-variation", 0.f);
-  result.add_float(_("Speed X"), &m_particle_speed_x, "speed-x", 0.f);
-  result.add_float(_("Speed Y"), &m_particle_speed_y, "speed-y", 0.f);
-  result.add_float(_("Speed X (variation)"), &m_particle_speed_variation_x, "speed-var-x", 0.f);
-  result.add_float(_("Speed Y (variation)"), &m_particle_speed_variation_y, "speed-var-y", 0.f);
-  result.add_float(_("Acceleration X"), &m_particle_acceleration_x, "acceleration-x", 0.f);
-  result.add_float(_("Acceleration Y"), &m_particle_acceleration_y, "acceleration-y", 0.f);
-  result.add_float(_("Friction X"), &m_particle_friction_x, "friction-x", 0.f);
-  result.add_float(_("Friction Y"), &m_particle_friction_y, "friction-y", 0.f);
-  result.add_float(_("Feather factor"), &m_particle_feather_factor, "feather-factor", 0.f);
-  result.add_float(_("Rotation"), &m_particle_rotation, "rotation", 0.f);
-  result.add_float(_("Rotation (variation)"), &m_particle_rotation_variation, "rotation-variation", 0.f);
-  result.add_float(_("Rotation speed"), &m_particle_rotation_speed, "rotation-speed", 0.f);
-  result.add_float(_("Rotation speed (variation)"), &m_particle_rotation_speed_variation, "rotation-speed-variation", 0.f);
-  result.add_float(_("Rotation acceleration"), &m_particle_rotation_acceleration, "rotation-acceleration", 0.f);
-  result.add_float(_("Rotation friction"), &m_particle_rotation_decceleration, "rotation-decceleration", 0.f);
-  result.add_enum(_("Rotation mode"), reinterpret_cast<int*>(&m_particle_rotation_mode),
-                  {_("Fixed"), _("Facing"), _("Wiggling")},
-                  {"fixed", "facing", "wiggling"},
-                  static_cast<int>(RotationMode::Fixed),
-                  "rotation-mode");
-  result.add_enum(_("Collision mode"), reinterpret_cast<int*>(&m_particle_collision_mode),
-                  {_("None (pass through)"), _("Stick"), _("Stick Forever"), _("Bounce (heavy)"), _("Bounce (light)"), _("Kill particle"), _("Fade out particle")},
-                  {"ignore", "stick", "stick-forever", "bounce-heavy", "bounce-light", "destroy", "fade-out"},
-                  static_cast<int>(CollisionMode::Ignore),
-                  "collision-mode");
-  result.add_enum(_("Delete if off-screen"), reinterpret_cast<int*>(&m_particle_offscreen_mode),
-                  {_("Never"), _("Only on exit"), _("Always")},
-                  {"never", "only-on-exit", "always"},
-                  static_cast<int>(OffscreenMode::Never),
-                  "offscreen-mode");
-  result.add_bool(_("Cover screen"), &m_cover_screen, "cover-screen", true);
-
-  //result.reorder({"amount", "delay", "lifetime", "lifetime-variation", "enabled", "name"});
-
-  result.add_particle_editor();
-
-  return result;
 }
 
 void
@@ -1092,24 +952,9 @@ CustomParticleSystem::get_zones()
   std::vector<ParticleZone::ZoneDetails> list;
 
   //if (!!GameSession::current() && Sector::current()) {
-  if (!ParticleEditor::current()) {
-
-    // In game or in level editor
-    for (auto& zone : GameSession::current()->get_current_sector().get_objects_by_type<ParticleZone>()) {
-      list.push_back(zone.get_details());
-    }
-
-  } else {
-
-    // In particle editor
-    list.push_back(ParticleZone::ZoneDetails(m_name,
-                                             ParticleZone::ParticleZoneType::Spawn,
-                                             Rectf(virtual_width / 2 - 16.f,
-                                                   virtual_height / 2 - 16.f,
-                                                   virtual_width / 2 + 16.f,
-                                                   virtual_height / 2 + 16.f)
-                                            ));
-
+  // In game or in level editor
+  for (auto& zone : GameSession::current()->get_current_sector().get_objects_by_type<ParticleZone>()) {
+    list.push_back(zone.get_details());
   }
 
   return list;

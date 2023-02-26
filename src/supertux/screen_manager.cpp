@@ -19,8 +19,6 @@
 #include "supertux/screen_manager.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
-#include "editor/particle_editor.hpp"
 #include "gui/dialog.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/mousecursor.hpp"
@@ -400,14 +398,6 @@ ScreenManager::process_events()
 
     m_menu_manager->event(event);
 
-    if (Editor::is_active()) {
-      Editor::current()->event(event);
-    }
-
-    if (ParticleEditor::is_active()) {
-      ParticleEditor::current()->event(event);
-    }
-
     switch (event.type)
     {
       case SDL_QUIT:
@@ -420,9 +410,6 @@ ScreenManager::process_events()
           case SDL_WINDOWEVENT_RESIZED:
             m_video_system.on_resize(event.window.data1, event.window.data2);
             m_menu_manager->on_window_resize();
-            if (Editor::is_active()) {
-              Editor::current()->resize();
-            }
             break;
 
           case SDL_WINDOWEVENT_HIDDEN:

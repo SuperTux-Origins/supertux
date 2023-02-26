@@ -398,23 +398,6 @@ Crusher::draw(DrawingContext& context)
   }
 }
 
-void
-Crusher::after_editor_set()
-{
-  MovingSprite::after_editor_set();
-  after_sprite_set();
-}
-
-ObjectSettings
-Crusher::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-  result.add_bool(_("Sideways"), &m_sideways, "sideways", false);
-  result.reorder({ "sideways", "sprite", "x", "y" });
-
-  return result;
-}
-
 bool
 Crusher::found_victim() const
 {

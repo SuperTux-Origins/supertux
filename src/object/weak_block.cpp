@@ -207,16 +207,4 @@ WeakBlock::on_flip(float height)
   FlipLevelTransformer::transform_flip(m_flip);
 }
 
-ObjectSettings
-WeakBlock::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_bool(_("Linked"), &linked, "linked", true);
-
-  result.reorder({"linked", "sprite", "x", "y"});
-
-  return result;
-}
-
 /* EOF */

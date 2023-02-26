@@ -46,22 +46,6 @@ RubLight::RubLight(const ReaderMapping& mapping) :
   mapping.get("strength_multiplier", strength_multiplier);
 }
 
-ObjectSettings
-RubLight::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  // The object settings and their default values shown in the Editor
-  result.add_color(_("Color"), &color, "color", Color(1.0f, 0.5f, 0.3f));
-  result.add_float(_("Fading Speed"), &fading_speed, "fading_speed", 5.0f);
-  result.add_float(_("Glowing Strength"), &strength_multiplier,
-    "strength_multiplier", 1.0f);
-
-  result.reorder({"color", "fading_speed", "x", "y"});
-
-  return result;
-}
-
 HitResponse
 RubLight::collision(GameObject& other, const CollisionHit&)
 {

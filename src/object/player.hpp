@@ -27,6 +27,7 @@
 #include "supertux/player_status.hpp"
 #include "supertux/sequence.hpp"
 #include "supertux/timer.hpp"
+#include "video/color.hpp"
 #include "video/layer.hpp"
 #include "video/surface_ptr.hpp"
 

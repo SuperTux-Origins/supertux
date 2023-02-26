@@ -17,6 +17,7 @@
 #ifndef HEADER_SUPERTUX_OBJECT_CUSTOM_PARTICLE_SYSTEM_HPP
 #define HEADER_SUPERTUX_OBJECT_CUSTOM_PARTICLE_SYSTEM_HPP
 
+#include "video/color.hpp"
 #include "math/easing.hpp"
 #include "math/vector.hpp"
 #include "object/particlesystem_interactive.hpp"
@@ -29,7 +30,6 @@ class CustomParticleSystem :
   public ParticleSystem_Interactive,
   public ExposedObject<CustomParticleSystem, scripting::CustomParticles>
 {
-  friend class ParticleEditor;
   friend class scripting::CustomParticles;
 public:
   CustomParticleSystem();
@@ -45,8 +45,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Custom Particles"); }
   virtual std::string get_display_name() const override { return display_name(); }
-  virtual void save(Writer& writer) override;
-  virtual ObjectSettings get_settings() override;
 
   virtual const std::string get_icon_path() const override {
     return "images/engine/editor/sparkle.png";

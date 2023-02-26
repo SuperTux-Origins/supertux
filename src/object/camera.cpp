@@ -228,46 +228,6 @@ Camera::~Camera()
 {
 }
 
-ObjectSettings
-Camera::get_settings()
-{
-  ObjectSettings result = GameObject::get_settings();
-
-  result.add_enum(_("Mode"), reinterpret_cast<int*>(&m_defaultmode),
-                  {_("normal"), _("manual"), _("autoscroll")},
-                  {"normal", "manual", "autoscroll"},
-                  {}, "mode");
-
-  result.add_path_ref(_("Path"), *this, get_path_ref(), "path-ref");
-
-  if (get_walker() && get_path()->is_valid()) {
-    result.add_walk_mode(_("Path Mode"), &get_path()->m_mode, {}, {});
-    result.add_bool(_("Adapt Speed"), &get_path()->m_adapt_speed, {}, {});
-    result.add_path_handle(_("Handle"), m_path_handle, "handle");
-  }
-
-  return result;
-}
-
-void
-Camera::after_editor_set()
-{
-  if (get_walker() && get_path()->is_valid()) {
-    if (m_defaultmode != Mode::AUTOSCROLL) {
-      get_path()->m_nodes.clear();
-      auto path_obj = get_path_gameobject();
-      if(path_obj != nullptr)
-      {
-        path_obj->editor_delete();
-      }
-    }
-  } else {
-    if (m_defaultmode == Mode::AUTOSCROLL) {
-      init_path_pos(Vector(0,0));
-    }
-  }
-}
-
 const Vector
 Camera::get_translation() const
 {

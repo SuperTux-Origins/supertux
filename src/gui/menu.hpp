@@ -101,7 +101,6 @@ public:
   ItemColorChannelRGBA& add_color_channel_rgba(float* input, Color channel, int id = -1,
     bool is_linear = false);
   ItemColorChannelOKLab& add_color_channel_oklab(Color* color, int channel);
-  ItemPaths& add_path_settings(const std::string& text, PathObject& target, const std::string& path_ref);
   ItemStringArray& add_string_array(const std::string& text, std::vector<std::string>& items, int id = -1);
   ItemImages& add_images(const std::string& image_path, int max_image_width = 0, int max_image_height = 0, int id = -1);
   ItemImages& add_images(const std::vector<std::string>& image_paths, int max_image_width = 0, int max_image_height = 0, int id = -1);

@@ -18,12 +18,12 @@
 
 #include <sstream>
 
+#include "control/input_manager.hpp"
 #include "supertux/game_object.hpp"
 #include "supertux/player_status.hpp"
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
-#include "editor/editor.hpp"
 
 static const int DISPLAYED_COINS_UNSET = -1;
 
@@ -51,9 +51,6 @@ PlayerStatusHUD::update(float dt_sec)
 void
 PlayerStatusHUD::draw(DrawingContext& context)
 {
-  if (Editor::is_active())
-    return;
-
   if ((displayed_coins == DISPLAYED_COINS_UNSET) ||
       (std::abs(displayed_coins - m_player_status.coins) > 100)) {
     displayed_coins = m_player_status.coins;
@@ -73,24 +70,23 @@ PlayerStatusHUD::draw(DrawingContext& context)
   context.push_transform();
   context.set_translation(Vector(0, 0));
   context.transform().scale = 1.f;
-  if (!Editor::is_active())
-  {
-    if (coin_surface)
-    {
-      context.color().draw_surface(coin_surface,
-                                  Vector(static_cast<float>(context.get_width()) - BORDER_X - static_cast<float>(coin_surface->get_width()) - Resources::fixed_font->get_text_width(coins_text),
-                                          BORDER_Y + 1.0f),
-                                  LAYER_HUD);
-    }
 
-    context.color().draw_text(Resources::fixed_font,
-                              coins_text,
-                              Vector(static_cast<float>(context.get_width()) - BORDER_X - Resources::fixed_font->get_text_width(coins_text),
-                                    BORDER_Y),
-                              ALIGN_LEFT,
-                              LAYER_HUD,
-                              PlayerStatusHUD::text_color);
+  if (coin_surface)
+  {
+    context.color().draw_surface(coin_surface,
+                                 Vector(static_cast<float>(context.get_width()) - BORDER_X - static_cast<float>(coin_surface->get_width()) - Resources::fixed_font->get_text_width(coins_text),
+                                        BORDER_Y + 1.0f),
+                                 LAYER_HUD);
   }
+
+  context.color().draw_text(Resources::fixed_font,
+                            coins_text,
+                            Vector(static_cast<float>(context.get_width()) - BORDER_X - Resources::fixed_font->get_text_width(coins_text),
+                                   BORDER_Y),
+                            ALIGN_LEFT,
+                            LAYER_HUD,
+                            PlayerStatusHUD::text_color);
+
   std::string ammo_text;
 
   for (int target = 0; target < InputManager::current()->get_num_users(); target++)
@@ -101,27 +97,27 @@ PlayerStatusHUD::draw(DrawingContext& context)
 
       if (fire_surface) {
         context.color().draw_surface(fire_surface,
-                                    Vector(static_cast<float>(context.get_width())
-                                                - BORDER_X
-                                                - static_cast<float>(fire_surface->get_width())
-                                                - Resources::fixed_font->get_text_width(ammo_text),
+                                     Vector(static_cast<float>(context.get_width())
+                                            - BORDER_X
+                                            - static_cast<float>(fire_surface->get_width())
+                                            - Resources::fixed_font->get_text_width(ammo_text),
                                             BORDER_Y
-                                                + 1.0f
-                                                + (Resources::fixed_font->get_text_height(coins_text) + 5)
-                                                + (Resources::fixed_font->get_text_height(ammo_text) + 5)
-                                                * static_cast<float>(target)),
-                                    LAYER_HUD);
+                                            + 1.0f
+                                            + (Resources::fixed_font->get_text_height(coins_text) + 5)
+                                            + (Resources::fixed_font->get_text_height(ammo_text) + 5)
+                                            * static_cast<float>(target)),
+                                     LAYER_HUD);
       }
 
       context.color().draw_text(Resources::fixed_font,
                                 ammo_text,
                                 Vector(static_cast<float>(context.get_width())
-                                          - BORDER_X
-                                          - Resources::fixed_font->get_text_width(ammo_text),
-                                      BORDER_Y
-                                          + (Resources::fixed_font->get_text_height(coins_text) + 5.0f)
-                                          + (Resources::fixed_font->get_text_height(ammo_text) + 5.0f)
-                                          * static_cast<float>(target)),
+                                       - BORDER_X
+                                       - Resources::fixed_font->get_text_width(ammo_text),
+                                       BORDER_Y
+                                       + (Resources::fixed_font->get_text_height(coins_text) + 5.0f)
+                                       + (Resources::fixed_font->get_text_height(ammo_text) + 5.0f)
+                                       * static_cast<float>(target)),
                                 ALIGN_LEFT,
                                 LAYER_HUD,
                                 PlayerStatusHUD::text_color);
@@ -133,27 +129,27 @@ PlayerStatusHUD::draw(DrawingContext& context)
 
       if (ice_surface) {
         context.color().draw_surface(ice_surface,
-                                    Vector(static_cast<float>(context.get_width())
-                                                - BORDER_X
-                                                - static_cast<float>(ice_surface->get_width())
-                                                - Resources::fixed_font->get_text_width(ammo_text),
+                                     Vector(static_cast<float>(context.get_width())
+                                            - BORDER_X
+                                            - static_cast<float>(ice_surface->get_width())
+                                            - Resources::fixed_font->get_text_width(ammo_text),
                                             BORDER_Y
-                                                + 1.0f
-                                                + (Resources::fixed_font->get_text_height(coins_text) + 5)
-                                                + (Resources::fixed_font->get_text_height(ammo_text) + 5)
-                                                * static_cast<float>(target)),
-                                    LAYER_HUD);
+                                            + 1.0f
+                                            + (Resources::fixed_font->get_text_height(coins_text) + 5)
+                                            + (Resources::fixed_font->get_text_height(ammo_text) + 5)
+                                            * static_cast<float>(target)),
+                                     LAYER_HUD);
       }
 
       context.color().draw_text(Resources::fixed_font,
                                 ammo_text,
                                 Vector(static_cast<float>(context.get_width())
-                                          - BORDER_X
-                                          - Resources::fixed_font->get_text_width(ammo_text),
-                                      BORDER_Y
-                                          + (Resources::fixed_font->get_text_height(coins_text) + 5.0f)
-                                          + (Resources::fixed_font->get_text_height(ammo_text) + 5.0f)
-                                          * static_cast<float>(target)),
+                                       - BORDER_X
+                                       - Resources::fixed_font->get_text_width(ammo_text),
+                                       BORDER_Y
+                                       + (Resources::fixed_font->get_text_height(coins_text) + 5.0f)
+                                       + (Resources::fixed_font->get_text_height(ammo_text) + 5.0f)
+                                       * static_cast<float>(target)),
                                 ALIGN_LEFT,
                                 LAYER_HUD,
                                 PlayerStatusHUD::text_color);

@@ -30,9 +30,6 @@ public:
   virtual HitResponse collision_badguy(BadGuy& other, const CollisionHit& hit) override;
   virtual HitResponse collision_bullet(Bullet& bullet, const CollisionHit& hit) override;
 
-  virtual ObjectSettings get_settings() override;
-  void after_editor_set() override;
-
   virtual void kill_fall() override;
   virtual void draw(DrawingContext& context) override;
   virtual void deactivate() override;

@@ -17,7 +17,6 @@
 #include "badguy/stalactite.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
 #include "math/random.hpp"
 #include "object/bullet.hpp"
 #include "object/player.hpp"
@@ -25,6 +24,7 @@
 #include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
+#include "util/file_system.hpp"
 
 static const int SHAKE_RANGE_X = 40;
 static const float SHAKE_TIME = .8f;
@@ -58,22 +58,17 @@ Stalactite::Stalactite(const ReaderMapping& mapping) :
   }
   catch (std::exception&)
   {
-    if (!Editor::is_active())
+    if (type.empty())
     {
-      if (type.empty())
-      {
-        log_warning << "No stalactite type set, setting to ice." << std::endl;
-      }
-      else
-      {
-        log_warning << "Unknown type of stalactite:" << type << ", setting to ice." << std::endl;
-      }
+      log_warning << "No stalactite type set, setting to ice." << std::endl;
     }
+    else
+    {
+      log_warning << "Unknown type of stalactite:" << type << ", setting to ice." << std::endl;
+    }
+
     m_type = StalactiteType::ICE;
   }
-
-  if (m_type != StalactiteType::ICE)
-    after_editor_set();
 
   m_countMe = false;
   set_colgroup_active(COLGROUP_TOUCHABLE);
@@ -184,28 +179,6 @@ Stalactite::collision_bullet(Bullet& bullet, const CollisionHit& hit)
   return FORCE_MOVE;
 }
 
-ObjectSettings
-Stalactite::get_settings()
-{
-  ObjectSettings result = BadGuy::get_settings();
-
-  result.add_enum(_("Type"), reinterpret_cast<int*>(&m_type),
-                  {_("ice"), _("rock")},
-                  {"ice", "rock"},
-                  static_cast<int>(StalactiteType::ICE), "type");
-
-  return result;
-}
-
-void
-Stalactite::after_editor_set()
-{
-  BadGuy::after_editor_set();
-
-  if (std::find(s_sprites.begin(), s_sprites.end(), FileSystem::basename(m_sprite_name)) != s_sprites.end())
-    change_sprite("images/creatures/stalactite/" + s_sprites[static_cast<int>(m_type)]);
-}
-
 void
 Stalactite::kill_fall()
 {
@@ -214,11 +187,6 @@ Stalactite::kill_fall()
 void
 Stalactite::draw(DrawingContext& context)
 {
-  if (Editor::is_active()) {
-    BadGuy::draw(context);
-    return;
-  }
-
   if (get_state() == STATE_INIT || get_state() == STATE_INACTIVE)
     return;
 

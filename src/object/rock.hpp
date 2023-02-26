@@ -42,7 +42,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Rock"); }
   virtual std::string get_display_name() const override { return display_name(); }
-  virtual ObjectSettings get_settings() override;
 
   /** Adds velocity from wind */
   virtual void add_wind_velocity(const Vector& velocity, const Vector& end_speed);

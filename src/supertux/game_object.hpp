@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <string>
 
-#include "editor/object_settings.hpp"
 #include "supertux/game_object_component.hpp"
 #include "util/fade_helper.hpp"
 #include "util/gettext.hpp"
@@ -73,7 +72,6 @@ public:
   virtual void draw(DrawingContext& context) = 0;
 
   /** This function saves the object. Editor will use that. */
-  virtual void save(Writer& writer);
   virtual std::string get_class_name() const { return "game-object"; }
   virtual std::string get_display_name() const { return _("Unknown object"); }
 
@@ -92,9 +90,6 @@ public:
   /** Indicates if get_settings() is implemented. If true the editor
       will display Tip and ObjectMenu. */
   virtual bool has_settings() const { return is_saveable(); }
-  virtual ObjectSettings get_settings();
-
-  virtual void after_editor_set() {}
 
   /** When level is flipped vertically */
   virtual void on_flip(float height) {}

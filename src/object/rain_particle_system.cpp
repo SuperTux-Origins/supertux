@@ -92,20 +92,6 @@ void RainParticleSystem::init()
   set_amount(m_current_amount);
 }
 
-ObjectSettings
-RainParticleSystem::get_settings()
-{
-  ObjectSettings result = ParticleSystem::get_settings();
-
-  result.add_float(_("Intensity"), &m_current_amount, "intensity", 1.f);
-  result.add_float(_("Angle"), &m_current_angle, "angle", 1.f);
-  result.add_float(_("Speed"), &m_current_speed, "speed", 1.f);
-
-  result.reorder({"intensity", "angle", "speed", "enabled", "name"});
-
-  return result;
-}
-
 void RainParticleSystem::set_amount(float amount)
 {
   // Don't spawn too many particles to avoid destroying the player's computer

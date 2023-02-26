@@ -70,38 +70,6 @@ LitObject::update(float)
 {
 }
 
-ObjectSettings
-LitObject::get_settings()
-{
-  ObjectSettings result = MovingObject::get_settings();
-
-  result.add_sprite(_("Sprite"), &m_sprite_name, "sprite", std::string("images/objects/lightflower/lightflower1.sprite"));
-  result.add_sprite(_("Light sprite"), &m_light_sprite_name, "light-sprite", std::string("images/objects/lightflower/light/glow_light.sprite"));
-  result.add_int(_("Layer"), &m_layer, "layer", 0);
-
-  result.add_text(_("Sprite starting action"), &m_sprite_action, "action", std::string("default"));
-  result.add_text(_("Light sprite starting action"), &m_light_sprite_action, "light-action", std::string("default"));
-
-  result.add_float(_("Light sprite offset X"), &m_light_offset.x, "light-offset-x");
-  result.add_float(_("Light sprite offset Y"), &m_light_offset.y, "light-offset-y");
-
-  return result;
-}
-
-void
-LitObject::after_editor_set()
-{
-  m_sprite = SpriteManager::current()->create(m_sprite_name);
-  m_light_sprite = SpriteManager::current()->create(m_light_sprite_name);
-  m_light_sprite->set_blend(Blend::ADD);
-
-  m_sprite->set_action(m_sprite_action);
-  m_light_sprite->set_action(m_light_sprite_action);
-
-  m_col.m_bbox.set_size(static_cast<float>(m_sprite->get_width()),
-                        static_cast<float>(m_sprite->get_height()));
-}
-
 void
 LitObject::on_flip(float height)
 {

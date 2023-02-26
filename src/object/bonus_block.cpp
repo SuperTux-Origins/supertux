@@ -19,7 +19,6 @@
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
 #include "badguy/crusher.hpp"
-#include "editor/editor.hpp"
 #include "object/bouncy_coin.hpp"
 #include "object/coin_explode.hpp"
 #include "object/coin_rain.hpp"
@@ -108,28 +107,24 @@ BonusBlock::BonusBlock(const ReaderMapping& mapping) :
 
       if (m_contents == Content::CUSTOM)
       {
-        if (Editor::is_active()) {
-          mapping.get("custom-contents", m_custom_sx);
-        } else {
-          std::optional<ReaderCollection> content_collection;
-          if (!mapping.get("custom-contents", content_collection))
-          {
-            log_warning << "bonusblock is missing 'custom-contents' tag" << std::endl;
-          }
-          else
-          {
-            const auto& object_specs = content_collection->get_objects();
-            if (!object_specs.empty()) {
-              if (object_specs.size() > 1) {
-                log_warning << "only one object allowed in bonusblock 'custom-contents', ignoring the rest" << std::endl;
-              }
+        std::optional<ReaderCollection> content_collection;
+        if (!mapping.get("custom-contents", content_collection))
+        {
+          log_warning << "bonusblock is missing 'custom-contents' tag" << std::endl;
+        }
+        else
+        {
+          const auto& object_specs = content_collection->get_objects();
+          if (!object_specs.empty()) {
+            if (object_specs.size() > 1) {
+              log_warning << "only one object allowed in bonusblock 'custom-contents', ignoring the rest" << std::endl;
+            }
 
-              const ReaderObject& spec = object_specs[0];
-              auto game_object = GameObjectFactory::instance().create(spec.get_name(), spec.get_mapping());
-              m_object = to_moving_object(std::move(game_object));
-              if (!m_object) {
-                log_warning << "Only MovingObjects are allowed inside BonusBlocks" << std::endl;
-              }
+            const ReaderObject& spec = object_specs[0];
+            auto game_object = GameObjectFactory::instance().create(spec.get_name(), spec.get_mapping());
+            m_object = to_moving_object(std::move(game_object));
+            if (!m_object) {
+              log_warning << "Only MovingObjects are allowed inside BonusBlocks" << std::endl;
             }
           }
         }
@@ -154,10 +149,8 @@ BonusBlock::BonusBlock(const ReaderMapping& mapping) :
     }
   }
 
-  if (!Editor::is_active()) {
-    if (m_contents == Content::CUSTOM && !m_object) {
-      throw std::runtime_error("Need to specify content object for custom block");
-    }
+  if (m_contents == Content::CUSTOM && !m_object) {
+    throw std::runtime_error("Need to specify content object for custom block");
   }
 
   if (m_contents == Content::LIGHT || m_contents == Content::LIGHT_ON) {
@@ -199,28 +192,6 @@ BonusBlock::get_content_by_data(int tile_data) const
 BonusBlock::~BonusBlock()
 {
 }
-
-ObjectSettings
-BonusBlock::get_settings()
-{
-  ObjectSettings result = Block::get_settings();
-
-  result.add_script(_("Script"), &m_script, "script");
-  result.add_int(_("Count"), &m_hit_counter, "count", 1);
-  result.add_enum(_("Content"), reinterpret_cast<int*>(&m_contents),
-                  {_("Coin"), _("Growth (fire flower)"), _("Growth (ice flower)"), _("Growth (air flower)"),
-                   _("Growth (earth flower)"), _("Star"), _("Tux doll"), _("Custom"), _("Script"), _("Light"), _("Light (On)"),
-                   _("Trampoline"), _("Coin rain"), _("Coin explosion")},
-                  {"coin", "firegrow", "icegrow", "airgrow", "earthgrow", "star",
-                   "1up", "custom", "script", "light", "light-on", "trampoline", "rain", "explode"},
-                  static_cast<int>(Content::COIN), "contents");
-  result.add_sexp(_("Custom Content"), "custom-contents", m_custom_sx);
-
-  result.reorder({"script", "count", "contents", "sprite", "x", "y"});
-
-  return result;
-}
-
 
 void
 BonusBlock::hit(Player& player)

@@ -18,7 +18,6 @@
 
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
-#include "editor/editor.hpp"
 #include "object/bouncy_coin.hpp"
 #include "object/player.hpp"
 #include "object/tilemap.hpp"
@@ -93,26 +92,6 @@ Coin::update(float dt_sec)
 
     if (get_path()->is_valid()) {
       m_col.set_movement(v - get_pos());
-    }
-  }
-}
-
-void
-Coin::editor_update()
-{
-  if (get_walker()) {
-    if (m_from_tilemap) {
-      set_pos(m_offset + get_walker()->get_pos(m_col.m_bbox.get_size(), m_path_handle));
-    } else {
-      set_pos(get_walker()->get_pos(m_col.m_bbox.get_size(), m_path_handle));
-
-      if (!get_path()) return;
-      if (!get_path()->is_valid()) return;
-
-      if (m_starting_node >= static_cast<int>(get_path()->get_nodes().size()))
-        m_starting_node = static_cast<int>(get_path()->get_nodes().size()) - 1;
-
-      set_pos(m_path_handle.get_pos(m_col.m_bbox.get_size(), get_path()->get_nodes()[m_starting_node].position));
     }
   }
 }
@@ -279,69 +258,12 @@ Coin::move_to(const Vector& pos)
   set_pos(pos);
 }
 
-ObjectSettings
-Coin::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_path_ref(_("Path"), *this, get_path_ref(), "path-ref");
-  m_add_path = get_walker() && get_path() && get_path()->is_valid();
-  result.add_bool(_("Following path"), &m_add_path);
-
-  if (get_walker() && get_path()->is_valid()) {
-    result.add_walk_mode(_("Path Mode"), &get_path()->m_mode, {}, {});
-    result.add_bool(_("Adapt Speed"), &get_path()->m_adapt_speed, {}, {});
-    result.add_int(_("Starting Node"), &m_starting_node, "starting-node", 0, 0U);
-    result.add_path_handle(_("Handle"), m_path_handle, "handle");
-  }
-
-  result.add_script(_("Collect script"), &m_collect_script, "collect-script");
-
-  result.reorder({"collect-script", "path-ref"});
-
-  return result;
-}
-
-void
-Coin::after_editor_set()
-{
-  MovingSprite::after_editor_set();
-
-  if (get_walker() && get_path()->is_valid()) {
-    if (!m_add_path) {
-      get_path()->m_nodes.clear();
-    }
-  } else {
-    if (m_add_path) {
-      init_path_pos(m_col.m_bbox.p1());
-    }
-  }
-}
-
 void
 Coin::on_flip(float height)
 {
   MovingSprite::on_flip(height);
   PathObject::on_flip();
   FlipLevelTransformer::transform_flip(m_flip);
-}
-
-ObjectSettings
-HeavyCoin::get_settings()
-{
-  auto result = MovingSprite::get_settings();
-
-  result.add_script(_("Collect script"), &m_collect_script, "collect-script");
-
-  result.reorder({"collect-script", "sprite", "x", "y"});
-
-  return result;
-}
-
-void
-HeavyCoin::after_editor_set()
-{
-  MovingSprite::after_editor_set();
 }
 
 void

@@ -21,7 +21,6 @@
 #include "audio/sound_manager.hpp"
 #include "badguy/treewillowisp.hpp"
 #include "badguy/willowisp.hpp"
-#include "editor/editor.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "util/reader_mapping.hpp"
@@ -35,9 +34,7 @@ Lantern::Lantern(const ReaderMapping& reader) :
   if (reader.get("color", vColor)) {
     lightcolor = Color(vColor);
   } else {
-    if (!Editor::is_active()) {
-      lightcolor = Color(1, 1, 1);
-    }
+    lightcolor = Color(1, 1, 1);
   }
   lightsprite->set_blend(Blend::ADD);
   updateColor();
@@ -52,26 +49,6 @@ Lantern::Lantern(const Vector& pos) :
   lightsprite->set_blend(Blend::ADD);
   updateColor();
   SoundManager::current()->preload("sounds/willocatch.wav");
-}
-
-ObjectSettings
-Lantern::get_settings()
-{
-  ObjectSettings result = Rock::get_settings();
-
-  result.add_color(_("Color"), &lightcolor, "color", Color::WHITE);
-
-  result.reorder({"color", "name", "x", "y"});
-
-  return result;
-}
-
-void
-Lantern::after_editor_set()
-{
-  Rock::after_editor_set();
-
-  updateColor();
 }
 
 void

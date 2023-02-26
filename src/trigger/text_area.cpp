@@ -17,7 +17,6 @@
 
 #include "trigger/text_area.hpp"
 
-#include "editor/editor.hpp"
 #include "math/anchor_point.hpp"
 #include "object/player.hpp"
 #include "object/text_object.hpp"
@@ -75,8 +74,6 @@ TextArea::TextArea(const Vector& pos) :
 void
 TextArea::draw(DrawingContext& context)
 {
-  if (Editor::is_active())
-    context.color().draw_filled_rect(m_col.m_bbox, Color(1.0f, 1.0f, 1.0f, 0.6f), LAYER_OBJECTS);
 }
 
 void
@@ -153,25 +150,6 @@ TextArea::update(float dt_sec)
         break;
     }
   }
-}
-
-ObjectSettings
-TextArea::get_settings()
-{
-  ObjectSettings settings = TriggerBase::get_settings();
-
-  settings.add_bool(_("Once"), &m_once, "once");
-  settings.add_float(_("Text change time"), &m_delay, "delay");
-  settings.add_float(_("Fade time"), &m_fade_delay, "fade-delay");
-  settings.add_enum(_("Anchor"), reinterpret_cast<int*>(&m_anchor),
-                    get_anchor_names(), g_anchor_keys,
-                    static_cast<int>(AnchorPoint::ANCHOR_MIDDLE),
-                    "anchor-point");
-  settings.add_float(_("Anchor offset X"), &m_anchor_offset.x, "anchor-offset-x");
-  settings.add_float(_("Anchor offset Y"), &m_anchor_offset.y, "anchor-offset-y");
-  settings.add_string_array(_("Texts"), "texts", m_items);
-
-  return settings;
 }
 
 /* EOF */

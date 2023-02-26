@@ -49,9 +49,6 @@ public:
     return "images/engine/editor/background.png";
   }
 
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
-
   virtual void on_flip(float height) override;
 
   void set_image(const std::string& name);

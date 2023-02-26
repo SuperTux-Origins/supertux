@@ -144,14 +144,6 @@ Brick::break_for_crusher(Crusher* crusher)
   start_break(crusher);
 }
 
-ObjectSettings
-Brick::get_settings()
-{
-  ObjectSettings result = Block::get_settings();
-  result.add_bool(_("Breakable"), &m_breakable, "breakable");
-  return result;
-}
-
 HeavyBrick::HeavyBrick(const Vector& pos, int data, const std::string& spriteName) :
   Brick(pos, data, spriteName)
 {

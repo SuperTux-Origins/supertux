@@ -55,26 +55,6 @@ Switch::~Switch()
 {
 }
 
-ObjectSettings
-Switch::get_settings()
-{
-  ObjectSettings result = TriggerBase::get_settings();
-
-  result.add_sprite(_("Sprite"), &sprite_name, "sprite", std::string("images/objects/switch/left.sprite"));
-  result.add_script(_("Turn on script"), &script, "script");
-  result.add_script(_("Turn off script"), &off_script, "off-script");
-
-  result.reorder({"script", "off-script", "sprite", "x", "y"});
-
-  return result;
-}
-
-void
-Switch::after_editor_set() {
-  sprite = SpriteManager::current()->create(sprite_name);
-  m_col.m_bbox.set_size(sprite->get_current_hitbox_width(), sprite->get_current_hitbox_height());
-}
-
 void
 Switch::update(float )
 {

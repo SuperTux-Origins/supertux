@@ -18,7 +18,6 @@
 
 #include <algorithm>
 
-#include "editor/editor.hpp"
 #include "object/player.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/resources.hpp"
@@ -34,25 +33,14 @@ LevelTime::LevelTime(const ReaderMapping& reader) :
   GameObject(reader),
   ExposedObject<LevelTime, scripting::LevelTime>(this),
   time_surface(Surface::from_file("images/engine/hud/time-0.png")),
-  running(!Editor::is_active()),
+  running(true),
   time_left()
 {
   reader.get("time", time_left, 0.0f);
-  if (time_left <= 0 && !Editor::is_active()) {
+  if (time_left <= 0) {
     log_warning << "No or invalid leveltime specified." << std::endl;
     remove_me();
   }
-}
-
-ObjectSettings
-LevelTime::get_settings()
-{
-  ObjectSettings result = GameObject::get_settings();
-
-  result.add_float(_("Time"), &time_left, "time");
-  result.add_remove();
-
-  return result;
 }
 
 void
@@ -102,8 +90,6 @@ LevelTime::update(float dt_sec)
 void
 LevelTime::draw(DrawingContext& context)
 {
-  if (Editor::is_active())
-    return;
   context.push_transform();
   context.set_translation(Vector(0, 0));
   context.transform().scale = 1.f;

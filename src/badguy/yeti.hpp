@@ -38,8 +38,6 @@ public:
   static std::string display_name() { return _("Yeti"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual ObjectSettings get_settings() override;
-
   void kill_squished(GameObject& object);
 
 private:

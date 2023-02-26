@@ -22,8 +22,6 @@
 
 #include "badguy/fish_jumping.hpp"
 #include "badguy/jumpy.hpp"
-#include "editor/editor.hpp"
-#include "editor/worldmap_objects.hpp"
 #include "object/ambient_light.hpp"
 #include "object/background.hpp"
 #include "object/camera.hpp"
@@ -354,7 +352,7 @@ SectorParser::create_sector()
   intact.set_solid(true);
 
   if (worldmap) {
-    m_sector.add<worldmap_editor::WorldmapSpawnPoint>("main", Vector(4, 4));
+    // m_sector.add<worldmap_editor::WorldmapSpawnPoint>("main", Vector(4, 4));
   } else {
     m_sector.add<SpawnPointMarker>("main", Vector(64, 480));
   }

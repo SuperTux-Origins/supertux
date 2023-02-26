@@ -39,9 +39,6 @@ public:
 
   virtual bool has_variable_size() const override { return true; }
 
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
-
   virtual int get_layer() const override { return LAYER_OBJECTS; }
 
 private:

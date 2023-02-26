@@ -41,7 +41,6 @@ public:
   virtual void event(Player& player, EventType type) override;
   virtual void update(float dt_sec) override;
 
-  virtual ObjectSettings get_settings() override;
   static std::string class_name() { return "text-area"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Text Area"); }

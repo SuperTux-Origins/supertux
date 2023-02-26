@@ -27,18 +27,6 @@ Crystallo::Crystallo(const ReaderMapping& reader) :
   reader.get("radius", m_radius, 100.0f);
 }
 
-ObjectSettings
-Crystallo::get_settings()
-{
-  ObjectSettings result = WalkingBadguy::get_settings();
-
-  result.add_float(_("Radius"), &m_radius, "radius", 100.0f);
-
-  result.reorder({"radius", "direction", "x", "y"});
-
-  return result;
-}
-
 void
 Crystallo::active_update(float dt_sec)
 {

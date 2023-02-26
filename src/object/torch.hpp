@@ -18,10 +18,11 @@
 #ifndef HEADER_SUPERTUX_OBJECT_TORCH_HPP
 #define HEADER_SUPERTUX_OBJECT_TORCH_HPP
 
-#include "squirrel/exposed_object.hpp"
 #include "scripting/torch.hpp"
 #include "sprite/sprite_ptr.hpp"
+#include "squirrel/exposed_object.hpp"
 #include "supertux/moving_object.hpp"
+#include "video/color.hpp"
 #include "video/flip.hpp"
 
 class ReaderMapping;
@@ -42,9 +43,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Torch"); }
   virtual std::string get_display_name() const override { return display_name(); }
-
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
 
   virtual int get_layer() const override { return m_layer; }
 

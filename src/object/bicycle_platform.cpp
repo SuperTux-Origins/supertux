@@ -76,12 +76,6 @@ BicyclePlatformChild::collision(GameObject& other, const CollisionHit& )
   return FORCE_MOVE;
 }
 
-void BicyclePlatformChild::editor_delete()
-{
-  // removing a child removes the whole platform
-  m_parent.editor_delete();
-}
-
 void
 BicyclePlatformChild::on_flip(float height)
 {
@@ -174,42 +168,6 @@ void
 BicyclePlatform::on_flip(float height)
 {
   m_center.y = height - m_center.y;
-}
-
-void
-BicyclePlatform::editor_delete()
-{
-  // remove children
-  for (auto& child : m_children)
-  {
-    child->remove_me();
-  }
-
-  // remove self
-  remove_me();
-}
-
-void
-BicyclePlatform::after_editor_set()
-{
-  GameObject::after_editor_set();
-}
-
-ObjectSettings
-BicyclePlatform::get_settings()
-{
-  auto result = GameObject::get_settings();
-
-  result.add_float(_("X"), &m_center.x, "x", 0.0f, OPTION_HIDDEN);
-  result.add_float(_("Y"), &m_center.y, "y", 0.0f, OPTION_HIDDEN);
-
-  result.add_int(_("Platforms"), &m_platforms, "platforms", 2);
-  result.add_float(_("Radius"), &m_radius, "radius", 128.0f);
-  result.add_float(_("Momentum change rate"), &m_momentum_change_rate, "momentum-change-rate", 0.1f);
-
-  result.reorder({"platforms", "x", "y"});
-
-  return result;
 }
 
 /* EOF */

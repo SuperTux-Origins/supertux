@@ -97,29 +97,6 @@ Torch::collision(GameObject& other, const CollisionHit& )
   return ABORT_MOVE;
 }
 
-ObjectSettings
-Torch::get_settings()
-{
-  ObjectSettings result = MovingObject::get_settings();
-
-  result.add_bool(_("Burning"), &m_burning, "burning", true);
-  result.add_sprite(_("Sprite"), &sprite_name, "sprite", std::string("images/objects/torch/torch1.sprite"));
-  result.add_int(_("Layer"), &m_layer, "layer", 0);
-  result.add_color(_("Color"), &m_light_color, "color", Color::WHITE);
-
-  result.reorder({"sprite", "layer", "color", "x", "y"});
-
-  return result;
-}
-
-void Torch::after_editor_set()
-{
-  m_torch = SpriteManager::current()->create(sprite_name);
-  m_flame->set_color(m_light_color);
-  m_flame_glow->set_color(m_light_color);
-  m_flame_light->set_color(m_light_color);
-}
-
 bool
 Torch::get_burning() const
 {

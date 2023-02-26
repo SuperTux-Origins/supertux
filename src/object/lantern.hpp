@@ -38,9 +38,6 @@ public:
   static std::string display_name() { return _("Lantern"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
-
   /** returns true if lamp is currently open */
   bool is_open() const;
 

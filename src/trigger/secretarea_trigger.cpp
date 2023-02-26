@@ -17,7 +17,6 @@
 #include "trigger/secretarea_trigger.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
 #include "object/tilemap.hpp"
 #include "supertux/debug.hpp"
 #include "supertux/level.hpp"
@@ -50,7 +49,7 @@ SecretAreaTrigger::SecretAreaTrigger(const ReaderMapping& reader) :
   new_size.y = h;
   reader.get("fade-tilemap", fade_tilemap);
   reader.get("message", message);
-  if (message.empty() && !Editor::is_active()) {
+  if (message.empty()) {
     message = _("You found a secret area!");
   }
   reader.get("script", script);
@@ -65,30 +64,6 @@ SecretAreaTrigger::SecretAreaTrigger(const Rectf& area, const std::string& fade_
   new_size(0.0f, 0.0f)
 {
   m_col.m_bbox = area;
-}
-
-ObjectSettings
-SecretAreaTrigger::get_settings()
-{
-  new_size.x = m_col.m_bbox.get_width();
-  new_size.y = m_col.m_bbox.get_height();
-
-  ObjectSettings result = TriggerBase::get_settings();
-
-  result.add_text(_("Name"), &m_name);
-  result.add_text(_("Fade tilemap"), &fade_tilemap, "fade-tilemap");
-  result.add_translatable_text(_("Message"), &message, "message");
-  result.add_script(_("Script"), &script, "script");
-
-  result.reorder({"fade-tilemap", "script", "sprite", "message", "region", "name", "x", "y"});
-
-  return result;
-}
-
-void
-SecretAreaTrigger::after_editor_set()
-{
-  m_col.m_bbox.set_size(new_size.x, new_size.y);
 }
 
 std::string
@@ -108,10 +83,7 @@ SecretAreaTrigger::draw(DrawingContext& context)
     context.color().draw_text(Resources::normal_font, message, pos, FontAlignment::ALIGN_CENTER, LAYER_HUD, SecretAreaTrigger::text_color);
     context.pop_transform();
   }
-  if (Editor::is_active() || g_debug.show_collision_rects) {
-    context.color().draw_filled_rect(m_col.m_bbox, Color(0.0f, 1.0f, 0.0f, 0.6f),
-                             0.0f, LAYER_OBJECTS);
-  } else if (message_timer.check()) {
+  if (message_timer.check()) {
     remove_me();
   }
 }

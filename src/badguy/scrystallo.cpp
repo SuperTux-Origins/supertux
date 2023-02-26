@@ -44,19 +44,6 @@ SCrystallo::initialize()
   m_sprite->set_action("editor", m_dir);
 }
 
-ObjectSettings
-SCrystallo::get_settings()
-{
-  ObjectSettings result = WalkingBadguy::get_settings();
-
-  result.add_float(_("Walk Radius"), &m_radius, "radius", 100.0f);
-  result.add_float(_("Awakening Radius"), &m_range, "range", 250.0f);
-
-  result.reorder({ "radius", "range", "direction", "x", "y" });
-
-  return result;
-}
-
 void
 SCrystallo::collision_solid(const CollisionHit& hit)
 {

@@ -73,25 +73,6 @@ GameObject::del_remove_listener(ObjectRemoveListener* listener)
 }
 
 void
-GameObject::save(Writer& writer)
-{
-  auto settings = get_settings();
-  for (const auto& option_ptr : settings.get_options())
-  {
-    const auto& option = *option_ptr;
-    option.save(writer);
-  }
-}
-
-ObjectSettings
-GameObject::get_settings()
-{
-  ObjectSettings result(get_display_name());
-  result.add_text(_("Name"), &m_name, "name", std::string());
-  return result;
-}
-
-void
 GameObject::update(float dt_sec)
 {
   for (auto& h : m_fade_helpers)

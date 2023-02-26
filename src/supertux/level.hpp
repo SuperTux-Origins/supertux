@@ -40,10 +40,6 @@ public:
   explicit Level(bool m_is_worldmap);
   ~Level();
 
-  // saves to a levelfile
-  void save(const std::string& filename, bool retry = false);
-  void save(std::ostream& stream);
-
   void add_sector(std::unique_ptr<Sector> sector);
   const std::string& get_name() const { return m_name; }
   const std::string& get_author() const { return m_author; }

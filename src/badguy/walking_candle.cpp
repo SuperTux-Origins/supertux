@@ -83,25 +83,4 @@ WalkingCandle::kill_fall()
   unfreeze(false);
 }
 
-ObjectSettings
-WalkingCandle::get_settings()
-{
-  ObjectSettings result = BadGuy::get_settings();
-
-  result.add_color(_("Color"), &lightcolor, "color", Color::WHITE);
-
-  result.reorder({"color", "x", "y"});
-
-  return result;
-}
-
-void
-WalkingCandle::after_editor_set()
-{
-  WalkingBadguy::after_editor_set();
-
-  m_sprite->set_color(lightcolor);
-  m_lightsprite->set_color(lightcolor);
-}
-
 /* EOF */

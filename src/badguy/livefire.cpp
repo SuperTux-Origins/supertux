@@ -17,7 +17,6 @@
 #include "badguy/livefire.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
 #include "object/player.hpp"
 #include "object/sprite_particle.hpp"
 #include "sprite/sprite.hpp"
@@ -151,12 +150,7 @@ LiveFireAsleep::LiveFireAsleep(const ReaderMapping& reader) :
 void
 LiveFireAsleep::draw(DrawingContext& context)
 {
-  if (Editor::is_active()) {
-    m_sprite->set_action("sleeping", m_dir);
-    BadGuy::draw(context);
-  } else {
-    LiveFire::draw(context);
-  }
+  LiveFire::draw(context);
 }
 
 void
@@ -177,12 +171,7 @@ LiveFireDormant::LiveFireDormant(const ReaderMapping& reader) :
 void
 LiveFireDormant::draw(DrawingContext& context)
 {
-  if (Editor::is_active()) {
-    m_sprite->set_action("sleeping", m_dir);
-    BadGuy::draw(context);
-  } else {
-    LiveFire::draw(context);
-  }
+  LiveFire::draw(context);
 }
 
 void

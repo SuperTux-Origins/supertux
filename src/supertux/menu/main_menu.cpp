@@ -17,7 +17,6 @@
 #include "supertux/menu/main_menu.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
 #include "gui/dialog.hpp"
 #include "gui/menu_item.hpp"
 #include "gui/menu_manager.hpp"
@@ -58,7 +57,6 @@ MainMenu::MainMenu()
   add_entry(MNID_MANAGEASSETS, _("Manage Assets"));
 #endif
   add_submenu(_("Options"), MenuStorage::OPTIONS_MENU);
-  add_entry(MNID_LEVELEDITOR, _("Level Editor"));
   add_entry(MNID_CREDITS, _("Credits"));
 #ifndef STEAM_BUILD
   // Links to external purchases are not allowed on Steam, including donations
@@ -91,25 +89,14 @@ MainMenu::menu_action(MenuItem& item)
       MenuManager::instance().push_menu(MenuStorage::ASSET_MENU);
       break;
 
-     case MNID_CREDITS:
+    case MNID_CREDITS:
     {
       // Credits Level
       SoundManager::current()->stop_music(0.2f);
       std::unique_ptr<World> world = World::from_directory("levels/misc");
       GameManager::current()->start_level(*world, "credits.stl");
     }
-	  break;
-
-    case MNID_LEVELEDITOR:
-      {
-        MenuManager::instance().clear_menu_stack();
-        std::unique_ptr<Screen> screen(new Editor());
-        auto fade = std::make_unique<FadeToBlack>(FadeToBlack::FADEOUT, 0.5f);
-        SoundManager::current()->stop_music(0.5);
-        ScreenManager::current()->push_screen(move(screen),move(fade));
-        //Editor::current()->setup();
-      }
-      break;
+    break;
 
     case MNID_DONATE:
       Dialog::show_confirmation(_("This will take you to the SuperTux donation page. Are you sure you want to continue?"), [] {

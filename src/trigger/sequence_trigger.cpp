@@ -16,7 +16,6 @@
 
 #include "trigger/sequence_trigger.hpp"
 
-#include "editor/editor.hpp"
 #include "object/player.hpp"
 #include "supertux/debug.hpp"
 #include "util/reader_mapping.hpp"
@@ -61,39 +60,6 @@ SequenceTrigger::SequenceTrigger(const Vector& pos, const std::string& sequence_
   m_col.m_bbox.set_size(32, 32);
 }
 
-ObjectSettings
-SequenceTrigger::get_settings()
-{
-  new_size.x = m_col.m_bbox.get_width();
-  new_size.y = m_col.m_bbox.get_height();
-
-  ObjectSettings result = TriggerBase::get_settings();
-
-  //result.add_float(_("Width"), &new_size.x, "width");
-  //result.add_float(_("Height"), &new_size.y, "height");
-
-  result.add_enum(_("Sequence"), reinterpret_cast<int*>(&sequence),
-                  {_("end sequence"), _("stop Tux"), _("fireworks")},
-                  {"endsequence", "stoptux", "fireworks"},
-                  std::nullopt, "sequence");
-
-  result.add_text(_("New worldmap spawnpoint"), &new_spawnpoint, "new_spawnpoint");
-  result.add_text(_("Worldmap fade tilemap"), &fade_tilemap, "fade_tilemap");
-  result.add_string_select(_("Fade"), reinterpret_cast<int*>(&fade),
-                           {_("Fade in"), _("Fade out")},
-                           0, "fade");
-
-  result.reorder({"sequence", "region", "width", "height", "x", "y", "fade"});
-
-  return result;
-}
-
-void
-SequenceTrigger::after_editor_set()
-{
-  m_col.m_bbox.set_size(new_size.x, new_size.y);
-}
-
 void
 SequenceTrigger::event(Player& player, EventType type)
 {
@@ -112,7 +78,7 @@ SequenceTrigger::get_sequence_name() const
 void
 SequenceTrigger::draw(DrawingContext& context)
 {
-  if (Editor::is_active() || g_debug.show_collision_rects) {
+  if (g_debug.show_collision_rects) {
     context.color().draw_filled_rect(m_col.m_bbox, Color(1.0f, 0.0f, 0.0f, 0.6f),
                              0.0f, LAYER_OBJECTS);
   }

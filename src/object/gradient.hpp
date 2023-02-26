@@ -47,8 +47,6 @@ public:
     return "images/engine/editor/gradient.png";
   }
 
-  virtual ObjectSettings get_settings() override;
-
   virtual void on_flip(float height) override;
 
   void set_gradient(Color top, Color bottom);

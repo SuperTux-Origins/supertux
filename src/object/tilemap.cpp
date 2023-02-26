@@ -18,7 +18,6 @@
 
 #include <tuple>
 
-#include "editor/editor.hpp"
 #include "supertux/autotile.hpp"
 #include "supertux/debug.hpp"
 #include "supertux/globals.hpp"
@@ -39,7 +38,6 @@
 TileMap::TileMap(const TileSet *new_tileset) :
   ExposedObject<TileMap, scripting::TileMap>(this),
   PathObject(),
-  m_editor_active(true),
   m_tileset(new_tileset),
   m_tiles(),
   m_real_solid(false),
@@ -74,7 +72,6 @@ TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
   GameObject(reader),
   ExposedObject<TileMap, scripting::TileMap>(this),
   PathObject(),
-  m_editor_active(true),
   m_tileset(tileset_),
   m_tiles(),
   m_real_solid(false),
@@ -123,12 +120,10 @@ TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
 
   m_z_pos = reader_get_layer(reader, 0);
 
-  if (!Editor::is_active()) {
-    if (m_real_solid && ((m_speed_x != 1) || (m_speed_y != 1))) {
-      log_warning << "Speed of solid tilemap is not 1. fixing" << std::endl;
-      m_speed_x = 1;
-      m_speed_y = 1;
-    }
+  if (m_real_solid && ((m_speed_x != 1) || (m_speed_y != 1))) {
+    log_warning << "Speed of solid tilemap is not 1. fixing" << std::endl;
+    m_speed_x = 1;
+    m_speed_y = 1;
   }
 
   reader.get("starting-node", m_starting_node, 0);
@@ -163,7 +158,6 @@ TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
     m_tiles.clear();
     resize(static_cast<int>(Sector::get().get_width() / 32.0f),
            static_cast<int>(Sector::get().get_height() / 32.0f));
-    m_editor_active = false;
   } else {
     if (!reader.get("tiles", m_tiles))
       throw std::runtime_error("No tiles in tilemap.");
@@ -250,80 +244,6 @@ TileMap::apply_offset_y(int fill_id, int yoffset)
   }
 }
 
-ObjectSettings
-TileMap::get_settings()
-{
-  m_new_size_x = m_width;
-  m_new_size_y = m_height;
-  m_new_offset_x = 0;
-  m_new_offset_y = 0;
-
-  ObjectSettings result = GameObject::get_settings();
-
-  result.add_bool(_("Solid"), &m_real_solid, "solid");
-  result.add_int(_("Resize offset x"), &m_new_offset_x);
-  result.add_int(_("Resize offset y"), &m_new_offset_y);
-
-  result.add_int(_("Width"), &m_new_size_x);
-  result.add_int(_("Height"), &m_new_size_y);
-
-  result.add_float(_("Alpha"), &m_alpha, "alpha", 1.0f);
-  result.add_float(_("Speed x"), &m_speed_x, "speed-x", 1.0f);
-  result.add_float(_("Speed y"), &m_speed_y, "speed-y", 1.0f);
-  result.add_color(_("Tint"), &m_tint, "tint", Color::WHITE);
-  result.add_int(_("Z-pos"), &m_z_pos, "z-pos");
-  result.add_enum(_("Draw target"), reinterpret_cast<int*>(&m_draw_target),
-                  {_("Normal"), _("Lightmap")},
-                  {"normal", "lightmap"},
-                  static_cast<int>(DrawingTarget::COLORMAP),
-                  "draw-target");
-
-  result.add_path_ref(_("Path"), *this, get_path_ref(), "path-ref");
-  result.add_int(_("Starting Node"), &m_starting_node, "starting-node", 0, 0U);
-  m_add_path = get_walker() && get_path() && get_path()->is_valid();
-  result.add_bool(_("Following path"), &m_add_path);
-
-  if (get_walker() && get_path() && get_path()->is_valid()) {
-    result.add_walk_mode(_("Path Mode"), &get_path()->m_mode, {}, {});
-    result.add_bool(_("Adapt Speed"), &get_path()->m_adapt_speed, {}, {});
-    result.add_bool(_("Running"), &get_walker()->m_running, "running", false);
-    result.add_path_handle(_("Handle"), m_path_handle, "handle");
-  }
-
-  result.add_tiles(_("Tiles"), this, "tiles");
-
-  result.reorder({"solid", "running", "speed-x", "speed-y", "tint", "draw-target", "alpha", "z-pos", "name", "path-ref", "width", "height", "tiles"});
-
-  if (!m_editor_active) {
-    result.add_remove();
-  }
-
-  return result;
-}
-
-void
-TileMap::after_editor_set()
-{
-  if ((m_new_size_x != m_width || m_new_size_y != m_height ||
-      m_new_offset_x || m_new_offset_y) &&
-      m_new_size_x > 0 && m_new_size_y > 0) {
-    resize(m_new_size_x, m_new_size_y, 0, m_new_offset_x, m_new_offset_y);
-  }
-
-  if (get_walker() && get_path() && get_path()->is_valid()) {
-    if (!m_add_path) {
-      get_path()->m_nodes.clear();
-    }
-  } else {
-    if (m_add_path) {
-      init_path_pos(m_offset);
-    }
-  }
-
-  m_current_tint = m_tint;
-  m_current_alpha = m_alpha;
-}
-
 void
 TileMap::update(float dt_sec)
 {
@@ -376,28 +296,6 @@ TileMap::update(float dt_sec)
 }
 
 void
-TileMap::editor_update()
-{
-  if (get_walker()) {
-    if (get_path() && get_path()->is_valid()) {
-      m_movement = get_walker()->get_pos(get_size() * 32, m_path_handle) - get_offset();
-      set_offset(get_walker()->get_pos(get_size() * 32, m_path_handle));
-
-      if (!get_path()) return;
-      if (!get_path()->is_valid()) return;
-
-      if (m_starting_node >= static_cast<int>(get_path()->get_nodes().size()))
-        m_starting_node = static_cast<int>(get_path()->get_nodes().size()) - 1;
-
-      m_movement += get_path()->get_nodes()[m_starting_node].position - get_offset();
-      set_offset(m_path_handle.get_pos(get_size() * 32, get_path()->get_nodes()[m_starting_node].position));
-    } else {
-      set_offset(m_path_handle.get_pos(get_size() * 32, Vector(0, 0)));
-    }
-  }
-}
-
-void
 TileMap::on_flip(float height)
 {
   for (int x = 0; x < get_width(); ++x) {
@@ -427,19 +325,15 @@ TileMap::draw(DrawingContext& context)
 
   if (m_flip != NO_FLIP) context.set_flip(m_flip);
 
-  if (m_editor_active) {
-    if (m_current_alpha != 1.0f) {
-      context.set_alpha(m_current_alpha);
-    }
-  } else {
-    context.set_alpha(m_current_alpha/2);
+  if (m_current_alpha != 1.0f) {
+    context.set_alpha(m_current_alpha);
   }
 
   const float trans_x = context.get_translation().x;
   const float trans_y = context.get_translation().y;
-  const bool normal_speed = m_editor_active && Editor::is_active();
-  context.set_translation(Vector(trans_x * (normal_speed ? 1.0f : m_speed_x),
-                                 trans_y * (normal_speed ? 1.0f : m_speed_y)));
+
+  context.set_translation(Vector(trans_x * m_speed_x,
+                                 trans_y * m_speed_y));
 
   Rectf draw_rect = context.get_cliprect();
   Rect t_draw_rect = get_tiles_overlapping(draw_rect);
@@ -465,7 +359,7 @@ TileMap::draw(DrawingContext& context)
         tile.draw_debug(context.color(), pos, LAYER_FOREGROUND1);
       }
 
-      const SurfacePtr& surface = Editor::is_active() ? tile.get_current_editor_surface() : tile.get_current_surface();
+      SurfacePtr const& surface = tile.get_current_surface();
       if (surface) {
         std::get<0>(batches[surface]).emplace_back(surface->get_region());
         std::get<1>(batches[surface]).emplace_back(pos,

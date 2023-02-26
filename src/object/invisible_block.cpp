@@ -17,7 +17,6 @@
 #include "object/invisible_block.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
@@ -42,7 +41,7 @@ InvisibleBlock::InvisibleBlock(const ReaderMapping& mapping) :
 void
 InvisibleBlock::draw(DrawingContext& context)
 {
-  if (visible || Editor::is_active())
+  if (visible)
     m_sprite->draw(context.color(), get_pos(), LAYER_OBJECTS);
 }
 

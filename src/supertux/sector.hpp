@@ -82,8 +82,6 @@ public:
 
   void draw(DrawingContext& context);
 
-  void save(Writer &writer);
-
   /** stops all looping sounds in whole sector. */
   void stop_looping_sounds();
 

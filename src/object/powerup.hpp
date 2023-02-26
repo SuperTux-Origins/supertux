@@ -37,8 +37,6 @@ public:
   static std::string display_name() { return _("Powerup"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual ObjectSettings get_settings() override;
-
 private:
   /** Initialize power up sprites and other defaults */
   virtual void initialize();

@@ -223,15 +223,6 @@ Rock::ungrab(MovingObject& object, Direction dir)
   Portable::ungrab(object, dir);
 }
 
-ObjectSettings
-Rock::get_settings()
-{
-  auto result = MovingSprite::get_settings();
-  result.add_script(_("On-grab script"), &on_grab_script, "on-grab-script");
-  result.add_script(_("On-ungrab script"), &on_ungrab_script, "on-ungrab-script");
-  return result;
-}
-
 void
 Rock::add_wind_velocity(const Vector& velocity, const Vector& end_speed)
 {

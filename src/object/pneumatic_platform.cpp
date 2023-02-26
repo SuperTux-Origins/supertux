@@ -66,12 +66,6 @@ PneumaticPlatformChild::collision(GameObject& other, const CollisionHit& )
   return FORCE_MOVE;
 }
 
-void PneumaticPlatformChild::editor_delete()
-{
-  // removing a child removes the whole platform
-  m_parent.editor_delete();
-}
-
 void
 PneumaticPlatformChild::on_flip(float height)
 {
@@ -139,36 +133,6 @@ PneumaticPlatform::on_flip(float height)
 {
   m_pos.y = height - m_pos.y - m_children[0]->m_col.m_bbox.get_height();
   m_start_y = height - m_start_y - m_children[0]->m_col.m_bbox.get_height();
-}
-
-void
-PneumaticPlatform::editor_delete()
-{
-  // remove children
-  for (auto& child : m_children) {
-    child->remove_me();
-  }
-
-  // remove self
-  remove_me();
-}
-
-ObjectSettings
-PneumaticPlatform::get_settings()
-{
-  ObjectSettings result = GameObject::get_settings();
-
-  result.add_sprite(_("Sprite"), &m_sprite_name, "sprite", std::string("images/objects/platforms/small.sprite"));
-  result.add_float(_("X"), &m_pos.x, "x", 0.0f, OPTION_HIDDEN);
-  result.add_float(_("Y"), &m_pos.y, "y", 0.0f, OPTION_HIDDEN);
-
-  return result;
-}
-
-void
-PneumaticPlatform::after_editor_set()
-{
-  GameObject::after_editor_set();
 }
 
 /* EOF */

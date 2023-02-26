@@ -21,7 +21,6 @@
 #include "control/input_manager.hpp"
 #include "gui/item_action.hpp"
 #include "gui/item_back.hpp"
-#include "gui/item_badguy_select.hpp"
 #include "gui/item_color.hpp"
 #include "gui/item_colorchannel.hpp"
 #include "gui/item_colordisplay.hpp"
@@ -33,7 +32,6 @@
 #include "gui/item_inactive.hpp"
 #include "gui/item_intfield.hpp"
 #include "gui/item_label.hpp"
-#include "gui/item_paths.hpp"
 #include "gui/item_script.hpp"
 #include "gui/item_script_line.hpp"
 #include "gui/item_stringselect.hpp"
@@ -321,14 +319,6 @@ Menu::add_color_channel_oklab(Color* color, int channel) {
   return *item_ptr;
 }
 
-ItemPaths&
-Menu::add_path_settings(const std::string& text, PathObject& target, const std::string& path_ref) {
-  auto item = std::make_unique<ItemPaths>(text, target, path_ref);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
 ItemColorDisplay&
 Menu::add_color_display(Color* color, int id) {
   auto item = std::make_unique<ItemColorDisplay>(color, id);
@@ -340,14 +330,6 @@ Menu::add_color_display(Color* color, int id) {
 ItemColor&
 Menu::add_color(const std::string& text, Color* color, int id) {
   auto item = std::make_unique<ItemColor>(text, color, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemBadguySelect&
-Menu::add_badguy_select(const std::string& text, std::vector<std::string>* badguys, int id) {
-  auto item = std::make_unique<ItemBadguySelect>(text, badguys, id);
   auto item_ptr = item.get();
   add_item(std::move(item));
   return *item_ptr;

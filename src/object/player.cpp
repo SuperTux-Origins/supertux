@@ -21,7 +21,6 @@
 #include "badguy/badguy.hpp"
 #include "control/codecontroller.hpp"
 #include "control/input_manager.hpp"
-#include "editor/editor.hpp"
 #include "math/util.hpp"
 #include "math/random.hpp"
 #include "object/brick.hpp"
@@ -1822,10 +1821,6 @@ Player::kick()
 void
 Player::draw(DrawingContext& context)
 {
-  if (Editor::is_active()) {
-    return;
-  }
-
   if (!m_visible)
     return;
 

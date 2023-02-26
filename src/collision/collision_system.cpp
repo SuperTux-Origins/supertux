@@ -19,7 +19,6 @@
 
 #include "collision/collision.hpp"
 #include "collision/collision_movement_manager.hpp"
-#include "editor/editor.hpp"
 #include "math/aatriangle.hpp"
 #include "math/rect.hpp"
 #include "object/player.hpp"
@@ -512,11 +511,6 @@ CollisionSystem::collision_static_constrains(CollisionObject& object)
 void
 CollisionSystem::update()
 {
-  if (Editor::is_active()) {
-    return;
-    //Objects in editor shouldn't collide.
-  }
-
   using namespace collision;
 
   m_ground_movement_manager->apply_all_ground_movement();

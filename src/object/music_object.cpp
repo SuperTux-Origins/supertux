@@ -101,14 +101,4 @@ MusicObject::get_music() const
   return m_music;
 }
 
-ObjectSettings
-MusicObject::get_settings()
-{
-  auto settings = GameObject::get_settings();
-
-  settings.add_music(_("File"), &m_music, "file");
-
-  return settings;
-}
-
 /* EOF */

@@ -15,7 +15,6 @@
 
 #include "object/circleplatform.hpp"
 
-#include "editor/editor.hpp"
 #include "math/util.hpp"
 #include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
@@ -33,32 +32,16 @@ CirclePlatform::CirclePlatform(const ReaderMapping& reader) :
   reader.get("radius", radius, 100.0f);
   reader.get("speed", speed, 2.0f);
   reader.get("time", time, 0.0f);
-  if (!Editor::is_active())
-  {
-    m_col.m_bbox.set_pos(Vector(start_position.x + cosf(angle) * radius,
-                                start_position.y + sinf(angle) * radius));
-    initialize();
-  }
+
+  m_col.m_bbox.set_pos(Vector(start_position.x + cosf(angle) * radius,
+                              start_position.y + sinf(angle) * radius));
+  initialize();
 }
 
 HitResponse
 CirclePlatform::collision(GameObject& other, const CollisionHit& )
 {
   return FORCE_MOVE;
-}
-
-ObjectSettings
-CirclePlatform::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_float(_("Radius"), &radius, "radius", 100.0f);
-  result.add_float(_("Speed"), &speed, "speed", 2.0f);
-  result.add_float(_("Delay"), &time, "time", 0.0f);
-
-  result.reorder({"radius", "speed", "time", "sprite", "x", "y"});
-
-  return result;
 }
 
 void
@@ -69,13 +52,11 @@ CirclePlatform::update(float dt_sec)
     time = 0;
     timer.stop();
     angle = fmodf(angle + dt_sec * speed, math::TAU);
-    if (!Editor::is_active())
-    {
-      Vector newpos(start_position.x + cosf(angle) * radius,
-                    start_position.y + sinf(angle) * radius);
-      m_col.set_movement(newpos - get_pos());
-      m_col.propagate_movement(newpos - get_pos());
-    }
+
+    Vector newpos(start_position.x + cosf(angle) * radius,
+                  start_position.y + sinf(angle) * radius);
+    m_col.set_movement(newpos - get_pos());
+    m_col.propagate_movement(newpos - get_pos());
   }
 }
 

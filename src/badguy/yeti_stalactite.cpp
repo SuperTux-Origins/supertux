@@ -16,7 +16,6 @@
 
 #include "badguy/yeti_stalactite.hpp"
 
-#include "editor/editor.hpp"
 #include "sprite/sprite.hpp"
 
 static const float YT_SHAKE_TIME = .8f;
@@ -71,18 +70,7 @@ YetiStalactite::update(float dt_sec)
 void
 YetiStalactite::draw(DrawingContext& context)
 {
-  if (Editor::is_active() &&
-      m_sprite->get_action() != "yeti-stalactite" &&
-      m_sprite->has_action("yeti-stalactite"))
-  {
-    m_sprite->set_action("yeti-stalactite");
-    BadGuy::draw(context);
-    return;
-  }
-  else
-  {
-    Stalactite::draw(context);
-  }
+  Stalactite::draw(context);
 }
 
 bool

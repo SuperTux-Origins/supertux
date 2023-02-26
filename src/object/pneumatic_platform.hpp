@@ -36,8 +36,6 @@ public:
   virtual bool is_saveable() const override { return false; }
   virtual void on_flip(float height) override;
 
-  virtual void editor_delete() override;
-
 protected:
   PneumaticPlatform& m_parent;
   bool m_left;
@@ -66,10 +64,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Pneumatic Platform"); }
   virtual std::string get_display_name() const override { return display_name(); }
-
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
-  virtual void editor_delete() override;
 
 private:
   Vector m_pos;

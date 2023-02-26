@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 
+#include "math/rect.hpp"
 #include "math/size.hpp"
 #include "math/vector.hpp"
 #include "object/path_object.hpp"
@@ -67,9 +68,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Camera"); }
   virtual std::string get_display_name() const override { return display_name(); }
-
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
 
   virtual const std::string get_icon_path() const override { return "images/engine/editor/camera.png"; }
   /** @} */

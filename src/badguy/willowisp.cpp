@@ -19,7 +19,6 @@
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
 #include "badguy/dispenser.hpp"
-#include "editor/editor.hpp"
 #include "object/lantern.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
@@ -49,14 +48,8 @@ WillOWisp::WillOWisp(const ReaderMapping& reader) :
   m_color(0, 1, 0),
   m_starting_node(0)
 {
-  if (Editor::is_active()) {
-    reader.get("sector", m_target_sector);
-    reader.get("spawnpoint", m_target_spawnpoint);
-  } else {
-    reader.get("sector", m_target_sector, "main");
-    reader.get("spawnpoint", m_target_spawnpoint, "main");
-  }
-
+  reader.get("sector", m_target_sector, "main");
+  reader.get("spawnpoint", m_target_spawnpoint, "main");
   reader.get("flyspeed", m_flyspeed, FLYSPEED);
   reader.get("track-range", m_track_range, TRACK_RANGE);
   reader.get("vanish-range", m_vanish_range, VANISH_RANGE);
@@ -97,25 +90,8 @@ WillOWisp::finish_construction()
 }
 
 void
-WillOWisp::after_editor_set()
-{
-  BadGuy::after_editor_set();
-
-  m_lightsprite->set_color(Color(m_color.red * 0.2f,
-                                 m_color.green * 0.2f,
-                                 m_color.blue * 0.2f));
-  m_sprite->set_color(m_color);
-}
-
-void
 WillOWisp::active_update(float dt_sec)
 {
-  if (Editor::is_active() && get_path() && get_path()->is_valid()) {
-    get_walker()->update(dt_sec);
-    set_pos(get_walker()->get_pos(m_col.m_bbox.get_size(), m_path_handle));
-    return;
-  }
-
   auto player = get_nearest_player();
   if (!player) return;
   Vector p1 = m_col.m_bbox.get_middle();
@@ -179,9 +155,6 @@ WillOWisp::active_update(float dt_sec)
 void
 WillOWisp::activate()
 {
-  if (Editor::is_active())
-    return;
-
   m_sound_source = SoundManager::current()->create_sound_source(SOUNDFILE);
   m_sound_source->set_position(get_pos());
   m_sound_source->set_looping(true);
@@ -300,32 +273,6 @@ WillOWisp::set_state(const std::string& new_state)
   } else {
     log_warning << "Can't set unknown willowisp state '" << new_state << std::endl;
   }
-}
-
-ObjectSettings
-WillOWisp::get_settings()
-{
-  ObjectSettings result = BadGuy::get_settings();
-
-  result.add_direction(_("Direction"), &m_dir);
-  result.add_text(_("Sector"), &m_target_sector, "sector");
-  result.add_text(_("Spawnpoint"), &m_target_spawnpoint, "spawnpoint");
-  result.add_text(_("Hit script"), &m_hit_script, "hit-script");
-  result.add_float(_("Track range"), &m_track_range, "track-range", TRACK_RANGE);
-  result.add_float(_("Vanish range"), &m_vanish_range, "vanish-range", VANISH_RANGE);
-  result.add_float(_("Fly speed"), &m_flyspeed, "flyspeed", FLYSPEED);
-  result.add_path_ref(_("Path"), *this, get_path_ref(), "path-ref");
-  result.add_int(_("Starting Node"), &m_starting_node, "starting-node", 0, 0U);
-  result.add_color(_("Color"), &m_color, "color");
-  if (get_path())
-  {
-    result.add_bool(_("Adapt Speed"), &get_path()->m_adapt_speed, {}, {});
-    result.add_path_handle(_("Handle"), m_path_handle, "handle");
-  }
-
-  result.reorder({"sector", "spawnpoint", "flyspeed", "track-range", "hit-script", "vanish-range", "name", "path-ref", "region", "x", "y"});
-
-  return result;
 }
 
 void WillOWisp::stop_looping_sounds()

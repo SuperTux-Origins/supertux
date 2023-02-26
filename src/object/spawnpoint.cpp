@@ -16,7 +16,6 @@
 
 #include "object/spawnpoint.hpp"
 
-#include "editor/editor.hpp"
 #include "supertux/debug.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
@@ -29,9 +28,7 @@ SpawnPointMarker::SpawnPointMarker(const std::string& name, const Vector& pos) :
   m_col.m_bbox.set_p1(pos);
   m_col.m_bbox.set_size(32, 32);
 
-  if (!Editor::is_active()) {
-    set_group(COLGROUP_DISABLED);
-  }
+  set_group(COLGROUP_DISABLED);
 }
 
 SpawnPointMarker::SpawnPointMarker(const ReaderMapping& mapping) :
@@ -48,18 +45,10 @@ SpawnPointMarker::SpawnPointMarker(const ReaderMapping& mapping) :
 void
 SpawnPointMarker::draw(DrawingContext& context)
 {
-  if (Editor::is_active() || g_debug.show_collision_rects)
+  if (g_debug.show_collision_rects)
   {
     context.color().draw_surface(m_surface, m_col.m_bbox.p1(), LAYER_FOREGROUND1);
   }
-}
-
-ObjectSettings
-SpawnPointMarker::get_settings()
-{
-  ObjectSettings result = MovingObject::get_settings();
-  result.add_test_from_here();
-  return result;
 }
 
 /* EOF */

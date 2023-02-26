@@ -18,7 +18,6 @@
 
 #include "audio/sound_manager.hpp"
 #include "badguy/dispenser.hpp"
-#include "editor/editor.hpp"
 #include "math/random.hpp"
 #include "object/bullet.hpp"
 #include "object/camera.hpp"
@@ -135,9 +134,6 @@ BadGuy::draw(DrawingContext& context)
 
   if (m_state == STATE_INIT || m_state == STATE_INACTIVE)
   {
-    if (Editor::is_active()) {
-      m_sprite->draw(context.color(), get_pos(), m_layer, m_flip);
-    }
   }
   else
   {
@@ -210,9 +206,6 @@ BadGuy::update(float dt_sec)
   switch (m_state) {
     case STATE_ACTIVE:
       m_is_active_flag = true;
-      if (Editor::is_active()) {
-        break;
-      }
       //won't work if defined anywhere else for some reason
       if (m_frozen && is_portable())
         m_freezesprite->set_action(get_overlay_size(), 1);
@@ -699,17 +692,12 @@ BadGuy::is_offscreen() const
   Vector player_dist(0.0f, 0.0f);
   Camera& cam = Sector::get().get_camera();
   cam_dist = cam.get_center() - m_col.m_bbox.get_middle();
-  if (Editor::is_active()) {
-      if ((fabsf(cam_dist.x) <= X_OFFSCREEN_DISTANCE) && (fabsf(cam_dist.y) <= Y_OFFSCREEN_DISTANCE)) {
-        return false;
-    }
-  }
   auto player = get_nearest_player();
   if (!player)
     return false;
-  if (!Editor::is_active()) {
-    player_dist = player->get_bbox().get_middle() - m_col.m_bbox.get_middle();
-  }
+
+  player_dist = player->get_bbox().get_middle() - m_col.m_bbox.get_middle();
+
   // In SuperTux 0.1.x, Badguys were activated when Tux<->Badguy center distance was approx. <= ~668px
   // This doesn't work for wide-screen monitors which give us a virt. res. of approx. 1066px x 600px
   if (((fabsf(player_dist.x) <= X_OFFSCREEN_DISTANCE) && (fabsf(player_dist.y) <= Y_OFFSCREEN_DISTANCE))
@@ -1038,81 +1026,6 @@ BadGuy::set_colgroup_active(CollisionGroup group_)
 {
   m_colgroup_active = group_;
   if (m_state == STATE_ACTIVE) set_group(group_);
-}
-
-ObjectSettings
-BadGuy::get_settings()
-{
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_direction(_("Direction"), &m_start_dir, Direction::AUTO, "direction");
-  result.add_script(_("Death script"), &m_dead_script, "dead-script");
-
-  result.reorder({"direction", "sprite", "x", "y"});
-
-  return result;
-}
-
-void
-BadGuy::after_editor_set()
-{
-  MovingSprite::after_editor_set();
-
-  if (m_dir == Direction::AUTO)
-  {
-    if (m_sprite->has_action("editor-left")) {
-      m_sprite->set_action("editor-left");
-    } else if (m_sprite->has_action("editor-right")) {
-      m_sprite->set_action("editor-right");
-    } else if (m_sprite->has_action("left")) {
-      m_sprite->set_action("left");
-    } else if (m_sprite->has_action("normal")) {
-      m_sprite->set_action("normal");
-    } else if (m_sprite->has_action("idle")) {
-      m_sprite->set_action("idle");
-    } else if (m_sprite->has_action("idle-left")) {
-      m_sprite->set_action("idle-left");
-    } else if (m_sprite->has_action("flying-left")) {
-      m_sprite->set_action("flying-left");
-    } else if (m_sprite->has_action("walking-left")) {
-      m_sprite->set_action("walking-left");
-    } else if (m_sprite->has_action("flying")) {
-      m_sprite->set_action("flying");
-    } else if (m_sprite->has_action("standing-left")) {
-      m_sprite->set_action("standing-left");
-    } else {
-      log_warning << "couldn't find editor sprite for badguy direction='auto': " << get_class_name() << std::endl;
-    }
-  }
-  else
-  {
-    std::string action_str = dir_to_string(m_dir);
-
-    if (m_sprite->has_action("editor-" + action_str)) {
-      m_sprite->set_action("editor-" + action_str);
-    } else if (m_sprite->has_action(action_str)) {
-      m_sprite->set_action(action_str);
-    } else if (m_sprite->has_action("idle-" + action_str)) {
-      m_sprite->set_action("idle-" + action_str);
-    } else if (m_sprite->has_action("flying-" + action_str)) {
-      m_sprite->set_action("flying-" + action_str);
-    } else if (m_sprite->has_action("standing-" + action_str)) {
-      m_sprite->set_action("standing-" + action_str);
-    } else if (m_sprite->has_action("walking-" + action_str)) {
-      m_sprite->set_action("walking-" + action_str);
-    } else if (m_sprite->has_action("left")) {
-      m_sprite->set_action("left");
-    } else if (m_sprite->has_action("normal")) {
-      m_sprite->set_action("normal");
-    } else if (m_sprite->has_action("idle")) {
-      m_sprite->set_action("idle");
-    } else if (m_sprite->has_action("flying")) {
-      m_sprite->set_action("flying");
-    } else {
-      log_warning << "couldn't find editor sprite for badguy direction='" << action_str << "': "
-                  << get_class_name() << std::endl;
-    }
-  }
 }
 
 bool

@@ -34,8 +34,6 @@ public:
 
   virtual void finish_construction() override;
 
-  virtual ObjectSettings get_settings() override;
-
   virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
   virtual void update(float dt_sec) override;
 
@@ -45,8 +43,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Platform"); }
   virtual std::string get_display_name() const override { return display_name(); }
-
-  virtual void editor_update() override;
 
   virtual void on_flip(float height) override;
 

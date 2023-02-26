@@ -20,7 +20,6 @@
 
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
-#include "editor/editor.hpp"
 #include "object/camera.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
@@ -54,11 +53,8 @@ AmbientSound::AmbientSound(const ReaderMapping& mapping) :
   mapping.get("volume"         ,maximumvolume  , 1.0f);
 
   // square all distances (saves us a sqrt later)
-
-  if (!Editor::is_active()) {
-    distance_bias*=distance_bias;
-    distance_factor*=distance_factor;
-  }
+  distance_bias*=distance_bias;
+  distance_factor*=distance_factor;
 
   // set default silence_distance
 
@@ -69,10 +65,9 @@ AmbientSound::AmbientSound(const ReaderMapping& mapping) :
 
   mapping.get("silence_distance",silence_distance);
 
-  if (!Editor::is_active()) {
-    sound_source.reset(); // not playing at the beginning
-    SoundManager::current()->preload(sample);
-  }
+  sound_source.reset(); // not playing at the beginning
+  SoundManager::current()->preload(sample);
+
   latency=0;
 }
 
@@ -100,35 +95,13 @@ AmbientSound::AmbientSound(const Vector& pos, float factor, float bias, float vo
   else
     silence_distance = 1/distance_factor;
 
-  if (!Editor::is_active()) {
-    sound_source.reset(); // not playing at the beginning
-    SoundManager::current()->preload(sample);
-  }
+  sound_source.reset(); // not playing at the beginning
+  SoundManager::current()->preload(sample);
 }
 
 AmbientSound::~AmbientSound()
 {
   stop_playing();
-}
-
-ObjectSettings
-AmbientSound::get_settings()
-{
-  ObjectSettings result = MovingObject::get_settings();
-
-  result.add_sound(_("Sound"), &sample, "sample");
-  result.add_float(_("Distance factor"), &distance_factor, "distance_factor");
-  result.add_float(_("Distance bias"), &distance_bias, "distance_bias");
-  result.add_float(_("Volume"), &maximumvolume, "volume");
-
-  result.reorder({"sample", "distance_factor", "distance_bias", "volume", "region", "name", "x", "y", "width", "height"});
-
-  return result;
-}
-
-void
-AmbientSound::after_editor_set()
-{
 }
 
 void
@@ -140,8 +113,6 @@ AmbientSound::stop_playing()
 void
 AmbientSound::start_playing()
 {
-  if (Editor::is_active()) return;
-
   try {
     sound_source = SoundManager::current()->create_sound_source(sample);
     if (!sound_source)
@@ -252,10 +223,6 @@ AmbientSound::collision(GameObject& other, const CollisionHit& hit_)
 void
 AmbientSound::draw(DrawingContext& context)
 {
-  if (Editor::is_active()) {
-    context.color().draw_filled_rect(m_col.m_bbox, Color(0.0f, 0.0f, 1.0f, 0.6f),
-                                     0.0f, LAYER_OBJECTS);
-  }
 }
 
 /* EOF */

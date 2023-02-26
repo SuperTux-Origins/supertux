@@ -18,7 +18,6 @@
 
 #include <optional>
 
-#include "editor/node_marker.hpp"
 #include "gui/menu_manager.hpp"
 #include "object/path.hpp"
 #include "object/path_object.hpp"
@@ -165,45 +164,9 @@ PathGameObject::draw(DrawingContext& context)
   }
 }
 
-ObjectSettings
-PathGameObject::get_settings()
-{
-  ObjectSettings result = GameObject::get_settings();
-
-  result.add_path(_("Path"), m_path.get(), "path");
-
-  return result;
-}
-
-void
-PathGameObject::editor_update()
-{
-  check_references();
-}
-
-void
-PathGameObject::editor_select()
-{
-  log_fatal << "PathGameObject::selected" << std::endl;
-}
-
-void
-PathGameObject::editor_deselect()
-{
-  log_fatal << "PathGameObject::deselected" << std::endl;
-}
-
 void
 PathGameObject::remove_me()
 {
-  if (Sector::current())
-  {
-    auto handles = Sector::get().get_objects_by_type<NodeMarker>();
-
-    for (auto& handle : handles)
-      handle.remove_me(); // Removing a node handle also removes its bezier handles
-  }
-
   const auto& path_objects = Sector::get().get_objects_by_type<PathObject>();
 
   for (const auto& path_obj : path_objects)

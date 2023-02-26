@@ -25,7 +25,6 @@ public:
   SCrystallo(const ReaderMapping& reader);
 
   virtual void initialize() override;
-  virtual ObjectSettings get_settings() override;
   static std::string class_name() { return "scrystallo"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Sleeping Crystallo"); }

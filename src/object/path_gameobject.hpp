@@ -49,15 +49,9 @@ public:
     return "images/engine/editor/path.png";
   }
 
-  virtual void editor_update() override;
-  virtual void editor_select() override;
-  virtual void editor_deselect() override;
-
   virtual void remove_me() override;
 
   virtual void on_flip(float height) override;
-
-  virtual ObjectSettings get_settings() override;
 
   Path& get_path() { return *m_path; }
 

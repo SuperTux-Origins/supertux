@@ -16,7 +16,6 @@
 
 #include "object/scripted_object.hpp"
 
-#include "editor/editor.hpp"
 #include "math/random.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
@@ -39,11 +38,9 @@ ScriptedObject::ScriptedObject(const ReaderMapping& mapping) :
 {
   m_default_sprite_name = {};
 
-  if (!Editor::is_active()) {
-    if (m_name.empty()) {
-      m_name = "unnamed" + std::to_string(graphicsRandom.rand());
-      log_warning << "Scripted object must have a name specified, setting to: " << m_name << std::endl;
-    }
+  if (m_name.empty()) {
+    m_name = "unnamed" + std::to_string(graphicsRandom.rand());
+    log_warning << "Scripted object must have a name specified, setting to: " << m_name << std::endl;
   }
 
   mapping.get("solid", solid, true);
@@ -56,26 +53,6 @@ ScriptedObject::ScriptedObject(const ReaderMapping& mapping) :
   } else {
     set_group( COLGROUP_DISABLED );
   }
-}
-ObjectSettings
-ScriptedObject::get_settings()
-{
-  new_size.x = m_col.m_bbox.get_width();
-  new_size.y = m_col.m_bbox.get_height();
-
-  ObjectSettings result = MovingSprite::get_settings();
-
-  result.add_int(_("Z-pos"), &m_layer, "z-pos", LAYER_OBJECTS);
-  //result.add_float("width", &new_size.x, "width", OPTION_HIDDEN);
-  //result.add_float("height", &new_size.y, "height", OPTION_HIDDEN);
-  result.add_bool(_("Solid"), &solid, "solid", true);
-  result.add_bool(_("Physics enabled"), &physic_enabled, "physic-enabled", true);
-  result.add_bool(_("Visible"), &visible, "visible", true);
-  result.add_text(_("Hit script"), &hit_script, "hit-script");
-
-  result.reorder({"z-pos", "visible", "physic-enabled", "solid", "name", "sprite", "script", "button", "x", "y"});
-
-  return result;
 }
 
 void

@@ -45,14 +45,6 @@ public:
     static Color reference_color;
     static Color normal_color;
   };
-
-  class Editor
-  {
-  public:
-    static Color default_color;
-    static Color hover_color;
-    static Color grab_color;
-  };
 };
 
 #endif

@@ -19,8 +19,6 @@
 #include <math.h>
 #include <assert.h>
 
-#include "editor/editor.hpp"
-#include "editor/object_option.hpp"
 #include "math/bezier.hpp"
 #include "math/random.hpp"
 #include "object/path_gameobject.hpp"
@@ -79,7 +77,6 @@ PathWalker::update(float dt_sec)
   Path* path = get_path();
   if (!path) return;
   if (!path->is_valid()) return;
-  if (Editor::is_active()) return;
   if (!m_running) return;
 
   float delta = fabsf(m_walking_speed) * dt_sec;
@@ -111,15 +108,14 @@ PathWalker::get_pos(const Sizef& object_size, const Handle& handle) const
   Path* path = get_path();
   if (!path) return Vector(0, 0);
   if (!path->is_valid()) return Vector(0, 0);
-  if (Editor::is_active()) return path->m_nodes.begin()->position;
 
   const Path::Node* current_node = &(path->m_nodes[m_current_node_nr]);
   const Path::Node* next_node = & (path->m_nodes[m_next_node_nr]);
-  
+
   easing easeFunc = m_walking_speed > 0 ?
                           getEasingByName(current_node->easing) :
                           getEasingByName(get_reverse_easing(next_node->easing));
-  
+
   float progress = static_cast<float>(easeFunc(static_cast<double>(m_node_time)));
 
   Vector p1 = current_node->position,

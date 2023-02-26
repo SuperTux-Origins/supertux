@@ -25,7 +25,7 @@
  * A burning candle: Simple, scriptable level decoration.
  */
 class Candle final : public MovingSprite,
-               public ExposedObject<Candle, scripting::Candle>
+                     public ExposedObject<Candle, scripting::Candle>
 {
 public:
   Candle(const ReaderMapping& mapping);
@@ -36,9 +36,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Candle"); }
   virtual std::string get_display_name() const override { return display_name(); }
-
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
 
   virtual void on_flip(float height) override;
 

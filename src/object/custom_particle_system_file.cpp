@@ -18,7 +18,6 @@
 
 #include <algorithm>
 
-#include "editor/editor.hpp"
 #include "gui/menu_manager.hpp"
 #include "util/reader.hpp"
 #include "util/reader_document.hpp"
@@ -43,22 +42,6 @@ CustomParticleSystemFile::CustomParticleSystemFile(const ReaderMapping& reader) 
 
 CustomParticleSystemFile::~CustomParticleSystemFile()
 {
-}
-
-ObjectSettings
-CustomParticleSystemFile::get_settings()
-{
-  ObjectSettings result = ParticleSystem::get_settings();
-
-  result.add_file(_("File"), &m_filename, "file", {}, {".stcp"}, "/particles");
-  result.add_particle_editor();
-
-  // It is assumed get_settings() is called whenever the menu is opened
-  Editor::current()->m_particle_editor_filename = &m_filename;
-
-  result.add_remove();
-
-  return result;
 }
 
 void

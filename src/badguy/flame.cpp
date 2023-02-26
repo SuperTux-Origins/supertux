@@ -17,7 +17,6 @@
 #include "badguy/flame.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "editor/editor.hpp"
 #include "math/util.hpp"
 #include "object/sprite_particle.hpp"
 #include "sprite/sprite.hpp"
@@ -38,10 +37,10 @@ Flame::Flame(const ReaderMapping& reader, const std::string& sprite) :
 {
   reader.get("radius", radius, 100.0f);
   reader.get("speed", speed, 2.0f);
-  if (!Editor::is_active()) {
-    m_col.m_bbox.set_pos(Vector(m_start_position.x + cosf(angle) * radius,
-                                m_start_position.y + sinf(angle) * radius));
-  }
+
+  m_col.m_bbox.set_pos(Vector(m_start_position.x + cosf(angle) * radius,
+                              m_start_position.y + sinf(angle) * radius));
+
   m_countMe = false;
   SoundManager::current()->preload(FLAME_SOUND);
 
@@ -54,29 +53,15 @@ Flame::Flame(const ReaderMapping& reader, const std::string& sprite) :
   m_glowing = true;
 }
 
-ObjectSettings
-Flame::get_settings()
-{
-  ObjectSettings result = BadGuy::get_settings();
-
-  result.add_float(_("Radius"), &radius, "radius", 100.0f);
-  result.add_float(_("Speed"), &speed, "speed", 2.0f);
-
-  result.reorder({"speed", "sprite", "x", "y"});
-
-  return result;
-}
-
 void
 Flame::active_update(float dt_sec)
 {
   angle = fmodf(angle + dt_sec * speed, math::TAU);
-  if (!Editor::is_active()) {
-    Vector newpos(m_start_position.x + cosf(angle) * radius,
-                  m_start_position.y + sinf(angle) * radius);
-    m_col.set_movement(newpos - get_pos());
-    sound_source->set_position(get_pos());
-  }
+
+  Vector newpos(m_start_position.x + cosf(angle) * radius,
+                m_start_position.y + sinf(angle) * radius);
+  m_col.set_movement(newpos - get_pos());
+  sound_source->set_position(get_pos());
 
   if (m_sprite->get_action() == "fade" && m_sprite->animation_done()) remove_me();
 }
@@ -84,8 +69,6 @@ Flame::active_update(float dt_sec)
 void
 Flame::activate()
 {
-  if (Editor::is_active())
-    return;
   sound_source = SoundManager::current()->create_sound_source(FLAME_SOUND);
   sound_source->set_position(get_pos());
   sound_source->set_looping(true);

@@ -20,7 +20,6 @@
 
 #include "audio/sound_manager.hpp"
 #include "control/input_manager.hpp"
-#include "editor/editor.hpp"
 #include "gui/menu_manager.hpp"
 #include "math/vector.hpp"
 #include "object/camera.hpp"
@@ -422,9 +421,7 @@ GameSession::update(float dt_sec, const Controller& controller)
       || controller.hold(Control::RIGHT));
   }
 
-  if (controller.pressed(Control::CHEAT_MENU) &&
-      (g_config->developer_mode || (Editor::current() && Editor::current()->is_testing_level()))
-     )
+  if (controller.pressed(Control::CHEAT_MENU) && g_config->developer_mode)
   {
     if (!MenuManager::instance().is_active())
     {

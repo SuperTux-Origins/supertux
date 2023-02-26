@@ -16,7 +16,6 @@
 
 #include "object/particle_zone.hpp"
 
-#include "editor/editor.hpp"
 #include "supertux/resources.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
@@ -71,24 +70,6 @@ ParticleZone::ParticleZone(const ReaderMapping& reader) :
   set_group(COLGROUP_TOUCHABLE);
 }
 
-ObjectSettings
-ParticleZone::get_settings()
-{
-  ObjectSettings result = MovingObject::get_settings();
-
-  result.add_bool(_("Enabled"), &m_enabled, "enabled", true);
-  result.add_text(_("Particle Name"), &m_particle_name, "particle-name");
-  result.add_enum(_("Zone Type"), reinterpret_cast<int*>(&m_type),
-                  {_("Spawn"), _("Life zone"), _("Life zone (clear)"), _("Kill particles"), _("Clear particles")},
-                  {"spawn", "life", "life-clear", "killer", "destroyer"},
-                  static_cast<int>(ParticleZoneType::Spawn),
-                  "zone-type");
-
-  result.reorder({"region", "name", "x", "y"});
-
-  return result;
-}
-
 void
 ParticleZone::update(float dt_sec)
 {
@@ -99,35 +80,6 @@ ParticleZone::update(float dt_sec)
 void
 ParticleZone::draw(DrawingContext& context)
 {
-  if (Editor::is_active()) {
-    Color c;
-    switch(m_type) {
-    case ParticleZoneType::Spawn:
-      c = Color(0.5f, 0.5f, 1.0f, 0.6f);
-      break;
-    case ParticleZoneType::Life:
-      c = Color(0.5f, 1.0f, 0.5f, 0.6f);
-      break;
-    case ParticleZoneType::LifeClear:
-      c = Color(1.0f, 1.0f, 0.5f, 0.6f);
-      break;
-    case ParticleZoneType::Killer:
-      c = Color(1.0f, 0.75f, 0.5f, 0.6f);
-      break;
-    case ParticleZoneType::Destroyer:
-      c = Color(1.0f, 0.5f, 0.5f, 0.6f);
-      break;
-    }
-
-    context.color().draw_filled_rect(m_col.m_bbox, c,
-                           0.0f, LAYER_OBJECTS);
-    context.color().draw_text(Resources::small_font,
-                          m_particle_name, 
-                          m_col.m_bbox.p1(),
-                          FontAlignment::ALIGN_LEFT,
-                          LAYER_OBJECTS,
-                          Color::WHITE);
-  }
 }
 
 HitResponse

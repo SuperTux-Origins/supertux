@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include "editor/overlay_widget.hpp"
 #include "supertux/colorscheme.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"

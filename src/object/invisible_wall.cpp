@@ -16,7 +16,6 @@
 
 #include "object/invisible_wall.hpp"
 
-#include "editor/editor.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 
@@ -35,25 +34,6 @@ InvisibleWall::InvisibleWall(const ReaderMapping& mapping):
   m_col.m_group = COLGROUP_STATIC;
 }
 
-ObjectSettings
-InvisibleWall::get_settings()
-{
-  width = m_col.m_bbox.get_width();
-  height = m_col.m_bbox.get_height();
-
-  ObjectSettings result = MovingObject::get_settings();
-
-  //result.add_float(_("Width"), &width, "width");
-  //result.add_float(_("Height"), &height, "height");
-
-  return result;
-}
-
-void
-InvisibleWall::after_editor_set() {
-  m_col.m_bbox.set_size(width, height);
-}
-
 HitResponse
 InvisibleWall::collision(GameObject& , const CollisionHit& )
 {
@@ -63,10 +43,6 @@ InvisibleWall::collision(GameObject& , const CollisionHit& )
 void
 InvisibleWall::draw(DrawingContext& context)
 {
-  if (Editor::is_active()) {
-    context.color().draw_filled_rect(m_col.m_bbox, Color(0.0f, 0.0f, 0.0f, 0.6f),
-                             0.0f, LAYER_OBJECTS);
-  }
 }
 
 void

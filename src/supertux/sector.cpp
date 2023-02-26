@@ -23,7 +23,7 @@
 #include "badguy/badguy.hpp"
 #include "collision/collision.hpp"
 #include "collision/collision_system.hpp"
-#include "editor/editor.hpp"
+#include "control/input_manager.hpp"
 #include "math/aatriangle.hpp"
 #include "math/rect.hpp"
 #include "object/ambient_light.hpp"
@@ -78,9 +78,7 @@ Sector::Sector(Level& parent) :
   m_collision_system(new CollisionSystem(*this)),
   m_gravity(10.0)
 {
-  Savegame* savegame = (Editor::current() && Editor::is_active()) ?
-    Editor::current()->m_savegame.get() :
-    GameSession::current() ? &GameSession::current()->get_savegame() : nullptr;
+  Savegame* savegame = GameSession::current() ? &GameSession::current()->get_savegame() : nullptr;
   PlayerStatus& player_status = savegame ? savegame->get_player_status() : dummy_player_status;
 
   if (savegame && !m_level.m_suppress_pause_menu && !savegame->is_title_screen()) {
@@ -232,9 +230,6 @@ Sector::activate(const Vector& player_pos)
   // The Sector object is called 'settings' as it is accessed as 'sector.settings'
   m_squirrel_environment->expose("settings", std::make_unique<scripting::Sector>(this));
 
-  if (Editor::is_active())
-    return;
-
   // two-player hack: move other players to main player's position
   // Maybe specify 2 spawnpoints in the level?
   for (auto player_ptr : get_objects_by_type_index(typeid(Player))) {
@@ -283,7 +278,7 @@ Sector::activate(const Vector& player_pos)
   }
 
   // Run init script
-  if (!m_init_script.empty() && !Editor::is_active()) {
+  if (!m_init_script.empty()) {
     run_script(m_init_script, "init-script");
   }
 }
@@ -669,47 +664,6 @@ void Sector::play_looping_sounds()
   for (const auto& object : get_objects()) {
     object->play_looping_sounds();
   }
-}
-
-void
-Sector::save(Writer &writer)
-{
-  BIND_SECTOR(*this);
-
-  writer.start_list("sector", false);
-
-  writer.write("name", m_name, false);
-
-  if (!m_level.is_worldmap()) {
-    if (m_gravity != 10.0f) {
-      writer.write("gravity", m_gravity);
-    }
-  }
-
-  if (m_init_script.size()) {
-    writer.write("init-script", m_init_script,false);
-  }
-
-  // saving objects;
-  std::vector<GameObject*> objects(get_objects().size());
-  std::transform(get_objects().begin(), get_objects().end(), objects.begin(), [] (auto& obj) {
-    return obj.get();
-  });
-
-  std::stable_sort(objects.begin(), objects.end(),
-                   [](const GameObject* lhs, GameObject* rhs) {
-                     return lhs->get_class_name() < rhs->get_class_name();
-                   });
-
-  for (auto& obj : objects) {
-    if (obj->is_saveable()) {
-      writer.start_list(obj->get_class_name());
-      obj->save(writer);
-      writer.end_list(obj->get_class_name());
-    }
-  }
-
-  writer.end_list("sector");
 }
 
 void

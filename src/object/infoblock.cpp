@@ -18,7 +18,6 @@
 
 #include <algorithm>
 
-#include "editor/editor.hpp"
 #include "object/player.hpp"
 #include "object/camera.hpp"
 #include "supertux/info_box_line.hpp"
@@ -39,7 +38,7 @@ InfoBlock::InfoBlock(const ReaderMapping& mapping) :
   m_fadetransition(true),
   m_initial_y(0.0f)
 {
-  if (!mapping.get("message", m_message) && !(Editor::is_active()))
+  if (!mapping.get("message", m_message))
   {
     log_warning << "No message in InfoBlock" << std::endl;
   }
@@ -66,26 +65,6 @@ InfoBlock::InfoBlock(const ReaderMapping& mapping) :
 
 InfoBlock::~InfoBlock()
 {
-}
-
-ObjectSettings
-InfoBlock::get_settings()
-{
-  ObjectSettings result = Block::get_settings();
-
-  result.add_multiline_translatable_text(_("Message"), &m_message, "message");
-
-  result.add_color(_("Front Color"), &m_frontcolor, "frontcolor", Color(0.6f, 0.7f, 0.8f, 0.5f));
-
-  result.add_color(_("Back Color"), &m_backcolor, "backcolor", Color(0.f, 0.f, 0.f, 0.f));
-
-  result.add_float(_("Roundness"), &m_roundness, "roundness", 0.f);
-
-  result.add_bool(_("Fade Transition"), &m_fadetransition, "fadetransition", true);
-
-  result.reorder({ "message", "frontcolor", "backcolor", "roundness", "fadetransition", "x", "y" });
-
-  return result;
 }
 
 void

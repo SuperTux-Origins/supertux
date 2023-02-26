@@ -17,7 +17,7 @@
 #include "object/wind.hpp"
 
 #include "badguy/badguy.hpp"
-#include "editor/editor.hpp"
+#include "control/controller.hpp"
 #include "math/random.hpp"
 #include "object/particles.hpp"
 #include "object/player.hpp"
@@ -65,30 +65,6 @@ Wind::Wind(const ReaderMapping& reader) :
   set_group(COLGROUP_TOUCHABLE);
 }
 
-ObjectSettings
-Wind::get_settings()
-{
-  new_size.x = m_col.m_bbox.get_width();
-  new_size.y = m_col.m_bbox.get_height();
-
-  ObjectSettings result = MovingObject::get_settings();
-
-  //result.add_float("width", &new_size.x, "width", OPTION_HIDDEN);
-  //result.add_float("height", &new_size.y, "height", OPTION_HIDDEN);
-  result.add_float(_("Speed X"), &speed.x, "speed-x");
-  result.add_float(_("Speed Y"), &speed.y, "speed-y");
-  result.add_float(_("Acceleration"), &acceleration, "acceleration");
-  result.add_bool(_("Blowing"), &blowing, "blowing", true);
-  result.add_bool(_("Affects Badguys"), &affects_badguys, "affects-badguys", false);
-  result.add_bool(_("Affects Objects"), &affects_objects, "affects-objects", false);
-  result.add_bool(_("Affects Player"), &affects_player, "affects-player");
-  result.add_bool(_("Fancy Particles"), &fancy_wind, "fancy-wind", false);
-
-  result.reorder({"blowing", "speed-x", "speed-y", "acceleration", "affects-badguys", "affects-objects", "affects-player", "fancy-wind", "region", "name", "x", "y"});
-
-  return result;
-}
-
 void
 Wind::update(float dt_sec_)
 {
@@ -119,10 +95,6 @@ Wind::update(float dt_sec_)
 void
 Wind::draw(DrawingContext& context)
 {
-  if (Editor::is_active()) {
-    context.color().draw_filled_rect(m_col.m_bbox, Color(0.0f, 1.0f, 1.0f, 0.6f),
-                             0.0f, LAYER_OBJECTS);
-  }
 }
 
 HitResponse
