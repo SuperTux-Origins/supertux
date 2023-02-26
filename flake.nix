@@ -59,7 +59,6 @@
 
     freetype-win32.url = "github:grumnix/freetype-win32";
     freetype-win32.inputs.nixpkgs.follows = "nixpkgs";
-    freetype-win32.inputs.flake-utils.follows = "flake-utils";
 
     SDL2_ttf.url = "github:SuperTux/SDL_ttf";
     SDL2_ttf.inputs.nixpkgs.follows = "nixpkgs";
@@ -67,7 +66,6 @@
 
     SDL2_ttf-win32.url = "github:grumnix/SDL2_ttf-win32";
     SDL2_ttf-win32.inputs.nixpkgs.follows = "nixpkgs";
-    SDL2_ttf-win32.inputs.flake-utils.follows = "flake-utils";
     SDL2_ttf-win32.inputs.tinycmmc.follows = "tinycmmc";
 
     wstsound.url = "github:WindstilleTeam/wstsound";
