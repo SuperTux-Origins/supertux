@@ -45,7 +45,6 @@ choice the next time.
 Important documentation for SuperTux is contained in multiple files.
 Please see them:
 
-* `INSTALL.md` - Requirements, compiling and installing.
 * `README.md` - This file
 * `NEWS.md` - Changes since the previous versions of SuperTux.
 * `LICENSE.txt` - The GNU General Public License, under whose terms SuperTux is
