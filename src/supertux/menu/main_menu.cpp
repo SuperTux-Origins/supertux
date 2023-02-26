@@ -16,22 +16,27 @@
 
 #include "supertux/menu/main_menu.hpp"
 
+#include <physfs.h>
+
 #include "audio/sound_manager.hpp"
 #include "gui/dialog.hpp"
 #include "gui/menu_item.hpp"
 #include "gui/menu_manager.hpp"
+#include "physfs/util.hpp"
 #include "supertux/fadetoblack.hpp"
+#include "supertux/game_manager.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/level.hpp"
 #include "supertux/level_parser.hpp"
 #include "supertux/levelset.hpp"
 #include "supertux/menu/menu_storage.hpp"
+#include "supertux/menu/sorted_contrib_menu.hpp"
 #include "supertux/screen_manager.hpp"
-#include "supertux/game_manager.hpp"
 #include "supertux/textscroller_screen.hpp"
 #include "supertux/world.hpp"
-#include "util/log.hpp"
 #include "util/file_system.hpp"
+#include "util/log.hpp"
+#include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
 #if defined(_WIN32)
@@ -52,6 +57,7 @@ MainMenu::MainMenu()
                  static_cast<float>(SCREEN_HEIGHT) / 2.0f + 35.0f);
 
   add_entry(MNID_STARTGAME, _("Start Game"));
+  add_entry(MNID_CONTRIB, _("Contrib Levels"));
 #ifdef __EMSCRIPTEN__
   add_entry(MNID_MANAGEASSETS, _("Manage Assets"));
 #endif
@@ -76,8 +82,61 @@ MainMenu::menu_action(MenuItem& item)
   {
 
     case MNID_STARTGAME:
-      // World selection menu
-      MenuManager::instance().push_menu(MenuStorage::WORLDSET_MENU);
+      {
+        std::unique_ptr<World> world = World::from_directory("levels/world1");
+        GameManager::current()->start_worldmap(*world);
+      }
+      break;
+
+    case MNID_CONTRIB:
+      {
+        std::vector<std::string> level_worlds;
+        std::unique_ptr<char*, decltype(&PHYSFS_freeList)>
+          files(PHYSFS_enumerateFiles("levels"),
+                PHYSFS_freeList);
+        for (const char* const* filename = files.get(); *filename != nullptr; ++filename)
+        {
+          std::string filepath = FileSystem::join("levels", *filename);
+          if (physfsutil::is_directory(filepath))
+          {
+            level_worlds.push_back(filepath);
+          }
+        }
+
+        std::vector<std::unique_ptr<World> > contrib_worlds;
+
+        for (std::vector<std::string>::const_iterator it = level_worlds.begin(); it != level_worlds.end(); ++it)
+        {
+          try
+          {
+            auto levelset =
+              std::unique_ptr<Levelset>(new Levelset(*it, /* recursively = */ true));
+            if (levelset->get_num_levels() == 0)
+              continue;
+
+            std::unique_ptr<World> world = World::from_directory(*it);
+            if (!world->hide_from_contribs())
+            {
+              if (world->is_levelset() || world->is_worldmap())
+              {
+                contrib_worlds.push_back(std::move(world));
+              }
+              else
+              {
+                log_warning << "unknown World type" << std::endl;
+              }
+            }
+          }
+          catch(std::exception& e)
+          {
+            log_info << "Couldn't parse levelset info for '" << *it << "': " << e.what() << std::endl;
+          }
+        }
+
+        auto contrib_menu = std::make_unique<SortedContribMenu>(contrib_worlds, "official", _("Contrib Levels"),
+                                                                _("How is this possible? There are no Official Contrib Levels!"));
+        MenuManager::instance().push_menu(std::move(contrib_menu));
+      }
       break;
 
     case MNID_MANAGEASSETS:
@@ -85,13 +144,13 @@ MainMenu::menu_action(MenuItem& item)
       break;
 
     case MNID_CREDITS:
-    {
-      // Credits Level
-      SoundManager::current()->stop_music(0.2f);
-      std::unique_ptr<World> world = World::from_directory("levels/misc");
-      GameManager::current()->start_level(*world, "credits.stl");
-    }
-    break;
+      {
+        // Credits Level
+        SoundManager::current()->stop_music(0.2f);
+        std::unique_ptr<World> world = World::from_directory("levels/misc");
+        GameManager::current()->start_level(*world, "credits.stl");
+      }
+      break;
 
     case MNID_QUITMAINMENU:
       MenuManager::instance().clear_menu_stack();

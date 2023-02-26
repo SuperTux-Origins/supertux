@@ -20,7 +20,6 @@
 
 #include "supertux/menu/cheat_menu.hpp"
 #include "supertux/menu/debug_menu.hpp"
-#include "supertux/menu/contrib_menu.hpp"
 #include "supertux/menu/custom_menu_menu.hpp"
 #include "supertux/menu/game_menu.hpp"
 #include "supertux/menu/joystick_menu.hpp"
@@ -32,7 +31,6 @@
 #include "supertux/menu/web_asset_menu.hpp"
 #include "supertux/menu/worldmap_menu.hpp"
 #include "supertux/menu/worldmap_cheat_menu.hpp"
-#include "supertux/menu/world_set_menu.hpp"
 #include "util/log.hpp"
 
 MenuStorage* MenuStorage::s_instance = nullptr;
@@ -93,15 +91,6 @@ MenuStorage::create(MenuId menu_id)
     case DEBUG_MENU:
       return std::make_unique<DebugMenu>();
 
-    case WORLDSET_MENU:
-      return std::make_unique<WorldSetMenu>();
-
-    case CONTRIB_MENU:
-      return std::make_unique<ContribMenu>();
-
-    case CONTRIB_WORLD_MENU:
-      return nullptr; //return new ContribWorldMenu();
-
     case ASSET_MENU:
       return std::make_unique<WebAssetMenu>();
 
@@ -118,7 +107,7 @@ MenuStorage::create(MenuId menu_id)
       return std::unique_ptr<Menu>();
 
     default:
-      log_warning << "unknown MenuId provided" << std::endl;
+      log_warning << "unknown MenuId provided: " << menu_id << std::endl;
       assert(false);
       return std::unique_ptr<Menu>();
   }
