@@ -1,18 +1,7 @@
 (supertux-sprite
       (action
-         (fps 15)
-		 (name "normal")
-         (images "scriptblock-0.png"
-                 "scriptblock-1.png"
-                 "scriptblock-2.png"
-                 "scriptblock-3.png"
-                 "scriptblock-4.png"
-                 "scriptblock-2.png"
-                 "scriptblock-1.png"
-                 "scriptblock-0.png"
-                 "scriptblock-0.png"
-                 "scriptblock-0.png"
-                 ))
+         (name "normal")
+         (images "scriptblock.png"))
       (action
          (name "empty")
          (surfaces
