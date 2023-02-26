@@ -133,7 +133,7 @@
       width: 100%;
       background-color: #000d;
       z-index: 10;
-      background-image: linear-gradient(to bottom, #000a, #000a), url('supertux2.png'), url('supertux2_bkg.png');
+      background-image: linear-gradient(to bottom, #000a, #000a), url('supertux.png'), url('supertux_bkg.png');
       background-position: 0 0, 50% calc(50% - 100px);
       background-repeat: repeat, no-repeat;
       animation: movebkg 10s linear infinite;
@@ -212,7 +212,7 @@
       document.getElementById("data_warning").innerHTML = 'Your browser does not support persistent data. That means the browser can choose to delete your progress anytime.';
     }
 
-    window.supertux2_ispersistent = function() {
+    window.supertux_ispersistent = function() {
       return data_persistent ? 1 : 0;
     }
 
@@ -387,7 +387,7 @@
     }
 
     // FIXME: Hardcoded
-    const root = "/home/web_user/.local/share/supertux2/";
+    const root = "/home/web_user/.local/share/supertux-origins/";
 
     window.supertux_loadFiles = function() {
       try {
@@ -395,10 +395,10 @@
         // rest of the files are stored in IndexedDB, managed by Emscripten.
         // Check the supertux_saveFiles function below for details.
         for (var key of Object.keys(localStorage)) {
-          if (key !== "supertux2_config" /*&& !key.match("^profile[0-9]+/")*/)
+          if (key !== "supertux-origins_config" /*&& !key.match("^profile[0-9]+/")*/)
             continue;
 
-          keyfilename = key.replace(/^supertux2_/, "");
+          keyfilename = key.replace(/^supertux-origins_/, "");
 
           if (keyfilename.indexOf("/") !== -1) {
             try {
@@ -418,7 +418,7 @@
 
       function save(file) {
         try {
-          localStorage.setItem("supertux2_" + file, FS.readFile(root + file, { encoding: "utf8" }));
+          localStorage.setItem("supertux-origins_" + file, FS.readFile(root + file, { encoding: "utf8" }));
           return true;
         } catch(e) {
           console.error(e);
@@ -519,7 +519,7 @@
     });
 
     var saving = false;
-    window.supertux2_syncfs = function() {
+    window.supertux-origins_syncfs = function() {
       if (saving) return;
       saving = true;
       try {
@@ -581,7 +581,7 @@
       }
     });
   </script>
-  <script async src="supertux2.js"></script>
+  <script async src="supertux-origins.js"></script>
 </body>
 
 </html>

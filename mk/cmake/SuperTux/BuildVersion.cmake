@@ -13,7 +13,7 @@ endif()
 
 get_filename_component(BASEDIR ${CMAKE_SOURCE_DIR} NAME)
 if("${VERSION_LIST}" STREQUAL "")
-  if(${BASEDIR} MATCHES "supertux2-[0-9\\.]*")
+  if(${BASEDIR} MATCHES "supertux-origins-[0-9\\.]*")
     string(REGEX REPLACE "(\\.|_|-)" ";" VERSION_LIST ${BASEDIR})
   endif()
 endif()

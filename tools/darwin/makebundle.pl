@@ -29,7 +29,7 @@ print "This script is highly experimental. Modify it to suit your needs and take
 exit 1;
 
 my $OUTPUTDIR='/tmp/SuperTux.app/Contents/MacOS';
-my $EXECUTABLE='./supertux2';
+my $EXECUTABLE='./supertux-origins';
 
 my %COPIED;
 my @TOCOPY;

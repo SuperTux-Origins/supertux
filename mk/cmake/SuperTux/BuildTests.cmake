@@ -6,24 +6,24 @@ if(BUILD_TESTS)
 
   # build SuperTux tests
   file(GLOB_RECURSE TEST_SUPERTUX_SOURCES tests/*.cpp)
-  add_executable(test_supertux2 ${TEST_SUPERTUX_SOURCES})
-  target_compile_options(test_supertux2 PRIVATE ${WARNINGS_CXX_FLAGS})
-  target_link_libraries(test_supertux2
+  add_executable(test_supertux_origins ${TEST_SUPERTUX_SOURCES})
+  target_compile_options(test_supertux_origins PRIVATE ${WARNINGS_CXX_FLAGS})
+  target_link_libraries(test_supertux_origins
     GTest::GTest GTest::Main
-    supertux2_lib
+    supertux-origins_lib
     ${CMAKE_THREAD_LIBS_INIT})
 
   # add 'make test' target, use 'make test ARGS="-V"' or 'ctest -V' for verbose
   enable_testing()
-  add_test(NAME test_supertux2
+  add_test(NAME test_supertux_origins
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND test_supertux2)
+    COMMAND test_supertux_origins)
 
   # Prepare coverage with gcov/lcov
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      target_compile_options(supertux2_lib PUBLIC -fprofile-arcs -ftest-coverage)
-      target_link_options(supertux2_lib PUBLIC -lgcov --coverage)
+      target_compile_options(supertux-origins_lib PUBLIC -fprofile-arcs -ftest-coverage)
+      target_link_options(supertux-origins_lib PUBLIC -lgcov --coverage)
 
       add_custom_target(coverage_clear_unix
         COMMAND find . -name "*.gcda" | xargs rm || true # FIXME: Make this platform-neutral

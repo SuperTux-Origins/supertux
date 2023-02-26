@@ -227,7 +227,7 @@ void PhysfsSubsystem::find_datadir() const
   {
     datadir = *m_forced_datadir;
   }
-  else if (const char* env_datadir = getenv("SUPERTUX2_DATA_DIR"))
+  else if (const char* env_datadir = getenv("SUPERTUX_ORIGNS_DATA_DIR"))
   {
     datadir = env_datadir;
   }
@@ -277,13 +277,13 @@ void PhysfsSubsystem::find_userdir() const
   {
     userdir = *m_forced_userdir;
   }
-  else if (const char* env_userdir = getenv("SUPERTUX2_USER_DIR"))
+  else if (const char* env_userdir = getenv("SUPERTUX_ORIGNS_USER_DIR"))
   {
     userdir = env_userdir;
   }
   else
   {
-  userdir = PHYSFS_getPrefDir("SuperTux","supertux2");
+  userdir = PHYSFS_getPrefDir("SuperTux","supertux-origins");
   }
 //Kept for backwards-compatability only, hence the silence
 #ifdef __GNUC__
@@ -337,7 +337,7 @@ if (FileSystem::is_directory(olduserdir)) {
 #endif
 
 #ifdef EMSCRIPTEN
-  userdir = "/home/web_user/.local/share/supertux2/";
+  userdir = "/home/web_user/.local/share/supertux-origins/";
 #endif
 
   if (!FileSystem::is_directory(userdir))
@@ -349,7 +349,7 @@ if (FileSystem::is_directory(olduserdir)) {
 #ifdef EMSCRIPTEN
   EM_ASM({
     try {
-      FS.mount(IDBFS, {}, "/home/web_user/.local/share/supertux2/");
+      FS.mount(IDBFS, {}, "/home/web_user/.local/share/supertux-origins/");
       FS.syncfs(true, (err) => { console.log(err); });
     } catch(err) {}
   }, 0); // EM_ASM is a variadic macro and Clang requires at least 1 value for the variadic argument
@@ -627,7 +627,7 @@ Main::run(int argc, char** argv)
 #ifdef WIN32
 	//SDL is used instead of PHYSFS because both create the same path in app data
 	//However, PHYSFS is not yet initizlized, and this should be run before anything is initialized
-	std::string prefpath = SDL_GetPrefPath("SuperTux", "supertux2");
+	std::string prefpath = SDL_GetPrefPath("SuperTux", "supertux-origins");
 
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 

@@ -63,7 +63,7 @@ include(CheckCXXCompilerFlag)
 include(CheckSymbolExists)
 
 ## For autopackage
-set(APPDATADIR "${CMAKE_INSTALL_PREFIX}/share/games/supertux2")
+set(APPDATADIR "${CMAKE_INSTALL_PREFIX}/share/games/supertux-origins")
 
 set(BUILD_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data")
 set(BUILD_CONFIG_DATA_DIR "${CMAKE_BINARY_DIR}/data")
@@ -87,8 +87,8 @@ else()
     set(INSTALL_SUBDIR_DOC "SuperTux.app/Contents/Resources" CACHE STRING "Installation subdir for docs")
   else()
     set(INSTALL_SUBDIR_BIN "games" CACHE STRING "Installation subdir for binaries")
-    set(INSTALL_SUBDIR_SHARE "share/games/supertux2" CACHE STRING "Installation subdir for data")
-    set(INSTALL_SUBDIR_DOC "share/doc/supertux2" CACHE STRING "Installation subdir for docs")
+    set(INSTALL_SUBDIR_SHARE "share/games/supertux-origins" CACHE STRING "Installation subdir for data")
+    set(INSTALL_SUBDIR_DOC "share/doc/supertux-origins" CACHE STRING "Installation subdir for docs")
   endif()
 endif()
 
@@ -221,70 +221,70 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 ## Add target for supertux binary
 
-add_library(supertux2_c OBJECT ${SUPERTUX_SOURCES_C})
-add_library(supertux2_lib STATIC ${CMAKE_BINARY_DIR}/version.h ${SUPERTUX_SOURCES_CXX} ${SUPERTUX_RESOURCES} $<TARGET_OBJECTS:supertux2_c>)
-target_include_directories(supertux2_lib PUBLIC ${CMAKE_BINARY_DIR} src/)
+add_library(supertux-origins_c OBJECT ${SUPERTUX_SOURCES_C})
+add_library(supertux-origins_lib STATIC ${CMAKE_BINARY_DIR}/version.h ${SUPERTUX_SOURCES_CXX} ${SUPERTUX_RESOURCES} $<TARGET_OBJECTS:supertux-origins_c>)
+target_include_directories(supertux-origins_lib PUBLIC ${CMAKE_BINARY_DIR} src/)
 
 if(WIN32)
-  add_executable(supertux2 WIN32 src/main.cpp ${CMAKE_CURRENT_SOURCE_DIR}/data/images/engine/icons/supertux.rc)
-  target_link_libraries(supertux2 LibSDL2main)
+  add_executable(supertux-origins WIN32 src/main.cpp ${CMAKE_CURRENT_SOURCE_DIR}/data/images/engine/icons/supertux.rc)
+  target_link_libraries(supertux-origins LibSDL2main)
 else()
-  add_executable(supertux2 src/main.cpp)
+  add_executable(supertux-origins src/main.cpp)
 endif()
-target_link_libraries(supertux2 supertux2_lib)
+target_link_libraries(supertux-origins supertux-origins_lib)
 
-set_target_properties(supertux2_lib PROPERTIES OUTPUT_NAME supertux2_lib)
-set_target_properties(supertux2_lib PROPERTIES COMPILE_FLAGS "${SUPERTUX2_EXTRA_WARNING_FLAGS}")
+set_target_properties(supertux-origins_lib PROPERTIES OUTPUT_NAME supertux-origins_lib)
+set_target_properties(supertux-origins_lib PROPERTIES COMPILE_FLAGS "${SUPERTUX-ORIGINS_EXTRA_WARNING_FLAGS}")
 if(EMSCRIPTEN)
-  target_link_options(supertux2 PUBLIC -sEXPORTED_FUNCTIONS=['_main','_set_resolution','_save_config','_onDownloadProgress','_onDownloadFinished','_onDownloadError','_onDownloadAborted','_getExceptionMessage'] PUBLIC -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] PUBLIC -sEXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'])
+  target_link_options(supertux-origins PUBLIC -sEXPORTED_FUNCTIONS=['_main','_set_resolution','_save_config','_onDownloadProgress','_onDownloadFinished','_onDownloadError','_onDownloadAborted','_getExceptionMessage'] PUBLIC -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] PUBLIC -sEXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'])
 endif()
 
 if(WIN32 AND NOT VCPKG_BUILD AND NOT MINGW)
   ## Copy dlls on windows
-  add_custom_command(TARGET supertux2_lib POST_BUILD
+  add_custom_command(TARGET supertux-origins_lib POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${DEPENDENCY_FOLDER}/dll"
-    $<TARGET_FILE_DIR:supertux2_lib>)
+    $<TARGET_FILE_DIR:supertux-origins_lib>)
 endif()
 
 ## Some additional include paths
-target_include_directories(supertux2_lib SYSTEM PUBLIC
+target_include_directories(supertux-origins_lib SYSTEM PUBLIC
   external/findlocale/
   external/obstack/
   )
 
 # Include altivec wrapper on ppc
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc.*")
-  target_include_directories(supertux2_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ppc)
+  target_include_directories(supertux-origins_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ppc)
 endif()
 
 ## Link supertux binary with squirrel and other libraries
 if(NOT EMSCRIPTEN)
-  target_link_libraries(supertux2_lib PUBLIC LibSDL2 LibSDL2_image)
+  target_link_libraries(supertux-origins_lib PUBLIC LibSDL2 LibSDL2_image)
 endif()
 
-target_link_libraries(supertux2_lib PUBLIC LibSDL2_ttf)
-target_link_libraries(supertux2_lib PUBLIC LibSquirrel)
-target_link_libraries(supertux2_lib PUBLIC LibSqstdlib)
-target_link_libraries(supertux2_lib PUBLIC LibTinygettext)
-target_link_libraries(supertux2_lib PUBLIC LibSexp)
-target_link_libraries(supertux2_lib PUBLIC LibSavePNG)
-target_link_libraries(supertux2_lib PUBLIC LibPartioZip)
-target_link_libraries(supertux2_lib PUBLIC LibGlm)
-target_link_libraries(supertux2_lib PUBLIC LibFmt)
-target_link_libraries(supertux2_lib PUBLIC LibPhysfs)
-target_link_libraries(supertux2_lib PUBLIC wstsound::wstsound)
+target_link_libraries(supertux-origins_lib PUBLIC LibSDL2_ttf)
+target_link_libraries(supertux-origins_lib PUBLIC LibSquirrel)
+target_link_libraries(supertux-origins_lib PUBLIC LibSqstdlib)
+target_link_libraries(supertux-origins_lib PUBLIC LibTinygettext)
+target_link_libraries(supertux-origins_lib PUBLIC LibSexp)
+target_link_libraries(supertux-origins_lib PUBLIC LibSavePNG)
+target_link_libraries(supertux-origins_lib PUBLIC LibPartioZip)
+target_link_libraries(supertux-origins_lib PUBLIC LibGlm)
+target_link_libraries(supertux-origins_lib PUBLIC LibFmt)
+target_link_libraries(supertux-origins_lib PUBLIC LibPhysfs)
+target_link_libraries(supertux-origins_lib PUBLIC wstsound::wstsound)
 
 if(HAVE_OPENGL)
-  target_link_libraries(supertux2_lib PUBLIC LibOpenGL)
+  target_link_libraries(supertux-origins_lib PUBLIC LibOpenGL)
 endif()
 
 if(ENABLE_DISCORD)
-  target_link_libraries(supertux2_lib PUBLIC LibDiscord)
+  target_link_libraries(supertux-origins_lib PUBLIC LibDiscord)
 endif()
 
 if(NOT EMSCRIPTEN)
-  target_link_libraries(supertux2_lib PUBLIC LibCurl)
+  target_link_libraries(supertux-origins_lib PUBLIC LibCurl)
 endif()
 
 ## Install stuff

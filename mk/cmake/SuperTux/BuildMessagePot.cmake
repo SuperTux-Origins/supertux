@@ -41,7 +41,7 @@ if(GENERATE_MESSAGESPOT)
     endforeach(SUPERTUX_LEVEL_DIR)
 
     add_custom_target(
-      supertux2-messages ALL
+      supertux-origins-messages ALL
       DEPENDS ${MESSAGES_POT_FILES}
       )
 

@@ -1,14 +1,14 @@
 .TH SUPERTUX2 6 "December 20, 2021" "SuperTux 0.6.3" "Games"
 .SH NAME
-supertux2 \- SuperTux, a classic jump'n'run platformer featuring Tux
+supertux-origins \- SuperTux, a classic jump'n'run platformer featuring Tux
 .SH SYNOPSIS
-.B supertux2
+.B supertux-origins
 .RI [ options ]
 .br
-.B supertux2
+.B supertux-origins
 .RI [ options ] " level.stl"
 .br
-.B supertux2
+.B supertux-origins
 .RI [ options ] " worldmap.stwm"
 .br
 .SH DESCRIPTION
@@ -118,14 +118,14 @@ Set the directory for user data (savegames, etc.)
 Set the URL to the Add-On repository
 .SH ENVIRONMENT
 .TP
-.B SUPERTUX2_USER_DIR
+.B SUPERTUX_ORIGINS_USER_DIR
 Directory for user data (savegames, etc.)
 .TP
-.B SUPERTUX2_DATA_DIR
+.B SUPERTUX_ORIGINS_DATA_DIR
 Directory for the games datafiles
 .SH FILES
 .TP
-.B ~/.local/share/supertux2, ~/.supertux2
+.B ~/.local/share/supertux-origins, ~/.config/supertux-origins
 Contains configuration and savegames.
 Also acts as an overlay of the SuperTux game data path: 
 Files placed here will override or supplement game data files.
@@ -133,18 +133,18 @@ Files placed here will override or supplement game data files.
 To play level /tmp/mylevel.stl in a window of size 800x600, run 
 the program like this:
 .IP
-.B supertux2 --window --geometry 800x600 /tmp/mylevel.stl
+.B supertux-origins --window --geometry 800x600 /tmp/mylevel.stl
 .LP
 To play a previously recorded demo /tmp/mylevel.demo of level 
 /tmp/mylevel.stl, run SuperTux like this: 
 .IP
-.B supertux2 --play-demo /tmp/mylevel.demo /tmp/mylevel.stl
+.B supertux-origins --play-demo /tmp/mylevel.demo /tmp/mylevel.stl
 .LP
 .PP
 Custom-made levels can be conveniently stored in the overlay data folder. 
 .PP
 .TP
-.B ~/.supertux2/levels/sample_collection/level01.stl
+.B ~/.config/supertux-origins/levels/sample_collection/level01.stl
 .nf
 (supertux-level
   (version 2)
@@ -156,7 +156,7 @@ Custom-made levels can be conveniently stored in the overlay data folder.
 Make sure to also create an "info" file, so the collection will be 
 recognized by SuperTux.
 .TP
-.B ~/.supertux2/levels/sample_collection/info
+.B ~/.config/supertux-origins/levels/sample_collection/info
 .nf
 ;SuperTux-Level-Subset
 (supertux-level-subset
@@ -169,7 +169,7 @@ For easier distribution, the level collection can be bundled in a Zip
 archive.
 .PP
 .TP
-.B ~/.supertux2/sample_collection.zip
+.B ~/.config/supertux-origins/sample_collection.zip
 .nf
 levels/sample_collection/info
 levels/sample_collection/level01.stl

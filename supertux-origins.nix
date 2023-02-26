@@ -26,7 +26,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "supertux2";
+  pname = "supertux-origins";
   # FIXME: Should use `git describe` to get the version
   # number or leave it to cmake, but the .git/ directory
   # isn't included in the Nix store.
@@ -57,7 +57,7 @@ EOF
 
   postFixup =
     (lib.optionalString stdenv.targetPlatform.isLinux ''
-       wrapProgram $out/bin/supertux2 \
+       wrapProgram $out/bin/supertux-origins \
          --prefix LIBGL_DRIVERS_PATH ":" "${mesa.drivers}/lib/dri" \
          --prefix LD_LIBRARY_PATH ":" "${mesa.drivers}/lib"
     '')

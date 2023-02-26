@@ -93,9 +93,9 @@
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {
         packages = rec {
-          default = supertux2;
+          default = supertux-origins;
 
-          supertux2 = pkgs.callPackage ./supertux2.nix {
+          supertux-origins = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
 
             SDL2_ttf = if pkgs.targetPlatform.isWindows
@@ -133,26 +133,26 @@
             mcfgthreads = pkgs.windows.mcfgthreads;
           };
 
-          supertux2-win32 = pkgs.runCommand "supertux2-win32" {} ''
+          supertux-origins-win32 = pkgs.runCommand "supertux-origins-win32" {} ''
             mkdir -p $out
             mkdir -p $out/data/
 
-            cp --verbose --recursive ${supertux2}/bin/supertux2.exe $out/
-            cp --verbose --recursive --dereference --no-preserve=all ${supertux2}/bin/*.dll $out/
-            cp --verbose --recursive ${supertux2}/data/. $out/data/
+            cp --verbose --recursive ${supertux-origins}/bin/supertux-origins.exe $out/
+            cp --verbose --recursive --dereference --no-preserve=all ${supertux-origins}/bin/*.dll $out/
+            cp --verbose --recursive ${supertux-origins}/data/. $out/data/
           '';
 
-          supertux2-win32-zip = pkgs.runCommand "supertux2-win32-zip" {} ''
+          supertux-origins-win32-zip = pkgs.runCommand "supertux-origins-win32-zip" {} ''
             mkdir -p $out
             WORKDIR=$(mktemp -d)
 
             cp --no-preserve mode,ownership --verbose --recursive \
-              ${supertux2-win32}/. "$WORKDIR"
+              ${supertux-origins-win32}/. "$WORKDIR"
 
             cd "$WORKDIR"
             ${nixpkgs.legacyPackages.x86_64-linux.zip}/bin/zip \
               -r \
-              $out/SuperTux-${supertux2.version}-${pkgs.system}.zip \
+              $out/SuperTux-${supertux-origins.version}-${pkgs.system}.zip \
               .
           '';
         };

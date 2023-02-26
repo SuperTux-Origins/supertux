@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define PACKAGE_NAME "supertux2"
+#define PACKAGE_NAME "supertux-origins"
 
 #cmakedefine ENABLE_SQDBG
 
