@@ -295,6 +295,7 @@ TileSetParser::parse_tiles(const ReaderMapping& reader, int32_t min, int32_t max
   {
     throw std::runtime_error("No IDs specified.");
   }
+
   if (width == 0)
   {
     throw std::runtime_error("Width is zero.");
@@ -310,7 +311,7 @@ TileSetParser::parse_tiles(const ReaderMapping& reader, int32_t min, int32_t max
   else if (ids.size() != width*height)
   {
     std::ostringstream err;
-    err << "Number of ids (" << ids.size() <<  ") and "
+    err << reader.get_sexp().get_line() << ": Number of ids (" << ids.size() <<  ") and "
       "dimensions of image (" << width << "x" << height << " = " << width*height << ") "
       "differ";
     throw std::runtime_error(err.str());
