@@ -20,6 +20,10 @@
   )
  
    ;; next-id: 4700
+  
+  ;; free/skipped ids (please use before any other): 126, 127, 1357, 2045, 2046
+  ;; Tile ids: 1752 - 1761, 3667 - 3686 are reserved!
+ 
   (tilegroup
     (name (_ "Snow"))
     (tiles
@@ -33,8 +37,8 @@
       20   23   207  208
       3044 3045 3046 3047
       3048 3049 3050 3051
-      3052 3053 3055 26
-      3056 3057 3059 0
+      3052 3053 3054 3055
+      3056 3057 3058 3059
       4009 4010 4011 4012
       4013 4014 4015 4016
       4017 4018 4019 4020
@@ -44,15 +48,19 @@
       4033 4034 4035 0
       2134 115  116  214
       2135 117  118  1539
-      2121 2122 2123 2469
-      2126 2127 2128 1517
-      2131 2132 2133 1518
-      2124 2125 3263 3264
-      2129 2130 3267 3268
-	  3249 3250 3251 3252
-      3253 3254 3255 3256 
-
-3988 3989 3990 3991
+      
+      3249 3250 3251 3252
+      3253 3254 3255 3256
+      3261 3262 3263 3264
+      3265 3266 3267 3268
+      
+      2121 2122 2123 0
+      2126 2127 2128 0
+      2131 2132 2133 0
+      2124 2125 0    0
+      2129 2130 0    0
+	  
+	  3988 3989 3990 3991
 
       2909 2910 2913 2914
       2911 2912 2915 2916
@@ -425,7 +433,7 @@
 	  4370 4371 4372 4373
 	  4374 4375 4376 4377
       1569 1571 4119 4120
-      1570 1573 4121 4122
+      1573 1570 4121 4122
       1572 1574 4123 4124
       3435 3436 3437 0
 	  
@@ -902,7 +910,7 @@
 	  102  140  3161 3162
 	  104  105  3160  112
 	  3037 2943 2944 2945
-	  2946 1312 2153 443
+	  2946 1312 2153 4434
      
       57   58   2841 2842
       59   60   2843 2844
@@ -1616,7 +1624,12 @@
       124  210  125
       1345 1346 1344
     )
-    (image "tiles/snow/background2.png")
+    (attributes
+      3 3 3
+      0 1 0
+      0 0 0
+    )
+    (image "tiles/snow/background.png")
   )
   (tile
     (id 24)
@@ -1965,7 +1978,7 @@
     (solid #t)
     (object-name "bonusblock")
     (object-data "(sprite \"images/objects/bonus_block/bonusblock.sprite\") (data 3)")
-    (editor-images "objects/bonus_block/bonus-star.png")
+    (editor-images "objects/bonus_block/bonus-herring.png")
     (data 3)
     (fps 2)
   )
@@ -2006,7 +2019,7 @@
       106 107 108
       109 110 111
     )
-    (image "tiles/snow/background.png")
+    (image "tiles/background/background.png")
   )
   (tile
     (id 112)
@@ -3467,16 +3480,21 @@
     (width 2)
     (height 2)
     (ids
-      1569 1571
-	    1570 1573
-      1572 1574
+      1570 1571
+      1572 1573
     )
-	(attributes
-	  1024 0
-	  1024 1024
-	  0    1024
-	)
-    (images "tiles/forest/pogonia.png")
+    (image "tiles/forest/pogonia/base.png")
+  )
+  (tile
+    (id 1574)
+    (images
+      "tiles/forest/pogonia/pogonia-1-flip.png"
+      "tiles/forest/pogonia/pogonia-2-flip.png"
+      "tiles/forest/pogonia/pogonia-3-flip.png"
+      "tiles/forest/pogonia/pogonia-4-flip.png")
+    (hurts #t)
+    (solid #f)
+    (fps 2)
   )
   (tiles
     (width 2)
@@ -4321,11 +4339,34 @@
     )
 
   (tiles
-    (width  6)
+    (width  5)
+    (height 7)
+    (ids 2091 2092 2093 2094 2095
+         2096 2097 2098 2099 2100
+         2101 2102 2103 2104 2105
+         2106 2107 2108 2109 2110
+         2111 2112 2113 2114 2115
+         2116 2117 2118 2119 2120
+         3515    0    0    0    0
+    )
+    (attributes
+      1 1 1 1 1
+      1 1 1 1 1
+      1 1 1 1 0
+      1 1 1 1 1
+      1 1 1 1024 1024
+      1 1 1 1024 1024
+      1 0 0 0 0
+    )
+    (image "tiles/snowcastle/foreground.png")
+  )
+
+  (tiles
+    (width  5)
     (height 3)
-    (ids 2121 2122 2123 2124 2125 2469
-         2126 2127 2128 2129 2130 0
-         2131 2132 2133 1517 1518 0
+    (ids 2121 2122 2123 2124 2125
+         2126 2127 2128 2129 2130
+         2131 2132 2133 2134 2135
     )
     (image "tiles/snow/unisolid2.png")
   )
@@ -4420,7 +4461,7 @@
      2187 2188 2189 2190   2191 2192 2193 2194
      2195 2196 2197 2198   2199 2200 2201 2202)
 
-    (image "tiles/snow/background3.png"))
+    (image "tiles/snow/background2.png"))
 
   (tiles
     (width  3)
@@ -5745,28 +5786,6 @@
 	  1 1 1 1
 	  1 1 0 0
     )
-    (images "tiles/forest/special2.png")
-  )
-
-  ;; Additional attributes
-  (additional
-    (thunderstorm
-      ;; Attributes for thunderstorm changing tiles
-      (changing-tiles
-        2019 3873
-        2140 3874
-        2141 3875
-        2142 3876
-        2020 3877
-        3419 3523
-        3420 3524
-        3421 3525
-        3422 3526
-        3423 3527
-        3424 3528
-        3425 3529
-        3426 3530
-      )
-    )
+    (image "tiles/forest/special2.png")
   )
 )
