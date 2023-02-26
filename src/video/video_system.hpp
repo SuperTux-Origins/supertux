@@ -40,8 +40,6 @@ public:
   enum Enum {
     VIDEO_AUTO,
     VIDEO_OPENGL33CORE,
-    VIDEO_OPENGL20,
-    VIDEO_SDL,
     VIDEO_NULL
   };
 

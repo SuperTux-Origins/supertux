@@ -26,13 +26,10 @@
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "video/null/null_video_system.hpp"
-#include "video/sdl/sdl_video_system.hpp"
 #include "video/sdl_surface.hpp"
 #include "video/sdl_surface_ptr.hpp"
 
-#ifdef HAVE_OPENGL
-#  include "video/gl/gl_video_system.hpp"
-#endif
+#include "video/gl/gl_video_system.hpp"
 
 std::unique_ptr<VideoSystem>
 VideoSystem::create(VideoSystem::Enum video_system)
@@ -40,50 +37,8 @@ VideoSystem::create(VideoSystem::Enum video_system)
   switch (video_system)
   {
     case VIDEO_AUTO:
-#ifdef HAVE_OPENGL
-  #ifdef __EMSCRIPTEN__
-      try
-      {
-        log_warning << "WebGL detected, using GLVideoSystem-20" << std::endl;
-        return std::make_unique<GLVideoSystem>(false, false);
-      }
-      catch(std::exception& err2)
-      {
-        log_warning << "Error creating GLVideoSystem-20, using SDL fallback: "  << err2.what() << std::endl;
-        return std::make_unique<SDLVideoSystem>();
-      }
-  #else
-      try
-      {
-        return std::make_unique<GLVideoSystem>(true, true);
-      }
-      catch(std::exception& err2)
-      {
-        log_warning << "Error creating GLVideoSystem, using SDL fallback: "  << err2.what() << std::endl;
-        return std::make_unique<SDLVideoSystem>();
-      }
-  #endif
-#else
-      log_info << "new SDL renderer\n";
-      return std::make_unique<SDLVideoSystem>();
-#endif
-
-#ifdef HAVE_OPENGL
     case VIDEO_OPENGL33CORE:
-      return std::make_unique<GLVideoSystem>(true, false);
-
-    case VIDEO_OPENGL20:
-      return std::make_unique<GLVideoSystem>(false, false);
-#else
-    case VIDEO_OPENGL33CORE:
-    case VIDEO_OPENGL20:
-      log_warning << "OpenGL requested, but missing using SDL fallback" << std::endl;
-      return std::make_unique<SDLVideoSystem>();
-#endif
-
-    case VIDEO_SDL:
-      log_info << "new SDL renderer\n";
-      return std::make_unique<SDLVideoSystem>();
+      return std::make_unique<GLVideoSystem>();
 
     case VIDEO_NULL:
       return std::make_unique<NullVideoSystem>();
@@ -102,19 +57,9 @@ VideoSystem::get_video_system(const std::string &video)
   {
     return VIDEO_AUTO;
   }
-#ifdef HAVE_OPENGL
   else if (video == "opengl" || video == "opengl33" || video == "opengl33core")
   {
     return VIDEO_OPENGL33CORE;
-  }
-  else if (video == "opengl20")
-  {
-    return VIDEO_OPENGL20;
-  }
-#endif
-  else if (video == "sdl")
-  {
-    return VIDEO_SDL;
   }
   else if (video == "null")
   {
@@ -122,11 +67,7 @@ VideoSystem::get_video_system(const std::string &video)
   }
   else
   {
-#ifdef HAVE_OPENGL
-    throw std::runtime_error("invalid VideoSystem::Enum, valid values are 'auto', 'sdl', 'opengl', 'opengl20' and 'null'");
-#else
-    throw std::runtime_error("invalid VideoSystem::Enum, valid values are 'auto' and 'sdl'");
-#endif
+    throw std::runtime_error("invalid VideoSystem::Enum, valid values are 'auto', 'opengl33' and 'null'");
   }
 }
 
@@ -139,10 +80,6 @@ VideoSystem::get_video_string(VideoSystem::Enum video)
       return "auto";
     case VIDEO_OPENGL33CORE:
       return "opengl";
-    case VIDEO_OPENGL20:
-      return "opengl20";
-    case VIDEO_SDL:
-      return "sdl";
     case VIDEO_NULL:
       return "null";
     default:
@@ -157,11 +94,7 @@ VideoSystem::get_available_video_systems()
 {
   std::vector<std::string> output;
   output.push_back("auto");
-  output.push_back("sdl");
-#ifdef HAVE_OPENGL
   output.push_back("opengl33");
-  output.push_back("opengl20");
-#endif
   return output;
 }
 

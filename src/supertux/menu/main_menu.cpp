@@ -32,7 +32,6 @@
 #include "supertux/world.hpp"
 #include "util/log.hpp"
 #include "util/file_system.hpp"
-#include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
 #if defined(_WIN32)

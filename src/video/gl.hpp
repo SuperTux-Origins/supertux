@@ -19,12 +19,8 @@
 
 #include <config.h>
 
-#ifdef HAVE_OPENGL
-
 #if defined(USE_OPENGLES2)
 #  include <SDL_opengles2.h>
-#elif defined(USE_OPENGLES1)
-#  include <SDL_opengles.h>
 #else
 #  ifdef USE_GLBINDING
 #    include <glbinding/gl/gl.h>
@@ -35,48 +31,12 @@
 #  endif
 #endif
 
-#ifdef USE_OPENGLES1
-#  define glOrtho glOrthof
-#endif
-
 #ifdef USE_OPENGLES2
 // These are required for OpenGL3.3Core, but not availabel en GLES2,
 // simple no-op replacement looks prettier than #ifdef
 inline void glGenVertexArrays(GLsizei n, GLuint *arrays) {}
 inline void glDeleteVertexArrays(GLsizei n, GLuint *arrays) {}
 inline void glBindVertexArray(GLuint vao) {}
-#endif
-
-#ifdef USE_GLBINDING
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wheader-hygiene"
-#endif
-using namespace gl;
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-#endif
-
-#else
-
-// These are used by SDL code when OpenGL is completely disabled
-#define GLint int
-
-enum GLenum {
-  GL_SRC_ALPHA,
-  GL_ONE_MINUS_SRC_ALPHA,
-  GL_RGBA,
-  GL_ONE,
-  GL_ZERO,
-  GL_DST_COLOR,
-  GL_LINEAR,
-  GL_NEAREST,
-  GL_CLAMP_TO_EDGE,
-  GL_MIRRORED_REPEAT,
-  GL_REPEAT
-};
-
 #endif
 
 #endif

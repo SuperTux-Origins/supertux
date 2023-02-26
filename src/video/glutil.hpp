@@ -78,8 +78,6 @@ inline bool gl_needs_power_of_two()
 {
 #if defined(USE_OPENGLES2)
   return true;
-#elif defined(USE_OPENGLES1)
-  return true;
 #else
 #  ifdef USE_GLBINDING
   static auto extensions = glbinding::ContextInfo::extensions();

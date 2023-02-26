@@ -38,7 +38,7 @@ struct SDL_Surface;
 class GLVideoSystem final : public SDLBaseVideoSystem
 {
 public:
-  GLVideoSystem(bool use_opengl33core, bool auto_opengl_version);
+  GLVideoSystem();
   ~GLVideoSystem() override;
 
   virtual std::string get_name() const override;
@@ -65,7 +65,6 @@ private:
   void create_gl_context();
 
 private:
-  bool m_use_opengl33core;
   std::unique_ptr<TextureManager> m_texture_manager;
   std::unique_ptr<GLScreenRenderer> m_renderer;
   std::unique_ptr<GLTextureRenderer> m_lightmap;
