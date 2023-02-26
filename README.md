@@ -81,30 +81,6 @@ arrow keys or the mouse.
 In the worldmap, the arrow keys are used to navigate and Enter to
 enter the current level.
 
-## Community
-
-In case you need help, feel free to reach out using the following means:
-
-* **IRC:** [#supertux](ircs://irc.libera.chat/#supertux) on
-  [Libera Chat](https://libera.chat) hosts most of the discussions between
-  developers. Also, real-time support can be provided here. If you don't know
-  how to use an IRC client, you access the channel using a web-based
-  [client](https://kiwiirc.com/nextclient/irc.libera.chat:+6697/?nick=Guest?#supertux).
-  Please stay around after asking questions, otherwise you will be disconnected
-  and might miss potential answers.
-* **Matrix:** [#supertux:matrix.org](https://matrix.to/#/#supertux:matrix.org)
-  is bridged to our IRC room.
-* **[Forum](https://forum.freegamedev.net/viewforum.php?f=66):** The SuperTux
-  community is very active on the forum, the discussion ranges from feature
-  proposals to support questions. In particular, most community-contributed
-  add-ons are published there first, so this is worth checking.
-* **Mailing Lists:** The
-  [supertux-devel](http://lists.lethargik.org/listinfo.cgi/supertux-devel-lethargik.org)
-  mailing list is dead. Here is the [archive](https://github.com/supertux-community/supertux-devel-maillist).
-* **Social Media:** Mostly on [Twitter](https://twitter.com/supertux_team) at
-  the moment.
-* **Discord:** Also, you can join our [Discord server](https://discord.com/invite/AcvtHWz) to get in touch with us.
-
 ## Development status
 
 As of now, with the release of SuperTux 0.6.3 (December 2021), the Forest World is almost
