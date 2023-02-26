@@ -22,13 +22,11 @@
 #include "object/player.hpp"
 #include "object/portable.hpp"
 #include "sprite/sprite.hpp"
-#include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 
 Bomb::Bomb(const Vector& pos, Direction dir_, const std::string& custom_sprite /*= "images/creatures/mr_bomb/mr_bomb.sprite"*/ ) :
   BadGuy( pos, dir_, custom_sprite ),
-  ticking(SoundManager::current()->create_sound_source("sounds/fizz.wav")),
-  m_exploding_sprite(SpriteManager::current()->create("images/creatures/mr_bomb/ticking_glow/ticking_glow.sprite"))
+  ticking(SoundManager::current()->create_sound_source("sounds/fizz.wav"))
 {
   SoundManager::current()->preload("sounds/explosion.wav");
   set_action(dir_ == Direction::LEFT ? "ticking-left" : "ticking-right", 1);
@@ -81,17 +79,6 @@ Bomb::active_update(float dt_sec)
   else if (!is_grabbed()) {
     m_col.set_movement(m_physic.get_movement(dt_sec));
   }
-}
-
-void
-Bomb::draw(DrawingContext& context)
-{
-  m_sprite->draw(context.color(), get_pos(), m_layer, m_flip);
-  m_exploding_sprite->set_action("exploding");
-  m_exploding_sprite->set_blend(Blend::ADD);
-  m_exploding_sprite->draw(context.light(),
-    get_pos() + Vector(get_bbox().get_width() / 2, get_bbox().get_height() / 2), m_layer, m_flip);
-  BadGuy::draw(context);
 }
 
 void

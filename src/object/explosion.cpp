@@ -31,14 +31,13 @@
 #include "supertux/sector.hpp"
 
 Explosion::Explosion(const Vector& pos, float p_push_strength,
-    int p_num_particles, bool p_short_fuse) :
+    int p_num_particles) :
   MovingSprite(pos, "images/objects/explosion/explosion.sprite", LAYER_OBJECTS+40, COLGROUP_MOVING),
   hurt(true),
   push_strength(p_push_strength),
   num_particles(p_num_particles),
   state(STATE_WAITING),
-  lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-large.sprite")),
-  short_fuse(p_short_fuse)
+  lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-large.sprite"))
 {
   SoundManager::current()->preload("sounds/explosion.wav");
   SoundManager::current()->preload("sounds/firecracker.ogg");
@@ -53,8 +52,7 @@ Explosion::Explosion(const ReaderMapping& reader) :
   push_strength(-1),
   num_particles(100),
   state(STATE_WAITING),
-  lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-large.sprite")),
-  short_fuse(false)
+  lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-large.sprite"))
 {
   SoundManager::current()->preload("sounds/explosion.wav");
   SoundManager::current()->preload("sounds/firecracker.ogg");
@@ -104,11 +102,10 @@ Explosion::explode()
       /* The force decreases with the distance squared. In the distance of one
        * tile (32 pixels) you will have a speed increase of 150 pixels/s. */
       float force = push_strength / (distance * distance);
-      float force_limit = short_fuse ? 400.f : 200.f;
-      // If we somehow get a force of over the limit, keep it at the limit because
+      // If we somehow get a force of over 200, keep it at 200 because
       // unexpected behaviour could result otherwise.
-      if (force > force_limit)
-        force = force_limit;
+      if (force > 200.0f)
+        force = 200.0;
 
       Vector add_speed = glm::normalize(direction) * force;
 
