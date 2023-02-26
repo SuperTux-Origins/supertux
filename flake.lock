@@ -72,30 +72,6 @@
         "url": "https://libsdl.org/release/SDL2-devel-2.0.22-mingw.tar.gz"
       }
     },
-    "SDL2_ttf": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "raqm_src": "raqm_src"
-      },
-      "locked": {
-        "lastModified": 1658514386,
-        "narHash": "sha256-xGTsK9ummzKrYy8e+3pgXcU0RMxhvxjHYEyRgj/E1dk=",
-        "owner": "SuperTux",
-        "repo": "SDL_ttf",
-        "rev": "d4be96880248dbcda136e60f3585bac2d4f91474",
-        "type": "github"
-      },
-      "original": {
-        "owner": "SuperTux",
-        "repo": "SDL_ttf",
-        "type": "github"
-      }
-    },
     "SDL2_ttf-win32": {
       "inputs": {
         "SDL2_ttf_src": "SDL2_ttf_src",
@@ -590,28 +566,10 @@
         "url": "https://icculus.org/physfs/downloads/physfs-3.0.2.tar.bz2"
       }
     },
-    "raqm_src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1632761857,
-        "narHash": "sha256-Zv6h5Z9X9H1gc/tDy0GPdOCWOaJwM7UbQOPQI2jRDOo=",
-        "owner": "HOST-Oman",
-        "repo": "libraqm",
-        "rev": "573820451937d7a7f33a1ec132bc1f1b12db917f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "HOST-Oman",
-        "ref": "v0.7.2",
-        "repo": "libraqm",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "SDL2-win32": "SDL2-win32",
         "SDL2_image-win32": "SDL2_image-win32",
-        "SDL2_ttf": "SDL2_ttf",
         "SDL2_ttf-win32": "SDL2_ttf-win32",
         "curl-win32": "curl-win32",
         "flake-utils": "flake-utils",
@@ -623,7 +581,6 @@
         "squirrel": "squirrel",
         "strutcpp": "strutcpp",
         "tinycmmc": "tinycmmc_2",
-        "tinygettext": "tinygettext",
         "wstsound": "wstsound"
       }
     },
@@ -759,32 +716,6 @@
       "original": {
         "owner": "grumbel",
         "repo": "tinycmmc",
-        "type": "github"
-      }
-    },
-    "tinygettext": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "tinycmmc": [
-          "tinycmmc"
-        ]
-      },
-      "locked": {
-        "lastModified": 1660505802,
-        "narHash": "sha256-rCneT/lpadOKDytVgY+6R1XwD8OrMTg7an4hBLhRl24=",
-        "owner": "tinygettext",
-        "repo": "tinygettext",
-        "rev": "2fcecb76900fac852fd4006e4d49b0744b1031e1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "tinygettext",
-        "repo": "tinygettext",
         "type": "github"
       }
     },

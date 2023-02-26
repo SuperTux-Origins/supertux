@@ -64,7 +64,6 @@ public:
 
 private:
   static std::string current_font;
-  static std::string get_font_for_locale(const tinygettext::Language& locale);
 
 public:
   Resources();

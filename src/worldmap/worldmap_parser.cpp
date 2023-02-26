@@ -24,7 +24,6 @@
 #include "object/music_object.hpp"
 #include "object/path_gameobject.hpp"
 #include "object/tilemap.hpp"
-#include "physfs/physfs_file_system.hpp"
 #include "physfs/util.hpp"
 #include "supertux/tile_manager.hpp"
 #include "util/file_system.hpp"
@@ -57,7 +56,6 @@ WorldMapParser::load_worldmap(const std::string& filename)
   m_worldmap.m_levels_path = FileSystem::dirname(m_worldmap.m_map_filename);
 
   try {
-    register_translation_directory(m_worldmap.m_map_filename);
     auto doc = ReaderDocument::from_file(m_worldmap.m_map_filename);
     auto root = doc.get_root();
 
@@ -184,7 +182,6 @@ WorldMapParser::load_level_information(LevelTile& level)
       return;
     }
 
-    register_translation_directory(filename);
     auto doc = ReaderDocument::from_file(filename);
     auto root = doc.get_root();
     if (root.get_name() != "supertux-level") {

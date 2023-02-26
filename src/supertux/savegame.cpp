@@ -21,7 +21,6 @@
 #include <physfs.h>
 
 #include "control/input_manager.hpp"
-#include "physfs/physfs_file_system.hpp"
 #include "physfs/util.hpp"
 #include "squirrel/serialize.hpp"
 #include "squirrel/squirrel_util.hpp"

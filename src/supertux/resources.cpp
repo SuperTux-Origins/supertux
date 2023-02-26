@@ -66,7 +66,7 @@ Resources::load()
   {
     console_font.reset(new TTFFont("fonts/SuperTux-Medium.ttf", 12, 1.25f, 0, 1));
 
-    auto font = get_font_for_locale(g_dictionary_manager->get_language());
+    auto font = "fonts/SuperTux-Medium.ttf";
     if(font != current_font)
     {
       current_font = font;
@@ -85,23 +85,6 @@ Resources::load()
   arrow_left = Surface::from_file("images/engine/menu/arrow-left.png");
   arrow_right = Surface::from_file("images/engine/menu/arrow-right.png");
   no_tile = Surface::from_file("images/tiles/auxiliary/notile.png");
-}
-
-std::string
-Resources::get_font_for_locale(const tinygettext::Language& locale)
-{
-  auto lang = locale.get_language();
-
-  if(lang == "ne")
-    return "fonts/Dekko-Regular.ttf";
-  if(lang == "cmn" || lang == "ja" || lang == "zh")
-    return "fonts/NotoSansCJKjp-Medium.otf";
-  if(lang == "he")
-    return "fonts/VarelaRound-Regular.ttf";
-  if(lang == "ko")
-    return "fonts/MapoBackpacking.ttf";
-
-  return "fonts/SuperTux-Medium.ttf";
 }
 
 void

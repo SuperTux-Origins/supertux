@@ -28,7 +28,6 @@
 #include "object/music_object.hpp"
 #include "object/tilemap.hpp"
 #include "physfs/ifile_stream.hpp"
-#include "physfs/physfs_file_system.hpp"
 #include "scripting/worldmap.hpp"
 #include "sprite/sprite.hpp"
 #include "squirrel/squirrel_environment.hpp"

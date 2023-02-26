@@ -38,7 +38,6 @@ World::from_directory(const std::string& directory)
 
   try
   {
-    register_translation_directory(info_filename);
     auto doc = ReaderDocument::from_file(info_filename);
     auto root = doc.get_root();
 

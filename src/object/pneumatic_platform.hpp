@@ -19,6 +19,8 @@
 
 #include "object/moving_sprite.hpp"
 
+#include <set>
+
 class PneumaticPlatform;
 
 class PneumaticPlatformChild final : public MovingSprite

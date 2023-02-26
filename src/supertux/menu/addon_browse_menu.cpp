@@ -42,13 +42,6 @@ AddonBrowseMenu::AddonBrowseMenu(bool langpacks_only, bool auto_install_langpack
   m_max_addons_on_page(10)
 {
   refresh();
-  if (auto_install_langpack)
-  {
-    const std::string& language = g_dictionary_manager->get_language().get_language();
-    if (language == "en")
-      return;
-    check_online();
-  }
 }
 
 AddonBrowseMenu::~AddonBrowseMenu()

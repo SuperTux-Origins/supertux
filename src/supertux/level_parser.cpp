@@ -32,7 +32,6 @@ LevelParser::get_level_name(const std::string& filename)
 {
   try
   {
-    register_translation_directory(filename);
     auto doc = ReaderDocument::from_file(filename);
     auto root = doc.get_root();
 
@@ -132,7 +131,6 @@ void
 LevelParser::load(const std::string& filepath)
 {
   m_level.m_filename = filepath;
-  register_translation_directory(filepath);
   try {
     auto doc = ReaderDocument::from_file(filepath);
     load(doc);

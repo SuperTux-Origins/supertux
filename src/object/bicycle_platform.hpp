@@ -20,6 +20,8 @@
 #include "object/path_walker.hpp"
 #include "object/moving_sprite.hpp"
 
+#include <set>
+
 class BicyclePlatform;
 
 class BicyclePlatformChild : public MovingSprite

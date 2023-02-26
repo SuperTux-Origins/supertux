@@ -17,10 +17,7 @@
 #ifndef HEADER_SUPERTUX_UTIL_GETTEXT_HPP
 #define HEADER_SUPERTUX_UTIL_GETTEXT_HPP
 
-#include <tinygettext/tinygettext.hpp>
 #include <memory>
-
-extern std::unique_ptr<tinygettext::DictionaryManager> g_dictionary_manager;
 
 /*
  * If you need to do a nontrivial substitution of values into a pattern, use
@@ -57,30 +54,15 @@ extern std::unique_ptr<tinygettext::DictionaryManager> g_dictionary_manager;
 
 static inline std::string _(const std::string& message)
 {
-  if (g_dictionary_manager)
-  {
-    return g_dictionary_manager->get_dictionary().translate(message);
-  }
-  else
-  {
-    return message;
-  }
+  return message;
 }
 
 static inline std::string __(const std::string& message,
-    const std::string& message_plural, int num)
+                             const std::string& message_plural, int num)
 {
-  if (g_dictionary_manager)
-  {
-    return g_dictionary_manager->get_dictionary().translate_plural(message,
-        message_plural, num);
-  }
-  else if (num == 1)
-  {
+  if (num == 1) {
     return message;
-  }
-  else
-  {
+  } else {
     return message_plural;
   }
 }

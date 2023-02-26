@@ -37,7 +37,6 @@
 #include "supertux/menu/game_menu.hpp"
 #include "supertux/menu/joystick_menu.hpp"
 #include "supertux/menu/keyboard_menu.hpp"
-#include "supertux/menu/language_menu.hpp"
 #include "supertux/menu/main_menu.hpp"
 #include "supertux/menu/multiplayer_menu.hpp"
 #include "supertux/menu/multiplayer_players_menu.hpp"
@@ -80,9 +79,6 @@ MenuStorage::create(MenuId menu_id)
   {
     case MAIN_MENU:
       return std::make_unique<MainMenu>();
-
-    case LANGUAGE_MENU:
-      return std::make_unique<LanguageMenu>();
 
     case OPTIONS_MENU:
       return std::unique_ptr<Menu>(new OptionsMenu(true));

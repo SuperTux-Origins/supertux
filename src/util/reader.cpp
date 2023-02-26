@@ -66,23 +66,4 @@ std::string dirname(const std::string& filename)
 
 } // namespace
 
-void register_translation_directory(const std::string& filename)
-{
-  if (g_dictionary_manager) {
-    std::string rel_dir = dirname(filename);
-    if (rel_dir.empty()) {
-      // Relative dir inside PhysFS search path?
-      // Get full path from search path, instead.
-      const char* rel_dir_c = PHYSFS_getRealDir(filename.c_str());
-      if (rel_dir_c) {
-        rel_dir = rel_dir_c;
-      }
-    }
-
-    if (!rel_dir.empty()) {
-      g_dictionary_manager->add_directory(rel_dir);
-    }
-  }
-}
-
 /* EOF */

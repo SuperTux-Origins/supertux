@@ -36,11 +36,6 @@
     sexpcpp.inputs.flake-utils.follows = "flake-utils";
     sexpcpp.inputs.tinycmmc.follows = "tinycmmc";
 
-    tinygettext.url = "github:tinygettext/tinygettext";
-    tinygettext.inputs.nixpkgs.follows = "nixpkgs";
-    tinygettext.inputs.flake-utils.follows = "flake-utils";
-    tinygettext.inputs.tinycmmc.follows = "tinycmmc";
-
     curl-win32.url = "github:grumnix/curl-win32";
     curl-win32.inputs.nixpkgs.follows = "nixpkgs";
     curl-win32.inputs.tinycmmc.follows = "tinycmmc";
@@ -59,10 +54,6 @@
 
     freetype-win32.url = "github:grumnix/freetype-win32";
     freetype-win32.inputs.nixpkgs.follows = "nixpkgs";
-
-    SDL2_ttf.url = "github:SuperTux/SDL_ttf";
-    SDL2_ttf.inputs.nixpkgs.follows = "nixpkgs";
-    SDL2_ttf.inputs.flake-utils.follows = "flake-utils";
 
     SDL2_ttf-win32.url = "github:grumnix/SDL2_ttf-win32";
     SDL2_ttf-win32.inputs.nixpkgs.follows = "nixpkgs";
@@ -87,9 +78,8 @@
   };
 
   outputs = { self, nixpkgs, flake-utils,
-              tinycmmc, sexpcpp, tinygettext,
-              curl-win32,
-              SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf, SDL2_ttf-win32,
+              tinycmmc, sexpcpp, curl-win32,
+              SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
               strutcpp, wstsound, squirrel, glew-win32 }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
@@ -102,12 +92,11 @@
 
             SDL2_ttf = if pkgs.targetPlatform.isWindows
                        then SDL2_ttf-win32.packages.${pkgs.system}.default
-                       else SDL2_ttf.packages.${pkgs.system}.default;
+                       else pkgs.SDL2_ttf;
 
             sexpcpp = sexpcpp.packages.${pkgs.system}.default;
             squirrel = squirrel.packages.${pkgs.system}.default;
             tinycmmc = tinycmmc.packages.${pkgs.system}.default;
-            tinygettext = tinygettext.packages.${pkgs.system}.default;
             strutcpp = strutcpp.packages.${pkgs.system}.default;
             wstsound = wstsound.packages.${pkgs.system}.default;
 
