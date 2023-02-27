@@ -39,12 +39,6 @@
     (coin
       (path-ref "gen15425645892763072623872")
     )
-    (decal
-      (z-pos -10)
-      (sprite "/images/decal/explanations/billboard-pickrock.png")
-      (x 864)
-      (y 832)
-    )
     (door
       (sector "climbing")
       (spawnpoint "climb1")

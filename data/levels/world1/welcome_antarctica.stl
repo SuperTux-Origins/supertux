@@ -22,41 +22,6 @@
       (name "Camera")
       (mode "normal")
     )
-    (decal
-      (z-pos -10)
-      (sprite "images/decal/explanations/billboard-fireflower.png")
-      (x 3488)
-      (y 288)
-    )
-    (decal
-      (z-pos -10)
-      (x 928)
-      (y 416)
-    )
-    (decal
-      (z-pos -10)
-      (sprite "images/decal/explanations/billboard-resetpoint.png")
-      (x 4960)
-      (y 416)
-    )
-    (decal
-      (z-pos -10)
-      (sprite "images/decal/explanations/billboard-runjump.png")
-      (x 7296)
-      (y 384)
-    )
-    (decal
-      (z-pos -10)
-      (sprite "images/decal/explanations/billboard-buttjump.png")
-      (x 6784)
-      (y 224)
-    )
-    (decal
-      (z-pos -10)
-      (sprite "images/decal/explanations/billboard-backflip.png")
-      (x 2432)
-      (y 384)
-    )
     (firefly
       (x 5360)
       (y 448)

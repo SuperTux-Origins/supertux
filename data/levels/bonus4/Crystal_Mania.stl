@@ -137,12 +137,6 @@
       (y 1792.667)
     )
     (decal
-      (z-pos -50)
-      (sprite "/images/decal/explanations/billboard-climbing.png")
-      (x 1600)
-      (y 1824)
-    )
-    (decal
       (z-pos -10)
       (sprite "/images/decal/snow/exitbg.png")
       (x 12704)

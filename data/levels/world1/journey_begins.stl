@@ -19,12 +19,6 @@
       (name "Camera")
       (mode "normal")
     )
-    (decal
-      (z-pos -10)
-      (sprite "images/decal/explanations/billboard-star.png")
-      (x 5024)
-      (y 320)
-    )
     (firefly
       (x 6704)
       (y 544)

@@ -44,24 +44,6 @@
       (x 11168)
       (y 672)
     )
-    (decal
-      (z-pos -50)
-      (sprite "images/decal/explanations/billboard-switch.png")
-      (x 4544)
-      (y 640)
-    )
-    (decal
-      (z-pos -10)
-      (sprite "/images/decal/explanations/billboard-trampoline.png")
-      (x 8000)
-      (y 544)
-    )
-    (decal
-      (z-pos -10)
-      (sprite "/images/decal/explanations/billboard-climbing.png")
-      (x 10848)
-      (y 864)
-    )
     (firefly
       (x 8672)
       (y 384)
