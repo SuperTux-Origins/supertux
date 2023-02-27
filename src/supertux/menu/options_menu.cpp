@@ -448,12 +448,6 @@ OptionsMenu::OptionsMenu(bool complete) :
     .set_help(_("Automatically pause the game when the window loses focus"));
   add_toggle(MNID_CUSTOM_CURSOR, _("Use custom mouse cursor"), &g_config->custom_mouse_cursor).set_help(_("Whether the game renders its own cursor or uses the system's cursor"));
 
-  if (g_config->developer_mode)
-  {
-    add_submenu(_("Menu Customization"), MenuStorage::CUSTOM_MENU_MENU)
-      .set_help(_("Customize the appearance of the menus"));
-  }
-
   add_hl();
   add_back(_("Back"));
 }

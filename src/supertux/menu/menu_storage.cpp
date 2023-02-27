@@ -20,7 +20,6 @@
 
 #include "supertux/menu/cheat_menu.hpp"
 #include "supertux/menu/debug_menu.hpp"
-#include "supertux/menu/custom_menu_menu.hpp"
 #include "supertux/menu/game_menu.hpp"
 #include "supertux/menu/joystick_menu.hpp"
 #include "supertux/menu/keyboard_menu.hpp"
@@ -93,9 +92,6 @@ MenuStorage::create(MenuId menu_id)
 
     case ASSET_MENU:
       return std::make_unique<WebAssetMenu>();
-
-    case CUSTOM_MENU_MENU:
-      return std::make_unique<CustomMenuMenu>();
 
     case MULTIPLAYER_MENU:
       return std::make_unique<MultiplayerMenu>();
