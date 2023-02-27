@@ -99,55 +99,46 @@
     (person
       (name "Bill Kendrick")
       (info (_ "Original Developer"))
-	  (image "images/credits/bill.jpg")
     )
 	(blank)
 	(person
       (name "Ingo \"grumbel\" Ruhnke")
       (info (_ "Graphics, Programming, Level Design"))
-	  (image "images/credits/ingo.jpg")
     )
     (blank)
     (person
       (name "Matthias \"MatzeB\" Braun")
       (info (_ "Graphics, Programming, Level Design"))
-	  (image "images/credits/matze.jpg")
     )
     (blank)
     (person
       (name "Marek \"Wansti\" Moeckel")
       (info (_ "Music, Level Design"))
-	  (image "images/credits/wansti.jpg")
     )
     (blank)
     (person
       (name "Stephen Groundwater")
       (info (_ "Graphics"))
-      (image "images/credits/gwater.jpg")
     )
     (blank)
     (person
       (name "Christoph Sommer")
       (info (_ "Programming, Graphics, Level Design"))
-      (image "images/credits/christoph.jpg")
     )
     (blank)
     (person
       (name "Wolfgang Becker")
       (info (_ "Programming, Level Design"))
-      (image "images/credits/wolfgang.jpg")
     )
     (blank)
     (person
       (name "Christopher A. \"paroneayea\" Webber")
       (info (_ "Graphics, Story"))
-      (image "images/credits/paroneayea.jpg")
     )
     (blank)
     (person
       (name "Ondřej \"Ravu al Hemio\" Hošek")
       (info (_ "Programming, Documentation"))
-      (image "images/credits/ondra.jpg")
     )
     (blank)
     (person
