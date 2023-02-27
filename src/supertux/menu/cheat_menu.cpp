@@ -21,7 +21,6 @@
 #include "object/player.hpp"
 #include "scripting/functions.hpp"
 #include "supertux/game_session.hpp"
-#include "supertux/menu/cheat_apply_menu.hpp"
 #include "supertux/sector.hpp"
 
 CheatMenu::CheatMenu()
@@ -63,124 +62,61 @@ CheatMenu::menu_action(MenuItem& item)
   const auto& players = Sector::get().get_players();
   Player* single_player = (players.size() == 1) ? players[0] : nullptr;
 
-  switch (item.get_id())
-  {
-    case MNID_GROW:
-      if (single_player)
-      {
-        single_player->set_bonus(GROWUP_BONUS);
-        MenuManager::instance().clear_menu_stack();
-      }
-      else
-      {
-        MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([](Player& player){
-          player.set_bonus(GROWUP_BONUS);
-        }));
-      }
-      break;
+  for (Player* const player_ptr : Sector::get().get_players()) {
+    Player& player = *player_ptr;
 
-    case MNID_FIRE:
-      MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([](Player& player, int count){
-        log_warning << player.get_id() << std::endl;
+    switch (item.get_id())
+    {
+      case MNID_GROW:
+        player.set_bonus(GROWUP_BONUS);
+        break;
+
+      case MNID_FIRE:
         player.set_bonus(FIRE_BONUS);
-        player.get_status().max_fire_bullets[player.get_id()] = count;
-      }));
-      break;
+        player.get_status().max_fire_bullets[player.get_id()] = 5;
+        break;
 
-    case MNID_ICE:
-      MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([](Player& player, int count){
-        log_warning << player.get_id() << std::endl;
+      case MNID_ICE:
         player.set_bonus(ICE_BONUS);
-        player.get_status().max_ice_bullets[player.get_id()] = count;
-      }));
-      break;
+        player.get_status().max_ice_bullets[player.get_id()] = 5;
+        break;
 
-    case MNID_AIR:
-      MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([](Player& player, int count){
-        log_warning << player.get_id() << std::endl;
+      case MNID_AIR:
         player.set_bonus(AIR_BONUS);
-        player.get_status().max_air_time[player.get_id()] = count;
-      }));
-      break;
+        player.get_status().max_air_time[player.get_id()] = 5;
+        break;
 
-    case MNID_EARTH:
-      MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([](Player& player, int count){
-        log_warning << player.get_id() << std::endl;
+      case MNID_EARTH:
         player.set_bonus(EARTH_BONUS);
-        player.get_status().max_earth_time[player.get_id()] = count;
-      }));
-      break;
+        player.get_status().max_earth_time[player.get_id()] = 5;
+        break;
 
-    case MNID_STAR:
-      if (single_player)
-      {
-        single_player->make_invincible();
-        MenuManager::instance().clear_menu_stack();
-      }
-      else
-      {
-        MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([](Player& player){
-          player.make_invincible();
-        }));
-      }
-      break;
+      case MNID_STAR:
+        player.make_invincible();
+        break;
 
-    case MNID_SHRINK:
-      if (single_player)
-      {
-        single_player->kill(false);
-        MenuManager::instance().clear_menu_stack();
-      }
-      else
-      {
-        MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([](Player& player){
-          player.kill(false);
-        }));
-      }
-      break;
+      case MNID_SHRINK:
+        player.kill(false);
+        break;
 
-    case MNID_KILL:
-      if (single_player)
-      {
-        single_player->kill(true);
-        MenuManager::instance().clear_menu_stack();
-      }
-      else
-      {
-        MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([](Player& player){
-          player.kill(true);
-        }));
-      }
-      break;
+      case MNID_KILL:
+        player.kill(true);
+        break;
 
-    case MNID_FINISH:
-      if (GameSession::current())
-      {
-        GameSession::current()->finish(true);
-      }
-      MenuManager::instance().clear_menu_stack();
-      break;
+      case MNID_GHOST:
+      case MNID_UNGHOST:
+        player.set_ghost_mode(!single_player->get_ghost_mode());
+        break;
 
-    case MNID_GHOST:
-    case MNID_UNGHOST:
-      if (GameSession::current())
-      {
-        if (single_player)
-        {
-          single_player->set_ghost_mode(!single_player->get_ghost_mode());
-          MenuManager::instance().clear_menu_stack();
+      case MNID_FINISH:
+        if (GameSession::current()) {
+          GameSession::current()->finish(true);
         }
-        else
-        {
-          MenuManager::instance().push_menu(std::make_unique<CheatApplyMenu>([&item](Player& player){
-            player.set_ghost_mode(item.get_id() == MNID_GHOST);
-          }));
-        }
-      }
-      break;
+        break;
 
-    default:
-      break;
+      default:
+        break;
+    }
   }
 }
 
