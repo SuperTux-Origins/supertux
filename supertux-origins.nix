@@ -24,6 +24,7 @@
 , strutcpp
 , miniswig
 , wstsound
+, gtest
 }:
 
 stdenv.mkDerivation rec {
@@ -54,6 +55,7 @@ EOF
   cmakeFlags = [
     "-DINSTALL_SUBDIR_BIN=bin"
     "-DUSE_SYSTEM_SDL2_TTF=ON"
+    "-DBUILD_TESTS=ON"
   ];
 
   postFixup =
@@ -100,5 +102,8 @@ EOF
     strutcpp
     miniswig
     wstsound
+
+    # checkInputs
+    gtest
   ];
 }

@@ -128,6 +128,7 @@
                          else pkgs.SDL2_image;
 
             mcfgthreads = pkgs.windows.mcfgthreads;
+            gtest = pkgs.gtest;
           };
 
           supertux-origins-win32 = pkgs.runCommand "supertux-origins-win32" {} ''
