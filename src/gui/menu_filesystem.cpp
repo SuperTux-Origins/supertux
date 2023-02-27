@@ -24,7 +24,6 @@
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/gettext.hpp"
-#include "util/string_util.hpp"
 
 FileSystemMenu::FileSystemMenu(std::string* filename, const std::vector<std::string>& extensions,
                                const std::string& basedir, bool path_relative_to_basedir, std::function<void(std::string)> callback) :
@@ -119,7 +118,7 @@ FileSystemMenu::has_right_suffix(const std::string& file) const
     return true;
 
   for (const auto& extension : m_extensions) {
-    if (StringUtil::has_suffix(file, extension))
+    if (file.ends_with(extension))
     {
       return true;
     }

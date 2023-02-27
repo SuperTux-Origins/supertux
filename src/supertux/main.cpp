@@ -64,9 +64,7 @@
 #include "util/gettext.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/string_util.hpp"
 #include "util/timelog.hpp"
-#include "util/string_util.hpp"
 #include "video/sdl_surface.hpp"
 #include "video/sdl_surface_ptr.hpp"
 #include "video/ttf_surface_manager.hpp"
@@ -455,7 +453,7 @@ Main::launch_game(const CommandLineArguments& args)
       log_debug << "Adding dir: " << dir << std::endl;
       PHYSFS_mount(dir.c_str(), nullptr, true);
 
-      if (StringUtil::has_suffix(start_level, ".stwm"))
+      if (start_level.ends_with(".stwm"))
       {
         m_screen_manager->push_screen(std::make_unique<worldmap::WorldMapScreen>(
                                      std::make_unique<worldmap::WorldMap>(filename, *m_savegame)));

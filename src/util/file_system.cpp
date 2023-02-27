@@ -37,7 +37,6 @@
 
 #include "gui/dialog.hpp"
 #include "util/log.hpp"
-#include "util/string_util.hpp"
 
 namespace fs = std::filesystem;
 

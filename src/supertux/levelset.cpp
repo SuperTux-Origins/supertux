@@ -16,20 +16,21 @@
 
 #include "supertux/levelset.hpp"
 
-#include <physfs.h>
 #include <algorithm>
+
+#include <physfs.h>
+#include <strut/numeric_less.hpp>
 
 #include "physfs/util.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
-#include "util/string_util.hpp"
 
 Levelset::Levelset(const std::string& basedir, bool recursively) :
   m_basedir(basedir),
   m_levels()
 {
   walk_directory(m_basedir, recursively);
-  std::sort(m_levels.begin(), m_levels.end(), StringUtil::numeric_less);
+  std::sort(m_levels.begin(), m_levels.end(), strut::numeric_less);
 }
 
 int
@@ -62,7 +63,7 @@ Levelset::walk_directory(const std::string& directory, bool recursively)
     {
       walk_directory(filepath, true);
     }
-    if (StringUtil::has_suffix(*filename, ".stl"))
+    if (std::string_view(*filename).ends_with(".stl"))
     {
       if (is_basedir)
       {

@@ -24,7 +24,6 @@
 #include "trigger/secretarea_trigger.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
-#include "util/string_util.hpp"
 #include "util/writer.hpp"
 
 #include <physfs.h>

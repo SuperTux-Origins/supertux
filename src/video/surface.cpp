@@ -20,7 +20,6 @@
 
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/string_util.hpp"
 #include "video/texture.hpp"
 #include "video/texture_manager.hpp"
 #include "video/video_system.hpp"
@@ -57,7 +56,7 @@ Surface::from_reader(const ReaderMapping& mapping, const std::optional<Rect>& re
 SurfacePtr
 Surface::from_file(const std::string& filename, const std::optional<Rect>& rect)
 {
-  if (StringUtil::has_suffix(filename, ".surface"))
+  if (filename.ends_with(".surface"))
   {
     ReaderDocument doc = ReaderDocument::from_file(filename);
     ReaderObject object = doc.get_root();

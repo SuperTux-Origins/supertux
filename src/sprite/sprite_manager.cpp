@@ -20,7 +20,6 @@
 #include "util/file_system.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/string_util.hpp"
 
 #include <sstream>
 
@@ -54,7 +53,7 @@ SpriteManager::load(const std::string& filename)
 {
   ReaderDocument doc = [filename](){
     try {
-      if (StringUtil::has_suffix(filename, ".sprite")) {
+      if (filename.ends_with(".sprite")) {
         return ReaderDocument::from_file(filename);
       } else {
         std::stringstream text;

@@ -17,8 +17,6 @@
 
 #include "easing.hpp"
 
-#include "util/string_util.hpp"
-
 #include <math.h>
 #include <stdexcept>
 #include <string>
@@ -596,10 +594,10 @@ std::string get_reverse_easing_str(const std::string& ease_name)
   if (ease_name == "EaseNone")
     return "EaseNone";
 
-  if (StringUtil::has_suffix(ease_name, "InOut"))
+  if (ease_name.ends_with("InOut"))
     return ease_name;
 
-  if (StringUtil::has_suffix(ease_name, "In"))
+  if (ease_name.ends_with("In"))
   {
     std::string e = ease_name;
     e.pop_back();
@@ -607,7 +605,7 @@ std::string get_reverse_easing_str(const std::string& ease_name)
     return e + "Out";
   }
 
-  if (StringUtil::has_suffix(ease_name, "Out"))
+  if (ease_name.ends_with("Out"))
   {
     std::string e = ease_name;
     e.pop_back();
