@@ -66,11 +66,11 @@ Block::Block(const ReaderMapping& mapping, const std::string& sprite_file) :
   m_original_y(-1),
   m_flip(NO_FLIP)
 {
-  mapping.get("x", m_col.m_bbox.get_left());
-  mapping.get("y", m_col.m_bbox.get_top());
+  mapping.read("x", m_col.m_bbox.get_left());
+  mapping.read("y", m_col.m_bbox.get_top());
 
   std::string sf;
-  mapping.get("sprite", sf);
+  mapping.read("sprite", sf);
   if (sf.empty() || !PHYSFS_exists(sf.c_str())) {
     sf = sprite_file;
   }

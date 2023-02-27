@@ -21,8 +21,6 @@
 
 #include "video/layer.hpp"
 
-class ReaderMapping;
-
 /** A tile that starts falling down if tux stands to long on it */
 class InvisibleWall final : public MovingObject
 {

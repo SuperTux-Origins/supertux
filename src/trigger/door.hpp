@@ -22,7 +22,6 @@
 #include "video/flip.hpp"
 
 class Player;
-class ReaderMapping;
 
 class Door final : public TriggerBase
 {

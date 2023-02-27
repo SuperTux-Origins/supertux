@@ -37,9 +37,9 @@ ScriptTrigger::ScriptTrigger(const ReaderMapping& reader) :
   if (m_col.m_bbox.get_height() == 0.f)
     m_col.m_bbox.set_height(32.f);
 
-  reader.get("script", script);
-  reader.get("button", must_activate);
-  reader.get("oneshot", oneshot);
+  reader.read("script", script);
+  reader.read("button", must_activate);
+  reader.read("oneshot", oneshot);
   if (script.empty()) {
     log_warning << "No script set in script trigger" << std::endl;
   }

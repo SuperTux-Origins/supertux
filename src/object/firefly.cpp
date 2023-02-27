@@ -39,7 +39,7 @@ Firefly::Firefly(const ReaderMapping& mapping) :
    activated(false),
    initial_position(get_pos())
 {
-  if (!mapping.get( "sprite", m_sprite_name)){
+  if (!mapping.read( "sprite", m_sprite_name)){
     reactivate();
     return;
   }

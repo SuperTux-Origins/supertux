@@ -113,55 +113,62 @@ BitmapFont::loadFontFile(const std::string &filename)
     throw std::runtime_error(msg.str());
   }
 
-  config_l.get("glyph-border", border);
-  config_l.get("rtl", rtl);
+  config_l.read("glyph-border", border);
+  config_l.read("rtl", rtl);
 
-  auto iter = config_l.get_iter();
-  while (iter.next()) {
-    const std::string& token = iter.get_key();
-    if ( token == "surface" ) {
-      auto glyphs_val = iter.as_mapping();
-      int local_char_width;
-      bool monospaced;
-      GlyphWidth local_glyph_width;
-      std::string glyph_image;
-      std::string shadow_image;
-      std::vector<std::string> chars;
-      if ( ! glyphs_val.get("glyph-width", local_char_width) ) {
-        local_char_width = def_char_width;
-      }
-      if ( ! glyphs_val.get("monospace", monospaced ) ) {
-        local_glyph_width = glyph_width;
+  ReaderMapping surface_mapping;
+  if (config_l.read("surface", surface_mapping))
+  {
+    int local_char_width;
+    if ( ! surface_mapping.read("glyph-width", local_char_width) ) {
+      local_char_width = def_char_width;
+    }
+
+    GlyphWidth local_glyph_width;
+    bool monospaced;
+    if (!surface_mapping.read("monospace", monospaced))
+    {
+      local_glyph_width = glyph_width;
+    }
+    else
+    {
+      if (monospaced) {
+        local_glyph_width = FIXED;
       }
       else {
-        if ( monospaced ) local_glyph_width = FIXED;
-        else local_glyph_width = VARIABLE;
+        local_glyph_width = VARIABLE;
       }
-      if ( ! glyphs_val.get("glyphs", glyph_image) ) {
-        std::ostringstream msg;
-        msg << "Font:" << filename << ": missing glyphs image";
-        throw std::runtime_error(msg.str());
-      }
-      if ( ! glyphs_val.get("shadows", shadow_image) ) {
-        std::ostringstream msg;
-        msg << "Font:" << filename << ": missing shadows image";
-        throw std::runtime_error(msg.str());
-      }
-      if ( ! glyphs_val.get("chars", chars) || chars.size() == 0) {
-        std::ostringstream msg;
-        msg << "Font:" << filename << ": missing chars definition";
-        throw std::runtime_error(msg.str());
-      }
-
-      if ( local_char_width==0 ) {
-        std::ostringstream msg;
-        msg << "Font:" << filename << ": misses glyph-width for some surface";
-        throw std::runtime_error(msg.str());
-      }
-
-      loadFontSurface(glyph_image, shadow_image, chars,
-                      local_glyph_width, local_char_width);
     }
+
+    std::string glyph_image;
+    if ( !surface_mapping.read("glyphs", glyph_image) ) {
+      std::ostringstream msg;
+      msg << "Font:" << filename << ": missing glyphs image";
+      throw std::runtime_error(msg.str());
+    }
+
+    std::string shadow_image;
+    if ( !surface_mapping.read("shadows", shadow_image) ) {
+      std::ostringstream msg;
+      msg << "Font:" << filename << ": missing shadows image";
+      throw std::runtime_error(msg.str());
+    }
+
+    std::vector<std::string> chars;
+    if ( !surface_mapping.read("chars", chars) || chars.size() == 0) {
+      std::ostringstream msg;
+      msg << "Font:" << filename << ": missing chars definition";
+      throw std::runtime_error(msg.str());
+    }
+
+    if ( local_char_width==0 ) {
+      std::ostringstream msg;
+      msg << "Font:" << filename << ": misses glyph-width for some surface";
+      throw std::runtime_error(msg.str());
+    }
+
+    loadFontSurface(glyph_image, shadow_image, chars,
+                    local_glyph_width, local_char_width);
   }
 }
 

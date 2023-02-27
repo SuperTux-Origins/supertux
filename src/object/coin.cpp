@@ -50,11 +50,11 @@ Coin::Coin(const ReaderMapping& reader) :
   m_collect_script(),
   m_starting_node(0)
 {
-  reader.get("starting-node", m_starting_node, 0);
+  m_starting_node = reader.get("starting-node", 0);
 
   init_path(reader, true);
 
-  reader.get("collect-script", m_collect_script, "");
+  m_collect_script = reader.get("collect-script", std::string());
 
   SoundManager::current()->preload("sounds/coin.wav");
 }

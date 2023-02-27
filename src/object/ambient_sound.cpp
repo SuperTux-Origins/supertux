@@ -41,16 +41,16 @@ AmbientSound::AmbientSound(const ReaderMapping& mapping) :
   m_col.m_group = COLGROUP_DISABLED;
 
   float w, h;
-  mapping.get("x", m_col.m_bbox.get_left(), 0.0f);
-  mapping.get("y", m_col.m_bbox.get_top(), 0.0f);
-  mapping.get("width" , w, 32.0f);
-  mapping.get("height", h, 32.0f);
+  m_col.m_bbox.get_left() = mapping.get("x", 0.0f);
+  m_col.m_bbox.get_top() = mapping.get("y", 0.0f);
+  w = mapping.get("width" , 32.0f);
+  h = mapping.get("height", 32.0f);
   m_col.m_bbox.set_size(w, h);
 
-  mapping.get("distance_factor",distance_factor, 0.0f);
-  mapping.get("distance_bias"  ,distance_bias  , 0.0f);
-  mapping.get("sample"         ,sample         , "");
-  mapping.get("volume"         ,maximumvolume  , 1.0f);
+  distance_factor = mapping.get("distance_factor", 0.0f);
+  distance_bias = mapping.get("distance_bias", 0.0f);
+  sample = mapping.get("sample", std::string());
+  maximumvolume = mapping.get("volume", 1.0f);
 
   // square all distances (saves us a sqrt later)
   distance_bias*=distance_bias;
@@ -63,7 +63,7 @@ AmbientSound::AmbientSound(const ReaderMapping& mapping) :
   else
     silence_distance = 1/distance_factor;
 
-  mapping.get("silence_distance",silence_distance);
+  mapping.read("silence_distance", silence_distance);
 
   sound_source.reset(); // not playing at the beginning
   SoundManager::current()->preload(sample);

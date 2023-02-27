@@ -40,7 +40,7 @@ ParticleSystem::ParticleSystem(const ReaderMapping& reader, float max_particle_s
   virtual_height(static_cast<float>(SCREEN_HEIGHT) + max_particle_size * 2.0f),
   enabled(true)
 {
-  reader.get("enabled", enabled, true);
+  enabled = reader.get("enabled", true);
   z_pos = reader_get_layer(reader, LAYER_BACKGROUND1);
 }
 

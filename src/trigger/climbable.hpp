@@ -26,7 +26,6 @@
 class Color;
 class DrawingContext;
 class Player;
-class ReaderMapping;
 
 class Climbable final : public TriggerBase
 {

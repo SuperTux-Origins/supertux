@@ -75,14 +75,14 @@ WorldSelect::WorldSelect(const std::string& current_world_filename) :
       wm.unlocked = unlocked;
 
       ReaderDocument doc = ReaderDocument::from_file(world);
-      if (!doc.get_root().get_mapping().get("name", wm.name))
+      if (!doc.get_root().get_mapping().read("name", wm.name))
       {
         log_warning << "No name for worldmap " << world << std::endl;
         continue;
       }
 
       std::string icon_path = "";
-      if (!doc.get_root().get_mapping().get(unlocked ? "icon" : "icon-locked", icon_path))
+      if (!doc.get_root().get_mapping().read(unlocked ? "icon" : "icon-locked", icon_path))
       {
         log_warning << "No icon (" << (unlocked ? "unlocked" : "locked") << ") for worldmap " << world << std::endl;
         continue;
@@ -102,7 +102,7 @@ WorldSelect::WorldSelect(const std::string& current_world_filename) :
         m_current_world = i;
 
         std::string bkg_path = "";
-        if (doc.get_root().get_mapping().get("bkg", bkg_path))
+        if (doc.get_root().get_mapping().read("bkg", bkg_path))
         {
           m_bkg = Surface::from_file(bkg_path);
         }

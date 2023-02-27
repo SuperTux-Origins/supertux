@@ -98,18 +98,18 @@ TexturePtr
 TextureManager::get(const ReaderMapping& mapping, const std::optional<Rect>& region)
 {
   std::string filename;
-  if (!mapping.get("file", filename))
+  if (!mapping.read("file", filename))
   {
     log_warning << "'file' tag missing" << std::endl;
   }
   else
   {
-    filename = FileSystem::join(mapping.get_doc().get_directory(), filename);
+    filename = FileSystem::join(mapping.get_document().get_directory(), filename);
   }
 
   std::optional<Rect> rect;
   std::vector<int> rect_v;
-  if (mapping.get("rect", rect_v))
+  if (mapping.read("rect", rect_v))
   {
     if (rect_v.size() == 4)
     {
@@ -125,7 +125,7 @@ TextureManager::get(const ReaderMapping& mapping, const std::optional<Rect>& reg
   GLenum wrap_t = GL_CLAMP_TO_EDGE;
 
   std::vector<std::string> wrap_v;
-  if (mapping.get("wrap", wrap_v))
+  if (mapping.read("wrap", wrap_v))
   {
     if (wrap_v.size() == 1)
     {
@@ -145,14 +145,14 @@ TextureManager::get(const ReaderMapping& mapping, const std::optional<Rect>& reg
 
   GLenum filter = GL_LINEAR;
   std::string filter_s;
-  if (mapping.get("filter", filter_s))
+  if (mapping.read("filter", filter_s))
   {
     filter = string2filter(filter_s);
   }
 
   Vector animate(0.0f, 0.0f);
   std::vector<float> animate_v;
-  if (mapping.get("animate", animate_v))
+  if (mapping.read("animate", animate_v))
   {
     if (animate_v.size() == 2)
     {

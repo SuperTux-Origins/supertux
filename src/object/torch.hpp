@@ -25,8 +25,6 @@
 #include "video/color.hpp"
 #include "video/flip.hpp"
 
-class ReaderMapping;
-
 class Torch final :
   public MovingObject,
   public ExposedObject<Torch, scripting::Torch>

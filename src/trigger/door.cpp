@@ -38,13 +38,13 @@ Door::Door(const ReaderMapping& mapping) :
   stay_open_timer(),
   m_flip(NO_FLIP)
 {
-  mapping.get("x", m_col.m_bbox.get_left());
-  mapping.get("y", m_col.m_bbox.get_top());
-  mapping.get("sector", target_sector);
-  mapping.get("spawnpoint", target_spawnpoint);
-  mapping.get("sprite", sprite_name);
+  mapping.read("x", m_col.m_bbox.get_left());
+  mapping.read("y", m_col.m_bbox.get_top());
+  mapping.read("sector", target_sector);
+  mapping.read("spawnpoint", target_spawnpoint);
+  mapping.read("sprite", sprite_name);
 
-  mapping.get("script", script);
+  mapping.read("script", script);
 
   sprite = SpriteManager::current()->create(sprite_name);
   sprite->set_action("closed");

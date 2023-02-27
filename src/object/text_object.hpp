@@ -26,7 +26,6 @@
 #include "video/font_ptr.hpp"
 
 class DrawingContext;
-class ReaderMapping;
 
 /** A text object intended for scripts that want to tell a story */
 class TextObject final : public GameObject,

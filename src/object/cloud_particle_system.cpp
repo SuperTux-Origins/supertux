@@ -54,7 +54,7 @@ CloudParticleSystem::CloudParticleSystem(const ReaderMapping& reader) :
   m_current_amount(15),
   m_current_real_amount(0)
 {
-  reader.get("intensity", m_current_amount);
+  reader.read("intensity", m_current_amount);
   init();
 }
 

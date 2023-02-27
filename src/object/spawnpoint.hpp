@@ -22,7 +22,6 @@
 #include "video/surface_ptr.hpp"
 #include "video/layer.hpp"
 
-class ReaderMapping;
 class DrawingContext;
 
 class SpawnPointMarker final : public MovingObject

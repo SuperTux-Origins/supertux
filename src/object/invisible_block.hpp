@@ -19,8 +19,6 @@
 
 #include "object/block.hpp"
 
-class ReaderMapping;
-
 class InvisibleBlock final : public Block
 {
 public:

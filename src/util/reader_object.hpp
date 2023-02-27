@@ -17,32 +17,9 @@
 #ifndef HEADER_SUPERTUX_UTIL_READER_OBJECT_HPP
 #define HEADER_SUPERTUX_UTIL_READER_OBJECT_HPP
 
-#include <string>
+#include <prio/reader_object.hpp>
 
-namespace sexp {
-class Value;
-} // namespace sexp
-
-class ReaderDocument;
-class ReaderMapping;
-class ReaderCollection;
-
-class ReaderObject final
-{
-public:
-  ReaderObject(const ReaderDocument& doc, const sexp::Value& sx);
-
-  std::string get_name() const;
-  ReaderMapping get_mapping() const;
-  ReaderCollection get_collection() const;
-
-  const ReaderDocument& get_doc() const { return m_doc; }
-  const sexp::Value& get_sexp() const { return m_sx; }
-
-private:
-  const ReaderDocument& m_doc;
-  const sexp::Value& m_sx;
-};
+using prio::ReaderObject;
 
 #endif
 

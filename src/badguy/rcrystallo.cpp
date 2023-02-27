@@ -31,7 +31,7 @@ RCrystallo::RCrystallo(const ReaderMapping& reader) :
 {
   walk_speed = 80;
   max_drop_height = 16;
-  reader.get("radius", m_radius, 100.0f);
+  m_radius = reader.get("radius", 100.0f);
   SoundManager::current()->preload("sounds/crystallo-shatter.ogg");
 }
 

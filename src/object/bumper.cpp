@@ -34,9 +34,9 @@ Bumper::Bumper(const ReaderMapping& reader) :
   physic(),
   left()
 {
-	reader.get("left", left);
+  reader.read("left", left);
   m_sprite->set_action(left ? "left-normal" : "right-normal");
-	physic.enable_gravity(false);
+  physic.enable_gravity(false);
 }
 
 void

@@ -43,24 +43,24 @@ Wind::Wind(const ReaderMapping& reader) :
   fancy_wind()
 {
   float w,h;
-  reader.get("x", m_col.m_bbox.get_left(), 0.0f);
-  reader.get("y", m_col.m_bbox.get_top(), 0.0f);
-  reader.get("width", w, 32.0f);
-  reader.get("height", h, 32.0f);
+  m_col.m_bbox.get_left() = reader.get("x", 0.0f);
+  m_col.m_bbox.get_top() = reader.get("y", 0.0f);
+  w = reader.get("width", 32.0f);
+  h = reader.get("height", 32.0f);
   m_col.m_bbox.set_size(w, h);
 
-  reader.get("blowing", blowing, true);
+  blowing = reader.get("blowing", true);
 
-  reader.get("speed-x", speed.x, 0.0f);
-  reader.get("speed-y", speed.y, 0.0f);
+  speed.x = reader.get("speed-x", 0.0f);
+  speed.y = reader.get("speed-y", 0.0f);
 
-  reader.get("acceleration", acceleration, 100.0f);
+  acceleration = reader.get("acceleration", 100.0f);
 
-  reader.get("affects-badguys", affects_badguys, false);
-  reader.get("affects-objects", affects_objects, false);
-  reader.get("affects-player", affects_player, true);
-  
-  reader.get("fancy-wind", fancy_wind, false);
+  affects_badguys = reader.get("affects-badguys", false);
+  affects_objects = reader.get("affects-objects", false);
+  affects_player = reader.get("affects-player", true);
+
+  fancy_wind = reader.get("fancy-wind", false);
 
   set_group(COLGROUP_TOUCHABLE);
 }

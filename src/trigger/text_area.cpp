@@ -39,20 +39,21 @@ TextArea::TextArea(const ReaderMapping& mapping) :
 {
   float w, h;
 
-  mapping.get("x", m_col.m_bbox.get_left(), 0.0f);
-  mapping.get("y", m_col.m_bbox.get_top(), 0.0f);
-  mapping.get("width", w, 32.0f);
-  mapping.get("height", h, 32.0f);
-  mapping.get("strings", m_items);
-  mapping.get("delay", m_delay);
-  mapping.get("once", m_once);
-  mapping.get("fade-delay", m_fade_delay);
-  mapping.get("anchor-offset-x", m_anchor_offset.x);
-  mapping.get("anchor-offset-y", m_anchor_offset.y);
+  m_col.m_bbox.get_left() = mapping.get("x", 0.0f);
+  m_col.m_bbox.get_top() = mapping.get("y", 0.0f);
+  w = mapping.get("width", 32.0f);
+  h = mapping.get("height", 32.0f);
+  mapping.read("strings", m_items);
+  mapping.read("delay", m_delay);
+  mapping.read("once", m_once);
+  mapping.read("fade-delay", m_fade_delay);
+  mapping.read("anchor-offset-x", m_anchor_offset.x);
+  mapping.read("anchor-offset-y", m_anchor_offset.y);
 
   std::string anchor;
-  if (mapping.get("anchor-point", anchor))
+  if (mapping.read("anchor-point", anchor)) {
     m_anchor = string_to_anchor_point(anchor);
+  }
 
   m_col.m_bbox.set_size(w, h);
 }

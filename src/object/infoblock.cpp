@@ -38,22 +38,22 @@ InfoBlock::InfoBlock(const ReaderMapping& mapping) :
   m_fadetransition(true),
   m_initial_y(0.0f)
 {
-  if (!mapping.get("message", m_message))
+  if (!mapping.read("message", m_message))
   {
     log_warning << "No message in InfoBlock" << std::endl;
   }
   std::vector<float> m_frontcolor_;
-  if (mapping.get("frontcolor", m_frontcolor_))
+  if (mapping.read("frontcolor", m_frontcolor_))
   {
     m_frontcolor = Color(m_frontcolor_);
   }
   std::vector<float> m_backcolor_;
-  if (mapping.get("backcolor", m_backcolor_))
+  if (mapping.read("backcolor", m_backcolor_))
   {
     m_backcolor = Color(m_backcolor_);
   }
-  mapping.get("roundness", m_roundness, 0.f);
-  mapping.get("fadetransition", m_fadetransition, true);
+  m_roundness = mapping.get("roundness", 0.f);
+  m_fadetransition = mapping.get("fadetransition", true);
   //stopped = false;
   //ringing = new AmbientSound(get_pos(), 0.5, 300, 1, "sounds/phone.wav");
   //Sector::get().add_object(ringing);

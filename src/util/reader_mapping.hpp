@@ -17,80 +17,39 @@
 #ifndef HEADER_SUPERTUX_UTIL_READER_MAPPING_HPP
 #define HEADER_SUPERTUX_UTIL_READER_MAPPING_HPP
 
-#include <optional>
+#include <prio/reader_mapping.hpp>
 
-#include "util/reader_iterator.hpp"
+using prio::ReaderMapping;
 
-namespace sexp {
-class Value;
-} // namespace sexp
+namespace prio {
 
-class ReaderDocument;
-class ReaderCollection;
-
-class ReaderMapping final
+template<>
+inline bool read_custom(ReaderMapping const& mapping, std::string_view key, std::vector<uint32_t>& value)
 {
-public:
-  static bool s_translations_enabled;
-
-public:
-  // sx should point to (section (name value)...)
-  ReaderMapping(const ReaderDocument& doc, const sexp::Value& sx);
-
-  ReaderIterator get_iter() const;
-
-  bool get(const char* key, bool& value, const std::optional<bool>& default_value = std::nullopt) const;
-  bool get(const char* key, int& value, const std::optional<int>& default_value = std::nullopt) const;
-  bool get(const char* key, uint32_t& value, const std::optional<uint32_t>& default_value = std::nullopt) const;
-  bool get(const char* key, float& value, const std::optional<float>& default_value = std::nullopt) const;
-  bool get(const char* key, std::string& value, const std::optional<const char*>& default_value = std::nullopt) const;
-
-  bool get(const char* key, std::vector<bool>& value, const std::optional<std::vector<bool>>& default_value = std::nullopt) const;
-  bool get(const char* key, std::vector<int>& value, const std::optional<std::vector<int>>& default_value = std::nullopt) const;
-  bool get(const char* key, std::vector<float>& value, const std::optional<std::vector<float>>& default_value = std::nullopt) const;
-  bool get(const char* key, std::vector<std::string>& value, const std::optional<std::vector<std::string>>& default_value = std::nullopt) const;
-  bool get(const char* key, std::vector<unsigned int>& value, const std::optional<std::vector<unsigned int>>& default_value = std::nullopt) const;
-
-  bool get(const char* key, std::optional<ReaderMapping>&) const;
-  bool get(const char* key, std::optional<ReaderCollection>&) const;
-
-  bool get(const char* key, sexp::Value& value) const;
-
-  /** Read a custom data format, such an as enum. The data is stored
-      as string and converted to the custom type using the supplied
-      `from_string` convert function. Example:
-
-      mapping.get_custom("style", value, Style_from_string, Style::DEFAULT); */
-  template<typename C, typename F>
-  bool get_custom(const char* key, C& value, F from_string, std::optional<decltype(C())> default_value = std::nullopt) const
-  {
-    std::string text;
-    if (!get(key, text))
-    {
-      if (default_value) {
-        value = *default_value;
-      }
-      return false;
-    }
-    else
-    {
-      value = from_string(text);
-      return true;
-    }
+  std::vector<int> tmpvalues;
+  if (!mapping.read(key, tmpvalues)) {
+    return false;
+  } else {
+    value.reserve(tmpvalues.size());
+    std::transform(tmpvalues.begin(), tmpvalues.end(), std::back_inserter(value),
+                   [](int v) { return static_cast<uint32_t>(v); });
+    return true;
   }
+}
 
-  const sexp::Value& get_sexp() const { return m_sx; }
-  const ReaderDocument& get_doc() const { return m_doc; }
+template<>
+inline bool read_custom(ReaderMapping const& mapping, std::string_view key, uint32_t& value)
+{
+  int tmp;
+  if (!mapping.read(key, tmp)) {
+    return false;
+  } else {
+    value = static_cast<uint32_t>(tmp);
+    return true;
+  }
+}
 
-private:
-  /** Returns pointer to (key value) */
-  const sexp::Value* get_item(const char* key) const;
-
-private:
-  const ReaderDocument& m_doc;
-  const sexp::Value& m_sx;
-  const std::vector<sexp::Value>& m_arr;
-};
+} // namespace prio
 
 #endif
 

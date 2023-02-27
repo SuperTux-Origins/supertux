@@ -29,9 +29,9 @@ CirclePlatform::CirclePlatform(const ReaderMapping& reader) :
   timer(),
   time(0.0)
 {
-  reader.get("radius", radius, 100.0f);
-  reader.get("speed", speed, 2.0f);
-  reader.get("time", time, 0.0f);
+  radius = reader.get("radius", 100.0f);
+  speed = reader.get("speed", 2.0f);
+  time = reader.get("time", 0.0f);
 
   m_col.m_bbox.set_pos(Vector(start_position.x + cosf(angle) * radius,
                               start_position.y + sinf(angle) * radius));

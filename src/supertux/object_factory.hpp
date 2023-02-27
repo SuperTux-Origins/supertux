@@ -26,8 +26,8 @@
 
 #include "math/fwd.hpp"
 #include "supertux/direction.hpp"
+#include "util/reader_fwd.hpp"
 
-class ReaderMapping;
 class GameObject;
 
 class ObjectFactory

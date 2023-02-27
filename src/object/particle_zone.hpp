@@ -22,8 +22,6 @@
 #include "supertux/moving_object.hpp"
 #include "video/layer.hpp"
 
-class ReaderMapping;
-
 /** Defines an area where a certain particle type can spawn */
 class ParticleZone final :
   public MovingObject//, // TODO: Make this area actually moveable with Squirrel

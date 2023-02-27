@@ -27,9 +27,6 @@
 
 class DrawingContext;
 class InfoBoxLine;
-class ReaderCollection;
-class ReaderMapping;
-class ReaderObject;
 
 class TextScroller : public GameObject
 {

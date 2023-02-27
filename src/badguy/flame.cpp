@@ -35,8 +35,8 @@ Flame::Flame(const ReaderMapping& reader, const std::string& sprite) :
   speed(),
   sound_source()
 {
-  reader.get("radius", radius, 100.0f);
-  reader.get("speed", speed, 2.0f);
+  radius = reader.get("radius", 100.0f);
+  speed = reader.get("speed", 2.0f);
 
   m_col.m_bbox.set_pos(Vector(m_start_position.x + cosf(angle) * radius,
                               m_start_position.y + sinf(angle) * radius));
@@ -44,7 +44,7 @@ Flame::Flame(const ReaderMapping& reader, const std::string& sprite) :
   m_countMe = false;
   SoundManager::current()->preload(FLAME_SOUND);
 
-  reader.get("sprite", m_sprite_name, m_sprite_name.c_str());
+  reader.read("sprite", m_sprite_name);
   m_sprite = SpriteManager::current()->create(m_sprite_name);
 
   set_colgroup_active(COLGROUP_TOUCHABLE);

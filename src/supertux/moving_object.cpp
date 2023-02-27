@@ -37,8 +37,8 @@ MovingObject::MovingObject(const ReaderMapping& reader) :
   if (reader.get("height", height))
     m_col.m_bbox.set_height(height);
 
-  reader.get("x", m_col.m_bbox.get_left());
-  reader.get("y", m_col.m_bbox.get_top());
+  reader.read("x", m_col.m_bbox.get_left());
+  reader.read("y", m_col.m_bbox.get_top());
 }
 
 MovingObject::~MovingObject()

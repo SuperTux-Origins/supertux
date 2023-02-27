@@ -23,8 +23,6 @@
 #include "supertux/moving_object.hpp"
 #include "video/color.hpp"
 
-class ReaderMapping;
-
 class Spotlight final : public MovingObject,
                         public ExposedObject<Spotlight, scripting::Spotlight>
 {

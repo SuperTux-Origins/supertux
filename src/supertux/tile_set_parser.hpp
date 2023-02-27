@@ -24,8 +24,8 @@
 
 #include "math/rect.hpp"
 #include "supertux/tile.hpp"
+#include "util/reader_fwd.hpp"
 
-class ReaderMapping;
 class TileSet;
 
 class TileSetParser final

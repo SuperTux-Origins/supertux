@@ -23,8 +23,6 @@
 
 #include "video/layer.hpp"
 
-class ReaderMapping;
-
 /** Defines an area that will gently push Players in one direction */
 class Wind final :
   public MovingObject,

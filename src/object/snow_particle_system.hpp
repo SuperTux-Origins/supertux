@@ -20,8 +20,6 @@
 #include "object/particlesystem.hpp"
 #include "supertux/timer.hpp"
 
-class ReaderMapping;
-
 class SnowParticleSystem final : public ParticleSystem
 {
 public:

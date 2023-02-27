@@ -39,12 +39,12 @@ PushButton::PushButton(const ReaderMapping& mapping) :
   set_action("off", -1);
   m_col.m_bbox.set_size(m_sprite->get_current_hitbox_width(), m_sprite->get_current_hitbox_height());
 
-  if (!mapping.get("script", script))
+  if (!mapping.read("script", script))
   {
     log_warning << "No script set for pushbutton." << std::endl;
   }
 
-  mapping.get("upside-down", m_upside_down);
+  mapping.read("upside-down", m_upside_down);
   if (m_upside_down)
     FlipLevelTransformer::transform_flip(m_flip);
 }

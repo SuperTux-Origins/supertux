@@ -87,9 +87,9 @@ Config::Config() :
   labeltextcolor(ColorScheme::Menu::label_color),
   activetextcolor(ColorScheme::Menu::active_color),
   hlcolor(ColorScheme::Menu::hl_color),
-  editorcolor(ColorScheme::Editor::default_color),
-  editorhovercolor(ColorScheme::Editor::hover_color),
-  editorgrabcolor(ColorScheme::Editor::grab_color),
+  editorcolor(),
+  editorhovercolor(),
+  editorgrabcolor(),
   menuroundness(16.f),
   editor_selected_snap_grid_size(3),
   editor_render_grid(true),
@@ -130,11 +130,11 @@ Config::load()
   }
 
   auto config_mapping = root.get_mapping();
-  config_mapping.get("profile", profile);
-  std::optional<ReaderCollection> config_profiles_mapping;
-  if (config_mapping.get("profiles", config_profiles_mapping))
+  config_mapping.read("profile", profile);
+  ReaderCollection config_profiles_mapping;
+  if (config_mapping.read("profiles", config_profiles_mapping))
   {
-    for (auto const& profile_node : config_profiles_mapping->get_objects())
+    for (auto const& profile_node : config_profiles_mapping.get_objects())
     {
       if (profile_node.get_name() == "profile")
       {
@@ -142,8 +142,8 @@ Config::load()
 
         int id;
         std::string name;
-        if (current_profile.get("id", id) &&
-            current_profile.get("name", name))
+        if (current_profile.read("id", id) &&
+            current_profile.read("name", name))
         {
           profiles.push_back({id, name});
         }
@@ -154,18 +154,18 @@ Config::load()
       }
     }
   }
-  config_mapping.get("show_fps", show_fps);
-  config_mapping.get("show_player_pos", show_player_pos);
-  config_mapping.get("show_controller", show_controller);
-  config_mapping.get("developer", developer_mode);
-  config_mapping.get("confirmation_dialog", confirmation_dialog);
-  config_mapping.get("pause_on_focusloss", pause_on_focusloss);
-  config_mapping.get("custom_mouse_cursor", custom_mouse_cursor);
+  config_mapping.read("show_fps", show_fps);
+  config_mapping.read("show_player_pos", show_player_pos);
+  config_mapping.read("show_controller", show_controller);
+  config_mapping.read("developer", developer_mode);
+  config_mapping.read("confirmation_dialog", confirmation_dialog);
+  config_mapping.read("pause_on_focusloss", pause_on_focusloss);
+  config_mapping.read("custom_mouse_cursor", custom_mouse_cursor);
 
-  std::optional<ReaderCollection> config_notifications_mapping;
-  if (config_mapping.get("notifications", config_notifications_mapping))
+  ReaderCollection config_notifications_mapping;
+  if (config_mapping.read("notifications", config_notifications_mapping))
   {
-    for (auto const& notification_node : config_notifications_mapping->get_objects())
+    for (auto const& notification_node : config_notifications_mapping.get_objects())
     {
       if (notification_node.get_name() == "notification")
       {
@@ -173,8 +173,8 @@ Config::load()
 
         std::string id;
         bool disabled = false;
-        if (notification.get("id", id) &&
-            notification.get("disabled", disabled))
+        if (notification.read("id", id) &&
+            notification.read("disabled", disabled))
         {
           notifications.push_back({id, disabled});
         }
@@ -188,11 +188,12 @@ Config::load()
 
   // menu colors
 
+#ifdef FIXME_READER_ITERATOR
   std::vector<float> menubackcolor_, menufrontcolor_, menuhelpbackcolor_, menuhelpfrontcolor_,
     labeltextcolor_, activetextcolor_, hlcolor_, editorcolor_, editorhovercolor_, editorgrabcolor_;
 
-  std::optional<ReaderMapping> interface_colors_mapping;
-  if (config_mapping.get("interface_colors", interface_colors_mapping))
+  ReaderMapping interface_colors_mapping;
+  if (config_mapping.read("interface_colors", interface_colors_mapping))
   {
     interface_colors_mapping->get("menubackcolor", menubackcolor_, ColorScheme::Menu::back_color.toVector());
     interface_colors_mapping->get("menufrontcolor", menufrontcolor_, ColorScheme::Menu::front_color.toVector());
@@ -216,66 +217,66 @@ Config::load()
     editorgrabcolor = Color(editorgrabcolor_);
     interface_colors_mapping->get("menuroundness", menuroundness, 16.f);
   }
+#endif
 
   // Compatibility; will be overwritten by the "editor" category
-  
-  config_mapping.get("editor_autosave_frequency", editor_autosave_frequency);
+  config_mapping.read("editor_autosave_frequency", editor_autosave_frequency);
 
   editor_autotile_help = !developer_mode;
 
-  std::optional<ReaderMapping> editor_mapping;
-  if (config_mapping.get("editor", editor_mapping))
+  ReaderMapping editor_mapping;
+  if (config_mapping.read("editor", editor_mapping))
   {
-    editor_mapping->get("autosave_frequency", editor_autosave_frequency);
-    editor_mapping->get("autotile_help", editor_autotile_help);
-    editor_mapping->get("autotile_mode", editor_autotile_mode);
-    editor_mapping->get("render_background", editor_render_background);
-    editor_mapping->get("render_grid", editor_render_grid);
-    editor_mapping->get("render_lighting", editor_render_lighting);
-    editor_mapping->get("selected_snap_grid_size", editor_selected_snap_grid_size);
-    editor_mapping->get("snap_to_grid", editor_snap_to_grid);
+    editor_mapping.read("autosave_frequency", editor_autosave_frequency);
+    editor_mapping.read("autotile_help", editor_autotile_help);
+    editor_mapping.read("autotile_mode", editor_autotile_mode);
+    editor_mapping.read("render_background", editor_render_background);
+    editor_mapping.read("render_grid", editor_render_grid);
+    editor_mapping.read("render_lighting", editor_render_lighting);
+    editor_mapping.read("selected_snap_grid_size", editor_selected_snap_grid_size);
+    editor_mapping.read("snap_to_grid", editor_snap_to_grid);
   }
 
   if (is_christmas()) {
-    config_mapping.get("christmas", christmas_mode, true);
+    christmas_mode = config_mapping.get("christmas", true);
   }
-  config_mapping.get("transitions_enabled", transitions_enabled);
-  config_mapping.get("locale", locale);
-  config_mapping.get("random_seed", random_seed);
-  config_mapping.get("repository_url", repository_url);
+  config_mapping.read("transitions_enabled", transitions_enabled);
+  config_mapping.read("locale", locale);
+  config_mapping.read("random_seed", random_seed);
+  config_mapping.read("repository_url", repository_url);
 
-  config_mapping.get("multiplayer_auto_manage_players", multiplayer_auto_manage_players);
-  config_mapping.get("multiplayer_multibind", multiplayer_multibind);
-  config_mapping.get("multiplayer_buzz_controllers", multiplayer_buzz_controllers);
+  config_mapping.read("multiplayer_auto_manage_players", multiplayer_auto_manage_players);
+  config_mapping.read("multiplayer_multibind", multiplayer_multibind);
+  config_mapping.read("multiplayer_buzz_controllers", multiplayer_buzz_controllers);
 
-  std::optional<ReaderMapping> config_video_mapping;
-  if (config_mapping.get("video", config_video_mapping))
+  ReaderMapping config_video_mapping;
+  if (config_mapping.read("video", config_video_mapping))
   {
-    config_video_mapping->get("fullscreen", use_fullscreen);
+    config_video_mapping.read("fullscreen", use_fullscreen);
     std::string video_string;
-    config_video_mapping->get("video", video_string);
+    config_video_mapping.read("video", video_string);
     video = VideoSystem::get_video_system(video_string);
-    config_video_mapping->get("vsync", try_vsync);
+    config_video_mapping.read("vsync", try_vsync);
 
-    config_video_mapping->get("fullscreen_width",  fullscreen_size.width);
-    config_video_mapping->get("fullscreen_height", fullscreen_size.height);
+    config_video_mapping.read("fullscreen_width",  fullscreen_size.width);
+    config_video_mapping.read("fullscreen_height", fullscreen_size.height);
     if (fullscreen_size.width < 0 || fullscreen_size.height < 0)
     {
       // Somehow, an invalid size got entered into the config file,
       // let's use the "auto" setting instead.
       fullscreen_size = Size(0, 0);
     }
-    config_video_mapping->get("fullscreen_refresh_rate", fullscreen_refresh_rate);
+    config_video_mapping.read("fullscreen_refresh_rate", fullscreen_refresh_rate);
 
-    config_video_mapping->get("window_width",  window_size.width);
-    config_video_mapping->get("window_height", window_size.height);
+    config_video_mapping.read("window_width",  window_size.width);
+    config_video_mapping.read("window_height", window_size.height);
 
-    config_video_mapping->get("window_resizable", window_resizable);
+    config_video_mapping.read("window_resizable", window_resizable);
 
-    config_video_mapping->get("aspect_width",  aspect_size.width);
-    config_video_mapping->get("aspect_height", aspect_size.height);
+    config_video_mapping.read("aspect_width",  aspect_size.width);
+    config_video_mapping.read("aspect_height", aspect_size.height);
 
-    config_video_mapping->get("magnification", magnification);
+    config_video_mapping.read("magnification", magnification);
 
 #ifdef __EMSCRIPTEN__
     // Forcibly set autofit to true
@@ -286,38 +287,38 @@ Config::load()
 #endif
   }
 
-  std::optional<ReaderMapping> config_audio_mapping;
-  if (config_mapping.get("audio", config_audio_mapping))
+  ReaderMapping config_audio_mapping;
+  if (config_mapping.read("audio", config_audio_mapping))
   {
-    config_audio_mapping->get("sound_enabled", sound_enabled);
-    config_audio_mapping->get("music_enabled", music_enabled);
-    config_audio_mapping->get("sound_volume", sound_volume);
-    config_audio_mapping->get("music_volume", music_volume);
+    config_audio_mapping.read("sound_enabled", sound_enabled);
+    config_audio_mapping.read("music_enabled", music_enabled);
+    config_audio_mapping.read("sound_volume", sound_volume);
+    config_audio_mapping.read("music_volume", music_volume);
   }
 
-  std::optional<ReaderMapping> config_control_mapping;
-  if (config_mapping.get("control", config_control_mapping))
+  ReaderMapping config_control_mapping;
+  if (config_mapping.read("control", config_control_mapping))
   {
-    std::optional<ReaderMapping> keymap_mapping;
-    if (config_control_mapping->get("keymap", keymap_mapping))
+    ReaderMapping keymap_mapping;
+    if (config_control_mapping.read("keymap", keymap_mapping))
     {
-      keyboard_config.read(*keymap_mapping);
+      keyboard_config.read(keymap_mapping);
     }
 
-    std::optional<ReaderMapping> joystick_mapping;
-    if (config_control_mapping->get("joystick", joystick_mapping))
+    ReaderMapping joystick_mapping;
+    if (config_control_mapping.read("joystick", joystick_mapping))
     {
-      joystick_config.read(*joystick_mapping);
+      joystick_config.read(joystick_mapping);
     }
 
-    config_control_mapping->get("mobile_controls", mobile_controls, SDL_GetNumTouchDevices() > 0);
-    config_control_mapping->get("mobile_controls_scale", m_mobile_controls_scale, 1);
+    mobile_controls = config_control_mapping.get("mobile_controls", SDL_GetNumTouchDevices() > 0);
+    m_mobile_controls_scale = config_control_mapping.get("mobile_controls_scale", 1);
   }
 
-  std::optional<ReaderCollection> config_addons_mapping;
-  if (config_mapping.get("addons", config_addons_mapping))
+  ReaderCollection config_addons_mapping;
+  if (config_mapping.read("addons", config_addons_mapping))
   {
-    for (auto const& addon_node : config_addons_mapping->get_objects())
+    for (auto const& addon_node : config_addons_mapping.get_objects())
     {
       if (addon_node.get_name() == "addon")
       {
@@ -325,8 +326,8 @@ Config::load()
 
         std::string id;
         bool enabled = false;
-        if (addon.get("id", id) &&
-            addon.get("enabled", enabled))
+        if (addon.read("id", id) &&
+            addon.read("enabled", enabled))
         {
           addons.push_back({id, enabled});
         }

@@ -38,7 +38,7 @@ WeakBlock::WeakBlock(const ReaderMapping& mapping) :
 {
   m_sprite->set_action("normal");
   //Check if this weakblock destroys adjacent weakblocks
-  if (mapping.get("linked", linked)){
+  if (mapping.read("linked", linked)){
     if (! linked){
       m_default_sprite_name = "images/objects/weak_block/meltbox.sprite";
       m_sprite_name = m_default_sprite_name;

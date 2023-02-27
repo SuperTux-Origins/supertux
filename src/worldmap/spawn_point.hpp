@@ -21,8 +21,7 @@
 
 #include "math/vector.hpp"
 #include "worldmap/direction.hpp"
-
-class ReaderMapping;
+#include "util/reader_fwd.hpp"
 
 namespace worldmap {
 

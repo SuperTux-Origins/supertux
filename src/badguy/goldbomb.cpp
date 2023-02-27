@@ -41,7 +41,7 @@ GoldBomb::GoldBomb(const ReaderMapping& reader) :
   SoundManager::current()->preload("sounds/explosion.wav");
 
   //Check if we need another sprite
-  if ( !reader.get( "sprite", m_sprite_name ) ){
+  if ( !reader.read( "sprite", m_sprite_name ) ){
     return;
   }
   if (m_sprite_name.empty()) {

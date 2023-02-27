@@ -38,12 +38,12 @@ Platform::Platform(const ReaderMapping& reader, const std::string& default_sprit
   m_starting_node(0)
 {
   bool running = true;
-  reader.get("running", running);
+  reader.read("running", running);
   if ((get_name().empty()) && (!running)) {
     m_automatic = true;
   }
 
-  reader.get("starting-node", m_starting_node, 0.f);
+  m_starting_node = reader.get("starting-node", 0.f);
 
   init_path(reader, true);
 }

@@ -24,8 +24,6 @@
 #include "video/drawing_context.hpp"
 #include "video/flip.hpp"
 
-class ReaderMapping;
-
 /** Abstract base class for MovingObjects that are represented by a Sprite */
 class MovingSprite : public MovingObject
 {

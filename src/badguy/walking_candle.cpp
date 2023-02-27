@@ -28,7 +28,7 @@ WalkingCandle::WalkingCandle(const ReaderMapping& reader)
   max_drop_height = 64;
 
   std::vector<float> vColor;
-  if (reader.get("color", vColor)) {
+  if (reader.read("color", vColor)) {
     lightcolor = Color(vColor);
   }
   m_sprite->set_color(lightcolor);

@@ -40,26 +40,26 @@ void
 PathObject::init_path(const ReaderMapping& mapping, bool running_default)
 {
   bool running = running_default;
-  mapping.get("running", running);
+  mapping.read("running", running);
 
-  std::optional<ReaderMapping> handle_map;
-  if (mapping.get("handle", handle_map))
+  ReaderMapping handle_map;
+  if (mapping.read("handle", handle_map))
   {
-    handle_map->get("scale_x", m_path_handle.m_scalar_pos.x);
-    handle_map->get("scale_y", m_path_handle.m_scalar_pos.y);
-    handle_map->get("offset_x", m_path_handle.m_pixel_offset.x);
-    handle_map->get("offset_y", m_path_handle.m_pixel_offset.y);
+    handle_map.read("scale_x", m_path_handle.m_scalar_pos.x);
+    handle_map.read("scale_y", m_path_handle.m_scalar_pos.y);
+    handle_map.read("offset_x", m_path_handle.m_pixel_offset.x);
+    handle_map.read("offset_y", m_path_handle.m_pixel_offset.y);
   }
 
   std::string path_ref;
-  std::optional<ReaderMapping> path_mapping;
-  if (mapping.get("path", path_mapping))
+  ReaderMapping path_mapping;
+  if (mapping.read("path", path_mapping))
   {
-    auto& path_gameobject = d_gameobject_manager->add<PathGameObject>(*path_mapping, true);
+    auto& path_gameobject = d_gameobject_manager->add<PathGameObject>(path_mapping, true);
     m_path_uid = path_gameobject.get_uid();
     m_walker.reset(new PathWalker(m_path_uid, running));
   }
-  else if (mapping.get("path-ref", path_ref))
+  else if (mapping.read("path-ref", path_ref))
   {
     d_gameobject_manager->request_name_resolve(path_ref, [this, running](UID uid){
         m_path_uid = uid;

@@ -43,10 +43,10 @@ ScriptedObject::ScriptedObject(const ReaderMapping& mapping) :
     log_warning << "Scripted object must have a name specified, setting to: " << m_name << std::endl;
   }
 
-  mapping.get("solid", solid, true);
-  mapping.get("physic-enabled", physic_enabled, true);
-  mapping.get("visible", visible, true);
-  mapping.get("hit-script", hit_script, "");
+  solid = mapping.get("solid", true);
+  physic_enabled = mapping.get("physic-enabled", true);
+  visible = mapping.get("visible", true);
+  hit_script = mapping.get("hit-script", std::string());
   m_layer = reader_get_layer(mapping, LAYER_OBJECTS);
   if ( solid ){
     set_group( COLGROUP_MOVING_STATIC );

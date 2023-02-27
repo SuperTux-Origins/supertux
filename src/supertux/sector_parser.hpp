@@ -20,9 +20,10 @@
 #include <memory>
 #include <string>
 
+#include "util/reader_mapping.hpp"
+
 class GameObject;
 class Level;
-class ReaderMapping;
 class Sector;
 
 class SectorParser final

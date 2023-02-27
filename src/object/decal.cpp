@@ -33,10 +33,10 @@ Decal::Decal(const ReaderMapping& reader) :
 {
   m_layer = reader_get_layer(reader, LAYER_OBJECTS);
 
-  reader.get("solid", m_solid, false);
+  m_solid = reader.get("solid", false);
   if (m_solid)
     set_group(COLGROUP_STATIC);
-  if (reader.get("action", m_default_action))
+  if (reader.read("action", m_default_action))
     set_action(m_default_action, -1);
 }
 

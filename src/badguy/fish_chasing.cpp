@@ -30,13 +30,13 @@ FishChasing::FishChasing(const ReaderMapping& reader) :
   FishSwimming(reader, "images/creatures/fish/ice/greenfish.sprite"),
   m_chase_state(ChaseState::NORMAL),
   m_realization_timer(),
-  m_track_distance(),
-  m_lost_distance(),
-  m_chase_speed()
+  m_track_distance(TRACK_DISTANCE),
+  m_lost_distance(LOST_DISTANCE),
+  m_chase_speed(CHASE_SPEED)
 {
-  reader.get("track-distance", m_track_distance, TRACK_DISTANCE);
-  reader.get("lost-distance", m_lost_distance, LOST_DISTANCE);
-  reader.get("chase-speed", m_chase_speed, CHASE_SPEED);
+  reader.read("track-distance", m_track_distance);
+  reader.read("lost-distance", m_lost_distance);
+  reader.read("chase-speed", m_chase_speed);
 }
 
 void

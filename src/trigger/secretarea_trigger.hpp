@@ -23,7 +23,6 @@
 
 class Color;
 class DrawingContext;
-class ReaderMapping;
 
 class SecretAreaTrigger final : public TriggerBase
 {

@@ -25,8 +25,6 @@
 #include "supertux/game_object.hpp"
 #include "video/surface_ptr.hpp"
 
-class ReaderMapping;
-
 /**
   This is the base class for particle systems. It is responsible for
   storing a set of particles with each having an x- and y-coordinate

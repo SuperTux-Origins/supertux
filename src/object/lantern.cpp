@@ -31,7 +31,7 @@ Lantern::Lantern(const ReaderMapping& reader) :
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light.sprite"))
 {
   std::vector<float> vColor;
-  if (reader.get("color", vColor)) {
+  if (reader.read("color", vColor)) {
     lightcolor = Color(vColor);
   } else {
     lightcolor = Color(1, 1, 1);

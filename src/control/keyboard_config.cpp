@@ -90,23 +90,20 @@ KeyboardConfig::read(const ReaderMapping& keymap_mapping)
   // based values and use the defaults instead on the first read of
   // the config file
   bool config_is_sdl2 = false;
-  keymap_mapping.get("sdl2", config_is_sdl2);
+  keymap_mapping.read("sdl2", config_is_sdl2);
   if (!config_is_sdl2)
     return;
 
-  keymap_mapping.get("jump-with-up", m_jump_with_up_kbd);
+  keymap_mapping.read("jump-with-up", m_jump_with_up_kbd);
 
-  auto iter = keymap_mapping.get_iter();
-  while (iter.next())
+  ReaderMapping map;
+  if (keymap_mapping.read("map", map))
   {
-    if (iter.get_key() != "map")
-      continue;
     int key = -1;
-    auto map = iter.as_mapping();
-    map.get("key", key);
+    map.read("key", key);
 
     std::string control_text;
-    map.get("control", control_text);
+    map.read("control", control_text);
 
     int player_id = 0;
     size_t pos = control_text.find(DELIMITER);

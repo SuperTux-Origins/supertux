@@ -28,12 +28,12 @@ SpawnPoint::SpawnPoint(const ReaderMapping& mapping) :
   m_pos(-1.0f, -1.0f),
   m_auto_dir(Direction::NONE)
 {
-  mapping.get("name", m_name);
-  mapping.get("x", m_pos.x);
-  mapping.get("y", m_pos.y);
+  mapping.read("name", m_name);
+  mapping.read("x", m_pos.x);
+  mapping.read("y", m_pos.y);
 
   std::string auto_dir_str;
-  if (mapping.get("auto-dir", auto_dir_str)) {
+  if (mapping.read("auto-dir", auto_dir_str)) {
     m_auto_dir = string_to_direction(auto_dir_str);
   }
 

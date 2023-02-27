@@ -33,7 +33,7 @@ CustomParticleSystemFile::CustomParticleSystemFile(const ReaderMapping& reader) 
   CustomParticleSystem(reader),
   m_filename()
 {
-  reader.get("file", m_filename, "default.stcp");
+  m_filename = reader.get("file", std::string("default.stcp"));
   std::replace(m_filename.begin(), m_filename.end(), '\\', '/');
 
   update_data();

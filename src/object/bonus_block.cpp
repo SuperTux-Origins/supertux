@@ -38,6 +38,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_mapping.hpp"
+#include "util/reader_object.hpp"
 #include "util/writer.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
@@ -85,66 +86,40 @@ BonusBlock::BonusBlock(const ReaderMapping& mapping) :
 {
   m_default_sprite_name = "images/objects/bonus_block/bonusblock.sprite";
 
-  auto iter = mapping.get_iter();
-  while (iter.next()) {
-    const std::string& token = iter.get_key();
-    if (token == "x" || token == "y" || token == "sprite") {
-      // already initialized in Block::Block
-    } else if (token == "count") {
-      iter.get(m_hit_counter);
-    } else if (token == "script") {
-      iter.get(m_script);
-    } else if (token == "data") {
-      int d = 0;
-      iter.get(d);
-      m_contents = get_content_by_data(d);
-      preload_contents(d);
-    } else if (token == "contents") {
-      std::string contentstring;
-      iter.get(contentstring);
+  mapping.read("count", m_hit_counter);
+  mapping.read("script", m_script);
 
-      m_contents = get_content_from_string(contentstring);
+  int d = mapping.get("data", 0);
+  m_contents = get_content_by_data(d);
+  preload_contents(d);
 
-      if (m_contents == Content::CUSTOM)
+  std::string contentstring;
+  if (mapping.read("contents", contentstring))
+  {
+    m_contents = get_content_from_string(contentstring);
+
+    if (m_contents == Content::CUSTOM)
+    {
+      ReaderCollection content_collection;
+      if (!mapping.read("custom-contents", content_collection))
       {
-        std::optional<ReaderCollection> content_collection;
-        if (!mapping.get("custom-contents", content_collection))
-        {
-          log_warning << "bonusblock is missing 'custom-contents' tag" << std::endl;
-        }
-        else
-        {
-          const auto& object_specs = content_collection->get_objects();
-          if (!object_specs.empty()) {
-            if (object_specs.size() > 1) {
-              log_warning << "only one object allowed in bonusblock 'custom-contents', ignoring the rest" << std::endl;
-            }
+        log_warning << "bonusblock is missing 'custom-contents' tag" << std::endl;
+      }
+      else
+      {
+        const auto& object_specs = content_collection.get_objects();
+        if (!object_specs.empty()) {
+          if (object_specs.size() > 1) {
+            log_warning << "only one object allowed in bonusblock 'custom-contents', ignoring the rest" << std::endl;
+          }
 
-            const ReaderObject& spec = object_specs[0];
-            auto game_object = GameObjectFactory::instance().create(spec.get_name(), spec.get_mapping());
-            m_object = to_moving_object(std::move(game_object));
-            if (!m_object) {
-              log_warning << "Only MovingObjects are allowed inside BonusBlocks" << std::endl;
-            }
+          const ReaderObject& spec = object_specs[0];
+          auto game_object = GameObjectFactory::instance().create(spec.get_name(), spec.get_mapping());
+          m_object = to_moving_object(std::move(game_object));
+          if (!m_object) {
+            log_warning << "Only MovingObjects are allowed inside BonusBlocks" << std::endl;
           }
         }
-      }
-    } else if (token == "custom-contents") {
-      // handled elsewhere
-    } else {
-      if (m_contents == Content::CUSTOM && !m_object) {
-        // FIXME: This an ugly mess, could probably be removed as of
-        // 16. Aug 2018 no level in either the supertux or the
-        // addon-src repository is using this anymore
-        ReaderMapping object_mapping = iter.as_mapping();
-        auto game_object = GameObjectFactory::instance().create(token, object_mapping);
-
-        m_object = to_moving_object(std::move(game_object));
-        if (!m_object) {
-          throw std::runtime_error("Only MovingObjects are allowed inside BonusBlocks");
-        }
-      } else {
-        log_warning << "Invalid element '" << token << "' in bonusblock" << std::endl;
       }
     }
   }

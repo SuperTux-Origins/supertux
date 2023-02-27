@@ -23,6 +23,7 @@
 #include "supertux/globals.hpp"
 #include "supertux/game_session.hpp"
 #include "util/log.hpp"
+#include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
 
@@ -164,12 +165,11 @@ void
 PlayerStatus::read(const ReaderMapping& mapping)
 {
   int num_players_in_file = 1;
-  mapping.get("num_players", num_players_in_file);
+  mapping.read("num_players", num_players_in_file);
 
   reset(std::max(m_num_players, num_players_in_file));
 
-  auto iter = mapping.get_iter();
-
+  ReaderIterator iter(mapping);
   while (iter.next())
   {
     try
@@ -208,7 +208,7 @@ PlayerStatus::read(const ReaderMapping& mapping)
         auto map = iter.as_mapping();
 
         std::string bonusname;
-        if (map.get("bonus", bonusname)) {
+        if (map.read("bonus", bonusname)) {
           if (bonusname == "none") {
             bonus[id] = NO_BONUS;
           } else if (bonusname == "growup") {
@@ -226,10 +226,10 @@ PlayerStatus::read(const ReaderMapping& mapping)
             bonus[id] = NO_BONUS;
           }
         }
-        map.get("fireflowers", max_fire_bullets[id]);
-        map.get("iceflowers", max_ice_bullets[id]);
-        map.get("airflowers", max_air_time[id]);
-        map.get("earthflowers", max_earth_time[id]);
+        map.read("fireflowers", max_fire_bullets[id]);
+        map.read("iceflowers", max_ice_bullets[id]);
+        map.read("airflowers", max_air_time[id]);
+        map.read("earthflowers", max_earth_time[id]);
       }
     }
     catch (const std::exception& e)
@@ -239,7 +239,7 @@ PlayerStatus::read(const ReaderMapping& mapping)
   }
 
   std::string bonusname;
-  if (mapping.get("bonus", bonusname)) {
+  if (mapping.read("bonus", bonusname)) {
     if (bonusname == "none") {
       bonus[0] = NO_BONUS;
     } else if (bonusname == "growup") {
@@ -257,15 +257,15 @@ PlayerStatus::read(const ReaderMapping& mapping)
       bonus[0] = NO_BONUS;
     }
   }
-  mapping.get("fireflowers", max_fire_bullets[0]);
-  mapping.get("iceflowers", max_ice_bullets[0]);
-  mapping.get("airflowers", max_air_time[0]);
-  mapping.get("earthflowers", max_earth_time[0]);
+  mapping.read("fireflowers", max_fire_bullets[0]);
+  mapping.read("iceflowers", max_ice_bullets[0]);
+  mapping.read("airflowers", max_air_time[0]);
+  mapping.read("earthflowers", max_earth_time[0]);
 
-  mapping.get("coins", coins);
+  mapping.read("coins", coins);
 
-  mapping.get("worldmap-sprite", worldmap_sprite);
-  mapping.get("last-worldmap", last_worldmap);
+  mapping.read("worldmap-sprite", worldmap_sprite);
+  mapping.read("last-worldmap", last_worldmap);
 }
 
 std::string

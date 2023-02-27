@@ -46,7 +46,7 @@ GameObject::GameObject(const std::string& name) :
 GameObject::GameObject(const ReaderMapping& reader) :
   GameObject()
 {
-  reader.get("name", m_name, "");
+  reader.read("name", m_name);
 }
 
 GameObject::~GameObject()

@@ -57,7 +57,7 @@ Crusher::Crusher(const ReaderMapping& reader) :
   m_righteye(),
   m_whites()
 {
-  reader.get("sideways", m_sideways);
+  reader.read("sideways", m_sideways);
   // TODO: crusher hitting deserves its own sounds-
   // one for hitting the ground, one for hitting Tux
   SoundManager::current()->preload(not_ice() ? "sounds/thud.ogg" : "sounds/brick.wav");

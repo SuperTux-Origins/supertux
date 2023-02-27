@@ -32,7 +32,7 @@ MusicObject::MusicObject(const ReaderMapping& mapping) :
   m_currentmusic(LEVEL_MUSIC),
   m_music()
 {
-  mapping.get("file", m_music);
+  mapping.read("file", m_music);
 }
 
 void

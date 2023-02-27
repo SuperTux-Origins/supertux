@@ -50,7 +50,7 @@ MovingSprite::MovingSprite(const ReaderMapping& reader, const Vector& pos, int l
   m_flip(NO_FLIP)
 {
   m_col.m_bbox.set_pos(pos);
-  if (!reader.get("sprite", m_sprite_name))
+  if (!reader.read("sprite", m_sprite_name))
     throw std::runtime_error("no sprite name set");
 
   //m_default_sprite_name = m_sprite_name;
@@ -67,9 +67,9 @@ MovingSprite::MovingSprite(const ReaderMapping& reader, const std::string& sprit
   m_layer(layer_),
   m_flip(NO_FLIP)
 {
-  reader.get("x", m_col.m_bbox.get_left());
-  reader.get("y", m_col.m_bbox.get_top());
-  reader.get("sprite", m_sprite_name);
+  reader.read("x", m_col.m_bbox.get_left());
+  reader.read("y", m_col.m_bbox.get_top());
+  reader.read("sprite", m_sprite_name);
 
   //Make the sprite go default when the sprite file is invalid
   if (m_sprite_name.empty() || !PHYSFS_exists(m_sprite_name.c_str()))
@@ -94,9 +94,9 @@ MovingSprite::MovingSprite(const ReaderMapping& reader, int layer_, CollisionGro
   m_layer(layer_),
   m_flip(NO_FLIP)
 {
-  reader.get("x", m_col.m_bbox.get_left());
-  reader.get("y", m_col.m_bbox.get_top());
-  if (!reader.get("sprite", m_sprite_name))
+  reader.read("x", m_col.m_bbox.get_left());
+  reader.read("y", m_col.m_bbox.get_top());
+  if (!reader.read("sprite", m_sprite_name))
     throw std::runtime_error("no sprite name set");
 
   //m_default_sprite_name = m_sprite_name;

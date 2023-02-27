@@ -48,23 +48,23 @@ WillOWisp::WillOWisp(const ReaderMapping& reader) :
   m_color(0, 1, 0),
   m_starting_node(0)
 {
-  reader.get("sector", m_target_sector, "main");
-  reader.get("spawnpoint", m_target_spawnpoint, "main");
-  reader.get("flyspeed", m_flyspeed, FLYSPEED);
-  reader.get("track-range", m_track_range, TRACK_RANGE);
-  reader.get("vanish-range", m_vanish_range, VANISH_RANGE);
-  reader.get("hit-script", m_hit_script, "");
+  m_target_sector = reader.get("sector", std::string("main"));
+  m_target_spawnpoint = reader.get("spawnpoint", std::string("main"));
+  m_flyspeed = reader.get("flyspeed", FLYSPEED);
+  m_track_range = reader.get("track-range", TRACK_RANGE);
+  m_vanish_range = reader.get("vanish-range", VANISH_RANGE);
+  m_hit_script = reader.get("hit-script", std::string(""));
 
   bool running;
   if ( !reader.get("running", running)) running = false;
 
   std::vector<float> color;
-  if (reader.get("color", color))
+  if (reader.read("color", color))
   {
     m_color = Color(color);
   }
 
-  reader.get("starting-node", m_starting_node, 0.f);
+  m_starting_node = reader.get("starting-node", 0.f);
 
   init_path(reader, running);
 

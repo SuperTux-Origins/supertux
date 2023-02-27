@@ -24,11 +24,11 @@
 #include "util/fade_helper.hpp"
 #include "util/gettext.hpp"
 #include "util/uid.hpp"
+#include "util/reader_fwd.hpp"
 
 class DrawingContext;
 class GameObjectComponent;
 class ObjectRemoveListener;
-class ReaderMapping;
 class Writer;
 
 /**

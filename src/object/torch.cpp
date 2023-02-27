@@ -36,15 +36,17 @@ Torch::Torch(const ReaderMapping& reader) :
   m_layer(0),
   m_flip(NO_FLIP)
 {
-  reader.get("x", m_col.m_bbox.get_left());
-  reader.get("y", m_col.m_bbox.get_top());
+  reader.read("x", m_col.m_bbox.get_left());
+  reader.read("y", m_col.m_bbox.get_top());
 
-  reader.get("sprite", sprite_name);
-  reader.get("burning", m_burning, true);
-  reader.get("layer", m_layer, 0);
+  reader.read("sprite", sprite_name);
+  reader.read("burning", m_burning);
+  reader.read("layer", m_layer);
 
   std::vector<float> vColor;
-  if (!reader.get("color", vColor)) vColor = { 1.f, 1.f, 1.f };
+  if (!reader.read("color", vColor)) {
+    vColor = { 1.f, 1.f, 1.f };
+  }
 
   m_torch = SpriteManager::current()->create(sprite_name);
   m_col.m_bbox.set_size(static_cast<float>(m_torch->get_width()),

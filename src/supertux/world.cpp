@@ -49,11 +49,11 @@ World::from_directory(const std::string& directory)
 
     auto info = root.get_mapping();
 
-    info.get("title", world->m_title);
-    info.get("description", world->m_description);
-    info.get("levelset", world->m_is_levelset, true);
-    info.get("hide-from-contribs", world->m_hide_from_contribs, false);
-    info.get("contrib-type", world->m_contrib_type, "user");
+    info.read("title", world->m_title);
+    info.read("description", world->m_description);
+    world->m_is_levelset = info.get("levelset", true);
+    world->m_hide_from_contribs = info.get("hide-from-contribs", false);
+    world->m_contrib_type = info.get("contrib-type", std::string("user"));
     return world;
   }
   catch (const std::exception& err)

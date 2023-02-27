@@ -78,10 +78,10 @@ Background::Background(const ReaderMapping& reader) :
   m_dst_color(),
   m_flip(NO_FLIP)
 {
-  reader.get("fill", m_fill);
+  reader.read("fill", m_fill);
 
   std::string alignment_str;
-  if (reader.get("alignment", alignment_str))
+  if (reader.read("alignment", alignment_str))
   {
     if (alignment_str == "left")
     {
@@ -110,47 +110,47 @@ Background::Background(const ReaderMapping& reader) :
     }
   }
 
-  reader.get("scroll-offset-x", m_scroll_offset.x, 0.0f);
-  reader.get("scroll-offset-y", m_scroll_offset.y, 0.0f);
+  m_scroll_offset.x = reader.get("scroll-offset-x", 0.0f);
+  m_scroll_offset.y = reader.get("scroll-offset-y", 0.0f);
 
   // for backwards compatibility, add position to scroll offset
   float px;
   float py;
-  if (reader.get("x", px))
+  if (reader.read("x", px))
     m_scroll_offset.x += px;
-  if (reader.get("y", py))
+  if (reader.read("y", py))
     m_scroll_offset.y += py;
 
-  reader.get("scroll-speed-x", m_scroll_speed.x, 0.0f);
-  reader.get("scroll-speed-y", m_scroll_speed.y, 0.0f);
+  m_scroll_speed.x = reader.get("scroll-speed-x", 0.0f);
+  m_scroll_speed.y = reader.get("scroll-speed-y", 0.0f);
 
   m_layer = reader_get_layer(reader, LAYER_BACKGROUND0);
 
-  reader.get("image", m_imagefile, "images/background/misc/transparent_up.png");
+  m_imagefile = reader.get("image", std::string("images/background/misc/transparent_up.png"));
   m_image = load_background(m_imagefile);
 
-  if(!reader.get("speed-x", m_parallax_speed.x))
+  if(!reader.read("speed-x", m_parallax_speed.x))
   {
     // for backward compatibilty
-    reader.get("speed", m_parallax_speed.x, 0.5f);
+    m_parallax_speed.x = reader.get("speed", 0.5f);
   }
 
-  reader.get("speed-y", m_parallax_speed.y, m_parallax_speed.x);
+  m_parallax_speed.y = reader.get("speed-y", m_parallax_speed.x);
 
-  if (reader.get("image-top", m_imagefile_top)) {
+  if (reader.read("image-top", m_imagefile_top)) {
     m_image_top = load_background(m_imagefile_top);
   } else {
     m_imagefile_top = m_imagefile;
   }
 
-  if (reader.get("image-bottom", m_imagefile_bottom)) {
+  if (reader.read("image-bottom", m_imagefile_bottom)) {
     m_image_bottom = load_background(m_imagefile_bottom);
   } else {
     m_imagefile_bottom = m_imagefile;
   }
 
   std::vector<float> color;
-  if (reader.get("color", color))
+  if (reader.read("color", color))
   {
     m_color = Color(color);
   }
@@ -159,8 +159,8 @@ Background::Background(const ReaderMapping& reader) :
     m_color = Color(1, 1, 1);
   }
 
-  reader.get_custom("blend", m_blend, Blend_from_string);
-  reader.get_custom("target", m_target, DrawingTarget_from_string);
+  reader.read("blend", m_blend, Blend_from_string);
+  reader.read("target", m_target, DrawingTarget_from_string);
 }
 
 Background::~Background()

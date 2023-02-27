@@ -23,7 +23,6 @@
 #include "video/flip.hpp"
 
 class Player;
-class ReaderMapping;
 
 class Block : public MovingObject
 {

@@ -22,8 +22,6 @@
 #include "trigger/trigger_base.hpp"
 #include "video/flip.hpp"
 
-class ReaderMapping;
-
 class Switch final : public TriggerBase
 {
 public:

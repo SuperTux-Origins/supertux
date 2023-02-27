@@ -169,24 +169,24 @@ Savegame::load()
         auto mapping = root.get_mapping();
 
         int version = 1;
-        mapping.get("version", version);
+        mapping.read("version", version);
         if (version != 1)
         {
           throw std::runtime_error("incompatible savegame version");
         }
         else
         {
-          std::optional<ReaderMapping> tux;
-          if (!mapping.get("tux", tux))
+          ReaderMapping tux;
+          if (!mapping.read("tux", tux))
           {
             throw std::runtime_error("No tux section in savegame");
           }
           {
-            m_player_status->read(*tux);
+            m_player_status->read(tux);
           }
 
-          std::optional<ReaderMapping> state;
-          if (!mapping.get("state", state))
+          ReaderMapping state;
+          if (!mapping.read("state", state))
           {
             throw std::runtime_error("No state section in savegame");
           }
@@ -194,7 +194,7 @@ Savegame::load()
           {
             sq_pushroottable(vm.get_vm());
             vm.get_table_entry("state");
-            load_squirrel_table(vm.get_vm(), -1, *state);
+            load_squirrel_table(vm.get_vm(), -1, state);
             sq_pop(vm.get_vm(), 2);
           }
         }

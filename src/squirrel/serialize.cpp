@@ -20,6 +20,9 @@
 #include <sexp/value.hpp>
 #include <sexp/util.hpp>
 
+#include <prio/reader_document.hpp>
+#include <prio/sexpr_reader_impl.hpp>
+
 #include "squirrel/squirrel_error.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
@@ -30,7 +33,7 @@ void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMappin
   if (table_idx < 0)
     table_idx -= 2;
 
-  auto const& arr = mapping.get_sexp().as_array();
+  auto const& arr = dynamic_cast<prio::SExprReaderMappingImpl const&>(mapping.get_impl()).get_sx().as_array();
   for (size_t i = 1; i < arr.size(); ++i)
   {
     auto const& pair = arr[i].as_array();
@@ -58,7 +61,11 @@ void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMappin
     switch (value.get_type()) {
       case sexp::Value::Type::ARRAY:
         sq_newtable(vm);
-        load_squirrel_table(vm, sq_gettop(vm), ReaderMapping(mapping.get_doc(), arr[i]));
+        load_squirrel_table(vm, sq_gettop(vm),
+                            ReaderMapping(
+                              std::make_unique<prio::SExprReaderMappingImpl>(
+                                dynamic_cast<prio::SExprReaderDocumentImpl const&>(mapping.get_document().get_impl()),
+                                arr[i])));
         break;
       case sexp::Value::Type::INTEGER:
         sq_pushinteger(vm, value.as_int());

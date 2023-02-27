@@ -26,9 +26,9 @@
 #include "math/vector.hpp"
 #include "math/easing.hpp"
 #include "util/gettext.hpp"
+#include "util/reader_fwd.hpp"
 
 class ObjectOption;
-class ReaderMapping;
 class Writer;
 
 enum class WalkMode {

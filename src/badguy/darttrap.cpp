@@ -38,10 +38,10 @@ DartTrap::DartTrap(const ReaderMapping& reader) :
   state(IDLE),
   fire_timer()
 {
-  reader.get("enabled", enabled, true);
-  reader.get("initial-delay", initial_delay, 0.0f);
-  reader.get("fire-delay", fire_delay, 2.0f);
-  reader.get("ammo", ammo, -1);
+  enabled = reader.get("enabled", true);
+  initial_delay = reader.get("initial-delay", 0.0f);
+  fire_delay = reader.get("fire-delay", 2.0f);
+  ammo = reader.get("ammo", -1);
   m_countMe = false;
   SoundManager::current()->preload("sounds/dartfire.wav");
   if (m_start_dir == Direction::AUTO) { log_warning << "Setting a DartTrap's direction to AUTO is no good idea" << std::endl; }

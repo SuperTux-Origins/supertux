@@ -24,8 +24,6 @@
 
 #include "supertux/autotile.hpp"
 
-class ReaderMapping;
-
 class AutotileParser final
 {
 private:

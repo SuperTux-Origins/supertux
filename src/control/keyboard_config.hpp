@@ -22,8 +22,8 @@
 #include <set>
 
 #include "control/controller.hpp"
+#include "util/reader_fwd.hpp"
 
-class ReaderMapping;
 class Writer;
 
 class KeyboardConfig final

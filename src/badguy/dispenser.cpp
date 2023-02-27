@@ -95,12 +95,12 @@ Dispenser::Dispenser(const ReaderMapping& reader) :
 {
   set_colgroup_active(COLGROUP_MOVING_STATIC);
   SoundManager::current()->preload("sounds/squish.wav");
-  reader.get("cycle", m_cycle, 5.0f);
-  if (reader.get("gravity", m_gravity)) m_physic.enable_gravity(true);
-  if (!reader.get("badguy", m_badguys)) m_badguys.clear();
-  reader.get("random", m_random, false);
+  m_cycle = reader.get("cycle", 5.0f);
+  if (reader.read("gravity", m_gravity)) m_physic.enable_gravity(true);
+  if (!reader.read("badguy", m_badguys)) m_badguys.clear();
+  m_random = reader.get("random", false);
   std::string type_s = "cannon"; //default
-  reader.get("type", type_s, "");
+  type_s = reader.get("type", std::string());
   try
   {
     m_type = DispenserType_from_string(type_s);
@@ -121,8 +121,8 @@ Dispenser::Dispenser(const ReaderMapping& reader) :
 
   m_dir = m_start_dir; // Reset direction to default.
 
-  reader.get("limit-dispensed-badguys", m_limit_dispensed_badguys, false);
-  reader.get("max-concurrent-badguys", m_max_concurrent_badguys, 0);
+  m_limit_dispensed_badguys = reader.get("limit-dispensed-badguys", false);
+  m_max_concurrent_badguys = reader.get("max-concurrent-badguys", 0);
 
   //  if (badguys.size() <= 0)
   //    throw std::runtime_error("No badguys in dispenser.");

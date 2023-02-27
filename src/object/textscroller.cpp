@@ -57,22 +57,17 @@ TextScroller::TextScroller(const ReaderMapping& mapping) :
   m_x_anchor(XAnchor::SCROLLER_ANCHOR_CENTER),
   m_text_align(TextAlign::SCROLLER_ALIGN_CENTER)
 {
-  if (!mapping.get("file", m_filename))
-  {
-    log_warning << mapping.get_doc().get_filename() << "'file' tag missing" << std::endl;
-  }
-  else
-  {
-    parse_file(m_filename);
-  }
+  mapping.must_read("file", m_filename);
 
-  mapping.get("finish-script", m_finish_script, "");
-  mapping.get("speed", m_default_speed);
-  mapping.get("x-offset", m_x_offset);
-  mapping.get("controllable", m_controllable, true);
+  parse_file(m_filename);
+
+  m_finish_script = mapping.get("finish-script", std::string());
+  mapping.read("speed", m_default_speed);
+  mapping.read("x-offset", m_x_offset);
+  m_controllable = mapping.get("controllable", true);
 
   std::string x_anchor_str;
-  if (mapping.get("x-anchor", x_anchor_str))
+  if (mapping.read("x-anchor", x_anchor_str))
   {
     if (x_anchor_str == "left")
       m_x_anchor = XAnchor::SCROLLER_ANCHOR_LEFT;
@@ -83,7 +78,7 @@ TextScroller::TextScroller(const ReaderMapping& mapping) :
   }
 
   std::string text_align_str;
-  if (mapping.get("text-align", text_align_str))
+  if (mapping.read("text-align", text_align_str))
   {
     if (text_align_str == "left")
       m_text_align = TextAlign::SCROLLER_ALIGN_LEFT;
@@ -132,13 +127,13 @@ TextScroller::parse_root(const ReaderObject& root)
     auto mapping = root.get_mapping();
 
     int version = 1;
-    mapping.get("version", version);
+    mapping.read("version", version);
     if (version == 1)
     {
-      log_info << "[" << mapping.get_doc().get_filename() << "] Text uses old format: version 1" << std::endl;
+      log_info << "[" << mapping.get_document().get_filename() << "] Text uses old format: version 1" << std::endl;
 
       std::string text;
-      if (!mapping.get("text", text)) {
+      if (!mapping.read("text", text)) {
         throw std::runtime_error("File doesn't contain a text field");
       }
 
@@ -147,11 +142,11 @@ TextScroller::parse_root(const ReaderObject& root)
     }
     else if (version == 2)
     {
-      std::optional<ReaderCollection> content_collection;
-      if (!mapping.get("content", content_collection)) {
+      ReaderCollection content_collection;
+      if (!mapping.read("content", content_collection)) {
         throw std::runtime_error("File doesn't contain content");
       } else {
-        parse_content(*content_collection);
+        parse_content(content_collection);
       }
     }
   }
@@ -164,7 +159,9 @@ TextScroller::parse_content(const ReaderCollection& collection)
   {
     if (item.get_name() == "image")
     {
-      std::string image_file = item.get_sexp().as_array()[1].as_string();
+      ReaderMapping const& mapping = item.get_mapping();
+      std::string image_file;
+      mapping.read("file", image_file);
       m_lines.emplace_back(new InfoBoxLine('!', image_file));
     }
     else if (item.get_name() == "person")
@@ -172,28 +169,31 @@ TextScroller::parse_content(const ReaderCollection& collection)
       bool simple;
       std::string name, info, image_file;
 
-      item.get_mapping().get("simple", simple, false);
+      ReaderMapping const& mapping = item.get_mapping();
+      simple = mapping.get("simple", false);
 
       if (simple) {
-        if (!item.get_mapping().get("name", name) || !item.get_mapping().get("info", info)) {
+        if (!mapping.read("name", name) ||
+            !mapping.read("info", info))
+        {
           throw std::runtime_error("Simple entry requires both name and info specified");
         }
 
-        if (item.get_mapping().get("image", image_file)) {
-          log_warning << "[" << collection.get_doc().get_filename() << "] Simple person entry shouldn't specify images" << std::endl;
+        if (mapping.read("image", image_file)) {
+          log_warning << "[" << collection.get_document().get_filename() << "] Simple person entry shouldn't specify images" << std::endl;
         }
 
         m_lines.emplace_back(new InfoBoxLine(' ', name + " (" + info + ")")); // NOLINT
       } else {
-        if (item.get_mapping().get("name", name)) {
+        if (mapping.read("name", name)) {
           m_lines.emplace_back(new InfoBoxLine('\t', name));
         }
 
-        if (item.get_mapping().get("image", image_file)) {
+        if (mapping.read("image", image_file)) {
           m_lines.emplace_back(new InfoBoxLine('!', image_file));
         }
 
-        if (item.get_mapping().get("info", info)) {
+        if (mapping.read("info", info)) {
           m_lines.emplace_back(new InfoBoxLine(' ', info));
         }
       }
@@ -207,11 +207,12 @@ TextScroller::parse_content(const ReaderCollection& collection)
     {
       std::string type, string;
 
-      if (!item.get_mapping().get("type", type)) {
+      ReaderMapping const& mapping = item.get_mapping();
+      if (!mapping.read("type", type)) {
         type = "normal";
       }
 
-      if (!item.get_mapping().get("string", string)) {
+      if (!mapping.read("string", string)) {
         throw std::runtime_error("Text entry requires a string");
       }
 
@@ -226,13 +227,13 @@ TextScroller::parse_content(const ReaderCollection& collection)
       else if (type == "reference")
         m_lines.emplace_back(new InfoBoxLine('*', string));
       else {
-        log_warning << "[" << item.get_doc().get_filename() << "] Unknown text type '" << type << "'" << std::endl;
+        log_warning << "[" << item.get_document().get_filename() << "] Unknown text type '" << type << "'" << std::endl;
         m_lines.emplace_back(new InfoBoxLine('\t', string));
       }
     }
     else
     {
-      log_warning << "[" << item.get_doc().get_filename() << "] Unknown token '" << item.get_name() << "'" << std::endl;
+      log_warning << "[" << item.get_document().get_filename() << "] Unknown token '" << item.get_name() << "'" << std::endl;
     }
   }
 }

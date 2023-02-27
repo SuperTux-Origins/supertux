@@ -23,8 +23,6 @@
 #include "supertux/game_object.hpp"
 #include "supertux/statistics.hpp"
 
-class ReaderMapping;
-
 namespace worldmap {
 
 class LevelTile final : public GameObject

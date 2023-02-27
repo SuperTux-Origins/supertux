@@ -69,17 +69,17 @@ Yeti::Yeti(const ReaderMapping& reader) :
   fixed_pos(),
   hud_icon()
 {
-  reader.get("lives", hit_points, INITIAL_HITPOINTS);
+  hit_points = reader.get("lives", INITIAL_HITPOINTS);
   m_countMe = true;
   SoundManager::current()->preload("sounds/yeti_gna.wav");
   SoundManager::current()->preload("sounds/yeti_roar.wav");
 
-  reader.get("hud-icon", hud_icon, "images/creatures/yeti/hudlife.png");
+  hud_icon = reader.get("hud-icon", std::string("images/creatures/yeti/hudlife.png"));
   hud_head = Surface::from_file(hud_icon);
 
   initialize();
 
-  reader.get("fixed-pos", fixed_pos, false);
+  fixed_pos = reader.get("fixed-pos", false);
   if (fixed_pos) {
     left_stand_x = 80;
     right_stand_x = 1140;

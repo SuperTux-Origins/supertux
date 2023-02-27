@@ -38,15 +38,15 @@ Climbable::Climbable(const ReaderMapping& reader) :
   message(),
   new_size(0.0f, 0.0f)
 {
-  reader.get("x", m_col.m_bbox.get_left());
-  reader.get("y", m_col.m_bbox.get_top());
+  reader.read("x", m_col.m_bbox.get_left());
+  reader.read("y", m_col.m_bbox.get_top());
   float w = 32, h = 32;
-  reader.get("width", w);
-  reader.get("height", h);
+  reader.read("width", w);
+  reader.read("height", h);
   m_col.m_bbox.set_size(w, h);
   new_size.x = w;
   new_size.y = h;
-  reader.get("message", message);
+  reader.read("message", message);
 }
 
 Climbable::Climbable(const Rectf& area) :

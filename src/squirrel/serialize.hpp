@@ -19,7 +19,8 @@
 
 #include <squirrel.h>
 
-class ReaderMapping;
+#include "util/reader_fwd.hpp"
+
 class Writer;
 
 void save_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, Writer& writer);

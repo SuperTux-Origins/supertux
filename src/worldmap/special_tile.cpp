@@ -36,36 +36,36 @@ SpecialTile::SpecialTile(const ReaderMapping& mapping) :
   m_apply_action_south(true),
   m_apply_action_west(true)
 {
-  if (!mapping.get("x", m_pos.x)) {
+  if (!mapping.read("x", m_pos.x)) {
     log_warning << "X coordinate of special tile not set, defaulting to 0" << std::endl;
   }
-  if (!mapping.get("y", m_pos.y)) {
+  if (!mapping.read("y", m_pos.y)) {
     log_warning << "Y coordinate of special tile not set, defaulting to 0" << std::endl;
   }
-  if (!mapping.get("invisible-tile", m_invisible)) {
+  if (!mapping.read("invisible-tile", m_invisible)) {
     // Ignore attribute if it's not specified. Tile is visible.
   }
 
   if (!m_invisible) {
     std::string spritefile = "";
-    if (!mapping.get("sprite", spritefile)) {
+    if (!mapping.read("sprite", spritefile)) {
       log_warning << "No sprite specified for visible special tile." << std::endl;
     }
     m_sprite = SpriteManager::current()->create(spritefile);
   }
 
-  if (!mapping.get("map-message", m_map_message)) {
+  if (!mapping.read("map-message", m_map_message)) {
     // Ignore attribute if it's not specified. No map message set.
   }
-  if (!mapping.get("passive-message", m_passive_message)) {
+  if (!mapping.read("passive-message", m_passive_message)) {
     // Ignore attribute if it's not specified. No passive message set.
   }
-  if (!mapping.get("script", m_script)) {
+  if (!mapping.read("script", m_script)) {
     // Ignore attribute if it's not specified. No script set.
   }
 
   std::string apply_direction;
-  if (!mapping.get("apply-to-direction", apply_direction)) {
+  if (!mapping.read("apply-to-direction", apply_direction)) {
     // Ignore attribute if it's not specified. Applies to all directions.
   }
   if (!apply_direction.empty()) {

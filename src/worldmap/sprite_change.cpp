@@ -34,17 +34,17 @@ SpriteChange::SpriteChange(const ReaderMapping& mapping) :
   m_stay_group(),
   m_in_stay_action(false)
 {
-  mapping.get("x", m_pos.x);
-  mapping.get("y", m_pos.y);
-  mapping.get("change-on-touch", m_change_on_touch);
+  mapping.read("x", m_pos.x);
+  mapping.read("y", m_pos.y);
+  mapping.read("change-on-touch", m_change_on_touch);
 
-  if (!mapping.get("sprite", m_sprite_name)) m_sprite_name = "";
+  if (!mapping.read("sprite", m_sprite_name)) m_sprite_name = "";
   m_sprite = SpriteManager::current()->create(m_sprite_name);
 
-  mapping.get("stay-action", m_stay_action);
-  mapping.get("initial-stay-action", m_in_stay_action);
+  mapping.read("stay-action", m_stay_action);
+  mapping.read("initial-stay-action", m_in_stay_action);
 
-  mapping.get("stay-group", m_stay_group);
+  mapping.read("stay-group", m_stay_group);
 
   s_all_sprite_changes.push_back(this);
 }

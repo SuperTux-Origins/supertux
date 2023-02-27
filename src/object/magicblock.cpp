@@ -58,7 +58,7 @@ MagicBlock::MagicBlock(const ReaderMapping& mapping) :
   set_group(COLGROUP_STATIC);
 
   std::vector<float> vColor;
-  if (mapping.get("color", vColor )) {
+  if (mapping.read("color", vColor )) {
     m_color = Color( vColor );
   } else {
     m_color = Color(0, 0, 0);

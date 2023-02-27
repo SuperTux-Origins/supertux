@@ -17,37 +17,9 @@
 #ifndef HEADER_SUPERTUX_UTIL_READER_DOCUMENT_HPP
 #define HEADER_SUPERTUX_UTIL_READER_DOCUMENT_HPP
 
-#include <istream>
-#include <sexp/value.hpp>
+#include <prio/reader_document.hpp>
 
-#include "util/reader_object.hpp"
-
-/** The ReaderDocument holds a parsed document in memory, access to
-    it's content is provided by get_root() */
-class ReaderDocument final
-{
-public:
-  static ReaderDocument from_stream(std::istream& stream, const std::string& filename = "<stream>");
-  static ReaderDocument from_file(const std::string& filename);
-
-public:
-  ReaderDocument(const std::string& filename, sexp::Value sx);
-
-  /** Returns the root object */
-  ReaderObject get_root() const;
-
-  /** Returns the filename of the document */
-  std::string get_filename() const;
-
-  /** Returns the directory of the document */
-  std::string get_directory() const;
-
-  const sexp::Value& get_sexp() const { return m_sx; }
-
-private:
-  std::string m_filename;
-  sexp::Value m_sx;
-};
+using prio::ReaderDocument;
 
 #endif
 

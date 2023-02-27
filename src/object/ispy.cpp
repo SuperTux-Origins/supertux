@@ -30,10 +30,10 @@ Ispy::Ispy(const ReaderMapping& reader) :
   m_script(),
   m_dir(Direction::AUTO)
 {
-  reader.get("script", m_script);
+  reader.read("script", m_script);
 
   std::string dir_str;
-  if (reader.get("direction", dir_str))
+  if (reader.read("direction", dir_str))
     m_dir = string_to_dir(dir_str);
   else
     m_dir = Direction::LEFT;

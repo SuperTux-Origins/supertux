@@ -40,6 +40,8 @@
 #include "supertux/tile_manager.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_mapping.hpp"
+#include "util/reader_object.hpp"
+#include "util/reader_iterator.hpp"
 
 static const std::string DEFAULT_BG = "images/background/antarctic/arctis2.png";
 
@@ -99,7 +101,7 @@ SectorParser::parse_object(const std::string& name_, const ReaderMapping& reader
 void
 SectorParser::parse(const ReaderMapping& sector)
 {
-  auto iter = sector.get_iter();
+  ReaderIterator iter(sector);
   while (iter.next()) {
     if (iter.get_key() == "name") {
       std::string value;
@@ -129,7 +131,7 @@ SectorParser::parse(const ReaderMapping& sector)
       {
         // for backward compatibilty
         std::vector<float> vColor;
-        bool hasColor = sector.get("ambient-light", vColor);
+        bool hasColor = sector.read("ambient-light", vColor);
         if (vColor.size() < 3 || !hasColor) {
           log_warning << "(ambient-light) requires a color as argument" << std::endl;
         } else {
@@ -160,7 +162,7 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
     m_sector.set_gravity(gravity);
 
   std::string backgroundimage;
-  if (reader.get("background", backgroundimage) && (!backgroundimage.empty())) {
+  if (reader.read("background", backgroundimage) && (!backgroundimage.empty())) {
     // These paths may need to be changed.
     if (backgroundimage == "arctis.png") backgroundimage = "arctis.jpg";
     if (backgroundimage == "arctis2.jpg") backgroundimage = "arctis.jpg";
@@ -173,21 +175,21 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
   }
 
   float bgspeed = .5;
-  reader.get("bkgd_speed", bgspeed);
+  reader.read("bkgd_speed", bgspeed);
   bgspeed /= 100;
 
   Color bkgd_top, bkgd_bottom;
   int r = 0, g = 0, b = 128;
-  reader.get("bkgd_red_top", r);
-  reader.get("bkgd_green_top",  g);
-  reader.get("bkgd_blue_top",  b);
+  reader.read("bkgd_red_top", r);
+  reader.read("bkgd_green_top",  g);
+  reader.read("bkgd_blue_top",  b);
   bkgd_top.red = static_cast<float> (r) / 255.0f;
   bkgd_top.green = static_cast<float> (g) / 255.0f;
   bkgd_top.blue = static_cast<float> (b) / 255.0f;
 
-  reader.get("bkgd_red_bottom",  r);
-  reader.get("bkgd_green_bottom", g);
-  reader.get("bkgd_blue_bottom", b);
+  reader.read("bkgd_red_bottom",  r);
+  reader.read("bkgd_green_bottom", g);
+  reader.read("bkgd_blue_bottom", b);
   bkgd_bottom.red = static_cast<float> (r) / 255.0f;
   bkgd_bottom.green = static_cast<float> (g) / 255.0f;
   bkgd_bottom.blue = static_cast<float> (b) / 255.0f;
@@ -202,7 +204,7 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
   }
 
   std::string particlesystem;
-  reader.get("particle_system", particlesystem);
+  reader.read("particle_system", particlesystem);
   if (particlesystem == "clouds")
     m_sector.add<CloudParticleSystem>();
   else if (particlesystem == "snow")
@@ -213,8 +215,8 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
     m_sector.add<CustomParticleSystem>();
 
   Vector startpos(100, 170);
-  reader.get("start_pos_x", startpos.x);
-  reader.get("start_pos_y", startpos.y);
+  reader.read("start_pos_x", startpos.x);
+  reader.read("start_pos_y", startpos.y);
 
   m_sector.add<SpawnPointMarker>("main", startpos);
 
@@ -226,12 +228,12 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
   */
 
   int width = 30, height = 15;
-  reader.get("width", width);
-  reader.get("height", height);
+  reader.read("width", width);
+  reader.read("height", height);
 
   std::vector<unsigned int> tiles;
-  if (reader.get("interactive-tm", tiles)
-     || reader.get("tilemap", tiles)) {
+  if (reader.read("interactive-tm", tiles)
+     || reader.read("tilemap", tiles)) {
     auto* tileset = TileManager::current()->get_tileset(m_sector.get_level().get_tileset());
     auto& tilemap = m_sector.add<TileMap>(tileset);
     tilemap.set(width, height, tiles, LAYER_TILES, true);
@@ -248,14 +250,14 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
     if (height < 19) tilemap.resize(width, 19);
   }
 
-  if (reader.get("background-tm", tiles)) {
+  if (reader.read("background-tm", tiles)) {
     auto* tileset = TileManager::current()->get_tileset(m_sector.get_level().get_tileset());
     auto& tilemap = m_sector.add<TileMap>(tileset);
     tilemap.set(width, height, tiles, LAYER_BACKGROUNDTILES, false);
     if (height < 19) tilemap.resize(width, 19);
   }
 
-  if (reader.get("foreground-tm", tiles)) {
+  if (reader.read("foreground-tm", tiles)) {
     auto* tileset = TileManager::current()->get_tileset(m_sector.get_level().get_tileset());
     auto& tilemap = m_sector.add<TileMap>(tileset);
     tilemap.set(width, height, tiles, LAYER_FOREGROUNDTILES, false);
@@ -265,9 +267,9 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
   }
 
   // read reset-points (now spawn-points)
-  std::optional<ReaderMapping> resetpoints;
-  if (reader.get("reset-points", resetpoints)) {
-    auto iter = resetpoints->get_iter();
+  ReaderMapping resetpoints;
+  if (reader.read("reset-points", resetpoints)) {
+    ReaderIterator iter(resetpoints);
     while (iter.next()) {
       if (iter.get_key() == "point") {
         Vector sp_pos(0.0f, 0.0f);
@@ -282,9 +284,9 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
   }
 
   // read objects
-  std::optional<ReaderCollection> objects;
-  if (reader.get("objects", objects)) {
-    for (auto const& obj : objects->get_objects())
+  ReaderCollection objects;
+  if (reader.read("objects", objects)) {
+    for (auto const& obj : objects.get_objects())
     {
       auto object = parse_object(obj.get_name(), obj.get_mapping());
       if (object) {

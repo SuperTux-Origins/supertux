@@ -32,14 +32,14 @@ Ghoul::Ghoul(const ReaderMapping& reader) :
   m_flyspeed(),
   m_track_range()
 {
-  reader.get("flyspeed", m_flyspeed, FLYSPEED);
-  reader.get("track-range", m_track_range, TRACK_RANGE);
-  
+  m_flyspeed = reader.get("flyspeed", FLYSPEED);
+  m_track_range = reader.get("track-range", TRACK_RANGE);
+
   bool running;
-  reader.get("running", running, false);
+  running = reader.get("running", false);
 
   init_path(reader, running);
-  
+
   m_sprite->set_action(m_dir);
 }
 

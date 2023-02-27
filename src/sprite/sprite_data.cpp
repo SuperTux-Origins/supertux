@@ -24,6 +24,7 @@
 #include "util/log.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
+#include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/reader_object.hpp"
 #include "video/surface.hpp"
@@ -47,7 +48,7 @@ SpriteData::SpriteData(const ReaderMapping& mapping) :
   actions(),
   name()
 {
-  auto iter = mapping.get_iter();
+  ReaderIterator iter(mapping);
   while (iter.next()) {
     if (iter.get_key() == "name") {
       iter.get(name);
@@ -57,6 +58,7 @@ SpriteData::SpriteData(const ReaderMapping& mapping) :
       log_warning << "Unknown sprite field: " << iter.get_key() << std::endl;
     }
   }
+
   if (actions.empty())
     throw std::runtime_error("Error: Sprite without actions.");
 }
@@ -66,14 +68,14 @@ SpriteData::parse_action(const ReaderMapping& mapping)
 {
   auto action = std::make_unique<Action>();
 
-  if (!mapping.get("name", action->name)) {
+  if (!mapping.read("name", action->name)) {
     if (!actions.empty())
       throw std::runtime_error(
         "If there are more than one action, they need names!");
   }
 
   std::vector<float> hitbox;
-  if (mapping.get("hitbox", hitbox)) {
+  if (mapping.read("hitbox", hitbox)) {
     switch (hitbox.size())
     {
       case 4:
@@ -89,12 +91,12 @@ SpriteData::parse_action(const ReaderMapping& mapping)
         throw std::runtime_error("hitbox should specify 2/4 coordinates");
     }
   }
-  mapping.get("fps", action->fps);
-  if (mapping.get("loops", action->loops))
+  mapping.read("fps", action->fps);
+  if (mapping.read("loops", action->loops))
   {
     action->has_custom_loops = true;
   }
-  if (mapping.get("loop-frame", action->loop_frame))
+  if (mapping.read("loop-frame", action->loop_frame))
   {
     if (action->loop_frame < 1)
     {
@@ -103,14 +105,14 @@ SpriteData::parse_action(const ReaderMapping& mapping)
     }
   }
 
-  if (!mapping.get("family_name", action->family_name))
+  if (!mapping.read("family_name", action->family_name))
   {
     action->family_name = "::" + action->name;
   }
 
   std::string mirror_action;
   std::string clone_action;
-  if (mapping.get("mirror-action", mirror_action)) {
+  if (mapping.read("mirror-action", mirror_action)) {
     const auto act_tmp = get_action(mirror_action);
     if (act_tmp == nullptr) {
       std::ostringstream msg;
@@ -150,7 +152,7 @@ SpriteData::parse_action(const ReaderMapping& mapping)
         action->family_name = act_tmp->family_name;
       }
     }
-  } else if (mapping.get("clone-action", clone_action)) {
+  } else if (mapping.read("clone-action", clone_action)) {
     const auto* act_tmp = get_action(clone_action);
     if (act_tmp == nullptr) {
       std::ostringstream msg;
@@ -170,14 +172,14 @@ SpriteData::parse_action(const ReaderMapping& mapping)
       }
     }
   } else { // Load images
-    std::optional<ReaderCollection> surfaces_collection;
+    ReaderCollection surfaces_collection;
     std::vector<std::string> images;
-    if (mapping.get("images", images))
+    if (mapping.read("images", images))
     {
       float max_w = 0;
       float max_h = 0;
       for (const auto& image : images) {
-        auto surface = Surface::from_file(FileSystem::join(mapping.get_doc().get_directory(), image));
+        auto surface = Surface::from_file(FileSystem::join(mapping.get_document().get_directory(), image));
         max_w = std::max(max_w, static_cast<float>(surface->get_width()));
         max_h = std::max(max_h, static_cast<float>(surface->get_height()));
         action->surfaces.push_back(surface);
@@ -185,9 +187,9 @@ SpriteData::parse_action(const ReaderMapping& mapping)
       if (action->hitbox_w < 1) action->hitbox_w = max_w - action->x_offset;
       if (action->hitbox_h < 1) action->hitbox_h = max_h - action->y_offset;
     }
-    else if (mapping.get("surfaces", surfaces_collection))
+    else if (mapping.read("surfaces", surfaces_collection))
     {
-      for (const auto& i : surfaces_collection->get_objects())
+      for (const auto& i : surfaces_collection.get_objects())
       {
         if (i.get_name() == "surface")
         {

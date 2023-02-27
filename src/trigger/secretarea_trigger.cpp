@@ -39,20 +39,20 @@ SecretAreaTrigger::SecretAreaTrigger(const ReaderMapping& reader) :
   script(),
   new_size(0.0f, 0.0f)
 {
-  reader.get("x", m_col.m_bbox.get_left());
-  reader.get("y", m_col.m_bbox.get_top());
+  reader.read("x", m_col.m_bbox.get_left());
+  reader.read("y", m_col.m_bbox.get_top());
   float w,h;
-  reader.get("width", w, 32.0f);
-  reader.get("height", h, 32.0f);
+  w = reader.get("width", 32.0f);
+  h = reader.get("height", 32.0f);
   m_col.m_bbox.set_size(w, h);
   new_size.x = w;
   new_size.y = h;
-  reader.get("fade-tilemap", fade_tilemap);
-  reader.get("message", message);
+  reader.read("fade-tilemap", fade_tilemap);
+  reader.read("message", message);
   if (message.empty()) {
     message = _("You found a secret area!");
   }
-  reader.get("script", script);
+  reader.read("script", script);
 }
 
 SecretAreaTrigger::SecretAreaTrigger(const Rectf& area, const std::string& fade_tilemap_) :

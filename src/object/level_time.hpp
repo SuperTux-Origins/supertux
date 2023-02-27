@@ -23,8 +23,6 @@
 #include "video/color.hpp"
 #include "video/surface_ptr.hpp"
 
-class ReaderMapping;
-
 class LevelTime final : public GameObject,
                         public ExposedObject<LevelTime, scripting::LevelTime>
 {

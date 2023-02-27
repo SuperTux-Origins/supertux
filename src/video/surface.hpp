@@ -22,11 +22,11 @@
 
 #include "math/rect.hpp"
 #include "math/vector.hpp"
+#include "util/reader_fwd.hpp"
 #include "video/flip.hpp"
 #include "video/surface_ptr.hpp"
 #include "video/texture_ptr.hpp"
 
-class ReaderMapping;
 class SurfaceData;
 
 /** A rectangular image.  The class basically holds a reference to a

@@ -30,24 +30,24 @@ Teleporter::Teleporter(const ReaderMapping& mapping) :
   m_automatic(false),
   m_message()
 {
-  mapping.get("x", m_pos.x);
-  mapping.get("y", m_pos.y);
+  mapping.read("x", m_pos.x);
+  mapping.read("y", m_pos.y);
 
   std::string spritefile = "";
-  if (mapping.get("sprite", spritefile)) {
+  if (mapping.read("sprite", spritefile)) {
     m_sprite = SpriteManager::current()->create(spritefile);
   }
 
-  if (!mapping.get("worldmap", m_worldmap)) {
+  if (!mapping.read("worldmap", m_worldmap)) {
     // worldmap parameter doesn't need to be set. Ignore.
   }
-  if (!mapping.get("spawnpoint", m_spawnpoint)) {
+  if (!mapping.read("spawnpoint", m_spawnpoint)) {
     // not set, use "main" spawnpoint.
   }
-  if (!mapping.get("automatic", m_automatic)) {
+  if (!mapping.read("automatic", m_automatic)) {
     // doesn't need to be set. Don't teleport automatically.
   }
-  if (!mapping.get("message", m_message)) {
+  if (!mapping.read("message", m_message)) {
     // Optional message not set. Ignore!
   }
 }

@@ -159,9 +159,9 @@ MusicFile load_music_file(const std::string& filename_original)
 
   MusicFile music_file;
 
-  music.get("file", music_file.file);
-  music.get("loop-begin", music_file.loop_begin);
-  music.get("loop-at", music_file.loop_at);
+  music.read("file", music_file.file);
+  music.read("loop-begin", music_file.loop_begin);
+  music.read("loop-at", music_file.loop_at);
 
   music_file.file = FileSystem::normalize(FileSystem::dirname(filename) + music_file.file);
 

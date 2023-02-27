@@ -24,8 +24,13 @@ namespace sexp {
 class Value;
 } // namespace sexp
 
+namespace prio {
 class ReaderMapping;
 class ReaderDocument;
+};
+
+using prio::ReaderMapping;
+using prio::ReaderDocument;
 
 /** The ReaderIterator class is for backward compatibilty with old
     fileformats only, do not use it in new code, use ReaderCollection
@@ -34,7 +39,7 @@ class ReaderIterator final
 {
 public:
   // sx should point to (section (name value)...)
-  ReaderIterator(const ReaderDocument& doc, const sexp::Value& sx);
+  ReaderIterator(ReaderMapping const& mapping);
 
   /** must be called once before any of the other function become
       valid, i.e. ReaderIterator it; while(it.next()) { ... } */

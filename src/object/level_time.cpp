@@ -36,7 +36,7 @@ LevelTime::LevelTime(const ReaderMapping& reader) :
   running(true),
   time_left()
 {
-  reader.get("time", time_left, 0.0f);
+  time_left = reader.get("time", 0.0f);
   if (time_left <= 0) {
     log_warning << "No or invalid leveltime specified." << std::endl;
     remove_me();

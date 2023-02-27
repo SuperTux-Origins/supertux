@@ -64,10 +64,10 @@ WorldMapParser::load_worldmap(const std::string& filename)
 
     auto level_ = root.get_mapping();
 
-    level_.get("name", m_worldmap.m_name);
+    level_.read("name", m_worldmap.m_name);
 
     std::string tileset_name;
-    if (level_.get("tileset", tileset_name)) {
+    if (level_.read("tileset", tileset_name)) {
       if (m_worldmap.m_tileset != nullptr) {
         log_warning << "multiple tilesets specified in level_" << std::endl;
       } else {
@@ -79,65 +79,71 @@ WorldMapParser::load_worldmap(const std::string& filename)
       m_worldmap.m_tileset = TileManager::current()->get_tileset("images/ice_world.strf");
     }
 
-    std::optional<ReaderMapping> sector;
-    if (!level_.get("sector", sector)) {
-      throw std::runtime_error("No sector specified in worldmap file.");
-    } else {
-      auto iter = sector->get_iter();
-      while (iter.next()) {
-        if (iter.get_key() == "tilemap") {
-          m_worldmap.add<TileMap>(m_worldmap.m_tileset, iter.as_mapping());
-        } else if (iter.get_key() == "background") {
-          m_worldmap.add<Background>(iter.as_mapping());
-        } else if (iter.get_key() == "music") {
-          const auto& sx = iter.get_sexp();
-          if (sx.is_array() && sx.as_array().size() == 2 && sx.as_array()[1].is_string()) {
-            std::string value;
-            iter.get(value);
-            m_worldmap.add<MusicObject>().set_music(value);
-          } else {
-            m_worldmap.add<MusicObject>(iter.as_mapping());
-          }
-        } else if (iter.get_key() == "init-script") {
-          iter.get(m_worldmap.m_init_script);
-        } else if (iter.get_key() == "worldmap-spawnpoint") {
-          auto sp = std::make_unique<SpawnPoint>(iter.as_mapping());
-          m_worldmap.m_spawn_points.push_back(std::move(sp));
-        } else if (iter.get_key() == "level") {
-          auto& level = m_worldmap.add<LevelTile>(m_worldmap.m_levels_path, iter.as_mapping());
-          load_level_information(level);
-        } else if (iter.get_key() == "special-tile") {
-          m_worldmap.add<SpecialTile>(iter.as_mapping());
-        } else if (iter.get_key() == "sprite-change") {
-          m_worldmap.add<SpriteChange>(iter.as_mapping());
-        } else if (iter.get_key() == "teleporter") {
-          m_worldmap.add<Teleporter>(iter.as_mapping());
-        } else if (iter.get_key() == "decal") {
-          m_worldmap.add<Decal>(iter.as_mapping());
-        } else if (iter.get_key() == "path") {
-          m_worldmap.add<PathGameObject>(iter.as_mapping());
-        } else if (iter.get_key() == "ambient-light") {
-          const auto& sx = iter.get_sexp();
-          if (sx.is_array() && sx.as_array().size() >= 3 &&
-              sx.as_array()[1].is_real() && sx.as_array()[2].is_real() && sx.as_array()[3].is_real())
-          {
-            // for backward compatibilty
-            std::vector<float> vColor;
-            bool hasColor = sector->get("ambient-light", vColor);
-            if (vColor.size() < 3 || !hasColor) {
-              log_warning << "(ambient-light) requires a color as argument" << std::endl;
-            } else {
-              m_worldmap.add<AmbientLight>(Color(vColor));
-            }
-          } else {
-            // modern format
-            m_worldmap.add<AmbientLight>(iter.as_mapping());
-          }
-        } else if (iter.get_key() == "name") {
-          // skip
-        } else {
-          log_warning << "Unknown token '" << iter.get_key() << "' in worldmap" << std::endl;
-        }
+    ReaderMapping sector;
+    if (level_.read("sector", sector))
+    {
+      ReaderMapping tilemap_mapping;
+      if (sector.read("tilemap", tilemap_mapping)) {
+        m_worldmap.add<TileMap>(m_worldmap.m_tileset, tilemap_mapping);
+      }
+
+      ReaderMapping background_mapping;
+      if (sector.read("background", background_mapping)) {
+        m_worldmap.add<Background>(background_mapping);
+      }
+
+      std::string music_file;
+      if (sector.read("music", music_file)) {
+        m_worldmap.add<MusicObject>().set_music(music_file);
+      }
+
+      ReaderMapping music_mapping;
+      if (sector.read("music", music_mapping)) {
+        m_worldmap.add<MusicObject>(music_mapping);
+      }
+
+      sector.read("init-script", m_worldmap.m_init_script);
+
+      ReaderMapping worldmap_spawnpoint_mapping;
+      if (sector.read("worldmap-spawnpoint", worldmap_spawnpoint_mapping)) {
+        auto sp = std::make_unique<SpawnPoint>(worldmap_spawnpoint_mapping);
+        m_worldmap.m_spawn_points.push_back(std::move(sp));
+      }
+
+      ReaderMapping level_mapping;
+      if (sector.read("level", level_mapping)) {
+        auto& level = m_worldmap.add<LevelTile>(m_worldmap.m_levels_path, level_mapping);
+        load_level_information(level);
+      }
+
+      ReaderMapping special_tile_mapping;
+      if (sector.read("special-tile", special_tile_mapping)) {
+        m_worldmap.add<SpecialTile>(special_tile_mapping);
+      }
+
+      ReaderMapping sprite_change_mapping;
+      if (sector.read("sprite-change", sprite_change_mapping)) {
+        m_worldmap.add<SpriteChange>(sprite_change_mapping);
+      }
+
+      ReaderMapping teleporter_mapping;
+      if (sector.read("teleporter", teleporter_mapping)) {
+        m_worldmap.add<Teleporter>(teleporter_mapping);
+      }
+
+      ReaderMapping decal_mapping;
+      if (sector.read("decal", decal_mapping)) {
+        m_worldmap.add<Decal>(decal_mapping);
+      }
+
+      ReaderMapping path_mapping;
+      if (sector.read("path", path_mapping)) {
+        m_worldmap.add<PathGameObject>(path_mapping);
+      }
+
+      ReaderMapping ambient_light_mapping;
+      if (sector.read("ambient-light", ambient_light_mapping)) {
+        m_worldmap.add<AmbientLight>(ambient_light_mapping);
       }
     }
 
@@ -188,8 +194,8 @@ WorldMapParser::load_level_information(LevelTile& level)
       return;
     } else {
       auto level_mapping = root.get_mapping();
-      level_mapping.get("name", level.m_title);
-      level_mapping.get("target-time", level.m_target_time);
+      level_mapping.read("name", level.m_title);
+      level_mapping.read("target-time", level.m_target_time);
     }
   } catch(std::exception& e) {
     log_warning << "Problem when reading level information: " << e.what() << std::endl;

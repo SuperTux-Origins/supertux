@@ -111,11 +111,11 @@ BadGuy::BadGuy(const ReaderMapping& reader, const std::string& sprite_name_, int
   m_colgroup_active(COLGROUP_MOVING)
 {
   std::string dir_str = "auto";
-  reader.get("direction", dir_str);
+  reader.read("direction", dir_str);
   m_start_dir = str2dir( dir_str );
   m_dir = m_start_dir;
 
-  reader.get("dead-script", m_dead_script);
+  reader.read("dead-script", m_dead_script);
 
   SoundManager::current()->preload("sounds/squish.wav");
   SoundManager::current()->preload("sounds/fall.wav");

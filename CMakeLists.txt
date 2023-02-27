@@ -157,6 +157,8 @@ function(build_dependencies)
   if(NOT TARGET wstsound::wstsound)
     add_subdirectory(external/wstsound/ EXCLUDE_FROM_ALL)
   endif()
+
+  find_package(prio)
 endfunction()
 build_dependencies()
 
@@ -268,6 +270,7 @@ target_link_libraries(supertux-origins_lib PUBLIC LibGlm)
 target_link_libraries(supertux-origins_lib PUBLIC LibFmt)
 target_link_libraries(supertux-origins_lib PUBLIC LibPhysfs)
 target_link_libraries(supertux-origins_lib PUBLIC wstsound::wstsound)
+target_link_libraries(supertux-origins_lib PUBLIC prio::prio)
 
 if(HAVE_OPENGL)
   target_link_libraries(supertux-origins_lib PUBLIC LibOpenGL)

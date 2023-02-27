@@ -34,18 +34,18 @@ LitObject::LitObject(const ReaderMapping& reader) :
   m_layer(0),
   m_flip(NO_FLIP)
 {
-  reader.get("x", m_col.m_bbox.get_left());
-  reader.get("y", m_col.m_bbox.get_top());
+  reader.read("x", m_col.m_bbox.get_left());
+  reader.read("y", m_col.m_bbox.get_top());
 
-  reader.get("light-offset-x", m_light_offset.x);
-  reader.get("light-offset-y", m_light_offset.y);
+  reader.read("light-offset-x", m_light_offset.x);
+  reader.read("light-offset-y", m_light_offset.y);
 
-  reader.get("sprite", m_sprite_name);
-  reader.get("light-sprite", m_light_sprite_name);
-  reader.get("layer", m_layer, 0);
+  reader.read("sprite", m_sprite_name);
+  reader.read("light-sprite", m_light_sprite_name);
+  m_layer = reader.get("layer", 0);
 
-  reader.get("action", m_sprite_action);
-  reader.get("light-action", m_light_sprite_action);
+  reader.read("action", m_sprite_action);
+  reader.read("light-action", m_light_sprite_action);
 
   m_sprite = SpriteManager::current()->create(m_sprite_name);
   m_light_sprite = SpriteManager::current()->create(m_light_sprite_name);

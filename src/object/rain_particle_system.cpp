@@ -71,9 +71,9 @@ RainParticleSystem::RainParticleSystem(const ReaderMapping& reader) :
   m_amount_fade_time_remaining(0.f),
   m_current_real_amount(0.f)
 {
-  reader.get("intensity", m_current_amount, 1.f);
-  reader.get("angle", m_current_angle, 1.f);
-  reader.get("speed", m_current_speed, 1.f);
+  m_current_amount = reader.get("intensity", 1.f);
+  m_current_angle = reader.get("angle", 1.f);
+  m_current_speed = reader.get("speed", 1.f);
   init();
 }
 

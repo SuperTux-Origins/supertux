@@ -24,6 +24,7 @@
 , strutcpp
 , miniswig
 , wstsound
+, priocpp
 , gtest
 }:
 
@@ -102,6 +103,7 @@ EOF
     strutcpp
     miniswig
     wstsound
+    priocpp
 
     # checkInputs
     gtest

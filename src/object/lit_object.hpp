@@ -23,8 +23,6 @@
 #include "supertux/moving_object.hpp"
 #include "video/flip.hpp"
 
-class ReaderMapping;
-
 class LitObject final :
   public MovingObject,
   public ExposedObject<LitObject, scripting::LitObject>

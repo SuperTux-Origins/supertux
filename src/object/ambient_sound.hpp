@@ -41,13 +41,13 @@
 
 #include "audio/fwd.hpp"
 #include "math/vector.hpp"
-#include "supertux/moving_object.hpp"
 #include "scripting/ambient_sound.hpp"
 #include "squirrel/exposed_object.hpp"
+#include "supertux/moving_object.hpp"
+#include "util/reader_fwd.hpp"
 #include "video/layer.hpp"
 
 class GameObject;
-class ReaderMapping;
 
 class AmbientSound final : public MovingObject,
                      public ExposedObject<AmbientSound, scripting::AmbientSound>

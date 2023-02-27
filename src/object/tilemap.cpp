@@ -102,17 +102,17 @@ TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
 {
   assert(m_tileset);
 
-  reader.get("solid",  m_real_solid);
+  reader.read("solid",  m_real_solid);
 
   bool backward_compatibility_fudge = false;
 
-  if (!reader.get("speed-x", m_speed_x)) {
-    if (reader.get("speed",  m_speed_x)) {
+  if (!reader.read("speed-x", m_speed_x)) {
+    if (reader.read("speed",  m_speed_x)) {
       backward_compatibility_fudge = true;
     }
   }
 
-  if (!reader.get("speed-y", m_speed_y)) {
+  if (!reader.read("speed-y", m_speed_y)) {
     if (backward_compatibility_fudge) {
       m_speed_y = m_speed_x;
     }
@@ -126,21 +126,20 @@ TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
     m_speed_y = 1;
   }
 
-  reader.get("starting-node", m_starting_node, 0);
+  m_starting_node = reader.get("starting-node", 0);
 
   init_path(reader, false);
 
-  std::string draw_target_s = "normal";
-  reader.get("draw-target", draw_target_s);
+  std::string draw_target_s = reader.get("draw-target", std::string("normal"));
   if (draw_target_s == "normal") m_draw_target = DrawingTarget::COLORMAP;
   if (draw_target_s == "lightmap") m_draw_target = DrawingTarget::LIGHTMAP;
 
-  if (reader.get("alpha", m_alpha)) {
+  if (reader.read("alpha", m_alpha)) {
     m_current_alpha = m_alpha;
   }
 
   std::vector<float> vColor;
-  if (reader.get("tint", vColor)) {
+  if (reader.read("tint", vColor)) {
     m_current_tint = Color(vColor);
     m_tint = m_current_tint;
   }
@@ -149,8 +148,8 @@ TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
   m_effective_solid = m_real_solid;
   update_effective_solid ();
 
-  reader.get("width", m_width);
-  reader.get("height", m_height);
+  reader.read("width", m_width);
+  reader.read("height", m_height);
   if (m_width < 0 || m_height < 0) {
     //throw std::runtime_error("Invalid/No width/height specified in tilemap.");
     m_width = 0;
@@ -159,8 +158,13 @@ TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
     resize(static_cast<int>(Sector::get().get_width() / 32.0f),
            static_cast<int>(Sector::get().get_height() / 32.0f));
   } else {
-    if (!reader.get("tiles", m_tiles))
+    std::vector<int> tmp_tiles;
+    if (!reader.read("tiles", tmp_tiles))
       throw std::runtime_error("No tiles in tilemap.");
+    m_tiles.reserve(tmp_tiles.size());
+    std::transform(tmp_tiles.begin(), tmp_tiles.end(),
+                   std::back_inserter(m_tiles),
+                   [](int x) { return static_cast<uint32_t>(x); });
 
     if (int(m_tiles.size()) != m_width * m_height) {
       throw std::runtime_error("wrong number of tiles in tilemap.");

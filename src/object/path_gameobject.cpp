@@ -78,14 +78,14 @@ PathGameObject::PathGameObject(const ReaderMapping& mapping, bool backward_compa
   }
   else
   {
-    std::optional<ReaderMapping> path_mapping;
-    if (mapping.get("path", path_mapping))
+    ReaderMapping path_mapping;
+    if (mapping.read("path", path_mapping))
     {
-      m_path->read(*path_mapping);
+      m_path->read(path_mapping);
     }
   }
 
-  mapping.get_custom("style", m_style, PathStyle_from_string);
+  mapping.read("style", m_style, PathStyle_from_string);
 
   if (m_style == PathStyle::SOLID)
   {

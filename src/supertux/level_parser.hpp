@@ -20,9 +20,9 @@
 #include <memory>
 #include <string>
 
+#include "util/reader_fwd.hpp"
+
 class Level;
-class ReaderDocument;
-class ReaderMapping;
 
 class LevelParser final
 {

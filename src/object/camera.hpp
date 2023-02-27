@@ -31,7 +31,6 @@
 
 class Path;
 class PathWalker;
-class ReaderMapping;
 class CameraConfig;
 
 class Camera final : public GameObject,

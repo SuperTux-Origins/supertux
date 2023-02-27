@@ -27,8 +27,6 @@
 #include "video/flip.hpp"
 #include "video/surface_ptr.hpp"
 
-class ReaderMapping;
-
 class Background final : public GameObject,
                          public ExposedObject<Background, scripting::Background>
 {

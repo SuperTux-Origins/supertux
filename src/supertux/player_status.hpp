@@ -23,9 +23,10 @@
 #include <string>
 #include <vector>
 
+#include "util/reader_fwd.hpp"
+#include "util/writer.hpp"
+
 class DrawingContext;
-class ReaderMapping;
-class Writer;
 
 static const float BORDER_X = 10;
 static const float BORDER_Y = 10;

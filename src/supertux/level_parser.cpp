@@ -26,6 +26,7 @@
 #include "util/reader.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
+#include "util/reader_iterator.hpp"
 
 std::string
 LevelParser::get_level_name(const std::string& filename)
@@ -40,7 +41,7 @@ LevelParser::get_level_name(const std::string& filename)
     } else {
       auto mapping = root.get_mapping();
       std::string name;
-      mapping.get("name", name);
+      mapping.read("name", name);
       return name;
     }
   }
@@ -123,7 +124,7 @@ LevelParser::LevelParser(Level& level, bool worldmap, bool editable) :
 void
 LevelParser::load(std::istream& stream, const std::string& context)
 {
-  auto doc = ReaderDocument::from_stream(stream, context);
+  auto doc = ReaderDocument::from_stream(prio::Format::SEXPR, stream, prio::ErrorHandler::THROW, context);
   load(doc);
 }
 
@@ -152,25 +153,25 @@ LevelParser::load(const ReaderDocument& doc)
   auto level = root.get_mapping();
 
   int version = 1;
-  level.get("version", version);
+  level.read("version", version);
   if (version == 1) {
     log_info << "[" << doc.get_filename() << "] level uses old format: version 1" << std::endl;
     load_old_format(level);
   } else if (version == 2 || version == 3) {
-    level.get("tileset", m_level.m_tileset);
+    level.read("tileset", m_level.m_tileset);
 
-    level.get("name", m_level.m_name);
-    level.get("author", m_level.m_author);
-    level.get("contact", m_level.m_contact);
-    level.get("license", m_level.m_license);
-    level.get("target-time", m_level.m_target_time);
-    level.get("suppress-pause-menu", m_level.m_suppress_pause_menu);
-    level.get("note", m_level.m_note);
-    level.get("icon", m_level.m_icon);
-    level.get("icon-locked", m_level.m_icon_locked);
-    level.get("bkg", m_level.m_wmselect_bkg);
+    level.read("name", m_level.m_name);
+    level.read("author", m_level.m_author);
+    level.read("contact", m_level.m_contact);
+    level.read("license", m_level.m_license);
+    level.read("target-time", m_level.m_target_time);
+    level.read("suppress-pause-menu", m_level.m_suppress_pause_menu);
+    level.read("note", m_level.m_note);
+    level.read("icon", m_level.m_icon);
+    level.read("icon-locked", m_level.m_icon_locked);
+    level.read("bkg", m_level.m_wmselect_bkg);
 
-    auto iter = level.get_iter();
+    ReaderIterator iter(level);
     while (iter.next())
     {
       if (iter.get_key() == "sector")
@@ -196,8 +197,8 @@ LevelParser::load(const ReaderDocument& doc)
 void
 LevelParser::load_old_format(const ReaderMapping& reader)
 {
-  reader.get("name", m_level.m_name);
-  reader.get("author", m_level.m_author);
+  reader.read("name", m_level.m_name);
+  reader.read("author", m_level.m_author);
 
   auto sector = SectorParser::from_reader_old_format(m_level, reader, m_editable);
   m_level.add_sector(std::move(sector));

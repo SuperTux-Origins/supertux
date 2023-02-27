@@ -34,8 +34,8 @@ PowerUp::PowerUp(const ReaderMapping& mapping) :
   no_physics(),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite"))
 {
-  mapping.get("script", script, "");
-  mapping.get("disable-physics", no_physics, false);
+  mapping.read("script", script);
+  no_physics = mapping.get("disable-physics", false);
   initialize();
 }
 

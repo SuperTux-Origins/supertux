@@ -46,9 +46,9 @@ Thunderstorm::Thunderstorm(const ReaderMapping& reader) :
   flash_display_timer(),
   changing_tiles(TileManager::current()->get_tileset(Level::current()->get_tileset())->m_thunderstorm_tiles)
 {
-  reader.get("running", running);
-  reader.get("interval", interval);
-  reader.get("strike-script", m_strike_script, "");
+  reader.read("running", running);
+  reader.read("interval", interval);
+  m_strike_script = reader.get("strike-script", std::string());
   if (interval <= 0) {
     log_warning << "Running a thunderstorm with non-positive time interval is a bad idea" << std::endl;
   }

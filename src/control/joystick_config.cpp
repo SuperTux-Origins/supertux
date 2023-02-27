@@ -159,53 +159,48 @@ JoystickConfig::bind_joybutton(JoystickID joy_id, int button, Control control)
 void
 JoystickConfig::read(const ReaderMapping& joystick_mapping)
 {
-  joystick_mapping.get("dead-zone", m_dead_zone);
-  joystick_mapping.get("jump-with-up", m_jump_with_up_joy);
-  joystick_mapping.get("use-game-controller", m_use_game_controller);
+  joystick_mapping.read("dead-zone", m_dead_zone);
+  joystick_mapping.read("jump-with-up", m_jump_with_up_joy);
+  joystick_mapping.read("use-game-controller", m_use_game_controller);
 
-  auto iter = joystick_mapping.get_iter();
-  while (iter.next())
+  ReaderMapping map;
+  if (joystick_mapping.read("map", map))
   {
-    if (iter.get_key() == "map")
+    std::string control_text;
+    map.read("control", control_text);
+
+    const std::optional<Control> maybe_control = Control_from_string(control_text);
+    if (!maybe_control)
     {
-      const auto& map = iter.as_mapping();
+      log_info << "Invalid control '" << control_text << "' in buttonmap" << std::endl;
+    }
+    else
+    {
+      const Control control = *maybe_control;
 
-      std::string control_text;
-      map.get("control", control_text);
+      int button = -1;
+      int axis   = 0;
+      int hat    = -1;
 
-      const std::optional<Control> maybe_control = Control_from_string(control_text);
-      if (!maybe_control)
+      if (map.read("button", button))
       {
-        log_info << "Invalid control '" << control_text << "' in buttonmap" << std::endl;
+        bind_joybutton(0, button, control);
       }
-      else
+      else if (map.read("axis",   axis))
       {
-        const Control control = *maybe_control;
-
-        int button = -1;
-        int axis   = 0;
-        int hat    = -1;
-
-        if (map.get("button", button))
-        {
-          bind_joybutton(0, button, control);
+        bind_joyaxis(0, axis, control);
+      }
+      else if (map.read("hat",   hat))
+      {
+        if (hat != SDL_HAT_UP   &&
+            hat != SDL_HAT_DOWN &&
+            hat != SDL_HAT_LEFT &&
+            hat != SDL_HAT_RIGHT) {
+          log_info << "Invalid axis '" << axis << "' in axismap" << std::endl;
         }
-        else if (map.get("axis",   axis))
+        else
         {
-          bind_joyaxis(0, axis, control);
-        }
-        else if (map.get("hat",   hat))
-        {
-          if (hat != SDL_HAT_UP   &&
-              hat != SDL_HAT_DOWN &&
-              hat != SDL_HAT_LEFT &&
-              hat != SDL_HAT_RIGHT) {
-            log_info << "Invalid axis '" << axis << "' in axismap" << std::endl;
-          }
-          else
-          {
-            bind_joyhat(0, hat, control);
-          }
+          bind_joyhat(0, hat, control);
         }
       }
     }

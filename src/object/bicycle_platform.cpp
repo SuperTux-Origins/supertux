@@ -94,12 +94,12 @@ BicyclePlatform::BicyclePlatform(const ReaderMapping& reader) :
   m_walker(),
   m_platforms(2)
 {
-  reader.get("x", m_center.x);
-  reader.get("y", m_center.y);
-  reader.get("radius", m_radius, 128.0f);
-  reader.get("momentum-change-rate", m_momentum_change_rate, 0.1f);
+  reader.read("x", m_center.x);
+  reader.read("y", m_center.y);
+  m_radius = reader.get("radius", 128.0f);
+  m_momentum_change_rate = reader.get("momentum-change-rate", 0.1f);
 
-  reader.get("platforms", m_platforms);
+  reader.read("platforms", m_platforms);
   m_platforms = std::max(1, m_platforms);
 
   for (int i = 0; i < m_platforms; ++i) {
@@ -108,7 +108,7 @@ BicyclePlatform::BicyclePlatform(const ReaderMapping& reader) :
   }
 
   std::string path_ref;
-  if (reader.get("path-ref", path_ref))
+  if (reader.read("path-ref", path_ref))
   {
     d_sector->request_name_resolve(path_ref, [this](UID uid){
         if (!uid) {

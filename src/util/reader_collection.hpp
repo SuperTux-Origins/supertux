@@ -17,31 +17,9 @@
 #ifndef HEADER_SUPERTUX_UTIL_READER_COLLECTION_HPP
 #define HEADER_SUPERTUX_UTIL_READER_COLLECTION_HPP
 
-#include <vector>
+#include <prio/reader_collection.hpp>
 
-#include "util/reader_object.hpp"
-
-namespace sexp {
-class Value;
-} // namespace sexp
-
-class ReaderDocument;
-
-class ReaderCollection final
-{
-public:
-  /** sx should point to (section (objname (name value)...)...) */
-  ReaderCollection(const ReaderDocument& doc, const sexp::Value& sx);
-
-  std::vector<ReaderObject> get_objects() const;
-
-  const ReaderDocument& get_doc() const { return m_doc; }
-  const sexp::Value& get_sexp() const { return m_sx; }
-
-private:
-  const ReaderDocument& m_doc;
-  const sexp::Value& m_sx;
-};
+using ReaderCollection = prio::ReaderCollection;
 
 #endif
 

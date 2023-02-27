@@ -28,22 +28,22 @@ SurfacePtr
 Surface::from_reader(const ReaderMapping& mapping, const std::optional<Rect>& rect, const std::string& filename)
 {
   TexturePtr diffuse_texture;
-  std::optional<ReaderMapping> diffuse_texture_mapping;
-  if (mapping.get("diffuse-texture", diffuse_texture_mapping))
+  ReaderMapping diffuse_texture_mapping;
+  if (mapping.read("diffuse-texture", diffuse_texture_mapping))
   {
-    diffuse_texture = TextureManager::current()->get(*diffuse_texture_mapping, rect);
+    diffuse_texture = TextureManager::current()->get(diffuse_texture_mapping, rect);
   }
 
   TexturePtr displacement_texture;
-  std::optional<ReaderMapping> displacement_texture_mapping;
-  if (mapping.get("displacement-texture", displacement_texture_mapping))
+  ReaderMapping displacement_texture_mapping;
+  if (mapping.read("displacement-texture", displacement_texture_mapping))
   {
-    displacement_texture = TextureManager::current()->get(*displacement_texture_mapping, rect);
+    displacement_texture = TextureManager::current()->get(displacement_texture_mapping, rect);
   }
 
   Flip flip = NO_FLIP;
   std::vector<bool> flip_v;
-  if (mapping.get("flip", flip_v))
+  if (mapping.read("flip", flip_v))
   {
     flip ^= flip_v[0] ? HORIZONTAL_FLIP : NO_FLIP;
     flip ^= flip_v[1] ? VERTICAL_FLIP : NO_FLIP;

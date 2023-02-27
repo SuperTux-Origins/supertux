@@ -29,17 +29,17 @@ ParticleZone::ParticleZone(const ReaderMapping& reader) :
   m_type()
 {
   float w,h;
-  reader.get("x", m_col.m_bbox.get_left(), 0.0f);
-  reader.get("y", m_col.m_bbox.get_top(), 0.0f);
-  reader.get("width", w, 32.0f);
-  reader.get("height", h, 32.0f);
+  m_col.m_bbox.get_left() = reader.get("x", 0.0f);
+  m_col.m_bbox.get_top() = reader.get("y", 0.0f);
+  w = reader.get("width", 32.0f);
+  h = reader.get("height", 32.0f);
   m_col.m_bbox.set_size(w, h);
 
-  reader.get("enabled", m_enabled, true);
-  reader.get("particle-name", m_particle_name, "");
+  m_enabled = reader.get("enabled", true);
+  m_particle_name = reader.get("particle-name", std::string());
 
   std::string zone_type;
-  if (reader.get("zone-type", zone_type))
+  if (reader.read("zone-type", zone_type))
   {
     if (zone_type == "destroyer")
     {

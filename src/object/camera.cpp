@@ -111,21 +111,21 @@ public:
     {
       auto camconfig = root.get_mapping();
 
-      camconfig.get("xmode", xmode);
-      camconfig.get("ymode", ymode);
-      camconfig.get("target-x", target_x);
-      camconfig.get("target-y", target_y);
-      camconfig.get("max-speed-x", max_speed_x);
-      camconfig.get("max-speed-y", max_speed_y);
-      camconfig.get("dynamic-max-speed-x", dynamic_max_speed_x);
-      camconfig.get("dirchange-time", dirchange_time);
-      camconfig.get("clamp-x", clamp_x);
-      camconfig.get("clamp-y", clamp_y);
-      camconfig.get("kirby-rectsize-x", kirby_rectsize_x);
-      camconfig.get("kirby-rectsize-y", kirby_rectsize_y);
-      camconfig.get("edge-x", edge_x);
-      camconfig.get("sensitive-x", sensitive_x);
-      camconfig.get("dynamic-speed-sm", dynamic_speed_sm);
+      camconfig.read("xmode", xmode);
+      camconfig.read("ymode", ymode);
+      camconfig.read("target-x", target_x);
+      camconfig.read("target-y", target_y);
+      camconfig.read("max-speed-x", max_speed_x);
+      camconfig.read("max-speed-y", max_speed_y);
+      camconfig.read("dynamic-max-speed-x", dynamic_max_speed_x);
+      camconfig.read("dirchange-time", dirchange_time);
+      camconfig.read("clamp-x", clamp_x);
+      camconfig.read("clamp-y", clamp_y);
+      camconfig.read("kirby-rectsize-x", kirby_rectsize_x);
+      camconfig.read("kirby-rectsize-y", kirby_rectsize_y);
+      camconfig.read("edge-x", edge_x);
+      camconfig.read("sensitive-x", sensitive_x);
+      camconfig.read("dynamic-speed-sm", dynamic_speed_sm);
     }
   }
 };
@@ -195,7 +195,7 @@ Camera::Camera(const ReaderMapping& reader) :
 {
   std::string modename;
 
-  reader.get("mode", modename);
+  reader.read("mode", modename);
   if (modename == "normal")
   {
     m_mode = Mode::NORMAL;

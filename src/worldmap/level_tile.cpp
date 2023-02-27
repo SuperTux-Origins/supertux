@@ -43,23 +43,23 @@ LevelTile::LevelTile(const std::string& basedir, const ReaderMapping& mapping) :
   m_sprite(),
   m_title_color(WorldMap::level_title_color)
 {
-  if (!mapping.get("level", m_level_filename)) {
+  if (!mapping.read("level", m_level_filename)) {
     // Hack for backward compatibility with 0.5.x level
     m_level_filename = m_name;
   }
 
-  mapping.get("x", m_pos.x);
-  mapping.get("y", m_pos.y);
-  mapping.get("auto-play", m_auto_play);
+  mapping.read("x", m_pos.x);
+  mapping.read("y", m_pos.y);
+  mapping.read("auto-play", m_auto_play);
 
   std::string spritefile = "images/worldmap/common/leveldot.sprite";
-  mapping.get("sprite", spritefile);
+  mapping.read("sprite", spritefile);
   m_sprite = SpriteManager::current()->create(spritefile);
 
-  mapping.get("extro-script", m_extro_script);
+  mapping.read("extro-script", m_extro_script);
 
   std::vector<float> vColor;
-  if (mapping.get("color", vColor)) {
+  if (mapping.read("color", vColor)) {
     m_title_color = Color(vColor);
   }
 

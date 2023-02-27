@@ -48,7 +48,7 @@ Brick::Brick(const ReaderMapping& mapping, const std::string& spriteName) :
   m_breakable(),
   m_coin_counter(0)
 {
-  mapping.get("breakable", m_breakable, true);
+  m_breakable = mapping.get("breakable", true);
   if (!m_breakable) {
     m_coin_counter = 5;
   }

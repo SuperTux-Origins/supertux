@@ -38,8 +38,8 @@ RustyTrampoline::RustyTrampoline(const ReaderMapping& mapping) :
 {
   SoundManager::current()->preload(BOUNCE_SOUND);
 
-  mapping.get("counter", counter);
-  mapping.get("portable", portable); //do we really need this?
+  mapping.read("counter", counter);
+  mapping.read("portable", portable); //do we really need this?
 }
 
 void

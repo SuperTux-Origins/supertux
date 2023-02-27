@@ -19,7 +19,7 @@
 
 #include <string>
 
-class ReaderMapping;
+#include "util/reader_fwd.hpp"
 
 int reader_get_layer(const ReaderMapping& reader, int def);
 

@@ -21,9 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "util/reader_fwd.hpp"
 #include "video/surface_ptr.hpp"
-
-class ReaderMapping;
 
 class SpriteData final
 {

@@ -36,6 +36,7 @@
 #include "util/reader.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
+#include "util/reader_iterator.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 #include "video/surface_batch.hpp"
@@ -126,10 +127,9 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
   m_particle_offscreen_mode(),
   m_cover_screen(true)
 {
-  reader.get("main-texture", m_particle_main_texture, "/images/engine/editor/sparkle.png");
+  m_particle_main_texture = reader.get("main-texture", std::string("/images/engine/editor/sparkle.png"));
 
-  // FIXME: Is there a cleaner way to get a list of textures?
-  auto iter = reader.get_iter();
+  ReaderIterator iter(reader);
   while (iter.next())
   {
     if (iter.get_key() == "texture")
@@ -137,58 +137,58 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
       ReaderMapping mapping = iter.as_mapping();
 
       std::string tex;
-      if (!mapping.get("surface", tex))
+      if (!mapping.read("surface", tex))
       {
-        log_warning << "Texture without surface data ('surface') in " <<
-                 mapping.get_doc().get_filename() << ", skipping" << std::endl;
+        log_warning << "Texture without surface data ('surface') in "
+                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
         continue;
       }
 
       float color_r, color_g, color_b, color_a;
-      if (!mapping.get("color_r", color_r))
+      if (!mapping.read("color_r", color_r))
       {
-        log_warning << "Texture without red color field ('color_r') in " <<
-                 mapping.get_doc().get_filename() << ", skipping" << std::endl;
+        log_warning << "Texture without red color field ('color_r') in "
+                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
         continue;
       }
-      if (!mapping.get("color_g", color_g))
+      if (!mapping.read("color_g", color_g))
       {
-        log_warning << "Texture without green color field ('color_g') in " <<
-                 mapping.get_doc().get_filename() << ", skipping" << std::endl;
+        log_warning << "Texture without green color field ('color_g') in "
+                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
         continue;
       }
-      if (!mapping.get("color_b", color_b))
+      if (!mapping.read("color_b", color_b))
       {
-        log_warning << "Texture without blue color field ('color_b') in " <<
-                 mapping.get_doc().get_filename() << ", skipping" << std::endl;
+        log_warning << "Texture without blue color field ('color_b') in "
+                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
         continue;
       }
-      if (!mapping.get("color_a", color_a))
+      if (!mapping.read("color_a", color_a))
       {
-        log_warning << "Texture without alpha channel field ('color_a') in " <<
-                 mapping.get_doc().get_filename() << ", skipping" << std::endl;
+        log_warning << "Texture without alpha channel field ('color_a') in "
+                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
         continue;
       }
 
       float likeliness;
-      if (!mapping.get("likeliness", likeliness))
+      if (!mapping.read("likeliness", likeliness))
       {
-        log_warning << "Texture without likeliness field in " <<
-                 mapping.get_doc().get_filename() << ", skipping" << std::endl;
+        log_warning << "Texture without likeliness field in "
+                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
         continue;
       }
 
       float scale_x, scale_y;
-      if (!mapping.get("scale_x", scale_x))
+      if (!mapping.read("scale_x", scale_x))
       {
-        log_warning << "Texture without horizontal scale ('scale_x') field in " <<
-                 mapping.get_doc().get_filename() << ", skipping" << std::endl;
+        log_warning << "Texture without horizontal scale ('scale_x') field in "
+                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
         continue;
       }
-      if (!mapping.get("scale_y", scale_y))
+      if (!mapping.read("scale_y", scale_y))
       {
-        log_warning << "Texture without vertical scale ('scale_y') field in " <<
-                 mapping.get_doc().get_filename() << ", skipping" << std::endl;
+        log_warning << "Texture without vertical scale ('scale_y') field in "
+                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
         continue;
       }
 
@@ -200,36 +200,36 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
     }
   }
 
-  reader.get("amount", m_max_amount, 25);
-  reader.get("delay", m_delay, 0.1f);
-  reader.get("lifetime", m_particle_lifetime, 5.f);
-  reader.get("lifetime-variation", m_particle_lifetime_variation, 0.f);
-  reader.get("birth-time", m_particle_birth_time, 0.f);
-  reader.get("birth-time-variation", m_particle_birth_time_variation, 0.f);
-  reader.get("death-time", m_particle_death_time, 0.f);
-  reader.get("death-time-variation", m_particle_death_time_variation, 0.f);
+  m_max_amount = reader.get("amount", 25);
+  m_delay = reader.get("delay", 0.1f);
+  m_particle_lifetime = reader.get("lifetime", 5.f);
+  m_particle_lifetime_variation = reader.get("lifetime-variation", 0.f);
+  m_particle_birth_time = reader.get("birth-time", 0.f);
+  m_particle_birth_time_variation = reader.get("birth-time-variation", 0.f);
+  m_particle_death_time = reader.get("death-time", 0.f);
+  m_particle_death_time_variation = reader.get("death-time-variation", 0.f);
 
-  reader.get("speed-x", m_particle_speed_x, 0.f);
-  reader.get("speed-y", m_particle_speed_y, 0.f);
-  reader.get("speed-var-x", m_particle_speed_variation_x, 0.f);
-  reader.get("speed-var-y", m_particle_speed_variation_y, 0.f);
-  reader.get("acceleration-x", m_particle_acceleration_x, 0.f);
-  reader.get("acceleration-y", m_particle_acceleration_y, 0.f);
-  reader.get("friction-x", m_particle_friction_x, 0.f);
-  reader.get("friction-y", m_particle_friction_y, 0.f);
-  reader.get("feather-factor", m_particle_feather_factor, 0.f);
+  m_particle_speed_x = reader.get("speed-x", 0.f);
+  m_particle_speed_y = reader.get("speed-y", 0.f);
+  m_particle_speed_variation_x = reader.get("speed-var-x", 0.f);
+  m_particle_speed_variation_y = reader.get("speed-var-y", 0.f);
+  m_particle_acceleration_x = reader.get("acceleration-x", 0.f);
+  m_particle_acceleration_y = reader.get("acceleration-y", 0.f);
+  m_particle_friction_x = reader.get("friction-x", 0.f);
+  m_particle_friction_y = reader.get("friction-y", 0.f);
+  m_particle_feather_factor = reader.get("feather-factor", 0.f);
 
-  reader.get("rotation", m_particle_rotation, 0.f);
-  reader.get("rotation-variation", m_particle_rotation_variation, 0.f);
-  reader.get("rotation-speed", m_particle_rotation_speed, 0.f);
-  reader.get("rotation-speed-variation", m_particle_rotation_speed_variation, 0.f);
-  reader.get("rotation-acceleration", m_particle_rotation_acceleration, 0.f);
-  reader.get("rotation-decceleration", m_particle_rotation_decceleration, 0.f);
+  m_particle_rotation = reader.get("rotation", 0.f);
+  m_particle_rotation_variation = reader.get("rotation-variation", 0.f);
+  m_particle_rotation_speed = reader.get("rotation-speed", 0.f);
+  m_particle_rotation_speed_variation = reader.get("rotation-speed-variation", 0.f);
+  m_particle_rotation_acceleration = reader.get("rotation-acceleration", 0.f);
+  m_particle_rotation_decceleration = reader.get("rotation-decceleration", 0.f);
 
-  reader.get("cover-screen", m_cover_screen, true);
+  m_cover_screen = reader.get("cover-screen", true);
 
   std::string rotation_mode;
-  if (reader.get("rotation-mode", rotation_mode))
+  if (reader.read("rotation-mode", rotation_mode))
   {
     if (rotation_mode == "wiggling")
     {
@@ -250,7 +250,7 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
   }
 
   std::string birth_mode;
-  if (reader.get("birth-mode", birth_mode))
+  if (reader.read("birth-mode", birth_mode))
   {
     if (birth_mode == "shrink")
     {
@@ -271,7 +271,7 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
   }
 
   std::string death_mode;
-  if (reader.get("death-mode", death_mode))
+  if (reader.read("death-mode", death_mode))
   {
     if (death_mode == "shrink")
     {
@@ -292,7 +292,7 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
   }
 
   std::string birth_easing;
-  if (reader.get("birth-easing", birth_easing))
+  if (reader.read("birth-easing", birth_easing))
   {
     m_particle_birth_easing = EasingMode_from_string(birth_easing);
   }
@@ -302,7 +302,7 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
   }
 
   std::string death_easing;
-  if (reader.get("death-easing", death_easing))
+  if (reader.read("death-easing", death_easing))
   {
     m_particle_death_easing = EasingMode_from_string(death_easing);
   }
@@ -312,7 +312,7 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
   }
 
   std::string collision_mode;
-  if (reader.get("collision-mode", collision_mode))
+  if (reader.read("collision-mode", collision_mode))
   {
     if (collision_mode == "stick")
     {
@@ -349,7 +349,7 @@ CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
   }
 
   std::string offscreen_mode;
-  if (reader.get("offscreen-mode", offscreen_mode))
+  if (reader.read("offscreen-mode", offscreen_mode))
   {
     if (offscreen_mode == "always")
     {

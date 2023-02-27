@@ -31,8 +31,8 @@ SCrystallo::SCrystallo(const ReaderMapping& reader) :
 {
   walk_speed = 80;
   max_drop_height = 16;
-  reader.get("radius", m_radius, 100.0f);
-  reader.get("range", m_range, 250.0f);
+  m_radius = reader.get("radius", 100.0f);
+  m_range = reader.get("range", 250.0f);
   SoundManager::current()->preload("sounds/crystallo-pop.ogg");
 }
 

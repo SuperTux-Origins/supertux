@@ -22,8 +22,6 @@
 #include "supertux/game_object.hpp"
 #include "video/drawing_context.hpp"
 
-class ReaderMapping;
-
 class Gradient final :
   public GameObject,
   public ExposedObject<Gradient, scripting::Gradient>

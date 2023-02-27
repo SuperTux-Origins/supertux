@@ -34,9 +34,9 @@ SpawnPointMarker::SpawnPointMarker(const std::string& name, const Vector& pos) :
 SpawnPointMarker::SpawnPointMarker(const ReaderMapping& mapping) :
   m_surface(Surface::from_file("images/engine/editor/spawnpoint.png"))
 {
-  mapping.get("name", m_name, "");
-  mapping.get("x", m_col.m_bbox.get_left(), 0.0f);
-  mapping.get("y", m_col.m_bbox.get_top(), 0.0f);
+  m_name = mapping.get("name", std::string());
+  m_col.m_bbox.get_left() = mapping.get("x", 0.0f);
+  m_col.m_bbox.get_top() = mapping.get("y", 0.0f);
 
   m_col.m_bbox.set_size(32, 32);
   set_group(COLGROUP_DISABLED);

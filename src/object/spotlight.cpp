@@ -65,27 +65,27 @@ Spotlight::Spotlight(const ReaderMapping& mapping) :
 {
   m_col.m_group = COLGROUP_DISABLED;
 
-  mapping.get("x", m_col.m_bbox.get_left(), 0.0f);
-  mapping.get("y", m_col.m_bbox.get_top(), 0.0f);
+  m_col.m_bbox.get_left() = mapping.get("x", 0.0f);
+  m_col.m_bbox.get_top() = mapping.get("y", 0.0f);
   m_col.m_bbox.set_size(32, 32);
 
-  mapping.get("angle", angle, 0.0f);
-  mapping.get("speed", speed, 50.0f);
+  angle = mapping.get("angle", 0.0f);
+  speed = mapping.get("speed", 50.0f);
 
-  if (!mapping.get_custom("r-direction", m_direction, Direction_from_string))
+  if (!mapping.read("r-direction", m_direction, Direction_from_string))
   {
     // Retrocompatibility
     bool counter_clockwise;
-    mapping.get("counter-clockwise", counter_clockwise, false);
+    counter_clockwise = mapping.get("counter-clockwise", false);
     m_direction = counter_clockwise ? Direction::COUNTERCLOCKWISE : Direction::CLOCKWISE;
   }
 
   std::vector<float> vColor;
-  if ( mapping.get( "color", vColor ) ){
+  if ( mapping.read( "color", vColor ) ){
     color = Color( vColor );
   }
 
-  mapping.get("layer", m_layer, 0);
+  m_layer = mapping.get("layer", 0);
 }
 
 Spotlight::~Spotlight()

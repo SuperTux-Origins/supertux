@@ -61,12 +61,12 @@ TextScrollerScreen::TextScrollerScreen(const std::string& filename) :
     } else {
       auto text_mapping = root.get_mapping();
 
-      if (!text_mapping.get("background", background_file)) {
+      if (!text_mapping.read("background", background_file)) {
         throw std::runtime_error("File doesn't contain a background file");
       }
 
-      text_mapping.get("speed", m_defaultspeed);
-      text_mapping.get("music", m_music);
+      text_mapping.read("speed", m_defaultspeed);
+      text_mapping.read("music", m_music);
 
       m_text_scroller->set_default_speed(m_defaultspeed);
     }

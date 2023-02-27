@@ -21,8 +21,6 @@
 #include "scripting/clouds.hpp"
 #include "video/surface_ptr.hpp"
 
-class ReaderMapping;
-
 class CloudParticleSystem final :
   public ParticleSystem,
   public ExposedObject<CloudParticleSystem, scripting::Clouds>

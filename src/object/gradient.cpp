@@ -64,7 +64,7 @@ Gradient::Gradient(const ReaderMapping& reader) :
   m_layer = reader_get_layer (reader, LAYER_BACKGROUND0);
   std::vector<float> bkgd_top_color, bkgd_bottom_color;
   std::string direction;
-  if (reader.get("direction", direction))
+  if (reader.read("direction", direction))
   {
     if (direction == "horizontal")
     {
@@ -89,8 +89,8 @@ Gradient::Gradient(const ReaderMapping& reader) :
   }
   if (m_gradient_direction == HORIZONTAL || m_gradient_direction == HORIZONTAL_SECTOR)
   {
-    if (!reader.get("left_color", bkgd_top_color) ||
-       !reader.get("right_color", bkgd_bottom_color))
+    if (!reader.read("left_color", bkgd_top_color) ||
+       !reader.read("right_color", bkgd_bottom_color))
     {
       log_warning <<
         "Horizontal gradients should use left_color and right_color, respectively. "
@@ -104,20 +104,20 @@ Gradient::Gradient(const ReaderMapping& reader) :
     }
   }
 
-  if (reader.get("top_color", bkgd_top_color)) {
+  if (reader.read("top_color", bkgd_top_color)) {
     m_gradient_top = Color(bkgd_top_color);
   } else {
     m_gradient_top = Color(0.3f, 0.4f, 0.75f);
   }
 
-  if (reader.get("bottom_color", bkgd_bottom_color)) {
+  if (reader.read("bottom_color", bkgd_bottom_color)) {
     m_gradient_bottom = Color(bkgd_bottom_color);
   } else {
     m_gradient_bottom = Color(1, 1, 1);
   }
 
-  reader.get_custom("blend", m_blend, Blend_from_string);
-  reader.get_custom("target", m_target, DrawingTarget_from_string);
+  reader.read("blend", m_blend, Blend_from_string);
+  reader.read("target", m_target, DrawingTarget_from_string);
 }
 
 Gradient::~Gradient()

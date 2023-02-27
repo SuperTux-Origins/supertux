@@ -82,9 +82,9 @@ PneumaticPlatform::PneumaticPlatform(const ReaderMapping& mapping) :
   m_offset_y(0),
   m_children()
 {
-  mapping.get("x", m_pos.x);
-  mapping.get("y", m_pos.y);
-  mapping.get("sprite", m_sprite_name);
+  mapping.read("x", m_pos.x);
+  mapping.read("y", m_pos.y);
+  mapping.read("sprite", m_sprite_name);
 
   m_children.push_back(&d_sector->add<PneumaticPlatformChild>(mapping, true, *this));
   m_children.push_back(&d_sector->add<PneumaticPlatformChild>(mapping, false, *this));

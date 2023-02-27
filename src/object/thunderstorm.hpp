@@ -25,7 +25,6 @@
 #include "supertux/timer.hpp"
 
 class DrawingContext;
-class ReaderMapping;
 
 /** Thunderstorm scriptable GameObject; plays thunder, lightning and
     electrifies water at regular interval */

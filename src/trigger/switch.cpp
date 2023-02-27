@@ -39,14 +39,14 @@ Switch::Switch(const ReaderMapping& reader) :
   bistable(),
   m_flip(NO_FLIP)
 {
-  if (!reader.get("x", m_col.m_bbox.get_left())) throw std::runtime_error("no x position set");
-  if (!reader.get("y", m_col.m_bbox.get_top())) throw std::runtime_error("no y position set");
-  if (!reader.get("sprite", sprite_name)) sprite_name = "images/objects/switch/left.sprite";
+  if (!reader.read("x", m_col.m_bbox.get_left())) throw std::runtime_error("no x position set");
+  if (!reader.read("y", m_col.m_bbox.get_top())) throw std::runtime_error("no y position set");
+  if (!reader.read("sprite", sprite_name)) sprite_name = "images/objects/switch/left.sprite";
   sprite = SpriteManager::current()->create(sprite_name);
   m_col.m_bbox.set_size(sprite->get_current_hitbox_width(), sprite->get_current_hitbox_height());
 
-  reader.get("script", script);
-  bistable = reader.get("off-script", off_script);
+  reader.read("script", script);
+  bistable = reader.read("off-script", off_script);
 
   SoundManager::current()->preload( SWITCH_SOUND );
 }

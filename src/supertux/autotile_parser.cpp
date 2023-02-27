@@ -24,10 +24,11 @@
 
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
+#include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/reader_document.hpp"
+#include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/file_system.hpp"
 
 AutotileParser::AutotileParser(std::vector<AutotileSet*>* autotilesets, const std::string& filename) :
   m_autotilesets(autotilesets),
@@ -48,7 +49,7 @@ AutotileParser::parse()
     throw std::runtime_error("file is not a supertux autotile configuration file.");
   }
 
-  auto iter = root.get_mapping().get_iter();
+  ReaderIterator iter(root.get_mapping());
   while (iter.next())
   {
     if (iter.get_key() == "autotileset")
@@ -74,33 +75,24 @@ AutotileParser::parse_autotileset(const ReaderMapping& reader, bool corner)
   std::vector<Autotile*>* autotiles = new std::vector<Autotile*>();
 
   std::string name = "[unnamed]";
-  if (!reader.get("name", name))
+  if (!reader.read("name", name))
   {
     log_warning << "Unnamed autotileset parsed" << std::endl;
   }
 
-  uint32_t default_id = 0;
-  if (!reader.get("default", default_id))
+  int default_id = 0;
+  if (!reader.read("default", default_id))
   {
     log_warning << "No default tile for autotileset " << name << std::endl;
   }
 
-  auto iter = reader.get_iter();
-  while (iter.next())
+  ReaderMapping tile_mapping;
+  if (reader.read("autotile", tile_mapping))
   {
-    if (iter.get_key() == "autotile")
-    {
-      ReaderMapping tile_mapping = iter.as_mapping();
-      autotiles->push_back(parse_autotile(tile_mapping, corner));
-    }
-    else if (iter.get_key() != "name" && iter.get_key() != "default")
-    {
-      log_warning << "Unknown symbol '" << iter.get_key() << "' in autotile config file" << std::endl;
-    }
+    autotiles->push_back(parse_autotile(tile_mapping, corner));
   }
 
   AutotileSet* autotileset = new AutotileSet(*autotiles, default_id, name, corner);
-
   if (g_config->developer_mode)
   {
     autotileset->validate();
@@ -115,7 +107,7 @@ AutotileParser::parse_autotile(const ReaderMapping& reader, bool corner)
   std::vector<AutotileMask*> autotile_masks;
   std::vector<std::pair<uint32_t, float>> alt_ids;
 
-  uint32_t tile_id;
+  int tile_id;
   if (!reader.get("id", tile_id))
   {
     throw std::runtime_error("Missing 'id' parameter in autotileset config file.");
@@ -133,7 +125,7 @@ AutotileParser::parse_autotile(const ReaderMapping& reader, bool corner)
       throw std::runtime_error("'solid' parameter not needed for corner-based tiles in autotileset config file.");
   }
 
-  auto iter = reader.get_iter();
+  ReaderIterator iter(reader);
   while (iter.next())
   {
     if (iter.get_key() == "mask")

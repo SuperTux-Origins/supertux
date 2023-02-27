@@ -28,13 +28,13 @@
 
 #include "math/rect.hpp"
 #include "util/currenton.hpp"
+#include "util/reader_fwd.hpp"
 #include "video/sampler.hpp"
 #include "video/sdl_surface_ptr.hpp"
 #include "video/texture.hpp"
 #include "video/texture_ptr.hpp"
 
 class GLTexture;
-class ReaderMapping;
 struct SDL_Surface;
 
 class TextureManager final : public Currenton<TextureManager>

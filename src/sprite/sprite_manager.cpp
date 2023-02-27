@@ -60,7 +60,7 @@ SpriteManager::load(const std::string& filename)
         text << "(supertux-sprite (action "
              << "(name \"default\") "
              << "(images \"" << FileSystem::basename(filename) << "\")))";
-        return ReaderDocument::from_stream(text, filename);
+        return ReaderDocument::from_stream(text, prio::ErrorHandler::THROW, filename);
       }
     } catch(const std::exception& e) {
       std::ostringstream msg;

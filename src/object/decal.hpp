@@ -22,8 +22,6 @@
 #include "squirrel/exposed_object.hpp"
 #include "supertux/timer.hpp"
 
-class ReaderMapping;
-
 /** A decorative image, perhaps part of the terrain */
 class Decal final : public MovingSprite,
                     public ExposedObject<Decal, scripting::Decal>

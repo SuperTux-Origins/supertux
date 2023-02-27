@@ -24,10 +24,10 @@ InvisibleWall::InvisibleWall(const ReaderMapping& mapping):
   width(),
   height()
 {
-  mapping.get("x", m_col.m_bbox.get_left(), 0.0f);
-  mapping.get("y", m_col.m_bbox.get_top(), 0.0f);
-  mapping.get("width", width, 32.0f);
-  mapping.get("height", height, 32.0f);
+  m_col.m_bbox.get_left() = mapping.get("x", 0.0f);
+  m_col.m_bbox.get_top() = mapping.get("y", 0.0f);
+  width = mapping.get("width", 32.0f);
+  height = mapping.get("height", 32.0f);
 
   m_col.m_bbox.set_size(width, height);
 

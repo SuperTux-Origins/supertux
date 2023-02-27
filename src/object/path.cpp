@@ -79,44 +79,39 @@ Path::Path(const Vector& pos) :
 void
 Path::read(const ReaderMapping& reader)
 {
-  auto iter = reader.get_iter();
-
   m_mode = WalkMode::CIRCULAR;
-  while (iter.next()) {
-    if (iter.get_key() == "mode") {
-      std::string mode_string;
-      iter.get(mode_string);
-      m_mode = string_to_walk_mode(mode_string);
-    } else if (iter.get_key() == "adapt_speed") {
-      iter.get(m_adapt_speed);
-    } else if (iter.get_key() == "node") {
-      ReaderMapping node_mapping = iter.as_mapping();
 
-      // each new node will inherit all values from the last one
-      Node node;
-      node.time = 1;
-      node.speed = 0;
-      node.easing = EaseNone;
-      if (!node_mapping.get("x", node.position.x) ||
-          !node_mapping.get("y", node.position.y))
-        throw std::runtime_error("Path node without x and y coordinate specified");
-      if (!node_mapping.get("bezier_before_x", node.bezier_before.x) ||
-          !node_mapping.get("bezier_before_y", node.bezier_before.y))
-        node.bezier_before = node.position;
-      if (!node_mapping.get("bezier_after_x", node.bezier_after.x) ||
-          !node_mapping.get("bezier_after_y", node.bezier_after.y))
-        node.bezier_after = node.position;
-      node_mapping.get("time", node.time);
-      node_mapping.get("speed", node.speed);
-      node_mapping.get_custom("easing", node.easing, EasingMode_from_string);
+  std::string mode_string;
+  reader.read("mode", mode_string);
+  m_mode = string_to_walk_mode(mode_string);
 
-      if (node.time <= 0)
-        throw std::runtime_error("Path node with non-positive time");
+  reader.read("adapt_speed", m_adapt_speed);
 
-      m_nodes.push_back(node);
-    } else {
-      log_warning << "unknown token '" << iter.get_key() << "' in Path nodes list. Ignored." << std::endl;
-    }
+  ReaderMapping node_mapping;
+  if (reader.read("node", node_mapping))
+  {
+    // each new node will inherit all values from the last one
+    Node node;
+    node.time = 1;
+    node.speed = 0;
+    node.easing = EaseNone;
+    if (!node_mapping.get("x", node.position.x) ||
+        !node_mapping.get("y", node.position.y))
+      throw std::runtime_error("Path node without x and y coordinate specified");
+    if (!node_mapping.get("bezier_before_x", node.bezier_before.x) ||
+        !node_mapping.get("bezier_before_y", node.bezier_before.y))
+      node.bezier_before = node.position;
+    if (!node_mapping.get("bezier_after_x", node.bezier_after.x) ||
+        !node_mapping.get("bezier_after_y", node.bezier_after.y))
+      node.bezier_after = node.position;
+    node_mapping.read("time", node.time);
+    node_mapping.read("speed", node.speed);
+    node_mapping.read("easing", node.easing, EasingMode_from_string);
+
+    if (node.time <= 0)
+      throw std::runtime_error("Path node with non-positive time");
+
+    m_nodes.push_back(node);
   }
 
   if (m_nodes.empty())

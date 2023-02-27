@@ -33,11 +33,11 @@ Candle::Candle(const ReaderMapping& mapping) :
   candle_light_1(SpriteManager::current()->create("images/objects/candle/candle-light-1.sprite")),
   candle_light_2(SpriteManager::current()->create("images/objects/candle/candle-light-2.sprite"))
 {
-  mapping.get("burning", burning, true);
-  mapping.get("flicker", flicker, true);
+  burning = mapping.get("burning", true);
+  flicker = mapping.get("flicker", true);
   std::vector<float> vColor;
-  if (!mapping.get("color", vColor)) vColor = {1.0f, 1.0f, 1.0f};
-  mapping.get("layer", m_layer, 0);
+  if (!mapping.read("color", vColor)) vColor = {1.0f, 1.0f, 1.0f};
+  m_layer = mapping.get("layer", 0);
 
   //change the light color if defined
   if (vColor.size() >= 3) {

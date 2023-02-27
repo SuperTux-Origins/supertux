@@ -40,10 +40,10 @@ RubLight::RubLight(const ReaderMapping& mapping) :
   m_sprite->set_action("normal");
 
   std::vector<float> vColor;
-  if (mapping.get("color", vColor))
+  if (mapping.read("color", vColor))
     color = Color(vColor);
-  mapping.get("fading_speed", fading_speed);
-  mapping.get("strength_multiplier", strength_multiplier);
+  mapping.read("fading_speed", fading_speed);
+  mapping.read("strength_multiplier", strength_multiplier);
 }
 
 HitResponse

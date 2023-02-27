@@ -19,9 +19,10 @@
 
 #include "supertux/statistics.hpp"
 
-class ReaderMapping;
 class Sector;
 class Writer;
+
+#include "util/reader_fwd.hpp"
 
 /** Represents a collection of Sectors running in a single GameSession.
 

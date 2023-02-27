@@ -51,7 +51,7 @@ Stalactite::Stalactite(const ReaderMapping& mapping) :
   shake_delta(0.0f, 0.0f)
 {
   std::string type;
-  mapping.get("type", type, "");
+  type = mapping.get("type", std::string());
   try
   {
     m_type = StalactiteType_from_string(type);

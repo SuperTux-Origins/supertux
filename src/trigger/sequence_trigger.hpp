@@ -21,7 +21,6 @@
 #include "trigger/trigger_base.hpp"
 
 class Player;
-class ReaderMapping;
 
 class SequenceTrigger final : public TriggerBase
 {

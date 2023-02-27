@@ -30,22 +30,22 @@ SequenceTrigger::SequenceTrigger(const ReaderMapping& reader) :
   fade_tilemap(),
   fade()
 {
-  reader.get("x", m_col.m_bbox.get_left(), 0.0f);
-  reader.get("y", m_col.m_bbox.get_top(), 0.0f);
+  m_col.m_bbox.get_left() = reader.get("x", 0.0f);
+  m_col.m_bbox.get_top() = reader.get("y", 0.0f);
   float w, h;
-  reader.get("width", w, 32.0f);
-  reader.get("height", h, 32.0f);
+  w = reader.get("width", 32.0f);
+  h = reader.get("height", 32.0f);
   m_col.m_bbox.set_size(w, h);
   new_size.x = w;
   new_size.y = h;
   std::string sequence_name;
-  if (reader.get("sequence", sequence_name)) {
+  if (reader.read("sequence", sequence_name)) {
     sequence = string_to_sequence(sequence_name);
   }
 
-  reader.get("new_spawnpoint", new_spawnpoint);
-  reader.get("fade_tilemap", fade_tilemap);
-  reader.get("fade", reinterpret_cast<int&>(fade));
+  reader.read("new_spawnpoint", new_spawnpoint);
+  reader.read("fade_tilemap", fade_tilemap);
+  reader.read("fade", reinterpret_cast<int&>(fade));
 }
 
 SequenceTrigger::SequenceTrigger(const Vector& pos, const std::string& sequence_name) :
