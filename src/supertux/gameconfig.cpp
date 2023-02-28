@@ -186,39 +186,6 @@ Config::load()
     }
   }
 
-  // menu colors
-
-#ifdef FIXME_READER_ITERATOR
-  std::vector<float> menubackcolor_, menufrontcolor_, menuhelpbackcolor_, menuhelpfrontcolor_,
-    labeltextcolor_, activetextcolor_, hlcolor_, editorcolor_, editorhovercolor_, editorgrabcolor_;
-
-  ReaderMapping interface_colors_mapping;
-  if (config_mapping.read("interface_colors", interface_colors_mapping))
-  {
-    interface_colors_mapping->get("menubackcolor", menubackcolor_, ColorScheme::Menu::back_color.toVector());
-    interface_colors_mapping->get("menufrontcolor", menufrontcolor_, ColorScheme::Menu::front_color.toVector());
-    interface_colors_mapping->get("menuhelpbackcolor", menuhelpbackcolor_, ColorScheme::Menu::help_back_color.toVector());
-    interface_colors_mapping->get("menuhelpfrontcolor", menuhelpfrontcolor_, ColorScheme::Menu::help_back_color.toVector());
-    interface_colors_mapping->get("labeltextcolor", labeltextcolor_, ColorScheme::Menu::label_color.toVector());
-    interface_colors_mapping->get("activetextkcolor", activetextcolor_, ColorScheme::Menu::active_color.toVector());
-    interface_colors_mapping->get("hlcolor", hlcolor_, ColorScheme::Menu::hl_color.toVector());
-    interface_colors_mapping->get("editorcolor", editorcolor_, ColorScheme::Editor::default_color.toVector());
-    interface_colors_mapping->get("editorhovercolor", editorhovercolor_, ColorScheme::Editor::hover_color.toVector());
-    interface_colors_mapping->get("editorgrabcolor", editorgrabcolor_, ColorScheme::Editor::grab_color.toVector());
-    menubackcolor = Color(menubackcolor_);
-    menufrontcolor = Color(menufrontcolor_);
-    menuhelpbackcolor = Color(menuhelpbackcolor_);
-    menuhelpfrontcolor = Color(menuhelpfrontcolor_);
-    labeltextcolor = Color(labeltextcolor_);
-    activetextcolor = Color(activetextcolor_);
-    hlcolor = Color(hlcolor_);
-    editorcolor = Color(editorcolor_);
-    editorhovercolor = Color(editorhovercolor_);
-    editorgrabcolor = Color(editorgrabcolor_);
-    interface_colors_mapping->get("menuroundness", menuroundness, 16.f);
-  }
-#endif
-
   // Compatibility; will be overwritten by the "editor" category
   config_mapping.read("editor_autosave_frequency", editor_autosave_frequency);
 
