@@ -4,7 +4,7 @@
   (music "music/credits.music")
   (speed 60)
   (content
-    (image "images/engine/menu/logo.png")
+    (image (file "images/engine/menu/logo.png"))
     (blank)
     (blank)
     (blank)
