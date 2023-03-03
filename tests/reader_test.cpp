@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 
+#include <prio/reader_error.hpp>
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -27,7 +28,7 @@ TEST(ReaderTest, get)
     "   (myint 123456789)\r\n"
     "   (myfloat 1.125)\n\r"
     "   (mystring \"Hello World\")\n"
-    "   (mystringtrans (_ \"Hello World\"))\n"
+    "   (mystringtrans \"Hello World\")\n"
     "   (myboolarray #t #f #t #f)\n"
     "   (myintarray 5 4 3 2 1 0)\n"
     "   (myfloatarray 6.5 5.25 4.125 3.0625 2.0 1.0 0.5 0.25 0.125)\n"
@@ -43,99 +44,97 @@ TEST(ReaderTest, get)
 
   {
     bool mybool;
-    mapping.get("mybool", mybool);
+    mapping.read("mybool", mybool);
     ASSERT_EQ(true, mybool);
   }
 
   {
     int myint;
-    mapping.get("myint", myint);
+    mapping.read("myint", myint);
     ASSERT_EQ(123456789, myint);
   }
 
   {
     float myfloat;
-    mapping.get("myfloat", myfloat);
+    mapping.read("myfloat", myfloat);
     ASSERT_EQ(1.125, myfloat);
   }
 
   {
     std::string mystring;
-    mapping.get("mystring", mystring);
+    mapping.read("mystring", mystring);
     ASSERT_EQ("Hello World", mystring);
   }
 
   {
     std::string mystringtrans;
-    mapping.get("mystringtrans", mystringtrans);
+    mapping.read("mystringtrans", mystringtrans);
     ASSERT_EQ("Hello World", mystringtrans);
   }
 
   {
     std::vector<bool> expected{ true, false, true, false };
     std::vector<bool> result;
-    mapping.get("myboolarray", result);
+    mapping.read("myboolarray", result);
     ASSERT_EQ(expected, result);
   }
 
   {
     std::vector<int> expected{ 5, 4, 3, 2, 1, 0 };
     std::vector<int> result;
-    mapping.get("myintarray", result);
+    mapping.read("myintarray", result);
     ASSERT_EQ(expected, result);
   }
 
   {
     std::vector<float> expected({6.5f, 5.25f, 4.125f, 3.0625f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f});
     std::vector<float> result;
-    mapping.get("myfloatarray", result);
+    mapping.read("myfloatarray", result);
     ASSERT_EQ(expected, result);
   }
 
   {
     std::vector<std::string> expected{"One", "Two", "Three"};
     std::vector<std::string> result;
-    mapping.get("mystringarray", result);
+    mapping.read("mystringarray", result);
     ASSERT_EQ(expected, result);
   }
 
   {
-    std::optional<ReaderMapping> child_mapping;
-    mapping.get("mymapping", child_mapping);
+    ReaderMapping child_mapping;
+    mapping.read("mymapping", child_mapping);
 
     int a;
-    child_mapping->get("a", a);
+    child_mapping.read("a", a);
     ASSERT_EQ(1, a);
 
     int b;
-    child_mapping->get("b", b);
+    child_mapping.read("b", b);
     ASSERT_EQ(2, b);
   }
 
   {
-    auto from_string = [](const std::string& text){ return std::stoi(text); };
+    enum class MyEnum { ONE, TWO, THREE };
 
-    int value = 0;
-    mapping.get_custom("mycustom", value, from_string);
-    ASSERT_EQ(1234, value);
+    auto from_string = [](const std::string& text){ return MyEnum::TWO; };
 
-    int value2 = 0;
-    mapping.get_custom("does-not-exist", value2, from_string);
-    ASSERT_EQ(0, value2);
+    MyEnum value = MyEnum::ONE;
+    mapping.read("mycustom", value, from_string);
+    ASSERT_EQ(MyEnum::TWO, value);
 
-    int value3 = 0;
-    mapping.get_custom("does-not-exist", value3, from_string, 4321);
-    ASSERT_EQ(4321, value3);
+    MyEnum value2 = MyEnum::THREE;
+    mapping.read("does-not-exist", value2, from_string);
+    ASSERT_EQ(MyEnum::THREE, value2);
   }
 
   {
     bool mybool;
     int myint;
     float myfloat;
-    ASSERT_THROW({mapping.get("mybool", myfloat);}, std::runtime_error);
-    ASSERT_THROW({mapping.get("myint", mybool);}, std::runtime_error);
-    ASSERT_THROW({mapping.get("myfloat", myint);}, std::runtime_error);
-    ASSERT_THROW({mapping.get("mymapping", myint);}, std::runtime_error);
+    ASSERT_THROW({mapping.must_read("mybool", myfloat);}, prio::ReaderError);
+    ASSERT_THROW({mapping.must_read("myint", mybool);}, prio::ReaderError);
+    ASSERT_THROW({mapping.must_read("myfloat", myint);}, prio::ReaderError);
+    ASSERT_THROW({mapping.must_read("mymapping", myint);}, prio::ReaderError);
   }
 }
 
@@ -148,7 +147,7 @@ TEST(ReaderTest, syntax_error)
     "   (myfloat 1.125 err)\n\r"
     "   (mystring \"Hello World\" err)\n"
     "   (mystringtrans (_ \"Hello World\" err))\n"
-    "   (mymapping err (a 1) (b 2))\n"
+    "   (mymapping (a 1) err (b 2))\n"
     ")\n");
 
   auto doc = ReaderDocument::from_stream(in);
@@ -159,14 +158,12 @@ TEST(ReaderTest, syntax_error)
   bool mybool;
   int myint;
   float myfloat;
-  std::optional<ReaderMapping> mymapping;
-  ASSERT_THROW({mapping.get("mybool", mybool);}, std::runtime_error);
-  ASSERT_THROW({mapping.get("myint", myint);}, std::runtime_error);
-  ASSERT_THROW({mapping.get("myfloat", myfloat);}, std::runtime_error);
+  ASSERT_THROW({mapping.read("mybool", mybool);}, prio::ReaderError);
+  ASSERT_THROW({mapping.read("myint", myint);}, prio::ReaderError);
+  ASSERT_THROW({mapping.read("myfloat", myfloat);}, prio::ReaderError);
 
-  mapping.get("mymapping", mymapping);
-  ASSERT_THROW({mymapping->get("a", myint);}, std::runtime_error);
-  ASSERT_THROW({mymapping->get("b", myint);}, std::runtime_error);
+  ReaderMapping mymapping;
+  ASSERT_THROW({mapping.read("mymapping", mymapping);}, prio::ReaderError);
 }
 
 /* EOF */
