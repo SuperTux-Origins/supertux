@@ -1,4 +1,4 @@
-# SuperTux
+# SuperTux Origins
 
 SuperTux is a jump'n'run game with strong inspiration from the
 Super Mario Bros. games for the various Nintendo platforms.
@@ -9,36 +9,42 @@ power-ups and other stuff on the way.
 
 ![Screenshot](https://www.supertux.org/images/0_6_0/0_6_0_3.png)
 
+## Origins Fork
 
-## Story: Penny gets captured!
+SuperTux Origins is a fork of the SuperTux project with the goal to
+bring the project back down to more managable levels and get the game
+finished. This means cutting out a lot of cruft:
 
-Tux and Penny were out having a nice picnic on the ice fields of
-Antarctica. Suddenly, a creature jumped from behind an ice bush, there
-was a flash, and Tux fell asleep!
+* reversal of unnecessary graphic updates
+* removal of addon and mod support
+* removal of the build in level editor
+* removal of OpenGL2 and SDL support
+* removal of Discord integration
+* removal of translation support
+* removal of Github CI
+* removal of unnecessary libraries (glbindings, ...)
+* removal of unnecessary or low quality tileset, badguys and game objects
+* removal of unnecessary powerups and actions (flowers, swimming)
+* removal or cleanup of old levels (most of forest world might get cut/rebuild)
+* focus on turning it back into a plain old jump'n run game, without convoluted puzzles or cutscenes
+* focus on Linux/NixOS as the main target, abandonment of most ports
 
-When Tux wakes up, he finds that Penny is missing. Where she lay
-before now lies a letter:
->Tux, my arch enemy! I have captured your beautiful Penny and have
->taken her to my fortress. The path to my fortress is littered with my
->minions. Give up on the thought of trying to reclaim her, you haven't
->got a chance!
->
->-Nolok
-
-Tux looks and sees Nolok's fortress in the distance. Determined to
-save his beloved Penny, he begins his journey.
+Some of the removed features might make it back eventually, but only
+after the main game is in a more presentable state. No point in having
+mod support when all it does is constantly break and bring development
+to a crawl.
 
 ## Installation
 
-For major platforms, stable releases are built and available for download from
-[supertux.org](https://www.supertux.org/download.html) or alternatively directly
-from [GitHub](https://github.com/SuperTux/supertux/releases). You should be able
-to install these using default tools provided by your platform. On macOS, when
-Gatekeeper is enabled (default) it will refuse to open SuperTux. This is due to
-the lack of a signature on the application. If you wish to open SuperTux anyway
-without disabling the Gatekeeper feature entirely, you can open the application
-from the context menu (control click on the icon). macOS will then remember your
-choice the next time.
+[Nix](https://nixos.org/download.html) is the only officially
+supported platform, meaning it can work on most Linux distributions
+via the Nix packgae manager. To run the game:
+
+    nix run github:supertux-origins/supertux
+
+To install the game:
+
+    nix profile install github:supertux-origins/supertux
 
 ## Documentation
 
@@ -70,12 +76,3 @@ arrow keys or the mouse.
 
 In the worldmap, the arrow keys are used to navigate and Enter to
 enter the current level.
-
-## Development status
-
-As of now, with the release of SuperTux 0.6.3 (December 2021), the Forest World is almost
-finished, since the ghost forest section has been included. However, some levels, especially
-the Ghostree Level, are considered to be placeholders, because for the next version (0.7.0) a
-great overhaul is planned with new features like reworked boss fights, graphics, and worlds.
-If you have some Constructive Feedback, Contributions or ideas to share, don't hestitate
-to contact us with one of the possibilities given above.
