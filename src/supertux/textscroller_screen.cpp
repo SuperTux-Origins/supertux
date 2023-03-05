@@ -51,7 +51,7 @@ TextScrollerScreen::TextScrollerScreen(const std::string& filename) :
   std::string background_file;
 
   try {
-    auto doc = ReaderDocument::from_file(filename);
+    auto doc = load_reader_document(filename);
     auto root = doc.get_root();
 
     m_text_scroller = std::make_unique<TextScroller>(root);

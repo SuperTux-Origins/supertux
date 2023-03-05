@@ -42,7 +42,7 @@ AutotileParser::parse()
 {
   m_tiles_path = FileSystem::dirname(m_filename);
 
-  auto doc = ReaderDocument::from_file(m_filename);
+  auto doc = load_reader_document(m_filename);
   auto root = doc.get_root();
 
   if (root.get_name() != "supertux-autotiles") {

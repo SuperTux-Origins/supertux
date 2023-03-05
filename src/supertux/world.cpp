@@ -38,7 +38,7 @@ World::from_directory(const std::string& directory)
 
   try
   {
-    auto doc = ReaderDocument::from_file(info_filename);
+    auto doc = load_reader_document(info_filename);
     auto root = doc.get_root();
 
     if (root.get_name() != "supertux-world" &&

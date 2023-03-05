@@ -110,7 +110,7 @@ TextScroller::TextScroller(const ReaderObject& root) :
 void
 TextScroller::parse_file(const std::string& filename)
 {
-  auto doc = ReaderDocument::from_file(filename);
+  auto doc = load_reader_document(filename);
   auto root = doc.get_root();
   parse_root(root);
 }

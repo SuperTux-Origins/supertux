@@ -33,7 +33,7 @@ LevelParser::get_level_name(const std::string& filename)
 {
   try
   {
-    auto doc = ReaderDocument::from_file(filename);
+    auto doc = load_reader_document(filename);
     auto root = doc.get_root();
 
     if (root.get_name() != "supertux-level") {
@@ -133,7 +133,7 @@ LevelParser::load(const std::string& filepath)
 {
   m_level.m_filename = filepath;
   try {
-    auto doc = ReaderDocument::from_file(filepath);
+    auto doc = load_reader_document(filepath);
     load(doc);
   } catch(std::exception& e) {
     std::stringstream msg;

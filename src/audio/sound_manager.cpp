@@ -138,10 +138,10 @@ struct MusicFile
 ReaderDocument doc_from_file_fallback(std::string& filename)
 {
   try {
-    return ReaderDocument::from_file(filename);
+    return load_reader_document(filename);
   } catch(const std::exception&) {
     filename = get_fallback_path(filename);
-    return ReaderDocument::from_file(filename);
+    return load_reader_document(filename);
   }
 }
 

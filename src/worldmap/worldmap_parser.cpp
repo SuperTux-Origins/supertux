@@ -56,7 +56,7 @@ WorldMapParser::load_worldmap(const std::string& filename)
   m_worldmap.m_levels_path = FileSystem::dirname(m_worldmap.m_map_filename);
 
   try {
-    auto doc = ReaderDocument::from_file(m_worldmap.m_map_filename);
+    auto doc = load_reader_document(m_worldmap.m_map_filename);
     auto root = doc.get_root();
 
     if (root.get_name() != "supertux-level")
@@ -188,7 +188,7 @@ WorldMapParser::load_level_information(LevelTile& level)
       return;
     }
 
-    auto doc = ReaderDocument::from_file(filename);
+    auto doc = load_reader_document(filename);
     auto root = doc.get_root();
     if (root.get_name() != "supertux-level") {
       return;

@@ -49,7 +49,7 @@ CustomParticleSystemFile::update_data()
 {
   try
   {
-    auto doc = ReaderDocument::from_file("particles/" + ((m_filename == "") ? "default.stcp" : m_filename));
+    auto doc = load_reader_document("particles/" + ((m_filename == "") ? "default.stcp" : m_filename));
     auto root = doc.get_root();
     auto mapping = root.get_mapping();
 

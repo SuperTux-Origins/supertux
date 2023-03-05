@@ -74,7 +74,7 @@ WorldSelect::WorldSelect(const std::string& current_world_filename) :
       wm.filename = world;
       wm.unlocked = unlocked;
 
-      ReaderDocument doc = ReaderDocument::from_file(world);
+      ReaderDocument doc = load_reader_document(world);
       if (!doc.get_root().get_mapping().read("name", wm.name))
       {
         log_warning << "No name for worldmap " << world << std::endl;

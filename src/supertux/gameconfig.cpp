@@ -122,7 +122,7 @@ Config::load()
   }, 0); // EM_ASM is a variadic macro and Clang requires at least 1 value for the variadic argument
 #endif
 
-  auto doc = ReaderDocument::from_file("config");
+  auto doc = load_reader_document("config");
   auto root = doc.get_root();
   if (root.get_name() != "supertux-config")
   {

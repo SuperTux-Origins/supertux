@@ -19,7 +19,16 @@
 
 #include <prio/reader_document.hpp>
 
+#include "physfs/ifile_stream.hpp"
+
 using prio::ReaderDocument;
+
+inline
+prio::ReaderDocument load_reader_document(std::string const& filename)
+{
+  IFileStream stream(filename);
+  return prio::ReaderDocument::from_stream(prio::Format::SEXPR, stream, prio::ErrorHandler::THROW, filename);
+}
 
 #endif
 

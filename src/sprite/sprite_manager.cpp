@@ -54,7 +54,7 @@ SpriteManager::load(const std::string& filename)
   ReaderDocument doc = [filename](){
     try {
       if (filename.ends_with(".sprite")) {
-        return ReaderDocument::from_file(filename);
+        return load_reader_document(filename);
       } else {
         std::stringstream text;
         text << "(supertux-sprite (action "
