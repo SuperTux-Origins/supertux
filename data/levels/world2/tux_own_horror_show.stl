@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Tux' Own Horror Show"))
+  (name "Tux' Own Horror Show")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (sector
@@ -944,7 +944,7 @@
       (y 592.0996)
     )
     (infoblock
-      (message (_ "#Will o' Wisps are small, annoying ghosts, which transport you to different, often dangerous places."))
+      (message "#Will o' Wisps are small, annoying ghosts, which transport you to different, often dangerous places.")
       (x 4128)
       (y 832)
     )

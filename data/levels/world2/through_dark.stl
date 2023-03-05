@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Through the Dark"))
+  (name "Through the Dark")
   (author "Carsten Wirtz")
   (license "GPL 2 / CC-by-sa 3.0")
   (target-time 135)
@@ -93,10 +93,10 @@
       (y 192)
     )
     (infoblock
-      (message (_ "-Earth Flower
+      (message "-Earth Flower
 !images/powerups/earthflower/earth_flower-1.png
 #The earth flower gives Tux the ability to turn into stone by pressing the ACTION Key and the DOWN Key at the same time.
-#This does not work while jumping or falling!"))
+#This does not work while jumping or falling!")
       (x 2336)
       (y 736)
     )
@@ -358,7 +358,7 @@ light1.set_burning(true);
 light2.set_burning(true);
 light3.set_burning(true);
 light4.set_burning(true);")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 384)
       (height 256)
       (x 11712)

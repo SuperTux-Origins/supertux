@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Lost Village"))
+  (name "Lost Village")
   (author "Wolfgang Becker & alex")
   (license "GPL 2+ / CC-by-sa 3.0")
   (sector
@@ -182,7 +182,7 @@
       (y 510.6554)
     )
     (infoblock
-      (message (_ "#Don't forget to hit the switch!"))
+      (message "#Don't forget to hit the switch!")
       (x 3712)
       (y 480)
     )

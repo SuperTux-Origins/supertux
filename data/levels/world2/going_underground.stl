@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Going Underground"))
+  (name "Going Underground")
   (author "Carsten Wirtz")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 53)
@@ -243,7 +243,7 @@
     )
     (secretarea
       (fade-tilemap "secret1")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 768)
       (height 96)
       (x 1568)
@@ -1246,7 +1246,7 @@
       (y 0)
     )
     (secretarea
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 128)
       (height 128)
       (x 1024)

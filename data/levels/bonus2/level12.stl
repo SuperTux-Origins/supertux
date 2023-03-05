@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Blind To The World"))
+  (name "Blind To The World")
   (author "Daniel Alston")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 100)

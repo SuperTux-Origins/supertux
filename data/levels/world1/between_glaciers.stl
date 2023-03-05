@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Between Two Glaciers"))
+  (name "Between Two Glaciers")
   (author "Carsten Wirtz")
   (license "CC-BY-SA 4.0 International")
   (target-time 80)
@@ -105,10 +105,10 @@
       (bottom_color 0.8 0.9 1)
     )
     (infoblock
-      (message (_ "-Crystals
+      (message "-Crystals
 #This level contains four coloured crystals. Can you find them?
 #
-#Note: These crystals do not serve any purpose at the moment but they might will in a future release of the game."))
+#Note: These crystals do not serve any purpose at the moment but they might will in a future release of the game.")
       (x 320)
       (y 416)
     )
@@ -852,7 +852,7 @@ lift2.start_moving();")
     )
     (secretarea
       (fade-tilemap "secret2")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 192)
       (height 192)
       (x 9792)
@@ -860,7 +860,7 @@ lift2.start_moving();")
     )
     (secretarea
       (fade-tilemap "secret1")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 128)
       (height 128)
       (x 128)

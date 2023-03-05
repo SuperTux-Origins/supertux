@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Welcome to Antarctica"))
+  (name "Welcome to Antarctica")
   (author "SuperTux Team")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 30)
@@ -36,52 +36,52 @@
       (bottom_color 1 1 1)
     )
     (infoblock
-      (message (_ "-Bonus Blocks
+      (message "-Bonus Blocks
 !images/objects/bonus_block/full-0.png
 #Bonus blocks can contain coins, power-ups or special items to help you in your quest.
 #
-#Hit them from below to get at their contents."))
+#Hit them from below to get at their contents.")
       (x 384)
       (y 480)
     )
     (infoblock
-      (message (_ "-Eggs
+      (message "-Eggs
 !images/powerups/egg/egg-shade.png
-#The egg makes Tux grow larger. Tux can then smash wooden blocks with his head."))
+#The egg makes Tux grow larger. Tux can then smash wooden blocks with his head.")
       (x 1344)
       (y 480)
     )
     (infoblock
-      (message (_ "-Checkpoints
+      (message "-Checkpoints
 !images/objects/resetpoints/bell-m.png
-#Activate the checkpoint. If you die, you can retry the level from here. Every time you retry from a checkpoint, you will lose 10 percent of your coins (at least 25 coins)."))
+#Activate the checkpoint. If you die, you can retry the level from here. Every time you retry from a checkpoint, you will lose 10 percent of your coins (at least 25 coins).")
       (x 5360)
       (y 384)
     )
     (infoblock
-      (message (_ "-Running
+      (message "-Running
 !images/tiles/signs/run.png
-#The path in front of you is blocked. Gain some speed before jumping to pass over the blocks."))
+#The path in front of you is blocked. Gain some speed before jumping to pass over the blocks.")
       (x 7648)
       (y 480)
     )
     (infoblock
-      (message (_ "-Fire Flower
+      (message "-Fire Flower
 !images/powerups/fireflower/fire_flower-0.png
-#The fire flower gives Tux the ability to shoot fireballs."))
+#The fire flower gives Tux the ability to shoot fireballs.")
       (x 3904)
       (y 352)
     )
     (infoblock
-      (message (_ "-Tux Doll
+      (message "-Tux Doll
 !images/powerups/1up/1up.png
-#The Tux doll gives Tux 100 coins."))
+#The Tux doll gives Tux 100 coins.")
       (x 4672)
       (y 352)
     )
     (infoblock
-      (message (_ "-Secret Areas
-#Many levels contain secret areas behind what seems to be plain walls. Look for clues to find them."))
+      (message "-Secret Areas
+#Many levels contain secret areas behind what seems to be plain walls. Look for clues to find them.")
       (x 8192)
       (y 480)
     )

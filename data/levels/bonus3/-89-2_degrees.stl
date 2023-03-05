@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "The Level Formely Known As \"-89,2 Degrees\""))
+  (name "The Level Formely Known As \"-89,2 Degrees\"")
   (author "Tore Bergebakken")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 55)

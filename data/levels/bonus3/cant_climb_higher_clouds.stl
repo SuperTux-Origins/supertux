@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "You can't climb higher than the clouds..."))
+  (name "You can't climb higher than the clouds...")
   (author "Tore Bergebakken")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 30)

@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Tip Of The Iceberg"))
+  (name "Tip Of The Iceberg")
   (author "SuperTux Team")
   (license "GPL 2+ / CC-by-sa 3.0")
   (icon "")

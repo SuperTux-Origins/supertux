@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Coconut Fortress"))
+  (name "Coconut Fortress")
   (author "Anja")
   (target-time 120)
   (icon "")

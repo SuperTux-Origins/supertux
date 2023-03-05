@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Icy Island"))
+  (name "Icy Island")
   (author "Carsten Wirtz")
   (contact "https://supertux.org")
   (license "CC-BY-SA 4.0 International")
@@ -186,7 +186,7 @@ state.ambient_b <- 0.7;")
       (y 73)
     )
     (special-tile
-      (map-message (_ "You found a secret area!"))
+      (map-message "You found a secret area!")
       (invisible-tile #t)
       (passive-message #t)
       (apply-to-direction "east")

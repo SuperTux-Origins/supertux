@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Antarctica 1"))
+  (name "Antarctica 1")
   (author "Bill Kendrick")
   (license "CC-BY-SA 4.0 International")
   (target-time 39)

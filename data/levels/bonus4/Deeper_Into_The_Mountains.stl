@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Deeper Into The Mountains"))
+  (name "Deeper Into The Mountains")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (sector

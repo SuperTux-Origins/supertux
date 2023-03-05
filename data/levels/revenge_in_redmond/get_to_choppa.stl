@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Get to da Choppa!"))
+  (name "Get to da Choppa!")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (target-time 49)

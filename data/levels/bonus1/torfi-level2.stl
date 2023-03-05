@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Too easy"))
+  (name "Too easy")
   (author "Torfi Gunnarsson")
   (license "GPL 2+ / CC-by-sa 3.0")
   (sector
@@ -53,7 +53,7 @@
       (bottom_color 1 1 1)
     )
     (infoblock
-      (message (_ "#All these levels were upgraded for milestone 2 by Hume."))
+      (message "#All these levels were upgraded for milestone 2 by Hume.")
       (x 6976)
       (y 608)
     )

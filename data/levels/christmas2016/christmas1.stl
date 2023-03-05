@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Ready for Christmas"))
+  (name "Ready for Christmas")
   (author "Carsten Wirtz")
   (license "GPL 2+ / CC-by-sa 3.0")
   (sector

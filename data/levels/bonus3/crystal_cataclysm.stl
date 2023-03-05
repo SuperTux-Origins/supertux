@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Crystal Cataclysm"))
+  (name "Crystal Cataclysm")
   (author "lazure")
   (license "GPL 3+/CC-BY-SA 3.0")
   (target-time 90)

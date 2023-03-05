@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "I Spy With My Little Eye"))
+  (name "I Spy With My Little Eye")
   (author "Daniel")
   (license "GPL 2+ / CC-by-sa 3.0")
   (sector
@@ -215,8 +215,8 @@
       (y 896)
     )
     (infoblock
-      (message (_ "-Ispy
-#Ispys will activate things like platforms whenever Tux is in their sight."))
+      (message "-Ispy
+#Ispys will activate things like platforms whenever Tux is in their sight.")
       (x 1920)
       (y 1120)
     )
@@ -671,7 +671,7 @@ updown2.start_moving();")
     )
     (secretarea
       (fade-tilemap "secret1")
-      (message (_ "Hint: Use snails to break blocks!"))
+      (message "Hint: Use snails to break blocks!")
       (width 976)
       (height 128)
       (x 7888)

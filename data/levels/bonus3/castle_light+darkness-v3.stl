@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Castle of Light and Darkness"))
+  (name "Castle of Light and Darkness")
   (author "Tore Bergebakken")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 80)

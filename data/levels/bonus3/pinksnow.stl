@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Pink Snow"))
+  (name "Pink Snow")
   (author "Stuart Rynn")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 40)

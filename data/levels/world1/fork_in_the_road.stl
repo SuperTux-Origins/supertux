@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "A Fork in the Road"))
+  (name "A Fork in the Road")
   (author "SuperTux Team")
   (license "GPL 2 / CC-by-sa 3.0")
   (target-time 55)
@@ -63,31 +63,31 @@
       (y 896)
     )
     (infoblock
-      (message (_ "-Switches
+      (message "-Switches
 !images/objects/switch/switch-0.png
 !images/objects/pushbutton/pushbutton-0.png
 #Switches can be used to do all manner of things. Press the UP key to use a switch.
-#There are also buttons that you can press by jumping on them."))
+#There are also buttons that you can press by jumping on them.")
       (x 4960)
       (y 768)
     )
     (infoblock
-      (message (_ "-Trampolines
+      (message "-Trampolines
 !images/objects/trampoline/trampoline2-0.png
-#Trampolines allow Tux to jump to new heights. Hold down the JUMP key while bouncing on the trampoline to launch extra high."))
+#Trampolines allow Tux to jump to new heights. Hold down the JUMP key while bouncing on the trampoline to launch extra high.")
       (x 8320)
       (y 640)
     )
     (infoblock
-      (message (_ "-Climbing
-#Tux can climb! Press the UP key to start climbing. Press the ACTION key or jump to let go."))
+      (message "-Climbing
+#Tux can climb! Press the UP key to start climbing. Press the ACTION key or jump to let go.")
       (x 11264)
       (y 928)
     )
     (infoblock
-      (message (_ "-Secret Exits
+      (message "-Secret Exits
 #Some level can have multiple exits. They are mostly hidden, so keep an eye out for them.
-#Maybe they lead you to something special."))
+#Maybe they lead you to something special.")
       (x 12320)
       (y 672)
     )

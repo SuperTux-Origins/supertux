@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Some Icy Path"))
+  (name "Some Icy Path")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (target-time 100)
@@ -125,17 +125,17 @@
       (y 984.9885)
     )
     (infoblock
-      (message (_ "#You won't be able to pass, if you don't bring him something he wants..."))
+      (message "#You won't be able to pass, if you don't bring him something he wants...")
       (x 2048)
       (y 1024)
     )
     (infoblock
-      (message (_ "#Maybe this crystal is the right thing for this snowman...?"))
+      (message "#Maybe this crystal is the right thing for this snowman...?")
       (x 7328)
       (y 672)
     )
     (infoblock
-      (message (_ "#Great, now he's gone... I'll keep the crystal for myself."))
+      (message "#Great, now he's gone... I'll keep the crystal for myself.")
       (x 2656)
       (y 1088)
     )

@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Tux the Builder"))
+  (name "Tux the Builder")
   (author "Wolfgang Becker & Carsten Wirtz")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 168)
@@ -68,10 +68,10 @@
       (y 768)
     )
     (infoblock
-      (message (_ "-Portable Objects:
+      (message "-Portable Objects:
 !images/objects/rock/rock.png
 #Tux can pick up certain objects and carry them around.
-#Press the ACTION key to grab an object and hold it pressed as long as you want to carry the object. Release the ACTION key to drop the object."))
+#Press the ACTION key to grab an object and hold it pressed as long as you want to carry the object. Release the ACTION key to drop the object.")
       (x 1184)
       (y 928)
     )
@@ -375,7 +375,7 @@
       (y 704)
     )
     (secretarea
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 320)
       (height 480)
       (x 1248)

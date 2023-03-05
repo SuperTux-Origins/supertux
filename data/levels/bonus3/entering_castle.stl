@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Entering the castle"))
+  (name "Entering the castle")
   (author "Wolfs")
   (contact "pizzaservice at freenet.de")
   (license "GPL 2+ / CC-by-sa 3.0")
@@ -57,7 +57,7 @@
       (y 1924)
     )
     (infoblock
-      (message (_ "#Sorry, nothing to see here! Use the rope to get out!"))
+      (message "#Sorry, nothing to see here! Use the rope to get out!")
       (x 1408)
       (y 2368)
     )

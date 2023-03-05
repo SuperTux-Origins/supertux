@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Mario's Supposed to Deal With This..."))
+  (name "Mario's Supposed to Deal With This...")
   (author "Kevin")
   (target-time 300)
   (icon "")

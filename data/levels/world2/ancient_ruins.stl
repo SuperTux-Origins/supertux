@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Ancient Ruins"))
+  (name "Ancient Ruins")
   (author "Carsten Wirtz")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 213)
@@ -1460,7 +1460,7 @@
     )
     (secretarea
       (fade-tilemap "secret1")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 352)
       (height 176)
       (x 3584)
@@ -1468,7 +1468,7 @@
     )
     (secretarea
       (fade-tilemap "secret2")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 336)
       (height 256)
       (x 784)

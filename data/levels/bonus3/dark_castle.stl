@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "The dark castle"))
+  (name "The dark castle")
   (author "Wolfs")
   (contact "pizzaservice at freenet.de")
   (license "GPL 2+ / CC-by-sa 3.0")

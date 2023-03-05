@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Above the Arctic Skies"))
+  (name "Above the Arctic Skies")
   (author "SuperTux Team")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 60)
@@ -159,9 +159,9 @@
       (bottom_color 0.7 0.85 0.95)
     )
     (infoblock
-      (message (_ "-Air Flower
+      (message "-Air Flower
 !images/powerups/airflower/air_flower-0.png
-#The Air Flower gives Tux the ability to glide in the air for a few seconds, while holding the JUMP Key."))
+#The Air Flower gives Tux the ability to glide in the air for a few seconds, while holding the JUMP Key.")
       (x 4384)
       (y 736)
     )

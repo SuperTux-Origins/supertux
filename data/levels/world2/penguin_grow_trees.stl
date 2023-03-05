@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Penguins don't grow on Trees"))
+  (name "Penguins don't grow on Trees")
   (author "Carsten Wirtz")
   (license "CC-BY-SA 4.0 International")
   (target-time 95)
@@ -456,7 +456,7 @@
     )
     (secretarea
       (fade-tilemap "secret1")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 160)
       (height 288)
       (x 64)
@@ -464,7 +464,7 @@
     )
     (secretarea
       (fade-tilemap "secret2")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 64)
       (height 192)
       (x 6656)

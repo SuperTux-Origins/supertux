@@ -25,7 +25,7 @@
   ;; Tile ids: 1752 - 1761, 3667 - 3686 are reserved!
  
   (tilegroup
-    (name (_ "Snow"))
+    (name "Snow")
     (tiles
       7    8    9    202
       13   14   15   204
@@ -173,7 +173,7 @@
   )
   
   (tilegroup
-    (name (_ "Snow Background"))
+    (name "Snow Background")
     (tiles
 		  
       2185 2186 2180 2181
@@ -228,7 +228,7 @@
   )
   
   (tilegroup
-	(name (_ "Snow Mountain"))
+	(name "Snow Mountain")
 	(tiles
 	  2679 2680 2681 2682
 	  2695 2696 2697 2698
@@ -302,7 +302,7 @@
 ))
 
   (tilegroup
-   (name (_ "Crystal"))
+   (name "Crystal")
    (tiles
 	  2407 2408 2411 2412
       2421 2422 2425 2426
@@ -383,7 +383,7 @@
    )
 
   (tilegroup
-    (name (_ "Forest"))
+    (name "Forest")
     (tiles
       1000 1001 1002 1003
       1004 1005 1006 1007
@@ -508,7 +508,7 @@
   )
 
   (tilegroup
-    (name (_ "Forest Background"))
+    (name "Forest Background")
     (tiles
       4339 4340 2005 2006
 	  4337 4338 2007 2008
@@ -657,7 +657,7 @@
   )
 
 (tilegroup
-    (name (_ "Corrupted Forest"))
+    (name "Corrupted Forest")
     (tiles
 	  1423 1424 1425 1426
       1427 1428 1429 1430
@@ -778,7 +778,7 @@
 	)
   )
   (tilegroup
-    (name (_ "Corrupted Background"))
+    (name "Corrupted Background")
     (tiles
 	  4463 4464 4435 4436
 	  4461 4462 4437 4438
@@ -899,7 +899,7 @@
   )
 
   (tilegroup
-    (name (_ "Block + Bonus"))
+    (name "Block + Bonus")
     (tiles
 	  27   28   29     47
 	  48   50   49    211
@@ -951,7 +951,7 @@
   )
   
   (tilegroup
-    (name (_ "Pole + Signs"))
+    (name "Pole + Signs")
     (tiles
 	  136  137  141  142
       138  139  143  144
@@ -996,7 +996,7 @@
   )
 
   (tilegroup
-    (name (_ "Liquid"))
+    (name "Liquid")
     (tiles
       2019 2140 2141 2142
       2020 0    0    0
@@ -1029,7 +1029,7 @@
   )
 
  (tilegroup
-    (name (_ "Castle"))
+    (name "Castle")
     (tiles
       68   65   69   64
       67   66   3518 321
@@ -1166,7 +1166,7 @@
   )
   
   (tilegroup
-    (name (_ "Halloween"))
+    (name "Halloween")
     (tiles
       3068 3069 3070 3071
       3072 3073 3074 3075
@@ -1194,7 +1194,7 @@
   )
   
   (tilegroup
-    (name (_ "Industrial"))
+    (name "Industrial")
     (tiles
       3167 3168 3169 3170
       3173 3174 3175 3189
@@ -1209,7 +1209,7 @@
   )
   
   (tilegroup
-    (name (_ "Unisolid + Lightmap"))
+    (name "Unisolid + Lightmap")
     (tiles
       2817 2818 2819 2820
       2823 2821 2822 2824
@@ -1236,7 +1236,7 @@
   )
   
   (tilegroup
-    (name (_ "Miscellaneous"))
+    (name "Miscellaneous")
     (tiles
       130  129  132  133
       295  296  297  298
@@ -1279,7 +1279,7 @@
   
   
   (tilegroup
-    (name (_ "Retro Snow"))
+    (name "Retro Snow")
     (tiles
      4000 4001 4002 4003
      4078 4079 4080 4081

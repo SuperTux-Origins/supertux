@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "A Mouldy Grotto"))
+  (name "A Mouldy Grotto")
   (author "Christoph Sommer & Carsten Wirtz")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 93)
@@ -556,7 +556,7 @@
     )
     (secretarea
       (fade-tilemap "secret1")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 352)
       (height 224)
       (x 2432)

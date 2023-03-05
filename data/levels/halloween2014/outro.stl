@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Halloween Party?"))
+  (name "Halloween Party?")
   (author "SuperTux Team")
   (license "GPL 2 / CC-by-sa 3.0")
   (sector

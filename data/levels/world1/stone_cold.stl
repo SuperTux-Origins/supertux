@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Stone Cold"))
+  (name "Stone Cold")
   (author "SuperTux Team")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 60)
@@ -394,7 +394,7 @@
     )
     (secretarea
       (fade-tilemap "secret")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 352)
       (height 128)
       (x 12576)

@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "After the Glaciers"))
+  (name "After the Glaciers")
   (author "CT. da'Bomb")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 50)

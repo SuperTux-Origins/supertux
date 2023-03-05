@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Bonus Island III"))
+  (name "Bonus Island III")
   (author "Various Authors")
   (license "GPL 2 / CC-by-sa 3.0")
   (sector
@@ -270,7 +270,7 @@
     )
     (teleporter
       (spawnpoint "main")
-      (message (_ "Go Home"))
+      (message "Go Home")
       (sprite "/images/worldmap/common/teleporterdot.sprite")
       (x 46)
       (y 50)

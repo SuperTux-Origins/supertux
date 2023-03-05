@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "High Gravity"))
+  (name "High Gravity")
   (author "Penguinmaster")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 45)

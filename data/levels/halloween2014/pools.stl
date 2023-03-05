@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Putrid Pools"))
+  (name "Putrid Pools")
   (author "LMH")
   (contact "lmh.0013@gmail.com")
   (license "GPL 2 / CC-by-sa 3.0")

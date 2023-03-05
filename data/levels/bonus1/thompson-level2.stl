@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Bad Guys Stink!"))
+  (name "Bad Guys Stink!")
   (author "Jason W. Thompson")
   (license "GPL 2+ / CC-by-sa 3.0")
   (sector
@@ -93,7 +93,7 @@
       (bottom_color 1 1 1)
     )
     (infoblock
-      (message (_ "#These levels were made Swimming-Ready by Serano and revamped by AllyTheOcelot"))
+      (message "#These levels were made Swimming-Ready by Serano and revamped by AllyTheOcelot")
       (x 12320)
       (y 640)
     )

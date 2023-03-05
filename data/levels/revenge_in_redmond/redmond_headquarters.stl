@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Redmond Headquarters"))
+  (name "Redmond Headquarters")
   (author "Carsten Wirtz")
   (license "CC-BY-SA 4.0 International")
   (target-time 66)

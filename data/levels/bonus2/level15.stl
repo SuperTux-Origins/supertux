@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Frozen Tunnel"))
+  (name "Frozen Tunnel")
   (author "Nilrok")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 65)

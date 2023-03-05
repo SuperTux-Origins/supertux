@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "The Fog is Clearing Up"))
+  (name "The Fog is Clearing Up")
   (author "Ingo Ruhnke")
   (contact "grumbel@gmail.com")
   (license "GPL 2+ / CC-by-sa 3.0")

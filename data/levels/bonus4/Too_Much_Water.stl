@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Too Much Water"))
+  (name "Too Much Water")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (target-time 65)

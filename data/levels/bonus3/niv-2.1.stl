@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Holes, a Day on Ice"))
+  (name "Holes, a Day on Ice")
   (author "GiBy ")
   (contact " ")
   (license "GPL 2+ / CC-by-sa 3.0")

@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "The abandoned castle"))
+  (name "The abandoned castle")
   (author "Tore Bergebakken")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 80)

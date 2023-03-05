@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Cold Cavern"))
+  (name "Cold Cavern")
   (author "165your4")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 30)
@@ -44,7 +44,7 @@
       (y 159.1612)
     )
     (infoblock
-      (message (_ "#Good job! You kept the red lantern! You didn't need to though, but just because you did, have 100 coins!"))
+      (message "#Good job! You kept the red lantern! You didn't need to though, but just because you did, have 100 coins!")
       (x 5200)
       (y 528)
     )

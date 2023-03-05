@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Snowy Sunset"))
+  (name "Snowy Sunset")
   (author "ThomyW")
   (license "CC-BY-SA 4.0 International")
   (target-time 55)

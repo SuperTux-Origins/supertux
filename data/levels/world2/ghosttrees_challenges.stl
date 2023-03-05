@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Ghosttree's Challenges"))
+  (name "Ghosttree's Challenges")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (sector

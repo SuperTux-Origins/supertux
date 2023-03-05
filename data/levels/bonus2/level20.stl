@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Fan Fortress"))
+  (name "Fan Fortress")
   (author "Marek Moeckel")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 75)

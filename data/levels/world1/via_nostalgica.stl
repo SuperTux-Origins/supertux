@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Via Nostalgica"))
+  (name "Via Nostalgica")
   (author "SuperTux Team")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 38)

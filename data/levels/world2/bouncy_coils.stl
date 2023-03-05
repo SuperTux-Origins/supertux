@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Bouncy Coils"))
+  (name "Bouncy Coils")
   (author "Carsten Wirtz")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 150)
@@ -377,7 +377,7 @@
     )
     (secretarea
       (fade-tilemap "secret1")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 224)
       (height 128)
       (x 3136)
@@ -385,7 +385,7 @@
     )
     (secretarea
       (fade-tilemap "secret2")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 192)
       (height 96)
       (x 6752)

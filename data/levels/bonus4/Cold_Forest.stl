@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Cold Forest"))
+  (name "Cold Forest")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (target-time 65)

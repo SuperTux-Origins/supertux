@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "SnowMan's Land"))
+  (name "SnowMan's Land")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (target-time 80)
@@ -134,7 +134,7 @@
       (y 1969.873)
     )
     (infoblock
-      (message (_ "#It sure is breezy today, huh?"))
+      (message "#It sure is breezy today, huh?")
       (x 4352)
       (y 1888)
     )

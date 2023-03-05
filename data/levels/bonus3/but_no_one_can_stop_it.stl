@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "...but no one can stop it..."))
+  (name "...but no one can stop it...")
   (author "Tore Bergebakken")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 100)
@@ -425,8 +425,8 @@
       (y 192)
     )
     (infoblock
-      (message (_ "-Sorry, this flying platform is lazy.
--Come back another time."))
+      (message "-Sorry, this flying platform is lazy.
+-Come back another time.")
       (x 2496)
       (y 160)
     )

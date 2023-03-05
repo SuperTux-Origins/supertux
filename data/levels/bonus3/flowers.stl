@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Flower Bonus"))
+  (name "Flower Bonus")
   (author "LMH")
   (license "GPL 2 / CC-by-sa 3.0")
   (sector

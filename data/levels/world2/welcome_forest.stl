@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Welcome to the Forest"))
+  (name "Welcome to the Forest")
   (author "Christoph Sommer & Carsten Wirtz")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 48)
@@ -47,9 +47,9 @@
       (bottom_color 0.5 0.7 1)
     )
     (infoblock
-      (message (_ "-Doors
+      (message "-Doors
 !images/objects/door/door-0.png
-#Tux can go through a door by pressing the UP key."))
+#Tux can go through a door by pressing the UP key.")
       (x 3712)
       (y 1376)
     )

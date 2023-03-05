@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Ghouls' Lair"))
+  (name "Ghouls' Lair")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (sector
@@ -856,7 +856,7 @@
       (y 752.0001)
     )
     (infoblock
-      (message (_ "#Lanterns are used to make magic blocks solid, so you're able to walk atop of them."))
+      (message "#Lanterns are used to make magic blocks solid, so you're able to walk atop of them.")
       (x 2912)
       (y 192)
     )

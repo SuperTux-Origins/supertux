@@ -7,7 +7,7 @@
 ;; ice tiles- next id: 648
 
 (tilegroup
-	(name (_ "Snow"))
+	(name "Snow")
 	(tiles
 		101 102 103 127
 		104 105 106 128
@@ -77,7 +77,7 @@
 )
 
 (tilegroup
-  (name (_ "Ice Cave & Crystal"))
+  (name "Ice Cave & Crystal")
   (tiles
 		149 150 151 0
 		152 153 154 0
@@ -124,7 +124,7 @@
 )
 
 (tilegroup
-	(name (_ "Embellishments"))
+	(name "Embellishments")
 	(tiles
 		136 137 138 0
 		139 140 141 0
@@ -208,7 +208,7 @@
 )
 
 (tilegroup
-	(name (_ "Forest"))
+	(name "Forest")
 	(tiles
 		257 258 259 357
 		260 261 262 359
@@ -317,7 +317,7 @@
 )
 
 (tilegroup
-	(name (_ "Underground Forest"))
+	(name "Underground Forest")
 	(tiles
 		579 580 581 642
 		582 583 584 644
@@ -372,7 +372,7 @@
 )
 
 (tilegroup
-	(name (_ "Trees & Bushes"))
+	(name "Trees & Bushes")
 	(tiles
 		291 292 328 329
 		293 294 330 331
@@ -403,7 +403,7 @@
 )
 
 (tilegroup
-	(name (_ "Seasonal"))
+	(name "Seasonal")
 	(tiles
 		475 476 477 478
 		479 480 481 482
@@ -493,7 +493,7 @@
 
 ;; shared tiles- ids available: 90-100
 (tilegroup
-	(name (_ "Structure"))
+	(name "Structure")
 	(tiles
 		60 61 62 0
 		63 64 65 0
@@ -554,7 +554,7 @@
 )
 
 (tilegroup
-	(name (_ "Pathing"))
+	(name "Pathing")
 	(tiles
 		10 11 12 13
 		14 15 16 17
@@ -715,7 +715,7 @@
 )
 
 (tilegroup
-	(name (_ "Water"))
+	(name "Water")
 	(tiles
 		1 2 3 4
 		5 6 7 8

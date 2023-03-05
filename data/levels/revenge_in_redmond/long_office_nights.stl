@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Long Office Nights"))
+  (name "Long Office Nights")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (target-time 83)
@@ -565,7 +565,7 @@
     )
     (infoblock
       (sprite "/images/objects/bonus_block/retro_info.sprite")
-      (message (_ "#Only those wielding the legendary coffee and mints shall pass this barrier!"))
+      (message "#Only those wielding the legendary coffee and mints shall pass this barrier!")
       (x 2080)
       (y 544)
     )

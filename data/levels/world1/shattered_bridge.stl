@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "The Shattered Bridge"))
+  (name "The Shattered Bridge")
   (author "SuperTux Team")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 65)
@@ -625,7 +625,7 @@
     )
     (secretarea
       (fade-tilemap "secret")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 128)
       (height 128)
       (x 10528)

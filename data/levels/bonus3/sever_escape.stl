@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Sewer escape"))
+  (name "Sewer escape")
   (author "Hume")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 70)

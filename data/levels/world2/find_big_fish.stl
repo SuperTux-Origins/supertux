@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Find the Bigger Fish!"))
+  (name "Find the Bigger Fish!")
   (author "Wolfgang Becker & Carsten Wirtz")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 62)
@@ -1055,7 +1055,7 @@ lift1.goto_node(0);")
       (bottom_color 0.5 0.7 1)
     )
     (infoblock
-      (message (_ "-A big fish... for you."))
+      (message "-A big fish... for you.")
       (x 352)
       (y 1056)
     )

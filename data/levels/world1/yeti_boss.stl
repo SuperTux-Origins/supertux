@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "No More Mr. Ice Guy"))
+  (name "No More Mr. Ice Guy")
   (author "SuperTux Team")
   (license "GPL 2+ / CC-by-sa 3.0")
   (sector

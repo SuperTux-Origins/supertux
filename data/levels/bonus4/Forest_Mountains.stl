@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Forest Mountains"))
+  (name "Forest Mountains")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (target-time 80)
@@ -138,17 +138,17 @@
       (y 783.2114)
     )
     (infoblock
-      (message (_ "#One Path contains enemies, the other treasure..."))
+      (message "#One Path contains enemies, the other treasure...")
       (x 6016)
       (y 704)
     )
     (infoblock
-      (message (_ "#You can use this door to try the other way..."))
+      (message "#You can use this door to try the other way...")
       (x 13248)
       (y 1056)
     )
     (infoblock
-      (message (_ "#You can use this door to try the other way..."))
+      (message "#You can use this door to try the other way...")
       (x 10912)
       (y 1216)
     )

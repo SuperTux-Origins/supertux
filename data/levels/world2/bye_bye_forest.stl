@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Bye Bye Forest"))
+  (name "Bye Bye Forest")
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (sector
@@ -1604,7 +1604,7 @@
     )
     (secretarea
       (fade-tilemap "secret")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 288)
       (height 192)
       (x 5056)

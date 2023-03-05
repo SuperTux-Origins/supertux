@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Wooden Roots"))
+  (name "Wooden Roots")
   (author "Carsten Wirtz")
   (license "CC-BY-SA 4.0 International")
   (target-time 72)
@@ -282,7 +282,7 @@
     )
     (secretarea
       (fade-tilemap "secret")
-      (message (_ "You found a secret area!"))
+      (message "You found a secret area!")
       (width 160)
       (height 128)
       (x 7776)

@@ -1,6 +1,6 @@
 (supertux-level
   (version 3)
-  (name (_ "Cave Run"))
+  (name "Cave Run")
   (author "Stuart Rynn")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 70)
