@@ -95,14 +95,14 @@ Path::read(const ReaderMapping& reader)
     node.time = 1;
     node.speed = 0;
     node.easing = EaseNone;
-    if (!node_mapping.get("x", node.position.x) ||
-        !node_mapping.get("y", node.position.y))
+    if (!node_mapping.read("x", node.position.x) ||
+        !node_mapping.read("y", node.position.y))
       throw std::runtime_error("Path node without x and y coordinate specified");
-    if (!node_mapping.get("bezier_before_x", node.bezier_before.x) ||
-        !node_mapping.get("bezier_before_y", node.bezier_before.y))
+    if (!node_mapping.read("bezier_before_x", node.bezier_before.x) ||
+        !node_mapping.read("bezier_before_y", node.bezier_before.y))
       node.bezier_before = node.position;
-    if (!node_mapping.get("bezier_after_x", node.bezier_after.x) ||
-        !node_mapping.get("bezier_after_y", node.bezier_after.y))
+    if (!node_mapping.read("bezier_after_x", node.bezier_after.x) ||
+        !node_mapping.read("bezier_after_y", node.bezier_after.y))
       node.bezier_after = node.position;
     node_mapping.read("time", node.time);
     node_mapping.read("speed", node.speed);

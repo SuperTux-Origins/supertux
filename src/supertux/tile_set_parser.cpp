@@ -181,7 +181,7 @@ void
 TileSetParser::parse_tile(const ReaderMapping& reader, int32_t min, int32_t max, int32_t offset)
 {
   uint32_t id;
-  if (!reader.get("id", id))
+  if (!reader.read("id", id))
   {
     throw std::runtime_error("Missing tile-id.");
   }
@@ -191,40 +191,40 @@ TileSetParser::parse_tile(const ReaderMapping& reader, int32_t min, int32_t max,
   uint32_t attributes = 0;
 
   bool value = false;
-  if (reader.get("solid", value) && value)
+  if (reader.read("solid", value) && value)
     attributes |= Tile::SOLID;
-  if (reader.get("unisolid", value) && value)
+  if (reader.read("unisolid", value) && value)
     attributes |= Tile::UNISOLID | Tile::SOLID;
-  if (reader.get("brick", value) && value)
+  if (reader.read("brick", value) && value)
     attributes |= Tile::BRICK;
-  if (reader.get("ice", value) && value)
+  if (reader.read("ice", value) && value)
     attributes |= Tile::ICE;
-  if (reader.get("water", value) && value)
+  if (reader.read("water", value) && value)
     attributes |= Tile::WATER;
-  if (reader.get("hurts", value) && value)
+  if (reader.read("hurts", value) && value)
     attributes |= Tile::HURTS;
-  if (reader.get("fire", value) && value)
+  if (reader.read("fire", value) && value)
     attributes |= Tile::FIRE;
-  if (reader.get("walljump", value) && value)
+  if (reader.read("walljump", value) && value)
     attributes |= Tile::WALLJUMP;
-  if (reader.get("fullbox", value) && value)
+  if (reader.read("fullbox", value) && value)
     attributes |= Tile::FULLBOX;
-  if (reader.get("coin", value) && value)
+  if (reader.read("coin", value) && value)
     attributes |= Tile::COIN;
-  if (reader.get("goal", value) && value)
+  if (reader.read("goal", value) && value)
     attributes |= Tile::GOAL;
 
   uint32_t data = 0;
 
-  if (reader.get("north", value) && value)
+  if (reader.read("north", value) && value)
     data |= Tile::WORLDMAP_NORTH;
-  if (reader.get("south", value) && value)
+  if (reader.read("south", value) && value)
     data |= Tile::WORLDMAP_SOUTH;
-  if (reader.get("west", value) && value)
+  if (reader.read("west", value) && value)
     data |= Tile::WORLDMAP_WEST;
-  if (reader.get("east", value) && value)
+  if (reader.read("east", value) && value)
     data |= Tile::WORLDMAP_EAST;
-  if (reader.get("stop", value) && value)
+  if (reader.read("stop", value) && value)
     data |= Tile::WORLDMAP_STOP;
 
   reader.read("data", data);

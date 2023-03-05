@@ -158,7 +158,7 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
   m_sector.set_name("main");
 
   float gravity;
-  if (reader.get("gravity", gravity))
+  if (reader.read("gravity", gravity))
     m_sector.set_gravity(gravity);
 
   std::string backgroundimage;
@@ -273,7 +273,7 @@ SectorParser::parse_old_format(const ReaderMapping& reader)
     while (iter.next()) {
       if (iter.get_key() == "point") {
         Vector sp_pos(0.0f, 0.0f);
-        if (reader.get("x", sp_pos.x) && reader.get("y", sp_pos.y))
+        if (reader.read("x", sp_pos.x) && reader.read("y", sp_pos.y))
         {
           m_sector.add<SpawnPointMarker>("main", sp_pos);
         }

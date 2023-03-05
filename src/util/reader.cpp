@@ -34,11 +34,11 @@ int reader_get_layer(const ReaderMapping& reader, int def)
   bool status;
 
   // 'z-pos' is the canonical name
-  status = reader.get("z-pos", tmp);
+  status = reader.read("z-pos", tmp);
 
   // 'layer' is the old name kept for backward compatibility
   if (!status)
-    status = reader.get("layer", tmp);
+    status = reader.read("layer", tmp);
 
   if (!status)
     tmp = def;

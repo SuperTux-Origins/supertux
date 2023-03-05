@@ -56,7 +56,7 @@ WillOWisp::WillOWisp(const ReaderMapping& reader) :
   m_hit_script = reader.get("hit-script", std::string(""));
 
   bool running;
-  if ( !reader.get("running", running)) running = false;
+  if ( !reader.read("running", running)) running = false;
 
   std::vector<float> color;
   if (reader.read("color", color))

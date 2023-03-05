@@ -103,11 +103,11 @@ BitmapFont::loadFontFile(const std::string &filename)
 
   int def_char_width=0;
 
-  if ( !config_l.get("glyph-width",def_char_width) ) {
+  if ( !config_l.read("glyph-width",def_char_width) ) {
     log_warning << "Font:"<< filename << ": misses default glyph-width" << std::endl;
   }
 
-  if ( !config_l.get("glyph-height",char_height) ) {
+  if ( !config_l.read("glyph-height",char_height) ) {
     std::ostringstream msg;
     msg << "Font:" << filename << ": misses glyph-height";
     throw std::runtime_error(msg.str());

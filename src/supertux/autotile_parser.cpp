@@ -108,13 +108,13 @@ AutotileParser::parse_autotile(const ReaderMapping& reader, bool corner)
   std::vector<std::pair<uint32_t, float>> alt_ids;
 
   int tile_id;
-  if (!reader.get("id", tile_id))
+  if (!reader.read("id", tile_id))
   {
     throw std::runtime_error("Missing 'id' parameter in autotileset config file.");
   }
 
   bool solid;
-  if (!reader.get("solid", solid))
+  if (!reader.read("solid", solid))
   {
     if (!corner)
       throw std::runtime_error("Missing 'solid' parameter in autotileset config file.");
@@ -147,13 +147,13 @@ AutotileParser::parse_autotile(const ReaderMapping& reader, bool corner)
       ReaderMapping alt_reader = iter.as_mapping();
 
       uint32_t alt_id = 0;
-      if (!alt_reader.get("id", alt_id))
+      if (!alt_reader.read("id", alt_id))
       {
         log_warning << "No alt tile for autotileset" << std::endl;
       }
 
       float weight = 0.0f;
-      if (!alt_reader.get("weight", weight))
+      if (!alt_reader.read("weight", weight))
       {
         log_warning << "No weight for alt tile id" << std::endl;
       }

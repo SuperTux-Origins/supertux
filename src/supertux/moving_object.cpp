@@ -31,10 +31,10 @@ MovingObject::MovingObject(const ReaderMapping& reader) :
 {
   float height, width;
 
-  if (reader.get("width", width))
+  if (reader.read("width", width))
     m_col.m_bbox.set_width(width);
 
-  if (reader.get("height", height))
+  if (reader.read("height", height))
     m_col.m_bbox.set_height(height);
 
   reader.read("x", m_col.m_bbox.get_left());
