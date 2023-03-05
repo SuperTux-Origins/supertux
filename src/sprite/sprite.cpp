@@ -154,6 +154,8 @@ Sprite::draw(Canvas& canvas, const Vector& pos, int layer,
              Flip flip)
 {
   assert(m_action != nullptr);
+  assert(!m_action->surfaces.empty());
+
   update();
 
 
@@ -176,6 +178,7 @@ Sprite::draw(Canvas& canvas, const Vector& pos, int layer,
 int
 Sprite::get_width() const
 {
+  assert(m_action != nullptr);
   assert(m_frameidx < get_frames());
   return static_cast<int>(m_action->surfaces[m_frameidx]->get_width());
 }
@@ -183,6 +186,7 @@ Sprite::get_width() const
 int
 Sprite::get_height() const
 {
+  assert(m_action != nullptr);
   assert(m_frameidx < get_frames());
   return static_cast<int>(m_action->surfaces[m_frameidx]->get_height());
 }
