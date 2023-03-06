@@ -36,8 +36,8 @@ public:
 public:
   using GameObject::GameObject;
 private:
-  LitObject(const LitObject&) = delete;
-  LitObject& operator=(const LitObject&) = delete;
+  LitObject(LitObject const&) = delete;
+  LitObject& operator=(LitObject const&) = delete;
 #endif
 
 public:

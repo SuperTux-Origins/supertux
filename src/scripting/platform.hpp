@@ -34,8 +34,8 @@ class Platform final
 public:
   using GameObject::GameObject;
 private:
-  Platform(const Platform&) = delete;
-  Platform& operator=(const Platform&) = delete;
+  Platform(Platform const&) = delete;
+  Platform& operator=(Platform const&) = delete;
 #endif
 
 public:
@@ -49,7 +49,7 @@ public:
   void stop_moving();
 
   /** Updates the platform to the given action  */
-  void set_action(const std::string& action, int repeat);
+  void set_action(std::string const& action, int repeat);
 };
 
 } // namespace scripting

@@ -162,7 +162,7 @@ PlayerStatus::write(Writer& writer)
 }
 
 void
-PlayerStatus::read(const ReaderMapping& mapping)
+PlayerStatus::read(ReaderMapping const& mapping)
 {
   int num_players_in_file = 1;
   mapping.read("num_players", num_players_in_file);
@@ -232,7 +232,7 @@ PlayerStatus::read(const ReaderMapping& mapping)
         map.read("earthflowers", max_earth_time[id]);
       }
     }
-    catch (const std::exception& e)
+    catch (std::exception const& e)
     {
       log_warning << "Couldn't parse player from player status save: " << e.what() << std::endl;
     }

@@ -51,8 +51,8 @@ private:
   };
 
 public:
-  Camera(const std::string& name);
-  Camera(const ReaderMapping& reader);
+  Camera(std::string const& name);
+  Camera(ReaderMapping const& reader);
   ~Camera() override;
 
   /** \addtogroup GameObject
@@ -77,18 +77,18 @@ public:
       @{ */
 
   /** reset camera position */
-  void reset(const Vector& tuxpos);
+  void reset(Vector const& tuxpos);
 
   /** return camera position */
   const Vector get_translation() const;
-  void set_translation(const Vector& translation) { m_translation = translation; }
+  void set_translation(Vector const& translation) { m_translation = translation; }
 
   /** shake camera in a direction 1 time */
   void shake(float duration, float x, float y);
 
   /** scroll the upper left edge of the camera in scrolltime seconds
       to the position goal */
-  void scroll_to(const Vector& goal, float scrolltime);
+  void scroll_to(Vector const& goal, float scrolltime);
   void move(const int dx, const int dy);
 
   void reload_config();
@@ -160,8 +160,8 @@ private:
   bool m_enfore_minimum_scale;
 
 private:
-  Camera(const Camera&) = delete;
-  Camera& operator=(const Camera&) = delete;
+  Camera(Camera const&) = delete;
+  Camera& operator=(Camera const&) = delete;
 };
 
 #endif

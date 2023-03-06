@@ -68,16 +68,16 @@ struct TextureRequest : public DrawingRequest
     color(1.0f, 1.0f, 1.0f)
   {}
 
-  const Texture* texture;
-  const Texture* displacement_texture;
+  Texture const* texture;
+  Texture const* displacement_texture;
   std::vector<Rectf> srcrects;
   std::vector<Rectf> dstrects;
   std::vector<float> angles;
   Color color;
 
 private:
-  TextureRequest(const TextureRequest&) = delete;
-  TextureRequest& operator=(const TextureRequest&) = delete;
+  TextureRequest(TextureRequest const&) = delete;
+  TextureRequest& operator=(TextureRequest const&) = delete;
 };
 
 struct GradientRequest : public DrawingRequest
@@ -167,8 +167,8 @@ struct GetPixelRequest : public DrawingRequest
   std::shared_ptr<Color> color_ptr;
 
 private:
-  GetPixelRequest(const GetPixelRequest&) = delete;
-  GetPixelRequest& operator=(const GetPixelRequest&) = delete;
+  GetPixelRequest(GetPixelRequest const&) = delete;
+  GetPixelRequest& operator=(GetPixelRequest const&) = delete;
 };
 
 #endif

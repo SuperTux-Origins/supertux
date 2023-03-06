@@ -23,7 +23,7 @@
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"
 
-TextObject::TextObject(const std::string& name) :
+TextObject::TextObject(std::string const& name) :
   GameObject(name),
   ExposedObject<TextObject, scripting::Text>(this),
   m_font(Resources::normal_font),
@@ -54,7 +54,7 @@ TextObject::~TextObject()
 }
 
 void
-TextObject::set_font(const std::string& name)
+TextObject::set_font(std::string const& name)
 {
   if (name == "normal") {
     m_font = Resources::normal_font;
@@ -77,7 +77,7 @@ TextObject::wrap_text()
 
   // strip all newlines except double ones (markdown'ish)
   char prev_c = ' ';
-  for (const char& c : m_text) {
+  for (char const& c : m_text) {
     if (c == '\n') {
       if (prev_c == '\n') {
         rest += '\n';
@@ -103,7 +103,7 @@ TextObject::wrap_text()
 }
 
 void
-TextObject::set_text(const std::string& text)
+TextObject::set_text(std::string const& text)
 {
   m_text = text;
   wrap_text();

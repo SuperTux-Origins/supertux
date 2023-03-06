@@ -34,8 +34,8 @@ private:
   uint32_t m_id_counter;
 
 private:
-  UIDGenerator(const UIDGenerator&) = delete;
-  UIDGenerator& operator=(const UIDGenerator&) = delete;
+  UIDGenerator(UIDGenerator const&) = delete;
+  UIDGenerator& operator=(UIDGenerator const&) = delete;
 };
 
 #endif

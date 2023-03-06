@@ -28,7 +28,7 @@ class RainParticleSystem final :
 {
 public:
   RainParticleSystem();
-  RainParticleSystem(const ReaderMapping& reader);
+  RainParticleSystem(ReaderMapping const& reader);
   ~RainParticleSystem() override;
 
   virtual void draw(DrawingContext& context) override;
@@ -102,8 +102,8 @@ private:
   float m_current_real_amount;
 
 private:
-  RainParticleSystem(const RainParticleSystem&) = delete;
-  RainParticleSystem& operator=(const RainParticleSystem&) = delete;
+  RainParticleSystem(RainParticleSystem const&) = delete;
+  RainParticleSystem& operator=(RainParticleSystem const&) = delete;
 };
 
 #endif

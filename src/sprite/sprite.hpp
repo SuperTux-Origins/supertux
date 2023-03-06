@@ -32,24 +32,24 @@ public:
   SpritePtr clone() const;
 
   /** Draw sprite, automatically calculates next frame */
-  void draw(Canvas& canvas, const Vector& pos, int layer,
+  void draw(Canvas& canvas, Vector const& pos, int layer,
             Flip flip = NO_FLIP);
 
   /** Set action (or state) */
-  void set_action(const std::string& name, int loops = -1);
+  void set_action(std::string const& name, int loops = -1);
 
   /** Composes action (or state) string from an action name and a particular direction
    * in the form of "name-direction", eg. "walk-left" 
    */
-  void set_action(const std::string& name, const Direction& dir, int loops = -1);
+  void set_action(std::string const& name, Direction const& dir, int loops = -1);
 
   /** Composes action (or state) string from a particular direction
    * in the form of "direction", e.g. "left"
    */
-  void set_action(const Direction& dir, int loops = -1);
+  void set_action(Direction const& dir, int loops = -1);
 
   /** Set action (or state), but keep current frame number, loop counter, etc. */
-  void set_action_continued(const std::string& name);
+  void set_action_continued(std::string const& name);
 
   /** Set number of animation cycles until animation stops */
   void set_animation_loops(int loops = -1) { m_animation_loops = loops; }
@@ -74,10 +74,10 @@ public:
   float get_current_frame_progress() const { return m_frame; }
 
   /** Get sprite's name */
-  const std::string& get_name() const { return m_data.name; }
+  std::string const& get_name() const { return m_data.name; }
 
   /** Get current action name */
-  const std::string& get_action() const { return m_action->name; }
+  std::string const& get_action() const { return m_action->name; }
 
   int get_width() const;
   int get_height() const;
@@ -99,16 +99,16 @@ public:
   /** Get the angle of the sprite rotation in degree */
   float get_angle() const;
 
-  void set_color(const Color& color);
+  void set_color(Color const& color);
   Color get_color() const;
 
   void set_alpha(float alpha);
   float get_alpha() const;
 
-  void set_blend(const Blend& blend);
+  void set_blend(Blend const& blend);
   Blend get_blend() const;
 
-  bool has_action (const std::string& name) const { return (m_data.get_action(name) != nullptr); }
+  bool has_action (std::string const& name) const { return (m_data.get_action(name) != nullptr); }
 
 private:
   void update();
@@ -126,11 +126,11 @@ private:
   Color m_color;
   Blend m_blend;
 
-  const SpriteData::Action* m_action;
+  SpriteData::Action const* m_action;
 
 private:
-  Sprite(const Sprite& other);
-  Sprite& operator=(const Sprite&) = delete;
+  Sprite(Sprite const& other);
+  Sprite& operator=(Sprite const&) = delete;
 };
 
 #endif

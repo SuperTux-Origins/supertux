@@ -53,11 +53,11 @@ class AmbientSound final : public MovingObject,
                      public ExposedObject<AmbientSound, scripting::AmbientSound>
 {
 public:
-  AmbientSound(const ReaderMapping& mapping);
-  AmbientSound(const Vector& pos, float factor, float bias, float vol, const std::string& file);
+  AmbientSound(ReaderMapping const& mapping);
+  AmbientSound(Vector const& pos, float factor, float bias, float vol, std::string const& file);
   ~AmbientSound() override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit_) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit_) override;
 
   static std::string class_name() { return "ambient-sound"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -68,7 +68,7 @@ public:
   /** @name Scriptable Methods
       @{ */
 #ifndef SCRIPTING_API
-  virtual void set_pos(const Vector& pos) override;
+  virtual void set_pos(Vector const& pos) override;
 #endif
   void set_pos(float x, float y);
   float get_pos_x() const;
@@ -98,8 +98,8 @@ private:
   float currentvolume; /// how loud we are
 
 private:
-  AmbientSound(const AmbientSound&) = delete;
-  AmbientSound& operator=(const AmbientSound&) = delete;
+  AmbientSound(AmbientSound const&) = delete;
+  AmbientSound& operator=(AmbientSound const&) = delete;
 };
 
 #endif

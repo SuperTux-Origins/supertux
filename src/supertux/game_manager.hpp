@@ -31,12 +31,12 @@ class GameManager final : public Currenton<GameManager>
 public:
   GameManager();
 
-  void start_worldmap(const World& world, const std::string& spawnpoint = "", const std::string& worldmap_filename = "");
-  void start_level(const World& world, const std::string& level_filename,
+  void start_worldmap(World const& world, std::string const& spawnpoint = "", std::string const& worldmap_filename = "");
+  void start_level(World const& world, std::string const& level_filename,
                    const std::optional<std::pair<std::string, Vector>>& start_pos = std::nullopt);
 
   bool load_next_worldmap();
-  void set_next_worldmap(const std::string& worldmap, const std::string &spawnpoint);
+  void set_next_worldmap(std::string const& worldmap, std::string const&spawnpoint);
 
 private:
   std::unique_ptr<Savegame> m_savegame;
@@ -45,8 +45,8 @@ private:
   std::string m_next_spawnpoint;
 
 private:
-  GameManager(const GameManager&) = delete;
-  GameManager& operator=(const GameManager&) = delete;
+  GameManager(GameManager const&) = delete;
+  GameManager& operator=(GameManager const&) = delete;
 };
 
 #endif

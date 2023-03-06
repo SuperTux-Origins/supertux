@@ -28,7 +28,7 @@
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
 
-void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMapping& mapping)
+void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, ReaderMapping const& mapping)
 {
   if (table_idx < 0)
     table_idx -= 2;
@@ -45,7 +45,7 @@ void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMappin
       continue;
     }
 
-    const std::string& key = pair[0].as_string();
+    std::string const& key = pair[0].as_string();
     auto const& value = pair[1];
 
     // ignore empty / null values
@@ -106,7 +106,7 @@ void save_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, Writer& writer)
       get_logging_instance(false) << "Table contains non-string key\n";
       continue;
     }
-    const SQChar* key;
+    SQChar const* key;
     sq_getstring(vm, -2, &key);
 
     switch (sq_gettype(vm, -1)) {
@@ -129,9 +129,9 @@ void save_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, Writer& writer)
         break;
       }
       case OT_STRING: {
-        const SQChar* str;
+        SQChar const* str;
         sq_getstring(vm, -1, &str);
-        writer.write(key, reinterpret_cast<const char*> (str));
+        writer.write(key, reinterpret_cast<char const*> (str));
         break;
       }
       case OT_TABLE: {

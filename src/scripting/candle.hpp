@@ -35,8 +35,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  Candle(const Candle&) = delete;
-  Candle& operator=(const Candle&) = delete;
+  Candle(Candle const&) = delete;
+  Candle& operator=(Candle const&) = delete;
 #endif
 
 public:

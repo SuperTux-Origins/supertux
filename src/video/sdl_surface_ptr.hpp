@@ -61,7 +61,7 @@ public:
     return *m_surface;
   }
 
-  const SDL_Surface& operator*() const
+  SDL_Surface const& operator*() const
   {
     return *m_surface;
   }
@@ -71,7 +71,7 @@ public:
     return m_surface;
   }
 
-  const SDL_Surface* operator->() const
+  SDL_Surface const* operator->() const
   {
     return m_surface;
   }
@@ -92,8 +92,8 @@ public:
   }
 
 private:
-  SDLSurfacePtr(const SDLSurfacePtr&) = delete;
-  SDLSurfacePtr& operator=(const SDLSurfacePtr&) = delete;
+  SDLSurfacePtr(SDLSurfacePtr const&) = delete;
+  SDLSurfacePtr& operator=(SDLSurfacePtr const&) = delete;
 };
 
 #endif

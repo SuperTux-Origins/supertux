@@ -29,7 +29,7 @@
 /** When to alert player they're low on time! */
 static const float TIME_WARNING = 20;
 
-LevelTime::LevelTime(const ReaderMapping& reader) :
+LevelTime::LevelTime(ReaderMapping const& reader) :
   GameObject(reader),
   ExposedObject<LevelTime, scripting::LevelTime>(this),
   time_surface(Surface::from_file("images/engine/hud/time-0.png")),
@@ -48,7 +48,7 @@ LevelTime::update(float dt_sec)
 {
   if (!running) return;
 
-  int players_alive = Sector::current() ? Sector::current()->get_object_count<Player>([](const Player& p) {
+  int players_alive = Sector::current() ? Sector::current()->get_object_count<Player>([](Player const& p) {
     return !p.is_dead() && !p.is_dying() && !p.is_winning();
   }) : 0;
 

@@ -52,7 +52,7 @@ public:
    * gets called for once (per logical) frame. Screens should do their state
    * updates and logic here
    */
-  virtual void update(float dt_sec, const Controller& controller) = 0;
+  virtual void update(float dt_sec, Controller const& controller) = 0;
 };
 
 #endif

@@ -22,10 +22,10 @@
 class LiveFire : public WalkingBadguy
 {
 public:
-  LiveFire(const ReaderMapping& reader);
+  LiveFire(ReaderMapping const& reader);
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   virtual void active_update(float dt_sec) override;
 
   virtual void freeze() override;
@@ -54,14 +54,14 @@ protected:
   SState state;
 
 private:
-  LiveFire(const LiveFire&) = delete;
-  LiveFire& operator=(const LiveFire&) = delete;
+  LiveFire(LiveFire const&) = delete;
+  LiveFire& operator=(LiveFire const&) = delete;
 };
 
 class LiveFireAsleep final : public LiveFire
 {
 public:
-  LiveFireAsleep(const ReaderMapping& reader);
+  LiveFireAsleep(ReaderMapping const& reader);
 
   virtual void draw(DrawingContext& context) override;
 
@@ -72,14 +72,14 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  LiveFireAsleep(const LiveFireAsleep&) = delete;
-  LiveFireAsleep& operator=(const LiveFireAsleep&) = delete;
+  LiveFireAsleep(LiveFireAsleep const&) = delete;
+  LiveFireAsleep& operator=(LiveFireAsleep const&) = delete;
 };
 
 class LiveFireDormant final : public LiveFire
 {
 public:
-  LiveFireDormant(const ReaderMapping& reader);
+  LiveFireDormant(ReaderMapping const& reader);
 
   virtual void draw(DrawingContext& context) override;
 
@@ -90,8 +90,8 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  LiveFireDormant(const LiveFireDormant&) = delete;
-  LiveFireDormant& operator=(const LiveFireDormant&) = delete;
+  LiveFireDormant(LiveFireDormant const&) = delete;
+  LiveFireDormant& operator=(LiveFireDormant const&) = delete;
 };
 
 #endif

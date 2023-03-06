@@ -44,7 +44,7 @@ SpriteData::Action::Action() :
 {
 }
 
-SpriteData::SpriteData(const ReaderMapping& mapping) :
+SpriteData::SpriteData(ReaderMapping const& mapping) :
   actions(),
   name()
 {
@@ -64,7 +64,7 @@ SpriteData::SpriteData(const ReaderMapping& mapping) :
 }
 
 void
-SpriteData::parse_action(const ReaderMapping& mapping)
+SpriteData::parse_action(ReaderMapping const& mapping)
 {
   auto action = std::make_unique<Action>();
 
@@ -122,7 +122,7 @@ SpriteData::parse_action(const ReaderMapping& mapping)
     } else {
       float max_w = 0;
       float max_h = 0;
-      for (const auto& surf : act_tmp->surfaces) {
+      for (auto const& surf : act_tmp->surfaces) {
         auto surface = surf->clone(HORIZONTAL_FLIP);
         max_w = std::max(max_w, static_cast<float>(surface->get_width()));
         max_h = std::max(max_h, static_cast<float>(surface->get_height()));
@@ -153,7 +153,7 @@ SpriteData::parse_action(const ReaderMapping& mapping)
       }
     }
   } else if (mapping.read("clone-action", clone_action)) {
-    const auto* act_tmp = get_action(clone_action);
+    auto const* act_tmp = get_action(clone_action);
     if (act_tmp == nullptr) {
       std::ostringstream msg;
       msg << "Could not clone action. Action not found: \"" << clone_action << "\"\n"
@@ -178,7 +178,7 @@ SpriteData::parse_action(const ReaderMapping& mapping)
     {
       float max_w = 0;
       float max_h = 0;
-      for (const auto& image : images) {
+      for (auto const& image : images) {
         auto surface = Surface::from_file(FileSystem::join(mapping.get_document().get_directory(), image));
         max_w = std::max(max_w, static_cast<float>(surface->get_width()));
         max_h = std::max(max_h, static_cast<float>(surface->get_height()));
@@ -189,7 +189,7 @@ SpriteData::parse_action(const ReaderMapping& mapping)
     }
     else if (mapping.read("surfaces", surfaces_collection))
     {
-      for (const auto& i : surfaces_collection.get_objects())
+      for (auto const& i : surfaces_collection.get_objects())
       {
         if (i.get_name() == "surface")
         {
@@ -206,7 +206,7 @@ SpriteData::parse_action(const ReaderMapping& mapping)
       // calculate hitbox
       float max_w = 0;
       float max_h = 0;
-      for (const auto& surface : action->surfaces)
+      for (auto const& surface : action->surfaces)
       {
         max_w = std::max(max_w, static_cast<float>(surface->get_width()));
         max_h = std::max(max_h, static_cast<float>(surface->get_height()));
@@ -234,8 +234,8 @@ SpriteData::parse_action(const ReaderMapping& mapping)
   actions[action->name] = std::move(action);
 }
 
-const SpriteData::Action*
-SpriteData::get_action(const std::string& act) const
+SpriteData::Action const*
+SpriteData::get_action(std::string const& act) const
 {
   Actions::const_iterator i = actions.find(act);
   if (i == actions.end()) {

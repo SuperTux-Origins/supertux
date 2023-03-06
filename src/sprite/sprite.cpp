@@ -39,7 +39,7 @@ Sprite::Sprite(SpriteData& newdata) :
   m_last_ticks = g_game_time;
 }
 
-Sprite::Sprite(const Sprite& other) :
+Sprite::Sprite(Sprite const& other) :
   m_data(other.m_data),
   m_frame(other.m_frame),
   m_frameidx(other.m_frameidx),
@@ -64,24 +64,24 @@ Sprite::clone() const
 }
 
 void
-Sprite::set_action(const std::string& name, const Direction& dir, int loops)
+Sprite::set_action(std::string const& name, Direction const& dir, int loops)
 {
   set_action(name + "-" + dir_to_string(dir), loops);
 }
 
 void
-Sprite::set_action(const Direction& dir, int loops)
+Sprite::set_action(Direction const& dir, int loops)
 {
   set_action(dir_to_string(dir), loops);
 }
 
 void
-Sprite::set_action(const std::string& name, int loops)
+Sprite::set_action(std::string const& name, int loops)
 {
   if (m_action && m_action->name == name)
     return;
 
-  const SpriteData::Action* newaction = m_data.get_action(name);
+  SpriteData::Action const* newaction = m_data.get_action(name);
   if (!newaction) {
     log_debug << "Action '" << name << "' not found." << std::endl;
     return;
@@ -101,12 +101,12 @@ Sprite::set_action(const std::string& name, int loops)
 }
 
 void
-Sprite::set_action_continued(const std::string& name)
+Sprite::set_action_continued(std::string const& name)
 {
   if (m_action && m_action->name == name)
     return;
 
-  const SpriteData::Action* newaction = m_data.get_action(name);
+  SpriteData::Action const* newaction = m_data.get_action(name);
   if (!newaction) {
     log_debug << "Action '" << name << "' not found." << std::endl;
     return;
@@ -150,7 +150,7 @@ Sprite::update()
 }
 
 void
-Sprite::draw(Canvas& canvas, const Vector& pos, int layer,
+Sprite::draw(Canvas& canvas, Vector const& pos, int layer,
              Flip flip)
 {
   assert(m_action != nullptr);
@@ -246,7 +246,7 @@ Sprite::get_alpha() const
 }
 
 void
-Sprite::set_color(const Color& c)
+Sprite::set_color(Color const& c)
 {
   m_color = c;
 }
@@ -258,7 +258,7 @@ Sprite::get_color() const
 }
 
 void
-Sprite::set_blend(const Blend& b)
+Sprite::set_blend(Blend const& b)
 {
   m_blend = b;
 }

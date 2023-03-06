@@ -37,8 +37,8 @@ private:
   using GameObject::GameObject;
 
 private:
-  Spotlight(const Spotlight&) = delete;
-  Spotlight& operator=(const Spotlight&) = delete;
+  Spotlight(Spotlight const&) = delete;
+  Spotlight& operator=(Spotlight const&) = delete;
 #endif
 
 public:

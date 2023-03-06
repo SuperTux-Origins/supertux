@@ -33,7 +33,7 @@ Tilegroup::Tilegroup() :
 }
 
 std::unique_ptr<TileSet>
-TileSet::from_file(const std::string& filename)
+TileSet::from_file(std::string const& filename)
 {
   auto tileset = std::make_unique<TileSet>();
 
@@ -74,7 +74,7 @@ TileSet::add_tile(int id, std::unique_ptr<Tile> tile)
   }
 }
 
-const Tile&
+Tile const&
 TileSet::get(const uint32_t id) const
 {
   if (id >= m_tiles.size()) {
@@ -121,10 +121,10 @@ TileSet::add_unassigned_tilegroup()
   for (auto tile = 0; tile < static_cast<int>(m_tiles.size()); tile++)
   {
     bool found = false;
-    for (const auto& group : m_tilegroups)
+    for (auto const& group : m_tilegroups)
     {
       found = std::any_of(group.tiles.begin(), group.tiles.end(),
-        [tile](const int& tile_in_group) {
+        [tile](int const& tile_in_group) {
           return tile_in_group == tile;
         });
       if(found)
@@ -149,13 +149,13 @@ TileSet::add_unassigned_tilegroup()
 }
 
 void
-TileSet::add_tilegroup(const Tilegroup& tilegroup)
+TileSet::add_tilegroup(Tilegroup const& tilegroup)
 {
   m_tilegroups.push_back(tilegroup);
 }
 
 void
-TileSet::print_debug_info(const std::string& filename)
+TileSet::print_debug_info(std::string const& filename)
 {
   if (false)
   { // enable this if you want to see a list of free tiles

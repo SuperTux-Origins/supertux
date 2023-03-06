@@ -24,15 +24,15 @@
 class GrowUp final : public MovingSprite
 {
 public:
-  GrowUp(const Vector& pos, Direction direction = Direction::RIGHT);
+  GrowUp(Vector const& pos, Direction direction = Direction::RIGHT);
   virtual bool is_saveable() const override {
     return false;
   }
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void do_jump();
 
 private:

@@ -24,7 +24,7 @@
 #include "util/writer.hpp"
 #include "video/drawing_context.hpp"
 
-AmbientLight::AmbientLight(const Color& color) :
+AmbientLight::AmbientLight(Color const& color) :
   m_ambient_light(color),
   m_ambient_light_fading(false),
   m_source_ambient_light(color),
@@ -34,7 +34,7 @@ AmbientLight::AmbientLight(const Color& color) :
 {
 }
 
-AmbientLight::AmbientLight(const ReaderMapping& mapping) :
+AmbientLight::AmbientLight(ReaderMapping const& mapping) :
   m_ambient_light(1.0f, 1.0f, 1.0f, 1.0f),
   m_ambient_light_fading(false),
   m_source_ambient_light(1.0f, 1.0f, 1.0f, 1.0f),
@@ -96,7 +96,7 @@ AmbientLight::draw(DrawingContext& context)
 }
 
 void
-AmbientLight::set_ambient_light(const Color& ambient_light)
+AmbientLight::set_ambient_light(Color const& ambient_light)
 {
   m_ambient_light = ambient_light;
 }

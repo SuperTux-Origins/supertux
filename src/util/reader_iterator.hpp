@@ -58,12 +58,12 @@ public:
 
   ReaderMapping as_mapping() const;
 
-  const sexp::Value& get_sexp() const;
-  const ReaderDocument& get_doc() const { return m_doc; }
+  sexp::Value const& get_sexp() const;
+  ReaderDocument const& get_doc() const { return m_doc; }
 
 private:
-  const ReaderDocument& m_doc;
-  const std::vector<sexp::Value>& m_arr;
+  ReaderDocument const& m_doc;
+  std::vector<sexp::Value> const& m_arr;
   size_t m_idx;
 };
 

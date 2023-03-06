@@ -22,7 +22,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
-SCrystallo::SCrystallo(const ReaderMapping& reader) :
+SCrystallo::SCrystallo(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/crystallo/scrystallo.sprite", "editor-left", "editor-right"),
   state(SCRYSTALLO_SLEEPING),
   m_radius(),
@@ -45,7 +45,7 @@ SCrystallo::initialize()
 }
 
 void
-SCrystallo::collision_solid(const CollisionHit& hit)
+SCrystallo::collision_solid(CollisionHit const& hit)
 {
   if (state != SCRYSTALLO_WALKING)
   {
@@ -56,7 +56,7 @@ SCrystallo::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-SCrystallo::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+SCrystallo::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (state != SCRYSTALLO_WALKING)
   {

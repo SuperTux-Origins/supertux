@@ -49,7 +49,7 @@ EndSequenceFireworks::running(float dt_sec)
 {
   EndSequence::running(dt_sec);
 
-  for (const auto& player : Sector::get().get_players())
+  for (auto const& player : Sector::get().get_players())
     if (!m_tux_is_stopped[player->get_id()])
       get_code_controller(player->get_id())->press(Control::JUMP);
 

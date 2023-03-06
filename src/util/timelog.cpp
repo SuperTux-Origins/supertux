@@ -28,7 +28,7 @@ Timelog::Timelog() :
 }
 
 void
-Timelog::log(const char* component)
+Timelog::log(char const* component)
 {
   Uint32 current_ticks = SDL_GetTicks();
 

@@ -25,7 +25,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 
-AmbientSound::AmbientSound(const ReaderMapping& mapping) :
+AmbientSound::AmbientSound(ReaderMapping const& mapping) :
   MovingObject(mapping),
   ExposedObject<AmbientSound, scripting::AmbientSound>(this),
   sample(),
@@ -71,7 +71,7 @@ AmbientSound::AmbientSound(const ReaderMapping& mapping) :
   latency=0;
 }
 
-AmbientSound::AmbientSound(const Vector& pos, float factor, float bias, float vol, const std::string& file) :
+AmbientSound::AmbientSound(Vector const& pos, float factor, float bias, float vol, std::string const& file) :
   ExposedObject<AmbientSound, scripting::AmbientSound>(this),
   sample(file),
   sound_source(),
@@ -190,7 +190,7 @@ AmbientSound::update(float dt_sec)
 
 #ifndef SCRIPTING_API
 void
-AmbientSound::set_pos(const Vector& pos)
+AmbientSound::set_pos(Vector const& pos)
 {
   MovingObject::set_pos(pos);
 }
@@ -215,7 +215,7 @@ AmbientSound::get_pos_y() const
 }
 
 HitResponse
-AmbientSound::collision(GameObject& other, const CollisionHit& hit_)
+AmbientSound::collision(GameObject& other, CollisionHit const& hit_)
 {
   return ABORT_MOVE;
 }

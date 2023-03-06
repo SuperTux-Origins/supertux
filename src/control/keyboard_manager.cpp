@@ -32,7 +32,7 @@ KeyboardManager::KeyboardManager(InputManager* parent,
 }
 
 void
-KeyboardManager::process_key_event(const SDL_KeyboardEvent& event)
+KeyboardManager::process_key_event(SDL_KeyboardEvent const& event)
 {
   auto key_mapping = m_keyboard_config.m_keymap.find(event.keysym.sym);
 
@@ -86,7 +86,7 @@ KeyboardManager::process_key_event(const SDL_KeyboardEvent& event)
 }
 
 void
-KeyboardManager::process_text_input_event(const SDL_TextInputEvent& event)
+KeyboardManager::process_text_input_event(SDL_TextInputEvent const& event)
 {
   if (!m_lock_text_input && Console::current()->hasFocus()) {
     for (int i = 0; event.text[i] != '\0'; ++i)
@@ -97,7 +97,7 @@ KeyboardManager::process_text_input_event(const SDL_TextInputEvent& event)
 }
 
 void
-KeyboardManager::process_console_key_event(const SDL_KeyboardEvent& event)
+KeyboardManager::process_console_key_event(SDL_KeyboardEvent const& event)
 {
   if (event.type != SDL_KEYDOWN) return;
   auto console = Console::current();
@@ -155,7 +155,7 @@ KeyboardManager::process_console_key_event(const SDL_KeyboardEvent& event)
 }
 
 void
-KeyboardManager::process_menu_key_event(const SDL_KeyboardEvent& event)
+KeyboardManager::process_menu_key_event(SDL_KeyboardEvent const& event)
 {
   // wait for key mode?
   if (m_wait_for_key)

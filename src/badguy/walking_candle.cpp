@@ -20,7 +20,7 @@
 #include "sprite/sprite.hpp"
 #include "util/reader_mapping.hpp"
 
-WalkingCandle::WalkingCandle(const ReaderMapping& reader)
+WalkingCandle::WalkingCandle(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/mr_candle/mr-candle.sprite", "left", "right"),
     lightcolor(1, 1, 1)
 {
@@ -64,7 +64,7 @@ WalkingCandle::unfreeze(bool melt) {
 }
 
 HitResponse
-WalkingCandle::collision(GameObject& other, const CollisionHit& hit) {
+WalkingCandle::collision(GameObject& other, CollisionHit const& hit) {
   auto l = dynamic_cast<Lantern*>(&other);
   if (l && !m_frozen) if (l->get_bbox().get_bottom() < m_col.m_bbox.get_top()) {
     l->add_color(lightcolor);

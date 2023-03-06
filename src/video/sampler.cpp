@@ -24,7 +24,7 @@ Sampler::Sampler() :
 {
 }
 
-Sampler::Sampler(GLenum filter, GLenum wrap_s, GLenum wrap_t, const Vector& animate) :
+Sampler::Sampler(GLenum filter, GLenum wrap_s, GLenum wrap_t, Vector const& animate) :
   m_filter(filter),
   m_wrap_s(wrap_s),
   m_wrap_t(wrap_t),

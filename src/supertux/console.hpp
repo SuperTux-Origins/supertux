@@ -43,16 +43,16 @@ public:
 public:
   ConsoleBuffer();
 
-  void addLines(const std::string& s); /**< display a string of (potentially) multiple lines in the console */
-  void addLine(const std::string& s); /**< display a line in the console */
+  void addLines(std::string const& s); /**< display a string of (potentially) multiple lines in the console */
+  void addLine(std::string const& s); /**< display a line in the console */
 
   void flush(ConsoleStreamBuffer& buffer); /**< act upon changes in a ConsoleStreamBuffer */
 
   void set_console(Console* console);
 
 private:
-  ConsoleBuffer(const ConsoleBuffer&) = delete;
-  ConsoleBuffer& operator=(const ConsoleBuffer&) = delete;
+  ConsoleBuffer(ConsoleBuffer const&) = delete;
+  ConsoleBuffer& operator=(ConsoleBuffer const&) = delete;
 };
 
 class Console final : public Currenton<Console>
@@ -106,19 +106,19 @@ private:
 
   float m_stayOpen;
 
-  void parse(const std::string& s); /**< react to a given command */
+  void parse(std::string const& s); /**< react to a given command */
 
   /** ready a virtual machine instance, creating a new thread and loading default .nut files if needed */
   void ready_vm();
 
   /** execute squirrel script and output result */
-  void execute_script(const std::string& s);
+  void execute_script(std::string const& s);
 
-  bool consoleCommand(const std::string& command, const std::vector<std::string>& arguments); /**< process internal command; return false if command was unknown, true otherwise */
+  bool consoleCommand(std::string const& command, std::vector<std::string> const& arguments); /**< process internal command; return false if command was unknown, true otherwise */
 
 private:
-  Console(const Console&) = delete;
-  Console & operator=(const Console&) = delete;
+  Console(Console const&) = delete;
+  Console & operator=(Console const&) = delete;
 };
 
 class ConsoleStreamBuffer final : public std::stringbuf

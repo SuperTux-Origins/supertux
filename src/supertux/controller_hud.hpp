@@ -35,8 +35,8 @@ private:
   std::map<Control, Rectf> m_controls;
 
 private:
-  ControllerHUD(const ControllerHUD&) = delete;
-  ControllerHUD& operator=(const ControllerHUD&) = delete;
+  ControllerHUD(ControllerHUD const&) = delete;
+  ControllerHUD& operator=(ControllerHUD const&) = delete;
 };
 
 #endif

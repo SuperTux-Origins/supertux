@@ -58,7 +58,7 @@ GLVertexArrays::bind()
 }
 
 void
-GLVertexArrays::set_positions(const float* data, size_t size)
+GLVertexArrays::set_positions(float const* data, size_t size)
 {
   assert_gl();
 
@@ -73,7 +73,7 @@ GLVertexArrays::set_positions(const float* data, size_t size)
 }
 
 void
-GLVertexArrays::set_texcoords(const float* data, size_t size)
+GLVertexArrays::set_texcoords(float const* data, size_t size)
 {
   assert_gl();
 
@@ -100,7 +100,7 @@ GLVertexArrays::set_texcoord(float u, float v)
 }
 
 void
-GLVertexArrays::set_colors(const float* data, size_t size)
+GLVertexArrays::set_colors(float const* data, size_t size)
 {
   assert_gl();
 
@@ -115,7 +115,7 @@ GLVertexArrays::set_colors(const float* data, size_t size)
 }
 
 void
-GLVertexArrays::set_color(const Color& color)
+GLVertexArrays::set_color(Color const& color)
 {
   assert_gl();
 

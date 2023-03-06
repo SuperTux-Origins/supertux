@@ -52,7 +52,7 @@ ControllerHUD::draw(DrawingContext& context)
   Canvas& canvas = context.color();
   Controller& controller = InputManager::current()->get_controller();
 
-  for(const auto& control: m_controls)
+  for(auto const& control: m_controls)
   {
     if (controller.pressed(control.first)) {
       canvas.draw_filled_rect(control.second, Color::WHITE, LAYER_HUD);

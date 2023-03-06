@@ -33,7 +33,7 @@
 
 namespace {
 
-PathStyle PathStyle_from_string(const std::string& text)
+PathStyle PathStyle_from_string(std::string const& text)
 {
   if (text == "none") {
     return PathStyle::NONE;
@@ -56,7 +56,7 @@ PathGameObject::PathGameObject() :
   m_name = make_unique_name("path", this);
 }
 
-PathGameObject::PathGameObject(const Vector& pos) :
+PathGameObject::PathGameObject(Vector const& pos) :
   m_path(new Path(pos)),
   m_style(PathStyle::NONE),
   m_edge_sprite(),
@@ -65,7 +65,7 @@ PathGameObject::PathGameObject(const Vector& pos) :
   m_name = make_unique_name("path", this);
 }
 
-PathGameObject::PathGameObject(const ReaderMapping& mapping, bool backward_compatibility_hack) :
+PathGameObject::PathGameObject(ReaderMapping const& mapping, bool backward_compatibility_hack) :
   GameObject(mapping),
   m_path(new Path),
   m_style(PathStyle::NONE),
@@ -115,7 +115,7 @@ PathGameObject::draw(DrawingContext& context)
   {
     std::optional<Vector> previous_node;
 
-    for (const auto& node : m_path->get_nodes())
+    for (auto const& node : m_path->get_nodes())
     {
       if (previous_node)
       {
@@ -149,7 +149,7 @@ PathGameObject::draw(DrawingContext& context)
     const Color edge_color = Color::MAGENTA;
 
     std::optional<Vector> previous_node;
-    for (const auto& node : m_path->get_nodes())
+    for (auto const& node : m_path->get_nodes())
     {
       if (previous_node)
       {
@@ -167,9 +167,9 @@ PathGameObject::draw(DrawingContext& context)
 void
 PathGameObject::remove_me()
 {
-  const auto& path_objects = Sector::get().get_objects_by_type<PathObject>();
+  auto const& path_objects = Sector::get().get_objects_by_type<PathObject>();
 
-  for (const auto& path_obj : path_objects)
+  for (auto const& path_obj : path_objects)
   {
     if (path_obj.get_path_gameobject() == this)
     {
@@ -197,9 +197,9 @@ PathGameObject::check_references()
   if (MenuManager::instance().is_active())
     return;
 
-  const auto& path_objects = Sector::get().get_objects_by_type<PathObject>();
+  auto const& path_objects = Sector::get().get_objects_by_type<PathObject>();
 
-  for (const auto& path_obj : path_objects)
+  for (auto const& path_obj : path_objects)
     if (path_obj.get_path_gameobject() == this)
       return;
 

@@ -22,10 +22,10 @@
 class FishJumping final : public BadGuy
 {
 public:
-  FishJumping(const ReaderMapping& );
+  FishJumping(ReaderMapping const& );
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& , const CollisionHit& ) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& , CollisionHit const& ) override;
   virtual void collision_tile(uint32_t tile_attributes) override;
 
   virtual void active_update(float) override;
@@ -42,7 +42,7 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  HitResponse hit(const CollisionHit& );
+  HitResponse hit(CollisionHit const& );
   void start_waiting();
   void jump();
 
@@ -51,8 +51,8 @@ private:
   float m_stop_y; /**< y-coordinate to stop at */
 
 private:
-  FishJumping(const FishJumping&) = delete;
-  FishJumping& operator=(const FishJumping&) = delete;
+  FishJumping(FishJumping const&) = delete;
+  FishJumping& operator=(FishJumping const&) = delete;
 };
 
 #endif

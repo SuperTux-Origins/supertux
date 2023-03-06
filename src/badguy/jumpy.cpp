@@ -25,7 +25,7 @@ static const float JUMPYSPEED=-600;
 static const float JUMPY_MID_TOLERANCE=4;
 static const float JUMPY_LOW_TOLERANCE=2;
 
-Jumpy::Jumpy(const ReaderMapping& reader) :
+Jumpy::Jumpy(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/snowjumpy/snowjumpy.sprite"),
   pos_groundhit(0.0f, 0.0f),
   groundhit_pos_set(false)
@@ -36,7 +36,7 @@ Jumpy::Jumpy(const ReaderMapping& reader) :
 }
 
 void
-Jumpy::collision_solid(const CollisionHit& chit)
+Jumpy::collision_solid(CollisionHit const& chit)
 {
   hit(chit);
   if (m_frozen)
@@ -44,13 +44,13 @@ Jumpy::collision_solid(const CollisionHit& chit)
 }
 
 HitResponse
-Jumpy::collision_badguy(BadGuy& , const CollisionHit& chit)
+Jumpy::collision_badguy(BadGuy& , CollisionHit const& chit)
 {
   return hit(chit);
 }
 
 HitResponse
-Jumpy::hit(const CollisionHit& chit)
+Jumpy::hit(CollisionHit const& chit)
 {
   if (chit.bottom) {
     if (!groundhit_pos_set)

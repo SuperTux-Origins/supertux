@@ -35,8 +35,8 @@ public:
   GameObjectManager(::GameObjectManager* parent);
 
 private:
-  GameObjectManager(const GameObjectManager&) = delete;
-  GameObjectManager& operator=(const GameObjectManager&) = delete;
+  GameObjectManager(GameObjectManager const&) = delete;
+  GameObjectManager& operator=(GameObjectManager const&) = delete;
 #endif
 
 public:
@@ -46,7 +46,7 @@ public:
   float get_ambient_green() const;
   float get_ambient_blue() const;
 
-  void set_music(const std::string& music);
+  void set_music(std::string const& music);
 };
 
 } // namespace scripting

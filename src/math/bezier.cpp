@@ -20,8 +20,8 @@
 #include "video/drawing_context.hpp"
 
 Vector
-Bezier::get_point(const Vector& p1, const Vector& p2, const Vector& p3,
-                  const Vector& p4, float t)
+Bezier::get_point(Vector const& p1, Vector const& p2, Vector const& p3,
+                  Vector const& p4, float t)
 {
   // SPECIAL CASE
   // If Beziers aren't used, treat it linearly. That is because Beziers will
@@ -37,8 +37,8 @@ Bezier::get_point(const Vector& p1, const Vector& p2, const Vector& p3,
 }
 
 Vector
-Bezier::get_point_raw(const Vector& p1, const Vector& p2, const Vector& p3,
-                      const Vector& p4, float t)
+Bezier::get_point_raw(Vector const& p1, Vector const& p2, Vector const& p3,
+                      Vector const& p4, float t)
 {
   float t2 = 1.f - t;
 
@@ -46,8 +46,8 @@ Bezier::get_point_raw(const Vector& p1, const Vector& p2, const Vector& p3,
 }
 
 float
-Bezier::get_length(const Vector& p1, const Vector& p2, const Vector& p3,
-                   const Vector& p4, int steps)
+Bezier::get_length(Vector const& p1, Vector const& p2, Vector const& p3,
+                   Vector const& p4, int steps)
 {
   float fteps = static_cast<float>(steps);
   float length = 0.f;
@@ -64,8 +64,8 @@ Bezier::get_length(const Vector& p1, const Vector& p2, const Vector& p3,
 }
 
 Vector
-Bezier::get_point_at_length(const Vector& p1, const Vector& p2, const Vector& p3,
-                            const Vector& p4, float length, int steps)
+Bezier::get_point_at_length(Vector const& p1, Vector const& p2, Vector const& p3,
+                            Vector const& p4, float length, int steps)
 {
   if (length == 0)
     return p1;
@@ -93,15 +93,15 @@ Bezier::get_point_at_length(const Vector& p1, const Vector& p2, const Vector& p3
 }
 
 Vector
-Bezier::get_point_by_length(const Vector& p1, const Vector& p2, const Vector& p3,
-                  const Vector& p4, float t)
+Bezier::get_point_by_length(Vector const& p1, Vector const& p2, Vector const& p3,
+                  Vector const& p4, float t)
 {
   return get_point_at_length(p1, p2, p3, p4, get_length(p1, p2, p3, p4) * t);
 }
 
 void
-Bezier::draw_curve(DrawingContext& context, const Vector& p1, const Vector& p2,
-                   const Vector& p3, const Vector& p4, int steps, Color color,
+Bezier::draw_curve(DrawingContext& context, Vector const& p1, Vector const& p2,
+                   Vector const& p3, Vector const& p4, int steps, Color color,
                    int layer)
 {
   // Save ourselves some processing time in common special cases

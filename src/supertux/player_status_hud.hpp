@@ -52,8 +52,8 @@ private:
   SurfacePtr ice_surface;
 
 private:
-  PlayerStatusHUD(const PlayerStatusHUD&) = delete;
-  PlayerStatusHUD& operator=(const PlayerStatusHUD&) = delete;
+  PlayerStatusHUD(PlayerStatusHUD const&) = delete;
+  PlayerStatusHUD& operator=(PlayerStatusHUD const&) = delete;
 };
 
 #endif

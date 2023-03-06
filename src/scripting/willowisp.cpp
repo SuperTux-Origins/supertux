@@ -28,7 +28,7 @@ WillOWisp::goto_node(int node_no)
 }
 
 void
-WillOWisp::set_state(const std::string& state)
+WillOWisp::set_state(std::string const& state)
 {
   SCRIPT_GUARD_VOID_T(WillOWisp);
   object.set_state(state);

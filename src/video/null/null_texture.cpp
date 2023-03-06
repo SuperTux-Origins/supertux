@@ -16,7 +16,7 @@
 
 #include "video/null/null_texture.hpp"
 
-NullTexture::NullTexture(const Size& size) :
+NullTexture::NullTexture(Size const& size) :
   m_texture_size(size),
   m_image_size(size)
 {

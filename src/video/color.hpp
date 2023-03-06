@@ -40,14 +40,14 @@ public:
 
     Color validate() const { return Color(r, g, b, a); }
 
-    CalculateColor operator+(const CalculateColor& o) const { return CalculateColor(r + o.r, g + o.g, b + o.b, a + o.a); }
-    CalculateColor operator-(const CalculateColor& o) const { return CalculateColor(r - o.r, g - o.g, b - o.b, a - o.a); }
-    CalculateColor operator*(const CalculateColor& o) const { return CalculateColor(r * o.r, g * o.g, b * o.b, a * o.a); }
-    CalculateColor operator/(const CalculateColor& o) const { return CalculateColor(r / o.r, g / o.g, b / o.b, a / o.a); }
-    CalculateColor operator+(const Color& o) const { return CalculateColor(r + o.red, g + o.green, b + o.blue, a + o.alpha); }
-    CalculateColor operator-(const Color& o) const { return CalculateColor(r - o.red, g - o.green, b - o.blue, a - o.alpha); }
-    CalculateColor operator*(const Color& o) const { return CalculateColor(r * o.red, g * o.green, b * o.blue, a * o.alpha); }
-    CalculateColor operator/(const Color& o) const { return CalculateColor(r / o.red, g / o.green, b / o.blue, a / o.alpha); }
+    CalculateColor operator+(CalculateColor const& o) const { return CalculateColor(r + o.r, g + o.g, b + o.b, a + o.a); }
+    CalculateColor operator-(CalculateColor const& o) const { return CalculateColor(r - o.r, g - o.g, b - o.b, a - o.a); }
+    CalculateColor operator*(CalculateColor const& o) const { return CalculateColor(r * o.r, g * o.g, b * o.b, a * o.a); }
+    CalculateColor operator/(CalculateColor const& o) const { return CalculateColor(r / o.r, g / o.g, b / o.b, a / o.a); }
+    CalculateColor operator+(Color const& o) const { return CalculateColor(r + o.red, g + o.green, b + o.blue, a + o.alpha); }
+    CalculateColor operator-(Color const& o) const { return CalculateColor(r - o.red, g - o.green, b - o.blue, a - o.alpha); }
+    CalculateColor operator*(Color const& o) const { return CalculateColor(r * o.red, g * o.green, b * o.blue, a * o.alpha); }
+    CalculateColor operator/(Color const& o) const { return CalculateColor(r / o.red, g / o.green, b / o.blue, a / o.alpha); }
     CalculateColor operator*(float m) const { return CalculateColor(r * m, g * m, b * m, a * m); }
     CalculateColor operator/(float d) const { return CalculateColor(r / d, g / d, b / d, a / d); }
 
@@ -95,17 +95,17 @@ public:
 
   Color(float red_, float green_, float blue_, float alpha_ = 1.0);
 
-  Color(const std::vector<float>& vals);
+  Color(std::vector<float> const& vals);
 
-  bool operator==(const Color& other) const;
-  bool operator!=(const Color& other) const;
+  bool operator==(Color const& other) const;
+  bool operator!=(Color const& other) const;
 
   float greyscale() const;
 
   // Multiplies the sRGB color values by v gamma-correctly
   Color multiply_linearly(float v) const;
 
-  bool operator < (const Color& other) const;
+  bool operator < (Color const& other) const;
 
   std::vector<float> toVector();
 
@@ -133,14 +133,14 @@ public:
     return { r8(), g8(), b8(), a8() };
   }
 
-  CalculateColor operator+(const Color& o) const { return CalculateColor(red + o.red, green + o.green, blue + o.blue, alpha + o.alpha); }
-  CalculateColor operator-(const Color& o) const { return CalculateColor(red - o.red, green - o.green, blue - o.blue, alpha - o.alpha); }
-  CalculateColor operator*(const Color& o) const { return CalculateColor(red * o.red, green * o.green, blue * o.blue, alpha * o.alpha); }
-  CalculateColor operator/(const Color& o) const { return CalculateColor(red / o.red, green / o.green, blue / o.blue, alpha / o.alpha); }
-  CalculateColor operator+(const CalculateColor& o) const { return CalculateColor(red + o.r, green + o.g, blue + o.b, alpha + o.a); }
-  CalculateColor operator-(const CalculateColor& o) const { return CalculateColor(red - o.r, green - o.g, blue - o.b, alpha - o.a); }
-  CalculateColor operator*(const CalculateColor& o) const { return CalculateColor(red * o.r, green * o.g, blue * o.b, alpha * o.a); }
-  CalculateColor operator/(const CalculateColor& o) const { return CalculateColor(red / o.r, green / o.g, blue / o.b, alpha / o.a); }
+  CalculateColor operator+(Color const& o) const { return CalculateColor(red + o.red, green + o.green, blue + o.blue, alpha + o.alpha); }
+  CalculateColor operator-(Color const& o) const { return CalculateColor(red - o.red, green - o.green, blue - o.blue, alpha - o.alpha); }
+  CalculateColor operator*(Color const& o) const { return CalculateColor(red * o.red, green * o.green, blue * o.blue, alpha * o.alpha); }
+  CalculateColor operator/(Color const& o) const { return CalculateColor(red / o.red, green / o.green, blue / o.blue, alpha / o.alpha); }
+  CalculateColor operator+(CalculateColor const& o) const { return CalculateColor(red + o.r, green + o.g, blue + o.b, alpha + o.a); }
+  CalculateColor operator-(CalculateColor const& o) const { return CalculateColor(red - o.r, green - o.g, blue - o.b, alpha - o.a); }
+  CalculateColor operator*(CalculateColor const& o) const { return CalculateColor(red * o.r, green * o.g, blue * o.b, alpha * o.a); }
+  CalculateColor operator/(CalculateColor const& o) const { return CalculateColor(red / o.r, green / o.g, blue / o.b, alpha / o.a); }
   CalculateColor operator*(float m) const { return CalculateColor(red * m, green * m, blue * m, alpha * m); }
   CalculateColor operator/(float d) const { return CalculateColor(red / d, green / d, blue / d, alpha / d); }
 

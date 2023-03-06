@@ -27,7 +27,7 @@ static const float JUMP_ON_SPEED_Y = -400;
 static const float JUMP_OFF_SPEED_Y = -500;
 static const std::string LAND_ON_TOTEM_SOUND = "sounds/totem.ogg";
 
-Totem::Totem(const ReaderMapping& reader) :
+Totem::Totem(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/totem/totem.sprite"),
   carrying(nullptr),
   carried_by(nullptr)
@@ -42,7 +42,7 @@ Totem::~Totem()
 }
 
 bool
-Totem::updatePointers(const GameObject* from_object, GameObject* to_object)
+Totem::updatePointers(GameObject const* from_object, GameObject* to_object)
 {
   if (from_object == carrying) {
     carrying = dynamic_cast<Totem*>(to_object);
@@ -141,7 +141,7 @@ Totem::collision_squished(GameObject& object)
 }
 
 void
-Totem::collision_solid(const CollisionHit& hit)
+Totem::collision_solid(CollisionHit const& hit)
 {
   update_on_ground_flag(hit);
 
@@ -168,7 +168,7 @@ Totem::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Totem::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+Totem::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   // if we are being carried around, pass event to bottom of stack and ignore it
   if (carried_by) {

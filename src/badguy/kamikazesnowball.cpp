@@ -26,7 +26,7 @@ namespace{
   const std::string SPLAT_SOUND = "sounds/splat.wav";
 }
 
-KamikazeSnowball::KamikazeSnowball(const ReaderMapping& reader) :
+KamikazeSnowball::KamikazeSnowball(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/snowball/kamikaze-snowball.sprite")
 {
   SoundManager::current()->preload(SPLAT_SOUND);
@@ -52,7 +52,7 @@ KamikazeSnowball::collision_squished(GameObject& object)
 }
 
 void
-KamikazeSnowball::collision_solid(const CollisionHit& hit)
+KamikazeSnowball::collision_solid(CollisionHit const& hit)
 {
   if (!m_frozen)
   {
@@ -81,7 +81,7 @@ KamikazeSnowball::kill_collision()
 }
 
 HitResponse
-KamikazeSnowball::collision_player(Player& player, const CollisionHit& hit)
+KamikazeSnowball::collision_player(Player& player, CollisionHit const& hit)
 {
   //Hack to tell if we should die
   if (!m_frozen)
@@ -99,7 +99,7 @@ KamikazeSnowball::collision_player(Player& player, const CollisionHit& hit)
   return ABORT_MOVE;
 }
 
-LeafShot::LeafShot(const ReaderMapping& reader) :
+LeafShot::LeafShot(ReaderMapping const& reader) :
   KamikazeSnowball(reader)
 {
   m_sprite_name = "images/creatures/leafshot/leafshot.sprite";

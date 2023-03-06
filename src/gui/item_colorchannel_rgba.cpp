@@ -59,7 +59,7 @@ ItemColorChannelRGBA::ItemColorChannelRGBA(float* input, Color channel, int id,
 }
 
 void
-ItemColorChannelRGBA::draw(DrawingContext& context, const Vector& pos,
+ItemColorChannelRGBA::draw(DrawingContext& context, Vector const& pos,
   int menu_width, bool active)
 {
   if (!m_edit_mode && *m_number != m_number_prev) {
@@ -92,7 +92,7 @@ ItemColorChannelRGBA::enable_edit_mode()
 
 
 void
-ItemColorChannelRGBA::event(const SDL_Event& ev)
+ItemColorChannelRGBA::event(SDL_Event const& ev)
 {
   if (ev.type == SDL_TEXTINPUT) {
     std::string txt = ev.text.text;
@@ -161,7 +161,7 @@ ItemColorChannelRGBA::remove_char()
 }
 
 void
-ItemColorChannelRGBA::process_action(const MenuAction& action)
+ItemColorChannelRGBA::process_action(MenuAction const& action)
 {
   switch (action)
   {

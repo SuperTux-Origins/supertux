@@ -21,7 +21,7 @@
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
-SpawnPointMarker::SpawnPointMarker(const std::string& name, const Vector& pos) :
+SpawnPointMarker::SpawnPointMarker(std::string const& name, Vector const& pos) :
   m_surface(Surface::from_file("images/engine/editor/spawnpoint.png"))
 {
   m_name = name;
@@ -31,7 +31,7 @@ SpawnPointMarker::SpawnPointMarker(const std::string& name, const Vector& pos) :
   set_group(COLGROUP_DISABLED);
 }
 
-SpawnPointMarker::SpawnPointMarker(const ReaderMapping& mapping) :
+SpawnPointMarker::SpawnPointMarker(ReaderMapping const& mapping) :
   m_surface(Surface::from_file("images/engine/editor/spawnpoint.png"))
 {
   m_name = mapping.get("name", std::string());

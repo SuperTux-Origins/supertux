@@ -29,7 +29,7 @@ namespace std {
 template<>
 struct hash<UID>
 {
-  size_t operator()(const UID& uid) const;
+  size_t operator()(UID const& uid) const;
 };
 
 } // namespace std {
@@ -37,8 +37,8 @@ struct hash<UID>
 class UID
 {
   friend class UIDGenerator;
-  friend std::ostream& operator<<(std::ostream& os, const UID& uid);
-  friend size_t std::hash<UID>::operator()(const UID&) const;
+  friend std::ostream& operator<<(std::ostream& os, UID const& uid);
+  friend size_t std::hash<UID>::operator()(UID const&) const;
 
 public:
   using Magic = uint8_t;
@@ -52,22 +52,22 @@ private:
 
 public:
   UID() : m_value(0) {}
-  UID(const UID& other) = default;
-  UID& operator=(const UID& other) = default;
+  UID(UID const& other) = default;
+  UID& operator=(UID const& other) = default;
 
   inline operator bool() const {
     return m_value != 0;
   }
 
-  inline bool operator<(const UID& other) const {
+  inline bool operator<(UID const& other) const {
     return m_value < other.m_value;
   }
 
-  inline bool operator==(const UID& other) const {
+  inline bool operator==(UID const& other) const {
     return m_value == other.m_value;
   }
 
-  inline bool operator!=(const UID& other) const {
+  inline bool operator!=(UID const& other) const {
     return m_value != other.m_value;
   }
 
@@ -77,7 +77,7 @@ protected:
   uint32_t m_value;
 };
 
-std::ostream& operator<<(std::ostream& os, const UID& uid);
+std::ostream& operator<<(std::ostream& os, UID const& uid);
 
 #endif
 

@@ -28,10 +28,10 @@ class Candle final : public MovingSprite,
                      public ExposedObject<Candle, scripting::Candle>
 {
 public:
-  Candle(const ReaderMapping& mapping);
+  Candle(ReaderMapping const& mapping);
   virtual void draw(DrawingContext& context) override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   static std::string class_name() { return "candle"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Candle"); }
@@ -54,8 +54,8 @@ private:
   SpritePtr candle_light_2; /**< drawn to lightmap (alternative image) */
 
 private:
-  Candle(const Candle&) = delete;
-  Candle& operator=(const Candle&) = delete;
+  Candle(Candle const&) = delete;
+  Candle& operator=(Candle const&) = delete;
 };
 
 #endif

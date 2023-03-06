@@ -18,12 +18,12 @@
 
 #include <sstream>
 
-SquirrelError::SquirrelError(HSQUIRRELVM v, const std::string& message_) throw() :
+SquirrelError::SquirrelError(HSQUIRRELVM v, std::string const& message_) throw() :
   message()
 {
   std::ostringstream msg;
   msg << "Squirrel error: " << message_ << " (";
-  const char* lasterr;
+  char const* lasterr;
   sq_getlasterror(v);
   if (sq_gettype(v, -1) != OT_STRING)
   {
@@ -41,7 +41,7 @@ SquirrelError::SquirrelError(HSQUIRRELVM v, const std::string& message_) throw()
 SquirrelError::~SquirrelError() throw()
 {}
 
-const char*
+char const*
 SquirrelError::what() const throw()
 {
   return message.c_str();

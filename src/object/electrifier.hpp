@@ -48,8 +48,8 @@ private:
   Timer duration;
 
 private:
-  Electrifier(const Electrifier&) = delete;
-  Electrifier& operator=(const Electrifier&) = delete;
+  Electrifier(Electrifier const&) = delete;
+  Electrifier& operator=(Electrifier const&) = delete;
 };
 
 #endif

@@ -24,7 +24,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
-Candle::Candle(const ReaderMapping& mapping) :
+Candle::Candle(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/candle/candle.sprite", LAYER_BACKGROUNDTILES+1, COLGROUP_DISABLED),
   ExposedObject<Candle, scripting::Candle>(this),
   burning(true),
@@ -80,7 +80,7 @@ Candle::draw(DrawingContext& context)
 }
 
 HitResponse
-Candle::collision(GameObject&, const CollisionHit& )
+Candle::collision(GameObject&, CollisionHit const& )
 {
   return FORCE_MOVE;
 }

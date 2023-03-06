@@ -46,12 +46,12 @@ public:
   };
 
 public:
-  BonusBlock(const Vector& pos, int tile_data);
-  BonusBlock(const ReaderMapping& mapping);
+  BonusBlock(Vector const& pos, int tile_data);
+  BonusBlock(ReaderMapping const& mapping);
   ~BonusBlock() override;
 
   virtual void hit(Player& player) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void draw(DrawingContext& context) override;
 
   static std::string class_name() { return "bonusblock"; }
@@ -68,12 +68,12 @@ private:
   void try_drop(Player* player);
 
   void preload_contents(int d);
-  void raise_growup_bonus(Player* player, const BonusType& bonus, const Direction& dir);
-  void drop_growup_bonus(Player* player, const std::string& bonus_sprite_name, const Direction& dir, bool& countdown);
+  void raise_growup_bonus(Player* player, BonusType const& bonus, Direction const& dir);
+  void drop_growup_bonus(Player* player, std::string const& bonus_sprite_name, Direction const& dir, bool& countdown);
 
   BonusBlock::Content get_content_by_data(int tile_data) const;
-  BonusBlock::Content get_content_from_string(const std::string& contentstring) const;
-  std::string contents_to_string(const BonusBlock::Content& content) const;
+  BonusBlock::Content get_content_from_string(std::string const& contentstring) const;
+  std::string contents_to_string(BonusBlock::Content const& content) const;
 
 private:
   Content m_contents;
@@ -84,8 +84,8 @@ private:
   sexp::Value m_custom_sx;
 
 private:
-  BonusBlock(const BonusBlock&) = delete;
-  BonusBlock& operator=(const BonusBlock&) = delete;
+  BonusBlock(BonusBlock const&) = delete;
+  BonusBlock& operator=(BonusBlock const&) = delete;
 };
 
 #endif

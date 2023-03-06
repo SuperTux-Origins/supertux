@@ -22,7 +22,7 @@
 class MrTree final : public WalkingBadguy
 {
 public:
-  MrTree(const ReaderMapping& reader);
+  MrTree(ReaderMapping const& reader);
 
   virtual bool is_freezable() const override;
 
@@ -36,8 +36,8 @@ protected:
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  MrTree(const MrTree&) = delete;
-  MrTree& operator=(const MrTree&) = delete;
+  MrTree(MrTree const&) = delete;
+  MrTree& operator=(MrTree const&) = delete;
 };
 
 #endif

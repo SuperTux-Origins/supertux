@@ -43,28 +43,28 @@ SquirrelVM::~SquirrelVM()
 }
 
 void
-SquirrelVM::begin_table(const char* name)
+SquirrelVM::begin_table(char const* name)
 {
   sq_pushstring(m_vm, name, -1);
   sq_newtable(m_vm);
 }
 
 void
-SquirrelVM::end_table(const char* name)
+SquirrelVM::end_table(char const* name)
 {
   if (SQ_FAILED(sq_createslot(m_vm, -3)))
     throw SquirrelError(m_vm, "Failed to create '" + std::string(name) + "' table entry");
 }
 
 void
-SquirrelVM::create_empty_table(const char* name)
+SquirrelVM::create_empty_table(char const* name)
 {
   begin_table(name);
   end_table(name);
 }
 
 bool
-SquirrelVM::has_property(const char* name)
+SquirrelVM::has_property(char const* name)
 {
   sq_pushstring(m_vm, name, -1);
   if (SQ_FAILED(sq_get(m_vm, -2))) return false;
@@ -73,7 +73,7 @@ SquirrelVM::has_property(const char* name)
 }
 
 void
-SquirrelVM::store_bool(const char* name, bool val)
+SquirrelVM::store_bool(char const* name, bool val)
 {
   sq_pushstring(m_vm, name, -1);
   sq_pushbool(m_vm, val ? SQTrue : SQFalse);
@@ -82,7 +82,7 @@ SquirrelVM::store_bool(const char* name, bool val)
 }
 
 void
-SquirrelVM::store_int(const char* name, int val)
+SquirrelVM::store_int(char const* name, int val)
 {
   sq_pushstring(m_vm, name, -1);
   sq_pushinteger(m_vm, val);
@@ -91,7 +91,7 @@ SquirrelVM::store_int(const char* name, int val)
 }
 
 void
-SquirrelVM::store_float(const char* name, float val)
+SquirrelVM::store_float(char const* name, float val)
 {
   sq_pushstring(m_vm, name, -1);
   sq_pushfloat(m_vm, val);
@@ -100,7 +100,7 @@ SquirrelVM::store_float(const char* name, float val)
 }
 
 void
-SquirrelVM::store_string(const char* name, const std::string& val)
+SquirrelVM::store_string(char const* name, std::string const& val)
 {
   sq_pushstring(m_vm, name, -1);
   sq_pushstring(m_vm, val.c_str(), val.length());
@@ -109,7 +109,7 @@ SquirrelVM::store_string(const char* name, const std::string& val)
 }
 
 void
-SquirrelVM::store_object(const char* name, const HSQOBJECT& val)
+SquirrelVM::store_object(char const* name, HSQOBJECT const& val)
 {
   sq_pushstring(m_vm, name, -1);
   sq_pushobject(m_vm, val);
@@ -118,7 +118,7 @@ SquirrelVM::store_object(const char* name, const HSQOBJECT& val)
 }
 
 bool
-SquirrelVM::get_bool(const char* name, bool& val)
+SquirrelVM::get_bool(char const* name, bool& val)
 {
   if (!has_property(name)) return false;
   val = read_bool(name);
@@ -126,7 +126,7 @@ SquirrelVM::get_bool(const char* name, bool& val)
 }
 
 bool
-SquirrelVM::get_int(const char* name, int& val)
+SquirrelVM::get_int(char const* name, int& val)
 {
   if (!has_property(name)) return false;
   val = read_int(name);
@@ -134,7 +134,7 @@ SquirrelVM::get_int(const char* name, int& val)
 }
 
 bool
-SquirrelVM::get_float(const char* name, float& val)
+SquirrelVM::get_float(char const* name, float& val)
 {
   if (!has_property(name)) return false;
   val = read_float(name);
@@ -142,7 +142,7 @@ SquirrelVM::get_float(const char* name, float& val)
 }
 
 bool
-SquirrelVM::get_string(const char* name, std::string& val)
+SquirrelVM::get_string(char const* name, std::string& val)
 {
   if (!has_property(name)) return false;
   val = read_string(name);
@@ -150,7 +150,7 @@ SquirrelVM::get_string(const char* name, std::string& val)
 }
 
 bool
-SquirrelVM::read_bool(const char* name)
+SquirrelVM::read_bool(char const* name)
 {
   get_table_entry(name);
 
@@ -166,7 +166,7 @@ SquirrelVM::read_bool(const char* name)
 }
 
 int
-SquirrelVM::read_int(const char* name)
+SquirrelVM::read_int(char const* name)
 {
   get_table_entry(name);
 
@@ -182,7 +182,7 @@ SquirrelVM::read_int(const char* name)
 }
 
 float
-SquirrelVM::read_float(const char* name)
+SquirrelVM::read_float(char const* name)
 {
   get_table_entry(name);
 
@@ -198,11 +198,11 @@ SquirrelVM::read_float(const char* name)
 }
 
 std::string
-SquirrelVM::read_string(const char* name)
+SquirrelVM::read_string(char const* name)
 {
   get_table_entry(name);
 
-  const char* result;
+  char const* result;
   if (SQ_FAILED(sq_getstring(m_vm, -1, &result))) {
     std::ostringstream msg;
     msg << "Couldn't get string value for '" << name << "' from table";
@@ -214,7 +214,7 @@ SquirrelVM::read_string(const char* name)
 }
 
 void
-SquirrelVM::get_table_entry(const std::string& name)
+SquirrelVM::get_table_entry(std::string const& name)
 {
   sq_pushstring(m_vm, name.c_str(), -1);
   if (SQ_FAILED(sq_get(m_vm, -2)))
@@ -230,7 +230,7 @@ SquirrelVM::get_table_entry(const std::string& name)
 }
 
 void
-SquirrelVM::get_or_create_table_entry(const std::string& name)
+SquirrelVM::get_or_create_table_entry(std::string const& name)
 {
   try
   {
@@ -244,7 +244,7 @@ SquirrelVM::get_or_create_table_entry(const std::string& name)
 }
 
 void
-SquirrelVM::delete_table_entry(const char* name)
+SquirrelVM::delete_table_entry(char const* name)
 {
   sq_pushstring(m_vm, name, -1);
   if (SQ_FAILED(sq_deleteslot(m_vm, -2, false)))
@@ -255,7 +255,7 @@ SquirrelVM::delete_table_entry(const char* name)
 }
 
 void
-SquirrelVM::rename_table_entry(const char* oldname, const char* newname)
+SquirrelVM::rename_table_entry(char const* oldname, char const* newname)
 {
   SQInteger oldtop = sq_gettop(m_vm);
 
@@ -285,7 +285,7 @@ SquirrelVM::get_table_keys()
   while (SQ_SUCCEEDED(sq_next(m_vm, -2)))
   {
     //here -1 is the value and -2 is the key
-    const char* result;
+    char const* result;
     if (SQ_FAILED(sq_getstring(m_vm, -2, &result)))
     {
       throw SquirrelError(m_vm, "Couldn't get string value for key");

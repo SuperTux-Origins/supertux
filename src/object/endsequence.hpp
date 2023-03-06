@@ -41,7 +41,7 @@ public:
     return false;
   }
 
-  const Controller* get_controller(int player);
+  Controller const* get_controller(int player);
 
 protected:
   CodeController* get_code_controller(int player);
@@ -56,8 +56,8 @@ protected:
   std::unordered_map<int, std::unique_ptr<CodeController>> m_end_sequence_controllers;
 
 private:
-  EndSequence(const EndSequence&) = delete;
-  EndSequence& operator=(const EndSequence&) = delete;
+  EndSequence(EndSequence const&) = delete;
+  EndSequence& operator=(EndSequence const&) = delete;
 };
 
 #endif

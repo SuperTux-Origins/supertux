@@ -28,7 +28,7 @@
 
 namespace worldmap {
 
-LevelTile::LevelTile(const std::string& basedir, const ReaderMapping& mapping) :
+LevelTile::LevelTile(std::string const& basedir, ReaderMapping const& mapping) :
   GameObject(mapping),
   m_pos(0.0f, 0.0f),
   m_basedir(basedir),

@@ -28,7 +28,7 @@ class ParticleZone final :
   //public ExposedObject<ParticleZone, scripting::Wind> // TODO: Scripting interface
 {
 public:
-  ParticleZone(const ReaderMapping& reader);
+  ParticleZone(ReaderMapping const& reader);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
@@ -38,7 +38,7 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Particle zone"); }
   virtual std::string get_display_name() const override { return display_name(); }
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   virtual int get_layer() const override { return LAYER_OBJECTS; }
 
@@ -105,7 +105,7 @@ public:
     ParticleZoneType m_type;
     Rectf m_rect;
 
-    ZoneDetails(std::string name, ParticleZoneType type, const Rectf& rect) :
+    ZoneDetails(std::string name, ParticleZoneType type, Rectf const& rect) :
       m_particle_name(std::move(name)),
       m_type(type),
       m_rect(rect)
@@ -125,8 +125,8 @@ private:
   ParticleZoneType m_type;
 
 private:
-  ParticleZone(const ParticleZone&) = delete;
-  ParticleZone& operator=(const ParticleZone&) = delete;
+  ParticleZone(ParticleZone const&) = delete;
+  ParticleZone& operator=(ParticleZone const&) = delete;
 };
 
 #endif

@@ -23,10 +23,10 @@
 class Zeekling final : public BadGuy
 {
 public:
-  Zeekling(const ReaderMapping& reader);
+  Zeekling(ReaderMapping const& reader);
 
   virtual void initialize() override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
   virtual void active_update(float dt_sec) override;
 
   virtual void freeze() override;
@@ -57,13 +57,13 @@ private:
   float speed;
   Timer diveRecoverTimer;
   ZeeklingState state;
-  const MovingObject* last_player; /**< last player we tracked */
+  MovingObject const* last_player; /**< last player we tracked */
   Vector last_player_pos; /**< position we last spotted the player at */
   Vector last_self_pos; /**< position we last were at */
 
 private:
-  Zeekling(const Zeekling&) = delete;
-  Zeekling& operator=(const Zeekling&) = delete;
+  Zeekling(Zeekling const&) = delete;
+  Zeekling& operator=(Zeekling const&) = delete;
 };
 
 #endif

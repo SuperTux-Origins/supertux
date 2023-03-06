@@ -24,7 +24,7 @@
 class ShrinkFade final : public ScreenFade
 {
 public:
-  ShrinkFade(const Vector& point, float fade_time);
+  ShrinkFade(Vector const& point, float fade_time);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
@@ -38,8 +38,8 @@ private:
   float m_initial_size;
 
 private:
-  ShrinkFade(const ShrinkFade&) = delete;
-  ShrinkFade& operator=(const ShrinkFade&) = delete;
+  ShrinkFade(ShrinkFade const&) = delete;
+  ShrinkFade& operator=(ShrinkFade const&) = delete;
 };
 
 #endif

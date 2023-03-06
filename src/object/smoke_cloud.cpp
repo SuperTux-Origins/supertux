@@ -19,7 +19,7 @@
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 
-SmokeCloud::SmokeCloud(const Vector& pos) :
+SmokeCloud::SmokeCloud(Vector const& pos) :
   sprite(SpriteManager::current()->create("images/particles/stomp.sprite")),
   timer(),
   position(pos)

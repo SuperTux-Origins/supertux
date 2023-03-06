@@ -37,14 +37,14 @@ public:
   using GameObject::GameObject;
 
 private:
-  Background(const Background&) = delete;
-  Background& operator=(const Background&) = delete;
+  Background(Background const&) = delete;
+  Background& operator=(Background const&) = delete;
 #endif
 
 public:
-  void set_image(const std::string& image);
-  void set_images(const std::string& top_image, const std::string& middle_image,
-                             const std::string& bottom_image);
+  void set_image(std::string const& image);
+  void set_images(std::string const& top_image, std::string const& middle_image,
+                             std::string const& bottom_image);
   void set_speed(float speed);
 
   float get_color_red();

@@ -40,8 +40,8 @@ private:
   Rectf m_right_stripe;
 
 private:
-  VerticalStripes(const VerticalStripes&) = delete;
-  VerticalStripes& operator=(const VerticalStripes&) = delete;
+  VerticalStripes(VerticalStripes const&) = delete;
+  VerticalStripes& operator=(VerticalStripes const&) = delete;
 };
 
 #endif

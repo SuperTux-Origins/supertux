@@ -25,8 +25,8 @@
     automatically. Do not use 'delete' or 'free()' on it.
 
     See: https://wiki.libsdl.org/SDL_RWclose */
-SDL_RWops* get_physfs_SDLRWops(const std::string& filename);
-SDL_RWops* get_writable_physfs_SDLRWops(const std::string& filename);
+SDL_RWops* get_physfs_SDLRWops(std::string const& filename);
+SDL_RWops* get_writable_physfs_SDLRWops(std::string const& filename);
 
 #endif
 

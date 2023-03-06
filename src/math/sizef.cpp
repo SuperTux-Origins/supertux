@@ -20,13 +20,13 @@
 
 #include "math/size.hpp"
 
-Sizef::Sizef(const Size& rhs) :
+Sizef::Sizef(Size const& rhs) :
   width(static_cast<float>(rhs.width)),
   height(static_cast<float>(rhs.height))
 {
 }
 
-std::ostream& operator<<(std::ostream& s, const Sizef& size)
+std::ostream& operator<<(std::ostream& s, Sizef const& size)
 {
   return s << "Sizef(" << size.width << ", " << size.height << ")";
 }

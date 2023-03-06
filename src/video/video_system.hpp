@@ -45,7 +45,7 @@ public:
 
   static std::unique_ptr<VideoSystem> create(VideoSystem::Enum video_system);
 
-  static Enum get_video_system(const std::string &video);
+  static Enum get_video_system(std::string const&video);
   static std::string get_video_string(Enum video);
   static std::vector<std::string> get_available_video_systems();
 
@@ -60,9 +60,9 @@ public:
   virtual Renderer& get_renderer() const = 0;
   virtual Renderer& get_lightmap() const = 0;
 
-  virtual TexturePtr new_texture(const SDL_Surface& image, const Sampler& sampler = Sampler()) = 0;
+  virtual TexturePtr new_texture(SDL_Surface const& image, Sampler const& sampler = Sampler()) = 0;
 
-  virtual const Viewport& get_viewport() const = 0;
+  virtual Viewport const& get_viewport() const = 0;
   virtual void apply_config() = 0;
   virtual void flip() = 0;
   virtual void on_resize(int w, int h) = 0;
@@ -71,15 +71,15 @@ public:
   virtual void set_vsync(int mode) = 0;
   virtual int get_vsync() const = 0;
   virtual void set_gamma(float gamma) = 0;
-  virtual void set_title(const std::string& title) = 0;
-  virtual void set_icon(const SDL_Surface& icon) = 0;
+  virtual void set_title(std::string const& title) = 0;
+  virtual void set_icon(SDL_Surface const& icon) = 0;
   virtual SDLSurfacePtr make_screenshot() = 0;
 
   void do_take_screenshot();
 
 private:
-  VideoSystem(const VideoSystem&) = delete;
-  VideoSystem& operator=(const VideoSystem&) = delete;
+  VideoSystem(VideoSystem const&) = delete;
+  VideoSystem& operator=(VideoSystem const&) = delete;
 };
 
 #endif

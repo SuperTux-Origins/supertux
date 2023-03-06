@@ -41,8 +41,8 @@ public:
   {}
 
 private:
-  WillOWisp(const WillOWisp&) = delete;
-  WillOWisp& operator=(const WillOWisp&) = delete;
+  WillOWisp(WillOWisp const&) = delete;
+  WillOWisp& operator=(WillOWisp const&) = delete;
 #endif
 
 public:
@@ -56,7 +56,7 @@ public:
    * -normal           "normal" mode starts tracking tux when he is near enough
    * -vanish           vanish
    */
-  void set_state(const std::string& state);
+  void set_state(std::string const& state);
 
   /**
    * Start following the path

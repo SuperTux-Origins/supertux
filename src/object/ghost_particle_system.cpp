@@ -32,7 +32,7 @@ GhostParticleSystem::GhostParticleSystem()
   init();
 }
 
-GhostParticleSystem::GhostParticleSystem(const ReaderMapping& reader) :
+GhostParticleSystem::GhostParticleSystem(ReaderMapping const& reader) :
   ParticleSystem(reader)
 {
   init();
@@ -70,8 +70,8 @@ GhostParticleSystem::update(float dt_sec)
   if (!enabled)
     return;
 
-  for (const auto& part : particles) {
-    const auto& particle = dynamic_cast<GhostParticle*>(part.get());
+  for (auto const& part : particles) {
+    auto const& particle = dynamic_cast<GhostParticle*>(part.get());
     particle->pos.y -= particle->speed * dt_sec;
     particle->pos.x -= particle->speed * dt_sec;
     if (particle->pos.y > static_cast<float>(SCREEN_HEIGHT)) {

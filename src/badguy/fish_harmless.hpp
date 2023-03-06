@@ -23,9 +23,9 @@
 class FishHarmless final : public FishSwimming
 {
 public:
-  FishHarmless(const ReaderMapping& reader);
+  FishHarmless(ReaderMapping const& reader);
 
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
   static std::string class_name() { return "fish-harmless"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -34,8 +34,8 @@ public:
   virtual std::string get_overlay_size() const override { return "1x1"; }
 
 private:
-  FishHarmless(const FishHarmless&) = delete;
-  FishHarmless& operator=(const FishHarmless&) = delete;
+  FishHarmless(FishHarmless const&) = delete;
+  FishHarmless& operator=(FishHarmless const&) = delete;
 };
 
 #endif

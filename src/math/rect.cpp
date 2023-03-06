@@ -20,7 +20,7 @@
 
 #include "math/rectf.hpp"
 
-Rect::Rect(const Rectf& other) :
+Rect::Rect(Rectf const& other) :
   left(static_cast<int>(other.get_left())),
   top(static_cast<int>(other.get_top())),
   right(static_cast<int>(other.get_right())),
@@ -28,7 +28,7 @@ Rect::Rect(const Rectf& other) :
 {
 }
 
-std::ostream& operator<<(std::ostream& out, const Rect& rect)
+std::ostream& operator<<(std::ostream& out, Rect const& rect)
 {
   out << "Rect("
       << rect.left << ", " << rect.top << ", "

@@ -22,16 +22,16 @@
 class ItemBack final : public MenuItem
 {
 public:
-  ItemBack(const std::string& text, int id = -1);
+  ItemBack(std::string const& text, int id = -1);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns the minimum width of the menu item. */
   virtual int get_width() const override;
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
   /** Returns true when the memu manager shouldn't do anything else. */
   virtual bool no_other_action() const override {
@@ -39,8 +39,8 @@ public:
   }
 
 private:
-  ItemBack(const ItemBack&) = delete;
-  ItemBack& operator=(const ItemBack&) = delete;
+  ItemBack(ItemBack const&) = delete;
+  ItemBack& operator=(ItemBack const&) = delete;
 };
 
 #endif

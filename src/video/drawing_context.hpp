@@ -67,12 +67,12 @@ public:
   void push_transform();
   void pop_transform();
   DrawingTransform& transform();
-  const DrawingTransform& transform() const;
+  DrawingTransform const& transform() const;
 
-  const Vector& get_translation() const
+  Vector const& get_translation() const
   {  return transform().translation;  }
 
-  void set_translation(const Vector& newtranslation)
+  void set_translation(Vector const& newtranslation)
   {  transform().translation = newtranslation;  }
 
   float get_scale() const { return transform().scale; }
@@ -92,7 +92,7 @@ public:
     m_colormap_canvas.clear();
   }
 
-  void set_viewport(const Rect& viewport)
+  void set_viewport(Rect const& viewport)
   {
     m_viewport = viewport;
   }
@@ -130,8 +130,8 @@ private:
   Canvas m_lightmap_canvas;
 
 private:
-  DrawingContext(const DrawingContext&) = delete;
-  DrawingContext& operator=(const DrawingContext&) = delete;
+  DrawingContext(DrawingContext const&) = delete;
+  DrawingContext& operator=(DrawingContext const&) = delete;
 };
 
 #endif

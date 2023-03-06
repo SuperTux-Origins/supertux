@@ -33,7 +33,7 @@ class GameObject;
 class ObjectFactory
 {
 private:
-  typedef std::function<std::unique_ptr<GameObject> (const ReaderMapping&)> FactoryFunction;
+  typedef std::function<std::unique_ptr<GameObject> (ReaderMapping const&)> FactoryFunction;
   typedef std::map<std::string, FactoryFunction> Factories;
   Factories factories;
   std::vector<std::string> m_badguys_names;
@@ -54,8 +54,8 @@ public:
 
 public:
   /** Will throw in case of creation failure, will never return nullptr */
-  std::unique_ptr<GameObject> create(const std::string& name, const ReaderMapping& reader) const;
-  std::string get_display_name(const std::string& name) const;
+  std::unique_ptr<GameObject> create(std::string const& name, ReaderMapping const& reader) const;
+  std::string get_display_name(std::string const& name) const;
 
   std::vector<std::string>& get_registered_badguys() { return m_badguys_names; }
   std::vector<std::string> get_registered_badguys(uint8_t params);
@@ -65,13 +65,13 @@ public:
 protected:
   ObjectFactory();
 
-  void add_display_name(const char* class_name, const std::string& display_name)
+  void add_display_name(char const* class_name, std::string const& display_name)
   {
     assert(m_other_display_names.find(class_name) == m_other_display_names.end());
     m_other_display_names[class_name] = display_name;
   }
 
-  void add_factory(const char* name, const std::string& display_name, const FactoryFunction& func, uint8_t obj_params = 0)
+  void add_factory(char const* name, std::string const& display_name, FactoryFunction const& func, uint8_t obj_params = 0)
   {
     assert(factories.find(name) == factories.end());
     if (m_adding_badguys)
@@ -86,10 +86,10 @@ protected:
   }
 
   template<class C>
-  void add_factory(const char* class_name, uint8_t obj_params = 0, const std::string& display_name = "")
+  void add_factory(char const* class_name, uint8_t obj_params = 0, std::string const& display_name = "")
   {
     add_factory(class_name, (display_name == "") ? C::display_name() : display_name,
-                [](const ReaderMapping& reader) {
+                [](ReaderMapping const& reader) {
                   return std::make_unique<C>(reader);
                 }, obj_params);
   }

@@ -45,7 +45,7 @@ class ParticleSystem : public GameObject,
                        public ExposedObject<ParticleSystem, scripting::ParticleSystem>
 {
 public:
-  ParticleSystem(const ReaderMapping& reader, float max_particle_size = 60);
+  ParticleSystem(ReaderMapping const& reader, float max_particle_size = 60);
   ParticleSystem(float max_particle_size = 60);
   ~ParticleSystem() override;
 
@@ -84,8 +84,8 @@ protected:
     float scale; // see initializer
 
   private:
-    Particle(const Particle&) = delete;
-    Particle& operator=(const Particle&) = delete;
+    Particle(Particle const&) = delete;
+    Particle& operator=(Particle const&) = delete;
   };
 
 protected:
@@ -97,8 +97,8 @@ protected:
   bool enabled;
 
 private:
-  ParticleSystem(const ParticleSystem&) = delete;
-  ParticleSystem& operator=(const ParticleSystem&) = delete;
+  ParticleSystem(ParticleSystem const&) = delete;
+  ParticleSystem& operator=(ParticleSystem const&) = delete;
 };
 
 #endif

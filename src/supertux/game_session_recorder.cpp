@@ -55,7 +55,7 @@ GameSessionRecorder::start_recording()
 }
 
 void
-GameSessionRecorder::record_demo(const std::string& filename)
+GameSessionRecorder::record_demo(std::string const& filename)
 {
   m_capture_demo_stream.reset(new std::ofstream(filename.c_str()));
   if (!m_capture_demo_stream->good()) {
@@ -72,7 +72,7 @@ GameSessionRecorder::record_demo(const std::string& filename)
 }
 
 int
-GameSessionRecorder::get_demo_random_seed(const std::string& filename) const
+GameSessionRecorder::get_demo_random_seed(std::string const& filename) const
 {
   std::unique_ptr<std::istream> test_stream(new std::ifstream(filename.c_str()));
   if (test_stream->good())
@@ -97,7 +97,7 @@ GameSessionRecorder::get_demo_random_seed(const std::string& filename) const
 }
 
 void
-GameSessionRecorder::play_demo(const std::string& filename)
+GameSessionRecorder::play_demo(std::string const& filename)
 {
   m_playing = true;
 

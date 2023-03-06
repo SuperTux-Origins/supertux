@@ -28,15 +28,15 @@ class Rock : public MovingSprite,
              public ExposedObject<Rock, scripting::Rock>
 {
 public:
-  Rock(const Vector& pos, const std::string& spritename);
-  Rock(const ReaderMapping& reader);
-  Rock(const ReaderMapping& reader, const std::string& spritename);
+  Rock(Vector const& pos, std::string const& spritename);
+  Rock(ReaderMapping const& reader);
+  Rock(ReaderMapping const& reader, std::string const& spritename);
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
 
-  virtual void grab(MovingObject& object, const Vector& pos, Direction dir) override;
+  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   virtual void ungrab(MovingObject& object, Direction dir) override;
   static std::string class_name() { return "rock"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -44,7 +44,7 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
   /** Adds velocity from wind */
-  virtual void add_wind_velocity(const Vector& velocity, const Vector& end_speed);
+  virtual void add_wind_velocity(Vector const& velocity, Vector const& end_speed);
 
 protected:
   Physic physic;
@@ -54,8 +54,8 @@ protected:
   std::string on_ungrab_script;
 
 private:
-  Rock(const Rock&) = delete;
-  Rock& operator=(const Rock&) = delete;
+  Rock(Rock const&) = delete;
+  Rock& operator=(Rock const&) = delete;
 };
 
 #endif

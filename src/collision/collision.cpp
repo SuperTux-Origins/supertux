@@ -23,7 +23,7 @@
 
 namespace collision {
 
-void Constraints::merge_constraints(const Constraints& other)
+void Constraints::merge_constraints(Constraints const& other)
 {
   constrain_left(other.position_left);
   constrain_right(other.position_right);
@@ -37,7 +37,7 @@ void Constraints::merge_constraints(const Constraints& other)
   hit.crush |= other.hit.crush;
 }
 
-bool intersects(const Rectf& r1, const Rectf& r2)
+bool intersects(Rectf const& r1, Rectf const& r2)
 {
   if (r1.get_right() < r2.get_left() || r1.get_left() > r2.get_right())
     return false;
@@ -50,7 +50,7 @@ bool intersects(const Rectf& r1, const Rectf& r2)
 //---------------------------------------------------------------------------
 
 namespace {
-inline void makePlane(const Vector& p1, const Vector& p2, Vector& n, float& c)
+inline void makePlane(Vector const& p1, Vector const& p2, Vector& n, float& c)
 {
   n = Vector(p2.y - p1.y, p1.x - p2.x);
   c = -glm::dot(p2, n);
@@ -61,15 +61,15 @@ inline void makePlane(const Vector& p1, const Vector& p2, Vector& n, float& c)
 
 }
 
-bool rectangle_aatriangle(Constraints* constraints, const Rectf& rect,
-                          const AATriangle& triangle)
+bool rectangle_aatriangle(Constraints* constraints, Rectf const& rect,
+                          AATriangle const& triangle)
 {
   bool dummy;
   return rectangle_aatriangle(constraints, rect, triangle, dummy);
 }
 
-bool rectangle_aatriangle(Constraints* constraints, const Rectf& rect,
-                          const AATriangle& triangle,
+bool rectangle_aatriangle(Constraints* constraints, Rectf const& rect,
+                          AATriangle const& triangle,
                           bool& hits_rectangle_bottom)
 {
   if (!intersects(rect, triangle.bbox))
@@ -166,7 +166,7 @@ bool rectangle_aatriangle(Constraints* constraints, const Rectf& rect,
   return true;
 }
 
-void set_rectangle_rectangle_constraints(Constraints* constraints, const Rectf& r1, const Rectf& r2)
+void set_rectangle_rectangle_constraints(Constraints* constraints, Rectf const& r1, Rectf const& r2)
 {
   float itop = r1.get_bottom() - r2.get_top();
   float ibottom = r2.get_bottom() - r1.get_top();
@@ -194,7 +194,7 @@ void set_rectangle_rectangle_constraints(Constraints* constraints, const Rectf& 
   }
 }
 
-bool line_intersects_line(const Vector& line1_start, const Vector& line1_end, const Vector& line2_start, const Vector& line2_end)
+bool line_intersects_line(Vector const& line1_start, Vector const& line1_end, Vector const& line2_start, Vector const& line2_end)
 {
   // Adapted from Striker, (C) 1999 Joris van der Hoeven, GPL
 
@@ -231,7 +231,7 @@ bool line_intersects_line(const Vector& line1_start, const Vector& line1_end, co
 
 }
 
-bool intersects_line(const Rectf& r, const Vector& line_start, const Vector& line_end)
+bool intersects_line(Rectf const& r, Vector const& line_start, Vector const& line_end)
 {
   Vector p1 = r.p1();
   Vector p2 = Vector(r.get_right(), r.get_top());

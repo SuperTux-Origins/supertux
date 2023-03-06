@@ -22,7 +22,7 @@
 class WalkingCandle final : public WalkingBadguy
 {
 public:
-  WalkingCandle(const ReaderMapping& reader);
+  WalkingCandle(ReaderMapping const& reader);
 
   virtual bool is_freezable() const override;
   virtual bool is_flammable() const override;
@@ -30,7 +30,7 @@ public:
   virtual void freeze() override;
   virtual void unfreeze(bool melt = true) override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   virtual void kill_fall() override;
 
@@ -43,8 +43,8 @@ private:
   Color lightcolor;
 
 private:
-  WalkingCandle(const WalkingCandle&) = delete;
-  WalkingCandle& operator=(const WalkingCandle&) = delete;
+  WalkingCandle(WalkingCandle const&) = delete;
+  WalkingCandle& operator=(WalkingCandle const&) = delete;
 };
 
 #endif

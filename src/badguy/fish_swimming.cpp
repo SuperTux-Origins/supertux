@@ -26,7 +26,7 @@
 static const float FISH_BEACH_TIME = 5.f;
 static const float FISH_FLOAT_TIME = 2.f;
 
-FishSwimming::FishSwimming(const ReaderMapping& reader) :
+FishSwimming::FishSwimming(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/fish/ice/bluefish.sprite"),
   m_state(FishYState::BALANCED),
   m_beached_timer(),
@@ -36,7 +36,7 @@ FishSwimming::FishSwimming(const ReaderMapping& reader) :
   reader.read("radius", m_radius);
 }
 
-FishSwimming::FishSwimming(const ReaderMapping& reader, const std::string& spritename) :
+FishSwimming::FishSwimming(ReaderMapping const& reader, std::string const& spritename) :
   BadGuy(reader, spritename),
   m_state(FishYState::BALANCED),
   m_beached_timer(),
@@ -55,7 +55,7 @@ FishSwimming::initialize()
 }
 
 void
-FishSwimming::collision_solid(const CollisionHit& hit)
+FishSwimming::collision_solid(CollisionHit const& hit)
 {
   if (m_frozen) {
     BadGuy::collision_solid(hit);
@@ -80,7 +80,7 @@ FishSwimming::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-FishSwimming::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+FishSwimming::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (m_beached_timer.started())
      collision_solid(hit);

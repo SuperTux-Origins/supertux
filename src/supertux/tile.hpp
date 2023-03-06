@@ -99,15 +99,15 @@ public:
 
 public:
   Tile();
-  Tile(const std::vector<SurfacePtr>& images,
-       const std::vector<SurfacePtr>& editor_images,
+  Tile(std::vector<SurfacePtr> const& images,
+       std::vector<SurfacePtr> const& editor_images,
        uint32_t attributes, uint32_t data, float fps,
-       const std::string& obj_name = "", const std::string& obj_data = "",
+       std::string const& obj_name = "", std::string const& obj_data = "",
        bool deprecated = false);
 
   /** Draw a tile on the screen */
-  void draw(Canvas& canvas, const Vector& pos, int z_pos, const Color& color = Color(1, 1, 1)) const;
-  void draw_debug(Canvas& canvas, const Vector& pos, int z_pos, const Color& color = Color(1.0f, 0.f, 1.0f, 0.5f)) const;
+  void draw(Canvas& canvas, Vector const& pos, int z_pos, Color const& color = Color(1, 1, 1)) const;
+  void draw_debug(Canvas& canvas, Vector const& pos, int z_pos, Color const& color = Color(1.0f, 0.f, 1.0f, 0.5f)) const;
 
   SurfacePtr get_current_surface() const;
   SurfacePtr get_current_editor_surface() const;
@@ -123,7 +123,7 @@ public:
       in question into account. Because creating the arguments for
       this function can be expensive, you should handle trivial cases
       using the "is_solid()" and "is_unisolid()" methods first. */
-  bool is_solid (const Rectf& tile_bbox, const Rectf& position, const Vector& movement) const;
+  bool is_solid (Rectf const& tile_bbox, Rectf const& position, Vector const& movement) const;
 
   /** This version only checks the SOLID flag to determine the
       solidity of a tile. This means it will always return "true" for
@@ -135,25 +135,25 @@ public:
   /** Determines whether the tile's attributes are important to
       calculate the collisions. The tile may be unisolid and therefore
       the collision with that tile don't matter.*/
-  bool is_collisionful(const Rectf& tile_bbox, const Rectf& position, const Vector& movement) const;
+  bool is_collisionful(Rectf const& tile_bbox, Rectf const& position, Vector const& movement) const;
 
   /** Checks the UNISOLID attribute. Returns "true" if set, "false" otherwise. */
   bool is_unisolid() const { return (m_attributes & UNISOLID) != 0; }
 
   bool is_deprecated() const { return m_deprecated; }
 
-  const std::string& get_object_name() const { return m_object_name; }
-  const std::string& get_object_data() const { return m_object_data; }
+  std::string const& get_object_name() const { return m_object_name; }
+  std::string const& get_object_data() const { return m_object_data; }
 
 private:
   /** Returns zero if a unisolid tile is non-solid due to the movement
       direction, non-zero if the tile is solid due to direction. */
-  bool check_movement_unisolid (const Vector& movement) const;
+  bool check_movement_unisolid (Vector const& movement) const;
 
   /** Returns zero if a unisolid tile is non-solid due to the position
       of the tile and the object, non-zero if the tile is solid. */
-  bool check_position_unisolid (const Rectf& obj_bbox,
-                                const Rectf& tile_bbox) const;
+  bool check_position_unisolid (Rectf const& obj_bbox,
+                                Rectf const& tile_bbox) const;
 
 private:
   std::vector<SurfacePtr> m_images;
@@ -174,8 +174,8 @@ private:
   bool m_deprecated;
 
 private:
-  Tile(const Tile&) = delete;
-  Tile& operator=(const Tile&) = delete;
+  Tile(Tile const&) = delete;
+  Tile& operator=(Tile const&) = delete;
 };
 
 #endif

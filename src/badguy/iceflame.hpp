@@ -22,7 +22,7 @@
 class Iceflame final : public Flame
 {
 public:
-  Iceflame(const ReaderMapping& reader);
+  Iceflame(ReaderMapping const& reader);
 
   virtual void active_update(float dt_sec) override;
 
@@ -35,8 +35,8 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  Iceflame(const Iceflame&) = delete;
-  Iceflame& operator=(const Iceflame&) = delete;
+  Iceflame(Iceflame const&) = delete;
+  Iceflame& operator=(Iceflame const&) = delete;
 };
 
 #endif

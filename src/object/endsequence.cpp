@@ -105,7 +105,7 @@ EndSequence::stopping()
 {
 }
 
-const Controller*
+Controller const*
 EndSequence::get_controller(int player)
 {
   return get_code_controller(player);

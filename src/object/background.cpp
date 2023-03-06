@@ -54,7 +54,7 @@ Background::Background() :
 {
 }
 
-Background::Background(const ReaderMapping& reader) :
+Background::Background(ReaderMapping const& reader) :
   GameObject(reader),
   ExposedObject<Background, scripting::Background>(this),
   m_alignment(NO_ALIGNMENT),
@@ -197,16 +197,16 @@ Background::fade_color(Color color, float time)
 }
 
 void
-Background::set_image(const std::string& name)
+Background::set_image(std::string const& name)
 {
   m_imagefile = name;
   m_image = load_background(name);
 }
 
 void
-Background::set_images(const std::string& name_top,
-                       const std::string& name_middle,
-                       const std::string& name_bottom)
+Background::set_images(std::string const& name_top,
+                       std::string const& name_middle,
+                       std::string const& name_bottom)
 {
   m_image_top = load_background(name_top);
   m_imagefile_top = name_top;
@@ -226,7 +226,7 @@ Background::set_speed(float speed)
 }
 
 void
-Background::draw_image(DrawingContext& context, const Vector& pos_)
+Background::draw_image(DrawingContext& context, Vector const& pos_)
 {
   const Sizef level(d_gameobject_manager->get_width(), d_gameobject_manager->get_height());
   const Sizef screen(static_cast<float>(context.get_width()),
@@ -407,7 +407,7 @@ std::unordered_map<std::string, std::string> fallback_paths = {
 } // namespace
 
 SurfacePtr
-Background::load_background(const std::string& image_path)
+Background::load_background(std::string const& image_path)
 {
   if (image_path.empty())
     return nullptr;
@@ -417,8 +417,8 @@ Background::load_background(const std::string& image_path)
     return Surface::from_file(image_path);
 
   // Search for a fallback image in fallback_paths
-  const std::string& default_dir = "images/background/";
-  const std::string& default_dir2 = "/images/background/";
+  std::string const& default_dir = "images/background/";
+  std::string const& default_dir2 = "/images/background/";
   std::string new_path = image_path;
   if (image_path.substr(0, default_dir.length()) == default_dir)
     new_path.erase(0, default_dir.length());

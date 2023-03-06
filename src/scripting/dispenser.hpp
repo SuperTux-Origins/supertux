@@ -40,8 +40,8 @@ public:
   {}
 
 private:
-  Dispenser(const Dispenser&) = delete;
-  Dispenser& operator=(const Dispenser&) = delete;
+  Dispenser(Dispenser const&) = delete;
+  Dispenser& operator=(Dispenser const&) = delete;
 #endif
 
 public:

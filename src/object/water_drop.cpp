@@ -22,7 +22,7 @@
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
-WaterDrop::WaterDrop(const Vector& pos, const std::string& sprite_path_, const Vector& velocity) :
+WaterDrop::WaterDrop(Vector const& pos, std::string const& sprite_path_, Vector const& velocity) :
   MovingSprite(pos, sprite_path_, LAYER_OBJECTS - 1, COLGROUP_MOVING_ONLY_STATIC),
   physic(),
   wd_state(WDS_FALLING),
@@ -43,7 +43,7 @@ WaterDrop::update(float dt_sec)
 }
 
 void
-WaterDrop::collision_solid(const CollisionHit& hit)
+WaterDrop::collision_solid(CollisionHit const& hit)
 {
   if (hit.bottom && wd_state == WDS_FALLING) {
     wd_state = WDS_SPLASH;
@@ -69,7 +69,7 @@ WaterDrop::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-WaterDrop::collision(GameObject&, const CollisionHit& )
+WaterDrop::collision(GameObject&, CollisionHit const& )
 {
   return FORCE_MOVE;
 }

@@ -23,7 +23,7 @@
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 
-Zeekling::Zeekling(const ReaderMapping& reader) :
+Zeekling::Zeekling(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/zeekling/zeekling.sprite"),
   speed(gameRandom.randf(130.0f, 171.0f)),
   diveRecoverTimer(),
@@ -101,7 +101,7 @@ Zeekling::onBumpVertical()
 }
 
 void
-Zeekling::collision_solid(const CollisionHit& hit)
+Zeekling::collision_solid(CollisionHit const& hit)
 {
   if (m_frozen)
     BadGuy::collision_solid(hit);
@@ -133,7 +133,7 @@ Zeekling::should_we_dive()
   if (player && last_player && (player == last_player)) {
 
     // get positions, calculate movement
-    const Vector& player_pos = player->get_pos();
+    Vector const& player_pos = player->get_pos();
     const Vector player_mov = (player_pos - last_player_pos);
     const Vector self_pos = m_col.m_bbox.p1();
     const Vector self_mov = (self_pos - last_self_pos);

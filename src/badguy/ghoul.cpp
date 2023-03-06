@@ -25,7 +25,7 @@
 static const float FLYSPEED = 80.0f; /**< speed in px per second */
 static const float TRACK_RANGE = 2500.0f; /**< at what distance to start tracking the player */
 
-Ghoul::Ghoul(const ReaderMapping& reader) :
+Ghoul::Ghoul(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/ghoul/ghoul.sprite"),
   PathObject(),
   m_mystate(STATE_IDLE),
@@ -101,7 +101,7 @@ Ghoul::active_update(float dt_sec)
   Vector p2 = player->get_bbox().get_middle();
   Vector dist = (p2 - p1);
   
-  const Rectf& player_bbox = player->get_bbox();
+  Rectf const& player_bbox = player->get_bbox();
   
   if (player_bbox.get_right() < m_col.m_bbox.get_left()) {
     m_sprite->set_action("left", -1);
@@ -169,7 +169,7 @@ Ghoul::stop_moving()
 }
 
 void
-Ghoul::set_state(const std::string& new_state)
+Ghoul::set_state(std::string const& new_state)
 {
   if (new_state == "stopped") {
     m_mystate = STATE_STOPPED;
@@ -189,7 +189,7 @@ Ghoul::set_state(const std::string& new_state)
 }
 
 void
-Ghoul::move_to(const Vector& pos)
+Ghoul::move_to(Vector const& pos)
 {
   Vector shift = pos - m_col.m_bbox.p1();
   if (get_path()) {

@@ -317,7 +317,7 @@ Config::save()
   writer.write("profile", profile);
 
   writer.start_list("profiles");
-  for (const auto& current_profile : profiles)
+  for (auto const& current_profile : profiles)
   {
     writer.start_list("profile");
     writer.write("id", current_profile.id);
@@ -335,7 +335,7 @@ Config::save()
   writer.write("custom_mouse_cursor", custom_mouse_cursor);
 
   writer.start_list("notifications");
-  for (const auto& notification : notifications)
+  for (auto const& notification : notifications)
   {
     writer.start_list("notification");
     writer.write("id", notification.id);
@@ -425,7 +425,7 @@ Config::save()
   writer.end_list("control");
 
   writer.start_list("addons");
-  for (const auto& addon : addons)
+  for (auto const& addon : addons)
   {
     writer.start_list("addon");
     writer.write("id", addon.id);

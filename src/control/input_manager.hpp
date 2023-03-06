@@ -47,7 +47,7 @@ public:
                JoystickConfig& joystick_config);
   ~InputManager() override;
 
-  void process_event(const SDL_Event& event);
+  void process_event(SDL_Event const& event);
 
   void update();
   void reset();
@@ -55,7 +55,7 @@ public:
   void use_game_controller(bool v);
   bool use_game_controller() const { return m_use_game_controller; }
 
-  const Controller& get_controller(int player_id = 0) const;
+  Controller const& get_controller(int player_id = 0) const;
   Controller& get_controller(int player_id = 0);
 
   int get_num_users() const { return static_cast<int>(m_controllers.size()); }
@@ -80,8 +80,8 @@ public:
   std::unordered_map<int, bool> m_uses_keyboard;
 
 private:
-  InputManager(const InputManager&) = delete;
-  InputManager& operator=(const InputManager&) = delete;
+  InputManager(InputManager const&) = delete;
+  InputManager& operator=(InputManager const&) = delete;
 };
 
 #endif

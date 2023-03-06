@@ -20,7 +20,7 @@
 
 #include "math/rect.hpp"
 
-Rectf::Rectf(const Rect& rect) :
+Rectf::Rectf(Rect const& rect) :
   m_p1(static_cast<float>(rect.left),
      static_cast<float>(rect.top)),
   m_size(static_cast<float>(rect.get_width()),
@@ -28,7 +28,7 @@ Rectf::Rectf(const Rect& rect) :
 {
 }
 
-std::ostream& operator<<(std::ostream& out, const Rectf& rect)
+std::ostream& operator<<(std::ostream& out, Rectf const& rect)
 {
   out << "Rectf("
       << rect.get_left() << ", " << rect.get_top() << ", "

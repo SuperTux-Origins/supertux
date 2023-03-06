@@ -22,13 +22,13 @@
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"
 
-ItemLabel::ItemLabel(const std::string& text_) :
+ItemLabel::ItemLabel(std::string const& text_) :
   MenuItem(text_)
 {
 }
 
 void
-ItemLabel::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active) {
+ItemLabel::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active) {
   context.color().draw_text(Resources::big_font, get_text(),
                             Vector(pos.x + static_cast<float>(menu_width) / 2.0f,
                                    pos.y - Resources::big_font->get_height() / 2.0f ),

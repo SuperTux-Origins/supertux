@@ -47,7 +47,7 @@ SDLBaseVideoSystem::~SDLBaseVideoSystem()
 }
 
 void
-SDLBaseVideoSystem::set_title(const std::string& title)
+SDLBaseVideoSystem::set_title(std::string const& title)
 {
   SDL_SetWindowTitle(m_sdl_window.get(), title.c_str());
 }
@@ -61,7 +61,7 @@ SDLBaseVideoSystem::set_gamma(float gamma)
 }
 
 void
-SDLBaseVideoSystem::set_icon(const SDL_Surface& icon)
+SDLBaseVideoSystem::set_icon(SDL_Surface const& icon)
 {
   SDL_SetWindowIcon(m_sdl_window.get(), const_cast<SDL_Surface*>(&icon));
 }

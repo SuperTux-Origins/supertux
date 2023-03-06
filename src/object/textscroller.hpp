@@ -31,8 +31,8 @@ class InfoBoxLine;
 class TextScroller : public GameObject
 {
 public:
-  TextScroller(const ReaderMapping& mapping);
-  TextScroller(const ReaderObject& root);
+  TextScroller(ReaderMapping const& mapping);
+  TextScroller(ReaderObject const& root);
 
   virtual void draw(DrawingContext& context) override;
   virtual void update(float dt_sec) override;
@@ -48,12 +48,12 @@ public:
   bool is_finished() const { return m_finished; }
   
 protected:
-  const Controller* controller;
+  Controller const* controller;
 
 private:
-  void parse_file(const std::string& filename);
-  void parse_root(const ReaderObject& root);
-  void parse_content(const ReaderCollection& collection);
+  void parse_file(std::string const& filename);
+  void parse_root(ReaderObject const& root);
+  void parse_content(ReaderCollection const& collection);
 
 private:
   std::string m_filename;
@@ -81,8 +81,8 @@ private:
   TextAlign m_text_align;
 
 private:
-  TextScroller(const TextScroller&) = delete;
-  TextScroller& operator=(const TextScroller&) = delete;
+  TextScroller(TextScroller const&) = delete;
+  TextScroller& operator=(TextScroller const&) = delete;
 };
 
 #endif

@@ -25,29 +25,29 @@ class Timer;
 class WalkingBadguy : public BadGuy
 {
 public:
-  WalkingBadguy(const Vector& pos,
-                const std::string& sprite_name,
-                const std::string& walk_left_action,
-                const std::string& walk_right_action,
+  WalkingBadguy(Vector const& pos,
+                std::string const& sprite_name,
+                std::string const& walk_left_action,
+                std::string const& walk_right_action,
                 int layer = LAYER_OBJECTS,
-                const std::string& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite");
-  WalkingBadguy(const Vector& pos, Direction direction,
-                const std::string& sprite_name,
-                const std::string& walk_left_action,
-                const std::string& walk_right_action,
+                std::string const& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite");
+  WalkingBadguy(Vector const& pos, Direction direction,
+                std::string const& sprite_name,
+                std::string const& walk_left_action,
+                std::string const& walk_right_action,
                 int layer = LAYER_OBJECTS,
-                const std::string& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite");
-  WalkingBadguy(const ReaderMapping& reader,
-                const std::string& sprite_name,
-                const std::string& walk_left_action,
-                const std::string& walk_right_action,
+                std::string const& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite");
+  WalkingBadguy(ReaderMapping const& reader,
+                std::string const& sprite_name,
+                std::string const& walk_left_action,
+                std::string const& walk_right_action,
                 int layer = LAYER_OBJECTS,
-                const std::string& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite");
+                std::string const& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite");
 
   virtual void initialize() override;
   virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   virtual void freeze() override;
   virtual void unfreeze(bool melt = true) override;
 
@@ -58,7 +58,7 @@ public:
   void set_velocity_y(float vy);
 
   /** Adds velocity to the badguy (be careful when using this) */
-  void add_velocity(const Vector& velocity);
+  void add_velocity(Vector const& velocity);
 
   float get_walk_speed() const { return walk_speed; }
   void set_walk_speed (float);
@@ -76,8 +76,8 @@ protected:
   int turn_around_counter; /**< counts number of turns since turn_around_timer was started */
 
 private:
-  WalkingBadguy(const WalkingBadguy&) = delete;
-  WalkingBadguy& operator=(const WalkingBadguy&) = delete;
+  WalkingBadguy(WalkingBadguy const&) = delete;
+  WalkingBadguy& operator=(WalkingBadguy const&) = delete;
 };
 
 #endif

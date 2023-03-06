@@ -99,7 +99,7 @@ public:
   {
   }
 
-  void load(const std::string& filename)
+  void load(std::string const& filename)
   {
     auto doc = load_reader_document(filename);
     auto root = doc.get_root();
@@ -130,7 +130,7 @@ public:
   }
 };
 
-Camera::Camera(const std::string& name) :
+Camera::Camera(std::string const& name) :
   GameObject(name),
   ExposedObject<Camera, scripting::Camera>(this),
   m_mode(Mode::NORMAL),
@@ -163,7 +163,7 @@ Camera::Camera(const std::string& name) :
   reload_config();
 }
 
-Camera::Camera(const ReaderMapping& reader) :
+Camera::Camera(ReaderMapping const& reader) :
   GameObject(reader),
   ExposedObject<Camera, scripting::Camera>(this),
   m_mode(Mode::NORMAL),
@@ -242,7 +242,7 @@ Camera::get_rect() const
 }
 
 void
-Camera::reset(const Vector& tuxpos)
+Camera::reset(Vector const& tuxpos)
 {
   m_translation.x = tuxpos.x - static_cast<float>(m_screen_size.width) / 2.0f;
   m_translation.y = tuxpos.y - static_cast<float>(m_screen_size.height) / 2.0f;
@@ -264,7 +264,7 @@ Camera::shake(float duration, float x, float y)
 }
 
 void
-Camera::scroll_to(const Vector& goal, float scrolltime)
+Camera::scroll_to(Vector const& goal, float scrolltime)
 {
   if(scrolltime == 0.0f)
   {
@@ -365,7 +365,7 @@ Camera::shake()
 void
 Camera::update_scroll_normal(float dt_sec)
 {
-  const auto& config_ = *(m_config);
+  auto const& config_ = *(m_config);
   Player& player = *d_sector->get_players()[0];
   // TODO: co-op mode needs a good camera
   Vector player_pos(player.get_bbox().get_left(),
@@ -682,7 +682,7 @@ Camera::update_scroll_normal_multiplayer(float dt_sec)
   float x2 = 0.f;
   float y2 = 0.f;
 
-  for (const auto* p : Sector::get().get_players())
+  for (auto const* p : Sector::get().get_players())
   {
     if (p->is_dead() || p->is_dying())
       continue;
@@ -748,7 +748,7 @@ Camera::update_scroll_normal_multiplayer(float dt_sec)
 void
 Camera::update_scroll_autoscroll(float dt_sec)
 {
-  if (!d_sector->get_object_count<Player>([](const Player& p) { return !p.is_dead() && !p.is_dying(); }))
+  if (!d_sector->get_object_count<Player>([](Player const& p) { return !p.is_dead() && !p.is_dying(); }))
     return;
 
   get_walker()->update(dt_sec);

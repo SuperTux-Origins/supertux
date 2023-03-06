@@ -34,8 +34,8 @@ public:
   virtual void menu_action(MenuItem& item) override;
 
 private:
-  DebugMenu(const DebugMenu&) = delete;
-  DebugMenu& operator=(const DebugMenu&) = delete;
+  DebugMenu(DebugMenu const&) = delete;
+  DebugMenu& operator=(DebugMenu const&) = delete;
 };
 
 #endif

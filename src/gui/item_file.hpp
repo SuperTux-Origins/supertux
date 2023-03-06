@@ -22,14 +22,14 @@
 class ItemFile final : public MenuItem
 {
 public:
-  ItemFile(const std::string& text, std::string* filename,
-           const std::vector<std::string>& extensions,
-           const std::string& basedir,
+  ItemFile(std::string const& text, std::string* filename,
+           std::vector<std::string> const& extensions,
+           std::string const& basedir,
            bool path_relative_to_basedir,
            int id = -1);
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
 private:
   std::string* m_filename;
@@ -38,8 +38,8 @@ private:
   bool m_path_relative_to_basedir;
 
 private:
-  ItemFile(const ItemFile&) = delete;
-  ItemFile& operator=(const ItemFile&) = delete;
+  ItemFile(ItemFile const&) = delete;
+  ItemFile& operator=(ItemFile const&) = delete;
 };
 
 #endif

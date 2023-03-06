@@ -19,7 +19,7 @@
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
-WalkingLeaf::WalkingLeaf(const ReaderMapping& reader) :
+WalkingLeaf::WalkingLeaf(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/walkingleaf/walkingleaf.sprite", "left", "right")
 {
   walk_speed = 60;

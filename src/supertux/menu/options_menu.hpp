@@ -48,8 +48,8 @@ private:
   std::vector<std::string> m_mobile_controls_scales;
 
 private:
-  OptionsMenu(const OptionsMenu&) = delete;
-  OptionsMenu& operator=(const OptionsMenu&) = delete;
+  OptionsMenu(OptionsMenu const&) = delete;
+  OptionsMenu& operator=(OptionsMenu const&) = delete;
 };
 
 #endif

@@ -47,9 +47,9 @@ public:
   virtual Renderer& get_renderer() const override;
   virtual Renderer& get_lightmap() const override;
 
-  virtual TexturePtr new_texture(const SDL_Surface& image, const Sampler& sampler) override;
+  virtual TexturePtr new_texture(SDL_Surface const& image, Sampler const& sampler) override;
 
-  virtual const Viewport& get_viewport() const override { return m_viewport; }
+  virtual Viewport const& get_viewport() const override { return m_viewport; }
   virtual void apply_config() override;
   virtual void flip() override;
 
@@ -75,8 +75,8 @@ private:
   Viewport m_viewport;
 
 private:
-  GLVideoSystem(const GLVideoSystem&) = delete;
-  GLVideoSystem& operator=(const GLVideoSystem&) = delete;
+  GLVideoSystem(GLVideoSystem const&) = delete;
+  GLVideoSystem& operator=(GLVideoSystem const&) = delete;
 };
 
 #endif

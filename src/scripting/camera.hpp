@@ -36,8 +36,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  Camera(const Camera&) = delete;
-  Camera& operator=(const Camera&) = delete;
+  Camera(Camera const&) = delete;
+  Camera& operator=(Camera const&) = delete;
 #endif
 
 public:
@@ -48,7 +48,7 @@ public:
   /** Set camera to a specific coordinate */
   void set_pos(float x, float y);
   /** Set camera to a specific mode, can be "normal", "manual" */
-  void set_mode(const std::string& mode);
+  void set_mode(std::string const& mode);
   /** Scroll camera to position x,y in scrolltime seconds */
   void scroll_to(float x, float y, float scrolltime);
   /** Get the curent scale factor of the camera */
@@ -60,7 +60,7 @@ public:
   /** Fade the scale factor over time */
   void scale(float scale, float time);
   /** Fade the scale factor over time with easing (smooth movement) */
-  void ease_scale(float scale, float time, const std::string& ease);
+  void ease_scale(float scale, float time, std::string const& ease);
 };
 
 } // namespace scripting

@@ -26,7 +26,7 @@ class InfoBoxLine;
 class InfoBlock final : public Block
 {
 public:
-  InfoBlock(const ReaderMapping& mapping);
+  InfoBlock(ReaderMapping const& mapping);
   ~InfoBlock() override;
 
   virtual void update(float dt_sec) override;
@@ -42,7 +42,7 @@ public:
 
 private:
   virtual void hit(Player& player) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   Player* get_nearest_player() const;
 
@@ -61,8 +61,8 @@ private:
   float m_initial_y;
 
 private:
-  InfoBlock(const InfoBlock&) = delete;
-  InfoBlock& operator=(const InfoBlock&) = delete;
+  InfoBlock(InfoBlock const&) = delete;
+  InfoBlock& operator=(InfoBlock const&) = delete;
 };
 
 #endif

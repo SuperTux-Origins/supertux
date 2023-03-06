@@ -22,13 +22,13 @@
 class Stumpy final : public WalkingBadguy
 {
 public:
-  Stumpy(const ReaderMapping& reader);
-  Stumpy(const Vector& pos, Direction d);
+  Stumpy(ReaderMapping const& reader);
+  Stumpy(Vector const& pos, Direction d);
 
   virtual void initialize() override;
   virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
   virtual bool is_freezable() const override;
 
@@ -51,8 +51,8 @@ private:
   Timer   invincible_timer;
 
 private:
-  Stumpy(const Stumpy&) = delete;
-  Stumpy& operator=(const Stumpy&) = delete;
+  Stumpy(Stumpy const&) = delete;
+  Stumpy& operator=(Stumpy const&) = delete;
 };
 
 #endif

@@ -42,7 +42,7 @@ CloudParticleSystem::CloudParticleSystem() :
   init();
 }
 
-CloudParticleSystem::CloudParticleSystem(const ReaderMapping& reader) :
+CloudParticleSystem::CloudParticleSystem(ReaderMapping const& reader) :
   ParticleSystem(reader, 128),
   ExposedObject<CloudParticleSystem, scripting::Clouds>(this),
   cloudimage(Surface::from_file("images/particles/cloud.png")),
@@ -223,18 +223,18 @@ void CloudParticleSystem::draw(DrawingContext& context)
   if (!enabled)
     return;
 
-  const auto& region = Sector::current()->get_active_region();
+  auto const& region = Sector::current()->get_active_region();
 
   context.push_transform();
 
   std::unordered_map<SurfacePtr, SurfaceBatch> batches;
-  for (const auto& particle : particles) {
+  for (auto const& particle : particles) {
 
     if(!region.contains(particle->pos))
       continue;
 
     if (particle->alpha != 1.f) {
-      const auto& batch_it = batches.emplace(
+      auto const& batch_it = batches.emplace(
           particle->texture->clone(),
           SurfaceBatch(
               particle->texture,
@@ -244,7 +244,7 @@ void CloudParticleSystem::draw(DrawingContext& context)
     } else {
       auto it = batches.find(particle->texture);
       if (it == batches.end()) {
-        const auto& batch_it = batches.emplace(particle->texture,
+        auto const& batch_it = batches.emplace(particle->texture,
           SurfaceBatch(particle->texture));
         batch_it.first->second.draw(particle->pos, particle->angle);
       } else {

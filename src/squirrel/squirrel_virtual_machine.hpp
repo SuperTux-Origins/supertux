@@ -55,8 +55,8 @@ private:
   std::unique_ptr<SquirrelScheduler> m_scheduler;
 
 private:
-  SquirrelVirtualMachine(const SquirrelVirtualMachine&) = delete;
-  SquirrelVirtualMachine& operator=(const SquirrelVirtualMachine&) = delete;
+  SquirrelVirtualMachine(SquirrelVirtualMachine const&) = delete;
+  SquirrelVirtualMachine& operator=(SquirrelVirtualMachine const&) = delete;
 };
 
 #endif

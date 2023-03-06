@@ -25,7 +25,7 @@
 class Light : public GameObject
 {
 public:
-  Light(const Vector& center, const Color& color = Color(1.0, 1.0, 1.0, 1.0));
+  Light(Vector const& center, Color const& color = Color(1.0, 1.0, 1.0, 1.0));
   ~Light() override;
   virtual bool is_saveable() const override {
     return false;

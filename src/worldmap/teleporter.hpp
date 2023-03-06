@@ -28,7 +28,7 @@ namespace worldmap {
 class Teleporter final : public GameObject
 {
 public:
-  Teleporter(const ReaderMapping& mapping);
+  Teleporter(ReaderMapping const& mapping);
 
   virtual void draw(DrawingContext& context) override;
   virtual void update(float dt_sec) override;
@@ -59,8 +59,8 @@ private:
   std::string m_message;
 
 private:
-  Teleporter(const Teleporter&) = delete;
-  Teleporter& operator=(const Teleporter&) = delete;
+  Teleporter(Teleporter const&) = delete;
+  Teleporter& operator=(Teleporter const&) = delete;
 };
 
 } // namespace worldmap

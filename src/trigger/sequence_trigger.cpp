@@ -22,7 +22,7 @@
 #include "util/writer.hpp"
 #include "video/drawing_context.hpp"
 
-SequenceTrigger::SequenceTrigger(const ReaderMapping& reader) :
+SequenceTrigger::SequenceTrigger(ReaderMapping const& reader) :
   triggerevent(EVENT_TOUCH),
   sequence(SEQ_ENDSEQUENCE),
   new_size(0.0f, 0.0f),
@@ -48,7 +48,7 @@ SequenceTrigger::SequenceTrigger(const ReaderMapping& reader) :
   reader.read("fade", reinterpret_cast<int&>(fade));
 }
 
-SequenceTrigger::SequenceTrigger(const Vector& pos, const std::string& sequence_name) :
+SequenceTrigger::SequenceTrigger(Vector const& pos, std::string const& sequence_name) :
   triggerevent(EVENT_TOUCH),
   sequence(string_to_sequence(sequence_name)),
   new_size(0.0f, 0.0f),

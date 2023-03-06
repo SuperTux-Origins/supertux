@@ -19,7 +19,7 @@
 #include "gui/menu_manager.hpp"
 #include "util/gettext.hpp"
 
-ListMenu::ListMenu(const std::vector<std::string>& items, std::string* selected, Menu* parent) :
+ListMenu::ListMenu(std::vector<std::string> const& items, std::string* selected, Menu* parent) :
   m_selected(selected),
   m_parent(parent)
 {

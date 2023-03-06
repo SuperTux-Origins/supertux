@@ -29,7 +29,7 @@ SpriteManager::SpriteManager() :
 }
 
 SpritePtr
-SpriteManager::create(const std::string& name)
+SpriteManager::create(std::string const& name)
 {
   Sprites::iterator i = sprites.find(name);
   SpriteData* data;
@@ -49,7 +49,7 @@ SpriteManager::create(const std::string& name)
 }
 
 SpriteData*
-SpriteManager::load(const std::string& filename)
+SpriteManager::load(std::string const& filename)
 {
   ReaderDocument doc = [filename](){
     try {
@@ -62,7 +62,7 @@ SpriteManager::load(const std::string& filename)
              << "(images \"" << FileSystem::basename(filename) << "\")))";
         return ReaderDocument::from_stream(text, prio::ErrorHandler::THROW, filename);
       }
-    } catch(const std::exception& e) {
+    } catch(std::exception const& e) {
       std::ostringstream msg;
       msg << "Parse error when trying to load sprite '" << filename
       << "': " << e.what() << "\n";

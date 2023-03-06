@@ -37,13 +37,13 @@ SQInteger squirrel_read_char(SQUserPointer file);
 HSQUIRRELVM object_to_vm(HSQOBJECT object);
 
 void compile_script(HSQUIRRELVM vm, std::istream& in,
-                    const std::string& sourcename);
+                    std::string const& sourcename);
 void compile_and_run(HSQUIRRELVM vm, std::istream& in,
-                     const std::string& sourcename);
+                     std::string const& sourcename);
 
 template<typename T>
 void expose_object(HSQUIRRELVM vm, SQInteger table_idx,
-                   std::unique_ptr<T> object, const std::string& name)
+                   std::unique_ptr<T> object, std::string const& name)
 {
   sq_pushstring(vm, name.c_str(), -1);
   scripting::create_squirrel_instance(vm, object.release(), true);
@@ -60,7 +60,7 @@ void expose_object(HSQUIRRELVM vm, SQInteger table_idx,
 }
 
 static inline void unexpose_object(HSQUIRRELVM vm, SQInteger table_idx,
-                                   const std::string& name)
+                                   std::string const& name)
 {
   assert(name.length() < static_cast<size_t>(std::numeric_limits<SQInteger>::max()));
   sq_pushstring(vm, name.c_str(), static_cast<SQInteger>(name.length()));

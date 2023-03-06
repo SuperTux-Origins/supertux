@@ -40,16 +40,16 @@ SQInteger get_current_thread(HSQUIRRELVM vm) __custom("t");
 bool is_christmas();
 
 /** Display a text file and scrolls it over the screen (on next screenswitch) */
-void display_text_file(const std::string& filename);
+void display_text_file(std::string const& filename);
 
 /** Load and display a worldmap (on next screenswitch) */
-void load_worldmap(const std::string& filename);
+void load_worldmap(std::string const& filename);
 
 /** Switch to a different worldmap after unloading current one, after exit_screen() is called */
-void set_next_worldmap(const std::string& dirname, const std::string& spawnpoint);
+void set_next_worldmap(std::string const& dirname, std::string const& spawnpoint);
 
 /** Load and display a level (on next screenswitch) */
-void load_level(const std::string& filename);
+void load_level(std::string const& filename);
 
 /** Manages skippable cutscenes (cancels calls to wait()) */
 void start_cutscene();
@@ -66,15 +66,15 @@ void wait_for_screenswitch(HSQUIRRELVM vm) __suspend;
 void exit_screen();
 
 /** Translate a text into the users language (by looking it up in the .po files) */
-std::string translate(const std::string& text);
-std::string _(const std::string& text);
+std::string translate(std::string const& text);
+std::string _(std::string const& text);
 
-std::string translate_plural(const std::string& text, const std::string&
+std::string translate_plural(std::string const& text, std::string const&
     text_plural, int num);
-std::string __(const std::string& text, const std::string& text_plural, int num);
+std::string __(std::string const& text, std::string const& text_plural, int num);
 
 /** Load a script file and executes it. This is typically used to import functions from external files. */
-void import(HSQUIRRELVM v, const std::string& filename);
+void import(HSQUIRRELVM v, std::string const& filename);
 
 /** Save world state to scripting table */
 void save_state();
@@ -98,13 +98,13 @@ void debug_draw_editor_images(bool enable);
 void debug_worldmap_ghost(bool enable);
 
 /** Changes music to musicfile */
-void play_music(const std::string& musicfile);
+void play_music(std::string const& musicfile);
 
 /** Stops the music */
 void stop_music(float fadetime);
 
 /** Fade in music */
-void fade_in_music(const std::string& musicfile, float fadetime);
+void fade_in_music(std::string const& musicfile, float fadetime);
 
 /** Resume music */
 void resume_music(float fadetime);
@@ -113,7 +113,7 @@ void resume_music(float fadetime);
 void pause_music(float fadetime);
 
 /** Plays a soundfile */
-void play_sound(const std::string& soundfile);
+void play_sound(std::string const& soundfile);
 
 /**  Set the game_speed */
 void set_game_speed(float speed);

@@ -36,13 +36,13 @@ public:
   using GameObject::GameObject;
 
 private:
-  Text(const Text&) = delete;
-  Text& operator=(const Text&) = delete;
+  Text(Text const&) = delete;
+  Text& operator=(Text const&) = delete;
 #endif
 
 public:
-  void set_text(const std::string& text);
-  void set_font(const std::string& fontname);
+  void set_text(std::string const& text);
+  void set_font(std::string const& fontname);
   void fade_in(float fadetime);
   void fade_out(float fadetime);
   void grow_in(float fadetime);

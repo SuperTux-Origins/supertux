@@ -22,7 +22,7 @@
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
 
-Snowman::Snowman(const ReaderMapping& reader) :
+Snowman::Snowman(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/snowman/snowman.sprite", "left", "right")
 {
   walk_speed = 40;
@@ -52,7 +52,7 @@ Snowman::loose_head()
 }
 
 HitResponse
-Snowman::collision_bullet(Bullet& bullet, const CollisionHit& hit)
+Snowman::collision_bullet(Bullet& bullet, CollisionHit const& hit)
 {
   if (bullet.get_type() == FIRE_BONUS) {
     // fire bullets destroy snowman's body

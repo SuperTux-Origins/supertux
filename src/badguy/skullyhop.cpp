@@ -23,7 +23,7 @@ namespace {
 static const std::string SKULLYHOP_SOUND = "sounds/hop.ogg";
 }
 
-SkullyHop::SkullyHop(const ReaderMapping& reader) :
+SkullyHop::SkullyHop(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/skullyhop/skullyhop.sprite"),
   recover_timer(),
   state()
@@ -76,7 +76,7 @@ SkullyHop::collision_squished(GameObject& object)
 }
 
 void
-SkullyHop::collision_solid(const CollisionHit& hit)
+SkullyHop::collision_solid(CollisionHit const& hit)
 {
   if (m_frozen || BadGuy::get_state() == STATE_BURNING)
   {
@@ -111,7 +111,7 @@ SkullyHop::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-SkullyHop::collision_badguy(BadGuy& , const CollisionHit& hit)
+SkullyHop::collision_badguy(BadGuy& , CollisionHit const& hit)
 {
   // behaviour for badguy collisions is the same as for collisions with solids
   collision_solid(hit);

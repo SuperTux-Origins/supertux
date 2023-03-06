@@ -79,7 +79,7 @@ Statistics::calculate_max_caption_length()
 
   m_max_width = 256;
 
-  for (const auto& caption : captions)
+  for (auto const& caption : captions)
   {
     auto font = Resources::small_font;
     // Add padding the size of lengthiest string:
@@ -125,7 +125,7 @@ Statistics::unserialize_from_squirrel(SquirrelVM& vm)
 
     m_status = FINAL;
   }
-  catch(const std::exception&)
+  catch(std::exception const&)
   {
     // ignore non-existing or malformed statistics table
   }
@@ -206,7 +206,7 @@ Statistics::draw_worldmap_info(DrawingContext& context, float target_time)
 }
 
 void
-Statistics::draw_endseq_panel(DrawingContext& context, Statistics* best_stats, const SurfacePtr& backdrop, float target_time)
+Statistics::draw_endseq_panel(DrawingContext& context, Statistics* best_stats, SurfacePtr const& backdrop, float target_time)
 {
   if (m_status != FINAL) return;
 
@@ -411,7 +411,7 @@ Statistics::update_timers(float dt_sec)
 }
 
 void
-Statistics::init(const Level& level)
+Statistics::init(Level const& level)
 {
   m_status = ACCUMULATING;
 
@@ -438,7 +438,7 @@ Statistics::invalidate()
 }
 
 void
-Statistics::update(const Statistics& other)
+Statistics::update(Statistics const& other)
 {
   if (other.m_status != FINAL) return;
 
@@ -461,7 +461,7 @@ Statistics::update(const Statistics& other)
 }
 
 bool
-Statistics::completed(const Statistics& stats, const float target_time) const
+Statistics::completed(Statistics const& stats, const float target_time) const
 {
   return (stats.m_coins == stats.m_total_coins &&
           stats.m_badguys == stats.m_total_badguys &&

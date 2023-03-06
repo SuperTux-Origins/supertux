@@ -46,7 +46,7 @@
 static const std::string DEFAULT_BG = "images/background/antarctic/arctis2.png";
 
 std::unique_ptr<Sector>
-SectorParser::from_reader(Level& level, const ReaderMapping& reader, bool editable)
+SectorParser::from_reader(Level& level, ReaderMapping const& reader, bool editable)
 {
   auto sector = std::make_unique<Sector>(level);
   BIND_SECTOR(*sector);
@@ -56,7 +56,7 @@ SectorParser::from_reader(Level& level, const ReaderMapping& reader, bool editab
 }
 
 std::unique_ptr<Sector>
-SectorParser::from_reader_old_format(Level& level, const ReaderMapping& reader, bool editable)
+SectorParser::from_reader_old_format(Level& level, ReaderMapping const& reader, bool editable)
 {
   auto sector = std::make_unique<Sector>(level);
   BIND_SECTOR(*sector);
@@ -82,7 +82,7 @@ SectorParser::SectorParser(Sector& sector, bool editable) :
 }
 
 std::unique_ptr<GameObject>
-SectorParser::parse_object(const std::string& name_, const ReaderMapping& reader)
+SectorParser::parse_object(std::string const& name_, ReaderMapping const& reader)
 {
   if (name_ == "money") { // for compatibility with old maps
     return std::make_unique<Jumpy>(reader);
@@ -99,7 +99,7 @@ SectorParser::parse_object(const std::string& name_, const ReaderMapping& reader
 }
 
 void
-SectorParser::parse(const ReaderMapping& sector)
+SectorParser::parse(ReaderMapping const& sector)
 {
   ReaderIterator iter(sector);
   while (iter.next()) {
@@ -112,7 +112,7 @@ SectorParser::parse(const ReaderMapping& sector)
       iter.get(value);
       m_sector.set_gravity(value);
     } else if (iter.get_key() == "music") {
-      const auto& sx = iter.get_sexp();
+      auto const& sx = iter.get_sexp();
       if (sx.is_array() && sx.as_array().size() == 2 && sx.as_array()[1].is_string()) {
         std::string value;
         iter.get(value);
@@ -125,7 +125,7 @@ SectorParser::parse(const ReaderMapping& sector)
       iter.get(value);
       m_sector.set_init_script(value);
     } else if (iter.get_key() == "ambient-light") {
-      const auto& sx = iter.get_sexp();
+      auto const& sx = iter.get_sexp();
       if (sx.is_array() && sx.as_array().size() >= 3 &&
           sx.as_array()[1].is_real() && sx.as_array()[2].is_real() && sx.as_array()[3].is_real())
       {
@@ -153,7 +153,7 @@ SectorParser::parse(const ReaderMapping& sector)
 }
 
 void
-SectorParser::parse_old_format(const ReaderMapping& reader)
+SectorParser::parse_old_format(ReaderMapping const& reader)
 {
   m_sector.set_name("main");
 

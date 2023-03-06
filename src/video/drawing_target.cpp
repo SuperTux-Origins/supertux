@@ -18,7 +18,7 @@
 
 #include "util/log.hpp"
 
-DrawingTarget DrawingTarget_from_string(const std::string& text)
+DrawingTarget DrawingTarget_from_string(std::string const& text)
 {
   if (text == "lightmap")
   {

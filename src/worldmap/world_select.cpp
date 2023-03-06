@@ -36,7 +36,7 @@ namespace worldmap {
 
 const float WorldSelect::s_torque = 0.75f;
 
-WorldSelect::WorldSelect(const std::string& current_world_filename) :
+WorldSelect::WorldSelect(std::string const& current_world_filename) :
   m_enabled(false),
   m_worlds(),
   m_current_world(),
@@ -54,13 +54,13 @@ WorldSelect::WorldSelect(const std::string& current_world_filename) :
     vm.get_table_entry("state");
     vm.get_table_entry("world_select");
     worlds = vm.get_table_keys();
-  } catch(const std::exception&) {}
+  } catch(std::exception const&) {}
 
   if (worlds.size() > 0)
     std::reverse(worlds.begin(), worlds.end());
 
   int i = 0;
-  for (const auto& world : worlds) {
+  for (auto const& world : worlds) {
     sq_pushroottable(vm.get_vm());
     try {
       vm.get_table_entry("state");
@@ -113,7 +113,7 @@ WorldSelect::WorldSelect(const std::string& current_world_filename) :
       }
       i++;
 
-    } catch(const std::exception& e) {
+    } catch(std::exception const& e) {
       log_info << "Exception thrown while generating world state: " << e.what() << std::endl;
     }
   }
@@ -159,7 +159,7 @@ WorldSelect::draw(Compositor& compositor)
   float distance = 0.f;
 
   int i = 0;
-  for (const auto& world : m_worlds)
+  for (auto const& world : m_worlds)
   {
     float angle = m_angle - static_cast<float>(i) /
                   static_cast<float>(m_worlds.size()) * math::PI * 2;
@@ -196,7 +196,7 @@ WorldSelect::draw(Compositor& compositor)
 }
 
 void
-WorldSelect::update(float dt_sec, const Controller& controller)
+WorldSelect::update(float dt_sec, Controller const& controller)
 {
   float target = static_cast<float>(m_selected_world) /
                  static_cast<float>(m_worlds.size()) * math::PI * 2;

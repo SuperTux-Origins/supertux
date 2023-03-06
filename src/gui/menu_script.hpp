@@ -37,11 +37,11 @@ private:
   std::string* base_script;
   std::vector<std::unique_ptr<std::string> > script_strings;
 
-  void push_string(const std::string& new_line);
+  void push_string(std::string const& new_line);
 
 private:
-  ScriptMenu(const ScriptMenu&) = delete;
-  ScriptMenu& operator=(const ScriptMenu&) = delete;
+  ScriptMenu(ScriptMenu const&) = delete;
+  ScriptMenu& operator=(ScriptMenu const&) = delete;
 };
 
 #endif

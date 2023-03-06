@@ -19,7 +19,7 @@
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
 
-OneUp::OneUp(const Vector& pos, Direction direction) :
+OneUp::OneUp(Vector const& pos, Direction direction) :
   MovingSprite(pos, "images/powerups/1up/1up.sprite", LAYER_FLOATINGOBJECTS, COLGROUP_TOUCHABLE),
   physic()
 {
@@ -38,7 +38,7 @@ OneUp::update(float dt_sec)
 }
 
 HitResponse
-OneUp::collision(GameObject& other, const CollisionHit& )
+OneUp::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player) {

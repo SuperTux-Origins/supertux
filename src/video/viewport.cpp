@@ -35,14 +35,14 @@ const Size Viewport::s_min_size(640, 480);
 namespace {
 
 inline Size
-apply_pixel_aspect_ratio_pre(const Size& window_size, float pixel_aspect_ratio)
+apply_pixel_aspect_ratio_pre(Size const& window_size, float pixel_aspect_ratio)
 {
   return Size(static_cast<int>(static_cast<float>(window_size.width) * pixel_aspect_ratio),
               window_size.height);
 }
 
 inline void
-apply_pixel_aspect_ratio_post(const Size& real_window_size, const Size& window_size, float scale,
+apply_pixel_aspect_ratio_post(Size const& real_window_size, Size const& window_size, float scale,
                               Rect& out_viewport, Vector& out_scale)
 {
   Vector transform(static_cast<float>(real_window_size.width) / static_cast<float>(window_size.width),
@@ -58,8 +58,8 @@ apply_pixel_aspect_ratio_post(const Size& real_window_size, const Size& window_s
 }
 
 inline float
-calculate_scale(const Size& min_size, const Size& max_size,
-                const Size& window_size,
+calculate_scale(Size const& min_size, Size const& max_size,
+                Size const& window_size,
                 float magnification)
 {
   float scale = magnification;
@@ -91,7 +91,7 @@ calculate_scale(const Size& min_size, const Size& max_size,
 }
 
 inline Rect
-calculate_viewport(const Size& max_size, const Size& window_size, float scale)
+calculate_viewport(Size const& max_size, Size const& window_size, float scale)
 {
   int viewport_width = std::min(window_size.width,
                                 static_cast<int>(scale * static_cast<float>(max_size.width)));
@@ -110,8 +110,8 @@ calculate_viewport(const Size& max_size, const Size& window_size, float scale)
   return viewport;
 }
 
-void calculate_viewport(const Size& min_size, const Size& max_size,
-                        const Size& real_window_size,
+void calculate_viewport(Size const& min_size, Size const& max_size,
+                        Size const& real_window_size,
                         float pixel_aspect_ratio, float magnification,
                         Vector& out_scale,
                         Rect& out_viewport)
@@ -130,7 +130,7 @@ void calculate_viewport(const Size& min_size, const Size& max_size,
                                 out_viewport, out_scale);
 }
 
-float calculate_pixel_aspect_ratio(const Size& source, const Size& target)
+float calculate_pixel_aspect_ratio(Size const& source, Size const& target)
 {
   float source_aspect = 16.0f / 9.0f; // random guess
   if (source != Size(0, 0))
@@ -150,7 +150,7 @@ float calculate_pixel_aspect_ratio(const Size& source, const Size& target)
 } // namespace
 
 Viewport
-Viewport::from_size(const Size& target_size, const Size& desktop_size)
+Viewport::from_size(Size const& target_size, Size const& desktop_size)
 {
   float pixel_aspect_ratio = 1.0f;
   if (g_config->aspect_size != Size(0, 0))
@@ -182,7 +182,7 @@ Viewport::Viewport() :
 {
 }
 
-Viewport::Viewport(const Rect& rect, const Vector& scale) :
+Viewport::Viewport(Rect const& rect, Vector const& scale) :
   m_rect(rect),
   m_scale(scale)
 {

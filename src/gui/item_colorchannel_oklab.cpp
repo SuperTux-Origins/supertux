@@ -46,7 +46,7 @@ ItemColorChannelOKLab::ItemColorChannelOKLab(Color* col, int channel,
 }
 
 void
-ItemColorChannelOKLab::draw(DrawingContext& context, const Vector& pos,
+ItemColorChannelOKLab::draw(DrawingContext& context, Vector const& pos,
   int menu_width, bool active)
 {
   const float lw = static_cast<float>(menu_width - 32);
@@ -113,7 +113,7 @@ ItemColorChannelOKLab::draw(DrawingContext& context, const Vector& pos,
 }
 
 void
-ItemColorChannelOKLab::process_action(const MenuAction& action)
+ItemColorChannelOKLab::process_action(MenuAction const& action)
 {
   if (action == MenuAction::SELECT) {
     m_col_prev = ColorOKLCh(*m_color);
@@ -149,7 +149,7 @@ ItemColorChannelOKLab::process_action(const MenuAction& action)
 }
 
 void
-ItemColorChannelOKLab::event(const SDL_Event& ev)
+ItemColorChannelOKLab::event(SDL_Event const& ev)
 {
   // Determine the new colour with the mouse position if either the mouse
   // is clicked once or clicked and held down

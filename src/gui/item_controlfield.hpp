@@ -22,17 +22,17 @@
 class ItemControlField final : public MenuItem
 {
 public:
-  ItemControlField(const std::string& text_, const std::string& input_, int id = -1);
+  ItemControlField(std::string const& text_, std::string const& input_, int id = -1);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns the minimum width of the menu item. */
   virtual int get_width() const override;
 
   std::string input;
 
-  void change_input(const std::string& input_) {
+  void change_input(std::string const& input_) {
     input = input_;
   }
 
@@ -41,8 +41,8 @@ public:
   }
 
 private:
-  ItemControlField(const ItemControlField&) = delete;
-  ItemControlField& operator=(const ItemControlField&) = delete;
+  ItemControlField(ItemControlField const&) = delete;
+  ItemControlField& operator=(ItemControlField const&) = delete;
 };
 
 #endif

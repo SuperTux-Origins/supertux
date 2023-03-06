@@ -23,13 +23,13 @@
 class ItemImages final : public MenuItem
 {
 public:
-  ItemImages(const std::string& image_path, int max_image_width = 0, int max_image_height = 0, int id = -1);
-  ItemImages(const std::vector<std::string>& image_paths, int max_image_width = 0, int max_image_height = 0, int id = -1);
+  ItemImages(std::string const& image_path, int max_image_width = 0, int max_image_height = 0, int id = -1);
+  ItemImages(std::vector<std::string> const& image_paths, int max_image_width = 0, int max_image_height = 0, int id = -1);
 
-  virtual void draw(DrawingContext& drawing_context, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext& drawing_context, Vector const& pos, int menu_width, bool active) override;
   virtual int get_width() const override { return m_item_width; }
   virtual int get_height() const override { return m_item_height; }
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
 private:
   std::vector<SurfacePtr> m_images;
@@ -41,8 +41,8 @@ private:
   int m_item_height;
 
 private:
-  ItemImages(const ItemImages&) = delete;
-  ItemImages& operator=(const ItemImages&) = delete;
+  ItemImages(ItemImages const&) = delete;
+  ItemImages& operator=(ItemImages const&) = delete;
 };
 
 #endif

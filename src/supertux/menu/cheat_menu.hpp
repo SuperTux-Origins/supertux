@@ -42,8 +42,8 @@ public:
   void menu_action(MenuItem& item) override;
 
 private:
-  CheatMenu(const CheatMenu&) = delete;
-  CheatMenu& operator=(const CheatMenu&) = delete;
+  CheatMenu(CheatMenu const&) = delete;
+  CheatMenu& operator=(CheatMenu const&) = delete;
 };
 
 #endif

@@ -48,7 +48,7 @@ Camera::set_pos(float x, float y)
 }
 
 void
-Camera::set_mode(const std::string& mode)
+Camera::set_mode(std::string const& mode)
 {
   SCRIPT_GUARD_VOID;
   BIND_SECTOR(::Sector::get());
@@ -99,7 +99,7 @@ Camera::scale(float scale, float time)
 }
 
 void
-Camera::ease_scale(float scale, float time, const std::string& ease)
+Camera::ease_scale(float scale, float time, std::string const& ease)
 {
   SCRIPT_GUARD_VOID;
   BIND_SECTOR(::Sector::get());

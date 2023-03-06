@@ -26,7 +26,7 @@
 #include "math/random.hpp"
 #include "util/reader_mapping.hpp"
 
-FallBlock::FallBlock(const ReaderMapping& reader) :
+FallBlock::FallBlock(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/fallblock/cave-4x4.sprite", LAYER_OBJECTS, COLGROUP_STATIC),
   state(IDLE),
   physic(),
@@ -97,7 +97,7 @@ FallBlock::update(float dt_sec)
 }
 
 HitResponse
-FallBlock::collision(GameObject& other, const CollisionHit& hit)
+FallBlock::collision(GameObject& other, CollisionHit const& hit)
 {
   auto fallblock = dynamic_cast<FallBlock*> (&other);
   if (fallblock && hit.bottom && (state == FALL || state == LAND))
@@ -117,7 +117,7 @@ FallBlock::collision(GameObject& other, const CollisionHit& hit)
 }
 
 void
-FallBlock::collision_solid(const CollisionHit& hit)
+FallBlock::collision_solid(CollisionHit const& hit)
 {
   if (hit.top || hit.bottom || hit.crush)
   {
@@ -150,7 +150,7 @@ FallBlock::found_victim_down() const
 {
   if (auto* player = Sector::get().get_nearest_player(m_col.m_bbox))
   {
-    const Rectf& player_bbox = player->get_bbox();
+    Rectf const& player_bbox = player->get_bbox();
     Rectf crush_area_down = Rectf(m_col.m_bbox.get_left()+1, m_col.m_bbox.get_bottom(),
                                   m_col.m_bbox.get_right()-1, std::max(m_col.m_bbox.get_bottom(),player_bbox.get_top()-1));
     if ((player_bbox.get_top() >= m_col.m_bbox.get_bottom())

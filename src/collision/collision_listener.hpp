@@ -26,15 +26,15 @@ public:
   virtual ~CollisionListener() {}
 
   /** this function is called when the object collided with something solid */
-  virtual void collision_solid(const CollisionHit& /*hit*/) = 0;
+  virtual void collision_solid(CollisionHit const& /*hit*/) = 0;
 
   /** when 2 objects collided, we will first call the
       collision functions of both objects that can decide on
       how to react to the collision. */
-  virtual bool collides(GameObject& /*other*/, const CollisionHit& /*hit*/) const = 0;
+  virtual bool collides(GameObject& /*other*/, CollisionHit const& /*hit*/) const = 0;
 
   /** this function is called when the object collided with any other object */
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) = 0;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) = 0;
 
   /** called when tiles with special attributes have been touched */
   virtual void collision_tile(uint32_t /*tile_attributes*/) = 0;

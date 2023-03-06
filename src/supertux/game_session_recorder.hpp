@@ -29,9 +29,9 @@ public:
   virtual ~GameSessionRecorder();
 
   void start_recording();
-  void record_demo(const std::string& filename);
-  int get_demo_random_seed(const std::string& filename) const;
-  void play_demo(const std::string& filename);
+  void record_demo(std::string const& filename);
+  int get_demo_random_seed(std::string const& filename) const;
+  void play_demo(std::string const& filename);
   void process_events();
 
   /** Re-sets the demo controller in case the sector (and thus the
@@ -51,8 +51,8 @@ private:
   bool m_playing;
 
 private:
-  GameSessionRecorder(const GameSessionRecorder&) = delete;
-  GameSessionRecorder& operator=(const GameSessionRecorder&) = delete;
+  GameSessionRecorder(GameSessionRecorder const&) = delete;
+  GameSessionRecorder& operator=(GameSessionRecorder const&) = delete;
 };
 
 #endif

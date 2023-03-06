@@ -22,9 +22,9 @@
 class CirclePlatform : public MovingSprite
 {
 public:
-  CirclePlatform(const ReaderMapping& reader);
+  CirclePlatform(ReaderMapping const& reader);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   virtual void update(float dt_sec) override;
   virtual void on_flip(float height) override;
@@ -47,8 +47,8 @@ protected:
   float time;
 
 private:
-  CirclePlatform(const CirclePlatform&) = delete;
-  CirclePlatform& operator=(const CirclePlatform&) = delete;
+  CirclePlatform(CirclePlatform const&) = delete;
+  CirclePlatform& operator=(CirclePlatform const&) = delete;
 };
 
 #endif

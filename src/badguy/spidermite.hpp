@@ -22,11 +22,11 @@
 class SpiderMite final : public BadGuy
 {
 public:
-  SpiderMite(const ReaderMapping& reader);
+  SpiderMite(ReaderMapping const& reader);
 
   virtual void initialize() override;
   virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
 
   virtual void freeze() override;
   virtual void unfreeze(bool melt = true) override;
@@ -52,8 +52,8 @@ private:
   Timer timer;
 
 private:
-  SpiderMite(const SpiderMite&) = delete;
-  SpiderMite& operator=(const SpiderMite&) = delete;
+  SpiderMite(SpiderMite const&) = delete;
+  SpiderMite& operator=(SpiderMite const&) = delete;
 };
 
 #endif

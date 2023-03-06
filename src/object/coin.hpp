@@ -32,11 +32,11 @@ class Coin : public MovingSprite,
 friend class HeavyCoin;
 
 public:
-  Coin(const Vector& pos);
-  Coin(const ReaderMapping& reader);
+  Coin(Vector const& pos);
+  Coin(ReaderMapping const& reader);
   virtual void finish_construction() override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   virtual void update(float dt_sec) override;
   static std::string class_name() { return "coin"; }
@@ -44,7 +44,7 @@ public:
   static std::string display_name() { return _("Coin"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual void move_to(const Vector& pos) override;
+  virtual void move_to(Vector const& pos) override;
 
   virtual void on_flip(float height) override;
 
@@ -60,18 +60,18 @@ private:
   int m_starting_node;
 
 private:
-  Coin(const Coin&) = delete;
-  Coin& operator=(const Coin&) = delete;
+  Coin(Coin const&) = delete;
+  Coin& operator=(Coin const&) = delete;
 };
 
 class HeavyCoin final : public Coin
 {
 public:
-  HeavyCoin(const Vector& pos, const Vector& init_velocity);
-  HeavyCoin(const ReaderMapping& reader);
+  HeavyCoin(Vector const& pos, Vector const& init_velocity);
+  HeavyCoin(ReaderMapping const& reader);
 
   virtual void update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
 
   static std::string class_name() { return "heavycoin"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -85,8 +85,8 @@ private:
   CollisionHit m_last_hit;
 
 private:
-  HeavyCoin(const HeavyCoin&) = delete;
-  HeavyCoin& operator=(const HeavyCoin&) = delete;
+  HeavyCoin(HeavyCoin const&) = delete;
+  HeavyCoin& operator=(HeavyCoin const&) = delete;
 };
 
 #endif

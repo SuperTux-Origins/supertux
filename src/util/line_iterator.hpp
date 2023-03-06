@@ -35,7 +35,7 @@ private:
   std::string::const_iterator line_end;
 
 public:
-  LineIterator(const std::string& str);
+  LineIterator(std::string const& str);
   LineIterator(std::string::const_iterator first,
                std::string::const_iterator last);
 

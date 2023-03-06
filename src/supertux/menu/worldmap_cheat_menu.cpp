@@ -200,7 +200,7 @@ WorldmapLevelSelectMenu::menu_action(MenuItem& item)
   auto worldmap = worldmap::WorldMap::current();
   auto& tux = worldmap->get_singleton_by_type<worldmap::Tux>();
   int id = 0;
-  for(const auto& tile : worldmap->get_objects_by_type<worldmap::LevelTile>())
+  for(auto const& tile : worldmap->get_objects_by_type<worldmap::LevelTile>())
   {
     if(id == item.get_id())
     {

@@ -36,7 +36,7 @@
 
 
 // TODO: Display all players on the intro scene
-LevelIntro::LevelIntro(const Level& level, const Statistics* best_level_statistics, const PlayerStatus& player_status) :
+LevelIntro::LevelIntro(Level const& level, Statistics const* best_level_statistics, PlayerStatus const& player_status) :
   m_level(level),
   m_best_level_statistics(best_level_statistics),
   m_player_sprite(),
@@ -62,7 +62,7 @@ LevelIntro::setup()
 }
 
 void
-LevelIntro::update(float dt_sec, const Controller& controller)
+LevelIntro::update(float dt_sec, Controller const& controller)
 {
   // Check if it's time to exit the screen
   if (controller.pressed(Control::JUMP) ||
@@ -109,7 +109,7 @@ LevelIntro::update(float dt_sec, const Controller& controller)
   }
 }
 
-void LevelIntro::draw_stats_line(DrawingContext& context, int& py, const std::string& name, const std::string& stat, bool isPerfect)
+void LevelIntro::draw_stats_line(DrawingContext& context, int& py, std::string const& name, std::string const& stat, bool isPerfect)
 {
   std::stringstream ss;
   ss << name << ": " << stat;
@@ -124,7 +124,7 @@ LevelIntro::draw(Compositor& compositor)
 {
   auto& context = compositor.make_context();
 
-  const Statistics& stats = m_level.m_stats;
+  Statistics const& stats = m_level.m_stats;
   int py = static_cast<int>(static_cast<float>(context.get_height()) / 2.0f - Resources::normal_font->get_height() / 2.0f);
 
   context.set_ambient_color(Color(1.0f, 1.0f, 1.0f, 1.0f));

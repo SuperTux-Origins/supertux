@@ -23,7 +23,7 @@
 #include "video/glutil.hpp"
 
 std::unique_ptr<GLShader>
-GLShader::from_file(GLenum type, const std::string& filename)
+GLShader::from_file(GLenum type, std::string const& filename)
 {
   IFileStream in(filename);
   std::vector<std::string> sources;
@@ -38,7 +38,7 @@ GLShader::from_file(GLenum type, const std::string& filename)
   {
     return from_source(type, sources);
   }
-  catch(const std::exception& err)
+  catch(std::exception const& err)
   {
     std::ostringstream out;
     out << filename << ": " << err.what();
@@ -47,7 +47,7 @@ GLShader::from_file(GLenum type, const std::string& filename)
 }
 
 std::unique_ptr<GLShader>
-GLShader::from_source(GLenum type, const std::vector<std::string>& sources)
+GLShader::from_source(GLenum type, std::vector<std::string> const& sources)
 {
   assert_gl();
 
@@ -95,7 +95,7 @@ GLShader::source(std::vector<std::string> const& sources)
   assert_gl();
 
   std::vector<GLint> length_lst(sources.size());
-  std::vector<const char*> source_lst(sources.size());
+  std::vector<char const*> source_lst(sources.size());
   for (size_t i = 0; i < sources.size(); ++i)
   {
     source_lst[i] = sources[i].c_str();

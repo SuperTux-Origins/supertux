@@ -36,8 +36,8 @@ public:
   Sector(::Sector* parent);
 
 private:
-  Sector(const Sector&) = delete;
-  Sector& operator=(const Sector&) = delete;
+  Sector(Sector const&) = delete;
+  Sector& operator=(Sector const&) = delete;
 #endif
 
 public:

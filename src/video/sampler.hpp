@@ -24,10 +24,10 @@ class Sampler final
 {
 public:
   Sampler();
-  Sampler(GLenum filter, GLenum wrap_s, GLenum wrap_t, const Vector& animate);
-  Sampler(const Sampler&) = default;
+  Sampler(GLenum filter, GLenum wrap_s, GLenum wrap_t, Vector const& animate);
+  Sampler(Sampler const&) = default;
 
-  Sampler& operator=(const Sampler&) = default;
+  Sampler& operator=(Sampler const&) = default;
 
   GLenum get_filter() const { return m_filter; }
   GLenum get_wrap_s() const { return m_wrap_s; }

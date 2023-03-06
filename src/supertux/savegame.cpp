@@ -43,7 +43,7 @@ std::vector<LevelState> get_level_states(SquirrelVM& vm)
   while (SQ_SUCCEEDED(sq_next(vm.get_vm(), -2)))
   {
     //here -1 is the value and -2 is the key
-    const char* result;
+    char const* result;
     if (SQ_FAILED(sq_getstring(vm.get_vm(), -2, &result)))
     {
       std::ostringstream msg;
@@ -70,10 +70,10 @@ std::vector<LevelState> get_level_states(SquirrelVM& vm)
 } // namespace
 
 void
-LevelsetState::store_level_state(const LevelState& in_state)
+LevelsetState::store_level_state(LevelState const& in_state)
 {
   auto it = std::find_if(level_states.begin(), level_states.end(),
-                         [&in_state](const LevelState& state)
+                         [&in_state](LevelState const& state)
                          {
                            return state.filename == in_state.filename;
                          });
@@ -88,10 +88,10 @@ LevelsetState::store_level_state(const LevelState& in_state)
 }
 
 LevelState
-LevelsetState::get_level_state(const std::string& filename) const
+LevelsetState::get_level_state(std::string const& filename) const
 {
   auto it = std::find_if(level_states.begin(), level_states.end(),
-                         [filename](const LevelState& state)
+                         [filename](LevelState const& state)
                          {
                            return state.filename == filename;
                          });
@@ -109,14 +109,14 @@ LevelsetState::get_level_state(const std::string& filename) const
 }
 
 std::unique_ptr<Savegame>
-Savegame::from_file(const std::string& filename)
+Savegame::from_file(std::string const& filename)
 {
   std::unique_ptr<Savegame> savegame(new Savegame(filename));
   savegame->load();
   return savegame;
 }
 
-Savegame::Savegame(const std::string& filename) :
+Savegame::Savegame(std::string const& filename) :
   m_filename(filename),
   m_player_status(new PlayerStatus(InputManager::current()->get_num_users()))
 {
@@ -200,7 +200,7 @@ Savegame::load()
         }
       }
     }
-    catch(const std::exception& e)
+    catch(std::exception const& e)
     {
       log_fatal << "Couldn't load savegame: " << e.what() << std::endl;
     }
@@ -283,7 +283,7 @@ Savegame::save()
     save_squirrel_table(vm.get_vm(), -1, writer);
     sq_pop(vm.get_vm(), 1); // Pop "state"
   }
-  catch(const std::exception&)
+  catch(std::exception const&)
   {
   }
   sq_pop(vm.get_vm(), 1); // Pop root table
@@ -307,7 +307,7 @@ Savegame::get_worldmaps()
     vm.get_or_create_table_entry("worlds");
     worlds = vm.get_table_keys();
   }
-  catch(const std::exception& err)
+  catch(std::exception const& err)
   {
     log_warning << err.what() << std::endl;
   }
@@ -321,7 +321,7 @@ Savegame::get_worldmaps()
 }
 
 WorldmapState
-Savegame::get_worldmap_state(const std::string& name)
+Savegame::get_worldmap_state(std::string const& name)
 {
   WorldmapState result;
 
@@ -347,7 +347,7 @@ Savegame::get_worldmap_state(const std::string& name)
 
     result.level_states = get_level_states(vm);
   }
-  catch(const std::exception& err)
+  catch(std::exception const& err)
   {
     log_warning << err.what() << std::endl;
   }
@@ -372,7 +372,7 @@ Savegame::get_levelsets()
     vm.get_or_create_table_entry("levelsets");
     results = vm.get_table_keys();
   }
-  catch(const std::exception& err)
+  catch(std::exception const& err)
   {
     log_warning << err.what() << std::endl;
   }
@@ -383,7 +383,7 @@ Savegame::get_levelsets()
 }
 
 LevelsetState
-Savegame::get_levelset_state(const std::string& basedir)
+Savegame::get_levelset_state(std::string const& basedir)
 {
   LevelsetState result;
 
@@ -400,7 +400,7 @@ Savegame::get_levelset_state(const std::string& basedir)
 
     result.level_states = get_level_states(vm);
   }
-  catch(const std::exception& err)
+  catch(std::exception const& err)
   {
     log_warning << err.what() << std::endl;
   }
@@ -411,8 +411,8 @@ Savegame::get_levelset_state(const std::string& basedir)
 }
 
 void
-Savegame::set_levelset_state(const std::string& basedir,
-                             const std::string& level_filename,
+Savegame::set_levelset_state(std::string const& basedir,
+                             std::string const& level_filename,
                              bool solved)
 {
   LevelsetState state = get_levelset_state(basedir);
@@ -433,7 +433,7 @@ Savegame::set_levelset_state(const std::string& basedir,
     vm.get_bool("solved", old_solved);
     vm.store_bool("solved", solved || old_solved);
   }
-  catch(const std::exception& err)
+  catch(std::exception const& err)
   {
     log_warning << err.what() << std::endl;
   }

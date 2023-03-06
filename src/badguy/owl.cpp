@@ -35,7 +35,7 @@ const float ACTIVATION_DISTANCE = 128.0f;
 
 std::vector<std::string> Owl::s_portable_objects;
 
-Owl::Owl(const ReaderMapping& reader) :
+Owl::Owl(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/owl/owl.sprite", LAYER_OBJECTS + 1),
   carried_obj_name(),
   carried_object(nullptr)
@@ -81,7 +81,7 @@ Owl::is_above_player() const
   // makes it more likely that we'll hit him.
   float x_offset = (m_dir == Direction::LEFT) ? ACTIVATION_DISTANCE : -ACTIVATION_DISTANCE;
 
-  const Rectf& player_bbox = player->get_bbox();
+  Rectf const& player_bbox = player->get_bbox();
 
   return ((player_bbox.get_top() >= m_col.m_bbox.get_bottom()) /* player is below us */
           && ((player_bbox.get_right() + x_offset) > m_col.m_bbox.get_left())
@@ -187,7 +187,7 @@ Owl::is_freezable() const
 }
 
 void
-Owl::collision_solid(const CollisionHit& hit)
+Owl::collision_solid(CollisionHit const& hit)
 {
   if (m_frozen)
   {

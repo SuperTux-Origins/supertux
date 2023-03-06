@@ -55,7 +55,7 @@ Block::Block(SpritePtr newsprite) :
   SoundManager::current()->preload("sounds/brick.wav");
 }
 
-Block::Block(const ReaderMapping& mapping, const std::string& sprite_file) :
+Block::Block(ReaderMapping const& mapping, std::string const& sprite_file) :
   m_sprite(),
   m_sprite_name(),
   m_default_sprite_name(),
@@ -85,7 +85,7 @@ Block::Block(const ReaderMapping& mapping, const std::string& sprite_file) :
 }
 
 HitResponse
-Block::collision(GameObject& other, const CollisionHit& )
+Block::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player)
@@ -209,7 +209,7 @@ Block::break_me()
   const auto gravity = Sector::get().get_gravity() * 100;
   Vector pos = get_pos() + Vector(16.0f, 16.0f);
 
-  for (const char* action : {"piece1", "piece2", "piece3", "piece4", "piece5", "piece6"})
+  for (char const* action : {"piece1", "piece2", "piece3", "piece4", "piece5", "piece6"})
   {
     Vector velocity(graphicsRandom.randf(-100, 100),
                     graphicsRandom.randf(-400, -300));

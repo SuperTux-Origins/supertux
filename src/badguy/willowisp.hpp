@@ -29,7 +29,7 @@ class WillOWisp final :
   public PathObject
 {
 public:
-  WillOWisp(const ReaderMapping& reader);
+  WillOWisp(ReaderMapping const& reader);
 
   virtual void finish_construction() override;
 
@@ -43,7 +43,7 @@ public:
   virtual void kill_fall() override { vanish(); }
 
   virtual void goto_node(int node_no);
-  virtual void set_state(const std::string& state);
+  virtual void set_state(std::string const& state);
   virtual void start_moving();
   virtual void stop_moving();
 
@@ -55,7 +55,7 @@ public:
   static std::string display_name() { return _("Will o' Wisp"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual void move_to(const Vector& pos) override;
+  virtual void move_to(Vector const& pos) override;
 
   virtual void on_flip(float height) override;
 
@@ -75,8 +75,8 @@ public:
   Color get_color() const { return m_color; }
 
 private:
-  virtual bool collides(GameObject& other, const CollisionHit& hit) const override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
 private:
   enum MyState {
@@ -101,8 +101,8 @@ private:
   int m_starting_node;
 
 private:
-  WillOWisp(const WillOWisp&) = delete;
-  WillOWisp& operator=(const WillOWisp&) = delete;
+  WillOWisp(WillOWisp const&) = delete;
+  WillOWisp& operator=(WillOWisp const&) = delete;
 };
 
 #endif

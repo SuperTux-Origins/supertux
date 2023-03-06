@@ -28,12 +28,12 @@
 class SquirrelError final : public std::exception
 {
 public:
-  SquirrelError(HSQUIRRELVM v, const std::string& message) throw();
-  SquirrelError(const SquirrelError&) = default;
-  SquirrelError& operator=(const SquirrelError&) = default;
+  SquirrelError(HSQUIRRELVM v, std::string const& message) throw();
+  SquirrelError(SquirrelError const&) = default;
+  SquirrelError& operator=(SquirrelError const&) = default;
   ~SquirrelError() throw() override;
 
-  virtual const char* what() const throw() override;
+  virtual char const* what() const throw() override;
 
 private:
   std::string message;

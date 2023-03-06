@@ -30,9 +30,9 @@ class Block : public MovingObject
 
 public:
   Block(SpritePtr sprite);
-  Block(const ReaderMapping& mapping, const std::string& sprite_file);
+  Block(ReaderMapping const& mapping, std::string const& sprite_file);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
 
@@ -64,8 +64,8 @@ private:
   Flip m_flip;
 
 private:
-  Block(const Block&) = delete;
-  Block& operator=(const Block&) = delete;
+  Block(Block const&) = delete;
+  Block& operator=(Block const&) = delete;
 };
 
 #endif

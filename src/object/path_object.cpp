@@ -37,7 +37,7 @@ PathObject::~PathObject()
 }
 
 void
-PathObject::init_path(const ReaderMapping& mapping, bool running_default)
+PathObject::init_path(ReaderMapping const& mapping, bool running_default)
 {
   bool running = running_default;
   mapping.read("running", running);
@@ -69,7 +69,7 @@ PathObject::init_path(const ReaderMapping& mapping, bool running_default)
 }
 
 void
-PathObject::init_path_pos(const Vector& pos, bool running)
+PathObject::init_path_pos(Vector const& pos, bool running)
 {
   auto& path_gameobject = d_gameobject_manager->add<PathGameObject>(pos);
   m_path_uid = path_gameobject.get_uid();

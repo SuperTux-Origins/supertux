@@ -33,7 +33,7 @@ class CustomParticleSystem :
   friend class scripting::CustomParticles;
 public:
   CustomParticleSystem();
-  CustomParticleSystem(const ReaderMapping& reader);
+  CustomParticleSystem(ReaderMapping const& reader);
   ~CustomParticleSystem() override;
 
   virtual void draw(DrawingContext& context) override;
@@ -60,8 +60,8 @@ public:
 
   //void fade_amount(int new_amount, float fade_time);
 protected:
-  virtual int collision(Particle* particle, const Vector& movement) override;
-  CollisionHit get_collision(Particle* particle, const Vector& movement);
+  virtual int collision(Particle* particle, Vector const& movement) override;
+  CollisionHit get_collision(Particle* particle, Vector const& movement);
 
 private:
   struct ease_request
@@ -142,7 +142,7 @@ private:
     {
     }
 
-    SpriteProperties(const SurfacePtr& surface) :
+    SpriteProperties(SurfacePtr const& surface) :
       likeliness(1.f),
       color(1.f, 1.f, 1.f, 1.f),
       texture(surface),
@@ -152,7 +152,7 @@ private:
     {
     }
 
-    SpriteProperties(const SpriteProperties& sp, float alpha) :
+    SpriteProperties(SpriteProperties const& sp, float alpha) :
       likeliness(sp.likeliness),
       color(sp.color.red, sp.color.green, sp.color.blue, sp.color.alpha * alpha),
       texture(sp.texture),
@@ -162,7 +162,7 @@ private:
     {
     }
 
-    inline bool operator==(const SpriteProperties& sp)
+    inline bool operator==(SpriteProperties const& sp)
     {
       return this->likeliness == sp.likeliness
           && this->color      == sp.color
@@ -171,7 +171,7 @@ private:
           && this->hb_scale   == sp.hb_scale
           && this->hb_offset  == sp.hb_offset;
     }
-    inline bool operator!=(const SpriteProperties& sp)
+    inline bool operator!=(SpriteProperties const& sp)
     {
       return !operator==(sp);
     }
@@ -435,8 +435,8 @@ public:
 
 
 private:
-  CustomParticleSystem(const CustomParticleSystem&) = delete;
-  CustomParticleSystem& operator=(const CustomParticleSystem&) = delete;
+  CustomParticleSystem(CustomParticleSystem const&) = delete;
+  CustomParticleSystem& operator=(CustomParticleSystem const&) = delete;
 };
 
 #endif

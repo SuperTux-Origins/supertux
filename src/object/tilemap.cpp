@@ -35,7 +35,7 @@
 #include "video/surface.hpp"
 #include "worldmap/worldmap.hpp"
 
-TileMap::TileMap(const TileSet *new_tileset) :
+TileMap::TileMap(TileSet const*new_tileset) :
   ExposedObject<TileMap, scripting::TileMap>(this),
   PathObject(),
   m_tileset(new_tileset),
@@ -68,7 +68,7 @@ TileMap::TileMap(const TileSet *new_tileset) :
 {
 }
 
-TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
+TileMap::TileMap(TileSet const*tileset_, ReaderMapping const& reader) :
   GameObject(reader),
   ExposedObject<TileMap, scripting::TileMap>(this),
   PathObject(),
@@ -174,7 +174,7 @@ TileMap::TileMap(const TileSet *tileset_, const ReaderMapping& reader) :
   bool empty = true;
 
   // make sure all tiles used on the tilemap are loaded and tilemap isn't empty
-  for (const auto& tile : m_tiles) {
+  for (auto const& tile : m_tiles) {
     if (tile != 0) {
       empty = false;
     }
@@ -357,7 +357,7 @@ TileMap::draw(DrawingContext& context)
       assert (index < (m_width * m_height));
 
       if (m_tiles[index] == 0) continue;
-      const Tile& tile = m_tileset->get(m_tiles[index]);
+      Tile const& tile = m_tileset->get(m_tiles[index]);
 
       if (g_debug.show_collision_rects) {
         tile.draw_debug(context.color(), pos, LAYER_FOREGROUND1);
@@ -377,7 +377,7 @@ TileMap::draw(DrawingContext& context)
 
   for (auto& it : batches)
   {
-    const SurfacePtr& surface = it.first;
+    SurfacePtr const& surface = it.first;
     if (surface) {
       canvas.draw_surface_batch(surface,
                                 std::move(std::get<0>(it.second)),
@@ -431,7 +431,7 @@ TileMap::set(int newwidth, int newheight, const std::vector<unsigned int>&newt,
   update_effective_solid ();
 
   // make sure all tiles are loaded
-  for (const auto& tile : m_tiles)
+  for (auto const& tile : m_tiles)
     m_tileset->get(tile);
 }
 
@@ -483,12 +483,12 @@ TileMap::resize(int new_width, int new_height, int fill_id,
     apply_offset_y(fill_id, yoffset);
 }
 
-void TileMap::resize(const Size& newsize, const Size& resize_offset) {
+void TileMap::resize(Size const& newsize, Size const& resize_offset) {
   resize(newsize.width, newsize.height, 0, resize_offset.width, resize_offset.height);
 }
 
 Rect
-TileMap::get_tiles_overlapping(const Rectf &rect) const
+TileMap::get_tiles_overlapping(Rectf const&rect) const
 {
   Rectf rect2 = rect;
   rect2.move(-m_offset);
@@ -536,7 +536,7 @@ TileMap::get_tile_id(int x, int y) const
 }
 
 bool
-TileMap::is_outside_bounds(const Vector& pos) const
+TileMap::is_outside_bounds(Vector const& pos) const
 {
   auto pos_ = (pos - m_offset) / 32.0f;
   float width = static_cast<float>(m_width);
@@ -544,7 +544,7 @@ TileMap::is_outside_bounds(const Vector& pos) const
   return pos_.x < 0 || pos_.x >= width || pos_.y < 0 || pos_.y >= height;
 }
 
-const Tile&
+Tile const&
 TileMap::get_tile(int x, int y) const
 {
   uint32_t id = get_tile_id(x, y);
@@ -552,14 +552,14 @@ TileMap::get_tile(int x, int y) const
 }
 
 uint32_t
-TileMap::get_tile_id_at(const Vector& pos) const
+TileMap::get_tile_id_at(Vector const& pos) const
 {
   Vector xy = (pos - m_offset) / 32.0f;
   return get_tile_id(int(xy.x), int(xy.y));
 }
 
-const Tile&
-TileMap::get_tile_at(const Vector& pos) const
+Tile const&
+TileMap::get_tile_at(Vector const& pos) const
 {
   uint32_t id = get_tile_id_at(pos);
   return m_tileset->get(id);
@@ -573,7 +573,7 @@ TileMap::change(int x, int y, uint32_t newtile)
 }
 
 void
-TileMap::change_at(const Vector& pos, uint32_t newtile)
+TileMap::change_at(Vector const& pos, uint32_t newtile)
 {
   Vector xy = (pos - m_offset) / 32.0f;
   change(int(xy.x), int(xy.y), newtile);
@@ -700,7 +700,7 @@ TileMap::is_corner(uint32_t tile)
 }
 
 void
-TileMap::autotile_erase(const Vector& pos, const Vector& corner_pos)
+TileMap::autotile_erase(Vector const& pos, Vector const& corner_pos)
 {
   if (pos.x < 0.f || pos.x >= static_cast<float>(m_width) ||
       pos.y < 0.f || pos.y >= static_cast<float>(m_height))
@@ -791,7 +791,7 @@ TileMap::fade(float alpha_, float seconds)
 }
 
 void
-TileMap::tint_fade(const Color& new_tint, float seconds)
+TileMap::tint_fade(Color const& new_tint, float seconds)
 {
   m_tint = new_tint;
   m_remaining_tint_fade_time = seconds;
@@ -813,7 +813,7 @@ TileMap::get_alpha() const
 }
 
 void
-TileMap::move_by(const Vector& shift)
+TileMap::move_by(Vector const& shift)
 {
   if (!get_path()) {
     init_path_pos(m_offset);
@@ -843,7 +843,7 @@ TileMap::update_effective_solid()
 }
 
 void
-TileMap::set_tileset(const TileSet* new_tileset)
+TileMap::set_tileset(TileSet const* new_tileset)
 {
   m_tileset = new_tileset;
 }

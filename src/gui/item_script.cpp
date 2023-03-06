@@ -20,14 +20,14 @@
 #include "gui/menu_manager.hpp"
 #include "gui/menu_script.hpp"
 
-ItemScript::ItemScript(const std::string& text, std::string* script_, int id) :
+ItemScript::ItemScript(std::string const& text, std::string* script_, int id) :
   MenuItem(text, id),
   script(script_)
 {
 }
 
 void
-ItemScript::process_action(const MenuAction& action) {
+ItemScript::process_action(MenuAction const& action) {
   if (action == MenuAction::HIT) {
     MenuManager::instance().push_menu(std::make_unique<ScriptMenu>(script));
   }

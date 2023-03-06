@@ -24,10 +24,10 @@
 class KamikazeSnowball : public BadGuy
 {
 public:
-  KamikazeSnowball(const ReaderMapping& reader);
+  KamikazeSnowball(ReaderMapping const& reader);
 
   virtual void initialize() override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
   static std::string class_name() { return "kamikazesnowball"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Snowshot"); }
@@ -35,18 +35,18 @@ public:
 
 protected:
   virtual bool collision_squished(GameObject& object) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   virtual void kill_collision();
 
 private:
-  KamikazeSnowball(const KamikazeSnowball&) = delete;
-  KamikazeSnowball& operator=(const KamikazeSnowball&) = delete;
+  KamikazeSnowball(KamikazeSnowball const&) = delete;
+  KamikazeSnowball& operator=(KamikazeSnowball const&) = delete;
 };
 
 class LeafShot final : public KamikazeSnowball
 {
 public:
-  LeafShot(const ReaderMapping& reader);
+  LeafShot(ReaderMapping const& reader);
 
   virtual void initialize() override;
   virtual bool is_freezable() const override;
@@ -65,8 +65,8 @@ protected:
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  LeafShot(const LeafShot&) = delete;
-  LeafShot& operator=(const LeafShot&) = delete;
+  LeafShot(LeafShot const&) = delete;
+  LeafShot& operator=(LeafShot const&) = delete;
 };
 
 #endif

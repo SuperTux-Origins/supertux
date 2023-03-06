@@ -42,7 +42,7 @@ const float DEFAULT_SPEED = 20;
 
 } // namespace
 
-TextScrollerScreen::TextScrollerScreen(const std::string& filename) :
+TextScrollerScreen::TextScrollerScreen(std::string const& filename) :
   m_defaultspeed(DEFAULT_SPEED),
   m_music(),
   m_background(),
@@ -92,7 +92,7 @@ TextScrollerScreen::setup()
 }
 
 void
-TextScrollerScreen::update(float dt_sec, const Controller& controller)
+TextScrollerScreen::update(float dt_sec, Controller const& controller)
 {
   // NOTE: Keyboard input is handled by the TextScroller class.
 

@@ -26,11 +26,11 @@ protected:
   std::unique_ptr<std::streambuf> sb;
 
 public:
-  OFileStream(const std::string& filename);
+  OFileStream(std::string const& filename);
 
 private:
-  OFileStream(const OFileStream&) = delete;
-  OFileStream& operator=(const OFileStream&) = delete;
+  OFileStream(OFileStream const&) = delete;
+  OFileStream& operator=(OFileStream const&) = delete;
 };
 
 #endif

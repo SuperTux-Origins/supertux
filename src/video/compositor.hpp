@@ -53,8 +53,8 @@ private:
   std::vector<std::unique_ptr<DrawingContext> > m_drawing_contexts;
 
 private:
-  Compositor(const Compositor&) = delete;
-  Compositor& operator=(const Compositor&) = delete;
+  Compositor(Compositor const&) = delete;
+  Compositor& operator=(Compositor const&) = delete;
 };
 
 #endif

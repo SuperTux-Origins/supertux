@@ -30,7 +30,7 @@
 #include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
 
-AutotileParser::AutotileParser(std::vector<AutotileSet*>* autotilesets, const std::string& filename) :
+AutotileParser::AutotileParser(std::vector<AutotileSet*>* autotilesets, std::string const& filename) :
   m_autotilesets(autotilesets),
   m_filename(filename),
   m_tiles_path()
@@ -70,7 +70,7 @@ AutotileParser::parse()
 }
 
 void
-AutotileParser::parse_autotileset(const ReaderMapping& reader, bool corner)
+AutotileParser::parse_autotileset(ReaderMapping const& reader, bool corner)
 {
   std::vector<Autotile*>* autotiles = new std::vector<Autotile*>();
 
@@ -102,7 +102,7 @@ AutotileParser::parse_autotileset(const ReaderMapping& reader, bool corner)
 }
 
 Autotile*
-AutotileParser::parse_autotile(const ReaderMapping& reader, bool corner)
+AutotileParser::parse_autotile(ReaderMapping const& reader, bool corner)
 {
   std::vector<AutotileMask*> autotile_masks;
   std::vector<std::pair<uint32_t, float>> alt_ids;

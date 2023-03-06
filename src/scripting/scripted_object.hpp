@@ -36,12 +36,12 @@ public:
   using GameObject::GameObject;
 
 private:
-  ScriptedObject(const ScriptedObject&) = delete;
-  ScriptedObject& operator=(const ScriptedObject&) = delete;
+  ScriptedObject(ScriptedObject const&) = delete;
+  ScriptedObject& operator=(ScriptedObject const&) = delete;
 #endif
 
 public:
-  void set_action(const std::string& animation);
+  void set_action(std::string const& animation);
   std::string get_action() const;
 
   void move(float x, float y);

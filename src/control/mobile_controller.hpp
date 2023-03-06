@@ -39,11 +39,11 @@ public:
   void update();
 
   /** returns true if the finger event was inside the screen button area */
-  bool process_finger_down_event(const SDL_TouchFingerEvent& event);
+  bool process_finger_down_event(SDL_TouchFingerEvent const& event);
   /** returns true if the finger event was inside the screen button area */
-  bool process_finger_up_event(const SDL_TouchFingerEvent& event);
+  bool process_finger_up_event(SDL_TouchFingerEvent const& event);
   /** returns true if the finger event was inside the screen button area */
-  bool process_finger_motion_event(const SDL_TouchFingerEvent& event);
+  bool process_finger_motion_event(SDL_TouchFingerEvent const& event);
 
 private:
   void activate_widget_at_pos(float x, float y);
@@ -66,8 +66,8 @@ private:
   float m_mobile_controls_scale;
 
 private:
-  MobileController(const MobileController&) = delete;
-  MobileController& operator=(const MobileController&) = delete;
+  MobileController(MobileController const&) = delete;
+  MobileController& operator=(MobileController const&) = delete;
 };
 
 #endif

@@ -41,9 +41,9 @@ public:
   JoystickManager(InputManager* parent, JoystickConfig& joystick_config);
   ~JoystickManager();
 
-  void process_hat_event(const SDL_JoyHatEvent& jhat);
-  void process_axis_event(const SDL_JoyAxisEvent& jaxis);
-  void process_button_event(const SDL_JoyButtonEvent& jbutton);
+  void process_hat_event(SDL_JoyHatEvent const& jhat);
+  void process_axis_event(SDL_JoyAxisEvent const& jaxis);
+  void process_button_event(SDL_JoyButtonEvent const& jbutton);
 
   void bind_next_event_to(Control id);
 
@@ -84,8 +84,8 @@ private:
   std::unordered_map<SDL_Joystick*, int> joysticks;
 
 private:
-  JoystickManager(const JoystickManager&) = delete;
-  JoystickManager& operator=(const JoystickManager&) = delete;
+  JoystickManager(JoystickManager const&) = delete;
+  JoystickManager& operator=(JoystickManager const&) = delete;
 };
 
 #endif

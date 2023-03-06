@@ -36,14 +36,14 @@ class MovingObject : public GameObject,
 
 public:
   MovingObject();
-  MovingObject(const ReaderMapping& reader);
+  MovingObject(ReaderMapping const& reader);
   ~MovingObject() override;
 
-  virtual void collision_solid(const CollisionHit& /*hit*/) override
+  virtual void collision_solid(CollisionHit const& /*hit*/) override
   {
   }
 
-  virtual bool collides(GameObject& /*other*/, const CollisionHit& /*hit*/) const override
+  virtual bool collides(GameObject& /*other*/, CollisionHit const& /*hit*/) const override
   {
     return true;
   }
@@ -52,12 +52,12 @@ public:
   {
   }
 
-  virtual void set_pos(const Vector& pos)
+  virtual void set_pos(Vector const& pos)
   {
     m_col.set_pos(pos);
   }
 
-  virtual void move_to(const Vector& pos)
+  virtual void move_to(Vector const& pos)
   {
     m_col.move_to(pos);
   }
@@ -69,12 +69,12 @@ public:
     return m_col.m_bbox.p1();
   }
 
-  const Rectf& get_bbox() const
+  Rectf const& get_bbox() const
   {
     return m_col.m_bbox;
   }
 
-  const Vector& get_movement() const
+  Vector const& get_movement() const
   {
     return m_col.get_movement();
   }
@@ -88,7 +88,7 @@ public:
     return &m_col;
   }
 
-  const CollisionObject* get_collision_object() const {
+  CollisionObject const* get_collision_object() const {
     return &m_col;
   }
 
@@ -109,8 +109,8 @@ protected:
   CollisionObject m_col;
 
 private:
-  MovingObject(const MovingObject&) = delete;
-  MovingObject& operator=(const MovingObject&) = delete;
+  MovingObject(MovingObject const&) = delete;
+  MovingObject& operator=(MovingObject const&) = delete;
 };
 
 #endif

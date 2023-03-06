@@ -20,7 +20,7 @@
 #include "object/coin.hpp"
 #include "supertux/sector.hpp"
 
-CoinExplode::CoinExplode(const Vector& pos) :
+CoinExplode::CoinExplode(Vector const& pos) :
   position(pos)
 {
 }

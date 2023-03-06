@@ -246,7 +246,7 @@ ScreenManager::draw_player_pos(DrawingContext& context)
     Sector& sector = session->get_current_sector();
 
     float height = 0;
-    for (const auto* p : sector.get_players())
+    for (auto const* p : sector.get_players())
     {
       auto pos = p->get_pos();
       auto pos_text = "X:" + std::to_string(int(pos.x)) + " Y:" + std::to_string(int(pos.y));

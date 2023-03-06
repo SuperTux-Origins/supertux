@@ -28,8 +28,8 @@ public:
   SDLBaseVideoSystem();
   ~SDLBaseVideoSystem() override;
 
-  virtual void set_title(const std::string& title) override;
-  virtual void set_icon(const SDL_Surface& icon) override;
+  virtual void set_title(std::string const& title) override;
+  virtual void set_icon(SDL_Surface const& icon) override;
   virtual void set_gamma(float gamma) override;
 
   virtual Size get_window_size() const override;
@@ -44,8 +44,8 @@ protected:
   Size m_desktop_size;
 
 private:
-  SDLBaseVideoSystem(const SDLBaseVideoSystem&) = delete;
-  SDLBaseVideoSystem& operator=(const SDLBaseVideoSystem&) = delete;
+  SDLBaseVideoSystem(SDLBaseVideoSystem const&) = delete;
+  SDLBaseVideoSystem& operator=(SDLBaseVideoSystem const&) = delete;
 };
 
 #endif

@@ -22,8 +22,8 @@
 class ViciousIvy final : public WalkingBadguy
 {
 public:
-  ViciousIvy(const ReaderMapping& reader);
-  ViciousIvy(const Vector& pos, Direction d);
+  ViciousIvy(ReaderMapping const& reader);
+  ViciousIvy(Vector const& pos, Direction d);
 
   void active_update(float dt_sec) override;
 
@@ -39,8 +39,8 @@ protected:
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  ViciousIvy(const ViciousIvy&) = delete;
-  ViciousIvy& operator=(const ViciousIvy&) = delete;
+  ViciousIvy(ViciousIvy const&) = delete;
+  ViciousIvy& operator=(ViciousIvy const&) = delete;
 };
 
 #endif

@@ -29,7 +29,7 @@ const float PUFF_INTERVAL_MAX = 8.0f; /**< spawn new puff of smoke at least that
 const float GLOBAL_SPEED_MULT = 0.8f; /**< the overall movement speed/rate */
 }
 
-FlyingSnowBall::FlyingSnowBall(const ReaderMapping& reader) :
+FlyingSnowBall::FlyingSnowBall(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/flying_snowball/flying_snowball.sprite"),
   total_time_elapsed(),
   puff_timer()
@@ -61,7 +61,7 @@ FlyingSnowBall::collision_squished(GameObject& object)
 }
 
 void
-FlyingSnowBall::collision_solid(const CollisionHit& hit)
+FlyingSnowBall::collision_solid(CollisionHit const& hit)
 {
   if (hit.top || hit.bottom) {
     m_physic.set_velocity_y(0);

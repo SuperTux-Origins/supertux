@@ -32,14 +32,14 @@ public:
 
   void bind();
 
-  void set_positions(const float* data, size_t size);
+  void set_positions(float const* data, size_t size);
 
   /** size is in bytes */
-  void set_texcoords(const float* data, size_t size);
+  void set_texcoords(float const* data, size_t size);
   void set_texcoord(float u, float v);
 
-  void set_colors(const float* data, size_t size);
-  void set_color(const Color& color);
+  void set_colors(float const* data, size_t size);
+  void set_color(Color const& color);
 
 private:
   GL33CoreContext& m_context;
@@ -49,8 +49,8 @@ private:
   GLuint m_color_buffer;
 
 private:
-  GLVertexArrays(const GLVertexArrays&) = delete;
-  GLVertexArrays& operator=(const GLVertexArrays&) = delete;
+  GLVertexArrays(GLVertexArrays const&) = delete;
+  GLVertexArrays& operator=(GLVertexArrays const&) = delete;
 };
 
 #endif

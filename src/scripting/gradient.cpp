@@ -21,7 +21,7 @@
 namespace scripting {
 
 void
-Gradient::set_direction(const std::string& direction)
+Gradient::set_direction(std::string const& direction)
 {
   SCRIPT_GUARD_VOID;
 

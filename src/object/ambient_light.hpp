@@ -24,8 +24,8 @@
 class AmbientLight : public GameObject
 {
 public:
-  AmbientLight(const Color& color);
-  AmbientLight(const ReaderMapping& mapping);
+  AmbientLight(Color const& color);
+  AmbientLight(ReaderMapping const& mapping);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
@@ -38,7 +38,7 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
   virtual const std::string get_icon_path() const override { return "images/engine/editor/ambient_light.png"; }
 
-  void set_ambient_light(const Color& ambient_light);
+  void set_ambient_light(Color const& ambient_light);
   Color get_ambient_light() const;
 
   /** Fades to the target ambient light */
@@ -63,8 +63,8 @@ private:
   float m_ambient_light_fade_accum;
 
 private:
-  AmbientLight(const AmbientLight&) = delete;
-  AmbientLight& operator=(const AmbientLight&) = delete;
+  AmbientLight(AmbientLight const&) = delete;
+  AmbientLight& operator=(AmbientLight const&) = delete;
 };
 
 #endif

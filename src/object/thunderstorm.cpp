@@ -34,7 +34,7 @@ const float ELECTRIFY_TIME = 0.5f;
 
 } // namespace
 
-Thunderstorm::Thunderstorm(const ReaderMapping& reader) :
+Thunderstorm::Thunderstorm(ReaderMapping const& reader) :
   GameObject(reader),
   ExposedObject<Thunderstorm, scripting::Thunderstorm>(this),
   running(true),

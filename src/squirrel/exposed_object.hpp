@@ -98,8 +98,8 @@ public:
   }
 
 private:
-  ExposedObject(const ExposedObject&) = delete;
-  ExposedObject& operator=(const ExposedObject&) = delete;
+  ExposedObject(ExposedObject const&) = delete;
+  ExposedObject& operator=(ExposedObject const&) = delete;
 };
 
 #endif

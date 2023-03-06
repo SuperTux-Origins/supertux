@@ -24,15 +24,15 @@ class Timelog
 public:
   Timelog();
 
-  void log(const char* component = nullptr);
+  void log(char const* component = nullptr);
 
 private:
   Uint32 m_last_ticks;
-  const char* m_last_component = nullptr;
+  char const* m_last_component = nullptr;
 
 private:
-  Timelog(const Timelog&) = delete;
-  Timelog& operator=(const Timelog&) = delete;
+  Timelog(Timelog const&) = delete;
+  Timelog& operator=(Timelog const&) = delete;
 };
 
 #endif

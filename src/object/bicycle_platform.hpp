@@ -29,10 +29,10 @@ class BicyclePlatformChild : public MovingSprite
   friend class BicyclePlatform;
 
 public:
-  BicyclePlatformChild(const ReaderMapping& reader, float angle_offset, BicyclePlatform& parent);
+  BicyclePlatformChild(ReaderMapping const& reader, float angle_offset, BicyclePlatform& parent);
 
   virtual void update(float dt_sec) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual bool is_saveable() const override { return false; }
   virtual void on_flip(float height) override;
 
@@ -43,8 +43,8 @@ private:
   std::set<GameObject*> m_contacts; /**< objects that are currently pushing on the platform */
 
 private:
-  BicyclePlatformChild(const BicyclePlatformChild&) = delete;
-  BicyclePlatformChild& operator=(const BicyclePlatformChild&) = delete;
+  BicyclePlatformChild(BicyclePlatformChild const&) = delete;
+  BicyclePlatformChild& operator=(BicyclePlatformChild const&) = delete;
 };
 
 /**
@@ -55,7 +55,7 @@ class BicyclePlatform final : public GameObject
   friend class BicyclePlatformChild;
 
 public:
-  BicyclePlatform(const ReaderMapping& reader);
+  BicyclePlatform(ReaderMapping const& reader);
   ~BicyclePlatform() override;
 
   virtual void draw(DrawingContext& context) override;
@@ -81,8 +81,8 @@ private:
   int m_platforms;
 
 private:
-  BicyclePlatform(const BicyclePlatform&) = delete;
-  BicyclePlatform& operator=(const BicyclePlatform&) = delete;
+  BicyclePlatform(BicyclePlatform const&) = delete;
+  BicyclePlatform& operator=(BicyclePlatform const&) = delete;
 };
 
 #endif

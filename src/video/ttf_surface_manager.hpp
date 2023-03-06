@@ -34,10 +34,10 @@ class TTFSurfaceManager final : public Currenton<TTFSurfaceManager>
 public:
   TTFSurfaceManager();
 
-  TTFSurfacePtr create_surface(const TTFFont& font, const std::string& text);
+  TTFSurfacePtr create_surface(TTFFont const& font, std::string const& text);
 
   // Returns -1 if there is no cached text surface
-  int get_cached_surface_width(const TTFFont& font, const std::string& text);
+  int get_cached_surface_width(TTFFont const& font, std::string const& text);
 
   void print_debug_info(std::ostream& out);
 
@@ -48,7 +48,7 @@ private:
   struct CacheEntry
   {
     CacheEntry() : ttf_surface(), last_access() {}
-    CacheEntry(const TTFSurfacePtr& s);
+    CacheEntry(TTFSurfacePtr const& s);
 
     TTFSurfacePtr ttf_surface;
     float last_access;
@@ -61,8 +61,8 @@ private:
   std::map<Key, CacheEntry>::iterator m_cache_iter;
 
 private:
-  TTFSurfaceManager(const TTFSurfaceManager&) = delete;
-  TTFSurfaceManager& operator=(const TTFSurfaceManager&) = delete;
+  TTFSurfaceManager(TTFSurfaceManager const&) = delete;
+  TTFSurfaceManager& operator=(TTFSurfaceManager const&) = delete;
 };
 
 #endif

@@ -92,7 +92,7 @@ public:
 
   void parse_args(int argc, char** argv);
 
-  void print_help(const char* arg0) const;
+  void print_help(char const* arg0) const;
   void print_version() const;
   void print_datadir() const;
   void print_acknowledgements() const;
@@ -100,8 +100,8 @@ public:
   void merge_into(Config& config);
 
 private:
-  CommandLineArguments(const CommandLineArguments&) = delete;
-  CommandLineArguments& operator=(const CommandLineArguments&) = delete;
+  CommandLineArguments(CommandLineArguments const&) = delete;
+  CommandLineArguments& operator=(CommandLineArguments const&) = delete;
 };
 
 #endif

@@ -22,7 +22,7 @@
 
 #include "video/gl.hpp"
 
-inline void check_gl_error(const char* filename, int line)
+inline void check_gl_error(char const* filename, int line)
 {
   GLenum error = glGetError();
   if (error != GL_NO_ERROR) {

@@ -20,7 +20,7 @@
 #include "video/blend.hpp"
 
 Blend
-Blend_from_string(const std::string& text)
+Blend_from_string(std::string const& text)
 {
   if (text == "none")
   {

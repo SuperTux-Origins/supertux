@@ -26,7 +26,7 @@ TileManager::TileManager() :
 }
 
 TileSet*
-TileManager::get_tileset(const std::string &filename)
+TileManager::get_tileset(std::string const&filename)
 {
   auto it = m_tilesets.find(filename);
   if (it != m_tilesets.end())

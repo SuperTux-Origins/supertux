@@ -23,7 +23,7 @@
 class FishChasing final : public FishSwimming
 {
 public:
-  FishChasing(const ReaderMapping& reader);
+  FishChasing(ReaderMapping const& reader);
 
   virtual void active_update(float dt_sec) override;
 
@@ -48,8 +48,8 @@ private:
   float m_chase_speed;
 
 private:
-  FishChasing(const FishChasing&) = delete;
-  FishChasing& operator=(const FishChasing&) = delete;
+  FishChasing(FishChasing const&) = delete;
+  FishChasing& operator=(FishChasing const&) = delete;
 };
 
 #endif

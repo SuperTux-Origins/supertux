@@ -26,8 +26,8 @@ class Player;
 class Door final : public TriggerBase
 {
 public:
-  Door(const ReaderMapping& reader);
-  Door(int x, int y, const std::string& sector, const std::string& spawnpoint);
+  Door(ReaderMapping const& reader);
+  Door(int x, int y, std::string const& sector, std::string const& spawnpoint);
   ~Door() override;
 
   static std::string class_name() { return "door"; }
@@ -38,7 +38,7 @@ public:
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
   virtual void event(Player& player, EventType type) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void on_flip(float height) override;
 
 private:
@@ -60,8 +60,8 @@ private:
   Flip m_flip;
 
 private:
-  Door(const Door&) = delete;
-  Door& operator=(const Door&) = delete;
+  Door(Door const&) = delete;
+  Door& operator=(Door const&) = delete;
 };
 
 #endif

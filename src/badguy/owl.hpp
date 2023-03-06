@@ -28,10 +28,10 @@ private:
   static std::vector<std::string> s_portable_objects;
 
 public:
-  Owl(const ReaderMapping& reader);
+  Owl(ReaderMapping const& reader);
 
   virtual void initialize() override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
   virtual void kill_fall() override;
 
   virtual void freeze() override;
@@ -54,8 +54,8 @@ protected:
   Portable *carried_object;
 
 private:
-  Owl(const Owl&) = delete;
-  Owl& operator=(const Owl&) = delete;
+  Owl(Owl const&) = delete;
+  Owl& operator=(Owl const&) = delete;
 };
 
 #endif

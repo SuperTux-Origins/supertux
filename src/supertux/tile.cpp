@@ -56,11 +56,11 @@ Tile::Tile() :
 {
 }
 
-Tile::Tile(const std::vector<SurfacePtr>& images,
-           const std::vector<SurfacePtr>& editor_images,
+Tile::Tile(std::vector<SurfacePtr> const& images,
+           std::vector<SurfacePtr> const& editor_images,
            uint32_t attributes, uint32_t data, float fps,
-           const std::string& obj_name,
-           const std::string& obj_data,
+           std::string const& obj_name,
+           std::string const& obj_data,
            bool deprecated) :
   m_images(images),
   m_editor_images(editor_images),
@@ -74,7 +74,7 @@ Tile::Tile(const std::vector<SurfacePtr>& images,
 }
 
 void
-Tile::draw(Canvas& canvas, const Vector& pos, int z_pos, const Color& color) const
+Tile::draw(Canvas& canvas, Vector const& pos, int z_pos, Color const& color) const
 {
   if (draw_editor_images) {
     if (m_editor_images.size() > 1) {
@@ -96,7 +96,7 @@ Tile::draw(Canvas& canvas, const Vector& pos, int z_pos, const Color& color) con
 }
 
 void
-Tile::draw_debug(Canvas& canvas, const Vector& pos, int z_pos, const Color& color) const
+Tile::draw_debug(Canvas& canvas, Vector const& pos, int z_pos, Color const& color) const
 {
   if (!is_slope())
   {
@@ -238,7 +238,7 @@ Tile::get_current_editor_surface() const
 // Also, this uses the movement relative to the tilemaps own movement
 // (if any).  --octo
 bool
-Tile::check_movement_unisolid (const Vector& movement) const
+Tile::check_movement_unisolid (Vector const& movement) const
 {
   int slope_info;
   double mv_x;
@@ -332,8 +332,8 @@ Tile::check_movement_unisolid (const Vector& movement) const
 // is non-solid. Otherwise, if the object is "above" (south slopes) or
 // "below" (north slopes), the tile will be solid.
 bool
-Tile::check_position_unisolid (const Rectf& obj_bbox,
-                               const Rectf& tile_bbox) const
+Tile::check_position_unisolid (Rectf const& obj_bbox,
+                               Rectf const& tile_bbox) const
 {
   int slope_info;
   float tile_x;
@@ -484,7 +484,7 @@ Tile::check_position_unisolid (const Rectf& obj_bbox,
 }
 
 bool
-Tile::is_solid (const Rectf& tile_bbox, const Rectf& position, const Vector& movement) const
+Tile::is_solid (Rectf const& tile_bbox, Rectf const& position, Vector const& movement) const
 {
   if (!(m_attributes & SOLID))
     return false;
@@ -493,7 +493,7 @@ Tile::is_solid (const Rectf& tile_bbox, const Rectf& position, const Vector& mov
 }
 
 bool
-Tile::is_collisionful(const Rectf& tile_bbox, const Rectf& position, const Vector& movement) const
+Tile::is_collisionful(Rectf const& tile_bbox, Rectf const& position, Vector const& movement) const
 {
   if (!(m_attributes & UNISOLID))
     return true;

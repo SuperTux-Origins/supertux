@@ -41,7 +41,7 @@ Platform::stop_moving()
 }
 
 void
-Platform::set_action(const std::string& action, int repeat)
+Platform::set_action(std::string const& action, int repeat)
 {
   SCRIPT_GUARD_VOID;
   object.set_action(action, repeat);

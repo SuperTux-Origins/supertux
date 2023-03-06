@@ -31,9 +31,9 @@ class TypedUID : public UID
 {
 public:
   TypedUID() : UID() {}
-  TypedUID(const T* object) : UID() { if (object) *this = object->get_uid(); }
-  TypedUID(const TypedUID& other) = default;
-  TypedUID& operator=(const TypedUID& other) = default;
+  TypedUID(T const* object) : UID() { if (object) *this = object->get_uid(); }
+  TypedUID(TypedUID const& other) = default;
+  TypedUID& operator=(TypedUID const& other) = default;
 
   inline T* get() const
   {
@@ -53,13 +53,13 @@ public:
     return object;
   }
 
-  inline TypedUID& operator=(const T* object)
+  inline TypedUID& operator=(T const* object)
   {
     *this = object ? object->get_uid() : UID();
     return *this;
   }
 
-  inline TypedUID& operator=(const UID& other)
+  inline TypedUID& operator=(UID const& other)
   {
     UID::operator=(other);
     return *this;
@@ -79,12 +79,12 @@ public:
     return *t;
   }
 
-  inline bool operator==(const T* object) const
+  inline bool operator==(T const* object) const
   {
     return (!object && m_value == 0) || object->get_uid() == *this;
   }
 
-  inline bool operator!=(const T* object) const
+  inline bool operator!=(T const* object) const
   {
     return object ? object->get_uid() != *this : m_value == 0;
   }
@@ -95,12 +95,12 @@ public:
 };
 
 template<class T>
-inline bool operator==(const T* object, const TypedUID<T>& typed_uid) {
+inline bool operator==(T const* object, TypedUID<T> const& typed_uid) {
   return typed_uid == object;
 }
 
 template<class T>
-inline bool operator!=(const T* object, const TypedUID<T>& typed_uid) {
+inline bool operator!=(T const* object, TypedUID<T> const& typed_uid) {
   return typed_uid != object;
 }
 

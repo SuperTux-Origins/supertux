@@ -19,14 +19,14 @@
 #include "gui/menu_manager.hpp"
 #include "gui/menu_list.hpp"
 
-ItemList::ItemList(const std::string& text, const std::vector<std::string>& items, std::string* value_ptr, int id) :
+ItemList::ItemList(std::string const& text, std::vector<std::string> const& items, std::string* value_ptr, int id) :
   MenuItem(text, id),
   m_items(items),
   m_value_ptr(value_ptr)
 {}
 
 void
-ItemList::process_action(const MenuAction& action)
+ItemList::process_action(MenuAction const& action)
 {
   if (action == MenuAction::HIT)
     MenuManager::instance().push_menu(std::make_unique<ListMenu>(m_items, m_value_ptr, nullptr));

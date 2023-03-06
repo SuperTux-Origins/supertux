@@ -19,7 +19,7 @@
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 
-TriggerBase::TriggerBase(const ReaderMapping& mapping) :
+TriggerBase::TriggerBase(ReaderMapping const& mapping) :
   MovingObject(mapping),
   m_sprite(),
   m_hit(),
@@ -72,7 +72,7 @@ TriggerBase::draw(DrawingContext& context)
 }
 
 HitResponse
-TriggerBase::collision(GameObject& other, const CollisionHit& )
+TriggerBase::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player) {

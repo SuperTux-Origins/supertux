@@ -16,14 +16,14 @@
 
 #include "gui/item_action.hpp"
 
-ItemAction::ItemAction(const std::string& text, int id, std::function<void()> callback) :
+ItemAction::ItemAction(std::string const& text, int id, std::function<void()> callback) :
   MenuItem(text, id),
   m_callback(std::move(callback))
 {
 }
 
 void
-ItemAction::process_action(const MenuAction& action)
+ItemAction::process_action(MenuAction const& action)
 {
   if (action == MenuAction::HIT) {
     if (m_callback) {

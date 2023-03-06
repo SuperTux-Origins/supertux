@@ -33,8 +33,8 @@ class PathGameObject : public GameObject
 {
 public:
   PathGameObject();
-  PathGameObject(const Vector& pos);
-  PathGameObject(const ReaderMapping& mapping, bool backward_compatibility_hack=false);
+  PathGameObject(Vector const& pos);
+  PathGameObject(ReaderMapping const& mapping, bool backward_compatibility_hack=false);
   ~PathGameObject() override;
 
   virtual void update(float dt_sec) override;
@@ -68,8 +68,8 @@ private:
   SpritePtr m_node_sprite;
 
 private:
-  PathGameObject(const PathGameObject&) = delete;
-  PathGameObject& operator=(const PathGameObject&) = delete;
+  PathGameObject(PathGameObject const&) = delete;
+  PathGameObject& operator=(PathGameObject const&) = delete;
 };
 
 #endif

@@ -24,7 +24,7 @@
 static const float JUMPSPEED = -450;
 static const float BSNOWBALL_WALKSPEED = 80;
 
-BouncingSnowball::BouncingSnowball(const ReaderMapping& reader)
+BouncingSnowball::BouncingSnowball(ReaderMapping const& reader)
   : BadGuy(reader, "images/creatures/bouncing_snowball/bouncing_snowball.sprite")
 {
 }
@@ -67,7 +67,7 @@ BouncingSnowball::collision_squished(GameObject& object)
 }
 
 void
-BouncingSnowball::collision_solid(const CollisionHit& hit)
+BouncingSnowball::collision_solid(CollisionHit const& hit)
 {
   if (m_sprite->get_action() == "squished")
   {
@@ -97,7 +97,7 @@ BouncingSnowball::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-BouncingSnowball::collision_badguy(BadGuy& , const CollisionHit& hit)
+BouncingSnowball::collision_badguy(BadGuy& , CollisionHit const& hit)
 {
   collision_solid(hit);
   return CONTINUE;

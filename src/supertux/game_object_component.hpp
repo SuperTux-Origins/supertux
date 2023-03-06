@@ -24,8 +24,8 @@ public:
   virtual ~GameObjectComponent() {}
 
 private:
-  GameObjectComponent(const GameObjectComponent&) = delete;
-  GameObjectComponent& operator=(const GameObjectComponent&) = delete;
+  GameObjectComponent(GameObjectComponent const&) = delete;
+  GameObjectComponent& operator=(GameObjectComponent const&) = delete;
 };
 
 #endif

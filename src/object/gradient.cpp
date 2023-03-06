@@ -45,7 +45,7 @@ Gradient::Gradient() :
 {
 }
 
-Gradient::Gradient(const ReaderMapping& reader) :
+Gradient::Gradient(ReaderMapping const& reader) :
   GameObject(reader),
   ExposedObject<Gradient, scripting::Gradient>(this),
   m_layer(LAYER_BACKGROUND0),
@@ -191,7 +191,7 @@ Gradient::fade_gradient(Color top, Color bottom, float time)
 }
 
 void
-Gradient::set_direction(const GradientDirection& direction)
+Gradient::set_direction(GradientDirection const& direction)
 {
   m_gradient_direction = direction;
 }

@@ -31,12 +31,12 @@ private:
 
   static const std::vector<std::string> s_sprites;
 
-  static DispenserType DispenserType_from_string(const std::string& type_string);
+  static DispenserType DispenserType_from_string(std::string const& type_string);
   static std::string DispenserType_to_string(DispenserType type);
   static std::string Cannon_Direction_to_string(Direction direction);
 
 public:
-  Dispenser(const ReaderMapping& reader);
+  Dispenser(ReaderMapping const& reader);
 
   virtual void draw(DrawingContext& context) override;
   virtual void initialize() override;
@@ -74,7 +74,7 @@ public:
   }
 
 protected:
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void launch_badguy();
 
 private:
@@ -101,8 +101,8 @@ private:
   int m_current_badguys;
 
 private:
-  Dispenser(const Dispenser&) = delete;
-  Dispenser& operator=(const Dispenser&) = delete;
+  Dispenser(Dispenser const&) = delete;
+  Dispenser& operator=(Dispenser const&) = delete;
 };
 
 #endif

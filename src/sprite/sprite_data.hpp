@@ -28,9 +28,9 @@ class SpriteData final
 {
 public:
   /** cur has to be a pointer to data in the form of ((hitbox 5 10 0 0) ...) */
-  SpriteData(const ReaderMapping& cur);
+  SpriteData(ReaderMapping const& cur);
 
-  const std::string& get_name() const
+  std::string const& get_name() const
   {
     return name;
   }
@@ -78,9 +78,9 @@ private:
 
   typedef std::map <std::string, std::unique_ptr<Action> > Actions;
 
-  void parse_action(const ReaderMapping& mapping);
+  void parse_action(ReaderMapping const& mapping);
   /** Get an action */
-  const Action* get_action(const std::string& act) const;
+  Action const* get_action(std::string const& act) const;
 
   Actions actions;
   std::string name;

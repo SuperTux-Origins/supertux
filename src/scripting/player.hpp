@@ -37,8 +37,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  Player(const Player&) = delete;
-  Player& operator=(const Player&) = delete;
+  Player(Player const&) = delete;
+  Player& operator=(Player const&) = delete;
 #endif
 
 public:
@@ -46,12 +46,12 @@ public:
    * Set tux bonus.
    * This can be "grow", "fireflower" or "iceflower" at the moment
    */
-  bool add_bonus(const std::string& bonus);
+  bool add_bonus(std::string const& bonus);
   /**
    * Replaces the Tux's bonus with another bonus.
    * This can be "grow", "fireflower" or "iceflower" at the moment
    */
-  bool set_bonus(const std::string& bonus);
+  bool set_bonus(std::string const& bonus);
   /**
    * Give tux more coins
    *
@@ -147,7 +147,7 @@ public:
   /**
    * Orders the current GameSession to start a sequence
    */
-  void trigger_sequence(const std::string& sequence_name);
+  void trigger_sequence(std::string const& sequence_name);
 
   /**
    * Uses a scriptable controller for all user input (or restores controls)
@@ -158,12 +158,12 @@ public:
    * Check whether player is carrying a certain object
    * @param name Name of the Portable object to check for
    */
-   bool has_grabbed(const std::string& name) const;
+   bool has_grabbed(std::string const& name) const;
 
   /**
    * Instructs the scriptable controller to press or release a button
    */
-  void do_scripting_controller(const std::string& control, bool pressed);
+  void do_scripting_controller(std::string const& control, bool pressed);
 
   float get_velocity_x() const;
   float get_velocity_y() const;

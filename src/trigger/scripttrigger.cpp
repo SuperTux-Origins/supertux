@@ -22,7 +22,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 
-ScriptTrigger::ScriptTrigger(const ReaderMapping& reader) :
+ScriptTrigger::ScriptTrigger(ReaderMapping const& reader) :
   TriggerBase(reader),
   triggerevent(),
   script(),
@@ -50,7 +50,7 @@ ScriptTrigger::ScriptTrigger(const ReaderMapping& reader) :
     triggerevent = EVENT_TOUCH;
 }
 
-ScriptTrigger::ScriptTrigger(const Vector& pos, const std::string& script_) :
+ScriptTrigger::ScriptTrigger(Vector const& pos, std::string const& script_) :
   TriggerBase(),
   triggerevent(EVENT_TOUCH),
   script(script_),

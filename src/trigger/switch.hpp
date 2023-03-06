@@ -25,7 +25,7 @@
 class Switch final : public TriggerBase
 {
 public:
-  Switch(const ReaderMapping& reader);
+  Switch(ReaderMapping const& reader);
   ~Switch() override;
 
   static std::string class_name() { return "switch"; }
@@ -57,8 +57,8 @@ private:
   Flip m_flip;
 
 private:
-  Switch(const Switch&) = delete;
-  Switch& operator=(const Switch&) = delete;
+  Switch(Switch const&) = delete;
+  Switch& operator=(Switch const&) = delete;
 };
 
 #endif

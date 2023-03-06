@@ -23,13 +23,13 @@
 class DartTrap final : public BadGuy
 {
 public:
-  DartTrap(const ReaderMapping& reader);
+  DartTrap(ReaderMapping const& reader);
 
   virtual void initialize() override;
   virtual void activate() override;
   virtual void active_update(float dt_sec) override;
 
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   static std::string class_name() { return "darttrap"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Dart Trap"); }
@@ -55,8 +55,8 @@ private:
   Timer fire_timer; /**< time until new shot is fired */
 
 private:
-  DartTrap(const DartTrap&) = delete;
-  DartTrap& operator=(const DartTrap&) = delete;
+  DartTrap(DartTrap const&) = delete;
+  DartTrap& operator=(DartTrap const&) = delete;
 };
 
 #endif

@@ -53,12 +53,12 @@ public:
   Notification(std::string id, bool no_auto_hide = false, bool no_auto_disable = false);
   ~Notification();
 
-  void set_text(const std::string& text);
-  void set_mini_text(const std::string& text);
+  void set_text(std::string const& text);
+  void set_mini_text(std::string const& text);
   void on_press(const std::function<void ()>& callback) { m_callback = callback; }
 
-  void event(const SDL_Event& event);
-  void process_input(const Controller& controller);
+  void event(SDL_Event const& event);
+  void process_input(Controller const& controller);
   void draw(DrawingContext& context);
 
   // Notification actions
@@ -74,8 +74,8 @@ private:
   void calculate_size();
 
 private:
-  Notification(const Notification&) = delete;
-  Notification& operator=(const Notification&) = delete;
+  Notification(Notification const&) = delete;
+  Notification& operator=(Notification const&) = delete;
 };
 
 #endif

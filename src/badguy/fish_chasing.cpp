@@ -26,7 +26,7 @@ static const float LOST_DISTANCE = 400.0f;
 static const float CHASE_SPEED = 300.0f;
 static const float REALIZATION_TIME = 0.7f;
 
-FishChasing::FishChasing(const ReaderMapping& reader) :
+FishChasing::FishChasing(ReaderMapping const& reader) :
   FishSwimming(reader, "images/creatures/fish/ice/greenfish.sprite"),
   m_chase_state(ChaseState::NORMAL),
   m_realization_timer(),

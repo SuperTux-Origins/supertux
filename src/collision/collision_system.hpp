@@ -48,17 +48,17 @@ public:
       case (or not). */
   void update();
 
-  const std::shared_ptr<CollisionGroundMovementManager>& get_ground_movement_manager()
+  std::shared_ptr<CollisionGroundMovementManager> const& get_ground_movement_manager()
   {
     return m_ground_movement_manager;
   }
 
-  bool is_free_of_tiles(const Rectf& rect, const bool ignoreUnisolid = false, uint32_t tiletype = Tile::SOLID) const;
-  bool is_free_of_statics(const Rectf& rect, const CollisionObject* ignore_object, const bool ignoreUnisolid) const;
-  bool is_free_of_movingstatics(const Rectf& rect, const CollisionObject* ignore_object) const;
-  bool free_line_of_sight(const Vector& line_start, const Vector& line_end, bool ignore_objects, const CollisionObject* ignore_object) const;
+  bool is_free_of_tiles(Rectf const& rect, const bool ignoreUnisolid = false, uint32_t tiletype = Tile::SOLID) const;
+  bool is_free_of_statics(Rectf const& rect, CollisionObject const* ignore_object, const bool ignoreUnisolid) const;
+  bool is_free_of_movingstatics(Rectf const& rect, CollisionObject const* ignore_object) const;
+  bool free_line_of_sight(Vector const& line_start, Vector const& line_end, bool ignore_objects, CollisionObject const* ignore_object) const;
 
-  std::vector<CollisionObject*> get_nearby_objects(const Vector& center, float max_distance) const;
+  std::vector<CollisionObject*> get_nearby_objects(Vector const& center, float max_distance) const;
 
 private:
   /** Does collision detection of an object against all other static
@@ -70,14 +70,14 @@ private:
       this object (because of ABORT_MOVE in the collision response or
       no collisions) */
   void collision_static(collision::Constraints* constraints,
-                        const Vector& movement, const Rectf& dest,
+                        Vector const& movement, Rectf const& dest,
                         CollisionObject& object);
 
   void collision_tilemap(collision::Constraints* constraints,
-                         const Vector& movement, const Rectf& dest,
+                         Vector const& movement, Rectf const& dest,
                          CollisionObject& object) const;
 
-  uint32_t collision_tile_attributes(const Rectf& dest, const Vector& mov) const;
+  uint32_t collision_tile_attributes(Rectf const& dest, Vector const& mov) const;
 
   void collision_object(CollisionObject* object1, CollisionObject* object2) const;
 
@@ -91,8 +91,8 @@ private:
   std::shared_ptr<CollisionGroundMovementManager> m_ground_movement_manager;
 
 private:
-  CollisionSystem(const CollisionSystem&) = delete;
-  CollisionSystem& operator=(const CollisionSystem&) = delete;
+  CollisionSystem(CollisionSystem const&) = delete;
+  CollisionSystem& operator=(CollisionSystem const&) = delete;
 };
 
 #endif

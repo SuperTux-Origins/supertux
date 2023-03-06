@@ -29,12 +29,12 @@ class Player;
 class Bullet final : public MovingObject
 {
 public:
-  Bullet(const Vector& pos, const Vector& xm, Direction dir, BonusType type, Player& player);
+  Bullet(Vector const& pos, Vector const& xm, Direction dir, BonusType type, Player& player);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual bool is_saveable() const override { return false; }
 
   virtual int get_layer() const override { return LAYER_OBJECTS; }
@@ -43,7 +43,7 @@ public:
       by the collision handler of that object. Note that the @c hit
       parameter is filled in as perceived by the object, not by the
       bullet. */
-  void ricochet(GameObject& other, const CollisionHit& hit);
+  void ricochet(GameObject& other, CollisionHit const& hit);
 
   BonusType get_type() const { return type; }
 
@@ -58,8 +58,8 @@ private:
   BonusType type;
 
 private:
-  Bullet(const Bullet&) = delete;
-  Bullet& operator=(const Bullet&) = delete;
+  Bullet(Bullet const&) = delete;
+  Bullet& operator=(Bullet const&) = delete;
 };
 
 #endif

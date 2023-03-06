@@ -37,12 +37,12 @@ private:
   using GameObject::GameObject;
 
 private:
-  Gradient(const Gradient&) = delete;
-  Gradient& operator=(const Gradient&) = delete;
+  Gradient(Gradient const&) = delete;
+  Gradient& operator=(Gradient const&) = delete;
 #endif
 
 public:
-  void set_direction(const std::string& direction);
+  void set_direction(std::string const& direction);
   std::string get_direction() const;
 
   void set_color1(float red, float green, float blue);

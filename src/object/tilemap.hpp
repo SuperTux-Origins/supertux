@@ -46,8 +46,8 @@ class TileMap final :
   public PathObject
 {
 public:
-  TileMap(const TileSet *tileset);
-  TileMap(const TileSet *tileset, const ReaderMapping& reader);
+  TileMap(TileSet const*tileset);
+  TileMap(TileSet const*tileset, ReaderMapping const& reader);
   ~TileMap() override;
 
   virtual void finish_construction() override;
@@ -79,21 +79,21 @@ public:
       destroy the existing map) */
   void resize(int newwidth, int newheight, int fill_id = 0,
               int xoffset = 0, int yoffset = 0);
-  void resize(const Size& newsize, const Size& resize_offset);
+  void resize(Size const& newsize, Size const& resize_offset);
 
   int get_width() const { return m_width; }
   int get_height() const { return m_height; }
   Size get_size() const { return Size(m_width, m_height); }
 
-  void set_offset(const Vector &offset_) { m_offset = offset_; }
+  void set_offset(Vector const&offset_) { m_offset = offset_; }
   Vector get_offset() const { return m_offset; }
 
-  void set_ground_movement_manager(const std::shared_ptr<CollisionGroundMovementManager>& movement_manager)
+  void set_ground_movement_manager(std::shared_ptr<CollisionGroundMovementManager> const& movement_manager)
   {
     m_ground_movement_manager = movement_manager;
   }
 
-  void move_by(const Vector& pos);
+  void move_by(Vector const& pos);
 
   /** Get the movement of this tilemap. The collision detection code
       may need a non-negative y-movement. Passing `false' as the
@@ -125,7 +125,7 @@ public:
 
   /** Returns the half-open rectangle of (x, y) tile indices that
       overlap the given rectangle in the sector. */
-  Rect get_tiles_overlapping(const Rectf &rect) const;
+  Rect get_tiles_overlapping(Rectf const&rect) const;
 
   /** Called by the collision mechanism to indicate that this tilemap has been hit on
       the top, i.e. has hit a moving object on the bottom of its collision rectangle. */
@@ -141,15 +141,15 @@ public:
       doing collision detection. */
   void set_solid(bool solid = true);
 
-  bool is_outside_bounds(const Vector& pos) const;
-  const Tile& get_tile(int x, int y) const;
-  const Tile& get_tile_at(const Vector& pos) const;
+  bool is_outside_bounds(Vector const& pos) const;
+  Tile const& get_tile(int x, int y) const;
+  Tile const& get_tile_at(Vector const& pos) const;
   uint32_t get_tile_id(int x, int y) const;
-  uint32_t get_tile_id_at(const Vector& pos) const;
+  uint32_t get_tile_id_at(Vector const& pos) const;
 
   void change(int x, int y, uint32_t newtile);
 
-  void change_at(const Vector& pos, uint32_t newtile);
+  void change_at(Vector const& pos, uint32_t newtile);
 
   /** changes all tiles with the given ID */
   void change_all(uint32_t oldtile, uint32_t newtile);
@@ -172,7 +172,7 @@ public:
   void autotile_corner(int x, int y, uint32_t tile, AutotileCornerOperation op);
   
   /** Erases in autotile mode */
-  void autotile_erase(const Vector& pos, const Vector& corner_pos);
+  void autotile_erase(Vector const& pos, Vector const& corner_pos);
 
   /** Returns the Autotileset associated with the given tile */
   AutotileSet* get_autotileset(uint32_t tile) const;
@@ -187,7 +187,7 @@ public:
 
   /** Start fading the tilemap to tint given by RGBA.
       Destination opacity will be reached after @c seconds seconds. Doesn't influence solidity. */
-  void tint_fade(const Color& new_tint, float seconds = 0);
+  void tint_fade(Color const& new_tint, float seconds = 0);
 
   Color get_current_tint() const { return m_current_tint; }
 
@@ -199,9 +199,9 @@ public:
       target alpha. */
   float get_alpha() const;
 
-  void set_tileset(const TileSet* new_tileset);
+  void set_tileset(TileSet const* new_tileset);
 
-  const std::vector<uint32_t>& get_tiles() const { return m_tiles; }
+  std::vector<uint32_t> const& get_tiles() const { return m_tiles; }
 
 private:
   void update_effective_solid();
@@ -213,7 +213,7 @@ private:
   void apply_offset_y(int fill_id, int yoffset);
 
 private:
-  const TileSet* m_tileset;
+  TileSet const* m_tileset;
 
   typedef std::vector<uint32_t> Tiles;
   Tiles m_tiles;
@@ -261,8 +261,8 @@ private:
   int m_starting_node;
 
 private:
-  TileMap(const TileMap&) = delete;
-  TileMap& operator=(const TileMap&) = delete;
+  TileMap(TileMap const&) = delete;
+  TileMap& operator=(TileMap const&) = delete;
 };
 
 #endif

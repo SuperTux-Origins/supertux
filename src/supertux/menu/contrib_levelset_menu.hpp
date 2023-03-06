@@ -34,8 +34,8 @@ public:
   void menu_action(MenuItem& item) override;
 
 private:
-  ContribLevelsetMenu(const ContribLevelsetMenu&) = delete;
-  ContribLevelsetMenu& operator=(const ContribLevelsetMenu&) = delete;
+  ContribLevelsetMenu(ContribLevelsetMenu const&) = delete;
+  ContribLevelsetMenu& operator=(ContribLevelsetMenu const&) = delete;
 };
 
 #endif

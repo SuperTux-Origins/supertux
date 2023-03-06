@@ -41,8 +41,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  TextArray(const TextArray&) = delete;
-  TextArray& operator=(const TextArray&) = delete;
+  TextArray(TextArray const&) = delete;
+  TextArray& operator=(TextArray const&) = delete;
 #endif
 
 public:
@@ -51,8 +51,8 @@ public:
    * @see: text_array_object.hpp
    */
   void clear();
-  void add_text(const std::string& text);
-  void add_text_duration(const std::string& text, float duration);
+  void add_text(std::string const& text);
+  void add_text_duration(std::string const& text, float duration);
   void set_text_index(int index_);
   void set_keep_visible(bool keep_visible_);
   void set_fade_transition(bool fade_transition);
@@ -66,8 +66,8 @@ public:
    * Text object api related
    * @see: text_object.hpp
    */
-  void set_text(const std::string& text);
-  void set_font(const std::string& fontname);
+  void set_text(std::string const& text);
+  void set_font(std::string const& fontname);
   void fade_in(float fadetime);
   void fade_out(float fadetime);
   void set_visible(bool visible);

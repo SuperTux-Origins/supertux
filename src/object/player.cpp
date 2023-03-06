@@ -148,7 +148,7 @@ Player::get_player_color(int id)
                1.f - static_cast<float>(id & 1) * .4f);
 }
 
-Player::Player(PlayerStatus& player_status, const std::string& name_, int player_id) :
+Player::Player(PlayerStatus& player_status, std::string const& name_, int player_id) :
   ExposedObject<Player, scripting::Player>(this),
   m_id(player_id),
   m_target(nullptr),
@@ -280,7 +280,7 @@ Player::set_id(int id)
 }
 
 void
-Player::set_controller(const Controller* controller_)
+Player::set_controller(Controller const* controller_)
 {
   m_controller = controller_;
 }
@@ -308,7 +308,7 @@ Player::use_scripting_controller(bool use_or_release)
 }
 
 void
-Player::do_scripting_controller(const std::string& control_text, bool pressed)
+Player::do_scripting_controller(std::string const& control_text, bool pressed)
 {
   if (const auto maybe_control = Control_from_string(control_text)) {
     m_scripting_controller->press(*maybe_control, pressed);
@@ -338,13 +338,13 @@ Player::adjust_height(float new_height, float bottom_offset)
 }
 
 void
-Player::trigger_sequence(const std::string& sequence_name, const SequenceData* data)
+Player::trigger_sequence(std::string const& sequence_name, SequenceData const* data)
 {
   trigger_sequence(string_to_sequence(sequence_name), data);
 }
 
 void
-Player::trigger_sequence(Sequence seq, const SequenceData* data)
+Player::trigger_sequence(Sequence seq, SequenceData const* data)
 {
   if (m_climbing) stop_climbing(*m_climbing);
   stop_backflipping();
@@ -379,7 +379,7 @@ Player::update(float dt_sec)
   }
 
   // Skip if in multiplayer respawn
-  if (is_dead() && m_target && Sector::get().get_object_count<Player>([this](const Player& p) { return !p.is_dead() && !p.is_dying() && !p.is_winning() && &p != this; }))
+  if (is_dead() && m_target && Sector::get().get_object_count<Player>([this](Player const& p) { return !p.is_dead() && !p.is_dying() && !p.is_winning() && &p != this; }))
   {
     auto* target = Sector::get().get_object_by_uid<Player>(*m_target);
     if (!target || target->is_dying() || target->is_dead() || target->is_winning())
@@ -507,7 +507,7 @@ Player::update(float dt_sec)
     set_bonus(NO_BONUS, true);
     m_dead = true;
 
-    if (!Sector::get().get_object_count<Player>([](const Player& p) { return !p.is_dead() && !p.is_dying(); }))
+    if (!Sector::get().get_object_count<Player>([](Player const& p) { return !p.is_dead() && !p.is_dying(); }))
     {
       Sector::get().stop_looping_sounds();
     }
@@ -1267,7 +1267,7 @@ Player::handle_input()
   bool just_grabbed = try_grab();
 
   /* Shoot! */
-  auto active_bullets = Sector::get().get_object_count<Bullet>([this](const Bullet& b){ return &b.get_player() == this; });
+  auto active_bullets = Sector::get().get_object_count<Bullet>([this](Bullet const& b){ return &b.get_player() == this; });
   if (m_controller->pressed(Control::ACTION) && (m_player_status.bonus[get_id()] == FIRE_BONUS || m_player_status.bonus[get_id()] == ICE_BONUS) && !just_grabbed) {
     if ((m_player_status.bonus[get_id()] == FIRE_BONUS &&
       active_bullets < m_player_status.max_fire_bullets[get_id()]) ||
@@ -1387,7 +1387,7 @@ Player::position_grabbed_object()
 {
   auto moving_object = dynamic_cast<MovingObject*>(m_grabbed_object);
   assert(moving_object);
-  const auto& object_bbox = moving_object->get_bbox();
+  auto const& object_bbox = moving_object->get_bbox();
   if (!m_swimming && !m_water_jump)
   {
     // Position where we will hold the lower-inner corner
@@ -1496,7 +1496,7 @@ Player::get_coins() const
 }
 
 BonusType
-Player::string_to_bonus(const std::string& bonus) const {
+Player::string_to_bonus(std::string const& bonus) const {
   BonusType type = NO_BONUS;
 
   if (bonus == "grow") {
@@ -1521,13 +1521,13 @@ Player::string_to_bonus(const std::string& bonus) const {
 }
 
 bool
-Player::add_bonus(const std::string& bonustype)
+Player::add_bonus(std::string const& bonustype)
 {
   return add_bonus( string_to_bonus(bonustype) );
 }
 
 bool
-Player::set_bonus(const std::string& bonustype)
+Player::set_bonus(std::string const& bonustype)
 {
   return set_bonus( string_to_bonus(bonustype) );
 }
@@ -1660,7 +1660,7 @@ Player::draw(DrawingContext& context)
   if (!m_visible)
     return;
 
-  if (is_dead() && m_target && Sector::get().get_object_count<Player>([this](const Player& p){ return !p.is_dead() && !p.is_dying() && !p.is_winning() && &p != this; }))
+  if (is_dead() && m_target && Sector::get().get_object_count<Player>([this](Player const& p){ return !p.is_dead() && !p.is_dying() && !p.is_winning() && &p != this; }))
   {
     auto* target = Sector::get().get_object_by_uid<Player>(*m_target);
     if (target)
@@ -1905,7 +1905,7 @@ Player::collision_tile(uint32_t tile_attributes)
 }
 
 void
-Player::collision_solid(const CollisionHit& hit)
+Player::collision_solid(CollisionHit const& hit)
 {
   if (hit.bottom) {
     if (m_physic.get_velocity_y() > 0)
@@ -1962,7 +1962,7 @@ Player::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Player::collision(GameObject& other, const CollisionHit& hit)
+Player::collision(GameObject& other, CollisionHit const& hit)
 {
   auto bullet = dynamic_cast<Bullet*> (&other);
   if (bullet) {
@@ -2079,7 +2079,7 @@ Player::kill(bool completely)
     m_dying_timer.start(3.0);
     set_group(COLGROUP_DISABLED);
 
-    auto alive_players = Sector::get().get_object_count<Player>([](const Player& p){ return !p.is_dead() && !p.is_dying(); });
+    auto alive_players = Sector::get().get_object_count<Player>([](Player const& p){ return !p.is_dead() && !p.is_dying(); });
 
     if (!alive_players)
     {
@@ -2106,7 +2106,7 @@ Player::kill(bool completely)
 }
 
 void
-Player::move(const Vector& vector)
+Player::move(Vector const& vector)
 {
   set_pos(vector);
 
@@ -2155,13 +2155,13 @@ Player::check_bounds()
 }
 
 void
-Player::add_velocity(const Vector& velocity)
+Player::add_velocity(Vector const& velocity)
 {
   m_physic.set_velocity(m_physic.get_velocity() + velocity);
 }
 
 void
-Player::add_velocity(const Vector& velocity, const Vector& end_speed)
+Player::add_velocity(Vector const& velocity, Vector const& end_speed)
 {
   if (end_speed.x > 0)
     m_physic.set_velocity_x(std::min(m_physic.get_velocity_x() + velocity.x, end_speed.x));
@@ -2430,7 +2430,7 @@ Player::stop_backflipping()
 }
 
 bool
-Player::has_grabbed(const std::string& object_name) const
+Player::has_grabbed(std::string const& object_name) const
 {
   if (object_name.empty())
   {
@@ -2471,7 +2471,7 @@ Player::ungrab_object(GameObject* gameobject)
 void
 Player::next_target()
 {
-  const auto& players = Sector::get().get_players();
+  auto const& players = Sector::get().get_players();
 
   Player* first = nullptr;
   bool is_next = false;
@@ -2512,7 +2512,7 @@ Player::next_target()
 void
 Player::prev_target()
 {
-  const auto& players = Sector::get().get_players();
+  auto const& players = Sector::get().get_players();
 
   Player* last = nullptr;
   for (auto* player : players)

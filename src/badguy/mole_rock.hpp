@@ -23,19 +23,19 @@
 class MoleRock final : public BadGuy
 {
 public:
-  MoleRock(const ReaderMapping& reader);
-  MoleRock(const Vector& pos, const Vector& velocity, const BadGuy* parent);
+  MoleRock(ReaderMapping const& reader);
+  MoleRock(Vector const& pos, Vector const& velocity, BadGuy const* parent);
 
   virtual void initialize() override;
   virtual void deactivate() override;
 
   virtual void active_update(float dt_sec) override;
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
-  virtual bool updatePointers(const GameObject* from_object, GameObject* to_object);
+  virtual bool updatePointers(GameObject const* from_object, GameObject* to_object);
 
   virtual bool is_flammable() const override;
   virtual bool is_hurtable() const override { return false; }
@@ -45,12 +45,12 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 protected:
-  const BadGuy* parent; /**< collisions with this BadGuy will be ignored */
+  BadGuy const* parent; /**< collisions with this BadGuy will be ignored */
   const Vector initial_velocity; /**< velocity at time of creation */
 
 private:
-  MoleRock(const MoleRock&) = delete;
-  MoleRock& operator=(const MoleRock&) = delete;
+  MoleRock(MoleRock const&) = delete;
+  MoleRock& operator=(MoleRock const&) = delete;
 };
 
 #endif

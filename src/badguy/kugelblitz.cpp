@@ -35,7 +35,7 @@ const int RAND_SPEED = 150;
 
 } // namespace
 
-Kugelblitz::Kugelblitz(const ReaderMapping& reader) :
+Kugelblitz::Kugelblitz(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/kugelblitz/kugelblitz.sprite"),
   pos_groundhit(0.0f, 0.0f),
   groundhit_pos_set(false),
@@ -66,13 +66,13 @@ Kugelblitz::initialize()
 }
 
 void
-Kugelblitz::collision_solid(const CollisionHit& chit)
+Kugelblitz::collision_solid(CollisionHit const& chit)
 {
   hit(chit);
 }
 
 HitResponse
-Kugelblitz::collision_player(Player& player, const CollisionHit& )
+Kugelblitz::collision_player(Player& player, CollisionHit const& )
 {
   if (player.is_invincible()) {
     explode();
@@ -93,7 +93,7 @@ Kugelblitz::collision_player(Player& player, const CollisionHit& )
 }
 
 HitResponse
-Kugelblitz::collision_badguy(BadGuy& other , const CollisionHit& chit)
+Kugelblitz::collision_badguy(BadGuy& other , CollisionHit const& chit)
 {
   //Let the Kugelblitz explode, too? The problem with that is that
   //two Kugelblitzes would cancel each other out on contact...
@@ -102,7 +102,7 @@ Kugelblitz::collision_badguy(BadGuy& other , const CollisionHit& chit)
 }
 
 HitResponse
-Kugelblitz::hit(const CollisionHit& hit_)
+Kugelblitz::hit(CollisionHit const& hit_)
 {
   // hit floor?
   if (hit_.bottom) {

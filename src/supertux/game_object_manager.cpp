@@ -44,7 +44,7 @@ GameObjectManager::~GameObjectManager()
 }
 
 void
-GameObjectManager::request_name_resolve(const std::string& name, std::function<void (UID)> callback)
+GameObjectManager::request_name_resolve(std::string const& name, std::function<void (UID)> callback)
 {
   m_name_resolve_requests.push_back({name, std::move(callback)});
 }
@@ -54,7 +54,7 @@ GameObjectManager::process_resolve_requests()
 {
   assert(m_gameobjects_new.empty());
 
-  for (const auto& request : m_name_resolve_requests)
+  for (auto const& request : m_name_resolve_requests)
   {
     GameObject* object = get_object_by_name<GameObject>(request.name);
     if (!object)
@@ -76,7 +76,7 @@ GameObjectManager::try_process_resolve_requests()
   assert(m_gameobjects_new.empty());
   std::vector<GameObjectManager::NameResolveRequest> new_list;
 
-  for (const auto& request : m_name_resolve_requests)
+  for (auto const& request : m_name_resolve_requests)
   {
     auto* object = get_object_by_name<GameObject>(request.name);
     if (!object)
@@ -110,10 +110,10 @@ GameObjectManager::add_object(std::unique_ptr<GameObject> object)
 
   // make sure the object isn't already in the list
 #ifndef NDEBUG
-  for (const auto& game_object : m_gameobjects) {
+  for (auto const& game_object : m_gameobjects) {
     assert(game_object != object);
   }
-  for (const auto& gameobject : m_gameobjects_new) {
+  for (auto const& gameobject : m_gameobjects_new) {
     assert(gameobject != object);
   }
 #endif
@@ -128,7 +128,7 @@ GameObjectManager::clear_objects()
 {
   flush_game_objects();
 
-  for (const auto& obj: m_gameobjects) {
+  for (auto const& obj: m_gameobjects) {
     before_object_remove(*obj);
   }
   m_gameobjects.clear();
@@ -137,7 +137,7 @@ GameObjectManager::clear_objects()
 void
 GameObjectManager::update(float dt_sec)
 {
-  for (const auto& object : m_gameobjects)
+  for (auto const& object : m_gameobjects)
   {
     if (!object->is_valid())
       continue;
@@ -149,7 +149,7 @@ GameObjectManager::update(float dt_sec)
 void
 GameObjectManager::draw(DrawingContext& context)
 {
-  for (const auto& object : m_gameobjects)
+  for (auto const& object : m_gameobjects)
   {
     if (!object->is_valid())
       continue;
@@ -171,7 +171,7 @@ GameObjectManager::flush_game_objects()
   { // cleanup marked objects
     m_gameobjects.erase(
       std::remove_if(m_gameobjects.begin(), m_gameobjects.end(),
-                     [this](const std::unique_ptr<GameObject>& obj) {
+                     [this](std::unique_ptr<GameObject> const& obj) {
                        if (!obj->is_valid())
                        {
                          this_before_object_remove(*obj);
@@ -251,7 +251,7 @@ void
 GameObjectManager::this_before_object_remove(GameObject& object)
 {
   { // by_name
-    const std::string& name = object.get_name();
+    std::string const& name = object.get_name();
     if (!name.empty())
     {
       m_objects_by_name.erase(name);
@@ -285,7 +285,7 @@ float
 GameObjectManager::get_height() const
 {
   float height = 0;
-  for (const auto& tilemap: get_all_tilemaps()) {
+  for (auto const& tilemap: get_all_tilemaps()) {
     height = std::max(height, tilemap->get_bbox().get_bottom());
   }
 
@@ -296,7 +296,7 @@ float
 GameObjectManager::get_tiles_width() const
 {
   float width = 0;
-  for (const auto& tilemap : get_all_tilemaps()) {
+  for (auto const& tilemap : get_all_tilemaps()) {
     if (static_cast<float>(tilemap->get_width()) > width)
       width = static_cast<float>(tilemap->get_width());
   }
@@ -307,7 +307,7 @@ float
 GameObjectManager::get_tiles_height() const
 {
   float height = 0;
-  for (const auto& tilemap : get_all_tilemaps()) {
+  for (auto const& tilemap : get_all_tilemaps()) {
     if (static_cast<float>(tilemap->get_height()) > height)
       height = static_cast<float>(tilemap->get_height());
   }

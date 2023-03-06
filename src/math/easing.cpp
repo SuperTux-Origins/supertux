@@ -310,7 +310,7 @@ double BounceEaseInOut(double p)
 	}
 }
 
-easing getEasingByName(const EasingMode& ease_type)
+easing getEasingByName(EasingMode const& ease_type)
 {
   switch(ease_type) {
   case EaseNone:
@@ -381,9 +381,9 @@ easing getEasingByName(const EasingMode& ease_type)
 }
 
 
-EasingMode EasingMode_from_string(const std::string& ease_name)
+EasingMode EasingMode_from_string(std::string const& ease_name)
 {
-  const char* name = ease_name.c_str();
+  char const* name = ease_name.c_str();
   if (!strcmp(name, "EaseNone"))
   {
     return EaseNone;
@@ -514,7 +514,7 @@ EasingMode EasingMode_from_string(const std::string& ease_name)
   }
 }
 
-const char* getEasingName(const EasingMode& ease_type)
+char const* getEasingName(EasingMode const& ease_type)
 {
   switch(ease_type) {
   case EaseNone:
@@ -584,12 +584,12 @@ const char* getEasingName(const EasingMode& ease_type)
   }
 }
 
-EasingMode get_reverse_easing(const EasingMode& ease)
+EasingMode get_reverse_easing(EasingMode const& ease)
 {
   return EasingMode_from_string(get_reverse_easing_str(getEasingName(ease)));
 }
 
-std::string get_reverse_easing_str(const std::string& ease_name)
+std::string get_reverse_easing_str(std::string const& ease_name)
 {
   if (ease_name == "EaseNone")
     return "EaseNone";

@@ -65,7 +65,7 @@ GameObjectManager::get_ambient_blue() const
 }
 
 void
-GameObjectManager::set_music(const std::string& filename)
+GameObjectManager::set_music(std::string const& filename)
 {
   auto& music = m_gom_parent->get_singleton_by_type<MusicObject>();
   music.set_music(filename);

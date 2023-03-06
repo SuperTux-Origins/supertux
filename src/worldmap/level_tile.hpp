@@ -30,7 +30,7 @@ class LevelTile final : public GameObject
   friend class WorldMapParser;
 
 public:
-  LevelTile(const std::string& basedir, const ReaderMapping& mapping);
+  LevelTile(std::string const& basedir, ReaderMapping const& mapping);
   ~LevelTile() override;
 
   virtual void draw(DrawingContext& context) override;
@@ -43,7 +43,7 @@ public:
   bool is_perfect() const { return m_perfect; }
 
   Statistics& get_statistics() { return m_statistics; }
-  const Statistics& get_statistics() const { return m_statistics; }
+  Statistics const& get_statistics() const { return m_statistics; }
 
   void update_sprite_action();
 
@@ -82,8 +82,8 @@ private:
   Color m_title_color;
 
 private:
-  LevelTile(const LevelTile&) = delete;
-  LevelTile& operator=(const LevelTile&) = delete;
+  LevelTile(LevelTile const&) = delete;
+  LevelTile& operator=(LevelTile const&) = delete;
 };
 
 } // namespace worldmap

@@ -25,7 +25,7 @@
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 
-LevelsetScreen::LevelsetScreen(const std::string& basedir, const std::string& level_filename,
+LevelsetScreen::LevelsetScreen(std::string const& basedir, std::string const& level_filename,
                                Savegame& savegame,
                                const std::optional<std::pair<std::string, Vector>>& start_pos) :
   m_basedir(basedir),
@@ -53,7 +53,7 @@ LevelsetScreen::draw(Compositor& compositor)
 }
 
 void
-LevelsetScreen::update(float dt_sec, const Controller& controller)
+LevelsetScreen::update(float dt_sec, Controller const& controller)
 {
 }
 

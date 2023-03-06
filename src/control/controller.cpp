@@ -20,7 +20,7 @@
 
 namespace {
 
-const char* g_control_names[] = {
+char const* g_control_names[] = {
   "left",
   "right",
   "up",
@@ -55,7 +55,7 @@ std::string Control_to_string(Control control)
   return g_control_names[static_cast<int>(control)];
 }
 
-std::optional<Control> Control_from_string(const std::string& text)
+std::optional<Control> Control_from_string(std::string const& text)
 {
   for(int i = 0; g_control_names[i] != nullptr; ++i) {
     if (text == g_control_names[i]) {

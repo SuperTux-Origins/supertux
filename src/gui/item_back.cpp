@@ -24,13 +24,13 @@
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
-ItemBack::ItemBack(const std::string& text, int id) :
+ItemBack::ItemBack(std::string const& text, int id) :
   MenuItem(text, id)
 {
 }
 
 void
-ItemBack::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active)
+ItemBack::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active)
 {
   float text_width = Resources::normal_font->get_text_width(get_text());
   context.color().draw_text(Resources::normal_font, get_text(),
@@ -49,7 +49,7 @@ ItemBack::get_width() const {
 }
 
 void
-ItemBack::process_action(const MenuAction& action) {
+ItemBack::process_action(MenuAction const& action) {
   if (action == MenuAction::HIT) {
     if (MenuManager::instance().current_menu()->on_back_action())
       MenuManager::instance().pop_menu();

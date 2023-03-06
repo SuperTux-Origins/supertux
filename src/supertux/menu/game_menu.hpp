@@ -43,8 +43,8 @@ public:
   void menu_action(MenuItem& item) override;
 
 private:
-  GameMenu(const GameMenu&) = delete;
-  GameMenu& operator=(const GameMenu&) = delete;
+  GameMenu(GameMenu const&) = delete;
+  GameMenu& operator=(GameMenu const&) = delete;
 };
 
 #endif

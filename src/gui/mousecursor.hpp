@@ -71,8 +71,8 @@ private:
   SurfacePtr m_icon;
 
 private:
-  MouseCursor(const MouseCursor&) = delete;
-  MouseCursor& operator=(const MouseCursor&) = delete;
+  MouseCursor(MouseCursor const&) = delete;
+  MouseCursor& operator=(MouseCursor const&) = delete;
 };
 
 #endif

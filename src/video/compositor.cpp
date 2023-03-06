@@ -112,7 +112,7 @@ Compositor::render()
 
     if (use_lightmap)
     {
-      const TexturePtr& texture = lightmap.get_texture();
+      TexturePtr const& texture = lightmap.get_texture();
       if (texture)
       {
         TextureRequest request;

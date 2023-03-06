@@ -68,11 +68,11 @@ GLPainter::GLPainter(GLVideoSystem& video_system, GLRenderer& renderer) :
 }
 
 void
-GLPainter::draw_texture(const TextureRequest& request)
+GLPainter::draw_texture(TextureRequest const& request)
 {
   assert_gl();
 
-  const auto& texture = static_cast<const GLTexture&>(*request.texture);
+  auto const& texture = static_cast<GLTexture const&>(*request.texture);
 
   assert(request.srcrects.size() == request.dstrects.size());
   assert(request.srcrects.size() == request.angles.size());
@@ -181,14 +181,14 @@ GLPainter::draw_texture(const TextureRequest& request)
 }
 
 void
-GLPainter::draw_gradient(const GradientRequest& request)
+GLPainter::draw_gradient(GradientRequest const& request)
 {
   assert_gl();
 
-  const Color& top = request.top;
-  const Color& bottom = request.bottom;
-  const GradientDirection& direction = request.direction;
-  const Rectf& region = request.region;
+  Color const& top = request.top;
+  Color const& bottom = request.bottom;
+  GradientDirection const& direction = request.direction;
+  Rectf const& region = request.region;
 
   GLContext& context = m_video_system.get_context();
 
@@ -231,7 +231,7 @@ GLPainter::draw_gradient(const GradientRequest& request)
 }
 
 void
-GLPainter::draw_filled_rect(const FillRectRequest& request)
+GLPainter::draw_filled_rect(FillRectRequest const& request)
 {
   assert_gl();
 
@@ -313,7 +313,7 @@ GLPainter::draw_filled_rect(const FillRectRequest& request)
 }
 
 void
-GLPainter::draw_inverse_ellipse(const InverseEllipseRequest& request)
+GLPainter::draw_inverse_ellipse(InverseEllipseRequest const& request)
 {
   assert_gl();
 
@@ -328,7 +328,7 @@ GLPainter::draw_inverse_ellipse(const InverseEllipseRequest& request)
   float vertices[points * 2];
   int p = 0;
 
-  const Viewport& viewport = m_video_system.get_viewport();
+  Viewport const& viewport = m_video_system.get_viewport();
   const float screen_width = static_cast<float>(viewport.get_screen_width());
   const float screen_height = static_cast<float>(viewport.get_screen_height());
 
@@ -395,7 +395,7 @@ GLPainter::draw_inverse_ellipse(const InverseEllipseRequest& request)
 }
 
 void
-GLPainter::draw_line(const LineRequest& request)
+GLPainter::draw_line(LineRequest const& request)
 {
   assert_gl();
 
@@ -438,7 +438,7 @@ GLPainter::draw_line(const LineRequest& request)
 }
 
 void
-GLPainter::draw_triangle(const TriangleRequest& request)
+GLPainter::draw_triangle(TriangleRequest const& request)
 {
   assert_gl();
 
@@ -462,7 +462,7 @@ GLPainter::draw_triangle(const TriangleRequest& request)
 }
 
 void
-GLPainter::clear(const Color& color)
+GLPainter::clear(Color const& color)
 {
   assert_gl();
 
@@ -473,12 +473,12 @@ GLPainter::clear(const Color& color)
 }
 
 void
-GLPainter::get_pixel(const GetPixelRequest& request) const
+GLPainter::get_pixel(GetPixelRequest const& request) const
 {
   assert_gl();
 
-  const Rect& rect = m_renderer.get_rect();
-  const Size& logical_size = m_renderer.get_logical_size();
+  Rect const& rect = m_renderer.get_rect();
+  Size const& logical_size = m_renderer.get_logical_size();
 
   float x = request.pos.x * static_cast<float>(rect.get_width()) / static_cast<float>(logical_size.width);
   float y = request.pos.y * static_cast<float>(rect.get_height()) / static_cast<float>(logical_size.height);
@@ -510,12 +510,12 @@ GLPainter::get_pixel(const GetPixelRequest& request) const
 }
 
 void
-GLPainter::set_clip_rect(const Rect& clip_rect)
+GLPainter::set_clip_rect(Rect const& clip_rect)
 {
   assert_gl();
 
-  const Rect& rect = m_renderer.get_rect();
-  const Size& logical_size = m_renderer.get_logical_size();
+  Rect const& rect = m_renderer.get_rect();
+  Size const& logical_size = m_renderer.get_logical_size();
 
   const int y = rect.get_height() * clip_rect.top / logical_size.height;
 

@@ -39,7 +39,7 @@ public:
   virtual void leave() override;
 
   virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, const Controller& controller) override;
+  virtual void update(float dt_sec, Controller const& controller) override;
 
 private:
   void make_tux_jump();
@@ -52,8 +52,8 @@ private:
   std::string m_videosystem_name;
 
 private:
-  TitleScreen(const TitleScreen&) = delete;
-  TitleScreen& operator=(const TitleScreen&) = delete;
+  TitleScreen(TitleScreen const&) = delete;
+  TitleScreen& operator=(TitleScreen const&) = delete;
 };
 
 #endif

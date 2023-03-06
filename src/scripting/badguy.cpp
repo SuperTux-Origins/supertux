@@ -42,14 +42,14 @@ BadGuy::ignite()
 }
 
 void
-BadGuy::set_action(const std::string& action, int loops)
+BadGuy::set_action(std::string const& action, int loops)
 {
   SCRIPT_GUARD_VOID;
   object.set_sprite_action(action, loops);
 }
 
 void
-BadGuy::set_sprite(const std::string& sprite)
+BadGuy::set_sprite(std::string const& sprite)
 {
   SCRIPT_GUARD_VOID;
   object.change_sprite(sprite);

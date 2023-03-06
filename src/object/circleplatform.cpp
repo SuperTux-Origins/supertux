@@ -20,7 +20,7 @@
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
 
-CirclePlatform::CirclePlatform(const ReaderMapping& reader) :
+CirclePlatform::CirclePlatform(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/platforms/icebridge1.png", LAYER_OBJECTS, COLGROUP_STATIC),
   start_position(m_col.m_bbox.p1()),
   angle(0.0),
@@ -39,7 +39,7 @@ CirclePlatform::CirclePlatform(const ReaderMapping& reader) :
 }
 
 HitResponse
-CirclePlatform::collision(GameObject& other, const CollisionHit& )
+CirclePlatform::collision(GameObject& other, CollisionHit const& )
 {
   return FORCE_MOVE;
 }

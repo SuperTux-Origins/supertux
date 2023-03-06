@@ -22,7 +22,7 @@
 namespace math {
 
 template<class T>
-const T& clamp(const T& val, const T& min, const T& max)
+T const& clamp(T const& val, T const& min, T const& max)
 {
   if (val < min)
   {

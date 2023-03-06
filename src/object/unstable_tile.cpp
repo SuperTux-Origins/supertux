@@ -31,7 +31,7 @@ static const float FADE_OUT_TIME = 1.f;
 static const float FADE_IN_TIME = .5f;
 static const float DELAY_IF_TUX = 0.001f;
 
-UnstableTile::UnstableTile(const ReaderMapping& mapping) :
+UnstableTile::UnstableTile(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/unstable_tile/snow.sprite", LAYER_TILES, COLGROUP_STATIC),
   physic(),
   state(STATE_NORMAL),
@@ -47,7 +47,7 @@ UnstableTile::UnstableTile(const ReaderMapping& mapping) :
 }
 
 HitResponse
-UnstableTile::collision(GameObject& other, const CollisionHit& )
+UnstableTile::collision(GameObject& other, CollisionHit const& )
 {
   if (state == STATE_NORMAL)
   {

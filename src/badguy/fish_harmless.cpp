@@ -18,13 +18,13 @@
 
 #include "object/player.hpp"
 
-FishHarmless::FishHarmless(const ReaderMapping& reader) :
+FishHarmless::FishHarmless(ReaderMapping const& reader) :
   FishSwimming(reader, "images/creatures/fish/ice/goldfish.sprite")
 {
 }
 
 HitResponse
-FishHarmless::collision_player(Player& player, const CollisionHit& hit)
+FishHarmless::collision_player(Player& player, CollisionHit const& hit)
 {
   player.get_physic().set_velocity_x(hit.left ? -200.f : hit.right ? 200.f : player.get_physic().get_velocity_x());
   player.get_physic().set_velocity_y(hit.top ? -200.f : hit.bottom ? 200.f : player.get_physic().get_velocity_y());

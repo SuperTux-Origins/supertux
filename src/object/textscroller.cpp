@@ -43,7 +43,7 @@ const float SCROLL_JUMP = 60;
 
 } // namespace
 
-TextScroller::TextScroller(const ReaderMapping& mapping) :
+TextScroller::TextScroller(ReaderMapping const& mapping) :
   controller(&InputManager::current()->get_controller()),
   m_filename(),
   m_finish_script(),
@@ -90,7 +90,7 @@ TextScroller::TextScroller(const ReaderMapping& mapping) :
 
 }
 
-TextScroller::TextScroller(const ReaderObject& root) :
+TextScroller::TextScroller(ReaderObject const& root) :
   controller(&InputManager::current()->get_controller()),
   m_filename(),
   m_finish_script(),
@@ -108,7 +108,7 @@ TextScroller::TextScroller(const ReaderObject& root) :
 }
 
 void
-TextScroller::parse_file(const std::string& filename)
+TextScroller::parse_file(std::string const& filename)
 {
   auto doc = load_reader_document(filename);
   auto root = doc.get_root();
@@ -116,7 +116,7 @@ TextScroller::parse_file(const std::string& filename)
 }
 
 void
-TextScroller::parse_root(const ReaderObject& root)
+TextScroller::parse_root(ReaderObject const& root)
 {
   if (root.get_name() != "supertux-text")
   {
@@ -153,9 +153,9 @@ TextScroller::parse_root(const ReaderObject& root)
 }
 
 void
-TextScroller::parse_content(const ReaderCollection& collection)
+TextScroller::parse_content(ReaderCollection const& collection)
 {
-  for (const auto& item : collection.get_objects())
+  for (auto const& item : collection.get_objects())
   {
     if (item.get_name() == "image")
     {
@@ -251,7 +251,7 @@ TextScroller::draw(DrawingContext& context)
   float y = floorf(ctx_h - m_scroll);
 
   { // draw text
-    for (const auto& line : m_lines)
+    for (auto const& line : m_lines)
     {
       if (y + line->get_height() >= 0 && ctx_h - y >= 0) {
         line->draw(context, Rectf(LEFT_BORDER, y, ctx_w * (m_x_anchor == XAnchor::SCROLLER_ANCHOR_LEFT ? 0.f :

@@ -24,7 +24,7 @@
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 
-GrowUp::GrowUp(const Vector& pos, Direction direction) :
+GrowUp::GrowUp(Vector const& pos, Direction direction) :
   MovingSprite(pos, "images/powerups/egg/egg.sprite", LAYER_OBJECTS, COLGROUP_MOVING),
   physic(),
   shadesprite(SpriteManager::current()->create("images/powerups/egg/egg.sprite")),
@@ -58,7 +58,7 @@ GrowUp::draw(DrawingContext& context)
 }
 
 void
-GrowUp::collision_solid(const CollisionHit& hit)
+GrowUp::collision_solid(CollisionHit const& hit)
 {
   if (hit.top)
     physic.set_velocity_y(0);
@@ -70,7 +70,7 @@ GrowUp::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-GrowUp::collision(GameObject& other, const CollisionHit& hit )
+GrowUp::collision(GameObject& other, CollisionHit const& hit )
 {
   auto player = dynamic_cast<Player*>(&other);
   if (player != nullptr) {

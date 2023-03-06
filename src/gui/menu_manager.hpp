@@ -51,8 +51,8 @@ public:
   MenuManager();
   ~MenuManager();
 
-  void event(const SDL_Event& event);
-  void process_input(const Controller& controller);
+  void event(SDL_Event const& event);
+  void process_input(Controller const& controller);
   void refresh();
 
   void draw(DrawingContext& context);
@@ -87,8 +87,8 @@ private:
   void transition(Dialog* from, Dialog* to);
 
 private:
-  MenuManager(const MenuManager&) = delete;
-  MenuManager& operator=(const MenuManager&) = delete;
+  MenuManager(MenuManager const&) = delete;
+  MenuManager& operator=(MenuManager const&) = delete;
 };
 
 #endif

@@ -27,7 +27,7 @@ namespace scripting {
 void Level_finish(bool win);
 
 /** spawn tux at specified sector and spawnpoint */
-void Level_spawn(const std::string& sector, const std::string& spawnpoint);
+void Level_spawn(std::string const& sector, std::string const& spawnpoint);
 
 /** Flip level vertically */
 void Level_flip_vertically();

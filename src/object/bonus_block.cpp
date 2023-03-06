@@ -58,7 +58,7 @@ const float upgrade_sound_gain = 0.3f;
 
 } // namespace
 
-BonusBlock::BonusBlock(const Vector& pos, int tile_data) :
+BonusBlock::BonusBlock(Vector const& pos, int tile_data) :
   Block(SpriteManager::current()->create("images/objects/bonus_block/bonusblock.sprite")),
   m_contents(),
   m_object(),
@@ -75,7 +75,7 @@ BonusBlock::BonusBlock(const Vector& pos, int tile_data) :
   preload_contents(tile_data);
 }
 
-BonusBlock::BonusBlock(const ReaderMapping& mapping) :
+BonusBlock::BonusBlock(ReaderMapping const& mapping) :
   Block(mapping, "images/objects/bonus_block/bonusblock.sprite"),
   m_contents(Content::COIN),
   m_object(),
@@ -107,13 +107,13 @@ BonusBlock::BonusBlock(const ReaderMapping& mapping) :
       }
       else
       {
-        const auto& object_specs = content_collection.get_objects();
+        auto const& object_specs = content_collection.get_objects();
         if (!object_specs.empty()) {
           if (object_specs.size() > 1) {
             log_warning << "only one object allowed in bonusblock 'custom-contents', ignoring the rest" << std::endl;
           }
 
-          const ReaderObject& spec = object_specs[0];
+          ReaderObject const& spec = object_specs[0];
           auto game_object = GameObjectFactory::instance().create(spec.get_name(), spec.get_mapping());
           m_object = to_moving_object(std::move(game_object));
           if (!m_object) {
@@ -175,7 +175,7 @@ BonusBlock::hit(Player& player)
 }
 
 HitResponse
-BonusBlock::collision(GameObject& other, const CollisionHit& hit_)
+BonusBlock::collision(GameObject& other, CollisionHit const& hit_)
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player) {
@@ -461,7 +461,7 @@ BonusBlock::try_drop(Player *player)
 }
 
 void
-BonusBlock::raise_growup_bonus(Player* player, const BonusType& bonus, const Direction& dir)
+BonusBlock::raise_growup_bonus(Player* player, BonusType const& bonus, Direction const& dir)
 {
   std::unique_ptr<MovingObject> obj;
   if (player->get_status().bonus[player->get_id()] == NO_BONUS)
@@ -478,7 +478,7 @@ BonusBlock::raise_growup_bonus(Player* player, const BonusType& bonus, const Dir
 }
 
 void
-BonusBlock::drop_growup_bonus(Player* player, const std::string& bonus_sprite_name, const Direction& dir, bool& countdown)
+BonusBlock::drop_growup_bonus(Player* player, std::string const& bonus_sprite_name, Direction const& dir, bool& countdown)
 {
   if (player->get_status().bonus[player->get_id()] == NO_BONUS)
   {
@@ -506,7 +506,7 @@ BonusBlock::draw(DrawingContext& context)
 }
 
 BonusBlock::Content
-BonusBlock::get_content_from_string(const std::string& contentstring) const
+BonusBlock::get_content_from_string(std::string const& contentstring) const
 {
   if (contentstring == "coin") {
     return Content::COIN;
@@ -543,7 +543,7 @@ BonusBlock::get_content_from_string(const std::string& contentstring) const
 }
 
 std::string
-BonusBlock::contents_to_string(const BonusBlock::Content& content) const
+BonusBlock::contents_to_string(BonusBlock::Content const& content) const
 {
   switch (m_contents)
   {

@@ -28,7 +28,7 @@ MusicObject::MusicObject() :
 {
 }
 
-MusicObject::MusicObject(const ReaderMapping& mapping) :
+MusicObject::MusicObject(ReaderMapping const& mapping) :
   m_currentmusic(LEVEL_MUSIC),
   m_music()
 {
@@ -90,7 +90,7 @@ MusicObject::get_music_type() const
 }
 
 void
-MusicObject::set_music(const std::string& music)
+MusicObject::set_music(std::string const& music)
 {
   m_music = music;
 }

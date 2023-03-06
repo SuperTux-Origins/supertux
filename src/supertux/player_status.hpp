@@ -46,7 +46,7 @@ public:
   void take_checkpoint_coins();
 
   void write(Writer& writer);
-  void read(const ReaderMapping& mapping);
+  void read(ReaderMapping const& mapping);
 
   int get_max_coins() const;
   bool can_reach_checkpoint() const;
@@ -70,8 +70,8 @@ public:
   std::string last_worldmap; /**< the last played worldmap */
 
 private:
-  PlayerStatus(const PlayerStatus&) = delete;
-  PlayerStatus& operator=(const PlayerStatus&) = delete;
+  PlayerStatus(PlayerStatus const&) = delete;
+  PlayerStatus& operator=(PlayerStatus const&) = delete;
 };
 
 #endif

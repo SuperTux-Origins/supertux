@@ -44,7 +44,7 @@ namespace {
   const float PAUSE_TIME_LARGE = 1.0f;
 }
 
-Crusher::Crusher(const ReaderMapping& reader) :
+Crusher::Crusher(ReaderMapping const& reader) :
   MovingSprite(reader, "images/creatures/crusher/krush_ice.sprite", LAYER_OBJECTS, COLGROUP_MOVING_STATIC),
   m_state(IDLE),
   m_ic_size(NORMAL),
@@ -66,7 +66,7 @@ Crusher::Crusher(const ReaderMapping& reader) :
 }
 
 HitResponse
-Crusher::collision(GameObject& other, const CollisionHit& hit)
+Crusher::collision(GameObject& other, CollisionHit const& hit)
 {
   auto player = dynamic_cast<Player*>(&other);
 
@@ -95,7 +95,7 @@ Crusher::collision(GameObject& other, const CollisionHit& hit)
 }
 
 void
-Crusher::collision_solid(const CollisionHit& hit)
+Crusher::collision_solid(CollisionHit const& hit)
 {
   if (hit.left || hit.right)
     m_physic.set_velocity_x(0.f);
@@ -221,7 +221,7 @@ Crusher::update(float dt_sec)
 
   if (auto* player = Sector::get().get_nearest_player(m_col.m_bbox))
   {
-    const Rectf& player_bbox = player->get_bbox();
+    Rectf const& player_bbox = player->get_bbox();
     if (m_state == IDLE) {
       m_side_dir = (player_bbox.get_middle().x > get_bbox().get_middle().x) ? Direction::RIGHT : Direction::LEFT;
     }
@@ -403,7 +403,7 @@ Crusher::found_victim() const
 {
   for (auto* player : Sector::get().get_players())
   {
-    const Rectf& player_bbox = player->get_bbox();
+    Rectf const& player_bbox = player->get_bbox();
 
     Rectf crush_area = get_bbox().grown(-1.f);
     if (!m_sideways)
@@ -593,7 +593,7 @@ CrusherRoot::CrusherRoot(Vector position, Crusher::Direction direction, float de
 }
 
 HitResponse
-CrusherRoot::collision(GameObject& other, const CollisionHit& hit)
+CrusherRoot::collision(GameObject& other, CollisionHit const& hit)
 {
   if (delay_gone())
   {

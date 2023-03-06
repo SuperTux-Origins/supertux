@@ -38,7 +38,7 @@ MenuManager::instance()
 
 namespace {
 
-Rectf menu2rect(const Menu& menu)
+Rectf menu2rect(Menu const& menu)
 {
   return Rectf(menu.get_center_pos().x - menu.get_width() / 2,
                menu.get_center_pos().y - menu.get_height() / 2,
@@ -46,7 +46,7 @@ Rectf menu2rect(const Menu& menu)
                menu.get_center_pos().y + menu.get_height() / 2);
 }
 
-Rectf dialog2rect(const Dialog& dialog)
+Rectf dialog2rect(Dialog const& dialog)
 {
   return Rectf(dialog.get_center_pos().x - dialog.get_width() / 2,
                dialog.get_center_pos().y - dialog.get_height() / 2,
@@ -76,8 +76,8 @@ public:
   {
   }
 
-  void start(const Rectf& from_rect,
-             const Rectf& to_rect)
+  void start(Rectf const& from_rect,
+             Rectf const& to_rect)
   {
     m_from_rect = from_rect;
     m_to_rect = to_rect;
@@ -88,7 +88,7 @@ public:
     m_is_active = true;
   }
 
-  void set(const Rectf& rect)
+  void set(Rectf const& rect)
   {
     m_to_rect = m_from_rect = rect;
   }
@@ -167,14 +167,14 @@ MenuManager::~MenuManager()
 void
 MenuManager::refresh()
 {
-  for (const auto& menu : m_menu_stack)
+  for (auto const& menu : m_menu_stack)
   {
     menu->refresh();
   }
 }
 
 void
-MenuManager::process_input(const Controller& controller)
+MenuManager::process_input(Controller const& controller)
 {
   if (m_dialog && !m_dialog->is_passive())
   {
@@ -187,7 +187,7 @@ MenuManager::process_input(const Controller& controller)
 }
 
 void
-MenuManager::event(const SDL_Event& ev)
+MenuManager::event(SDL_Event const& ev)
 {
   if (!m_transition->is_active())
   {
@@ -371,7 +371,7 @@ MenuManager::clear_menu_stack()
 void
 MenuManager::on_window_resize()
 {
-  for (const auto& menu : m_menu_stack)
+  for (auto const& menu : m_menu_stack)
   {
     menu->on_window_resize();
   }

@@ -38,8 +38,8 @@ public:
   WorldMap(::worldmap::WorldMap* parent);
 
 private:
-  WorldMap(const WorldMap&) = delete;
-  WorldMap& operator=(const WorldMap&) = delete;
+  WorldMap(WorldMap const&) = delete;
+  WorldMap& operator=(WorldMap const&) = delete;
 #endif
 
 public:

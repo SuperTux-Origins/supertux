@@ -44,7 +44,7 @@ public:
 class TileSet final
 {
 public:
-  static std::unique_ptr<TileSet> from_file(const std::string& filename);
+  static std::unique_ptr<TileSet> from_file(std::string const& filename);
 
 public:
   TileSet();
@@ -56,9 +56,9 @@ public:
       been assigned to any other group */
   void add_unassigned_tilegroup();
 
-  void add_tilegroup(const Tilegroup& tilegroup);
+  void add_tilegroup(Tilegroup const& tilegroup);
 
-  const Tile& get(const uint32_t id) const;
+  Tile const& get(const uint32_t id) const;
   
   AutotileSet* get_autotileset_from_tile(uint32_t tile_id) const;
 
@@ -66,11 +66,11 @@ public:
     return static_cast<uint32_t>(m_tiles.size());
   }
 
-  const std::vector<Tilegroup>& get_tilegroups() const {
+  std::vector<Tilegroup> const& get_tilegroups() const {
     return m_tilegroups;
   }
 
-  void print_debug_info(const std::string& filename);
+  void print_debug_info(std::string const& filename);
   
 public:
   // Must be public because of tile_set_parser.cpp
@@ -86,8 +86,8 @@ private:
   std::vector<Tilegroup> m_tilegroups;
 
 private:
-  TileSet(const TileSet&) = delete;
-  TileSet& operator=(const TileSet&) = delete;
+  TileSet(TileSet const&) = delete;
+  TileSet& operator=(TileSet const&) = delete;
 };
 
 #endif

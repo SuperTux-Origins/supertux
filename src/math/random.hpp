@@ -46,8 +46,8 @@ private:
   std::mt19937 m_generator;
 
 private:
-  Random(const Random&) = delete;
-  Random& operator=(const Random&) = delete;
+  Random(Random const&) = delete;
+  Random& operator=(Random const&) = delete;
 };
 
 /** Use for random particle fx or whatever */

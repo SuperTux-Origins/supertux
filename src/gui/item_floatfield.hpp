@@ -23,7 +23,7 @@
 class ItemFloatField final : public ItemTextField
 {
 public:
-  ItemFloatField(const std::string& text_, float* input_, int id_ = -1, bool positive = false);
+  ItemFloatField(std::string const& text_, float* input_, int id_ = -1, bool positive = false);
   ~ItemFloatField() override;
 
   float* number;
@@ -33,7 +33,7 @@ public:
 
   // Text manipulation and navigation functions
 
-  virtual void insert_text(const std::string& text, const int left_offset_pos) override;
+  virtual void insert_text(std::string const& text, const int left_offset_pos) override;
 
 private:
   std::string m_input;
@@ -43,8 +43,8 @@ private:
   void add_char(char c, const int left_offset_pos);
 
 private:
-  ItemFloatField(const ItemFloatField&) = delete;
-  ItemFloatField& operator=(const ItemFloatField&) = delete;
+  ItemFloatField(ItemFloatField const&) = delete;
+  ItemFloatField& operator=(ItemFloatField const&) = delete;
 };
 
 #endif

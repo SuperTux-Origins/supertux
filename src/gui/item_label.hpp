@@ -22,10 +22,10 @@
 class ItemLabel final : public MenuItem
 {
 public:
-  ItemLabel(const std::string& text_);
+  ItemLabel(std::string const& text_);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns true when the menu item has no action and therefore can be skipped.
       Useful for labels and horizontal lines.*/
@@ -39,8 +39,8 @@ public:
   virtual Color get_color() const override;
 
 private:
-  ItemLabel(const ItemLabel&) = delete;
-  ItemLabel& operator=(const ItemLabel&) = delete;
+  ItemLabel(ItemLabel const&) = delete;
+  ItemLabel& operator=(ItemLabel const&) = delete;
 };
 
 #endif

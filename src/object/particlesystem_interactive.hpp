@@ -40,7 +40,7 @@ class ParticleSystem_Interactive : public ParticleSystem
 {
 public:
   ParticleSystem_Interactive();
-  ParticleSystem_Interactive(const ReaderMapping& mapping);
+  ParticleSystem_Interactive(ReaderMapping const& mapping);
   ~ParticleSystem_Interactive() override;
 
   virtual void draw(DrawingContext& context) override;
@@ -49,11 +49,11 @@ public:
   }
 
 protected:
-  virtual int collision(Particle* particle, const Vector& movement);
+  virtual int collision(Particle* particle, Vector const& movement);
 
 private:
-  ParticleSystem_Interactive(const ParticleSystem_Interactive&) = delete;
-  ParticleSystem_Interactive& operator=(const ParticleSystem_Interactive&) = delete;
+  ParticleSystem_Interactive(ParticleSystem_Interactive const&) = delete;
+  ParticleSystem_Interactive& operator=(ParticleSystem_Interactive const&) = delete;
 };
 
 #endif

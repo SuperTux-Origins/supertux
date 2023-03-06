@@ -23,19 +23,19 @@
 class MenuItem
 {
 public:
-  MenuItem(const std::string& text, int id = -1);
+  MenuItem(std::string const& text, int id = -1);
   virtual ~MenuItem();
 
   int get_id() const { return m_id; }
 
-  void set_help(const std::string& help_text);
-  const std::string& get_help() const { return m_help; }
+  void set_help(std::string const& help_text);
+  std::string const& get_help() const { return m_help; }
 
-  void set_text(const std::string& text) { m_text = text; }
-  const std::string& get_text() const { return m_text; }
+  void set_text(std::string const& text) { m_text = text; }
+  std::string const& get_text() const { return m_text; }
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active);
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active);
 
   /** Returns true when the menu item has no action and therefore can be skipped.
       Useful for labels and horizontal lines.*/
@@ -50,10 +50,10 @@ public:
   virtual int get_height() const { return 24; }
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) { }
+  virtual void process_action(MenuAction const& action) { }
 
   /** Processes the given event. */
-  virtual void event(const SDL_Event& ev) { }
+  virtual void event(SDL_Event const& ev) { }
 
   virtual Color get_color() const;
 
@@ -74,8 +74,8 @@ private:
   std::string m_help;
 
 private:
-  MenuItem(const MenuItem&) = delete;
-  MenuItem& operator=(const MenuItem&) = delete;
+  MenuItem(MenuItem const&) = delete;
+  MenuItem& operator=(MenuItem const&) = delete;
 };
 
 #endif

@@ -30,7 +30,7 @@
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 
-Explosion::Explosion(const Vector& pos, float p_push_strength,
+Explosion::Explosion(Vector const& pos, float p_push_strength,
     int p_num_particles) :
   MovingSprite(pos, "images/objects/explosion/explosion.sprite", LAYER_OBJECTS+40, COLGROUP_MOVING),
   hurt(true),
@@ -46,7 +46,7 @@ Explosion::Explosion(const Vector& pos, float p_push_strength,
   lightsprite->set_color(Color(0.6f, 0.6f, 0.6f));
 }
 
-Explosion::Explosion(const ReaderMapping& reader) :
+Explosion::Explosion(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/explosion/explosion.sprite", LAYER_OBJECTS+40, COLGROUP_MOVING),
   hurt(true),
   push_strength(-1),
@@ -167,7 +167,7 @@ Explosion::draw(DrawingContext& context)
 }
 
 HitResponse
-Explosion::collision(GameObject& other, const CollisionHit& )
+Explosion::collision(GameObject& other, CollisionHit const& )
 {
   if ((state != STATE_EXPLODING) || !hurt || m_sprite->get_current_frame() > 8)
     return ABORT_MOVE;

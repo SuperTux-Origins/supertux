@@ -48,8 +48,8 @@ private:
   bool m_center; // m_center should *always* be the same as the m_solid of the corresponding Autotile
 
 private:
-  AutotileMask(const AutotileMask&) = delete;
-  AutotileMask& operator=(const AutotileMask&) = delete;
+  AutotileMask(AutotileMask const&) = delete;
+  AutotileMask& operator=(AutotileMask const&) = delete;
 };
 
 class Autotile final
@@ -87,8 +87,8 @@ private:
   bool m_solid;
 
 private:
-  Autotile(const Autotile&) = delete;
-  Autotile& operator=(const Autotile&) = delete;
+  Autotile(Autotile const&) = delete;
+  Autotile& operator=(Autotile const&) = delete;
 };
 
 class AutotileSet final
@@ -142,8 +142,8 @@ private:
   bool m_corner;
 
 private:
-  AutotileSet(const AutotileSet&) = delete;
-  AutotileSet& operator=(const AutotileSet&) = delete;
+  AutotileSet(AutotileSet const&) = delete;
+  AutotileSet& operator=(AutotileSet const&) = delete;
 };
 
 #endif

@@ -24,11 +24,11 @@ class Viewport final
 {
 private:
 public:
-  static Viewport from_size(const Size& target_size, const Size& desktop_size);
+  static Viewport from_size(Size const& target_size, Size const& desktop_size);
 
 public:
   Viewport();
-  Viewport(const Rect& rect, const Vector& scale);
+  Viewport(Rect const& rect, Vector const& scale);
 
   /** The size of the viewport in window coordinates */
   Rect get_rect() const { return m_rect; }

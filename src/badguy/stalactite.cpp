@@ -33,7 +33,7 @@ static const float SHAKE_RANGE_Y = 400;
 const std::vector<std::string> Stalactite::s_sprites = { "stalactite.sprite", "rock_stalactite.sprite" };
 
 Stalactite::StalactiteType
-Stalactite::StalactiteType_from_string(const std::string& type_string)
+Stalactite::StalactiteType_from_string(std::string const& type_string)
 {
   if (type_string == "ice")
     return StalactiteType::ICE;
@@ -43,7 +43,7 @@ Stalactite::StalactiteType_from_string(const std::string& type_string)
     throw std::exception();
 }
 
-Stalactite::Stalactite(const ReaderMapping& mapping) :
+Stalactite::Stalactite(ReaderMapping const& mapping) :
   BadGuy(mapping, "images/creatures/stalactite/stalactite.sprite", LAYER_TILES - 1),
   m_type(),
   timer(),
@@ -120,7 +120,7 @@ Stalactite::squish()
 }
 
 void
-Stalactite::collision_solid(const CollisionHit& hit)
+Stalactite::collision_solid(CollisionHit const& hit)
 {
   if (state == STALACTITE_FALLING) {
     if (hit.bottom) squish();
@@ -131,7 +131,7 @@ Stalactite::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Stalactite::collision_player(Player& player, const CollisionHit& )
+Stalactite::collision_player(Player& player, CollisionHit const& )
 {
   if (state != STALACTITE_SQUISHED) {
     player.kill(false);
@@ -141,7 +141,7 @@ Stalactite::collision_player(Player& player, const CollisionHit& )
 }
 
 HitResponse
-Stalactite::collision_badguy(BadGuy& other, const CollisionHit& hit)
+Stalactite::collision_badguy(BadGuy& other, CollisionHit const& hit)
 {
   if (state == STALACTITE_SQUISHED) return FORCE_MOVE;
 
@@ -160,7 +160,7 @@ Stalactite::collision_badguy(BadGuy& other, const CollisionHit& hit)
 }
 
 HitResponse
-Stalactite::collision_bullet(Bullet& bullet, const CollisionHit& hit)
+Stalactite::collision_bullet(Bullet& bullet, CollisionHit const& hit)
 {
   if (m_type == StalactiteType::ROCK)
   {

@@ -27,7 +27,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
-PowerUp::PowerUp(const ReaderMapping& mapping) :
+PowerUp::PowerUp(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/powerups/egg/egg.sprite", LAYER_OBJECTS, COLGROUP_MOVING),
   physic(),
   script(),
@@ -39,7 +39,7 @@ PowerUp::PowerUp(const ReaderMapping& mapping) :
   initialize();
 }
 
-PowerUp::PowerUp(const Vector& pos, const std::string& sprite_name_) :
+PowerUp::PowerUp(Vector const& pos, std::string const& sprite_name_) :
   MovingSprite(pos, sprite_name_, LAYER_OBJECTS, COLGROUP_MOVING),
   physic(),
   script(),
@@ -75,7 +75,7 @@ PowerUp::initialize()
 }
 
 void
-PowerUp::collision_solid(const CollisionHit& hit)
+PowerUp::collision_solid(CollisionHit const& hit)
 {
   if (hit.bottom) {
     physic.set_velocity_y(0);
@@ -86,7 +86,7 @@ PowerUp::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-PowerUp::collision(GameObject& other, const CollisionHit&)
+PowerUp::collision(GameObject& other, CollisionHit const&)
 {
   Player* player = dynamic_cast<Player*>(&other);
   if (player == nullptr)

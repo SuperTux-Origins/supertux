@@ -49,10 +49,10 @@ private:
   };
 
 public:
-  Crusher(const ReaderMapping& reader);
+  Crusher(ReaderMapping const& reader);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
 
@@ -92,8 +92,8 @@ private:
   SpritePtr m_whites;
 
 private:
-  Crusher(const Crusher&) = delete;
-  Crusher& operator=(const Crusher&) = delete;
+  Crusher(Crusher const&) = delete;
+  Crusher& operator=(Crusher const&) = delete;
 };
 
 class CrusherRoot : public MovingSprite
@@ -101,7 +101,7 @@ class CrusherRoot : public MovingSprite
 public:
   CrusherRoot(Vector position, Crusher::Direction direction, float delay, int layer);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
 
 private:
@@ -114,8 +114,8 @@ private:
   float m_delay_remaining;
 
 private:
-  CrusherRoot(const CrusherRoot&) = delete;
-  CrusherRoot& operator=(const CrusherRoot&) = delete;
+  CrusherRoot(CrusherRoot const&) = delete;
+  CrusherRoot& operator=(CrusherRoot const&) = delete;
 };
 
 #endif

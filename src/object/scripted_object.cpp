@@ -24,7 +24,7 @@
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
 
-ScriptedObject::ScriptedObject(const ReaderMapping& mapping) :
+ScriptedObject::ScriptedObject(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/bonus_block/brick.sprite", LAYER_OBJECTS, COLGROUP_MOVING_STATIC),
   ExposedObject<ScriptedObject, scripting::ScriptedObject>(this),
   physic(),
@@ -134,7 +134,7 @@ ScriptedObject::enable_gravity(bool f)
 }
 
 void
-ScriptedObject::set_action(const std::string& animation)
+ScriptedObject::set_action(std::string const& animation)
 {
   m_sprite->set_action(animation);
 }
@@ -167,7 +167,7 @@ ScriptedObject::draw(DrawingContext& context)
 }
 
 void
-ScriptedObject::collision_solid(const CollisionHit& hit)
+ScriptedObject::collision_solid(CollisionHit const& hit)
 {
   if (!physic_enabled)
     return;
@@ -185,7 +185,7 @@ ScriptedObject::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-ScriptedObject::collision(GameObject& other, const CollisionHit& )
+ScriptedObject::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player && !hit_script.empty()) {

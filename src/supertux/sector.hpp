@@ -73,8 +73,8 @@ public:
   Level& get_level() const;
 
   /** activates this sector (change music, initialize player class, ...) */
-  void activate(const std::string& spawnpoint);
-  void activate(const Vector& player_pos);
+  void activate(std::string const& spawnpoint);
+  void activate(Vector const& player_pos);
   void deactivate();
 
   void update(float dt_sec);
@@ -87,38 +87,38 @@ public:
   /** continues the looping sounds in whole sector. */
   void play_looping_sounds();
 
-  void set_name(const std::string& name_) { m_name = name_; }
-  const std::string& get_name() const { return m_name; }
+  void set_name(std::string const& name_) { m_name = name_; }
+  std::string const& get_name() const { return m_name; }
 
   /** tests if a given rectangle is inside the sector
       (a rectangle that is on top of the sector is considered inside) */
-  bool inside(const Rectf& rectangle) const;
+  bool inside(Rectf const& rectangle) const;
 
   /** Checks if the specified rectangle is free of (solid) tiles.
       Note that this does not include static objects, e.g. bonus blocks. */
-  bool is_free_of_tiles(const Rectf& rect, const bool ignoreUnisolid = false, uint32_t tiletype = Tile::SOLID) const;
+  bool is_free_of_tiles(Rectf const& rect, const bool ignoreUnisolid = false, uint32_t tiletype = Tile::SOLID) const;
 
   /** Checks if the specified rectangle is free of both
       1.) solid tiles and
       2.) MovingObjects in COLGROUP_STATIC.
       Note that this does not include badguys or players. */
-  bool is_free_of_statics(const Rectf& rect, const MovingObject* ignore_object = nullptr, const bool ignoreUnisolid = false) const;
+  bool is_free_of_statics(Rectf const& rect, MovingObject const* ignore_object = nullptr, const bool ignoreUnisolid = false) const;
 
   /** Checks if the specified rectangle is free of both
       1.) solid tiles and
       2.) MovingObjects in COLGROUP_STATIC, COLGROUP_MOVINGSTATIC or COLGROUP_MOVING.
       This includes badguys and players. */
-  bool is_free_of_movingstatics(const Rectf& rect, const MovingObject* ignore_object = nullptr) const;
+  bool is_free_of_movingstatics(Rectf const& rect, MovingObject const* ignore_object = nullptr) const;
 
-  bool free_line_of_sight(const Vector& line_start, const Vector& line_end, bool ignore_objects = false, const MovingObject* ignore_object = nullptr) const;
-  bool can_see_player(const Vector& eye) const;
+  bool free_line_of_sight(Vector const& line_start, Vector const& line_end, bool ignore_objects = false, MovingObject const* ignore_object = nullptr) const;
+  bool can_see_player(Vector const& eye) const;
 
-  Player* get_nearest_player (const Vector& pos) const;
-  Player* get_nearest_player (const Rectf& pos) const {
+  Player* get_nearest_player (Vector const& pos) const;
+  Player* get_nearest_player (Rectf const& pos) const {
     return (get_nearest_player (get_anchor_pos (pos, ANCHOR_MIDDLE)));
   }
 
-  std::vector<MovingObject*> get_nearby_objects (const Vector& center, float max_distance) const;
+  std::vector<MovingObject*> get_nearby_objects (Vector const& center, float max_distance) const;
 
   Rectf get_active_region() const;
 
@@ -128,7 +128,7 @@ public:
   Size get_editor_size() const;
 
   /** resize all tilemaps with given size */
-  void resize_sector(const Size& old_size, const Size& new_size, const Size& resize_offset);
+  void resize_sector(Size const& old_size, Size const& new_size, Size const& resize_offset);
 
   /** globally changes solid tilemaps' tile ids */
   void change_solid_tiles(uint32_t old_tile_id, uint32_t new_tile_id);
@@ -137,18 +137,18 @@ public:
   void set_gravity(float gravity);
   float get_gravity() const;
 
-  void set_init_script(const std::string& init_script) {
+  void set_init_script(std::string const& init_script) {
     m_init_script = init_script;
   }
 
-  void run_script(const std::string& script, const std::string& sourcename);
+  void run_script(std::string const& script, std::string const& sourcename);
 
   Camera& get_camera() const;
   std::vector<Player*> get_players() const;
   DisplayEffect& get_effect() const;
 
 private:
-  uint32_t collision_tile_attributes(const Rectf& dest, const Vector& mov) const;
+  uint32_t collision_tile_attributes(Rectf const& dest, Vector const& mov) const;
 
   virtual bool before_object_add(GameObject& object) override;
   virtual void before_object_remove(GameObject& object) override;
@@ -177,8 +177,8 @@ private:
   float m_gravity;
 
 private:
-  Sector(const Sector&) = delete;
-  Sector& operator=(const Sector&) = delete;
+  Sector(Sector const&) = delete;
+  Sector& operator=(Sector const&) = delete;
 };
 
 #endif

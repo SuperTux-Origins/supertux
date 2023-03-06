@@ -16,7 +16,7 @@
 
 #include "badguy/spiky.hpp"
 
-Spiky::Spiky(const ReaderMapping& reader) :
+Spiky::Spiky(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/spiky/spiky.sprite", "left", "right")
 {
   walk_speed = 80;

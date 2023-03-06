@@ -24,7 +24,7 @@ class SnowParticleSystem final : public ParticleSystem
 {
 public:
   SnowParticleSystem();
-  SnowParticleSystem(const ReaderMapping& reader);
+  SnowParticleSystem(ReaderMapping const& reader);
   ~SnowParticleSystem() override;
 
   virtual void update(float dt_sec) override;
@@ -92,8 +92,8 @@ private:
   SurfacePtr snowimages[3];
 
 private:
-  SnowParticleSystem(const SnowParticleSystem&) = delete;
-  SnowParticleSystem& operator=(const SnowParticleSystem&) = delete;
+  SnowParticleSystem(SnowParticleSystem const&) = delete;
+  SnowParticleSystem& operator=(SnowParticleSystem const&) = delete;
 };
 
 #endif

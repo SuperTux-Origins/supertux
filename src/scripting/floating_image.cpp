@@ -23,7 +23,7 @@
 
 namespace scripting {
 
-FloatingImage::FloatingImage(const std::string& spritefile) :
+FloatingImage::FloatingImage(std::string const& spritefile) :
   GameObject(get_game_object_manager().add<::FloatingImage>(spritefile).get_uid())
 {
 }
@@ -92,7 +92,7 @@ FloatingImage::set_visible(bool visible)
 }
 
 void
-FloatingImage::set_action(const std::string& action)
+FloatingImage::set_action(std::string const& action)
 {
   SCRIPT_GUARD_VOID;
   object.set_action(action);

@@ -26,12 +26,12 @@ class FallBlock : public MovingSprite
 
 {
 public:
-  FallBlock(const ReaderMapping& reader);
+  FallBlock(ReaderMapping const& reader);
   
   virtual void update(float dt_sec) override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
 
   virtual void draw(DrawingContext& context) override;
   
@@ -60,8 +60,8 @@ private:
   bool found_victim_down() const;
 
 private:
-  FallBlock(const FallBlock&) = delete;
-  FallBlock& operator=(const FallBlock&) = delete;
+  FallBlock(FallBlock const&) = delete;
+  FallBlock& operator=(FallBlock const&) = delete;
 };
 
 #endif

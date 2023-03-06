@@ -59,7 +59,7 @@ public:
   static Color teleporter_message_color;
 
 public:
-  WorldMap(const std::string& filename, Savegame& savegame, const std::string& force_spawnpoint = "");
+  WorldMap(std::string const& filename, Savegame& savegame, std::string const& force_spawnpoint = "");
   ~WorldMap() override;
 
   void finish_construction();
@@ -70,19 +70,19 @@ public:
   void draw(DrawingContext& context);
   void update(float dt_sec);
 
-  void process_input(const Controller& controller);
+  void process_input(Controller const& controller);
 
-  Vector get_next_tile(const Vector& pos, const Direction& direction) const;
+  Vector get_next_tile(Vector const& pos, Direction const& direction) const;
 
   /** gets a bitfield of Tile::WORLDMAP_NORTH | Tile::WORLDMAP_WEST |
       ... values, which indicates the directions Tux can move to when
       at the given position. */
-  int available_directions_at(const Vector& pos) const;
+  int available_directions_at(Vector const& pos) const;
 
   /** returns a bitfield representing the union of all
       Tile::WORLDMAP_XXX values of all solid tiles at the given
       position */
-  int tile_data_at(const Vector& pos) const;
+  int tile_data_at(Vector const& pos) const;
 
   size_t level_count() const;
   size_t solved_level_count() const;
@@ -95,9 +95,9 @@ public:
 
   /** Get a spawnpoint by its name @param name The name of the
       spawnpoint @return spawnpoint corresponding to that name */
-  SpawnPoint* get_spawnpoint_by_name(const std::string& spawnpoint_name) const
+  SpawnPoint* get_spawnpoint_by_name(std::string const& spawnpoint_name) const
   {
-    for (const auto& sp : m_spawn_points) {
+    for (auto const& sp : m_spawn_points) {
       if (sp->get_name() == spawnpoint_name) {
         return sp.get();
       }
@@ -107,12 +107,12 @@ public:
 
   LevelTile* at_level() const;
   SpecialTile* at_special_tile() const;
-  SpriteChange* at_sprite_change(const Vector& pos) const;
-  Teleporter* at_teleporter(const Vector& pos) const;
+  SpriteChange* at_sprite_change(Vector const& pos) const;
+  Teleporter* at_teleporter(Vector const& pos) const;
 
   /** Check if it is possible to walk from \a pos into \a direction,
       if possible, write the new position to \a new_pos */
-  bool path_ok(const Direction& direction, const Vector& pos, Vector* new_pos) const;
+  bool path_ok(Direction const& direction, Vector const& pos, Vector* new_pos) const;
 
   /** Save worldmap state to squirrel state table */
   void save_state();
@@ -120,30 +120,30 @@ public:
   /** Load worldmap state from squirrel state table */
   void load_state();
 
-  const std::string& get_title() const { return m_name; }
+  std::string const& get_title() const { return m_name; }
 
   /** switch to another worldmap.
       filename is relative to data root path */
-  void change(const std::string& filename, const std::string& force_spawnpoint="");
+  void change(std::string const& filename, std::string const& force_spawnpoint="");
 
   /** Moves Tux to the given spawnpoint
       @param spawnpoint Name of the spawnpoint to move to
       @param pan Pan the camera during to new spawnpoint
       @param main_as_default Move Tux to main spawnpoint if specified spawnpoint can't be found */
-  void move_to_spawnpoint(const std::string& spawnpoint, bool pan = false, bool main_as_default = true);
+  void move_to_spawnpoint(std::string const& spawnpoint, bool pan = false, bool main_as_default = true);
 
   /** Mark all levels as solved or unsolved */
   void set_levels_solved(bool solved, bool perfect);
 
   /** Sets the name of the tilemap that should fade when worldmap is set up. */
-  void set_initial_fade_tilemap(const std::string& tilemap_name, int direction)
+  void set_initial_fade_tilemap(std::string const& tilemap_name, int direction)
   {
     m_initial_fade_tilemap = tilemap_name;
     m_fade_direction = direction;
   }
 
   /** Sets the initial spawnpoint on worldmap setup */
-  void set_initial_spawnpoint(const std::string& spawnpoint_name)
+  void set_initial_spawnpoint(std::string const& spawnpoint_name)
   {
     m_force_spawnpoint = spawnpoint_name;
 
@@ -152,9 +152,9 @@ public:
     m_main_is_default = false;
   }
 
-  void run_script(const std::string& script, const std::string& sourcename);
+  void run_script(std::string const& script, std::string const& sourcename);
 
-  void set_passive_message(const std::string& message, float time);
+  void set_passive_message(std::string const& message, float time);
 
   Camera& get_camera() const { return *m_camera; }
 
@@ -167,7 +167,7 @@ protected:
 private:
   void draw_status(DrawingContext& context);
 
-  void load(const std::string& filename);
+  void load(std::string const& filename);
   void on_escape_press();
 
 private:
@@ -204,8 +204,8 @@ private:
   bool m_in_world_select;
 
 private:
-  WorldMap(const WorldMap&) = delete;
-  WorldMap& operator=(const WorldMap&) = delete;
+  WorldMap(WorldMap const&) = delete;
+  WorldMap& operator=(WorldMap const&) = delete;
 };
 
 } // namespace worldmap

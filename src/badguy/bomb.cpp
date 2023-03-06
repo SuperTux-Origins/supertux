@@ -24,7 +24,7 @@
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
-Bomb::Bomb(const Vector& pos, Direction dir_, const std::string& custom_sprite /*= "images/creatures/mr_bomb/mr_bomb.sprite"*/ ) :
+Bomb::Bomb(Vector const& pos, Direction dir_, std::string const& custom_sprite /*= "images/creatures/mr_bomb/mr_bomb.sprite"*/ ) :
   BadGuy( pos, dir_, custom_sprite ),
   ticking(SoundManager::current()->create_sound_source("sounds/fizz.wav"))
 {
@@ -40,7 +40,7 @@ Bomb::Bomb(const Vector& pos, Direction dir_, const std::string& custom_sprite /
 }
 
 void
-Bomb::collision_solid(const CollisionHit& hit)
+Bomb::collision_solid(CollisionHit const& hit)
 {
   if (is_grabbed()) {
     return;
@@ -56,13 +56,13 @@ Bomb::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Bomb::collision_player(Player& , const CollisionHit& )
+Bomb::collision_player(Player& , CollisionHit const& )
 {
   return ABORT_MOVE;
 }
 
 HitResponse
-Bomb::collision_badguy(BadGuy& , const CollisionHit& )
+Bomb::collision_badguy(BadGuy& , CollisionHit const& )
 {
   return ABORT_MOVE;
 }
@@ -124,7 +124,7 @@ Bomb::is_portable() const
 }
 
 void
-Bomb::grab(MovingObject& object, const Vector& pos, Direction dir_)
+Bomb::grab(MovingObject& object, Vector const& pos, Direction dir_)
 {
   Portable::grab(object, pos, dir_);
   m_col.set_movement(pos - get_pos());

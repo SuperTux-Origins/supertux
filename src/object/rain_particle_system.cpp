@@ -52,7 +52,7 @@ RainParticleSystem::RainParticleSystem() :
   init();
 }
 
-RainParticleSystem::RainParticleSystem(const ReaderMapping& reader) :
+RainParticleSystem::RainParticleSystem(ReaderMapping const& reader) :
   ParticleSystem_Interactive(reader),
   ExposedObject<RainParticleSystem, scripting::Rain>(this),
   m_current_speed(1.f),
@@ -126,7 +126,7 @@ void RainParticleSystem::set_amount(float amount)
 
 void RainParticleSystem::set_angle(float angle)
 {
-  for (const auto& particle : particles)
+  for (auto const& particle : particles)
     particle->angle = angle;
 }
 
@@ -183,7 +183,7 @@ void RainParticleSystem::update(float dt_sec)
     set_angle(m_current_angle);
   }
 
-  const auto& cam_translation = Sector::get().get_camera().get_translation();
+  auto const& cam_translation = Sector::get().get_camera().get_translation();
   float movement_multiplier = dt_sec * Sector::get().get_gravity() * m_current_speed * 1.41421353f;
   float abs_x = cam_translation.x;
   float abs_y = cam_translation.y;

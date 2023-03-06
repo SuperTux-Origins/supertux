@@ -18,13 +18,13 @@
 
 #include "sprite/sprite.hpp"
 
-SnowBall::SnowBall(const ReaderMapping& reader)
+SnowBall::SnowBall(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/snowball/snowball.sprite", "left", "right")
 {
   walk_speed = 80;
 }
 
-SnowBall::SnowBall(const Vector& pos, Direction d, const std::string& script)
+SnowBall::SnowBall(Vector const& pos, Direction d, std::string const& script)
   : WalkingBadguy(pos, d, "images/creatures/snowball/snowball.sprite", "left", "right")
 {
   walk_speed = 80;

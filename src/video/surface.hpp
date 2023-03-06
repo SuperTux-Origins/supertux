@@ -35,18 +35,18 @@ class SurfaceData;
 class Surface final
 {
 public:
-  static SurfacePtr from_texture(const TexturePtr& texture);
-  static SurfacePtr from_file(const std::string& filename, const std::optional<Rect>& rect = std::nullopt);
-  static SurfacePtr from_reader(const ReaderMapping& mapping, const std::optional<Rect>& rect = std::nullopt, const std::string& filename = "");
+  static SurfacePtr from_texture(TexturePtr const& texture);
+  static SurfacePtr from_file(std::string const& filename, std::optional<Rect> const& rect = std::nullopt);
+  static SurfacePtr from_reader(ReaderMapping const& mapping, std::optional<Rect> const& rect = std::nullopt, std::string const& filename = "");
 
 private:
-  Surface(const TexturePtr& diffuse_texture, const TexturePtr& displacement_texture, Flip flip, const std::string& filename = "");
-  Surface(const TexturePtr& diffuse_texture, const TexturePtr& displacement_texture, const Rect& region, Flip flip, const std::string& filename = "");
+  Surface(TexturePtr const& diffuse_texture, TexturePtr const& displacement_texture, Flip flip, std::string const& filename = "");
+  Surface(TexturePtr const& diffuse_texture, TexturePtr const& displacement_texture, Rect const& region, Flip flip, std::string const& filename = "");
 
 public:
   ~Surface();
 
-  SurfacePtr region(const Rect& rect) const;
+  SurfacePtr region(Rect const& rect) const;
   SurfacePtr clone(Flip flip = NO_FLIP) const;
 
   TexturePtr get_texture() const;
@@ -65,7 +65,7 @@ private:
   const std::string m_source_filename;
 
 private:
-  Surface& operator=(const Surface&) = delete;
+  Surface& operator=(Surface const&) = delete;
 };
 
 #endif

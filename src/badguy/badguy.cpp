@@ -40,14 +40,14 @@ static const float BURN_TIME = 1;
 static const float X_OFFSCREEN_DISTANCE = 1280;
 static const float Y_OFFSCREEN_DISTANCE = 800;
 
-BadGuy::BadGuy(const Vector& pos, const std::string& sprite_name_, int layer_,
-               const std::string& light_sprite_name, const std::string& ice_sprite_name) :
+BadGuy::BadGuy(Vector const& pos, std::string const& sprite_name_, int layer_,
+               std::string const& light_sprite_name, std::string const& ice_sprite_name) :
   BadGuy(pos, Direction::LEFT, sprite_name_, layer_, light_sprite_name)
 {
 }
 
-BadGuy::BadGuy(const Vector& pos, Direction direction, const std::string& sprite_name_, int layer_,
-               const std::string& light_sprite_name, const std::string& ice_sprite_name) :
+BadGuy::BadGuy(Vector const& pos, Direction direction, std::string const& sprite_name_, int layer_,
+               std::string const& light_sprite_name, std::string const& ice_sprite_name) :
   MovingSprite(pos, sprite_name_, layer_, COLGROUP_DISABLED),
   ExposedObject<BadGuy, scripting::BadGuy>(this),
   m_physic(),
@@ -83,8 +83,8 @@ BadGuy::BadGuy(const Vector& pos, Direction direction, const std::string& sprite
   m_lightsprite->set_blend(Blend::ADD);
 }
 
-BadGuy::BadGuy(const ReaderMapping& reader, const std::string& sprite_name_, int layer_,
-               const std::string& light_sprite_name, const std::string& ice_sprite_name) :
+BadGuy::BadGuy(ReaderMapping const& reader, std::string const& sprite_name_, int layer_,
+               std::string const& light_sprite_name, std::string const& ice_sprite_name) :
   MovingSprite(reader, sprite_name_, layer_, COLGROUP_DISABLED),
   ExposedObject<BadGuy, scripting::BadGuy>(this),
   m_physic(),
@@ -285,7 +285,7 @@ BadGuy::update(float dt_sec)
 }
 
 Direction
-BadGuy::str2dir(const std::string& dir_str) const
+BadGuy::str2dir(std::string const& dir_str) const
 {
   return string_to_dir(dir_str);
 }
@@ -357,7 +357,7 @@ BadGuy::collision_tile(uint32_t tile_attributes)
 }
 
 HitResponse
-BadGuy::collision(GameObject& other, const CollisionHit& hit)
+BadGuy::collision(GameObject& other, CollisionHit const& hit)
 {
   if (!is_active()) return ABORT_MOVE;
 
@@ -427,7 +427,7 @@ BadGuy::collision(GameObject& other, const CollisionHit& hit)
 }
 
 void
-BadGuy::collision_solid(const CollisionHit& hit)
+BadGuy::collision_solid(CollisionHit const& hit)
 {
   if (m_frozen)
   {
@@ -464,7 +464,7 @@ BadGuy::on_flip(float height)
 }
 
 HitResponse
-BadGuy::collision_player(Player& player, const CollisionHit& hit)
+BadGuy::collision_player(Player& player, CollisionHit const& hit)
 {
   if (player.is_invincible()) {
     kill_fall();
@@ -497,7 +497,7 @@ BadGuy::collision_player(Player& player, const CollisionHit& hit)
 }
 
 HitResponse
-BadGuy::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+BadGuy::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (badguy.is_frozen())
     collision_solid(hit);
@@ -521,7 +521,7 @@ BadGuy::collision_squished(GameObject& object)
 }
 
 HitResponse
-BadGuy::collision_bullet(Bullet& bullet, const CollisionHit& hit)
+BadGuy::collision_bullet(Bullet& bullet, CollisionHit const& hit)
 {
   if (is_frozen()) {
     if (bullet.get_type() == FIRE_BONUS) {
@@ -761,7 +761,7 @@ BadGuy::get_nearest_player() const
 }
 
 void
-BadGuy::update_on_ground_flag(const CollisionHit& hit)
+BadGuy::update_on_ground_flag(CollisionHit const& hit)
 {
   if (hit.bottom) {
     m_on_ground_flag = true;
@@ -788,7 +788,7 @@ BadGuy::get_floor_normal() const
 }
 
 void
-BadGuy::grab(MovingObject& object, const Vector& pos, Direction dir_)
+BadGuy::grab(MovingObject& object, Vector const& pos, Direction dir_)
 {
   Portable::grab(object, pos, dir_);
   m_col.set_movement(pos - get_pos());
@@ -1034,7 +1034,7 @@ BadGuy::can_be_affected_by_wind() const
 }
 
 void
-BadGuy::add_wind_velocity(const Vector& velocity, const Vector& end_speed)
+BadGuy::add_wind_velocity(Vector const& velocity, Vector const& end_speed)
 {
   // only add velocity in the same direction as the wind
   if (end_speed.x > 0 && m_physic.get_velocity_x() < end_speed.x)

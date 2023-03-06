@@ -24,22 +24,22 @@
 class ItemStringSelect final : public MenuItem
 {
 public:
-  ItemStringSelect(const std::string& text, std::vector<std::string> items, int* selected, int id = -1);
+  ItemStringSelect(std::string const& text, std::vector<std::string> items, int* selected, int id = -1);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns the minimum width of the menu item. */
   virtual int get_width() const override;
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
   virtual bool changes_width() const override {
     return false;
   }
 
-  void set_callback(const std::function<void(int)>& callback) {
+  void set_callback(std::function<void(int)> const& callback) {
     m_callback = callback;
   }
 
@@ -53,8 +53,8 @@ private:
   float m_width;
 
 private:
-  ItemStringSelect(const ItemStringSelect&) = delete;
-  ItemStringSelect& operator=(const ItemStringSelect&) = delete;
+  ItemStringSelect(ItemStringSelect const&) = delete;
+  ItemStringSelect& operator=(ItemStringSelect const&) = delete;
 };
 
 #endif

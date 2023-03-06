@@ -35,7 +35,7 @@ class SquirrelVM;
 class SquirrelEnvironment
 {
 public:
-  SquirrelEnvironment(SquirrelVM& vm, const std::string& name);
+  SquirrelEnvironment(SquirrelVM& vm, std::string const& name);
   virtual ~SquirrelEnvironment();
 
 public:
@@ -53,23 +53,23 @@ public:
   /** Generic expose function, T must be a type that has a
       create_squirrel_instance() associated with it. */
   template<typename T>
-  void expose(const std::string& name, std::unique_ptr<T> script_object)
+  void expose(std::string const& name, std::unique_ptr<T> script_object)
   {
     sq_pushobject(m_vm.get_vm(), m_table);
     expose_object(m_vm.get_vm(), -1, std::move(script_object), name.c_str());
     sq_pop(m_vm.get_vm(), 1);
   }
-  void unexpose(const std::string& name);
+  void unexpose(std::string const& name);
 
   /** Convenience function that takes an std::string instead of an
       std::istream& */
-  void run_script(const std::string& script, const std::string& sourcename);
+  void run_script(std::string const& script, std::string const& sourcename);
 
   /** Runs a script in the context of the SquirrelEnvironment (m_table will
       be the roottable of this squirrel VM) and keeps a reference to
       the script so the script gets destroyed when the SquirrelEnvironment is
       destroyed). */
-  void run_script(std::istream& in, const std::string& sourcename);
+  void run_script(std::istream& in, std::string const& sourcename);
 
   void update(float dt_sec);
   void wait_for_seconds(HSQUIRRELVM vm, float seconds);
@@ -86,8 +86,8 @@ private:
   std::unique_ptr<SquirrelScheduler> m_scheduler;
 
 private:
-  SquirrelEnvironment(const SquirrelEnvironment&) = delete;
-  SquirrelEnvironment& operator=(const SquirrelEnvironment&) = delete;
+  SquirrelEnvironment(SquirrelEnvironment const&) = delete;
+  SquirrelEnvironment& operator=(SquirrelEnvironment const&) = delete;
 };
 
 #endif

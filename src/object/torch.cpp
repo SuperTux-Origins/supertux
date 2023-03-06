@@ -23,7 +23,7 @@
 #include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
 
-Torch::Torch(const ReaderMapping& reader) :
+Torch::Torch(ReaderMapping const& reader) :
   MovingObject(reader),
   ExposedObject<Torch, scripting::Torch>(this),
   m_light_color(1.f, 1.f, 1.f),
@@ -89,7 +89,7 @@ Torch::update(float)
 }
 
 HitResponse
-Torch::collision(GameObject& other, const CollisionHit& )
+Torch::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*>(&other);
   if (player != nullptr && !m_burning)

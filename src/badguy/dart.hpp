@@ -24,8 +24,8 @@
 class Dart final : public BadGuy
 {
 public:
-  Dart(const ReaderMapping& reader);
-  Dart(const Vector& pos, Direction d, const BadGuy* parent);
+  Dart(ReaderMapping const& reader);
+  Dart(Vector const& pos, Direction d, BadGuy const* parent);
 
   virtual void initialize() override;
   virtual void activate() override;
@@ -33,11 +33,11 @@ public:
 
   virtual void active_update(float dt_sec) override;
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
-  virtual bool updatePointers(const GameObject* from_object, GameObject* to_object);
+  virtual bool updatePointers(GameObject const* from_object, GameObject* to_object);
   static std::string class_name() { return "dart"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Dart"); }
@@ -53,12 +53,12 @@ public:
   virtual void on_flip(float height) override;
 
 protected:
-  const BadGuy* parent; /**< collisions with this BadGuy will be ignored */
+  BadGuy const* parent; /**< collisions with this BadGuy will be ignored */
   std::unique_ptr<SoundSource> sound_source; /**< SoundSource for ambient sound */
 
 private:
-  Dart(const Dart&) = delete;
-  Dart& operator=(const Dart&) = delete;
+  Dart(Dart const&) = delete;
+  Dart& operator=(Dart const&) = delete;
 };
 
 #endif

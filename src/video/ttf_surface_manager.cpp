@@ -28,7 +28,7 @@
 #include "video/ttf_surface.hpp"
 #include "video/video_system.hpp"
 
-TTFSurfaceManager::CacheEntry::CacheEntry(const TTFSurfacePtr& s) :
+TTFSurfaceManager::CacheEntry::CacheEntry(TTFSurfacePtr const& s) :
   ttf_surface(s),
   last_access(g_game_time)
 {
@@ -41,7 +41,7 @@ TTFSurfaceManager::TTFSurfaceManager() :
 }
 
 TTFSurfacePtr
-TTFSurfaceManager::create_surface(const TTFFont& font, const std::string& text)
+TTFSurfaceManager::create_surface(TTFFont const& font, std::string const& text)
 {
   auto key = Key(font.get_ttf_font(), text);
   auto it = m_cache.find(key);
@@ -71,8 +71,8 @@ TTFSurfaceManager::create_surface(const TTFFont& font, const std::string& text)
 }
 
 int
-TTFSurfaceManager::get_cached_surface_width(const TTFFont& font,
-  const std::string& text)
+TTFSurfaceManager::get_cached_surface_width(TTFFont const& font,
+  std::string const& text)
 {
   auto key = Key(font.get_ttf_font(), text);
   auto it = m_cache.find(key);

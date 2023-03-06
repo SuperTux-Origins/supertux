@@ -49,7 +49,7 @@ JoystickConfig::JoystickConfig() :
 int
 JoystickConfig::reversemap_joyaxis(Control c) const
 {
-  for (const auto& i : m_joy_axis_map) {
+  for (auto const& i : m_joy_axis_map) {
     if (i.second == c)
       return i.first.second;
   }
@@ -60,7 +60,7 @@ JoystickConfig::reversemap_joyaxis(Control c) const
 int
 JoystickConfig::reversemap_joybutton(Control c) const
 {
-  for (const auto& i : m_joy_button_map) {
+  for (auto const& i : m_joy_button_map) {
     if (i.second == c)
       return i.first.second;
   }
@@ -71,7 +71,7 @@ JoystickConfig::reversemap_joybutton(Control c) const
 int
 JoystickConfig::reversemap_joyhat(Control c) const
 {
-  for (const auto& i : m_joy_hat_map) {
+  for (auto const& i : m_joy_hat_map) {
     if (i.second == c)
       return i.first.second;
   }
@@ -84,15 +84,15 @@ JoystickConfig::print_joystick_mappings() const
 {
   std::cout << _("Joystick Mappings") << std::endl;
   std::cout << "-----------------" << std::endl;
-  for (const auto& i : m_joy_axis_map) {
+  for (auto const& i : m_joy_axis_map) {
     std::cout << "Axis: " << i.first.second << " -> " << i.second << std::endl;
   }
 
-  for (const auto& i : m_joy_button_map) {
+  for (auto const& i : m_joy_button_map) {
     std::cout << "Button: " << i.first.second << " -> " << i.second << std::endl;
   }
 
-  for (const auto& i : m_joy_hat_map) {
+  for (auto const& i : m_joy_hat_map) {
     std::cout << "Hat: " << i.first.second << " -> " << i.second << std::endl;
   }
   std::cout << std::endl;
@@ -157,7 +157,7 @@ JoystickConfig::bind_joybutton(JoystickID joy_id, int button, Control control)
 }
 
 void
-JoystickConfig::read(const ReaderMapping& joystick_mapping)
+JoystickConfig::read(ReaderMapping const& joystick_mapping)
 {
   joystick_mapping.read("dead-zone", m_dead_zone);
   joystick_mapping.read("jump-with-up", m_jump_with_up_joy);
@@ -214,21 +214,21 @@ JoystickConfig::write(Writer& writer)
   writer.write("jump-with-up", m_jump_with_up_joy);
   writer.write("use-game-controller", m_use_game_controller);
 
-  for (const auto& i : m_joy_button_map) {
+  for (auto const& i : m_joy_button_map) {
     writer.start_list("map");
     writer.write("button", i.first.second);
     writer.write("control", Control_to_string(i.second));
     writer.end_list("map");
   }
 
-  for (const auto& i : m_joy_hat_map) {
+  for (auto const& i : m_joy_hat_map) {
     writer.start_list("map");
     writer.write("hat", i.first.second);
     writer.write("control", Control_to_string(i.second));
     writer.end_list("map");
   }
 
-  for (const auto& i : m_joy_axis_map) {
+  for (auto const& i : m_joy_axis_map) {
     writer.start_list("map");
     writer.write("axis", i.first.second);
     writer.write("control", Control_to_string(i.second));

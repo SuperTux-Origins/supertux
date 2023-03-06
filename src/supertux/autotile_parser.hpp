@@ -32,19 +32,19 @@ private:
   std::string m_tiles_path;
 
 public:
-  AutotileParser(std::vector<AutotileSet*>* autotilesets, const std::string& filename);
+  AutotileParser(std::vector<AutotileSet*>* autotilesets, std::string const& filename);
 
   void parse();
 
 private:
-  void parse_autotileset(const ReaderMapping& reader, bool corner);
-  Autotile* parse_autotile(const ReaderMapping& reader, bool corner);
+  void parse_autotileset(ReaderMapping const& reader, bool corner);
+  Autotile* parse_autotile(ReaderMapping const& reader, bool corner);
   void parse_mask(std::string mask, std::vector<AutotileMask*>* autotile_masks, bool solid);
   void parse_mask_corner(std::string mask, std::vector<AutotileMask*>* autotile_masks);
 
 private:
-  AutotileParser(const AutotileParser&) = delete;
-  AutotileParser& operator=(const AutotileParser&) = delete;
+  AutotileParser(AutotileParser const&) = delete;
+  AutotileParser& operator=(AutotileParser const&) = delete;
 };
 
 #endif

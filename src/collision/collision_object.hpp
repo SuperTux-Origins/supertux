@@ -38,15 +38,15 @@ public:
   CollisionObject(CollisionGroup group, CollisionListener& parent);
 
   /** this function is called when the object collided with something solid */
-  void collision_solid(const CollisionHit& hit);
+  void collision_solid(CollisionHit const& hit);
 
   /** when 2 objects collided, we will first call the
       pre_collision_check functions of both objects that can decide on
       how to react to the collision. */
-  bool collides(CollisionObject& other, const CollisionHit& hit) const;
+  bool collides(CollisionObject& other, CollisionHit const& hit) const;
 
   /** this function is called when the object collided with any other object */
-  HitResponse collision(CollisionObject& other, const CollisionHit& hit);
+  HitResponse collision(CollisionObject& other, CollisionHit const& hit);
 
   /** called when tiles with special attributes have been touched */
   void collision_tile(uint32_t tile_attributes);
@@ -56,7 +56,7 @@ public:
 
   void notify_object_removal(CollisionObject* other);
 
-  void set_ground_movement_manager(const std::shared_ptr<CollisionGroundMovementManager>& movement_manager)
+  void set_ground_movement_manager(std::shared_ptr<CollisionGroundMovementManager> const& movement_manager)
   {
     m_ground_movement_manager = movement_manager;
   }
@@ -64,19 +64,19 @@ public:
   void clear_bottom_collision_list();
 
   /** returns the bounding box of the Object */
-  const Rectf& get_bbox() const
+  Rectf const& get_bbox() const
   {
     return m_bbox;
   }
 
-  void set_movement(const Vector& movement)
+  void set_movement(Vector const& movement)
   {
     m_movement = movement;
   }
 
-  void propagate_movement(const Vector& movement);
+  void propagate_movement(Vector const& movement);
 
-  const Vector& get_movement() const
+  Vector const& get_movement() const
   {
     return m_movement;
   }
@@ -84,7 +84,7 @@ public:
   /** places the moving object at a specific position. Be careful when
       using this function. There are no collision detection checks
       performed here so bad things could happen. */
-  void set_pos(const Vector& pos)
+  void set_pos(Vector const& pos)
   {
     m_dest.move(pos - get_pos());
     m_bbox.set_pos(pos);
@@ -98,7 +98,7 @@ public:
   /** moves entire object to a specific position, including all
       points those the object has, exactly like the object has
       spawned in that given pos instead.*/
-  void move_to(const Vector& pos)
+  void move_to(Vector const& pos)
   {
     set_pos(pos);
   }
@@ -162,8 +162,8 @@ private:
   std::shared_ptr<CollisionGroundMovementManager> m_ground_movement_manager;
 
 private:
-  CollisionObject(const CollisionObject&) = delete;
-  CollisionObject& operator=(const CollisionObject&) = delete;
+  CollisionObject(CollisionObject const&) = delete;
+  CollisionObject& operator=(CollisionObject const&) = delete;
 };
 
 #endif

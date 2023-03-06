@@ -23,12 +23,12 @@
 class FishSwimming : public BadGuy
 {
 public:
-  FishSwimming(const ReaderMapping& reader);
-  FishSwimming(const ReaderMapping& reader, const std::string& spritename);
+  FishSwimming(ReaderMapping const& reader);
+  FishSwimming(ReaderMapping const& reader, std::string const& spritename);
 
   virtual void initialize() override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   virtual void active_update(float dt_sec) override;
 
   virtual void freeze() override;
@@ -55,8 +55,8 @@ protected:
   float m_radius;
 
 private:
-  FishSwimming(const FishSwimming&) = delete;
-  FishSwimming& operator=(const FishSwimming&) = delete;
+  FishSwimming(FishSwimming const&) = delete;
+  FishSwimming& operator=(FishSwimming const&) = delete;
 };
 
 #endif

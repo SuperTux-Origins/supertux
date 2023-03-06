@@ -25,9 +25,9 @@
 class InvisibleWall final : public MovingObject
 {
 public:
-  InvisibleWall(const ReaderMapping& mapping);
+  InvisibleWall(ReaderMapping const& mapping);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void draw(DrawingContext& context) override;
 
   static std::string class_name() { return "invisible_wall"; }
@@ -47,8 +47,8 @@ private:
   float height;
 
 private:
-  InvisibleWall(const InvisibleWall&) = delete;
-  InvisibleWall& operator=(const InvisibleWall&) = delete;
+  InvisibleWall(InvisibleWall const&) = delete;
+  InvisibleWall& operator=(InvisibleWall const&) = delete;
 };
 
 #endif

@@ -35,8 +35,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  DisplayEffect(const DisplayEffect&) = delete;
-  DisplayEffect& operator=(const DisplayEffect&) = delete;
+  DisplayEffect(DisplayEffect const&) = delete;
+  DisplayEffect& operator=(DisplayEffect const&) = delete;
 #endif
 
 public:

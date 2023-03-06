@@ -35,8 +35,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  Clouds(const Clouds&) = delete;
-  Clouds& operator=(const Clouds&) = delete;
+  Clouds(Clouds const&) = delete;
+  Clouds& operator=(Clouds const&) = delete;
 #endif
 
 public:

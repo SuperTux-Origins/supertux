@@ -28,9 +28,9 @@ public:
 
 public:
   using ObjectFactory::create;
-  std::unique_ptr<GameObject> create(const std::string& name,
-                                     const Vector& pos, const Direction& dir = Direction::AUTO,
-                                     const std::string& data = {}) const;
+  std::unique_ptr<GameObject> create(std::string const& name,
+                                     Vector const& pos, Direction const& dir = Direction::AUTO,
+                                     std::string const& data = {}) const;
 
 private:
   GameObjectFactory();
@@ -38,8 +38,8 @@ private:
   void init_factories();
 
 private:
-  GameObjectFactory(const GameObjectFactory&) = delete;
-  GameObjectFactory& operator=(const GameObjectFactory&) = delete;
+  GameObjectFactory(GameObjectFactory const&) = delete;
+  GameObjectFactory& operator=(GameObjectFactory const&) = delete;
 };
 
 #endif

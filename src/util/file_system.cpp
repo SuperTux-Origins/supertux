@@ -42,7 +42,7 @@ namespace fs = std::filesystem;
 
 namespace FileSystem {
 
-bool exists(const std::string& path)
+bool exists(std::string const& path)
 {
   fs::path location = fs::u8path(path);
   // If we get an error (such as "Permission denied"), then ignore it
@@ -50,13 +50,13 @@ bool exists(const std::string& path)
   return fs::exists(location);
 }
 
-bool is_directory(const std::string& path)
+bool is_directory(std::string const& path)
 {
   fs::path location = fs::u8path(path);
   return fs::is_directory(location);
 }
 
-void mkdir(const std::string& directory)
+void mkdir(std::string const& directory)
 {
   fs::path location = fs::u8path(directory);
   if (!fs::create_directory(location))
@@ -65,12 +65,12 @@ void mkdir(const std::string& directory)
   }
 }
 
-void copy(const std::string& source_path, const std::string& target_path)
+void copy(std::string const& source_path, std::string const& target_path)
 {
   fs::copy_file(source_path, target_path, fs::copy_options::overwrite_existing);
 }
 
-std::string dirname(const std::string& filename)
+std::string dirname(std::string const& filename)
 {
   std::string::size_type p = filename.find_last_of('/');
   if (p == std::string::npos)
@@ -81,7 +81,7 @@ std::string dirname(const std::string& filename)
   return filename.substr(0, p+1);
 }
 
-std::string basename(const std::string& filename)
+std::string basename(std::string const& filename)
 {
   std::string::size_type p = filename.find_last_of('/');
   if (p == std::string::npos)
@@ -92,12 +92,12 @@ std::string basename(const std::string& filename)
   return filename.substr(p+1, filename.size()-p-1);
 }
 
-std::string relpath(const std::string& filename, const std::string& basedir)
+std::string relpath(std::string const& filename, std::string const& basedir)
 {
   return fs::relative(filename, basedir).string();
 }
 
-std::string extension(const std::string& filename)
+std::string extension(std::string const& filename)
 {
   std::string::size_type p = filename.find_last_of('.');
   if (p == std::string::npos)
@@ -106,7 +106,7 @@ std::string extension(const std::string& filename)
   return filename.substr(p);
 }
 
-std::string strip_extension(const std::string& filename)
+std::string strip_extension(std::string const& filename)
 {
   std::string::size_type p = filename.find_last_of('.');
   if (p == std::string::npos)
@@ -115,18 +115,18 @@ std::string strip_extension(const std::string& filename)
   return filename.substr(0, p);
 }
 
-std::string normalize(const std::string& filename)
+std::string normalize(std::string const& filename)
 {
   std::vector<std::string> path_stack;
 
-  const char* p = filename.c_str();
+  char const* p = filename.c_str();
 
   while (true) {
     while (*p == '/' || *p == '\\') {
       p++;
     }
 
-    const char* pstart = p;
+    char const* pstart = p;
     while (*p != '/' && *p != '\\' && *p != 0) {
       ++p;
     }
@@ -165,7 +165,7 @@ std::string normalize(const std::string& filename)
   return result.str();
 }
 
-std::string join(const std::string& lhs, const std::string& rhs)
+std::string join(std::string const& lhs, std::string const& rhs)
 {
   if (lhs.empty())
   {
@@ -193,13 +193,13 @@ std::string join(const std::string& lhs, const std::string& rhs)
   }
 }
 
-bool remove(const std::string& path)
+bool remove(std::string const& path)
 {
   fs::path location = fs::u8path(path);
   return fs::remove(location);
 }
 
-void open_path(const std::string& path)
+void open_path(std::string const& path)
 {
 #ifdef __ANDROID__
   // SDL >= 2.0.14 is strictly required for Android
@@ -227,7 +227,7 @@ void open_path(const std::string& path)
 #endif
 }
 
-void open_url(const std::string& url)
+void open_url(std::string const& url)
 {
 #if SDL_VERSION_ATLEAST(2,0,14)
   SDL_OpenURL(url.c_str());

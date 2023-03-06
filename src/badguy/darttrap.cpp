@@ -29,7 +29,7 @@ namespace {
 const float MUZZLE_Y = 25; /**< [px] muzzle y-offset from top */
 }
 
-DartTrap::DartTrap(const ReaderMapping& reader) :
+DartTrap::DartTrap(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/darttrap/darttrap.sprite", LAYER_TILES-1),
   enabled(true),
   initial_delay(),
@@ -64,7 +64,7 @@ DartTrap::activate()
 }
 
 HitResponse
-DartTrap::collision_player(Player& , const CollisionHit& )
+DartTrap::collision_player(Player& , CollisionHit const& )
 {
   return ABORT_MOVE;
 }

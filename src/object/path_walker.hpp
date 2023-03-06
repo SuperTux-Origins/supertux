@@ -35,7 +35,7 @@ public:
   {
   public:
     Handle() : m_scalar_pos(), m_pixel_offset() {}
-    Vector get_pos(const Sizef& size, const Vector& pos) const;
+    Vector get_pos(Sizef const& size, Vector const& pos) const;
 
   public:
     Vector m_scalar_pos; /**< The scale of the object the handle should be displaced to ((0,0) = top left, (1,1) = bottom right) */
@@ -50,7 +50,7 @@ public:
   void update(float dt_sec);
 
   /** current position of path walker */
-  Vector get_pos(const Sizef& object_size, const Handle& handle) const;
+  Vector get_pos(Sizef const& object_size, Handle const& handle) const;
 
   /** advance until at given node, then stop */
   void goto_node(int node_no);
@@ -93,8 +93,8 @@ private:
   float m_walking_speed;
 
 private:
-  PathWalker(const PathWalker&) = delete;
-  PathWalker& operator=(const PathWalker&) = delete;
+  PathWalker(PathWalker const&) = delete;
+  PathWalker& operator=(PathWalker const&) = delete;
 };
 
 #endif

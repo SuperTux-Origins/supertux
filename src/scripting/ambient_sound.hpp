@@ -35,8 +35,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  AmbientSound(const AmbientSound&) = delete;
-  AmbientSound& operator=(const AmbientSound&) = delete;
+  AmbientSound(AmbientSound const&) = delete;
+  AmbientSound& operator=(AmbientSound const&) = delete;
 #endif
 
 public:

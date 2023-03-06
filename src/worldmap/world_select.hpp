@@ -47,14 +47,14 @@ private:
   };
 
 public:
-  WorldSelect(const std::string& current_world_filename);
+  WorldSelect(std::string const& current_world_filename);
   ~WorldSelect() override;
 
   virtual void setup() override;
   virtual void leave() override;
 
   virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, const Controller& controller) override;
+  virtual void update(float dt_sec, Controller const& controller) override;
 
 private:
   bool m_enabled;
@@ -65,8 +65,8 @@ private:
   SurfacePtr m_bkg;
 
 private:
-  WorldSelect(const WorldSelect&) = delete;
-  WorldSelect& operator=(const WorldSelect&) = delete;
+  WorldSelect(WorldSelect const&) = delete;
+  WorldSelect& operator=(WorldSelect const&) = delete;
 };
 
 } // namespace worldmap

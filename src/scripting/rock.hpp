@@ -35,8 +35,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  Rock(const Rock&) = delete;
-  Rock& operator=(const Rock&) = delete;
+  Rock(Rock const&) = delete;
+  Rock& operator=(Rock const&) = delete;
 #endif
 };
 

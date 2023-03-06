@@ -21,7 +21,7 @@
 
 static const float BORDER_SIZE = 75;
 
-DisplayEffect::DisplayEffect(const std::string& name) :
+DisplayEffect::DisplayEffect(std::string const& name) :
   GameObject(name),
   ExposedObject<DisplayEffect, scripting::DisplayEffect>(this),
   screen_fade(FadeType::NO_FADE),

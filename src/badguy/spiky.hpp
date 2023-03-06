@@ -22,7 +22,7 @@
 class Spiky final : public WalkingBadguy
 {
 public:
-  Spiky(const ReaderMapping& reader);
+  Spiky(ReaderMapping const& reader);
 
   virtual bool is_freezable() const override;
   virtual bool is_flammable() const override;
@@ -32,8 +32,8 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  Spiky(const Spiky&) = delete;
-  Spiky& operator=(const Spiky&) = delete;
+  Spiky(Spiky const&) = delete;
+  Spiky& operator=(Spiky const&) = delete;
 };
 
 #endif

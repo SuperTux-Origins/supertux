@@ -22,7 +22,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
-PneumaticPlatformChild::PneumaticPlatformChild(const ReaderMapping& mapping, bool left, PneumaticPlatform& parent) :
+PneumaticPlatformChild::PneumaticPlatformChild(ReaderMapping const& mapping, bool left, PneumaticPlatform& parent) :
   MovingSprite(mapping, "images/objects/platforms/small.sprite", LAYER_OBJECTS, COLGROUP_STATIC),
   m_parent(parent),
   m_left(left),
@@ -47,7 +47,7 @@ PneumaticPlatformChild::update(float dt_sec)
 }
 
 HitResponse
-PneumaticPlatformChild::collision(GameObject& other, const CollisionHit& )
+PneumaticPlatformChild::collision(GameObject& other, CollisionHit const& )
 {
   // somehow the hit parameter does not get filled in, so to determine (hit.top == true) we do this:
   auto mo = dynamic_cast<MovingObject*>(&other);
@@ -73,7 +73,7 @@ PneumaticPlatformChild::on_flip(float height)
   FlipLevelTransformer::transform_flip(m_flip);
 }
 
-PneumaticPlatform::PneumaticPlatform(const ReaderMapping& mapping) :
+PneumaticPlatform::PneumaticPlatform(ReaderMapping const& mapping) :
   GameObject(mapping),
   m_pos(0.0f, 0.0f),
   m_sprite_name(),
@@ -105,7 +105,7 @@ void
 PneumaticPlatform::update(float dt_sec)
 {
   const int contact_diff = static_cast<int>(m_children[0]->m_contacts.size()) - static_cast<int>(m_children[1]->m_contacts.size());
-  for (const auto& child : m_children) {
+  for (auto const& child : m_children) {
     child->m_contacts.clear();
   }
 

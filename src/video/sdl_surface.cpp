@@ -74,7 +74,7 @@ SDLSurface::create_rgb(int width, int height)
 }
 
 SDLSurfacePtr
-SDLSurface::from_file(const std::string& filename)
+SDLSurface::from_file(std::string const& filename)
 {
   log_debug << "loading image: " << filename << std::endl;
   SDLSurfacePtr surface(IMG_Load_RW(get_physfs_SDLRWops(filename), 1));
@@ -91,7 +91,7 @@ SDLSurface::from_file(const std::string& filename)
 }
 
 int
-SDLSurface::save_png(const SDL_Surface& surface, const std::string& filename)
+SDLSurface::save_png(SDL_Surface const& surface, std::string const& filename)
 {
   // This does not lead to a double free when 'tmp == screen', as
   // SDL_PNGFormatAlpha() will increase the refcount of surface.

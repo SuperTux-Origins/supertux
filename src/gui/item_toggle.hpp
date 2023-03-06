@@ -24,21 +24,21 @@
 class ItemToggle final : public MenuItem
 {
 public:
-  ItemToggle(const std::string& text, bool* toggled, int id = -1, bool center_text = false);
-  ItemToggle(const std::string& text,
+  ItemToggle(std::string const& text, bool* toggled, int id = -1, bool center_text = false);
+  ItemToggle(std::string const& text,
              std::function<bool()> get_func,
              std::function<void(bool)> set_func,
              int id = -1,
              bool center_text = false);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns the minimum width of the menu item. */
   virtual int get_width() const override;
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
 private:
   const bool m_center_text;
@@ -46,8 +46,8 @@ private:
   std::function<void(bool)> m_set_func;
 
 private:
-  ItemToggle(const ItemToggle&) = delete;
-  ItemToggle& operator=(const ItemToggle&) = delete;
+  ItemToggle(ItemToggle const&) = delete;
+  ItemToggle& operator=(ItemToggle const&) = delete;
 };
 
 #endif

@@ -22,12 +22,12 @@
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
 
-Platform::Platform(const ReaderMapping& reader) :
+Platform::Platform(ReaderMapping const& reader) :
   Platform(reader, "images/objects/flying_platform/flying_platform.sprite")
 {
 }
 
-Platform::Platform(const ReaderMapping& reader, const std::string& default_sprite) :
+Platform::Platform(ReaderMapping const& reader, std::string const& default_sprite) :
   MovingSprite(reader, default_sprite, LAYER_OBJECTS, COLGROUP_STATIC),
   ExposedObject<Platform, scripting::Platform>(this),
   PathObject(),
@@ -66,7 +66,7 @@ Platform::finish_construction()
 }
 
 HitResponse
-Platform::collision(GameObject& other, const CollisionHit& )
+Platform::collision(GameObject& other, CollisionHit const& )
 {
   if (dynamic_cast<Player*>(&other)) {
     m_player_contact = true;
@@ -136,13 +136,13 @@ Platform::stop_moving()
 }
 
 void
-Platform::set_action(const std::string& action, int repeat)
+Platform::set_action(std::string const& action, int repeat)
 {
   MovingSprite::set_action(action, repeat);
 }
 
 void
-Platform::move_to(const Vector& pos)
+Platform::move_to(Vector const& pos)
 {
   Vector shift = pos - m_col.m_bbox.p1();
   if (get_path()) {

@@ -30,22 +30,22 @@ public:
     bool is_linear = false);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns the minimum width of the menu item. */
   virtual int get_width() const override;
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
   /** Processes the given event. */
-  virtual void event(const SDL_Event& ev) override;
+  virtual void event(SDL_Event const& ev) override;
 
   virtual Color get_color() const override;
 
   virtual bool changes_width() const override { return true; }
 
-  void change_input(const std::string& input_) { set_text(input_); }
+  void change_input(std::string const& input_) { set_text(input_); }
 
 private:
   void enable_edit_mode();
@@ -61,8 +61,8 @@ private:
   Color m_channel;
 
 private:
-  ItemColorChannelRGBA(const ItemColorChannelRGBA&) = delete;
-  ItemColorChannelRGBA& operator=(const ItemColorChannelRGBA&) = delete;
+  ItemColorChannelRGBA(ItemColorChannelRGBA const&) = delete;
+  ItemColorChannelRGBA& operator=(ItemColorChannelRGBA const&) = delete;
 };
 
 
@@ -73,12 +73,12 @@ public:
 
 public:
   ItemColorChannelOKLab(Color* col, int channel, Menu* menu);
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width,
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width,
     bool active) override;
   /** Returns the minimum width of the menu item. */
   virtual int get_width() const override { return 64; }
-  virtual void process_action(const MenuAction& action) override;
-  virtual void event(const SDL_Event& ev) override;
+  virtual void process_action(MenuAction const& action) override;
+  virtual void event(SDL_Event const& ev) override;
   virtual bool changes_width() const override { return true; }
 
 private:
@@ -92,8 +92,8 @@ private:
   bool m_mousedown;
 
 private:
-  ItemColorChannelOKLab(const ItemColorChannelOKLab&) = delete;
-  ItemColorChannelOKLab& operator=(const ItemColorChannelOKLab&) = delete;
+  ItemColorChannelOKLab(ItemColorChannelOKLab const&) = delete;
+  ItemColorChannelOKLab& operator=(ItemColorChannelOKLab const&) = delete;
 };
 
 #endif

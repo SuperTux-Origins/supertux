@@ -46,7 +46,7 @@ namespace {
 #ifdef __clang__
 __attribute__((__format__ (__printf__, 2, 0)))
 #endif
-void printfunc(HSQUIRRELVM, const char* fmt, ...)
+void printfunc(HSQUIRRELVM, char const* fmt, ...)
 {
   char buf[4096];
   char separator[] = "\n";

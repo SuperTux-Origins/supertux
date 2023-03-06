@@ -23,20 +23,20 @@
 class ItemTextField : public MenuItem
 {
 public:
-  ItemTextField(const std::string& text_, std::string* input_, int id_ = -1);
+  ItemTextField(std::string const& text_, std::string* input_, int id_ = -1);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns the minimum width of the menu item. */
   virtual int get_width() const override;
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
   std::string* input;
 
-  void change_input(const std::string& input_) {
+  void change_input(std::string const& input_) {
     *input = input_;
     m_input_undo.clear();
     m_input_redo.clear();
@@ -46,7 +46,7 @@ public:
   virtual void invalid_remove() {}
 
   /** Processes the given event. */
-  virtual void event(const SDL_Event& ev) override;
+  virtual void event(SDL_Event const& ev) override;
 
   /** Indicates that this item changes its width. */
   virtual bool changes_width() const override {
@@ -61,7 +61,7 @@ public:
 
   // Text manipulation and navigation functions
 
-  virtual void insert_text(const std::string& text, const int left_offset_pos);
+  virtual void insert_text(std::string const& text, const int left_offset_pos);
   virtual void clear();
   virtual void go_left();
   virtual void go_right();
@@ -84,8 +84,8 @@ protected:
   int m_cursor_left_offset;
 
 private:
-  ItemTextField(const ItemTextField&) = delete;
-  ItemTextField& operator=(const ItemTextField&) = delete;
+  ItemTextField(ItemTextField const&) = delete;
+  ItemTextField& operator=(ItemTextField const&) = delete;
 };
 
 #endif

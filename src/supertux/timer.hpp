@@ -50,8 +50,8 @@ private:
   bool m_cyclic;
 
 private:
-  Timer(const Timer&) = delete;
-  Timer& operator=(const Timer&) = delete;
+  Timer(Timer const&) = delete;
+  Timer& operator=(Timer const&) = delete;
 };
 
 #endif

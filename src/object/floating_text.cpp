@@ -21,7 +21,7 @@
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"
 
-FloatingText::FloatingText(const Vector& pos, const std::string& text_) :
+FloatingText::FloatingText(Vector const& pos, std::string const& text_) :
   position(pos),
   text(text_),
   timer()
@@ -30,7 +30,7 @@ FloatingText::FloatingText(const Vector& pos, const std::string& text_) :
   position.x -= static_cast<float>(text.size()) * 8.0f;
 }
 
-FloatingText::FloatingText(const Vector& pos, int score) :
+FloatingText::FloatingText(Vector const& pos, int score) :
   position(pos),
   text(),
   timer()

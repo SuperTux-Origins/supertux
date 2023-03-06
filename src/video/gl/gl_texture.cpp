@@ -67,7 +67,7 @@ GLTexture::GLTexture(int width, int height, std::optional<Color> fill_color) :
   assert_gl();
 }
 
-GLTexture::GLTexture(const SDL_Surface& image, const Sampler& sampler) :
+GLTexture::GLTexture(SDL_Surface const& image, Sampler const& sampler) :
   m_handle(),
   m_sampler(sampler),
   m_texture_width(),

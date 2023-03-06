@@ -86,7 +86,7 @@ GLProgram::validate()
 }
 
 GLint
-GLProgram::get_attrib_location(const char* name) const
+GLProgram::get_attrib_location(char const* name) const
 {
   assert_gl();
 
@@ -102,7 +102,7 @@ GLProgram::get_attrib_location(const char* name) const
 }
 
 GLint
-GLProgram::get_uniform_location(const char* name) const
+GLProgram::get_uniform_location(char const* name) const
 {
   assert_gl();
 

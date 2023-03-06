@@ -30,7 +30,7 @@ class Painter;
 class TTFFont final : public Font
 {
 public:
-  TTFFont(const std::string& filename, int size, float line_spacing = 1.0f, int shadowsize = 0, int border = 0);
+  TTFFont(std::string const& filename, int size, float line_spacing = 1.0f, int shadowsize = 0, int border = 0);
   ~TTFFont() override;
 
   float get_line_spacing() {
@@ -41,13 +41,13 @@ public:
     return static_cast<float>(m_font_size) * m_line_spacing;
   }
 
-  virtual float get_text_width(const std::string& text) const override;
-  virtual float get_text_height(const std::string& text) const override;
+  virtual float get_text_width(std::string const& text) const override;
+  virtual float get_text_height(std::string const& text) const override;
 
-  virtual std::string wrap_to_width(const std::string& text, float width, std::string* overflow) override;
+  virtual std::string wrap_to_width(std::string const& text, float width, std::string* overflow) override;
 
-  virtual void draw_text(Canvas& canvas, const std::string& text,
-                         const Vector& pos, FontAlignment alignment, int layer, const Color& color) override;
+  virtual void draw_text(Canvas& canvas, std::string const& text,
+                         Vector const& pos, FontAlignment alignment, int layer, Color const& color) override;
 
   int get_shadow_size() const { return m_shadow_size; }
   int get_border() const { return m_border; }
@@ -63,8 +63,8 @@ private:
   int m_border;
 
 private:
-  TTFFont(const TTFFont&) = delete;
-  TTFFont& operator=(const TTFFont&) = delete;
+  TTFFont(TTFFont const&) = delete;
+  TTFFont& operator=(TTFFont const&) = delete;
 };
 
 #endif

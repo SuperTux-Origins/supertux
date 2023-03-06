@@ -25,7 +25,7 @@
 #include "supertux/sector.hpp"
 #include "supertux/tile.hpp"
 
-SkyDive::SkyDive(const ReaderMapping& reader) :
+SkyDive::SkyDive(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/skydive/skydive.sprite")
 {
   SoundManager::current()->preload("sounds/explosion.wav");
@@ -33,7 +33,7 @@ SkyDive::SkyDive(const ReaderMapping& reader) :
 }
 
 void
-SkyDive::collision_solid(const CollisionHit& hit)
+SkyDive::collision_solid(CollisionHit const& hit)
 {
   if (m_frozen)
   {
@@ -52,7 +52,7 @@ SkyDive::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-SkyDive::collision_badguy(BadGuy&, const CollisionHit& hit)
+SkyDive::collision_badguy(BadGuy&, CollisionHit const& hit)
 {
   if (hit.bottom) {
     explode();
@@ -63,7 +63,7 @@ SkyDive::collision_badguy(BadGuy&, const CollisionHit& hit)
 }
 
 void
-SkyDive::grab(MovingObject& object, const Vector& pos, Direction dir_)
+SkyDive::grab(MovingObject& object, Vector const& pos, Direction dir_)
 {
   Vector movement = pos - get_pos();
   m_col.set_movement(movement);
@@ -130,7 +130,7 @@ SkyDive::is_freezable() const
 }
 
 HitResponse
-SkyDive::collision_player(Player&, const CollisionHit& hit)
+SkyDive::collision_player(Player&, CollisionHit const& hit)
 {
   if (hit.bottom) {
     explode();

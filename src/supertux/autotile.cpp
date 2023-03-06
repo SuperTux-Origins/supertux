@@ -87,7 +87,7 @@ Autotile::pick_tile(int x, int y) const
     ) % 256
   ) / 256.0f;
 
-  for (const auto& pair : m_alt_tiles)
+  for (auto const& pair : m_alt_tiles)
   {
     rnd_val -= pair.second;
     if (rnd_val <= 0)
@@ -105,7 +105,7 @@ Autotile::is_amongst(uint32_t tile) const
   if (tile == m_tile_id)
     return true;
 
-  for (const auto& pair : m_alt_tiles)
+  for (auto const& pair : m_alt_tiles)
     if (pair.first == tile)
       return true;
 
@@ -240,7 +240,7 @@ AutotileSet::is_member(uint32_t tile_id) const
     }
     else
     {
-      for (const auto& pair : tile->get_all_tile_ids())
+      for (auto const& pair : tile->get_all_tile_ids())
       {
         if (pair.first == tile_id)
         {
@@ -268,7 +268,7 @@ AutotileSet::is_solid(uint32_t tile_id) const
     }
     else
     {
-      for (const auto& pair : tile->get_all_tile_ids())
+      for (auto const& pair : tile->get_all_tile_ids())
       {
         if (pair.first == tile_id)
         {

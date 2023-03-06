@@ -44,8 +44,8 @@ private:
   std::unique_ptr<NullPainter> m_painter;
 
 private:
-  NullRenderer(const NullRenderer&) = delete;
-  NullRenderer& operator=(const NullRenderer&) = delete;
+  NullRenderer(NullRenderer const&) = delete;
+  NullRenderer& operator=(NullRenderer const&) = delete;
 };
 
 #endif

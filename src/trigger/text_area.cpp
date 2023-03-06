@@ -25,7 +25,7 @@
 #include "video/drawing_context.hpp"
 #include "video/layer.hpp"
 
-TextArea::TextArea(const ReaderMapping& mapping) :
+TextArea::TextArea(ReaderMapping const& mapping) :
   TriggerBase(mapping),
   m_once(false),
   m_items(),
@@ -58,7 +58,7 @@ TextArea::TextArea(const ReaderMapping& mapping) :
   m_col.m_bbox.set_size(w, h);
 }
 
-TextArea::TextArea(const Vector& pos) :
+TextArea::TextArea(Vector const& pos) :
   m_once(false),
   m_items(),
   m_delay(4.0f),

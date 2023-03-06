@@ -20,7 +20,7 @@
 #include <sstream>
 #include <stdexcept>
 
-OFileStreambuf::OFileStreambuf(const std::string& filename) :
+OFileStreambuf::OFileStreambuf(std::string const& filename) :
   file()
 {
   file = PHYSFS_openWrite(filename.c_str());

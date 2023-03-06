@@ -26,7 +26,7 @@
 #include "util/reader_mapping.hpp"
 
 
-RubLight::RubLight(const ReaderMapping& mapping) :
+RubLight::RubLight(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/rublight/rublight.sprite", LAYER_TILES,
     COLGROUP_STATIC),
   state(STATE_DARK),
@@ -47,7 +47,7 @@ RubLight::RubLight(const ReaderMapping& mapping) :
 }
 
 HitResponse
-RubLight::collision(GameObject& other, const CollisionHit&)
+RubLight::collision(GameObject& other, CollisionHit const&)
 {
   Player* player = dynamic_cast<Player*>(&other);
   if (player != nullptr &&

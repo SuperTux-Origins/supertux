@@ -34,10 +34,10 @@ public:
     height(height_)
   {}
 
-  Size(const Size& rhs) = default;
-  Size& operator=(const Size& rhs) = default;
+  Size(Size const& rhs) = default;
+  Size& operator=(Size const& rhs) = default;
 
-  explicit Size(const Sizef& rhs);
+  explicit Size(Sizef const& rhs);
 
   Size& operator*=(int factor)
   {
@@ -53,14 +53,14 @@ public:
     return *this;
   }
 
-  Size& operator+=(const Size& rhs)
+  Size& operator+=(Size const& rhs)
   {
     width  += rhs.width;
     height += rhs.height;
     return *this;
   }
 
-  Size& operator-=(const Size& rhs)
+  Size& operator-=(Size const& rhs)
   {
     width  -= rhs.width;
     height -= rhs.height;
@@ -77,47 +77,47 @@ public:
   int height;
 };
 
-inline Size operator*(const Size& lhs, int factor)
+inline Size operator*(Size const& lhs, int factor)
 {
   return Size(lhs.width  * factor,
               lhs.height * factor);
 }
 
-inline Size operator*(int factor, const Size& rhs)
+inline Size operator*(int factor, Size const& rhs)
 {
   return Size(rhs.width  * factor,
               rhs.height * factor);
 }
 
-inline Size operator/(const Size& lhs, int divisor)
+inline Size operator/(Size const& lhs, int divisor)
 {
   return Size(lhs.width  / divisor,
               lhs.height / divisor);
 }
 
-inline Size operator+(const Size& lhs, const Size& rhs)
+inline Size operator+(Size const& lhs, Size const& rhs)
 {
   return Size(lhs.width  + rhs.width,
               lhs.height + rhs.height);
 }
 
-inline Size operator-(const Size& lhs, const Size& rhs)
+inline Size operator-(Size const& lhs, Size const& rhs)
 {
   return Size(lhs.width  - rhs.width,
               lhs.height - rhs.height);
 }
 
-inline bool operator==(const Size& lhs, const Size& rhs)
+inline bool operator==(Size const& lhs, Size const& rhs)
 {
   return (lhs.width == rhs.width) && (lhs.height == rhs.height);
 }
 
-inline bool operator!=(const Size& lhs, const Size& rhs)
+inline bool operator!=(Size const& lhs, Size const& rhs)
 {
   return (lhs.width != rhs.width) || (lhs.height != rhs.height);
 }
 
-std::ostream& operator<<(std::ostream& s, const Size& size);
+std::ostream& operator<<(std::ostream& s, Size const& size);
 
 #endif
 

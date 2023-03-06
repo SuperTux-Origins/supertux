@@ -52,21 +52,21 @@ public:
   Dialog(bool passive = false, bool auto_clear_dialogs = true);
   virtual ~Dialog();
 
-  void set_text(const std::string& text);
+  void set_text(std::string const& text);
 
-  void add_button(const std::string& text, const std::function<void ()>& callback = {});
+  void add_button(std::string const& text, const std::function<void ()>& callback = {});
 
   /** The default gets focused when the dialog is first shown */
-  void add_default_button(const std::string& text, const std::function<void ()>& callback = {});
+  void add_default_button(std::string const& text, const std::function<void ()>& callback = {});
 
   /** The cancel button can not only be activated by selecting it, but
       via the MENU_BACK button */
-  void add_cancel_button(const std::string& text, const std::function<void ()>& callback = {});
+  void add_cancel_button(std::string const& text, const std::function<void ()>& callback = {});
 
   void clear_buttons();
 
-  void event(const SDL_Event& event);
-  void process_input(const Controller& controller);
+  void event(SDL_Event const& event);
+  void process_input(Controller const& controller);
   void draw(DrawingContext& context);
   virtual void update() {}
   bool is_passive() const
@@ -79,7 +79,7 @@ public:
   float get_width() const { return m_size.width; }
   float get_height() const { return m_size.height; }
 
-  static void show_message(const std::string& text, bool passive = false, bool no_auto_clear = false, const std::function<void ()>& ok_callback = {})
+  static void show_message(std::string const& text, bool passive = false, bool no_auto_clear = false, const std::function<void ()>& ok_callback = {})
   {
     auto dialog = std::make_unique<Dialog>(passive, !no_auto_clear);
     dialog->set_text(text);
@@ -88,7 +88,7 @@ public:
     MenuManager::instance().set_dialog(std::move(dialog));
   }
 
-  static void show_confirmation(const std::string& text, const std::function<void ()>& callback, bool no_auto_clear = false)
+  static void show_confirmation(std::string const& text, const std::function<void ()>& callback, bool no_auto_clear = false)
   {
     auto dialog = std::make_unique<Dialog>(false, !no_auto_clear);
     dialog->set_text(text);
@@ -100,11 +100,11 @@ public:
 
 private:
   void on_button_click(int button) const;
-  int get_button_at(const Vector& pos) const;
+  int get_button_at(Vector const& pos) const;
 
 private:
-  Dialog(const Dialog&) = delete;
-  Dialog& operator=(const Dialog&) = delete;
+  Dialog(Dialog const&) = delete;
+  Dialog& operator=(Dialog const&) = delete;
 };
 
 #endif

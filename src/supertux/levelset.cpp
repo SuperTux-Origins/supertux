@@ -25,7 +25,7 @@
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 
-Levelset::Levelset(const std::string& basedir, bool recursively) :
+Levelset::Levelset(std::string const& basedir, bool recursively) :
   m_basedir(basedir),
   m_levels()
 {
@@ -46,7 +46,7 @@ Levelset::get_level_filename(int i) const
 }
 
 void
-Levelset::walk_directory(const std::string& directory, bool recursively)
+Levelset::walk_directory(std::string const& directory, bool recursively)
 {
   bool is_basedir = (directory == m_basedir);
   char** files = PHYSFS_enumerateFiles(directory.c_str());
@@ -56,7 +56,7 @@ Levelset::walk_directory(const std::string& directory, bool recursively)
     return;
   }
 
-  for (const char* const* filename = files; *filename != nullptr; ++filename)
+  for (char const* const* filename = files; *filename != nullptr; ++filename)
   {
     auto filepath = FileSystem::join(directory.c_str(), *filename);
     if (physfsutil::is_directory(filepath) && recursively)

@@ -34,7 +34,7 @@ struct DrawingRequest;
 class GLTextureRenderer final : public GLRenderer
 {
 public:
-  GLTextureRenderer(GLVideoSystem& video_system, const Size& size, int downscale);
+  GLTextureRenderer(GLVideoSystem& video_system, Size const& size, int downscale);
   ~GLTextureRenderer() override;
 
   virtual void start_draw() override;
@@ -58,8 +58,8 @@ private:
   bool m_rendering;
 
 private:
-  GLTextureRenderer(const GLTextureRenderer&) = delete;
-  GLTextureRenderer& operator=(const GLTextureRenderer&) = delete;
+  GLTextureRenderer(GLTextureRenderer const&) = delete;
+  GLTextureRenderer& operator=(GLTextureRenderer const&) = delete;
 };
 
 #endif

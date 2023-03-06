@@ -27,31 +27,31 @@ class Value;
 class Writer final
 {
 public:
-  Writer(const std::string& filename);
+  Writer(std::string const& filename);
   Writer(std::ostream& out);
   ~Writer();
 
-  void write_comment(const std::string& comment);
+  void write_comment(std::string const& comment);
 
-  void start_list(const std::string& listname, bool string = false);
+  void start_list(std::string const& listname, bool string = false);
 
-  void write(const std::string& name, bool value);
-  void write(const std::string& name, int value);
-  void write(const std::string& name, float value);
-  void write(const std::string& name, const char* value);
-  void write(const std::string& name, const std::string& value, bool translatable = false);
-  void write(const std::string& name, const std::vector<int>& value);
-  void write(const std::string& name, const std::vector<unsigned int>& value, int width = 0);
-  void write(const std::string& name, const std::vector<float>& value);
-  void write(const std::string& name, const std::vector<std::string>& value);
-  void write(const std::string& name, const sexp::Value& value);
+  void write(std::string const& name, bool value);
+  void write(std::string const& name, int value);
+  void write(std::string const& name, float value);
+  void write(std::string const& name, char const* value);
+  void write(std::string const& name, std::string const& value, bool translatable = false);
+  void write(std::string const& name, std::vector<int> const& value);
+  void write(std::string const& name, const std::vector<unsigned int>& value, int width = 0);
+  void write(std::string const& name, std::vector<float> const& value);
+  void write(std::string const& name, std::vector<std::string> const& value);
+  void write(std::string const& name, sexp::Value const& value);
   // add more write-functions when needed...
 
-  void end_list(const std::string& listname);
+  void end_list(std::string const& listname);
 
 private:
-  void write_escaped_string(const std::string& str);
-  void write_sexp(const sexp::Value& value, bool fudge);
+  void write_escaped_string(std::string const& str);
+  void write_sexp(sexp::Value const& value, bool fudge);
   void indent();
 
 private:
@@ -62,8 +62,8 @@ private:
   std::vector<std::string> lists;
 
 private:
-  Writer(const Writer&) = delete;
-  Writer & operator=(const Writer&) = delete;
+  Writer(Writer const&) = delete;
+  Writer & operator=(Writer const&) = delete;
 };
 
 #endif

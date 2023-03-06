@@ -201,17 +201,17 @@ void exit_screen()
   ScreenManager::current()->pop_screen();
 }
 
-std::string translate(const std::string& text)
+std::string translate(std::string const& text)
 {
   return text;
 }
 
-std::string _(const std::string& text)
+std::string _(std::string const& text)
 {
   return translate(text);
 }
 
-std::string translate_plural(const std::string& text, const std::string& text_plural, int num)
+std::string translate_plural(std::string const& text, std::string const& text_plural, int num)
 {
   if (num == 1) {
     return text;
@@ -220,17 +220,17 @@ std::string translate_plural(const std::string& text, const std::string& text_pl
   }
 }
 
-std::string __(const std::string& text, const std::string& text_plural, int num)
+std::string __(std::string const& text, std::string const& text_plural, int num)
 {
   return translate_plural(text, text_plural, num);
 }
 
-void display_text_file(const std::string& filename)
+void display_text_file(std::string const& filename)
 {
   ScreenManager::current()->push_screen(std::make_unique<TextScrollerScreen>(filename));
 }
 
-void load_worldmap(const std::string& filename)
+void load_worldmap(std::string const& filename)
 {
   using namespace worldmap;
 
@@ -245,12 +245,12 @@ void load_worldmap(const std::string& filename)
   }
 }
 
-void set_next_worldmap(const std::string& dirname, const std::string& spawnpoint)
+void set_next_worldmap(std::string const& dirname, std::string const& spawnpoint)
 {
   GameManager::current()->set_next_worldmap(dirname, spawnpoint);
 }
 
-void load_level(const std::string& filename)
+void load_level(std::string const& filename)
 {
   if (!GameSession::current())
   {
@@ -262,7 +262,7 @@ void load_level(const std::string& filename)
   }
 }
 
-void import(HSQUIRRELVM vm, const std::string& filename)
+void import(HSQUIRRELVM vm, std::string const& filename)
 {
   IFileStream in(filename);
   compile_and_run(vm, in, filename);
@@ -327,7 +327,7 @@ void load_state()
   }
 }
 
-void play_music(const std::string& filename)
+void play_music(std::string const& filename)
 {
   SoundManager::current()->play_music(filename);
 }
@@ -337,7 +337,7 @@ void stop_music(float fadetime)
   SoundManager::current()->stop_music(fadetime);
 }
 
-void fade_in_music(const std::string& filename, float fadetime)
+void fade_in_music(std::string const& filename, float fadetime)
 {
   SoundManager::current()->play_music(filename, fadetime);
 }
@@ -352,7 +352,7 @@ void pause_music(float fadetime)
   SoundManager::current()->pause_music(fadetime);
 }
 
-void play_sound(const std::string& filename)
+void play_sound(std::string const& filename)
 {
   SoundManager::current()->play(filename);
 }
@@ -434,7 +434,7 @@ void warp(float offset_x, float offset_y)
 void camera()
 {
   if (!validate_sector_player()) return;
-  const auto& cam_pos = ::Sector::get().get_camera().get_translation();
+  auto const& cam_pos = ::Sector::get().get_camera().get_translation();
   log_info << "Camera is at " << cam_pos.x << "," << cam_pos.y << std::endl;
 }
 

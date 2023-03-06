@@ -19,7 +19,7 @@
 #include "math/rectf.hpp"
 #include "video/surface.hpp"
 
-SurfaceBatch::SurfaceBatch(const SurfacePtr& surface, const Color& color) :
+SurfaceBatch::SurfaceBatch(SurfacePtr const& surface, Color const& color) :
   m_surface(surface),
   m_color(color),
   m_srcrects(),
@@ -29,7 +29,7 @@ SurfaceBatch::SurfaceBatch(const SurfacePtr& surface, const Color& color) :
 }
 
 void
-SurfaceBatch::draw(const Vector& pos, float angle)
+SurfaceBatch::draw(Vector const& pos, float angle)
 {
   m_srcrects.emplace_back(Rectf(0, 0,
                                 static_cast<float>(m_surface->get_width()),
@@ -41,7 +41,7 @@ SurfaceBatch::draw(const Vector& pos, float angle)
 }
 
 void
-SurfaceBatch::draw(const Rectf& dstrect, float angle)
+SurfaceBatch::draw(Rectf const& dstrect, float angle)
 {
   m_srcrects.emplace_back(Rectf(0, 0,
                                 static_cast<float>(m_surface->get_width()),
@@ -51,7 +51,7 @@ SurfaceBatch::draw(const Rectf& dstrect, float angle)
 }
 
 void
-SurfaceBatch::draw(const Rectf& srcrect, const Rectf& dstrect, float angle)
+SurfaceBatch::draw(Rectf const& srcrect, Rectf const& dstrect, float angle)
 {
   m_srcrects.emplace_back(srcrect);
   m_dstrects.emplace_back(dstrect);

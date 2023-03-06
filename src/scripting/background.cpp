@@ -23,7 +23,7 @@
 namespace scripting {
 
 void
-Background::set_image(const std::string& image)
+Background::set_image(std::string const& image)
 {
   SCRIPT_GUARD_VOID;
 
@@ -33,7 +33,7 @@ Background::set_image(const std::string& image)
     return;
   }
 
-  const std::string& default_dir = "images/background/";
+  std::string const& default_dir = "images/background/";
   bool path_valid = true;
 
   if (!PHYSFS_exists(image.c_str()))
@@ -43,8 +43,8 @@ Background::set_image(const std::string& image)
 }
 
 void
-Background::set_images(const std::string& top_image, const std::string& middle_image,
-                       const std::string& bottom_image)
+Background::set_images(std::string const& top_image, std::string const& middle_image,
+                       std::string const& bottom_image)
 {
   SCRIPT_GUARD_VOID;
 
@@ -54,7 +54,7 @@ Background::set_images(const std::string& top_image, const std::string& middle_i
     return;
   }
 
-  const std::string& default_dir = "images/background/";
+  std::string const& default_dir = "images/background/";
   bool top_image_valid = true, middle_image_valid = true, bottom_image_valid = true;
 
   if (!PHYSFS_exists(top_image.c_str()))

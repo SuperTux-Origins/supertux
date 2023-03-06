@@ -26,8 +26,8 @@
 class GLShader final
 {
 public:
-  static std::unique_ptr<GLShader> from_file(GLenum type, const std::string& filename);
-  static std::unique_ptr<GLShader> from_source(GLenum type, const std::vector<std::string>& sources);
+  static std::unique_ptr<GLShader> from_file(GLenum type, std::string const& filename);
+  static std::unique_ptr<GLShader> from_source(GLenum type, std::vector<std::string> const& sources);
 
 public:
   GLShader(GLenum type);
@@ -47,8 +47,8 @@ private:
   GLuint m_shader;
 
 private:
-  GLShader(const GLShader&) = delete;
-  GLShader& operator=(const GLShader&) = delete;
+  GLShader(GLShader const&) = delete;
+  GLShader& operator=(GLShader const&) = delete;
 };
 
 #endif

@@ -23,13 +23,13 @@
 class Trampoline final : public Rock
 {
 public:
-  Trampoline(const ReaderMapping& reader);
-  Trampoline(const Vector& pos, bool port);
+  Trampoline(ReaderMapping const& reader);
+  Trampoline(Vector const& pos, bool port);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
 
-  virtual void grab(MovingObject&, const Vector& pos, Direction) override;
+  virtual void grab(MovingObject&, Vector const& pos, Direction) override;
   virtual bool is_portable() const override;
   static std::string class_name() { return "trampoline"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -40,8 +40,8 @@ private:
   bool portable;
 
 private:
-  Trampoline(const Trampoline&) = delete;
-  Trampoline& operator=(const Trampoline&) = delete;
+  Trampoline(Trampoline const&) = delete;
+  Trampoline& operator=(Trampoline const&) = delete;
 
 };
 

@@ -22,7 +22,7 @@
 static const float PLANT_SPEED = 80;
 static const float WAKE_TIME = .5;
 
-Plant::Plant(const ReaderMapping& reader) :
+Plant::Plant(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/plant/plant.sprite"),
   timer(),
   state(PLANT_SLEEPING)
@@ -41,7 +41,7 @@ Plant::initialize()
 }
 
 void
-Plant::collision_solid(const CollisionHit& hit)
+Plant::collision_solid(CollisionHit const& hit)
 {
   if (hit.top || hit.bottom) {
     m_physic.set_velocity_y(0);
@@ -53,7 +53,7 @@ Plant::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Plant::collision_badguy(BadGuy& , const CollisionHit& hit)
+Plant::collision_badguy(BadGuy& , CollisionHit const& hit)
 {
   if (state != PLANT_WALKING) return CONTINUE;
 

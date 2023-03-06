@@ -22,14 +22,14 @@
 class FileSystemMenu final : public Menu
 {
 public:
-  FileSystemMenu(std::string* filename, const std::vector<std::string>& extensions, const std::string& basedir, bool path_relative_to_basedir, const std::function<void(std::string)> callback = nullptr);
+  FileSystemMenu(std::string* filename, std::vector<std::string> const& extensions, std::string const& basedir, bool path_relative_to_basedir, const std::function<void(std::string)> callback = nullptr);
   ~FileSystemMenu() override;
 
   void menu_action(MenuItem& item) override;
 
 private:
   void refresh_items();
-  bool has_right_suffix(const std::string& file) const;
+  bool has_right_suffix(std::string const& file) const;
 
 private:
   std::string* m_filename;
@@ -42,8 +42,8 @@ private:
   std::function<void(std::string)> m_callback;
 
 private:
-  FileSystemMenu(const FileSystemMenu&) = delete;
-  FileSystemMenu& operator=(const FileSystemMenu&) = delete;
+  FileSystemMenu(FileSystemMenu const&) = delete;
+  FileSystemMenu& operator=(FileSystemMenu const&) = delete;
 };
 
 #endif

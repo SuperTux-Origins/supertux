@@ -24,7 +24,7 @@ static const float FADE_TIME = .2f;
 /** this is the total life time of a bouncy coin */
 static const float LIFE_TIME = .5f;
 
-BouncyCoin::BouncyCoin(const Vector& pos, bool emerge, const std::string& sprite_path) :
+BouncyCoin::BouncyCoin(Vector const& pos, bool emerge, std::string const& sprite_path) :
   sprite(SpriteManager::current()->create(sprite_path)),
   position(pos),
   timer(),

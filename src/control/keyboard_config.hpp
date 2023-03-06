@@ -35,7 +35,7 @@ public:
   class PlayerControl final
   {
   public:
-    inline bool operator==(const PlayerControl& other) const
+    inline bool operator==(PlayerControl const& other) const
     {
       return player == other.player && control == other.control;
     }
@@ -51,7 +51,7 @@ public:
   SDL_Keycode reversemap_key(int player, Control c) const;
   void bind_key(SDL_Keycode key, int player, Control c);
 
-  void read(const ReaderMapping& keymap_mapping);
+  void read(ReaderMapping const& keymap_mapping);
   void write(Writer& writer);
 
 private:
@@ -60,8 +60,8 @@ private:
   bool m_jump_with_up_kbd;
 
 private:
-  KeyboardConfig(const KeyboardConfig&) = delete;
-  KeyboardConfig& operator=(const KeyboardConfig&) = delete;
+  KeyboardConfig(KeyboardConfig const&) = delete;
+  KeyboardConfig& operator=(KeyboardConfig const&) = delete;
 };
 
 #endif

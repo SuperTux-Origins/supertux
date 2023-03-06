@@ -40,8 +40,8 @@ private:
   static Color text_color;
 
 public:
-  Climbable(const ReaderMapping& reader);
-  Climbable(const Rectf& area);
+  Climbable(ReaderMapping const& reader);
+  Climbable(Rectf const& area);
   ~Climbable() override;
 
   static std::string class_name() { return "climbable"; }
@@ -65,8 +65,8 @@ protected:
 private:
   Vector new_size;
 
-  Climbable(const Climbable&) = delete;
-  Climbable& operator=(const Climbable&) = delete;
+  Climbable(Climbable const&) = delete;
+  Climbable& operator=(Climbable const&) = delete;
 };
 
 #endif

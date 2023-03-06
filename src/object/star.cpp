@@ -27,7 +27,7 @@ static const float INITIALJUMP = -400;
 static const float STAR_SPEED = 150;
 static const float JUMPSTAR_SPEED = -300;
 
-Star::Star(const Vector& pos, Direction direction) :
+Star::Star(Vector const& pos, Direction direction) :
   MovingSprite(pos, "images/powerups/star/star.sprite", LAYER_OBJECTS, COLGROUP_MOVING),
   physic(),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite"))
@@ -75,7 +75,7 @@ Star::draw(DrawingContext& context)
 }
 
 void
-Star::collision_solid(const CollisionHit& hit)
+Star::collision_solid(CollisionHit const& hit)
 {
   if (hit.bottom) {
     physic.set_velocity_y(JUMPSTAR_SPEED);
@@ -87,7 +87,7 @@ Star::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Star::collision(GameObject& other, const CollisionHit& )
+Star::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player) {

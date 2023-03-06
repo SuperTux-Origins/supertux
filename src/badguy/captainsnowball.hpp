@@ -22,10 +22,10 @@
 class CaptainSnowball final : public WalkingBadguy
 {
 public:
-  CaptainSnowball(const ReaderMapping& reader);
+  CaptainSnowball(ReaderMapping const& reader);
 
   virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
 
   static std::string class_name() { return "captainsnowball"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -38,8 +38,8 @@ protected:
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  CaptainSnowball(const CaptainSnowball&) = delete;
-  CaptainSnowball& operator=(const CaptainSnowball&) = delete;
+  CaptainSnowball(CaptainSnowball const&) = delete;
+  CaptainSnowball& operator=(CaptainSnowball const&) = delete;
 };
 
 #endif

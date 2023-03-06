@@ -51,7 +51,7 @@ WorldMapScreen::draw(Compositor& compositor)
 }
 
 void
-WorldMapScreen::update(float dt_sec, const Controller& controller)
+WorldMapScreen::update(float dt_sec, Controller const& controller)
 {
   m_worldmap->process_input(controller);
   m_worldmap->update(dt_sec);

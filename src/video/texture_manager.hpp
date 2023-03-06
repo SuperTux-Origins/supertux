@@ -46,26 +46,26 @@ public:
   TextureManager();
   ~TextureManager() override;
 
-  TexturePtr get(const ReaderMapping& mapping, const std::optional<Rect>& region = std::nullopt);
-  TexturePtr get(const std::string& filename);
-  TexturePtr get(const std::string& filename,
-                 const std::optional<Rect>& rect,
-                 const Sampler& sampler = Sampler());
+  TexturePtr get(ReaderMapping const& mapping, std::optional<Rect> const& region = std::nullopt);
+  TexturePtr get(std::string const& filename);
+  TexturePtr get(std::string const& filename,
+                 std::optional<Rect> const& rect,
+                 Sampler const& sampler = Sampler());
 
   void debug_print(std::ostream& out) const;
 
 private:
-  const SDL_Surface& get_surface(const std::string& filename);
-  void reap_cache_entry(const Texture::Key& key);
+  SDL_Surface const& get_surface(std::string const& filename);
+  void reap_cache_entry(Texture::Key const& key);
 
-  TexturePtr create_image_texture(const std::string& filename, const Rect& rect, const Sampler& sampler);
+  TexturePtr create_image_texture(std::string const& filename, Rect const& rect, Sampler const& sampler);
 
   /** on failure a dummy texture is returned and no exception is thrown */
-  TexturePtr create_image_texture(const std::string& filename, const Sampler& sampler);
+  TexturePtr create_image_texture(std::string const& filename, Sampler const& sampler);
 
   /** throw an exception on error */
-  TexturePtr create_image_texture_raw(const std::string& filename, const Sampler& sampler);
-  TexturePtr create_image_texture_raw(const std::string& filename, const Rect& rect, const Sampler& sampler);
+  TexturePtr create_image_texture_raw(std::string const& filename, Sampler const& sampler);
+  TexturePtr create_image_texture_raw(std::string const& filename, Rect const& rect, Sampler const& sampler);
 
   TexturePtr create_dummy_texture();
 
@@ -74,8 +74,8 @@ private:
   std::map<std::string, SDLSurfacePtr> m_surfaces;
 
 private:
-  TextureManager(const TextureManager&) = delete;
-  TextureManager& operator=(const TextureManager&) = delete;
+  TextureManager(TextureManager const&) = delete;
+  TextureManager& operator=(TextureManager const&) = delete;
 };
 
 #endif

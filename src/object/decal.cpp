@@ -21,7 +21,7 @@
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
 
-Decal::Decal(const ReaderMapping& reader) :
+Decal::Decal(ReaderMapping const& reader) :
   MovingSprite(reader, "images/decal/explanations/billboard-bigtux.png", LAYER_OBJECTS, COLGROUP_DISABLED),
   ExposedObject<Decal, scripting::Decal>(this),
   m_default_action("default"),
@@ -72,7 +72,7 @@ Decal::fade_out(float fade_time)
 }
 
 void
-Decal::fade_sprite(const std::string& new_sprite, float fade_time)
+Decal::fade_sprite(std::string const& new_sprite, float fade_time)
 {
   m_fade_sprite = SpriteManager::current()->create(new_sprite);
   m_sprite.swap(m_fade_sprite);

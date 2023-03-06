@@ -28,7 +28,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
-MrBomb::MrBomb(const ReaderMapping& reader) :
+MrBomb::MrBomb(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/mr_bomb/mr_bomb.sprite", "left", "right")
 {
   walk_speed = 80;
@@ -50,7 +50,7 @@ MrBomb::MrBomb(const ReaderMapping& reader) :
 }
 
 HitResponse
-MrBomb::collision(GameObject& object, const CollisionHit& hit)
+MrBomb::collision(GameObject& object, CollisionHit const& hit)
 {
   if (is_grabbed())
     return FORCE_MOVE;
@@ -58,7 +58,7 @@ MrBomb::collision(GameObject& object, const CollisionHit& hit)
 }
 
 HitResponse
-MrBomb::collision_player(Player& player, const CollisionHit& hit)
+MrBomb::collision_player(Player& player, CollisionHit const& hit)
 {
   if (is_grabbed())
     return FORCE_MOVE;
@@ -127,7 +127,7 @@ MrBomb::ignite()
 }
 
 void
-MrBomb::grab(MovingObject& object, const Vector& pos, Direction dir_)
+MrBomb::grab(MovingObject& object, Vector const& pos, Direction dir_)
 {
   Portable::grab(object, pos, dir_);
   if (dynamic_cast<Owl*>(&object))

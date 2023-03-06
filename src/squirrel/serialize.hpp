@@ -24,7 +24,7 @@
 class Writer;
 
 void save_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, Writer& writer);
-void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMapping& mapping);
+void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, ReaderMapping const& mapping);
 
 #endif
 

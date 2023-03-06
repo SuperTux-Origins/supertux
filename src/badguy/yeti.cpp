@@ -54,7 +54,7 @@ const float SNOW_EXPLOSIONS_VX = 150; /**< Speed of snowballs */
 const float SNOW_EXPLOSIONS_VY = -200; /**< Speed of snowballs */
 }
 
-Yeti::Yeti(const ReaderMapping& reader) :
+Yeti::Yeti(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/yeti/yeti.sprite"),
   state(),
   state_timer(),
@@ -313,7 +313,7 @@ Yeti::drop_stalactite()
 }
 
 void
-Yeti::collision_solid(const CollisionHit& hit)
+Yeti::collision_solid(CollisionHit const& hit)
 {
   update_on_ground_flag(hit);
   if (hit.top || hit.bottom) {
@@ -376,7 +376,7 @@ Yeti::add_snow_explosions()
   }
 }
 
-Yeti::SnowExplosionParticle::SnowExplosionParticle(const Vector& pos, const Vector& velocity)
+Yeti::SnowExplosionParticle::SnowExplosionParticle(Vector const& pos, Vector const& velocity)
   : BadGuy(pos, (velocity.x > 0) ? Direction::RIGHT : Direction::LEFT, "images/objects/bullets/icebullet.sprite")
 {
   m_physic.set_velocity_x(velocity.x);

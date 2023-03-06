@@ -32,8 +32,8 @@ public:
   void menu_action(MenuItem& item) override;
 
 private:
-  WorldmapMenu(const WorldmapMenu&) = delete;
-  WorldmapMenu& operator=(const WorldmapMenu&) = delete;
+  WorldmapMenu(WorldmapMenu const&) = delete;
+  WorldmapMenu& operator=(WorldmapMenu const&) = delete;
 };
 
 #endif

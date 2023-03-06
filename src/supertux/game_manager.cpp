@@ -38,7 +38,7 @@ GameManager::GameManager() :
 }
 
 void
-GameManager::start_level(const World& world, const std::string& level_filename,
+GameManager::start_level(World const& world, std::string const& level_filename,
                          const std::optional<std::pair<std::string, Vector>>& start_pos)
 {
   m_savegame = Savegame::from_file(world.get_savegame_filename());
@@ -51,7 +51,7 @@ GameManager::start_level(const World& world, const std::string& level_filename,
 }
 
 void
-GameManager::start_worldmap(const World& world, const std::string& spawnpoint, const std::string& worldmap_filename)
+GameManager::start_worldmap(World const& world, std::string const& spawnpoint, std::string const& worldmap_filename)
 {
   try
   {
@@ -102,7 +102,7 @@ GameManager::load_next_worldmap()
 }
 
 void
-GameManager::set_next_worldmap(const std::string& worldmap, const std::string &spawnpoint)
+GameManager::set_next_worldmap(std::string const& worldmap, std::string const&spawnpoint)
 {
   m_next_worldmap = worldmap;
   m_next_spawnpoint = spawnpoint;

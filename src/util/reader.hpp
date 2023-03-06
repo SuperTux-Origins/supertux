@@ -21,7 +21,7 @@
 
 #include "util/reader_fwd.hpp"
 
-int reader_get_layer(const ReaderMapping& reader, int def);
+int reader_get_layer(ReaderMapping const& reader, int def);
 
 #endif
 

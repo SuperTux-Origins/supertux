@@ -24,7 +24,7 @@
 class Haywire final : public WalkingBadguy
 {
 public:
-  Haywire(const ReaderMapping& reader);
+  Haywire(ReaderMapping const& reader);
 
   virtual void kill_fall() override;
   virtual void ignite() override;
@@ -38,7 +38,7 @@ public:
   virtual void stop_looping_sounds() override;
   virtual void play_looping_sounds() override;
 
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
   static std::string class_name() { return "haywire"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -64,8 +64,8 @@ private:
   Timer stomped_timer;
 
 private:
-  Haywire(const Haywire&) = delete;
-  Haywire& operator=(const Haywire&) = delete;
+  Haywire(Haywire const&) = delete;
+  Haywire& operator=(Haywire const&) = delete;
 };
 
 #endif

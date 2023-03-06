@@ -22,10 +22,10 @@
 class Jumpy final : public BadGuy
 {
 public:
-  Jumpy(const ReaderMapping& reader);
+  Jumpy(ReaderMapping const& reader);
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& other, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
 
   virtual void active_update(float) override;
   virtual void on_flip(float height) override;
@@ -41,15 +41,15 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  HitResponse hit(const CollisionHit& hit);
+  HitResponse hit(CollisionHit const& hit);
 
 private:
   Vector pos_groundhit;
   bool groundhit_pos_set;
 
 private:
-  Jumpy(const Jumpy&) = delete;
-  Jumpy& operator=(const Jumpy&) = delete;
+  Jumpy(Jumpy const&) = delete;
+  Jumpy& operator=(Jumpy const&) = delete;
 };
 
 #endif

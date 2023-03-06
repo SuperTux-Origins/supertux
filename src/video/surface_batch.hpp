@@ -28,12 +28,12 @@ class Rectf;
 class SurfaceBatch
 {
 public:
-  SurfaceBatch(const SurfacePtr& surface, const Color& color = Color::WHITE);
+  SurfaceBatch(SurfacePtr const& surface, Color const& color = Color::WHITE);
   SurfaceBatch(SurfaceBatch&&) = default;
 
-  void draw(const Vector& pos, float angle = 0.0f);
-  void draw(const Rectf& dstrect, float angle = 0.0f);
-  void draw(const Rectf& srcrect, const Rectf& dstrect, float angle = 0.0f);
+  void draw(Vector const& pos, float angle = 0.0f);
+  void draw(Rectf const& dstrect, float angle = 0.0f);
+  void draw(Rectf const& srcrect, Rectf const& dstrect, float angle = 0.0f);
 
   std::vector<Rectf> move_srcrects() { return std::move(m_srcrects); }
   std::vector<Rectf> move_dstrects() { return std::move(m_dstrects); }
@@ -49,8 +49,8 @@ private:
   std::vector<float> m_angles;
 
 private:
-  SurfaceBatch(const SurfaceBatch&) = delete;
-  SurfaceBatch& operator=(const SurfaceBatch&) = delete;
+  SurfaceBatch(SurfaceBatch const&) = delete;
+  SurfaceBatch& operator=(SurfaceBatch const&) = delete;
 };
 
 #endif

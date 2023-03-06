@@ -20,14 +20,14 @@
 
 #include "gui/menu_manager.hpp"
 
-ItemGoTo::ItemGoTo(const std::string& text, int target_menu_, int id) :
+ItemGoTo::ItemGoTo(std::string const& text, int target_menu_, int id) :
   MenuItem(text, id),
   target_menu(target_menu_)
 {
 }
 
 void
-ItemGoTo::process_action(const MenuAction& action) {
+ItemGoTo::process_action(MenuAction const& action) {
   if (action == MenuAction::HIT) {
     assert(target_menu != 0);
     MenuManager::instance().push_menu(target_menu);

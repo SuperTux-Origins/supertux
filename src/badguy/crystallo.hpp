@@ -23,7 +23,7 @@
 class Crystallo final : public WalkingBadguy
 {
 public:
-  Crystallo(const ReaderMapping& reader);
+  Crystallo(ReaderMapping const& reader);
 
   static std::string class_name() { return "crystallo"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -40,8 +40,8 @@ private:
   float m_radius;
 
 private:
-  Crystallo(const Crystallo&) = delete;
-  Crystallo& operator=(const Crystallo&) = delete;
+  Crystallo(Crystallo const&) = delete;
+  Crystallo& operator=(Crystallo const&) = delete;
 };
 
 #endif

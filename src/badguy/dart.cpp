@@ -27,7 +27,7 @@ const float DART_SPEED = 200;
 
 static const std::string DART_SOUND = "sounds/flame.wav";
 
-Dart::Dart(const ReaderMapping& reader) :
+Dart::Dart(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/dart/dart.sprite"),
   parent(nullptr),
   sound_source()
@@ -39,7 +39,7 @@ Dart::Dart(const ReaderMapping& reader) :
   SoundManager::current()->preload("sounds/stomp.wav");
 }
 
-Dart::Dart(const Vector& pos, Direction d, const BadGuy* parent_ = nullptr) :
+Dart::Dart(Vector const& pos, Direction d, BadGuy const* parent_ = nullptr) :
   BadGuy(pos, d, "images/creatures/dart/dart.sprite"),
   parent(parent_),
   sound_source()
@@ -52,7 +52,7 @@ Dart::Dart(const Vector& pos, Direction d, const BadGuy* parent_ = nullptr) :
 }
 
 bool
-Dart::updatePointers(const GameObject* from_object, GameObject* to_object)
+Dart::updatePointers(GameObject const* from_object, GameObject* to_object)
 {
   if (from_object == parent) {
     parent = dynamic_cast<Dart*>(to_object);
@@ -94,14 +94,14 @@ Dart::active_update(float dt_sec)
 }
 
 void
-Dart::collision_solid(const CollisionHit& )
+Dart::collision_solid(CollisionHit const& )
 {
   SoundManager::current()->play("sounds/darthit.wav", get_pos());
   remove_me();
 }
 
 HitResponse
-Dart::collision_badguy(BadGuy& badguy, const CollisionHit& )
+Dart::collision_badguy(BadGuy& badguy, CollisionHit const& )
 {
   // ignore collisions with parent
   if (&badguy == parent) {
@@ -114,7 +114,7 @@ Dart::collision_badguy(BadGuy& badguy, const CollisionHit& )
 }
 
 HitResponse
-Dart::collision_player(Player& player, const CollisionHit& hit)
+Dart::collision_player(Player& player, CollisionHit const& hit)
 {
   SoundManager::current()->play("sounds/stomp.wav", get_pos());
   remove_me();

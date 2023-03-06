@@ -18,7 +18,7 @@
 
 #include "sprite/sprite.hpp"
 
-RainSplash::RainSplash(const Vector& pos, bool vertical) :
+RainSplash::RainSplash(Vector const& pos, bool vertical) :
   sprite(),
   position(pos),
   frame(0)

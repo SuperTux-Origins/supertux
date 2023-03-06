@@ -25,7 +25,7 @@
 #include "video/video_system.hpp"
 
 SurfacePtr
-Surface::from_reader(const ReaderMapping& mapping, const std::optional<Rect>& rect, const std::string& filename)
+Surface::from_reader(ReaderMapping const& mapping, std::optional<Rect> const& rect, std::string const& filename)
 {
   TexturePtr diffuse_texture;
   ReaderMapping diffuse_texture_mapping;
@@ -54,7 +54,7 @@ Surface::from_reader(const ReaderMapping& mapping, const std::optional<Rect>& re
 }
 
 SurfacePtr
-Surface::from_file(const std::string& filename, const std::optional<Rect>& rect)
+Surface::from_file(std::string const& filename, std::optional<Rect> const& rect)
 {
   if (filename.ends_with(".surface"))
   {
@@ -86,9 +86,9 @@ Surface::from_file(const std::string& filename, const std::optional<Rect>& rect)
   }
 }
 
-Surface::Surface(const TexturePtr& diffuse_texture,
-                 const TexturePtr& displacement_texture,
-                 Flip flip, const std::string& filename) :
+Surface::Surface(TexturePtr const& diffuse_texture,
+                 TexturePtr const& displacement_texture,
+                 Flip flip, std::string const& filename) :
   m_diffuse_texture(diffuse_texture),
   m_displacement_texture(displacement_texture),
   m_region(0, 0, m_diffuse_texture->get_image_width(), m_diffuse_texture->get_image_height()),
@@ -97,10 +97,10 @@ Surface::Surface(const TexturePtr& diffuse_texture,
 {
 }
 
-Surface::Surface(const TexturePtr& diffuse_texture,
-                 const TexturePtr& displacement_texture,
-                 const Rect& region,
-                 Flip flip, const std::string& filename) :
+Surface::Surface(TexturePtr const& diffuse_texture,
+                 TexturePtr const& displacement_texture,
+                 Rect const& region,
+                 Flip flip, std::string const& filename) :
   m_diffuse_texture(diffuse_texture),
   m_displacement_texture(displacement_texture),
   m_region(region),
@@ -110,7 +110,7 @@ Surface::Surface(const TexturePtr& diffuse_texture,
 }
 
 SurfacePtr
-Surface::from_texture(const TexturePtr& texture)
+Surface::from_texture(TexturePtr const& texture)
 {
   return SurfacePtr(new Surface(texture, TexturePtr(), NO_FLIP));
 }
@@ -130,7 +130,7 @@ Surface::clone(Flip flip) const
 }
 
 SurfacePtr
-Surface::region(const Rect& rect) const
+Surface::region(Rect const& rect) const
 {
   SurfacePtr surface(new Surface(m_diffuse_texture,
                                  m_displacement_texture,

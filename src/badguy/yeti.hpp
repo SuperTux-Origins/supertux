@@ -23,12 +23,12 @@
 class Yeti final : public BadGuy
 {
 public:
-  Yeti(const ReaderMapping& mapping);
+  Yeti(ReaderMapping const& mapping);
 
   virtual void draw(DrawingContext& context) override;
   virtual void initialize() override;
   virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
   virtual bool collision_squished(GameObject& object) override;
   virtual void kill_fall() override;
 
@@ -84,12 +84,12 @@ private:
   class SnowExplosionParticle: public BadGuy
   {
   public:
-    SnowExplosionParticle(const Vector& pos, const Vector& velocity);
+    SnowExplosionParticle(Vector const& pos, Vector const& velocity);
   };
 
 private:
-  Yeti(const Yeti&) = delete;
-  Yeti& operator=(const Yeti&) = delete;
+  Yeti(Yeti const&) = delete;
+  Yeti& operator=(Yeti const&) = delete;
 };
 
 #endif

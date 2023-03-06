@@ -60,7 +60,7 @@ public:
     return m_object;
   }
 
-  const T* operator->() const {
+  T const* operator->() const {
     return m_object;
   }
 
@@ -72,12 +72,12 @@ public:
     return *m_object;
   }
 
-  bool operator==(const GameObjectIterator& other) const
+  bool operator==(GameObjectIterator const& other) const
   {
     return m_it == other.m_it;
   }
 
-  bool operator!=(const GameObjectIterator& other) const
+  bool operator!=(GameObjectIterator const& other) const
   {
     return !(*this == other);
   }
@@ -110,7 +110,7 @@ template<typename T>
 class GameObjectRange
 {
 public:
-  GameObjectRange(const GameObjectManager& manager) :
+  GameObjectRange(GameObjectManager const& manager) :
     m_manager(manager)
   {}
 
@@ -123,7 +123,7 @@ public:
   }
 
 private:
-  const GameObjectManager& m_manager;
+  GameObjectManager const& m_manager;
 };
 
 #endif

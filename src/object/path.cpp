@@ -25,7 +25,7 @@
 #include "util/log.hpp"
 
 WalkMode
-string_to_walk_mode(const std::string& mode_string)
+string_to_walk_mode(std::string const& mode_string)
 {
   if (mode_string == "oneshot")
     return WalkMode::ONE_SHOT;
@@ -61,7 +61,7 @@ Path::Path() :
 {
 }
 
-Path::Path(const Vector& pos) :
+Path::Path(Vector const& pos) :
   m_nodes(),
   m_mode(),
   m_adapt_speed()
@@ -77,7 +77,7 @@ Path::Path(const Vector& pos) :
 }
 
 void
-Path::read(const ReaderMapping& reader)
+Path::read(ReaderMapping const& reader)
 {
   m_mode = WalkMode::CIRCULAR;
 
@@ -171,7 +171,7 @@ Path::get_base() const
 }
 
 int
-Path::get_nearest_node_no(const Vector& reference_point) const
+Path::get_nearest_node_no(Vector const& reference_point) const
 {
   int nearest_node_id = -1;
   float nearest_node_dist = 0;
@@ -187,7 +187,7 @@ Path::get_nearest_node_no(const Vector& reference_point) const
 }
 
 int
-Path::get_farthest_node_no(const Vector& reference_point) const
+Path::get_farthest_node_no(Vector const& reference_point) const
 {
   int farthest_node_id = -1;
   float farthest_node_dist = 0;
@@ -204,7 +204,7 @@ Path::get_farthest_node_no(const Vector& reference_point) const
 }
 
 void
-Path::move_by(const Vector& shift)
+Path::move_by(Vector const& shift)
 {
   for (auto& nod : m_nodes) {
     nod.position += shift;

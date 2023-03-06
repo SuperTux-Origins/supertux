@@ -35,8 +35,8 @@ class TextArrayObject final : public GameObject,
                               public ExposedObject<TextArrayObject, scripting::TextArray>
 {
 public:
-  TextArrayObject(const std::string& name = std::string());
-  TextArrayObject(const ReaderMapping& reader);
+  TextArrayObject(std::string const& name = std::string());
+  TextArrayObject(ReaderMapping const& reader);
 
   ~TextArrayObject() override = default;
 
@@ -63,7 +63,7 @@ public:
   /** Adds a text with duration.
       @param: text      the text itself (can be multiline & formatted).
       @param: duration  (optional) the text display time in seconds, defaults to 3. */
-  void add_text(const std::string& text, float duration = 3.0f);
+  void add_text(std::string const& text, float duration = 3.0f);
 
   /** Sets the current text index.
       @param: index the index to set to. */
@@ -151,8 +151,8 @@ private:
   Timer m_waiting;
 
 private:
-  TextArrayObject(const TextArrayObject&) = delete;
-  TextArrayObject& operator=(const TextArrayObject&) = delete;
+  TextArrayObject(TextArrayObject const&) = delete;
+  TextArrayObject& operator=(TextArrayObject const&) = delete;
 };
 
 #endif

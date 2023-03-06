@@ -37,11 +37,11 @@ private:
   bool m_solved;
 
 public:
-  LevelsetScreen(const std::string& basedir, const std::string& level_filename, Savegame& savegame,
+  LevelsetScreen(std::string const& basedir, std::string const& level_filename, Savegame& savegame,
                  const std::optional<std::pair<std::string, Vector>>& start_pos);
 
   virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, const Controller& controller) override;
+  virtual void update(float dt_sec, Controller const& controller) override;
 
   virtual void setup() override;
   virtual void leave() override;
@@ -51,8 +51,8 @@ public:
 private:
   std::optional<std::pair<std::string, Vector>> m_start_pos;
 
-  LevelsetScreen(const LevelsetScreen&) = delete;
-  LevelsetScreen& operator=(const LevelsetScreen&) = delete;
+  LevelsetScreen(LevelsetScreen const&) = delete;
+  LevelsetScreen& operator=(LevelsetScreen const&) = delete;
 };
 
 #endif

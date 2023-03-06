@@ -37,8 +37,8 @@ private:
   int m_stack_count;
 
 private:
-  WorldmapCheatApplyMenu(const WorldmapCheatApplyMenu&) = delete;
-  WorldmapCheatApplyMenu& operator=(const WorldmapCheatApplyMenu&) = delete;
+  WorldmapCheatApplyMenu(WorldmapCheatApplyMenu const&) = delete;
+  WorldmapCheatApplyMenu& operator=(WorldmapCheatApplyMenu const&) = delete;
 };
 
 #endif

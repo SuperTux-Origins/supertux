@@ -52,8 +52,8 @@ private:
   easing m_ease;
 
 private:
-  FadeHelper(const FadeHelper&) = delete;
-  FadeHelper& operator=(const FadeHelper&) = delete;
+  FadeHelper(FadeHelper const&) = delete;
+  FadeHelper& operator=(FadeHelper const&) = delete;
 };
 
 #endif

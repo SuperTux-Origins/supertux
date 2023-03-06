@@ -46,8 +46,8 @@ GLScreenRenderer::start_draw()
 
   context.blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  const Viewport& viewport = m_video_system.get_viewport();
-  const Rect& rect = viewport.get_rect();
+  Viewport const& viewport = m_video_system.get_viewport();
+  Rect const& rect = viewport.get_rect();
 
   glViewport(rect.left, rect.top, rect.get_width(), rect.get_height());
 
@@ -70,14 +70,14 @@ GLScreenRenderer::end_draw()
 Rect
 GLScreenRenderer::get_rect() const
 {
-  const Viewport& viewport = m_video_system.get_viewport();
+  Viewport const& viewport = m_video_system.get_viewport();
   return viewport.get_rect();
 }
 
 Size
 GLScreenRenderer::get_logical_size() const
 {
-  const Viewport& viewport = m_video_system.get_viewport();
+  Viewport const& viewport = m_video_system.get_viewport();
   return Size(viewport.get_screen_width(),
               viewport.get_screen_height());
 }

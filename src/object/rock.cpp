@@ -34,7 +34,7 @@ const std::string ROCK_SOUND = "sounds/brick.wav"; //TODO use own sound.
 
 static const float GROUND_FRICTION = 0.1f; // Amount of friction to apply while on ground.
 
-Rock::Rock(const Vector& pos, const std::string& spritename) :
+Rock::Rock(Vector const& pos, std::string const& spritename) :
   MovingSprite(pos, spritename),
   ExposedObject<Rock, scripting::Rock>(this),
   physic(),
@@ -47,7 +47,7 @@ Rock::Rock(const Vector& pos, const std::string& spritename) :
   set_group(COLGROUP_MOVING_STATIC);
 }
 
-Rock::Rock(const ReaderMapping& reader) :
+Rock::Rock(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/rock/rock.sprite"),
   ExposedObject<Rock, scripting::Rock>(this),
   physic(),
@@ -62,7 +62,7 @@ Rock::Rock(const ReaderMapping& reader) :
   set_group(COLGROUP_MOVING_STATIC);
 }
 
-Rock::Rock(const ReaderMapping& reader, const std::string& spritename) :
+Rock::Rock(ReaderMapping const& reader, std::string const& spritename) :
   MovingSprite(reader, spritename),
   ExposedObject<Rock, scripting::Rock>(this),
   physic(),
@@ -85,7 +85,7 @@ Rock::update(float dt_sec)
 }
 
 void
-Rock::collision_solid(const CollisionHit& hit)
+Rock::collision_solid(CollisionHit const& hit)
 {
   if (is_grabbed()) {
     return;
@@ -113,7 +113,7 @@ Rock::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Rock::collision(GameObject& other, const CollisionHit& hit)
+Rock::collision(GameObject& other, CollisionHit const& hit)
 {
   auto heavy_coin = dynamic_cast<HeavyCoin*> (&other);
   if (heavy_coin) {
@@ -180,7 +180,7 @@ Rock::collision(GameObject& other, const CollisionHit& hit)
 }
 
 void
-Rock::grab(MovingObject& object, const Vector& pos, Direction dir_)
+Rock::grab(MovingObject& object, Vector const& pos, Direction dir_)
 {
   Portable::grab(object, pos, dir_);
   Vector movement = pos - get_pos();
@@ -224,7 +224,7 @@ Rock::ungrab(MovingObject& object, Direction dir)
 }
 
 void
-Rock::add_wind_velocity(const Vector& velocity, const Vector& end_speed)
+Rock::add_wind_velocity(Vector const& velocity, Vector const& end_speed)
 {
   // only add velocity in the same direction as the wind
   if (end_speed.x > 0 && physic.get_velocity_x() < end_speed.x)

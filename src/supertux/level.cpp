@@ -70,9 +70,9 @@ Level::add_sector(std::unique_ptr<Sector> sector)
 }
 
 Sector*
-Level::get_sector(const std::string& name_) const
+Level::get_sector(std::string const& name_) const
 {
-  auto _sector = std::find_if(m_sectors.begin(), m_sectors.end(), [name_] (const std::unique_ptr<Sector>& sector) {
+  auto _sector = std::find_if(m_sectors.begin(), m_sectors.end(), [name_] (std::unique_ptr<Sector> const& sector) {
     return sector->get_name() == name_;
   });
   if(_sector == m_sectors.end())
@@ -97,7 +97,7 @@ Level::get_total_coins() const
 {
   int total_coins = 0;
   for (auto const& sector : m_sectors) {
-    for (const auto& o: sector->get_objects()) {
+    for (auto const& o: sector->get_objects()) {
       auto coin = dynamic_cast<Coin*>(o.get());
       if (coin)
       {
@@ -131,7 +131,7 @@ Level::get_total_badguys() const
 {
   int total_badguys = 0;
   for (auto const& sector : m_sectors) {
-    total_badguys += sector->get_object_count<BadGuy>([] (const BadGuy& badguy) {
+    total_badguys += sector->get_object_count<BadGuy>([] (BadGuy const& badguy) {
       return badguy.m_countMe;
     });
   }
@@ -141,7 +141,7 @@ Level::get_total_badguys() const
 int
 Level::get_total_secrets() const
 {
-  auto get_secret_count = [](int accumulator, const std::unique_ptr<Sector>& sector) {
+  auto get_secret_count = [](int accumulator, std::unique_ptr<Sector> const& sector) {
     return accumulator + sector->get_object_count<SecretAreaTrigger>();
   };
   return std::accumulate(m_sectors.begin(), m_sectors.end(), 0, get_secret_count);

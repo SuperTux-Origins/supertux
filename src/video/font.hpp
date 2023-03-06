@@ -40,20 +40,20 @@ public:
   /**
    * returns the given string, truncated (preferably at whitespace) to be at most max_chars characters long
    */
-  static std::string wrap_to_chars(const std::string& text, int max_chars, std::string* overflow);
+  static std::string wrap_to_chars(std::string const& text, int max_chars, std::string* overflow);
 
 public:
   virtual ~Font() {}
 
   virtual float get_height() const = 0;
 
-  virtual float get_text_width(const std::string& text) const = 0;
-  virtual float get_text_height(const std::string& text) const = 0;
+  virtual float get_text_width(std::string const& text) const = 0;
+  virtual float get_text_height(std::string const& text) const = 0;
 
-  virtual std::string wrap_to_width(const std::string& text, float width, std::string* overflow) = 0;
+  virtual std::string wrap_to_width(std::string const& text, float width, std::string* overflow) = 0;
 
-  virtual void draw_text(Canvas& canvas, const std::string& text,
-                         const Vector& pos, FontAlignment alignment, int layer, const Color& color) = 0;
+  virtual void draw_text(Canvas& canvas, std::string const& text,
+                         Vector const& pos, FontAlignment alignment, int layer, Color const& color) = 0;
 };
 
 #endif

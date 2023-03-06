@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <time.h>
 
-std::string make_unique_name(const std::string& prefix, void* ptr)
+std::string make_unique_name(std::string const& prefix, void* ptr)
 {
   std::ostringstream out;
   out << "gen" << time(nullptr) << reinterpret_cast<uintptr_t>(ptr);

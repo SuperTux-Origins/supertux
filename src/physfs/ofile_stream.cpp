@@ -18,7 +18,7 @@
 
 #include "physfs/ofile_streambuf.hpp"
 
-OFileStream::OFileStream(const std::string& filename) :
+OFileStream::OFileStream(std::string const& filename) :
   std::ostream(nullptr), sb(new OFileStreambuf(filename))
 {
   init(sb.get());

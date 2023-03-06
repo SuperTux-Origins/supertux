@@ -25,7 +25,7 @@
 
 CheatMenu::CheatMenu()
 {
-  const auto& players = Sector::get().get_players();
+  auto const& players = Sector::get().get_players();
 
   add_label(_("Cheats"));
   add_hl();
@@ -59,7 +59,7 @@ CheatMenu::menu_action(MenuItem& item)
 {
   if (!Sector::current()) return;
 
-  const auto& players = Sector::get().get_players();
+  auto const& players = Sector::get().get_players();
   Player* single_player = (players.size() == 1) ? players[0] : nullptr;
 
   for (Player* const player_ptr : Sector::get().get_players()) {

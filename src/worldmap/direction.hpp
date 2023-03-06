@@ -27,7 +27,7 @@ namespace worldmap {
 enum class Direction { NONE, WEST, EAST, NORTH, SOUTH };
 
 Direction reverse_dir(Direction direction);
-Direction string_to_direction(const std::string& directory);
+Direction string_to_direction(std::string const& directory);
 std::string direction_to_string(Direction direction);
 
 } // namespace worldmap

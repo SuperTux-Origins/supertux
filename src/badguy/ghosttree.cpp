@@ -37,7 +37,7 @@ static const Vector SUCK_TARGET_OFFSET = Vector(-16,-16);
 static const float SUCK_TARGET_SPREAD = 8;
 static const float ROOT_HEIGHT = 87;
 
-GhostTree::GhostTree(const ReaderMapping& mapping) :
+GhostTree::GhostTree(ReaderMapping const& mapping) :
   BadGuy(mapping, "images/creatures/ghosttree/ghosttree.sprite", LAYER_OBJECTS - 10),
   mystate(STATE_IDLE),
   willowisp_timer(),
@@ -66,7 +66,7 @@ GhostTree::die()
   m_sprite->set_action("dying", 1);
   glow_sprite->set_action("dying", 1);
 
-  for (const auto& willo : willowisps) {
+  for (auto const& willo : willowisps) {
     willo->vanish();
   }
   run_dead_script();
@@ -105,7 +105,7 @@ GhostTree::active_update(float /*dt_sec*/)
     if (suck_timer.check()) {
       Color col = glow_sprite->get_color();
       SoundManager::current()->play("sounds/tree_suck.ogg", get_pos());
-      for (const auto& willo : willowisps) {
+      for (auto const& willo : willowisps) {
         if (willo->get_color() == col) {
           willo->start_sucking(
             m_col.m_bbox.get_middle() + SUCK_TARGET_OFFSET
@@ -205,7 +205,7 @@ GhostTree::willowisp_died(TreeWillOWisp* willowisp)
     mystate = STATE_IDLE;
   }
   willowisps.erase(std::find_if(willowisps.begin(), willowisps.end(),
-                                [willowisp](const GameObject* lhs)
+                                [willowisp](GameObject const* lhs)
                                 {
                                   return lhs == willowisp;
                                 }));
@@ -227,7 +227,7 @@ GhostTree::draw(DrawingContext& context)
 }
 
 bool
-GhostTree::collides(GameObject& other, const CollisionHit& ) const
+GhostTree::collides(GameObject& other, CollisionHit const& ) const
 {
   if (mystate != STATE_SUCKING) return false;
   if (dynamic_cast<Lantern*>(&other)) return true;
@@ -236,7 +236,7 @@ GhostTree::collides(GameObject& other, const CollisionHit& ) const
 }
 
 HitResponse
-GhostTree::collision(GameObject& other, const CollisionHit& )
+GhostTree::collision(GameObject& other, CollisionHit const& )
 {
   if (mystate != STATE_SUCKING) return ABORT_MOVE;
 

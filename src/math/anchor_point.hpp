@@ -44,9 +44,9 @@ const std::vector<std::string> g_anchor_keys = {
 
 std::vector<std::string> get_anchor_names();
 std::string anchor_point_to_string(AnchorPoint point);
-AnchorPoint string_to_anchor_point(const std::string& str);
-Vector get_anchor_pos(const Rectf& rect, AnchorPoint point);
-Vector get_anchor_pos(const Rectf& destrect, float width, float height,
+AnchorPoint string_to_anchor_point(std::string const& str);
+Vector get_anchor_pos(Rectf const& rect, AnchorPoint point);
+Vector get_anchor_pos(Rectf const& destrect, float width, float height,
                       AnchorPoint point);
 
 #endif

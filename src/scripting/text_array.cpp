@@ -22,14 +22,14 @@
 namespace scripting {
 
 void
-TextArray::add_text_duration(const std::string& text, float duration)
+TextArray::add_text_duration(std::string const& text, float duration)
 {
   SCRIPT_GUARD_VOID;
   object.add_text(text, duration);
 }
 
 void
-TextArray::add_text(const std::string& text)
+TextArray::add_text(std::string const& text)
 {
   SCRIPT_GUARD_VOID;
   object.add_text(text);
@@ -101,7 +101,7 @@ TextArray::set_auto(bool is_auto)
 /////////// text api
 
 void
-TextArray::set_text(const std::string& text)
+TextArray::set_text(std::string const& text)
 {
   SCRIPT_GUARD_VOID;
 
@@ -114,7 +114,7 @@ TextArray::set_text(const std::string& text)
 }
 
 void
-TextArray::set_font(const std::string& fontname)
+TextArray::set_font(std::string const& fontname)
 {
   SCRIPT_GUARD_VOID;
 

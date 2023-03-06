@@ -28,19 +28,19 @@
 class MovingSprite : public MovingObject
 {
 public:
-  MovingSprite(const Vector& pos,
-               const std::string& sprite_name,
+  MovingSprite(Vector const& pos,
+               std::string const& sprite_name,
                int layer = LAYER_OBJECTS,
                CollisionGroup collision_group = COLGROUP_MOVING);
-  MovingSprite(const ReaderMapping& reader,
-               const Vector& pos,
+  MovingSprite(ReaderMapping const& reader,
+               Vector const& pos,
                int layer = LAYER_OBJECTS,
                CollisionGroup collision_group = COLGROUP_MOVING);
-  MovingSprite(const ReaderMapping& reader,
-               const std::string& sprite_name,
+  MovingSprite(ReaderMapping const& reader,
+               std::string const& sprite_name,
                int layer = LAYER_OBJECTS,
                CollisionGroup collision_group = COLGROUP_MOVING);
-  MovingSprite(const ReaderMapping& reader,
+  MovingSprite(ReaderMapping const& reader,
                int layer = LAYER_OBJECTS,
                CollisionGroup collision_group = COLGROUP_MOVING);
 
@@ -53,23 +53,23 @@ public:
   virtual int get_layer() const override { return m_layer; }
 
   std::string get_sprite_name() const;
-  bool change_sprite(const std::string& new_sprite_name);
-  void spawn_explosion_sprites(int count, const std::string& sprite_path);
+  bool change_sprite(std::string const& new_sprite_name);
+  void spawn_explosion_sprites(int count, std::string const& sprite_path);
 
 protected:
   /** set new action for sprite and resize bounding box.  use with
       care as you can easily get stuck when resizing the bounding box. */
-  void set_action(const std::string& action, int loops);
+  void set_action(std::string const& action, int loops);
 
   /** set new action for sprite and re-center bounding box.  use with
       care as you can easily get stuck when resizing the bounding
       box. */
-  void set_action_centered(const std::string& action, int loops);
+  void set_action_centered(std::string const& action, int loops);
 
   /** set new action for sprite and align bounding boxes at
       anchorPoint.  use with care as you can easily get stuck when
       resizing the bounding box. */
-  void set_action(const std::string& action, int loops, AnchorPoint anchorPoint);
+  void set_action(std::string const& action, int loops, AnchorPoint anchorPoint);
 
 protected:
   std::string m_sprite_name;
@@ -82,8 +82,8 @@ protected:
   Flip m_flip;
 
 private:
-  MovingSprite(const MovingSprite&) = delete;
-  MovingSprite& operator=(const MovingSprite&) = delete;
+  MovingSprite(MovingSprite const&) = delete;
+  MovingSprite& operator=(MovingSprite const&) = delete;
 };
 
 #endif

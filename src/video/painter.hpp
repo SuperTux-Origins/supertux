@@ -39,22 +39,22 @@ public:
   Painter() {}
   virtual ~Painter() {}
 
-  virtual void draw_texture(const TextureRequest& request) = 0;
-  virtual void draw_gradient(const GradientRequest& request) = 0;
-  virtual void draw_filled_rect(const FillRectRequest& request) = 0;
-  virtual void draw_inverse_ellipse(const InverseEllipseRequest& request) = 0;
-  virtual void draw_line(const LineRequest& request) = 0;
-  virtual void draw_triangle(const TriangleRequest& request) = 0;
+  virtual void draw_texture(TextureRequest const& request) = 0;
+  virtual void draw_gradient(GradientRequest const& request) = 0;
+  virtual void draw_filled_rect(FillRectRequest const& request) = 0;
+  virtual void draw_inverse_ellipse(InverseEllipseRequest const& request) = 0;
+  virtual void draw_line(LineRequest const& request) = 0;
+  virtual void draw_triangle(TriangleRequest const& request) = 0;
 
-  virtual void clear(const Color& color) = 0;
-  virtual void get_pixel(const GetPixelRequest& request) const = 0;
+  virtual void clear(Color const& color) = 0;
+  virtual void get_pixel(GetPixelRequest const& request) const = 0;
 
-  virtual void set_clip_rect(const Rect& rect) = 0;
+  virtual void set_clip_rect(Rect const& rect) = 0;
   virtual void clear_clip_rect() = 0;
 
 private:
-  Painter(const Painter&) = delete;
-  Painter& operator=(const Painter&) = delete;
+  Painter(Painter const&) = delete;
+  Painter& operator=(Painter const&) = delete;
 };
 
 #endif

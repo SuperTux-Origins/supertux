@@ -31,7 +31,7 @@ Level_finish(bool win)
 }
 
 void
-Level_spawn(const std::string& sector, const std::string& spawnpoint)
+Level_spawn(std::string const& sector, std::string const& spawnpoint)
 {
   if (GameSession::current() == nullptr)
     return;

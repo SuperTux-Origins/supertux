@@ -28,7 +28,7 @@
 #include "math/easing.hpp"
 
 Vector
-PathWalker::Handle::get_pos(const Sizef& size, const Vector& pos) const
+PathWalker::Handle::get_pos(Sizef const& size, Vector const& pos) const
 {
   return pos - Vector(size.width * m_scalar_pos.x, size.height * m_scalar_pos.y) - m_pixel_offset;
 }
@@ -103,14 +103,14 @@ PathWalker::update(float dt_sec)
 }
 
 Vector
-PathWalker::get_pos(const Sizef& object_size, const Handle& handle) const
+PathWalker::get_pos(Sizef const& object_size, Handle const& handle) const
 {
   Path* path = get_path();
   if (!path) return Vector(0, 0);
   if (!path->is_valid()) return Vector(0, 0);
 
-  const Path::Node* current_node = &(path->m_nodes[m_current_node_nr]);
-  const Path::Node* next_node = & (path->m_nodes[m_next_node_nr]);
+  Path::Node const* current_node = &(path->m_nodes[m_current_node_nr]);
+  Path::Node const* next_node = & (path->m_nodes[m_next_node_nr]);
 
   easing easeFunc = m_walking_speed > 0 ?
                           getEasingByName(current_node->easing) :

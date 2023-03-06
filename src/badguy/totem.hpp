@@ -23,15 +23,15 @@
 class Totem final : public BadGuy
 {
 public:
-  Totem(const ReaderMapping& reader);
+  Totem(ReaderMapping const& reader);
   ~Totem() override;
 
   virtual void initialize() override;
   virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
-  virtual bool updatePointers(const GameObject* from_object, GameObject* to_object);
+  virtual bool updatePointers(GameObject const* from_object, GameObject* to_object);
   static std::string class_name() { return "totem"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Totem"); }
@@ -51,8 +51,8 @@ private:
   Totem* carried_by; /**< Totem by which we are currently carried (or 0) */
 
 private:
-  Totem(const Totem&) = delete;
-  Totem& operator=(const Totem&) = delete;
+  Totem(Totem const&) = delete;
+  Totem& operator=(Totem const&) = delete;
 };
 
 #endif

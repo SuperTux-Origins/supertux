@@ -21,7 +21,7 @@
 #include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
 
-LitObject::LitObject(const ReaderMapping& reader) :
+LitObject::LitObject(ReaderMapping const& reader) :
   MovingObject(reader),
   ExposedObject<LitObject, scripting::LitObject>(this),
   m_light_offset(-6.f, -17.f),
@@ -77,26 +77,26 @@ LitObject::on_flip(float height)
   FlipLevelTransformer::transform_flip(m_flip);
 }
 
-const std::string&
+std::string const&
 LitObject::get_action() const
 {
   return m_sprite->get_action();
 }
 
 void
-LitObject::set_action(const std::string& action)
+LitObject::set_action(std::string const& action)
 {
   m_sprite->set_action(action);
 }
 
-const std::string&
+std::string const&
 LitObject::get_light_action() const
 {
   return m_light_sprite->get_action();
 }
 
 void
-LitObject::set_light_action(const std::string& action)
+LitObject::set_light_action(std::string const& action)
 {
   m_light_sprite->set_action(action);
 }

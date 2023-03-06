@@ -22,7 +22,7 @@
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
-LiveFire::LiveFire(const ReaderMapping& reader) :
+LiveFire::LiveFire(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/livefire/livefire.sprite", "left", "right"),
   death_sound("sounds/fall.wav"),
   state(STATE_WALKING)
@@ -34,7 +34,7 @@ LiveFire::LiveFire(const ReaderMapping& reader) :
 }
 
 void
-LiveFire::collision_solid(const CollisionHit& hit)
+LiveFire::collision_solid(CollisionHit const& hit)
 {
   if (state != STATE_WALKING) {
     BadGuy::collision_solid(hit);
@@ -44,7 +44,7 @@ LiveFire::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-LiveFire::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+LiveFire::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (state != STATE_WALKING) {
     return BadGuy::collision_badguy(badguy, hit);
@@ -141,7 +141,7 @@ LiveFire::kill_fall()
 
 /* The following defines a sleeping version */
 
-LiveFireAsleep::LiveFireAsleep(const ReaderMapping& reader) :
+LiveFireAsleep::LiveFireAsleep(ReaderMapping const& reader) :
   LiveFire(reader)
 {
   state = STATE_SLEEPING;
@@ -161,7 +161,7 @@ LiveFireAsleep::initialize()
 }
 
 /* The following defines a dormant version that never wakes */
-LiveFireDormant::LiveFireDormant(const ReaderMapping& reader) :
+LiveFireDormant::LiveFireDormant(ReaderMapping const& reader) :
   LiveFire(reader)
 {
   walk_speed = 0;

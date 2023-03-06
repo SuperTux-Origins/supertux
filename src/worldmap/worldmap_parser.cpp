@@ -50,7 +50,7 @@ WorldMapParser::WorldMapParser(WorldMap& worldmap) :
 }
 
 void
-WorldMapParser::load_worldmap(const std::string& filename)
+WorldMapParser::load_worldmap(std::string const& filename)
 {
   m_worldmap.m_map_filename = physfsutil::realpath(filename);
   m_worldmap.m_levels_path = FileSystem::dirname(m_worldmap.m_map_filename);

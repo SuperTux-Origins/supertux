@@ -87,7 +87,7 @@ GL33CoreContext::bind()
     static_cast<float>(texture->get_image_height()) /
     static_cast<float>(texture->get_texture_height());
 
-  const Rect& rect = m_video_system.get_viewport().get_rect();
+  Rect const& rect = m_video_system.get_viewport().get_rect();
 
   const float sx = tsx / static_cast<float>(rect.get_width());
   const float sy = tsy / static_cast<float>(rect.get_height());
@@ -145,13 +145,13 @@ GL33CoreContext::blend_func(GLenum src, GLenum dst)
 }
 
 void
-GL33CoreContext::set_positions(const float* data, size_t size)
+GL33CoreContext::set_positions(float const* data, size_t size)
 {
   m_vertex_arrays->set_positions(data, size);
 }
 
 void
-GL33CoreContext::set_texcoords(const float* data, size_t size)
+GL33CoreContext::set_texcoords(float const* data, size_t size)
 {
   m_vertex_arrays->set_texcoords(data, size);
 }
@@ -163,19 +163,19 @@ GL33CoreContext::set_texcoord(float u, float v)
 }
 
 void
-GL33CoreContext::set_colors(const float* data, size_t size)
+GL33CoreContext::set_colors(float const* data, size_t size)
 {
   m_vertex_arrays->set_colors(data, size);
 }
 
 void
-GL33CoreContext::set_color(const Color& color)
+GL33CoreContext::set_color(Color const& color)
 {
   m_vertex_arrays->set_color(color);
 }
 
 void
-GL33CoreContext::bind_texture(const Texture& texture, const Texture* displacement_texture)
+GL33CoreContext::bind_texture(Texture const& texture, Texture const* displacement_texture)
 {
   assert_gl();
 
@@ -189,9 +189,9 @@ GL33CoreContext::bind_texture(const Texture& texture, const Texture* displacemen
   else
   {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, static_cast<const GLTexture&>(texture).get_handle());
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLTexture const&>(texture).get_handle());
 
-    Vector animate = static_cast<const GLTexture&>(texture).get_sampler().get_animate();
+    Vector animate = static_cast<GLTexture const&>(texture).get_sampler().get_animate();
 
     animate.x /= static_cast<float>(texture.get_image_width());
     animate.y /= static_cast<float>(texture.get_image_height());
@@ -202,9 +202,9 @@ GL33CoreContext::bind_texture(const Texture& texture, const Texture* displacemen
   if (displacement_texture)
   {
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, static_cast<const GLTexture&>(*displacement_texture).get_handle());
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLTexture const&>(*displacement_texture).get_handle());
 
-    Vector animate = static_cast<const GLTexture&>(*displacement_texture).get_sampler().get_animate();
+    Vector animate = static_cast<GLTexture const&>(*displacement_texture).get_sampler().get_animate();
 
     animate.x /= static_cast<float>(displacement_texture->get_image_width());
     animate.y /= static_cast<float>(displacement_texture->get_image_height());

@@ -17,7 +17,7 @@
 
 #include "gui/item_floatfield.hpp"
 
-ItemFloatField::ItemFloatField(const std::string& text_, float* input_, int id_, bool positive) :
+ItemFloatField::ItemFloatField(std::string const& text_, float* input_, int id_, bool positive) :
   ItemTextField(text_, new std::string, id_),
   number(input_),
   m_input(std::to_string(*input_)),
@@ -119,7 +119,7 @@ ItemFloatField::on_input_update()
 // Text manipulation and navigation functions
 
 void
-ItemFloatField::insert_text(const std::string& text, const int left_offset_pos)
+ItemFloatField::insert_text(std::string const& text, const int left_offset_pos)
 {
   update_undo();
   for (auto& c : text)

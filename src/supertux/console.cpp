@@ -48,7 +48,7 @@ ConsoleBuffer::set_console(Console* console)
 }
 
 void
-ConsoleBuffer::addLines(const std::string& s)
+ConsoleBuffer::addLines(std::string const& s)
 {
   std::istringstream iss(s);
   std::string line;
@@ -59,7 +59,7 @@ ConsoleBuffer::addLines(const std::string& s)
 }
 
 void
-ConsoleBuffer::addLine(const std::string& s_)
+ConsoleBuffer::addLine(std::string const& s_)
 {
   std::string s = s_;
 
@@ -189,7 +189,7 @@ Console::ready_vm()
 }
 
 void
-Console::execute_script(const std::string& command)
+Console::execute_script(std::string const& command)
 {
   ready_vm();
 
@@ -290,7 +290,7 @@ Console::move_cursor(int offset_)
 // TODO: Fix rough documentation
 namespace {
 
-void sq_insert_commands(std::list<std::string>& cmds, HSQUIRRELVM vm, const std::string& table_prefix, const std::string& search_prefix);
+void sq_insert_commands(std::list<std::string>& cmds, HSQUIRRELVM vm, std::string const& table_prefix, std::string const& search_prefix);
 
 /**
  * Acts upon key,value on top of stack:
@@ -298,9 +298,9 @@ void sq_insert_commands(std::list<std::string>& cmds, HSQUIRRELVM vm, const std:
  * Calls sq_insert_commands if search_prefix starts with table_prefix+key (and value is a table/class/instance);
  */
 void
-sq_insert_command(std::list<std::string>& cmds, HSQUIRRELVM vm, const std::string& table_prefix, const std::string& search_prefix)
+sq_insert_command(std::list<std::string>& cmds, HSQUIRRELVM vm, std::string const& table_prefix, std::string const& search_prefix)
 {
-  const SQChar* key_chars;
+  SQChar const* key_chars;
   if (SQ_FAILED(sq_getstring(vm, -2, &key_chars))) return;
   std::string key_string = table_prefix + key_chars;
 
@@ -338,7 +338,7 @@ sq_insert_command(std::list<std::string>& cmds, HSQUIRRELVM vm, const std::strin
  * calls sq_insert_command for all entries of table/class on top of stack
  */
 void
-sq_insert_commands(std::list<std::string>& cmds, HSQUIRRELVM vm, const std::string& table_prefix, const std::string& search_prefix)
+sq_insert_commands(std::list<std::string>& cmds, HSQUIRRELVM vm, std::string const& table_prefix, std::string const& search_prefix)
 {
   sq_pushnull(vm); // push iterator
   while (SQ_SUCCEEDED(sq_next(vm,-2))) {
@@ -416,7 +416,7 @@ Console::autocomplete()
 }
 
 void
-Console::parse(const std::string& s)
+Console::parse(std::string const& s)
 {
   // make sure we actually have something to parse
   if (s.length() == 0) return;
@@ -451,7 +451,7 @@ Console::parse(const std::string& s)
 }
 
 bool
-Console::consoleCommand(const std::string& /*command*/, const std::vector<std::string>& /*arguments*/)
+Console::consoleCommand(std::string const& /*command*/, std::vector<std::string> const& /*arguments*/)
 {
   return false;
 }

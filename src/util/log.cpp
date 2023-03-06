@@ -65,7 +65,7 @@ class _android_debugbuf: public std::streambuf
   }
 
   // Calls outputchar() for each character.
-  virtual int xsputn(const char *s, int n)
+  virtual int xsputn(char const*s, int n)
   {
     for (int i = 0; i < n; ++i)
     {
@@ -111,23 +111,23 @@ std::ostream& get_logging_instance(bool use_console_buffer)
 #endif
 }
 
-static std::ostream& log_generic_f (const char *prefix, const char* file, int line, bool use_console_buffer = true)
+static std::ostream& log_generic_f (char const*prefix, char const* file, int line, bool use_console_buffer = true)
 {
   get_logging_instance (use_console_buffer) << prefix << " " << file << ":" << line << " ";
   return (get_logging_instance (use_console_buffer));
 }
 
-std::ostream& log_debug_f(const char* file, int line, bool use_console_buffer = true)
+std::ostream& log_debug_f(char const* file, int line, bool use_console_buffer = true)
 {
   return (log_generic_f ("[DEBUG]", file, line, use_console_buffer));
 }
 
-std::ostream& log_info_f(const char* file, int line)
+std::ostream& log_info_f(char const* file, int line)
 {
   return (log_generic_f ("[INFO]", file, line));
 }
 
-std::ostream& log_warning_f(const char* file, int line)
+std::ostream& log_warning_f(char const* file, int line)
 {
   if (g_config && g_config->developer_mode &&
      Console::current() && !Console::current()->hasFocus()) {
@@ -136,7 +136,7 @@ std::ostream& log_warning_f(const char* file, int line)
   return (log_generic_f ("[WARNING]", file, line));
 }
 
-std::ostream& log_fatal_f(const char* file, int line)
+std::ostream& log_fatal_f(char const* file, int line)
 {
   if (g_config && g_config->developer_mode &&
      Console::current() && !Console::current()->hasFocus()) {
@@ -146,17 +146,17 @@ std::ostream& log_fatal_f(const char* file, int line)
 }
 
 /* Callbacks used by tinygettext */
-void log_info_callback(const std::string& str)
+void log_info_callback(std::string const& str)
 {
     log_info << "\r\n[TINYGETTEXT] " << str << std::endl;
 }
 
-void log_warning_callback(const std::string& str)
+void log_warning_callback(std::string const& str)
 {
     log_debug << "\r\n[TINYGETTEXT] " << str << std::endl;
 }
 
-void log_error_callback(const std::string& str)
+void log_error_callback(std::string const& str)
 {
     log_warning << "\r\n[TINYGETTEXT] " << str << std::endl;
 }

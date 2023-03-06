@@ -22,12 +22,12 @@
 class FlyingSnowBall final : public BadGuy
 {
 public:
-  FlyingSnowBall(const ReaderMapping& reader);
+  FlyingSnowBall(ReaderMapping const& reader);
 
   virtual void initialize() override;
   virtual void activate() override;
   virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
   static std::string class_name() { return "flyingsnowball"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Flying Snowball"); }
@@ -41,8 +41,8 @@ private:
   Timer puff_timer; /**< time until the next smoke puff is spawned */
 
 private:
-  FlyingSnowBall(const FlyingSnowBall&) = delete;
-  FlyingSnowBall& operator=(const FlyingSnowBall&) = delete;
+  FlyingSnowBall(FlyingSnowBall const&) = delete;
+  FlyingSnowBall& operator=(FlyingSnowBall const&) = delete;
 };
 
 #endif

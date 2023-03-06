@@ -44,7 +44,7 @@
 #include "video/surface.hpp"
 #include "worldmap/worldmap.hpp"
 
-GameSession::GameSession(const std::string& levelfile_, Savegame& savegame, Statistics* statistics) :
+GameSession::GameSession(std::string const& levelfile_, Savegame& savegame, Statistics* statistics) :
   GameSessionRecorder(),
   reset_button(false),
   reset_checkpoint_button(false),
@@ -90,13 +90,13 @@ GameSession::GameSession(const std::string& levelfile_, Savegame& savegame, Stat
 void
 GameSession::reset_level()
 {
-  for (const auto& p : m_currentsector->get_players())
+  for (auto const& p : m_currentsector->get_players())
   {
     try
     {
       p->set_bonus(m_boni_at_start.at(p->get_id()));
     }
-    catch(const std::out_of_range&)
+    catch(std::out_of_range const&)
     {
     }
   }
@@ -113,7 +113,7 @@ GameSession::reset_level()
 int
 GameSession::restart_level(bool after_death)
 {
-  const PlayerStatus& currentStatus = m_savegame.get_player_status();
+  PlayerStatus const& currentStatus = m_savegame.get_player_status();
   m_coins_at_start = currentStatus.coins;
   m_max_fire_bullets_at_start = currentStatus.max_fire_bullets;
   m_max_ice_bullets_at_start = currentStatus.max_ice_bullets;
@@ -124,13 +124,13 @@ GameSession::restart_level(bool after_death)
   {
     try
     {
-      for (const auto& p : m_currentsector->get_players())
+      for (auto const& p : m_currentsector->get_players())
       {
         p->set_bonus(m_boni_at_start.at(p->get_id()));
         m_boni_at_start[p->get_id()] = currentStatus.bonus[p->get_id()];
       }
     }
-    catch (const std::out_of_range&)
+    catch (std::out_of_range const&)
     {
     }
   }
@@ -210,7 +210,7 @@ GameSession::on_escape_press(bool force_quick_respawn)
 {
   auto players = m_currentsector->get_players();
 
-  int alive = m_currentsector->get_object_count<Player>([](const Player& p) {
+  int alive = m_currentsector->get_object_count<Player>([](Player const& p) {
     return !p.is_dead() && !p.is_dying();
   });
 
@@ -275,13 +275,13 @@ GameSession::abort_level()
   MenuManager::instance().clear_menu_stack();
   ScreenManager::current()->pop_screen();
 
-  for (const auto& p : m_currentsector->get_players())
+  for (auto const& p : m_currentsector->get_players())
   {
     try
     {
       p->set_bonus(m_boni_at_start.at(p->get_id()));
     }
-    catch(const std::out_of_range&)
+    catch(std::out_of_range const&)
     {
     }
   }
@@ -335,12 +335,12 @@ void
 GameSession::check_end_conditions()
 {
   bool all_dead = true;
-  for (const auto* p : m_currentsector->get_players())
+  for (auto const* p : m_currentsector->get_players())
     if (!(all_dead &= p->is_dead()))
       break;
 
   bool all_dead_or_winning = true;
-  for (const auto* p : m_currentsector->get_players())
+  for (auto const* p : m_currentsector->get_players())
     if (!(all_dead_or_winning &= (p->is_dead() || p->is_dying() || p->is_winning())))
       break;
 
@@ -405,7 +405,7 @@ GameSession::leave()
 }
 
 void
-GameSession::update(float dt_sec, const Controller& controller)
+GameSession::update(float dt_sec, Controller const& controller)
 {
   // Set active flag
   if (!m_active)
@@ -487,7 +487,7 @@ GameSession::update(float dt_sec, const Controller& controller)
 
     // retain invincibility if the player has it
     auto players = m_currentsector->get_players();
-    for (const auto& player : players)
+    for (auto const& player : players)
       player->m_invincible_timer.start(m_invincibilitytimeleft[player->get_id()]);
   }
 
@@ -505,7 +505,7 @@ GameSession::update(float dt_sec, const Controller& controller)
     } else {
       bool are_all_stopped = true;
 
-      for (const auto& player : m_currentsector->get_players())
+      for (auto const& player : m_currentsector->get_players())
       {
         if (!(m_end_sequence->is_tux_stopped(player->get_id())
             || player->get_ending_direction() == 0))
@@ -536,7 +536,7 @@ GameSession::update(float dt_sec, const Controller& controller)
   bool invincible_timer_started = false;
   float max_invincible_timer_left = 0.f;
 
-  for (const auto* p : m_currentsector->get_players())
+  for (auto const* p : m_currentsector->get_players())
   {
     invincible_timer_started |= (p->m_invincible_timer.started() && !p->is_winning());
     max_invincible_timer_left = std::max(max_invincible_timer_left, p->m_invincible_timer.get_timeleft());
@@ -595,7 +595,7 @@ GameSession::finish(bool win)
 }
 
 void
-GameSession::respawn(const std::string& sector, const std::string& spawnpoint,
+GameSession::respawn(std::string const& sector, std::string const& spawnpoint,
                      bool retain_invincibility)
 {
   m_newsector = sector;
@@ -604,14 +604,14 @@ GameSession::respawn(const std::string& sector, const std::string& spawnpoint,
   m_invincibilitytimeleft.clear();
 
   if (retain_invincibility)
-    for (const auto* player : Sector::get().get_players())
+    for (auto const* player : Sector::get().get_players())
       if (player->is_invincible())
         m_invincibilitytimeleft[player->get_id()] = player->m_invincible_timer.get_timeleft();
 }
 
 void
-GameSession::set_start_point(const std::string& sector,
-                             const std::string& spawnpoint)
+GameSession::set_start_point(std::string const& sector,
+                             std::string const& spawnpoint)
 {
   m_start_sector = sector;
   m_start_spawnpoint = spawnpoint;
@@ -619,8 +619,8 @@ GameSession::set_start_point(const std::string& sector,
 }
 
 void
-GameSession::set_start_pos(const std::string& sector,
-                           const Vector& pos)
+GameSession::set_start_pos(std::string const& sector,
+                           Vector const& pos)
 {
   m_start_sector = sector;
   m_start_spawnpoint = "";
@@ -628,7 +628,7 @@ GameSession::set_start_pos(const std::string& sector,
 }
 
 void
-GameSession::set_reset_point(const std::string& sector, const Vector& pos)
+GameSession::set_reset_point(std::string const& sector, Vector const& pos)
 {
   m_reset_sector = sector;
   m_reset_pos = pos;
@@ -641,7 +641,7 @@ GameSession::get_working_directory() const
 }
 
 void
-GameSession::start_sequence(Player* caller, Sequence seq, const SequenceData* data)
+GameSession::start_sequence(Player* caller, Sequence seq, SequenceData const* data)
 {
   // do not play sequences when in edit mode
   if (m_edit_mode) {
@@ -664,7 +664,7 @@ GameSession::start_sequence(Player* caller, Sequence seq, const SequenceData* da
       }
       else
       {
-        for (const auto* player : Sector::get().get_players())
+        for (auto const* player : Sector::get().get_players())
           m_end_sequence->stop_tux(player->get_id());
       }
     }
@@ -674,7 +674,7 @@ GameSession::start_sequence(Player* caller, Sequence seq, const SequenceData* da
   if (caller)
     caller->set_winning();
 
-  int remaining_players = get_current_sector().get_object_count<Player>([](const Player& p){
+  int remaining_players = get_current_sector().get_object_count<Player>([](Player const& p){
     return !p.is_dead() && !p.is_dying() && !p.is_winning();
   });
 
@@ -715,7 +715,7 @@ GameSession::start_sequence(Player* caller, Sequence seq, const SequenceData* da
 
   m_endsequence_timer.stop();
 
-  if (const auto& worldmap = worldmap::WorldMap::current())
+  if (auto const& worldmap = worldmap::WorldMap::current())
   {
     if (data != nullptr)
     {
@@ -744,7 +744,7 @@ GameSession::start_sequence(Player* caller, Sequence seq, const SequenceData* da
   }
 
   // Stop all clocks.
-  for (const auto& obj : m_currentsector->get_objects())
+  for (auto const& obj : m_currentsector->get_objects())
   {
     auto lt = dynamic_cast<LevelTime*>(obj.get());
     if (lt)

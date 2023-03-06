@@ -25,11 +25,11 @@ class World final
 public:
   /** Load a World
       @param directory  Directory containing the info file, e.g. "levels/world1" */
-  static std::unique_ptr<World> from_directory(const std::string& directory);
-  static std::unique_ptr<World> create(const std::string& title, const std::string& desc);
+  static std::unique_ptr<World> from_directory(std::string const& directory);
+  static std::unique_ptr<World> create(std::string const& title, std::string const& desc);
 
 private:
-  World(const std::string& directory);
+  World(std::string const& directory);
 
 public:
   std::string get_basedir() const { return m_basedir; }
@@ -59,8 +59,8 @@ private:
   std::string m_contrib_type; // Type of world if it is contrib: official, community, user
 
 private:
-  World(const World&) = delete;
-  World& operator=(const World&) = delete;
+  World(World const&) = delete;
+  World& operator=(World const&) = delete;
 };
 
 #endif

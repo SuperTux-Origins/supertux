@@ -24,10 +24,10 @@ class Color;
 class ItemColor final : public MenuItem
 {
 public:
-  ItemColor(const std::string& text_, Color* color_, int id = -1);
+  ItemColor(std::string const& text_, Color* color_, int id = -1);
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
   virtual Color get_color() const override;
 
@@ -37,8 +37,8 @@ private:
   Color* color;
 
 private:
-  ItemColor(const ItemColor&) = delete;
-  ItemColor& operator=(const ItemColor&) = delete;
+  ItemColor(ItemColor const&) = delete;
+  ItemColor& operator=(ItemColor const&) = delete;
 };
 
 #endif

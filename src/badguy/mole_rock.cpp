@@ -22,7 +22,7 @@
 #include "math/random.hpp"
 #include "sprite/sprite.hpp"
 
-MoleRock::MoleRock(const ReaderMapping& reader) :
+MoleRock::MoleRock(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/mole/mole_rock.sprite", LAYER_TILES - 2),
   parent(nullptr),
   initial_velocity(Vector(0, -400))
@@ -33,7 +33,7 @@ MoleRock::MoleRock(const ReaderMapping& reader) :
   SoundManager::current()->preload("sounds/stomp.wav");
 }
 
-MoleRock::MoleRock(const Vector& pos, const Vector& velocity, const BadGuy* parent_ = nullptr) :
+MoleRock::MoleRock(Vector const& pos, Vector const& velocity, BadGuy const* parent_ = nullptr) :
   BadGuy(pos, Direction::LEFT, "images/creatures/mole/mole_rock.sprite", LAYER_TILES - 2),
   parent(parent_),
   initial_velocity(velocity)
@@ -45,7 +45,7 @@ MoleRock::MoleRock(const Vector& pos, const Vector& velocity, const BadGuy* pare
 }
 
 bool
-MoleRock::updatePointers(const GameObject* from_object, GameObject* to_object)
+MoleRock::updatePointers(GameObject const* from_object, GameObject* to_object)
 {
   if (from_object == parent) {
     parent = dynamic_cast<MoleRock*>(to_object);
@@ -76,14 +76,14 @@ MoleRock::active_update(float dt_sec)
 }
 
 void
-MoleRock::collision_solid(const CollisionHit& )
+MoleRock::collision_solid(CollisionHit const& )
 {
   SoundManager::current()->play("sounds/darthit.wav", get_pos());
   remove_me();
 }
 
 HitResponse
-MoleRock::collision_badguy(BadGuy& badguy, const CollisionHit& )
+MoleRock::collision_badguy(BadGuy& badguy, CollisionHit const& )
 {
   // ignore collisions with parent
   if (&badguy == parent) {
@@ -96,7 +96,7 @@ MoleRock::collision_badguy(BadGuy& badguy, const CollisionHit& )
 }
 
 HitResponse
-MoleRock::collision_player(Player& player, const CollisionHit& hit)
+MoleRock::collision_player(Player& player, CollisionHit const& hit)
 {
   SoundManager::current()->play("sounds/stomp.wav", get_pos());
   remove_me();

@@ -83,7 +83,7 @@ KeyboardConfig::KeyboardConfig() :
 }
 
 void
-KeyboardConfig::read(const ReaderMapping& keymap_mapping)
+KeyboardConfig::read(ReaderMapping const& keymap_mapping)
 {
   // backwards compatibility:
   // keycode values changed between SDL1 and SDL2, so we skip old SDL1
@@ -113,7 +113,7 @@ KeyboardConfig::read(const ReaderMapping& keymap_mapping)
       {
         player_id = std::stoi(control_text.substr(0, pos));
       }
-      catch (const std::exception&)
+      catch (std::exception const&)
       {
         log_warning << "Could not parse player ID '" << control_text.substr(0, pos) << "' to number" << std::endl;
       }
@@ -160,7 +160,7 @@ KeyboardConfig::bind_key(SDL_Keycode key, int player, Control c)
 SDL_Keycode
 KeyboardConfig::reversemap_key(int player, Control c) const
 {
-  for (const auto& i : m_keymap)
+  for (auto const& i : m_keymap)
   {
     if (i.second == PlayerControl{player, c})
     {
@@ -181,7 +181,7 @@ KeyboardConfig::write(Writer& writer)
 
   writer.write("jump-with-up", m_jump_with_up_kbd);
 
-  for (const auto& i : m_keymap)
+  for (auto const& i : m_keymap)
   {
     std::string player_prefix = (i.second.player > 0) ? std::to_string(i.second.player) + DELIMITER : "";
     writer.start_list("map");

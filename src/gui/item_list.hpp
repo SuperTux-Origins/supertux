@@ -25,17 +25,17 @@
 class ItemList final : public MenuItem
 {
 public:
-  ItemList(const std::string& text, const std::vector<std::string>& items, std::string* value_ptr, int id = -1);
+  ItemList(std::string const& text, std::vector<std::string> const& items, std::string* value_ptr, int id = -1);
 
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
 private:
-  const std::vector<std::string>& m_items;
+  std::vector<std::string> const& m_items;
   std::string* m_value_ptr;
 
 private:
-  ItemList(const ItemList&) = delete;
-  ItemList& operator=(const ItemList&) = delete;
+  ItemList(ItemList const&) = delete;
+  ItemList& operator=(ItemList const&) = delete;
 };
 
 #endif

@@ -38,14 +38,14 @@ public:
   virtual void leave() override;
 
   virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, const Controller& controller) override;
+  virtual void update(float dt_sec, Controller const& controller) override;
 
 private:
   std::unique_ptr<WorldMap> m_worldmap;
 
 private:
-  WorldMapScreen(const WorldMapScreen&) = delete;
-  WorldMapScreen& operator=(const WorldMapScreen&) = delete;
+  WorldMapScreen(WorldMapScreen const&) = delete;
+  WorldMapScreen& operator=(WorldMapScreen const&) = delete;
 };
 
 } // namespace worldmap

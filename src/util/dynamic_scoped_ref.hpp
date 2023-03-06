@@ -77,8 +77,8 @@ private:
   T* m_ptr;
 
 private:
-  DynamicScopedRef(const DynamicScopedRef&) = delete;
-  DynamicScopedRef& operator=(const DynamicScopedRef&) = delete;
+  DynamicScopedRef(DynamicScopedRef const&) = delete;
+  DynamicScopedRef& operator=(DynamicScopedRef const&) = delete;
 };
 
 /** The DynamicScopedRefGuard class is returned by
@@ -107,8 +107,8 @@ private:
   T* m_old_ptr;
 
 private:
-  DynamicScopedRefGuard(const DynamicScopedRefGuard&) = delete;
-  DynamicScopedRefGuard& operator=(const DynamicScopedRefGuard&) = delete;
+  DynamicScopedRefGuard(DynamicScopedRefGuard const&) = delete;
+  DynamicScopedRefGuard& operator=(DynamicScopedRefGuard const&) = delete;
 };
 
 #endif

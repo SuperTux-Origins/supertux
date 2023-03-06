@@ -86,7 +86,7 @@ CustomParticleSystem::CustomParticleSystem() :
   reinit_textures();
 }
 
-CustomParticleSystem::CustomParticleSystem(const ReaderMapping& reader) :
+CustomParticleSystem::CustomParticleSystem(ReaderMapping const& reader) :
   ParticleSystem_Interactive(reader),
   ExposedObject<CustomParticleSystem, scripting::CustomParticles>(this),
   texture_sum_odds(0.f),
@@ -389,7 +389,7 @@ CustomParticleSystem::reinit_textures()
   }
 
   texture_sum_odds = 0.f;
-  for (const auto& texture : m_textures)
+  for (auto const& texture : m_textures)
   {
     texture_sum_odds += texture.likeliness;
   }
@@ -719,10 +719,10 @@ CustomParticleSystem::draw(DrawingContext& context)
   context.push_transform();
 
   std::unordered_map<SpriteProperties*, SurfaceBatch> batches;
-  for (const auto& particle : custom_particles) {
+  for (auto const& particle : custom_particles) {
     auto it = batches.find(&(particle->props));
     if (it == batches.end()) {
-      const auto& batch_it = batches.emplace(&(particle->props),
+      auto const& batch_it = batches.emplace(&(particle->props),
         SurfaceBatch(particle->props.texture, particle->props.color));
       batch_it.first->second.draw(Rectf(Vector(
                                                particle->pos.x - particle->scale
@@ -774,7 +774,7 @@ CustomParticleSystem::draw(DrawingContext& context)
 // Duplicated from ParticleSystem_Interactive because I intend to bring edits
 // sometime in the future, for even more flexibility with particles. (Semphris)
 int
-CustomParticleSystem::collision(Particle* object, const Vector& movement)
+CustomParticleSystem::collision(Particle* object, Vector const& movement)
 {
   using namespace collision;
 
@@ -814,12 +814,12 @@ CustomParticleSystem::collision(Particle* object, const Vector& movement)
   dest.move(movement);
   Constraints constraints;
 
-  for (const auto& solids : Sector::get().get_solid_tilemaps()) {
+  for (auto const& solids : Sector::get().get_solid_tilemaps()) {
     // FIXME Handle a nonzero tilemap offset
     // Check if it gets fixed in particlesystem_interactive.cpp
     for (int x = starttilex; x*32 < max_x; ++x) {
       for (int y = starttiley; y*32 < max_y; ++y) {
-        const Tile& tile = solids->get_tile(x, y);
+        Tile const& tile = solids->get_tile(x, y);
 
         // skip non-solid tiles, except water
         if (! (tile.get_attributes() & (Tile::WATER | Tile::SOLID)))
@@ -850,7 +850,7 @@ CustomParticleSystem::collision(Particle* object, const Vector& movement)
   if (!constraints.has_constraints())
     return -1;
 
-  const CollisionHit& hit = constraints.hit;
+  CollisionHit const& hit = constraints.hit;
   if (water) {
     return 0; //collision with water tile - don't draw splash
   } else {
@@ -863,7 +863,7 @@ CustomParticleSystem::collision(Particle* object, const Vector& movement)
 }
 
 CollisionHit
-CustomParticleSystem::get_collision(Particle* object, const Vector& movement)
+CustomParticleSystem::get_collision(Particle* object, Vector const& movement)
 {
   using namespace collision;
 
@@ -900,12 +900,12 @@ CustomParticleSystem::get_collision(Particle* object, const Vector& movement)
   dest.move(movement);
   Constraints constraints;
 
-  for (const auto& solids : Sector::get().get_solid_tilemaps()) {
+  for (auto const& solids : Sector::get().get_solid_tilemaps()) {
     // FIXME Handle a nonzero tilemap offset
     // Check if it gets fixed in particlesystem_interactive.cpp
     for (int x = starttilex; x*32 < max_x; ++x) {
       for (int y = starttiley; y*32 < max_y; ++y) {
-        const Tile& tile = solids->get_tile(x, y);
+        Tile const& tile = solids->get_tile(x, y);
 
         // skip non-solid tiles
         if (! (tile.get_attributes() & (/*Tile::WATER |*/ Tile::SOLID)))

@@ -29,7 +29,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
-GoldBomb::GoldBomb(const ReaderMapping& reader) :
+GoldBomb::GoldBomb(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/gold_bomb/gold_bomb.sprite", "left", "right"),
   tstate(STATE_NORMAL),
   ticking()
@@ -53,7 +53,7 @@ GoldBomb::GoldBomb(const ReaderMapping& reader) :
 }
 
 void
-GoldBomb::collision_solid(const CollisionHit& hit)
+GoldBomb::collision_solid(CollisionHit const& hit)
 {
   if (tstate == STATE_TICKING) {
     if (hit.bottom) {
@@ -70,7 +70,7 @@ GoldBomb::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-GoldBomb::collision(GameObject& object, const CollisionHit& hit)
+GoldBomb::collision(GameObject& object, CollisionHit const& hit)
 {
   if (tstate == STATE_TICKING) {
     if ( dynamic_cast<Player*>(&object) ) {
@@ -86,7 +86,7 @@ GoldBomb::collision(GameObject& object, const CollisionHit& hit)
 }
 
 HitResponse
-GoldBomb::collision_player(Player& player, const CollisionHit& hit)
+GoldBomb::collision_player(Player& player, CollisionHit const& hit)
 {
   if (tstate == STATE_TICKING)
     return FORCE_MOVE;
@@ -96,7 +96,7 @@ GoldBomb::collision_player(Player& player, const CollisionHit& hit)
 }
 
 HitResponse
-GoldBomb::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+GoldBomb::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (tstate == STATE_TICKING)
     return FORCE_MOVE;
@@ -192,7 +192,7 @@ GoldBomb::ignite()
 }
 
 void
-GoldBomb::grab(MovingObject& object, const Vector& pos, Direction dir_)
+GoldBomb::grab(MovingObject& object, Vector const& pos, Direction dir_)
 {
   Portable::grab(object,pos,dir_);
   if (tstate == STATE_TICKING){

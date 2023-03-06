@@ -28,12 +28,12 @@ class LitObject final :
   public ExposedObject<LitObject, scripting::LitObject>
 {
 public:
-  LitObject(const ReaderMapping& reader);
+  LitObject(ReaderMapping const& reader);
 
   virtual void draw(DrawingContext& context) override;
   virtual void update(float) override;
 
-  virtual HitResponse collision(GameObject&, const CollisionHit&) override
+  virtual HitResponse collision(GameObject&, CollisionHit const&) override
     { return ABORT_MOVE; }
 
   static std::string class_name() { return "lit-object"; }
@@ -45,10 +45,10 @@ public:
 
   virtual void on_flip(float height) override;
 
-  const std::string& get_action() const;
-  void set_action(const std::string& action);
-  const std::string& get_light_action() const;
-  void set_light_action(const std::string& action);
+  std::string const& get_action() const;
+  void set_action(std::string const& action);
+  std::string const& get_light_action() const;
+  void set_light_action(std::string const& action);
 
 private:
   Vector m_light_offset;
@@ -62,8 +62,8 @@ private:
   Flip m_flip;
 
 private:
-  LitObject(const LitObject&) = delete;
-  LitObject& operator=(const LitObject&) = delete;
+  LitObject(LitObject const&) = delete;
+  LitObject& operator=(LitObject const&) = delete;
 };
 
 #endif

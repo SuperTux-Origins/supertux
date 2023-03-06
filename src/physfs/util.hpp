@@ -23,16 +23,16 @@ namespace physfsutil {
 
 /** Convert 'path' to it's canonical name, i.e. normalize it and add a
     '/' to the front) */
-std::string realpath(const std::string& path);
+std::string realpath(std::string const& path);
 
 /** Returns true if the given path is a directory or a symlink
     pointing to a directory */
-bool is_directory(const std::string& path);
+bool is_directory(std::string const& path);
 
-bool remove(const std::string& filenam);
+bool remove(std::string const& filenam);
 
 /** Removes directory with content */
-void remove_with_content(const std::string& filename);
+void remove_with_content(std::string const& filename);
 
 } // namespace physfsutil
 

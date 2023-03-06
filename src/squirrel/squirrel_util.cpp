@@ -60,7 +60,7 @@ std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
       break;
     }
     case OT_STRING: {
-      const SQChar* val;
+      SQChar const* val;
       sq_getstring(v, i, &val);
       os << "\"" << val << "\"";
       break;
@@ -165,7 +165,7 @@ void print_squirrel_stack(HSQUIRRELVM v)
         break;
       }
       case OT_STRING: {
-        const SQChar* val;
+        SQChar const* val;
         sq_getstring(v, i, &val);
         printf("string (%s)", val);
         break;
@@ -221,14 +221,14 @@ SQInteger squirrel_read_char(SQUserPointer file)
   return c;
 }
 
-void compile_script(HSQUIRRELVM vm, std::istream& in, const std::string& sourcename)
+void compile_script(HSQUIRRELVM vm, std::istream& in, std::string const& sourcename)
 {
   if (SQ_FAILED(sq_compile(vm, squirrel_read_char, &in, sourcename.c_str(), true)))
     throw SquirrelError(vm, "Couldn't parse script");
 }
 
 void compile_and_run(HSQUIRRELVM vm, std::istream& in,
-                     const std::string& sourcename)
+                     std::string const& sourcename)
 {
   compile_script(vm, in, sourcename);
 

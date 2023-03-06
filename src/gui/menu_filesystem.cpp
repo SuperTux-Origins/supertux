@@ -25,8 +25,8 @@
 #include "util/log.hpp"
 #include "util/gettext.hpp"
 
-FileSystemMenu::FileSystemMenu(std::string* filename, const std::vector<std::string>& extensions,
-                               const std::string& basedir, bool path_relative_to_basedir, std::function<void(std::string)> callback) :
+FileSystemMenu::FileSystemMenu(std::string* filename, std::vector<std::string> const& extensions,
+                               std::string const& basedir, bool path_relative_to_basedir, std::function<void(std::string)> callback) :
   m_filename(filename),
   // when a basedir is given, 'filename' is relative to basedir, so
   // it's useless as a starting point
@@ -70,7 +70,7 @@ FileSystemMenu::refresh_items()
   char** dir_files = PHYSFS_enumerateFiles(m_directory.c_str());
   if (dir_files)
   {
-    for (const char* const* file = dir_files; *file != nullptr; ++file)
+    for (char const* const* file = dir_files; *file != nullptr; ++file)
     {
       std::string filepath = FileSystem::join(m_directory, *file);
       if (physfsutil::is_directory(filepath))
@@ -88,13 +88,13 @@ FileSystemMenu::refresh_items()
     PHYSFS_freeList(dir_files);
   }
 
-  for (const auto& item : m_directories)
+  for (auto const& item : m_directories)
   {
     add_entry(item_id, "[" + std::string(item) + "]");
     item_id++;
   }
 
-  for (const auto& item : m_files)
+  for (auto const& item : m_files)
   {
     add_entry(item_id, item);
     item_id++;
@@ -112,12 +112,12 @@ FileSystemMenu::refresh_items()
 }
 
 bool
-FileSystemMenu::has_right_suffix(const std::string& file) const
+FileSystemMenu::has_right_suffix(std::string const& file) const
 {
   if (m_extensions.empty())
     return true;
 
-  for (const auto& extension : m_extensions) {
+  for (auto const& extension : m_extensions) {
     if (file.ends_with(extension))
     {
       return true;

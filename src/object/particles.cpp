@@ -27,8 +27,8 @@
 #include "video/viewport.hpp"
 
 //TODO: remove this function in favor of the one below
-Particles::Particles(const Vector& epicenter, int min_angle, int max_angle,
-                     const Vector& initial_velocity, const Vector& acceleration, int number,
+Particles::Particles(Vector const& epicenter, int min_angle, int max_angle,
+                     Vector const& initial_velocity, Vector const& acceleration, int number,
                      Color color_, int size_, float life_time, int drawing_layer_) :
   accel(acceleration),
   timer(),
@@ -63,9 +63,9 @@ Particles::Particles(const Vector& epicenter, int min_angle, int max_angle,
   }
 }
 
-Particles::Particles(const Vector& epicenter, int min_angle, int max_angle,
+Particles::Particles(Vector const& epicenter, int min_angle, int max_angle,
                      const float min_initial_velocity, const float max_initial_velocity,
-                     const Vector& acceleration, int number, Color color_,
+                     Vector const& acceleration, int number, Color color_,
                      int size_, float life_time, int drawing_layer_) :
 
   accel(acceleration),

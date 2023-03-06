@@ -22,17 +22,17 @@
 class ItemScript final : public MenuItem
 {
 public:
-  ItemScript(const std::string& text_, std::string* script_, int id = -1);
+  ItemScript(std::string const& text_, std::string* script_, int id = -1);
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
 private:
   std::string* script;
 
 private:
-  ItemScript(const ItemScript&) = delete;
-  ItemScript& operator=(const ItemScript&) = delete;
+  ItemScript(ItemScript const&) = delete;
+  ItemScript& operator=(ItemScript const&) = delete;
 };
 
 #endif

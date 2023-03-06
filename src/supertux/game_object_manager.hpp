@@ -90,7 +90,7 @@ public:
     return GameObjectRange<T>(*this);
   }
 
-  const std::vector<GameObject*>&
+  std::vector<GameObject*> const&
   get_objects_by_type_index(std::type_index type_idx) const
   {
     auto it = m_objects_by_type_index.find(type_idx);
@@ -106,14 +106,14 @@ public:
   template<class T>
   T& get_singleton_by_type() const
   {
-    const auto& range = get_objects_by_type<T>();
+    auto const& range = get_objects_by_type<T>();
     assert(range.begin() != range.end());
     assert(range.begin()->is_singleton());
     return *range.begin();
   }
 
   template<class T>
-  T* get_object_by_uid(const UID& uid) const
+  T* get_object_by_uid(UID const& uid) const
   {
     auto it = m_objects_by_uid.find(uid);
     if (it == m_objects_by_uid.end())
@@ -146,10 +146,10 @@ public:
       resolsed to a UID. Note that this function is only valid in the
       construction phase, not during draw() or update() calls, use
       get_object_by_uid() instead. */
-  void request_name_resolve(const std::string& name, std::function<void (UID)> callback);
+  void request_name_resolve(std::string const& name, std::function<void (UID)> callback);
 
   template<class T>
-  T* get_object_by_name(const std::string& name) const
+  T* get_object_by_name(std::string const& name) const
   {
     auto it = m_objects_by_name.find(name);
     if (it == m_objects_by_name.end())
@@ -164,10 +164,10 @@ public:
 
   /** Get total number of GameObjects of given type */
   template<class T>
-  int get_object_count(std::function<bool(const T&)> predicate = nullptr) const
+  int get_object_count(std::function<bool(T const&)> predicate = nullptr) const
   {
     int total = 0;
-    for (const auto& obj : m_gameobjects) {
+    for (auto const& obj : m_gameobjects) {
       auto object = dynamic_cast<T*>(obj.get());
       if (object && (predicate == nullptr || predicate(*object)))
       {
@@ -177,8 +177,8 @@ public:
     return total;
   }
 
-  const std::vector<TileMap*>& get_solid_tilemaps() const { return m_solid_tilemaps; }
-  const std::vector<TileMap*>& get_all_tilemaps() const { return m_all_tilemaps; }
+  std::vector<TileMap*> const& get_solid_tilemaps() const { return m_solid_tilemaps; }
+  std::vector<TileMap*> const& get_all_tilemaps() const { return m_all_tilemaps; }
   
   void update_solid(TileMap* solid);
 
@@ -193,7 +193,7 @@ protected:
   template<class T>
   T* get_object_by_type() const
   {
-    const auto& range = get_objects_by_type<T>();
+    auto const& range = get_objects_by_type<T>();
     if (range.begin() == range.end()) {
       return nullptr;
     } else {
@@ -226,8 +226,8 @@ private:
   std::vector<NameResolveRequest> m_name_resolve_requests;
 
 private:
-  GameObjectManager(const GameObjectManager&) = delete;
-  GameObjectManager& operator=(const GameObjectManager&) = delete;
+  GameObjectManager(GameObjectManager const&) = delete;
+  GameObjectManager& operator=(GameObjectManager const&) = delete;
 };
 
 #include "supertux/game_object_iterator.hpp"

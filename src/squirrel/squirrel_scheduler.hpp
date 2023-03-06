@@ -43,7 +43,7 @@ private:
     // true if calling force_wake_up should wake this entry up
     bool skippable;
 
-    bool operator<(const ScheduleEntry& other) const
+    bool operator<(ScheduleEntry const& other) const
     {
       // we need the smallest value on top
       return wakeup_time > other.wakeup_time;
@@ -57,8 +57,8 @@ private:
   ScheduleHeap schedule;
 
 private:
-  SquirrelScheduler(const SquirrelScheduler&) = delete;
-  SquirrelScheduler& operator=(const SquirrelScheduler&) = delete;
+  SquirrelScheduler(SquirrelScheduler const&) = delete;
+  SquirrelScheduler& operator=(SquirrelScheduler const&) = delete;
 };
 
 #endif

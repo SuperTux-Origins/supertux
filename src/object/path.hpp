@@ -40,7 +40,7 @@ enum class WalkMode {
   CIRCULAR
 };
 
-WalkMode string_to_walk_mode(const std::string& mode_string);
+WalkMode string_to_walk_mode(std::string const& mode_string);
 std::string walk_mode_to_string(WalkMode walk_mode);
 
 class Path final
@@ -72,26 +72,26 @@ public:
 
 public:
   Path();
-  Path(const Vector& pos);
+  Path(Vector const& pos);
 
-  void read(const ReaderMapping& reader);
+  void read(ReaderMapping const& reader);
   void save(Writer& writer);
 
   Vector get_base() const;
 
   /** returns Node index nearest to reference_point or -1 if not applicable */
-  int get_nearest_node_no(const Vector& reference_point) const;
+  int get_nearest_node_no(Vector const& reference_point) const;
 
   /** returns Node index farthest from reference_point or -1 if not applicable */
-  int get_farthest_node_no(const Vector& reference_point) const;
+  int get_farthest_node_no(Vector const& reference_point) const;
 
   /** Moves all nodes by given shift. */
-  void move_by(const Vector& shift);
+  void move_by(Vector const& shift);
 
   /** Returns false when has no nodes */
   bool is_valid() const;
 
-  const std::vector<Node>& get_nodes() const { return m_nodes; }
+  std::vector<Node> const& get_nodes() const { return m_nodes; }
 
 public:
   std::vector<Node> m_nodes;
@@ -105,8 +105,8 @@ public:
   void on_flip(float height);
 
 private:
-  Path(const Path&) = delete;
-  Path& operator=(const Path&) = delete;
+  Path(Path const&) = delete;
+  Path& operator=(Path const&) = delete;
 };
 
 #endif

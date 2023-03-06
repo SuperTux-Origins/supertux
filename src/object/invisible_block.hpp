@@ -22,8 +22,8 @@
 class InvisibleBlock final : public Block
 {
 public:
-  InvisibleBlock(const Vector& pos);
-  InvisibleBlock(const ReaderMapping& mapping);
+  InvisibleBlock(Vector const& pos);
+  InvisibleBlock(ReaderMapping const& mapping);
 
   static std::string class_name() { return "invisible_block"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -31,8 +31,8 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
   virtual void draw(DrawingContext& context) override;
-  virtual bool collides(GameObject& other, const CollisionHit& hit) const override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
 private:
   virtual void hit(Player& player) override;
@@ -41,8 +41,8 @@ private:
   bool visible;
 
 private:
-  InvisibleBlock(const InvisibleBlock&) = delete;
-  InvisibleBlock& operator=(const InvisibleBlock&) = delete;
+  InvisibleBlock(InvisibleBlock const&) = delete;
+  InvisibleBlock& operator=(InvisibleBlock const&) = delete;
 };
 
 #endif

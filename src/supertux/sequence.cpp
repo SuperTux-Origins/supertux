@@ -17,7 +17,7 @@
 #include "supertux/sequence.hpp"
 #include "util/log.hpp"
 
-Sequence string_to_sequence(const std::string& sequencename) {
+Sequence string_to_sequence(std::string const& sequencename) {
   if (sequencename == "endsequence")
     return SEQ_ENDSEQUENCE;
   if (sequencename == "stoptux")
@@ -29,7 +29,7 @@ Sequence string_to_sequence(const std::string& sequencename) {
   return SEQ_ENDSEQUENCE;
 }
 
-std::string sequence_to_string(const Sequence& seq) {
+std::string sequence_to_string(Sequence const& seq) {
   switch (seq) {
     case SEQ_ENDSEQUENCE:
       return "endsequence";

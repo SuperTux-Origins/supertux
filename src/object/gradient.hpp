@@ -28,7 +28,7 @@ class Gradient final :
 {
 public:
   Gradient();
-  Gradient(const ReaderMapping& reader);
+  Gradient(ReaderMapping const& reader);
   ~Gradient() override;
 
   virtual void update(float dt_sec) override;
@@ -53,7 +53,7 @@ public:
   Color get_gradient_bottom() const { return m_gradient_bottom; }
 
   GradientDirection get_direction() const { return m_gradient_direction; }
-  void set_direction(const GradientDirection& direction);
+  void set_direction(GradientDirection const& direction);
 
   void set_layer(int layer) { m_layer = layer; }
   int get_layer() const { return m_layer; }
@@ -67,8 +67,8 @@ private:
   DrawingTarget m_target;
 
 private:
-  Gradient(const Gradient&) = delete;
-  Gradient& operator=(const Gradient&) = delete;
+  Gradient(Gradient const&) = delete;
+  Gradient& operator=(Gradient const&) = delete;
   
   Color m_start_gradient_top;
   Color m_start_gradient_bottom;

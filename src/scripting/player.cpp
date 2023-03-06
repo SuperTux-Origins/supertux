@@ -21,14 +21,14 @@
 namespace scripting {
 
 bool
-Player::add_bonus(const std::string& bonus)
+Player::add_bonus(std::string const& bonus)
 {
   SCRIPT_GUARD_DEFAULT;
   return object.add_bonus(bonus);
 }
 
 bool
-Player::set_bonus(const std::string& bonus)
+Player::set_bonus(std::string const& bonus)
 {
   SCRIPT_GUARD_DEFAULT;
   return object.set_bonus(bonus);
@@ -162,7 +162,7 @@ Player::do_jump(float yspeed)
 }
 
 void
-Player::trigger_sequence(const std::string& sequence_name)
+Player::trigger_sequence(std::string const& sequence_name)
 {
   SCRIPT_GUARD_VOID;
   object.trigger_sequence(sequence_name);
@@ -176,7 +176,7 @@ Player::use_scripting_controller(bool use_or_release)
 }
 
 void
-Player::do_scripting_controller(const std::string& control, bool pressed)
+Player::do_scripting_controller(std::string const& control, bool pressed)
 {
   SCRIPT_GUARD_VOID;
   object.do_scripting_controller(control, pressed);
@@ -197,7 +197,7 @@ Player::get_velocity_y() const
 }
 
 bool
-Player::has_grabbed(const std::string& name) const
+Player::has_grabbed(std::string const& name) const
 {
   SCRIPT_GUARD_DEFAULT;
   return object.has_grabbed(name);

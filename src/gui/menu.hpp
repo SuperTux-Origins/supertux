@@ -71,42 +71,42 @@ public:
 
   virtual void on_window_resize();
 
-  virtual void event(const SDL_Event& event);
+  virtual void event(SDL_Event const& event);
 
   ItemHorizontalLine& add_hl();
-  ItemLabel& add_label(const std::string& text);
-  ItemAction& add_entry(int id, const std::string& text);
-  ItemAction& add_entry(const std::string& text, const std::function<void()>& callback);
-  ItemToggle& add_toggle(int id, const std::string& text, bool* toggled, bool center_text = false);
-  ItemToggle& add_toggle(int id, const std::string& text,
-                         const std::function<bool()>& get_func,
-                         const std::function<void(bool)>& set_func,
+  ItemLabel& add_label(std::string const& text);
+  ItemAction& add_entry(int id, std::string const& text);
+  ItemAction& add_entry(std::string const& text, std::function<void()> const& callback);
+  ItemToggle& add_toggle(int id, std::string const& text, bool* toggled, bool center_text = false);
+  ItemToggle& add_toggle(int id, std::string const& text,
+                         std::function<bool()> const& get_func,
+                         std::function<void(bool)> const& set_func,
                          bool center_text = false);
-  ItemInactive& add_inactive(const std::string& text, bool default_color = false);
-  ItemBack& add_back(const std::string& text, int id = -1);
-  ItemGoTo& add_submenu(const std::string& text, int submenu, int id = -1);
-  ItemControlField& add_controlfield(int id, const std::string& text, const std::string& mapping = "");
-  ItemStringSelect& add_string_select(int id, const std::string& text, int* selected, const std::vector<std::string>& strings);
-  ItemTextField& add_textfield(const std::string& text, std::string* input, int id = -1);
-  ItemScript& add_script(const std::string& text, std::string* script, int id = -1);
+  ItemInactive& add_inactive(std::string const& text, bool default_color = false);
+  ItemBack& add_back(std::string const& text, int id = -1);
+  ItemGoTo& add_submenu(std::string const& text, int submenu, int id = -1);
+  ItemControlField& add_controlfield(int id, std::string const& text, std::string const& mapping = "");
+  ItemStringSelect& add_string_select(int id, std::string const& text, int* selected, std::vector<std::string> const& strings);
+  ItemTextField& add_textfield(std::string const& text, std::string* input, int id = -1);
+  ItemScript& add_script(std::string const& text, std::string* script, int id = -1);
   ItemScriptLine& add_script_line(std::string* input, int id = -1);
-  ItemIntField& add_intfield(const std::string& text, int* input, int id = -1, bool positive = false);
-  ItemFloatField& add_floatfield(const std::string& text, float* input, int id = -1, bool positive = false);
-  ItemBadguySelect& add_badguy_select(const std::string& text, std::vector<std::string>* badguys, int id = -1);
-  ItemFile& add_file(const std::string& text, std::string* input, const std::vector<std::string>& extensions,
-                     const std::string& basedir, bool path_relative_to_basedir, int id = -1);
+  ItemIntField& add_intfield(std::string const& text, int* input, int id = -1, bool positive = false);
+  ItemFloatField& add_floatfield(std::string const& text, float* input, int id = -1, bool positive = false);
+  ItemBadguySelect& add_badguy_select(std::string const& text, std::vector<std::string>* badguys, int id = -1);
+  ItemFile& add_file(std::string const& text, std::string* input, std::vector<std::string> const& extensions,
+                     std::string const& basedir, bool path_relative_to_basedir, int id = -1);
 
-  ItemColor& add_color(const std::string& text, Color* color, int id = -1);
+  ItemColor& add_color(std::string const& text, Color* color, int id = -1);
   ItemColorDisplay& add_color_display(Color* color, int id = -1);
   ItemColorChannelRGBA& add_color_channel_rgba(float* input, Color channel, int id = -1,
     bool is_linear = false);
   ItemColorChannelOKLab& add_color_channel_oklab(Color* color, int channel);
-  ItemStringArray& add_string_array(const std::string& text, std::vector<std::string>& items, int id = -1);
-  ItemImages& add_images(const std::string& image_path, int max_image_width = 0, int max_image_height = 0, int id = -1);
-  ItemImages& add_images(const std::vector<std::string>& image_paths, int max_image_width = 0, int max_image_height = 0, int id = -1);
-  ItemList& add_list(const std::string& text, const std::vector<std::string>& items, std::string* value_ptr, int id = -1);
+  ItemStringArray& add_string_array(std::string const& text, std::vector<std::string>& items, int id = -1);
+  ItemImages& add_images(std::string const& image_path, int max_image_width = 0, int max_image_height = 0, int id = -1);
+  ItemImages& add_images(std::vector<std::string> const& image_paths, int max_image_width = 0, int max_image_height = 0, int id = -1);
+  ItemList& add_list(std::string const& text, std::vector<std::string> const& items, std::string* value_ptr, int id = -1);
 
-  void process_input(const Controller& controller);
+  void process_input(Controller const& controller);
 
   /** Remove all entries from the menu */
   void clear();
@@ -114,7 +114,7 @@ public:
   MenuItem& get_item(int index) { return *(m_items[index]); }
 
   MenuItem& get_item_by_id(int id);
-  const MenuItem& get_item_by_id(int id) const;
+  MenuItem const& get_item_by_id(int id) const;
 
   int get_active_item_id() const;
   void set_active_item(int id);
@@ -140,8 +140,8 @@ protected:
   void calculate_height();
 
 private:
-  void process_action(const MenuAction& menuaction);
-  void check_controlfield_change_event(const SDL_Event& event);
+  void process_action(MenuAction const& menuaction);
+  void check_controlfield_change_event(SDL_Event const& event);
   void draw_item(DrawingContext& context, int index, float y_pos);
 
 private:
@@ -166,8 +166,8 @@ protected:
   int m_active_item;
 
 private:
-  Menu(const Menu&) = delete;
-  Menu& operator=(const Menu&) = delete;
+  Menu(Menu const&) = delete;
+  Menu& operator=(Menu const&) = delete;
 };
 
 #endif

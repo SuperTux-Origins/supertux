@@ -29,7 +29,7 @@ CustomParticleSystemFile::CustomParticleSystemFile() :
 {
 }
 
-CustomParticleSystemFile::CustomParticleSystemFile(const ReaderMapping& reader) :
+CustomParticleSystemFile::CustomParticleSystemFile(ReaderMapping const& reader) :
   CustomParticleSystem(reader),
   m_filename()
 {

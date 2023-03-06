@@ -27,7 +27,7 @@
 #include "supertux/globals.hpp"
 #include "util/log.hpp"
 
-SquirrelEnvironment::SquirrelEnvironment(SquirrelVM& vm, const std::string& name) :
+SquirrelEnvironment::SquirrelEnvironment(SquirrelVM& vm, std::string const& name) :
   m_vm(vm),
   m_table(),
   m_name(name),
@@ -107,7 +107,7 @@ SquirrelEnvironment::try_unexpose(GameObject& object)
 }
 
 void
-SquirrelEnvironment::unexpose(const std::string& name)
+SquirrelEnvironment::unexpose(std::string const& name)
 {
   SQInteger oldtop = sq_gettop(m_vm.get_vm());
   sq_pushobject(m_vm.get_vm(), m_table);
@@ -120,7 +120,7 @@ SquirrelEnvironment::unexpose(const std::string& name)
 }
 
 void
-SquirrelEnvironment::run_script(const std::string& script, const std::string& sourcename)
+SquirrelEnvironment::run_script(std::string const& script, std::string const& sourcename)
 {
   if (script.empty()) return;
 
@@ -147,7 +147,7 @@ SquirrelEnvironment::garbage_collect()
 }
 
 void
-SquirrelEnvironment::run_script(std::istream& in, const std::string& sourcename)
+SquirrelEnvironment::run_script(std::istream& in, std::string const& sourcename)
 {
   garbage_collect();
 
@@ -166,7 +166,7 @@ SquirrelEnvironment::run_script(std::istream& in, const std::string& sourcename)
 
     compile_and_run(vm, in, sourcename);
   }
-  catch(const std::exception& e)
+  catch(std::exception const& e)
   {
     log_warning << "Error running script: " << e.what() << std::endl;
   }

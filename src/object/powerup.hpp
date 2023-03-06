@@ -23,14 +23,14 @@
 class PowerUp final : public MovingSprite
 {
 public:
-  PowerUp(const ReaderMapping& mapping);
-  PowerUp(const Vector& pos, const std::string& sprite_name);
+  PowerUp(ReaderMapping const& mapping);
+  PowerUp(Vector const& pos, std::string const& sprite_name);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
   virtual void on_flip(float height) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   static std::string class_name() { return "powerup"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -48,8 +48,8 @@ private:
   SpritePtr lightsprite;
 
 private:
-  PowerUp(const PowerUp&) = delete;
-  PowerUp& operator=(const PowerUp&) = delete;
+  PowerUp(PowerUp const&) = delete;
+  PowerUp& operator=(PowerUp const&) = delete;
 };
 
 #endif

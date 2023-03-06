@@ -37,8 +37,8 @@ private:
   int m_selected_item;
 
 private:
-  StringArrayMenu(const StringArrayMenu&) = delete;
-  StringArrayMenu& operator=(const StringArrayMenu&) = delete;
+  StringArrayMenu(StringArrayMenu const&) = delete;
+  StringArrayMenu& operator=(StringArrayMenu const&) = delete;
 };
 
 #endif

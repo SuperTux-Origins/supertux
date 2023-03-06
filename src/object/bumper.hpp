@@ -24,10 +24,10 @@ class Player;
 class Bumper final : public MovingSprite
 {
 public:
-  Bumper(const ReaderMapping& reader);
+  Bumper(ReaderMapping const& reader);
 
   virtual void update(float dt_sec) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   static std::string class_name() { return "bumper"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -42,8 +42,8 @@ private:
   bool left;
 
 private:
-  Bumper(const Bumper&) = delete;
-  Bumper& operator=(const Bumper&) = delete;
+  Bumper(Bumper const&) = delete;
+  Bumper& operator=(Bumper const&) = delete;
 };
 
 #endif

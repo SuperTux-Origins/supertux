@@ -49,7 +49,7 @@ public:
   void bind_joyaxis(JoystickID joy_id, int axis, Control c);
   void bind_joyhat(JoystickID joy_id, int dir, Control c);
 
-  void read(const ReaderMapping& joystick_mapping);
+  void read(ReaderMapping const& joystick_mapping);
   void write(Writer& writer);
 
 private:
@@ -62,8 +62,8 @@ private:
   std::map<std::pair<JoystickID, int>, Control> m_joy_hat_map;
 
 private:
-  JoystickConfig(const JoystickConfig&) = delete;
-  JoystickConfig& operator=(const JoystickConfig&) = delete;
+  JoystickConfig(JoystickConfig const&) = delete;
+  JoystickConfig& operator=(JoystickConfig const&) = delete;
 };
 
 #endif

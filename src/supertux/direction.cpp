@@ -21,13 +21,13 @@
 #include "util/gettext.hpp"
 #include "util/log.hpp"
 
-std::ostream& operator<<(std::ostream& o, const Direction& dir)
+std::ostream& operator<<(std::ostream& o, Direction const& dir)
 {
   return o << dir_to_string(dir);
 }
 
 std::string
-dir_to_string(const Direction& dir)
+dir_to_string(Direction const& dir)
 {
   switch (dir)
   {
@@ -50,7 +50,7 @@ dir_to_string(const Direction& dir)
 }
 
 Direction
-string_to_dir(const std::string& dir_str)
+string_to_dir(std::string const& dir_str)
 {
   if (dir_str == "left")
     return Direction::LEFT;

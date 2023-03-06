@@ -25,7 +25,7 @@
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
-Bullet::Bullet(const Vector& pos, const Vector& xm, Direction dir, BonusType type_, Player& player) :
+Bullet::Bullet(Vector const& pos, Vector const& xm, Direction dir, BonusType type_, Player& player) :
   m_player(player),
   physic(),
   life_count(3),
@@ -98,7 +98,7 @@ Bullet::draw(DrawingContext& context)
 }
 
 void
-Bullet::collision_solid(const CollisionHit& hit)
+Bullet::collision_solid(CollisionHit const& hit)
 {
   if (hit.top || hit.bottom) {
     physic.set_velocity_y(-physic.get_velocity_y());
@@ -113,13 +113,13 @@ Bullet::collision_solid(const CollisionHit& hit)
 }
 
 void
-Bullet::ricochet(GameObject& , const CollisionHit& hit)
+Bullet::ricochet(GameObject& , CollisionHit const& hit)
 {
   collision_solid(hit);
 }
 
 HitResponse
-Bullet::collision(GameObject& , const CollisionHit& )
+Bullet::collision(GameObject& , CollisionHit const& )
 {
   return FORCE_MOVE;
 }

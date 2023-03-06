@@ -27,21 +27,21 @@ class Level;
 class LevelParser final
 {
 public:
-  static std::unique_ptr<Level> from_stream(std::istream& stream, const std::string& context, bool worldmap, bool editable);
-  static std::unique_ptr<Level> from_file(const std::string& filename, bool worldmap, bool editable);
-  static std::unique_ptr<Level> from_nothing(const std::string& basedir);
-  static std::unique_ptr<Level> from_nothing_worldmap(const std::string& basedir, const std::string& name);
+  static std::unique_ptr<Level> from_stream(std::istream& stream, std::string const& context, bool worldmap, bool editable);
+  static std::unique_ptr<Level> from_file(std::string const& filename, bool worldmap, bool editable);
+  static std::unique_ptr<Level> from_nothing(std::string const& basedir);
+  static std::unique_ptr<Level> from_nothing_worldmap(std::string const& basedir, std::string const& name);
 
-  static std::string get_level_name(const std::string& filename);
+  static std::string get_level_name(std::string const& filename);
 
 private:
   LevelParser(Level& level, bool worldmap, bool editable);
 
-  void load(const ReaderDocument& doc);
-  void load(std::istream& stream, const std::string& context);
-  void load(const std::string& filepath);
-  void load_old_format(const ReaderMapping& reader);
-  void create(const std::string& filepath, const std::string& levelname);
+  void load(ReaderDocument const& doc);
+  void load(std::istream& stream, std::string const& context);
+  void load(std::string const& filepath);
+  void load_old_format(ReaderMapping const& reader);
+  void create(std::string const& filepath, std::string const& levelname);
 
 private:
   Level& m_level;
@@ -49,8 +49,8 @@ private:
   bool m_editable;
 
 private:
-  LevelParser(const LevelParser&) = delete;
-  LevelParser& operator=(const LevelParser&) = delete;
+  LevelParser(LevelParser const&) = delete;
+  LevelParser& operator=(LevelParser const&) = delete;
 };
 
 #endif

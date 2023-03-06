@@ -81,7 +81,7 @@ public:
     position_bottom = std::min (position_bottom, position);
   }
 
-  void merge_constraints (const Constraints& other);
+  void merge_constraints (Constraints const& other);
 
   float get_position_left   () const { return position_left;   }
   float get_position_right  () const { return position_right;  }
@@ -103,22 +103,22 @@ private:
 };
 
 /** checks if 2 rectangle intersect each other */
-bool intersects(const Rectf& r1, const Rectf& r2);
+bool intersects(Rectf const& r1, Rectf const& r2);
 
 /** does collision detection between a rectangle and an axis aligned triangle
  * Returns true in case of a collision and fills in the hit structure then.
  */
-bool rectangle_aatriangle(Constraints* constraints, const Rectf& rect,
-                          const AATriangle& triangle);
+bool rectangle_aatriangle(Constraints* constraints, Rectf const& rect,
+                          AATriangle const& triangle);
 
-bool rectangle_aatriangle(Constraints* constraints, const Rectf& rect,
-                          const AATriangle& triangle,
+bool rectangle_aatriangle(Constraints* constraints, Rectf const& rect,
+                          AATriangle const& triangle,
                           bool& hits_rectangle_bottom);
 
-void set_rectangle_rectangle_constraints(Constraints* constraints, const Rectf& r1, const Rectf& r2);
+void set_rectangle_rectangle_constraints(Constraints* constraints, Rectf const& r1, Rectf const& r2);
 
-bool line_intersects_line(const Vector& line1_start, const Vector& line1_end, const Vector& line2_start, const Vector& line2_end);
-bool intersects_line(const Rectf& r, const Vector& line_start, const Vector& line_end);
+bool line_intersects_line(Vector const& line1_start, Vector const& line1_end, Vector const& line2_start, Vector const& line2_end);
+bool intersects_line(Rectf const& r, Vector const& line_start, Vector const& line_end);
 
 } // namespace collision
 

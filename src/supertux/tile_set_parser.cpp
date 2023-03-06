@@ -34,7 +34,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/surface.hpp"
 
-TileSetParser::TileSetParser(TileSet& tileset, const std::string& filename) :
+TileSetParser::TileSetParser(TileSet& tileset, std::string const& filename) :
   m_tileset(tileset),
   m_filename(filename),
   m_tiles_path()
@@ -178,7 +178,7 @@ TileSetParser::parse(int32_t start, int32_t end, int32_t offset, bool imported)
 }
 
 void
-TileSetParser::parse_tile(const ReaderMapping& reader, int32_t min, int32_t max, int32_t offset)
+TileSetParser::parse_tile(ReaderMapping const& reader, int32_t min, int32_t max, int32_t offset)
 {
   uint32_t id;
   if (!reader.read("id", id))
@@ -263,7 +263,7 @@ TileSetParser::parse_tile(const ReaderMapping& reader, int32_t min, int32_t max,
 }
 
 void
-TileSetParser::parse_tiles(const ReaderMapping& reader, int32_t min, int32_t max, int32_t offset)
+TileSetParser::parse_tiles(ReaderMapping const& reader, int32_t min, int32_t max, int32_t offset)
 {
   // List of ids (use 0 if the tile should be ignored)
   std::vector<uint32_t> ids;
@@ -365,14 +365,14 @@ TileSetParser::parse_tiles(const ReaderMapping& reader, int32_t min, int32_t max
         std::vector<SurfacePtr> regions;
         regions.reserve(surfaces.size());
         std::transform(surfaces.begin(), surfaces.end(), std::back_inserter(regions),
-            [x, y] (const SurfacePtr& surface) { 
+            [x, y] (SurfacePtr const& surface) { 
               return surface->region(Rect(x, y, Size(32, 32)));
             });
 
         std::vector<SurfacePtr> editor_regions;
         editor_regions.reserve(editor_surfaces.size());
         std::transform(editor_surfaces.begin(), editor_surfaces.end(), std::back_inserter(editor_regions),
-            [x, y] (const SurfacePtr& surface) { 
+            [x, y] (SurfacePtr const& surface) { 
               return surface->region(Rect(x, y, Size(32, 32)));
             });
 
@@ -421,8 +421,8 @@ TileSetParser::parse_tiles(const ReaderMapping& reader, int32_t min, int32_t max
 }
 
 std::vector<SurfacePtr>
-TileSetParser::parse_imagespecs(const ReaderMapping& images_mapping,
-                                const std::optional<Rect>& surface_region) const
+TileSetParser::parse_imagespecs(ReaderMapping const& images_mapping,
+                                std::optional<Rect> const& surface_region) const
 {
   std::vector<SurfacePtr> surfaces;
 

@@ -20,7 +20,7 @@
 #include "sprite/sprite_manager.hpp"
 #include "supertux/globals.hpp"
 
-FloatingImage::FloatingImage(const std::string& spritefile) :
+FloatingImage::FloatingImage(std::string const& spritefile) :
   sprite(SpriteManager::current()->create(spritefile)),
   layer(LAYER_FOREGROUND1 + 1),
   visible(false),
@@ -54,7 +54,7 @@ FloatingImage::update(float dt_sec)
 }
 
 void
-FloatingImage::set_action(const std::string& action)
+FloatingImage::set_action(std::string const& action)
 {
   sprite->set_action(action);
 }

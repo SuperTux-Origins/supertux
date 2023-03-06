@@ -30,12 +30,12 @@ class Torch final :
   public ExposedObject<Torch, scripting::Torch>
 {
 public:
-  Torch(const ReaderMapping& reader);
+  Torch(ReaderMapping const& reader);
 
   virtual void draw(DrawingContext& context) override;
   virtual void update(float) override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& ) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& ) override;
 
   static std::string class_name() { return "torch"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -65,8 +65,8 @@ private:
   Flip m_flip;
 
 private:
-  Torch(const Torch&) = delete;
-  Torch& operator=(const Torch&) = delete;
+  Torch(Torch const&) = delete;
+  Torch& operator=(Torch const&) = delete;
 };
 
 #endif

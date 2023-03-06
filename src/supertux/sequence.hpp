@@ -31,19 +31,19 @@ enum TilemapFadeType {
 };
 
 struct SequenceData {
-  SequenceData(const std::string& spawnpoint_, const std::string& fade_tilemap_, TilemapFadeType& fade_type_) :
+  SequenceData(std::string const& spawnpoint_, std::string const& fade_tilemap_, TilemapFadeType& fade_type_) :
     spawnpoint(spawnpoint_),
     fade_tilemap(fade_tilemap_),
     fade_type(fade_type_)
   {
   }
-  const std::string& spawnpoint;
-  const std::string& fade_tilemap;
-  const TilemapFadeType& fade_type;
+  std::string const& spawnpoint;
+  std::string const& fade_tilemap;
+  TilemapFadeType const& fade_type;
 };
 
-Sequence string_to_sequence(const std::string& sequencename);
-std::string sequence_to_string(const Sequence& seq);
+Sequence string_to_sequence(std::string const& sequencename);
+std::string sequence_to_string(Sequence const& seq);
 
 #endif
 /* EOF */

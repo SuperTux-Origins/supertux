@@ -26,13 +26,13 @@
 class RustyTrampoline final : public Rock
 {
 public:
-  RustyTrampoline(const ReaderMapping& reader);
+  RustyTrampoline(ReaderMapping const& reader);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
 
-  virtual void grab(MovingObject&, const Vector& pos, Direction) override;
+  virtual void grab(MovingObject&, Vector const& pos, Direction) override;
   virtual void ungrab(MovingObject&, Direction) override;
   virtual bool is_portable() const override;
   static std::string class_name() { return "rustytrampoline"; }
@@ -45,8 +45,8 @@ private:
   int counter;
 
 private:
-  RustyTrampoline(const RustyTrampoline&) = delete;
-  RustyTrampoline& operator=(const RustyTrampoline&) = delete;
+  RustyTrampoline(RustyTrampoline const&) = delete;
+  RustyTrampoline& operator=(RustyTrampoline const&) = delete;
 };
 
 #endif

@@ -21,7 +21,7 @@
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
-ShrinkFade::ShrinkFade(const Vector& dest_, float fade_time_) :
+ShrinkFade::ShrinkFade(Vector const& dest_, float fade_time_) :
   m_dest(dest_),
   m_fade_time(fade_time_),
   m_accum_time(0),

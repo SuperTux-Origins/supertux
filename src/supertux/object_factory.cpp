@@ -34,7 +34,7 @@ ObjectFactory::ObjectFactory() :
 }
 
 std::unique_ptr<GameObject>
-ObjectFactory::create(const std::string& name, const ReaderMapping& reader) const
+ObjectFactory::create(std::string const& name, ReaderMapping const& reader) const
 {
   auto it = factories.find(name);
 
@@ -51,7 +51,7 @@ ObjectFactory::create(const std::string& name, const ReaderMapping& reader) cons
 }
 
 std::string
-ObjectFactory::get_display_name(const std::string& name) const
+ObjectFactory::get_display_name(std::string const& name) const
 {
   auto it = std::find(m_objects_names.begin(), m_objects_names.end(), name);
 

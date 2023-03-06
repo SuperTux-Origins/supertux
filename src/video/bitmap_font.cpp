@@ -35,13 +35,13 @@
 
 namespace {
 
-bool vline_empty(const SDLSurfacePtr& surface, int x, int start_y, int end_y, Uint8 threshold)
+bool vline_empty(SDLSurfacePtr const& surface, int x, int start_y, int end_y, Uint8 threshold)
 {
   Uint8* pixels = static_cast<Uint8*>(surface->pixels);
 
   for (int y = start_y; y < end_y; ++y)
   {
-    const Uint8& p = pixels[surface->pitch*y + x*surface->format->BytesPerPixel + 3];
+    Uint8 const& p = pixels[surface->pitch*y + x*surface->format->BytesPerPixel + 3];
     if (p > threshold)
     {
       return false;
@@ -53,7 +53,7 @@ bool vline_empty(const SDLSurfacePtr& surface, int x, int start_y, int end_y, Ui
 } // namespace
 
 BitmapFont::BitmapFont(GlyphWidth glyph_width_,
-           const std::string& filename,
+           std::string const& filename,
            int shadowsize_) :
   glyph_width(glyph_width_),
   glyph_surfaces(),
@@ -77,7 +77,7 @@ BitmapFont::BitmapFont(GlyphWidth glyph_width_,
       try {
         loadFontFile(fontdir + filename_);
       }
-      catch(const std::exception& e)
+      catch(std::exception const& e)
       {
         log_fatal << "Couldn't load font file: " << e.what() << std::endl;
       }
@@ -87,7 +87,7 @@ BitmapFont::BitmapFont(GlyphWidth glyph_width_,
 }
 
 void
-BitmapFont::loadFontFile(const std::string &filename)
+BitmapFont::loadFontFile(std::string const&filename)
 {
   // FIXME: Workaround for a crash on MSYS2 when starting with --debug
   log_debug_ << "Loading font: " << filename << std::endl;
@@ -173,9 +173,9 @@ BitmapFont::loadFontFile(const std::string &filename)
 }
 
 void
-BitmapFont::loadFontSurface(const std::string& glyphimage,
-                      const std::string& shadowimage,
-                      const std::vector<std::string>& chars,
+BitmapFont::loadFontSurface(std::string const& glyphimage,
+                      std::string const& shadowimage,
+                      std::vector<std::string> const& chars,
                       GlyphWidth glyph_width_,
                       int char_width)
 {
@@ -268,7 +268,7 @@ BitmapFont::~BitmapFont()
 }
 
 float
-BitmapFont::get_text_width(const std::string& text) const
+BitmapFont::get_text_width(std::string const& text) const
 {
   float curr_width = 0;
   float last_width = 0;
@@ -293,7 +293,7 @@ BitmapFont::get_text_width(const std::string& text) const
 }
 
 float
-BitmapFont::get_text_height(const std::string& text) const
+BitmapFont::get_text_height(std::string const& text) const
 {
   std::string::size_type text_height = char_height;
 
@@ -315,7 +315,7 @@ BitmapFont::get_height() const
 }
 
 std::string
-BitmapFont::wrap_to_width(const std::string& s_, float width, std::string* overflow)
+BitmapFont::wrap_to_width(std::string const& s_, float width, std::string* overflow)
 {
   std::string s = s_;
 
@@ -365,8 +365,8 @@ BitmapFont::wrap_to_width(const std::string& s_, float width, std::string* overf
 
 
 void
-BitmapFont::draw_text(Canvas& canvas, const std::string& text,
-                      const Vector& pos_, FontAlignment alignment, int layer, const Color& color)
+BitmapFont::draw_text(Canvas& canvas, std::string const& text,
+                      Vector const& pos_, FontAlignment alignment, int layer, Color const& color)
 {
   float x = pos_.x;
   float y = pos_.y;
@@ -402,7 +402,7 @@ BitmapFont::draw_text(Canvas& canvas, const std::string& text,
 }
 
 void
-BitmapFont::draw_text(Canvas& canvas, const std::string& text, const Vector& pos, int layer, Color color) const
+BitmapFont::draw_text(Canvas& canvas, std::string const& text, Vector const& pos, int layer, Color color) const
 {
   if (shadowsize > 0)
     draw_chars(canvas, false, rtl ? std::string(text.rbegin(), text.rend()) : text,
@@ -413,7 +413,7 @@ BitmapFont::draw_text(Canvas& canvas, const std::string& text, const Vector& pos
 }
 
 void
-BitmapFont::draw_chars(Canvas& canvas, bool notshadow, const std::string& text, const Vector& pos, int layer, Color color) const
+BitmapFont::draw_chars(Canvas& canvas, bool notshadow, std::string const& text, Vector const& pos, int layer, Color color) const
 {
   Vector p = pos;
 

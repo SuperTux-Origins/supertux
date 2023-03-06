@@ -80,7 +80,7 @@ ConfigSubsystem::ConfigSubsystem() :
   try {
     m_config.load();
   }
-  catch(const std::exception& e)
+  catch(std::exception const& e)
   {
     log_info << "Couldn't load config file: " << e.what() << ", using default settings" << std::endl;
   }
@@ -124,7 +124,7 @@ Main::Main() :
 {
 }
 
-PhysfsSubsystem::PhysfsSubsystem(const char* argv0,
+PhysfsSubsystem::PhysfsSubsystem(char const* argv0,
                                  std::optional<std::string> forced_datadir,
                                  std::optional<std::string> forced_userdir) :
   m_forced_datadir(std::move(forced_datadir)),
@@ -149,7 +149,7 @@ PhysfsSubsystem::PhysfsSubsystem(const char* argv0,
 void PhysfsSubsystem::find_datadir() const
 {
 #ifndef __EMSCRIPTEN__
-  if (const char* assetpack = getenv("ANDROID_ASSET_PACK_PATH"))
+  if (char const* assetpack = getenv("ANDROID_ASSET_PACK_PATH"))
   {
     // Android asset pack has a hardcoded prefix for data files, and PhysFS cannot strip it, so we mount an archive inside an archive
     if (!PHYSFS_mount(std::filesystem::canonical(assetpack).string().c_str(), nullptr, 1))
@@ -178,11 +178,11 @@ void PhysfsSubsystem::find_datadir() const
   {
     datadir = *m_forced_datadir;
   }
-  else if (const char* env_datadir = getenv("SUPERTUX_ORIGNS_DATA_DIR"))
+  else if (char const* env_datadir = getenv("SUPERTUX_ORIGNS_DATA_DIR"))
   {
     datadir = env_datadir;
   }
-  else if (const char* env_datadir3 = getenv("ANDROID_MY_OWN_APP_FILE"))
+  else if (char const* env_datadir3 = getenv("ANDROID_MY_OWN_APP_FILE"))
   {
     datadir = env_datadir3;
   }
@@ -228,7 +228,7 @@ void PhysfsSubsystem::find_userdir() const
   {
     userdir = *m_forced_userdir;
   }
-  else if (const char* env_userdir = getenv("SUPERTUX_ORIGNS_USER_DIR"))
+  else if (char const* env_userdir = getenv("SUPERTUX_ORIGNS_USER_DIR"))
   {
     userdir = env_userdir;
   }
@@ -259,12 +259,12 @@ if (FileSystem::is_directory(olduserdir)) {
   bool success = true;
 
   // cycle through the directory
-  for (const auto& entry: std::filesystem::directory_iterator(olduserpath)) {
+  for (auto const& entry: std::filesystem::directory_iterator(olduserpath)) {
   try
   {
     std::filesystem::rename(entry.path(), userpath / entry.path().filename());
   }
-  catch (const std::filesystem::filesystem_error& err)
+  catch (std::filesystem::filesystem_error const& err)
   {
     success = false;
     log_warning << "Failed to move contents of config directory: " << err.what() << std::endl;
@@ -275,7 +275,7 @@ if (FileSystem::is_directory(olduserdir)) {
     {
       std::filesystem::remove_all(olduserpath);
     }
-    catch (const std::filesystem::filesystem_error& err)
+    catch (std::filesystem::filesystem_error const& err)
     {
       success = false;
       log_warning << "Failed to remove old config directory: " << err.what();
@@ -319,7 +319,7 @@ if (FileSystem::is_directory(olduserdir)) {
 
 void PhysfsSubsystem::print_search_path()
 {
-  const char* writedir = PHYSFS_getWriteDir();
+  char const* writedir = PHYSFS_getWriteDir();
   log_info << "PhysfsWriteDir: " << (writedir ? writedir : "(null)") << std::endl;
   log_info << "PhysfsSearchPath:" << std::endl;
   char** searchpath = PHYSFS_getSearchPath();
@@ -371,7 +371,7 @@ Main::init_video()
 {
   VideoSystem::current()->set_title("SuperTux " PACKAGE_VERSION);
 
-  const char* icon_fname = "images/engine/icons/supertux-256x256.png";
+  char const* icon_fname = "images/engine/icons/supertux-256x256.png";
 
   SDLSurfacePtr icon = SDLSurface::from_file(icon_fname);
   VideoSystem::current()->set_icon(*icon);
@@ -385,7 +385,7 @@ Main::init_video()
 }
 
 void
-Main::launch_game(const CommandLineArguments& args)
+Main::launch_game(CommandLineArguments const& args)
 {
   m_sdl_subsystem.reset(new SDLSubsystem());
   m_console_buffer.reset(new ConsoleBuffer());
@@ -439,7 +439,7 @@ Main::launch_game(const CommandLineArguments& args)
 
   if (!args.filenames.empty())
   {
-    for(const auto& start_level : args.filenames)
+    for(auto const& start_level : args.filenames)
     {
       // we have a normal path specified at commandline, not a physfs path.
       // So we simply mount that path here...
@@ -471,7 +471,7 @@ Main::launch_game(const CommandLineArguments& args)
         {
           std::string sectorname = args.sector.value_or("main");
 
-          const auto& spawnpoints = session->get_current_sector().get_objects_by_type<SpawnPointMarker>();
+          auto const& spawnpoints = session->get_current_sector().get_objects_by_type<SpawnPointMarker>();
           std::string default_spawnpoint = (spawnpoints.begin() != spawnpoints.end()) ?
             "" : spawnpoints.begin()->get_name();
           std::string spawnpointname = args.spawnpoint.value_or(default_spawnpoint);
@@ -540,7 +540,7 @@ Main::run(int argc, char** argv)
       args.parse_args(argc, argv);
       g_log_level = args.get_log_level();
     }
-    catch(const std::exception& err)
+    catch(std::exception const& err)
     {
       std::cout << "Error: " << err.what() << std::endl;
       return EXIT_FAILURE;
@@ -578,7 +578,7 @@ Main::run(int argc, char** argv)
         break;
     }
   }
-  catch(const std::exception& e)
+  catch(std::exception const& e)
   {
     log_fatal << "Unexpected exception: " << e.what() << std::endl;
     result = 1;

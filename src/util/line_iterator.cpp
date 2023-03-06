@@ -16,7 +16,7 @@
 
 #include "util/line_iterator.hpp"
 
-LineIterator::LineIterator(const std::string& str)
+LineIterator::LineIterator(std::string const& str)
   : first(str.begin()),
     last(str.end()),
     line_end(str.begin())

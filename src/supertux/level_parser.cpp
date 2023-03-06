@@ -29,7 +29,7 @@
 #include "util/reader_iterator.hpp"
 
 std::string
-LevelParser::get_level_name(const std::string& filename)
+LevelParser::get_level_name(std::string const& filename)
 {
   try
   {
@@ -45,7 +45,7 @@ LevelParser::get_level_name(const std::string& filename)
       return name;
     }
   }
-  catch(const std::exception& e)
+  catch(std::exception const& e)
   {
     log_warning << "Problem getting name of '" << filename << "': "
                 << e.what() << std::endl;
@@ -54,7 +54,7 @@ LevelParser::get_level_name(const std::string& filename)
 }
 
 std::unique_ptr<Level>
-LevelParser::from_stream(std::istream& stream, const std::string& context, bool worldmap, bool editable)
+LevelParser::from_stream(std::istream& stream, std::string const& context, bool worldmap, bool editable)
 {
   auto level = std::make_unique<Level>(worldmap);
   LevelParser parser(*level, worldmap, editable);
@@ -63,7 +63,7 @@ LevelParser::from_stream(std::istream& stream, const std::string& context, bool 
 }
 
 std::unique_ptr<Level>
-LevelParser::from_file(const std::string& filename, bool worldmap, bool editable)
+LevelParser::from_file(std::string const& filename, bool worldmap, bool editable)
 {
   auto level = std::make_unique<Level>(worldmap);
   LevelParser parser(*level, worldmap, editable);
@@ -72,7 +72,7 @@ LevelParser::from_file(const std::string& filename, bool worldmap, bool editable
 }
 
 std::unique_ptr<Level>
-LevelParser::from_nothing(const std::string& basedir)
+LevelParser::from_nothing(std::string const& basedir)
 {
   auto level = std::make_unique<Level>(false);
   LevelParser parser(*level, false, false);
@@ -92,7 +92,7 @@ LevelParser::from_nothing(const std::string& basedir)
 }
 
 std::unique_ptr<Level>
-LevelParser::from_nothing_worldmap(const std::string& basedir, const std::string& name)
+LevelParser::from_nothing_worldmap(std::string const& basedir, std::string const& name)
 {
   auto level = std::make_unique<Level>(true);
   LevelParser parser(*level, true, false);
@@ -122,14 +122,14 @@ LevelParser::LevelParser(Level& level, bool worldmap, bool editable) :
 }
 
 void
-LevelParser::load(std::istream& stream, const std::string& context)
+LevelParser::load(std::istream& stream, std::string const& context)
 {
   auto doc = ReaderDocument::from_stream(prio::Format::SEXPR, stream, prio::ErrorHandler::THROW, context);
   load(doc);
 }
 
 void
-LevelParser::load(const std::string& filepath)
+LevelParser::load(std::string const& filepath)
 {
   m_level.m_filename = filepath;
   try {
@@ -143,7 +143,7 @@ LevelParser::load(const std::string& filepath)
 }
 
 void
-LevelParser::load(const ReaderDocument& doc)
+LevelParser::load(ReaderDocument const& doc)
 {
   auto root = doc.get_root();
 
@@ -195,7 +195,7 @@ LevelParser::load(const ReaderDocument& doc)
 }
 
 void
-LevelParser::load_old_format(const ReaderMapping& reader)
+LevelParser::load_old_format(ReaderMapping const& reader)
 {
   reader.read("name", m_level.m_name);
   reader.read("author", m_level.m_author);
@@ -205,7 +205,7 @@ LevelParser::load_old_format(const ReaderMapping& reader)
 }
 
 void
-LevelParser::create(const std::string& filepath, const std::string& levelname)
+LevelParser::create(std::string const& filepath, std::string const& levelname)
 {
   m_level.m_filename = filepath;
   m_level.m_name = levelname;

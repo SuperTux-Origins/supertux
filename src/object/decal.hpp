@@ -29,10 +29,10 @@ class Decal final : public MovingSprite,
   friend class FlipLevelTransformer;
 
 public:
-  Decal(const ReaderMapping& reader);
+  Decal(ReaderMapping const& reader);
   ~Decal() override;
 
-  virtual HitResponse collision(GameObject& , const CollisionHit& ) override { return FORCE_MOVE; }
+  virtual HitResponse collision(GameObject& , CollisionHit const& ) override { return FORCE_MOVE; }
 
   static std::string class_name() { return "decal"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -46,7 +46,7 @@ public:
 
   void fade_in(float fade_time);
   void fade_out(float fade_time);
-  void fade_sprite(const std::string& new_sprite, float fade_time);
+  void fade_sprite(std::string const& new_sprite, float fade_time);
 
   void set_visible(bool v) { m_visible = v; }
   bool is_visible() const { return m_visible; }
@@ -60,8 +60,8 @@ private:
   bool m_visible;
 
 private:
-  Decal(const Decal&) = delete;
-  Decal& operator=(const Decal&) = delete;
+  Decal(Decal const&) = delete;
+  Decal& operator=(Decal const&) = delete;
 };
 
 #endif

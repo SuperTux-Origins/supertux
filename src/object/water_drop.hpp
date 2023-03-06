@@ -25,11 +25,11 @@
 class WaterDrop final : public MovingSprite
 {
 public:
-  WaterDrop(const Vector& pos, const std::string& sprite_path_, const Vector& velocity);
+  WaterDrop(Vector const& pos, std::string const& sprite_path_, Vector const& velocity);
 
   virtual void update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& ) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& ) override;
 
 private:
   Physic physic;

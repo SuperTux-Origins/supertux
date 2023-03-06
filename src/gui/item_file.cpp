@@ -20,9 +20,9 @@
 #include "gui/menu_filesystem.hpp"
 #include "gui/menu_manager.hpp"
 
-ItemFile::ItemFile(const std::string& text, std::string* filename,
-                   const std::vector<std::string>& extensions,
-                   const std::string& basedir,
+ItemFile::ItemFile(std::string const& text, std::string* filename,
+                   std::vector<std::string> const& extensions,
+                   std::string const& basedir,
                    bool path_relative_to_basedir,
                    int id) :
   MenuItem(text, id),
@@ -34,7 +34,7 @@ ItemFile::ItemFile(const std::string& text, std::string* filename,
 }
 
 void
-ItemFile::process_action(const MenuAction& action)
+ItemFile::process_action(MenuAction const& action)
 {
   if (action == MenuAction::HIT) {
     MenuManager::instance().push_menu(std::make_unique<FileSystemMenu>(m_filename, m_extensions, m_basedir, m_path_relative_to_basedir));

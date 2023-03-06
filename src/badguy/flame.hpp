@@ -24,8 +24,8 @@
 class Flame : public BadGuy
 {
 public:
-  Flame(const ReaderMapping& reader,
-        const std::string& sprite = "images/creatures/flame/flame.sprite");
+  Flame(ReaderMapping const& reader,
+        std::string const& sprite = "images/creatures/flame/flame.sprite");
 
   virtual void activate() override;
   virtual void deactivate() override;
@@ -55,8 +55,8 @@ protected:
   std::unique_ptr<SoundSource> sound_source;
 
 private:
-  Flame(const Flame&) = delete;
-  Flame& operator=(const Flame&) = delete;
+  Flame(Flame const&) = delete;
+  Flame& operator=(Flame const&) = delete;
 };
 
 #endif

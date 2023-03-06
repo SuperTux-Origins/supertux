@@ -49,8 +49,8 @@ class GameObject
 
 public:
   GameObject();
-  GameObject(const std::string& name);
-  GameObject(const ReaderMapping& reader);
+  GameObject(std::string const& name);
+  GameObject(ReaderMapping const& reader);
   virtual ~GameObject();
 
   /** Called after all objects have been added to the Sector and the
@@ -108,8 +108,8 @@ public:
       the object gets removed/destroyed */
   void del_remove_listener(ObjectRemoveListener* listener);
 
-  void set_name(const std::string& name) { m_name = name; }
-  const std::string& get_name() const { return m_name; }
+  void set_name(std::string const& name) { m_name = name; }
+  std::string const& get_name() const { return m_name; }
 
   virtual const std::string get_icon_path() const {
     return "images/tiles/auxiliary/notile.png";
@@ -137,7 +137,7 @@ public:
 
   void remove_component(GameObjectComponent* component) {
     auto it = std::find_if(m_components.begin(), m_components.end(),
-                           [component](const std::unique_ptr<GameObjectComponent>& lhs){
+                           [component](std::unique_ptr<GameObjectComponent> const& lhs){
                              return lhs.get() == component;
                            });
     if (it != m_components.end()) {
@@ -159,7 +159,7 @@ public:
   virtual void editor_update() {}
 
 private:
-  void set_uid(const UID& uid) { m_uid = uid; }
+  void set_uid(UID const& uid) { m_uid = uid; }
 
 protected:
   /** a name for the gameobject, this is mostly a hint for scripts and
@@ -182,8 +182,8 @@ private:
   std::vector<ObjectRemoveListener*> m_remove_listeners;
 
 private:
-  GameObject(const GameObject&) = delete;
-  GameObject& operator=(const GameObject&) = delete;
+  GameObject(GameObject const&) = delete;
+  GameObject& operator=(GameObject const&) = delete;
 };
 
 #endif

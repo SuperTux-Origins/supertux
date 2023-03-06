@@ -32,7 +32,7 @@ static const float TRACK_RANGE = 384.0f; /**< at what distance to start tracking
 static const float VANISH_RANGE = 512.0f; /**< at what distance to stop tracking and vanish */
 static const std::string SOUNDFILE = "sounds/willowisp.wav";
 
-WillOWisp::WillOWisp(const ReaderMapping& reader) :
+WillOWisp::WillOWisp(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/willowisp/willowisp.sprite", LAYER_FLOATINGOBJECTS,
          "images/objects/lightmap_light/lightmap_light-small.sprite"),
   ExposedObject<WillOWisp, scripting::WillOWisp>(this),
@@ -198,7 +198,7 @@ WillOWisp::vanish()
 }
 
 bool
-WillOWisp::collides(GameObject& other, const CollisionHit& ) const {
+WillOWisp::collides(GameObject& other, CollisionHit const& ) const {
   auto lantern = dynamic_cast<Lantern*>(&other);
 
   //                                 vv  'xor'
@@ -212,7 +212,7 @@ WillOWisp::collides(GameObject& other, const CollisionHit& ) const {
 }
 
 HitResponse
-WillOWisp::collision_player(Player& player, const CollisionHit& ) {
+WillOWisp::collision_player(Player& player, CollisionHit const& ) {
   if (player.is_invincible())
     return ABORT_MOVE;
 
@@ -254,7 +254,7 @@ WillOWisp::stop_moving()
 }
 
 void
-WillOWisp::set_state(const std::string& new_state)
+WillOWisp::set_state(std::string const& new_state)
 {
   if (new_state == "stopped") {
     m_mystate = STATE_STOPPED;
@@ -290,7 +290,7 @@ void WillOWisp::play_looping_sounds()
 }
 
 void
-WillOWisp::move_to(const Vector& pos)
+WillOWisp::move_to(Vector const& pos)
 {
   Vector shift = pos - m_col.m_bbox.p1();
   if (get_path()) {

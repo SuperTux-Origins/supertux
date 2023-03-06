@@ -28,10 +28,10 @@ class PneumaticPlatformChild final : public MovingSprite
   friend class PneumaticPlatform;
 
 public:
-  PneumaticPlatformChild(const ReaderMapping& reader, bool left, PneumaticPlatform& parent);
+  PneumaticPlatformChild(ReaderMapping const& reader, bool left, PneumaticPlatform& parent);
   ~PneumaticPlatformChild() override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
   virtual bool is_saveable() const override { return false; }
   virtual void on_flip(float height) override;
@@ -42,8 +42,8 @@ protected:
   std::set<GameObject*> m_contacts; /**< objects that are currently pushing on the platform */
 
 private:
-  PneumaticPlatformChild(const PneumaticPlatformChild&) = delete;
-  PneumaticPlatformChild& operator=(const PneumaticPlatformChild&) = delete;
+  PneumaticPlatformChild(PneumaticPlatformChild const&) = delete;
+  PneumaticPlatformChild& operator=(PneumaticPlatformChild const&) = delete;
 };
 
 /** Used to construct a pair of pneumatic platforms: If one is pushed
@@ -53,7 +53,7 @@ class PneumaticPlatform final : public GameObject
   friend class PneumaticPlatformChild;
 
 public:
-  PneumaticPlatform(const ReaderMapping& mapping);
+  PneumaticPlatform(ReaderMapping const& mapping);
   ~PneumaticPlatform() override;
 
   virtual void draw(DrawingContext& context) override;
@@ -74,8 +74,8 @@ private:
   std::vector<PneumaticPlatformChild*> m_children;
 
 private:
-  PneumaticPlatform(const PneumaticPlatform&) = delete;
-  PneumaticPlatform& operator=(const PneumaticPlatform&) = delete;
+  PneumaticPlatform(PneumaticPlatform const&) = delete;
+  PneumaticPlatform& operator=(PneumaticPlatform const&) = delete;
 };
 
 #endif

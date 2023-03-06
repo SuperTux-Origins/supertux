@@ -22,8 +22,8 @@
 class SnowBall final : public WalkingBadguy
 {
 public:
-  SnowBall(const ReaderMapping& reader);
-  SnowBall(const Vector& pos, Direction d, const std::string& script);
+  SnowBall(ReaderMapping const& reader);
+  SnowBall(Vector const& pos, Direction d, std::string const& script);
 
   static std::string class_name() { return "snowball"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -34,8 +34,8 @@ protected:
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  SnowBall(const SnowBall&) = delete;
-  SnowBall& operator=(const SnowBall&) = delete;
+  SnowBall(SnowBall const&) = delete;
+  SnowBall& operator=(SnowBall const&) = delete;
 };
 
 #endif

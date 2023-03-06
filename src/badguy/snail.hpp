@@ -25,12 +25,12 @@ class Snail final :
   public WalkingBadguy
 {
 public:
-  Snail(const ReaderMapping& reader);
+  Snail(ReaderMapping const& reader);
 
   virtual void initialize() override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   virtual bool can_break() const override;
 
   virtual void active_update(float dt_sec) override;
@@ -43,7 +43,7 @@ public:
 
   virtual bool is_portable() const override;
   virtual void ungrab(MovingObject& , Direction dir_) override;
-  virtual void grab(MovingObject&, const Vector& pos, Direction dir_) override;
+  virtual void grab(MovingObject&, Vector const& pos, Direction dir_) override;
 
 protected:
   virtual bool collision_squished(GameObject& object) override;
@@ -71,8 +71,8 @@ private:
   int   squishcount;
 
 private:
-  Snail(const Snail&) = delete;
-  Snail& operator=(const Snail&) = delete;
+  Snail(Snail const&) = delete;
+  Snail& operator=(Snail const&) = delete;
 };
 
 #endif

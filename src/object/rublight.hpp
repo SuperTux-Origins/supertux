@@ -24,9 +24,9 @@
 class RubLight final : public MovingSprite
 {
 public:
-  RubLight(const ReaderMapping& mapping);
+  RubLight(ReaderMapping const& mapping);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
   static std::string class_name() { return "rublight"; }
@@ -54,8 +54,8 @@ private:
   void rub(float strength);
   float get_brightness() const;
 
-  RubLight(const RubLight&) = delete;
-  RubLight& operator=(const RubLight&) = delete;
+  RubLight(RubLight const&) = delete;
+  RubLight& operator=(RubLight const&) = delete;
 };
 
 #endif

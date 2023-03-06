@@ -22,7 +22,7 @@
 #include "math/random.hpp"
 #include "math/util.hpp"
 
-PulsingLight::PulsingLight(const Vector& center, float cycle_len_, float min_alpha_, float max_alpha_, const Color& color_) :
+PulsingLight::PulsingLight(Vector const& center, float cycle_len_, float min_alpha_, float max_alpha_, Color const& color_) :
   Light(center, color_),
   min_alpha(min_alpha_),
   max_alpha(max_alpha_),

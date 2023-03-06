@@ -29,15 +29,15 @@ class Platform : public MovingSprite,
                  public PathObject
 {
 public:
-  Platform(const ReaderMapping& reader);
-  Platform(const ReaderMapping& reader, const std::string& default_sprite);
+  Platform(ReaderMapping const& reader);
+  Platform(ReaderMapping const& reader, std::string const& default_sprite);
 
   virtual void finish_construction() override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
 
-  virtual void move_to(const Vector& pos) override;
+  virtual void move_to(Vector const& pos) override;
 
   static std::string class_name() { return "platform"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -46,7 +46,7 @@ public:
 
   virtual void on_flip(float height) override;
 
-  const Vector& get_speed() const { return m_speed; }
+  Vector const& get_speed() const { return m_speed; }
 
   /** @name Scriptable Methods
       @{ */
@@ -61,7 +61,7 @@ public:
   void stop_moving();
 
   /** Updates the platform to the given action  */
-  void set_action(const std::string& action, int repeat);
+  void set_action(std::string const& action, int repeat);
   /** @} */
 
 private:
@@ -82,8 +82,8 @@ private:
   int m_starting_node;
 
 private:
-  Platform(const Platform&) = delete;
-  Platform& operator=(const Platform&) = delete;
+  Platform(Platform const&) = delete;
+  Platform& operator=(Platform const&) = delete;
 };
 
 #endif

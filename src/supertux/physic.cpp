@@ -42,7 +42,7 @@ Physic::set_velocity(float nvx, float nvy)
 }
 
 void
-Physic::set_velocity(const Vector& vector)
+Physic::set_velocity(Vector const& vector)
 {
   vx = vector.x;
   vy = vector.y;
@@ -56,7 +56,7 @@ Physic::set_acceleration(float nax, float nay)
 }
 
 void
-Physic::set_acceleration(const Vector& vector)
+Physic::set_acceleration(Vector const& vector)
 {
   ax = vector.x;
   ay = vector.y;

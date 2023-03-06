@@ -31,7 +31,7 @@
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 
-WeakBlock::WeakBlock(const ReaderMapping& mapping) :
+WeakBlock::WeakBlock(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/weak_block/strawbox.sprite", LAYER_TILES, COLGROUP_STATIC), state(STATE_NORMAL),
   linked(true),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite"))
@@ -58,7 +58,7 @@ WeakBlock::WeakBlock(const ReaderMapping& mapping) :
 }
 
 HitResponse
-WeakBlock::collision_bullet(Bullet& bullet, const CollisionHit& hit)
+WeakBlock::collision_bullet(Bullet& bullet, CollisionHit const& hit)
 {
   switch (state) {
 
@@ -87,7 +87,7 @@ WeakBlock::collision_bullet(Bullet& bullet, const CollisionHit& hit)
 }
 
 HitResponse
-WeakBlock::collision(GameObject& other, const CollisionHit& hit)
+WeakBlock::collision(GameObject& other, CollisionHit const& hit)
 {
   switch (state) {
 

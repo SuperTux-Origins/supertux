@@ -34,8 +34,8 @@ class Thunderstorm final
 public:
   using GameObject::GameObject;
 private:
-  Thunderstorm(const Thunderstorm&) = delete;
-  Thunderstorm& operator=(const Thunderstorm&) = delete;
+  Thunderstorm(Thunderstorm const&) = delete;
+  Thunderstorm& operator=(Thunderstorm const&) = delete;
 #endif
 
 public:

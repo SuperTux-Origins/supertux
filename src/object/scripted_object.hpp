@@ -27,13 +27,13 @@ class ScriptedObject final :
   public ExposedObject<ScriptedObject, scripting::ScriptedObject>
 {
 public:
-  ScriptedObject(const ReaderMapping& mapping);
+  ScriptedObject(ReaderMapping const& mapping);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   static std::string class_name() { return "scriptedobject"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -43,7 +43,7 @@ public:
   virtual void on_flip(float height) override;
 
   // --- scripting Interface stuff ---
-  void set_action(const std::string& animation);
+  void set_action(std::string const& animation);
   std::string get_action() const;
 
   void move(float x, float y);
@@ -70,8 +70,8 @@ private:
   Vector new_size;
 
 private:
-  ScriptedObject(const ScriptedObject&) = delete;
-  ScriptedObject& operator=(const ScriptedObject&) = delete;
+  ScriptedObject(ScriptedObject const&) = delete;
+  ScriptedObject& operator=(ScriptedObject const&) = delete;
 };
 
 #endif

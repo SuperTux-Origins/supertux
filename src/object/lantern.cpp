@@ -25,7 +25,7 @@
 #include "sprite/sprite_manager.hpp"
 #include "util/reader_mapping.hpp"
 
-Lantern::Lantern(const ReaderMapping& reader) :
+Lantern::Lantern(ReaderMapping const& reader) :
   Rock(reader, "images/objects/lantern/lantern.sprite"),
   lightcolor(1.0f, 1.0f, 1.0f),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light.sprite"))
@@ -41,7 +41,7 @@ Lantern::Lantern(const ReaderMapping& reader) :
   SoundManager::current()->preload("sounds/willocatch.wav");
 }
 
-Lantern::Lantern(const Vector& pos) :
+Lantern::Lantern(Vector const& pos) :
   Rock(pos, "images/objects/lantern/lantern.sprite"),
   lightcolor(0.0f, 0.0f, 0.0f),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light.sprite"))
@@ -72,7 +72,7 @@ Lantern::draw(DrawingContext& context){
   lightsprite->draw(context.light(), m_col.m_bbox.get_middle(), 0);
 }
 
-HitResponse Lantern::collision(GameObject& other, const CollisionHit& hit) {
+HitResponse Lantern::collision(GameObject& other, CollisionHit const& hit) {
 
   WillOWisp* wow = dynamic_cast<WillOWisp*>(&other);
 
@@ -97,7 +97,7 @@ HitResponse Lantern::collision(GameObject& other, const CollisionHit& hit) {
 }
 
 void
-Lantern::grab(MovingObject& object, const Vector& pos, Direction dir)
+Lantern::grab(MovingObject& object, Vector const& pos, Direction dir)
 {
   Rock::grab(object, pos, dir);
 
@@ -126,7 +126,7 @@ Lantern::is_open() const
 }
 
 void
-Lantern::add_color(const Color& c)
+Lantern::add_color(Color const& c)
 {
   lightcolor.red   = std::min(1.0f, lightcolor.red   + c.red);
   lightcolor.green = std::min(1.0f, lightcolor.green + c.green);

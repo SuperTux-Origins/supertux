@@ -31,10 +31,10 @@
 class MagicBlock final: public MovingSprite
 {
 public:
-  MagicBlock(const ReaderMapping& reader);
+  MagicBlock(ReaderMapping const& reader);
 
-  virtual bool collides(GameObject& other, const CollisionHit& hit) const override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
   static std::string class_name() { return "magicblock"; }
@@ -58,8 +58,8 @@ private:
   bool m_black;
 
 private:
-  MagicBlock(const MagicBlock&) = delete;
-  MagicBlock& operator=(const MagicBlock&) = delete;
+  MagicBlock(MagicBlock const&) = delete;
+  MagicBlock& operator=(MagicBlock const&) = delete;
 };
 
 #endif

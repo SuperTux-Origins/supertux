@@ -25,7 +25,7 @@ MovingObject::MovingObject() :
 {
 }
 
-MovingObject::MovingObject(const ReaderMapping& reader) :
+MovingObject::MovingObject(ReaderMapping const& reader) :
   GameObject(reader),
   m_col(COLGROUP_MOVING, *this)
 {

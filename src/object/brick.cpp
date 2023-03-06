@@ -30,7 +30,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
-Brick::Brick(const Vector& pos, int data, const std::string& spriteName) :
+Brick::Brick(Vector const& pos, int data, std::string const& spriteName) :
   Block(SpriteManager::current()->create(spriteName)),
   m_breakable(false),
   m_coin_counter(0)
@@ -43,7 +43,7 @@ Brick::Brick(const Vector& pos, int data, const std::string& spriteName) :
   }
 }
 
-Brick::Brick(const ReaderMapping& mapping, const std::string& spriteName) :
+Brick::Brick(ReaderMapping const& mapping, std::string const& spriteName) :
   Block(mapping, spriteName),
   m_breakable(),
   m_coin_counter(0)
@@ -64,7 +64,7 @@ Brick::hit(Player& player)
 }
 
 HitResponse
-Brick::collision(GameObject& other, const CollisionHit& hit)
+Brick::collision(GameObject& other, CollisionHit const& hit)
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player) {
@@ -140,18 +140,18 @@ Brick::break_for_crusher(Crusher* crusher)
   start_break(crusher);
 }
 
-HeavyBrick::HeavyBrick(const Vector& pos, int data, const std::string& spriteName) :
+HeavyBrick::HeavyBrick(Vector const& pos, int data, std::string const& spriteName) :
   Brick(pos, data, spriteName)
 {
 }
 
-HeavyBrick::HeavyBrick(const ReaderMapping& mapping) :
+HeavyBrick::HeavyBrick(ReaderMapping const& mapping) :
   Brick(mapping, "images/objects/bonus_block/heavy-brick.sprite")
 {
 }
 
 HitResponse
-HeavyBrick::collision(GameObject& other, const CollisionHit& hit)
+HeavyBrick::collision(GameObject& other, CollisionHit const& hit)
 {
   auto player = dynamic_cast<Player*>(&other);
   if (player)

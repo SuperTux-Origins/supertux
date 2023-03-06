@@ -24,7 +24,7 @@
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
-ItemStringSelect::ItemStringSelect(const std::string& text, std::vector<std::string> items, int* selected, int id) :
+ItemStringSelect::ItemStringSelect(std::string const& text, std::vector<std::string> items, int* selected, int id) :
   MenuItem(text, id),
   m_items(std::move(items)),
   m_selected(std::move(selected)),
@@ -34,7 +34,7 @@ ItemStringSelect::ItemStringSelect(const std::string& text, std::vector<std::str
 }
 
 void
-ItemStringSelect::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active)
+ItemStringSelect::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active)
 {
   float roff = static_cast<float>(Resources::arrow_left->get_width()) * 1.0f;
   float sel_width = Resources::normal_font->get_text_width(m_items[*m_selected]);
@@ -66,7 +66,7 @@ ItemStringSelect::get_width() const
 }
 
 void
-ItemStringSelect::process_action(const MenuAction& action)
+ItemStringSelect::process_action(MenuAction const& action)
 {
   switch (action) {
     case MenuAction::LEFT:

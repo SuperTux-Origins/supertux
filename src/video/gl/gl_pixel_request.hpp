@@ -45,8 +45,8 @@ private:
   GLsync m_sync;
 
 private:
-  GLPixelRequest(const GLPixelRequest&) = delete;
-  GLPixelRequest& operator=(const GLPixelRequest&) = delete;
+  GLPixelRequest(GLPixelRequest const&) = delete;
+  GLPixelRequest& operator=(GLPixelRequest const&) = delete;
 };
 
 #endif

@@ -21,7 +21,7 @@
 #include <sstream>
 #include <stdexcept>
 
-IFileStreambuf::IFileStreambuf(const std::string& filename) :
+IFileStreambuf::IFileStreambuf(std::string const& filename) :
   file(),
   buf()
 {

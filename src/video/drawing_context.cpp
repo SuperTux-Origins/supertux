@@ -91,7 +91,7 @@ DrawingContext::transform()
   return m_transform_stack.back();
 }
 
-const DrawingTransform&
+DrawingTransform const&
 DrawingContext::transform() const
 {
   assert(!m_transform_stack.empty());

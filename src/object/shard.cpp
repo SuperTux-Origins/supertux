@@ -23,7 +23,7 @@
 #include "sprite/sprite.hpp"
 #include "util/reader_mapping.hpp"
 
-Shard::Shard(const ReaderMapping& reader) :
+Shard::Shard(ReaderMapping const& reader) :
   MovingSprite(reader, "images/creatures/crystallo/shard.sprite", LAYER_TILES - 2, COLGROUP_MOVING),
   m_physic(),
   m_stick_timer()
@@ -32,7 +32,7 @@ Shard::Shard(const ReaderMapping& reader) :
   SoundManager::current()->preload("sounds/crystallo-shardhit.ogg");
 }
 
-Shard::Shard(const Vector& pos, const Vector& velocity) :
+Shard::Shard(Vector const& pos, Vector const& velocity) :
   MovingSprite(pos, "images/creatures/crystallo/shard.sprite", LAYER_TILES - 2, COLGROUP_MOVING),
   m_physic(),
   m_stick_timer()
@@ -54,7 +54,7 @@ Shard::update(float dt_sec)
 }
 
 void
-Shard::collision_solid(const CollisionHit& hit)
+Shard::collision_solid(CollisionHit const& hit)
 {
   m_physic.set_velocity(0.f, 0.f);
   m_physic.set_acceleration(0.f, 0.f);
@@ -67,7 +67,7 @@ Shard::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Shard::collision(GameObject& other, const CollisionHit&)
+Shard::collision(GameObject& other, CollisionHit const&)
 {
   // ignore collisions with other shards
   auto shard = dynamic_cast<Shard*>(&other);

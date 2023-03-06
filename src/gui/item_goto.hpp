@@ -22,16 +22,16 @@
 class ItemGoTo final : public MenuItem
 {
 public:
-  ItemGoTo(const std::string& text_, int target_menu_, int id = -1);
+  ItemGoTo(std::string const& text_, int target_menu_, int id = -1);
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
   int target_menu;
 
 private:
-  ItemGoTo(const ItemGoTo&) = delete;
-  ItemGoTo& operator=(const ItemGoTo&) = delete;
+  ItemGoTo(ItemGoTo const&) = delete;
+  ItemGoTo& operator=(ItemGoTo const&) = delete;
 };
 
 #endif

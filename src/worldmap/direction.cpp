@@ -58,7 +58,7 @@ direction_to_string(Direction direction)
 }
 
 Direction
-string_to_direction(const std::string& directory)
+string_to_direction(std::string const& directory)
 {
   if (directory == "west")
     return Direction::WEST;

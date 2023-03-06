@@ -29,7 +29,7 @@ enum class Blend {
   NONE
 };
 
-Blend Blend_from_string(const std::string& text);
+Blend Blend_from_string(std::string const& text);
 std::string Blend_to_string(Blend blend);
 
 #endif

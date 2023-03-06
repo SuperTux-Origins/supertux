@@ -41,13 +41,13 @@ public:
   };
 
 public:
-  TriggerBase(const ReaderMapping& mapping);
+  TriggerBase(ReaderMapping const& mapping);
   TriggerBase();
   ~TriggerBase() override;
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   /** Receive trigger events */
   virtual void event(Player& player, EventType type) = 0;
@@ -65,8 +65,8 @@ private:
   std::vector<Player*> m_losetouch_listeners;
 
 private:
-  TriggerBase(const TriggerBase&) = delete;
-  TriggerBase& operator=(const TriggerBase&) = delete;
+  TriggerBase(TriggerBase const&) = delete;
+  TriggerBase& operator=(TriggerBase const&) = delete;
 };
 
 #endif

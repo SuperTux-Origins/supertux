@@ -20,7 +20,7 @@
 
 static const float YT_SHAKE_TIME = .8f;
 
-YetiStalactite::YetiStalactite(const ReaderMapping& mapping) :
+YetiStalactite::YetiStalactite(ReaderMapping const& mapping) :
   Stalactite(mapping)
 {
 }

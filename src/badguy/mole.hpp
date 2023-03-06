@@ -22,10 +22,10 @@
 class Mole final : public BadGuy
 {
 public:
-  Mole(const ReaderMapping& );
+  Mole(ReaderMapping const& );
 
   virtual void kill_fall() override;
-  virtual HitResponse collision_badguy(BadGuy& , const CollisionHit& ) override;
+  virtual HitResponse collision_badguy(BadGuy& , CollisionHit const& ) override;
   virtual bool collision_squished(GameObject& object) override;
 
   virtual void activate() override;
@@ -60,8 +60,8 @@ private:
   Timer throw_timer;
 
 private:
-  Mole(const Mole&) = delete;
-  Mole& operator=(const Mole&) = delete;
+  Mole(Mole const&) = delete;
+  Mole& operator=(Mole const&) = delete;
 };
 
 #endif

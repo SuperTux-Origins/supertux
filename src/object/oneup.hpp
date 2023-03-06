@@ -24,13 +24,13 @@
 class OneUp final : public MovingSprite
 {
 public:
-  OneUp(const Vector& pos, Direction direction = Direction::RIGHT);
+  OneUp(Vector const& pos, Direction direction = Direction::RIGHT);
   virtual bool is_saveable() const override {
     return false;
   }
 
   virtual void update(float dt_sec) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
 private:
   Physic physic;

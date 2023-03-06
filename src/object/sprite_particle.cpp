@@ -24,8 +24,8 @@
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
-SpriteParticle::SpriteParticle(const std::string& sprite_name, const std::string& action,
-                               const Vector& position_, AnchorPoint anchor, const Vector& velocity_, const Vector& acceleration_,
+SpriteParticle::SpriteParticle(std::string const& sprite_name, std::string const& action,
+                               Vector const& position_, AnchorPoint anchor, Vector const& velocity_, Vector const& acceleration_,
                                int drawing_layer_, bool notimeout) :
   SpriteParticle(SpriteManager::current()->create(sprite_name), action,
                  position_, anchor, velocity_, acceleration_,
@@ -42,8 +42,8 @@ SpriteParticle::SpriteParticle(const std::string& sprite_name, const std::string
   no_time_out = notimeout;
 }
 
-SpriteParticle::SpriteParticle(SpritePtr sprite_, const std::string& action,
-                               const Vector& position_, AnchorPoint anchor, const Vector& velocity_, const Vector& acceleration_,
+SpriteParticle::SpriteParticle(SpritePtr sprite_, std::string const& action,
+                               Vector const& position_, AnchorPoint anchor, Vector const& velocity_, Vector const& acceleration_,
                                int drawing_layer_, bool notimeout) :
   sprite(std::move(sprite_)),
   position(position_),

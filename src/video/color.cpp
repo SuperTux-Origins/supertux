@@ -45,7 +45,7 @@ Color::Color(float red_, float green_, float blue_, float alpha_) :
   assert(0 <= blue  && blue <= 1.0f);
 }
 
-Color::Color(const std::vector<float>& vals) :
+Color::Color(std::vector<float> const& vals) :
   red(),
   green(),
   blue(),
@@ -71,14 +71,14 @@ Color::Color(const std::vector<float>& vals) :
 }
 
 bool
-Color::operator==(const Color& other) const
+Color::operator==(Color const& other) const
 {
   return red == other.red && green == other.green && blue == other.blue
     && alpha == other.alpha;
 }
 
 bool
-Color::operator!=(const Color& other) const
+Color::operator!=(Color const& other) const
 {
   return !(operator==(other));
 }
@@ -99,7 +99,7 @@ Color::multiply_linearly(float v) const
 }
 
 bool
-Color::operator < (const Color& other) const
+Color::operator < (Color const& other) const
 {
   return greyscale() < other.greyscale();
 }

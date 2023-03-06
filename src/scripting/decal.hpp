@@ -34,13 +34,13 @@ class Decal final
 public:
   using GameObject::GameObject;
 private:
-  Decal(const Decal&) = delete;
-  Decal& operator=(const Decal&) = delete;
+  Decal(Decal const&) = delete;
+  Decal& operator=(Decal const&) = delete;
 #endif
 
 public:
-  void fade_sprite(const std::string& new_sprite_name, float fade_time);
-  void change_sprite(const std::string& new_sprite_name);
+  void fade_sprite(std::string const& new_sprite_name, float fade_time);
+  void change_sprite(std::string const& new_sprite_name);
   void fade_in(float fade_time);
   void fade_out(float fade_time);
 };

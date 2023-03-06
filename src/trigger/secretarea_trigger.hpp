@@ -28,8 +28,8 @@ class SecretAreaTrigger final : public TriggerBase
 {
   static Color text_color;
 public:
-  SecretAreaTrigger(const ReaderMapping& reader);
-  SecretAreaTrigger(const Rectf& area, const std::string& fade_tilemap = "");
+  SecretAreaTrigger(ReaderMapping const& reader);
+  SecretAreaTrigger(Rectf const& area, std::string const& fade_tilemap = "");
 
   static std::string class_name() { return "secretarea"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -51,8 +51,8 @@ private:
   Vector new_size;
 
 private:
-  SecretAreaTrigger(const SecretAreaTrigger&) = delete;
-  SecretAreaTrigger& operator=(const SecretAreaTrigger&) = delete;
+  SecretAreaTrigger(SecretAreaTrigger const&) = delete;
+  SecretAreaTrigger& operator=(SecretAreaTrigger const&) = delete;
 };
 
 #endif

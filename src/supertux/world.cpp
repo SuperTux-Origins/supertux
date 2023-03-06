@@ -30,7 +30,7 @@
 #include "util/writer.hpp"
 
 std::unique_ptr<World>
-World::from_directory(const std::string& directory)
+World::from_directory(std::string const& directory)
 {
   std::unique_ptr<World> world(new World(directory));
 
@@ -56,7 +56,7 @@ World::from_directory(const std::string& directory)
     world->m_contrib_type = info.get("contrib-type", std::string("user"));
     return world;
   }
-  catch (const std::exception& err)
+  catch (std::exception const& err)
   {
     log_warning << "Failed to load " << info_filename << ":" << err.what() << std::endl;
 
@@ -67,7 +67,7 @@ World::from_directory(const std::string& directory)
 }
 
 std::unique_ptr<World>
-World::create(const std::string& title, const std::string& desc)
+World::create(std::string const& title, std::string const& desc)
 {
   // Limit the charset to numbers and alphabet.
   std::string base = title;
@@ -98,7 +98,7 @@ World::create(const std::string& title, const std::string& desc)
   return world;
 }
 
-World::World(const std::string& directory) :
+World::World(std::string const& directory) :
   m_title(),
   m_description(),
   m_is_levelset(true),

@@ -22,7 +22,7 @@
 class RCrystallo final : public WalkingBadguy
 {
 public:
-  RCrystallo(const ReaderMapping& reader);
+  RCrystallo(ReaderMapping const& reader);
 
   virtual void initialize() override;
   static std::string class_name() { return "rcrystallo"; }
@@ -32,9 +32,9 @@ public:
 
   virtual void active_update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   virtual bool is_flammable() const override;
   virtual void kill_fall() override;
 
@@ -51,8 +51,8 @@ private:
   float m_radius;
 
 private:
-  RCrystallo(const RCrystallo&) = delete;
-  RCrystallo& operator=(const RCrystallo&) = delete;
+  RCrystallo(RCrystallo const&) = delete;
+  RCrystallo& operator=(RCrystallo const&) = delete;
 };
 
 #endif

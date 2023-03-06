@@ -21,7 +21,7 @@ void
 CollisionGroundMovementManager::register_movement(
   CollisionObject& moving_object,
   CollisionObject& target_object,
-  const Vector& movement)
+  Vector const& movement)
 {
   m_movements_per_target[&target_object].register_movement(moving_object, movement);
 }
@@ -30,7 +30,7 @@ void
 CollisionGroundMovementManager::register_movement(
   TileMap& moving_tilemap,
   CollisionObject& target_object,
-  const Vector& movement)
+  Vector const& movement)
 {
   m_movements_per_target[&target_object].register_movement(moving_tilemap, movement);
 }
@@ -42,22 +42,22 @@ CollisionGroundMovementManager::apply_all_ground_movement()
   {
     TargetMovementData& movements = movements_for_target.second;
 
-    const auto& objects_map = movements.get_objects_map();
-    const auto& tilemaps_map = movements.get_tilemaps_map();
+    auto const& objects_map = movements.get_objects_map();
+    auto const& tilemaps_map = movements.get_tilemaps_map();
 
     // Find the lowest "y" position (i.e. the highest point since
     // (0,0) is the top-left corner) and the associated object
     Vector lowest_y_vector(0.0f, 0.0f);
     bool first_to_do = true;
 
-    for (const auto& movement_for_object : objects_map) {
+    for (auto const& movement_for_object : objects_map) {
       if (first_to_do || movement_for_object.second.y < lowest_y_vector.y) {
         lowest_y_vector = movement_for_object.second;
         first_to_do = false;
       }
     }
 
-    for (const auto& movement_for_tilemap : tilemaps_map) {
+    for (auto const& movement_for_tilemap : tilemaps_map) {
       if (first_to_do || movement_for_tilemap.second.y < lowest_y_vector.y) {
         lowest_y_vector = movement_for_tilemap.second;
         first_to_do = false;
@@ -77,7 +77,7 @@ CollisionGroundMovementManager::apply_all_ground_movement()
 void
 CollisionGroundMovementManager::TargetMovementData::register_movement(
   CollisionObject& moving_object,
-  const Vector& movement)
+  Vector const& movement)
 {
   m_moving_objects.emplace(&moving_object, movement);
 }
@@ -85,7 +85,7 @@ CollisionGroundMovementManager::TargetMovementData::register_movement(
 void
 CollisionGroundMovementManager::TargetMovementData::register_movement(
   TileMap& moving_tilemap,
-  const Vector& movement)
+  Vector const& movement)
 {
   m_moving_tilemaps.emplace(std::make_pair(&moving_tilemap, movement));
 }

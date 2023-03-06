@@ -28,7 +28,7 @@ class LevelTime final : public GameObject,
 {
   static Color text_color;
 public:
-  LevelTime(const ReaderMapping& reader);
+  LevelTime(ReaderMapping const& reader);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
@@ -62,8 +62,8 @@ private:
   float time_left;
 
 private:
-  LevelTime(const LevelTime&) = delete;
-  LevelTime& operator=(const LevelTime&) = delete;
+  LevelTime(LevelTime const&) = delete;
+  LevelTime& operator=(LevelTime const&) = delete;
 };
 
 #endif

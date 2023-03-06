@@ -32,7 +32,7 @@ const float VY_TRIGGER = -900; //negative, upwards
 const float VY_BOUNCE = -500;
 }
 
-RustyTrampoline::RustyTrampoline(const ReaderMapping& mapping) :
+RustyTrampoline::RustyTrampoline(ReaderMapping const& mapping) :
   Rock(mapping, "images/objects/rusty-trampoline/rusty-trampoline.sprite"),
   portable(true), counter(3)
 {
@@ -58,7 +58,7 @@ RustyTrampoline::update(float dt_sec)
 }
 
 HitResponse
-RustyTrampoline::collision(GameObject& other, const CollisionHit& hit)
+RustyTrampoline::collision(GameObject& other, CollisionHit const& hit)
 {
   //Trampoline has to be on ground to work.
   if (on_ground) {
@@ -109,12 +109,12 @@ RustyTrampoline::collision(GameObject& other, const CollisionHit& hit)
 }
 
 void
-RustyTrampoline::collision_solid(const CollisionHit& hit) {
+RustyTrampoline::collision_solid(CollisionHit const& hit) {
   Rock::collision_solid(hit);
 }
 
 void
-RustyTrampoline::grab(MovingObject& object, const Vector& pos, Direction dir) {
+RustyTrampoline::grab(MovingObject& object, Vector const& pos, Direction dir) {
   Rock::grab(object, pos, dir);
 }
 

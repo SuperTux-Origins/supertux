@@ -28,9 +28,9 @@
 class UnstableTile final : public MovingSprite
 {
 public:
-  UnstableTile(const ReaderMapping& mapping);
+  UnstableTile(ReaderMapping const& mapping);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
   virtual void on_flip(float height) override;
@@ -66,8 +66,8 @@ private:
   Vector m_original_pos;
 
 private:
-  UnstableTile(const UnstableTile&) = delete;
-  UnstableTile& operator=(const UnstableTile&) = delete;
+  UnstableTile(UnstableTile const&) = delete;
+  UnstableTile& operator=(UnstableTile const&) = delete;
 };
 
 #endif

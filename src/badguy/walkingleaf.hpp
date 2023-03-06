@@ -23,7 +23,7 @@
 class WalkingLeaf final : public WalkingBadguy
 {
 public:
-  WalkingLeaf(const ReaderMapping& reader);
+  WalkingLeaf(ReaderMapping const& reader);
 
   virtual bool is_freezable() const override;
   void active_update(float dt_sec) override;
@@ -38,8 +38,8 @@ protected:
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  WalkingLeaf(const WalkingLeaf&) = delete;
-  WalkingLeaf& operator=(const WalkingLeaf&) = delete;
+  WalkingLeaf(WalkingLeaf const&) = delete;
+  WalkingLeaf& operator=(WalkingLeaf const&) = delete;
 };
 
 #endif

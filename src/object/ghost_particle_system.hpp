@@ -24,7 +24,7 @@ class GhostParticleSystem final : public ParticleSystem
 {
 public:
   GhostParticleSystem();
-  GhostParticleSystem(const ReaderMapping& reader);
+  GhostParticleSystem(ReaderMapping const& reader);
   ~GhostParticleSystem() override;
 
   void init();
@@ -53,8 +53,8 @@ private:
   SurfacePtr ghosts[2];
 
 private:
-  GhostParticleSystem(const GhostParticleSystem&) = delete;
-  GhostParticleSystem& operator=(const GhostParticleSystem&) = delete;
+  GhostParticleSystem(GhostParticleSystem const&) = delete;
+  GhostParticleSystem& operator=(GhostParticleSystem const&) = delete;
 };
 
 #endif

@@ -29,7 +29,7 @@ namespace worldmap {
 class SpecialTile final : public GameObject
 {
 public:
-  SpecialTile(const ReaderMapping& mapping);
+  SpecialTile(ReaderMapping const& mapping);
   ~SpecialTile() override;
 
   virtual void draw(DrawingContext& context) override;
@@ -68,8 +68,8 @@ private:
   bool m_apply_action_west;
 
 private:
-  SpecialTile(const SpecialTile&) = delete;
-  SpecialTile& operator=(const SpecialTile&) = delete;
+  SpecialTile(SpecialTile const&) = delete;
+  SpecialTile& operator=(SpecialTile const&) = delete;
 };
 
 } // namespace worldmap

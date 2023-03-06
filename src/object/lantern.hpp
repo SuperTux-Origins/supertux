@@ -23,14 +23,14 @@
 class Lantern final : public Rock
 {
 public:
-  Lantern(const Vector& pos);
-  Lantern(const ReaderMapping& reader);
+  Lantern(Vector const& pos);
+  Lantern(ReaderMapping const& reader);
 
   virtual void draw(DrawingContext& context) override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  virtual void grab(MovingObject& object, const Vector& pos, Direction dir) override;
+  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   virtual void ungrab(MovingObject& object, Direction dir) override;
 
   static std::string class_name() { return "lantern"; }
@@ -43,7 +43,7 @@ public:
 
   /** returns the lamp's color */
   Color get_color() const { return lightcolor; }
-  void add_color(const Color& c);
+  void add_color(Color const& c);
 
 private:
   Color lightcolor;
@@ -51,8 +51,8 @@ private:
   void updateColor();
 
 private:
-  Lantern(const Lantern&) = delete;
-  Lantern& operator=(const Lantern&) = delete;
+  Lantern(Lantern const&) = delete;
+  Lantern& operator=(Lantern const&) = delete;
 };
 
 #endif

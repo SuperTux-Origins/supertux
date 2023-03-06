@@ -35,7 +35,7 @@
 
 namespace {
 
-GLenum string2wrap(const std::string& text)
+GLenum string2wrap(std::string const& text)
 {
   if (text == "clamp-to-edge")
   {
@@ -56,7 +56,7 @@ GLenum string2wrap(const std::string& text)
   }
 }
 
-GLenum string2filter(const std::string& text)
+GLenum string2filter(std::string const& text)
 {
   if (text == "nearest")
   {
@@ -83,7 +83,7 @@ TextureManager::TextureManager() :
 
 TextureManager::~TextureManager()
 {
-  for (const auto& texture : m_image_textures)
+  for (auto const& texture : m_image_textures)
   {
     if (!texture.second.expired())
     {
@@ -95,7 +95,7 @@ TextureManager::~TextureManager()
 }
 
 TexturePtr
-TextureManager::get(const ReaderMapping& mapping, const std::optional<Rect>& region)
+TextureManager::get(ReaderMapping const& mapping, std::optional<Rect> const& region)
 {
   std::string filename;
   if (!mapping.read("file", filename))
@@ -181,7 +181,7 @@ TextureManager::get(const ReaderMapping& mapping, const std::optional<Rect>& reg
 }
 
 TexturePtr
-TextureManager::get(const std::string& _filename)
+TextureManager::get(std::string const& _filename)
 {
   std::string filename = FileSystem::normalize(_filename);
   Texture::Key key(filename, Rect(0, 0, 0, 0));
@@ -201,9 +201,9 @@ TextureManager::get(const std::string& _filename)
 }
 
 TexturePtr
-TextureManager::get(const std::string& _filename,
-                    const std::optional<Rect>& rect,
-                    const Sampler& sampler)
+TextureManager::get(std::string const& _filename,
+                    std::optional<Rect> const& rect,
+                    Sampler const& sampler)
 {
   std::string filename = FileSystem::normalize(_filename);
   Texture::Key key;
@@ -239,7 +239,7 @@ TextureManager::get(const std::string& _filename,
 }
 
 void
-TextureManager::reap_cache_entry(const Texture::Key& key)
+TextureManager::reap_cache_entry(Texture::Key const& key)
 {
   auto i = m_image_textures.find(key);
   if (i == m_image_textures.end())
@@ -254,21 +254,21 @@ TextureManager::reap_cache_entry(const Texture::Key& key)
 }
 
 TexturePtr
-TextureManager::create_image_texture(const std::string& filename, const Rect& rect, const Sampler& sampler)
+TextureManager::create_image_texture(std::string const& filename, Rect const& rect, Sampler const& sampler)
 {
   try
   {
     return create_image_texture_raw(filename, rect, sampler);
   }
-  catch(const std::exception& err)
+  catch(std::exception const& err)
   {
     log_warning << "Couldn't load texture '" << filename << "' (now using dummy texture): " << err.what() << std::endl;
     return create_dummy_texture();
   }
 }
 
-const SDL_Surface&
-TextureManager::get_surface(const std::string& filename)
+SDL_Surface const&
+TextureManager::get_surface(std::string const& filename)
 {
   auto i = m_surfaces.find(filename);
   if (i != m_surfaces.end())
@@ -290,11 +290,11 @@ TextureManager::get_surface(const std::string& filename)
 }
 
 TexturePtr
-TextureManager::create_image_texture_raw(const std::string& filename, const Rect& rect, const Sampler& sampler)
+TextureManager::create_image_texture_raw(std::string const& filename, Rect const& rect, Sampler const& sampler)
 {
   assert(rect.valid());
 
-  const SDL_Surface& src_surface = get_surface(filename);
+  SDL_Surface const& src_surface = get_surface(filename);
 
   SDLSurfacePtr convert;
   if (src_surface.format->Rmask == 0 &&
@@ -306,7 +306,7 @@ TextureManager::create_image_texture_raw(const std::string& filename, const Rect
     convert.reset(SDL_ConvertSurfaceFormat(const_cast<SDL_Surface*>(&src_surface), SDL_PIXELFORMAT_RGBA8888, 0));
   }
 
-  const SDL_Surface& surface = convert ? *convert : src_surface;
+  SDL_Surface const& surface = convert ? *convert : src_surface;
 
   SDLSurfacePtr subimage;
   if (!Rect(0, 0, surface.w, surface.h).contains(rect))
@@ -353,13 +353,13 @@ TextureManager::create_image_texture_raw(const std::string& filename, const Rect
 }
 
 TexturePtr
-TextureManager::create_image_texture(const std::string& filename, const Sampler& sampler)
+TextureManager::create_image_texture(std::string const& filename, Sampler const& sampler)
 {
   try
   {
     return create_image_texture_raw(filename, sampler);
   }
-  catch (const std::exception& err)
+  catch (std::exception const& err)
   {
     log_warning << "Couldn't load texture '" << filename << "' (now using dummy texture): " << err.what() << std::endl;
     return create_dummy_texture();
@@ -367,7 +367,7 @@ TextureManager::create_image_texture(const std::string& filename, const Sampler&
 }
 
 TexturePtr
-TextureManager::create_image_texture_raw(const std::string& filename, const Sampler& sampler)
+TextureManager::create_image_texture_raw(std::string const& filename, Sampler const& sampler)
 {
   SDLSurfacePtr image = SDLSurface::from_file(filename);
   if (!image)
@@ -395,7 +395,7 @@ TextureManager::create_dummy_texture()
     TexturePtr tex = create_image_texture_raw(dummy_texture_fname, Sampler());
     return tex;
   }
-  catch (const std::exception& err)
+  catch (std::exception const& err)
   {
     // on error (when loading placeholder), try using empty surface,
     // when that fails to, just give up
@@ -418,9 +418,9 @@ TextureManager::debug_print(std::ostream& out) const
 {
   size_t total_texture_pixels = 0;
   out << "textures:begin" << std::endl;
-  for(const auto& it : m_image_textures)
+  for(auto const& it : m_image_textures)
   {
-    const auto& key = it.first;
+    auto const& key = it.first;
 
     if (it.second.lock()) {
       total_texture_pixels += std::get<1>(key).get_area();
@@ -434,10 +434,10 @@ TextureManager::debug_print(std::ostream& out) const
 
   size_t total_surface_pixels = 0;
   out << "surfaces:begin" << std::endl;
-  for(const auto& it : m_surfaces)
+  for(auto const& it : m_surfaces)
   {
-    const auto& filename = it.first;
-    const auto& surface = it.second;
+    auto const& filename = it.first;
+    auto const& surface = it.second;
 
     total_surface_pixels += surface->w * surface->h;
     out << "  surface filename:" << filename << " " << surface->w << "x" << surface->h << std::endl;

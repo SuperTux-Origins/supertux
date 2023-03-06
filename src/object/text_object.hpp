@@ -34,8 +34,8 @@ class TextObject final : public GameObject,
   static Color default_color;
 
 public:
-  TextObject(const ReaderMapping& reader);
-  TextObject(const std::string& name = std::string());
+  TextObject(ReaderMapping const& reader);
+  TextObject(std::string const& name = std::string());
   ~TextObject() override;
 
   static std::string class_name() { return "textobject"; }
@@ -51,8 +51,8 @@ public:
   virtual bool is_saveable() const override { return false; }
 
 
-  void set_text(const std::string& text);
-  void set_font(const std::string& name);
+  void set_text(std::string const& text);
+  void set_font(std::string const& name);
   void grow_in(float fadetime);
   void grow_out(float fadetime);
   void fade_in(float fadetime);
@@ -67,10 +67,10 @@ public:
 
   void set_anchor_point(AnchorPoint anchor) { m_anchor = anchor; }
   AnchorPoint get_anchor_point() const { return m_anchor; }
-  void set_anchor_offset(const Vector& offset) { m_anchor_offset = offset; }
+  void set_anchor_offset(Vector const& offset) { m_anchor_offset = offset; }
 
-  void set_pos(const Vector& pos) { m_pos = pos; }
-  const Vector& get_pos() const { return m_pos; }
+  void set_pos(Vector const& pos) { m_pos = pos; }
+  Vector const& get_pos() const { return m_pos; }
 
 private:
   void wrap_text();
@@ -98,8 +98,8 @@ private:
   bool m_fader;
 
 private:
-  TextObject(const TextObject&) = delete;
-  TextObject& operator=(const TextObject&) = delete;
+  TextObject(TextObject const&) = delete;
+  TextObject& operator=(TextObject const&) = delete;
 };
 
 #endif

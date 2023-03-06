@@ -31,7 +31,7 @@ class InfoBoxLine;
 class InfoBox final
 {
 public:
-  InfoBox(const std::string& text);
+  InfoBox(std::string const& text);
 
   void draw(DrawingContext& context);
   void scrolldown();
@@ -47,8 +47,8 @@ private:
   SurfacePtr arrow_scrolldown;
 
 private:
-  InfoBox(const InfoBox&) = delete;
-  InfoBox& operator=(const InfoBox&) = delete;
+  InfoBox(InfoBox const&) = delete;
+  InfoBox& operator=(InfoBox const&) = delete;
 };
 
 #endif

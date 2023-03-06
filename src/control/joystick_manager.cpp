@@ -158,7 +158,7 @@ JoystickManager::on_joystick_removed(int instance_id)
 }
 
 void
-JoystickManager::process_hat_event(const SDL_JoyHatEvent& jhat)
+JoystickManager::process_hat_event(SDL_JoyHatEvent const& jhat)
 {
   Uint8 changed = hat_state ^ jhat.value;
 
@@ -214,7 +214,7 @@ JoystickManager::process_hat_event(const SDL_JoyHatEvent& jhat)
 }
 
 void
-JoystickManager::process_axis_event(const SDL_JoyAxisEvent& jaxis)
+JoystickManager::process_axis_event(SDL_JoyAxisEvent const& jaxis)
 {
   if (wait_for_joystick >= 0)
   {
@@ -258,7 +258,7 @@ JoystickManager::process_axis_event(const SDL_JoyAxisEvent& jaxis)
 }
 
 void
-JoystickManager::process_button_event(const SDL_JoyButtonEvent& jbutton)
+JoystickManager::process_button_event(SDL_JoyButtonEvent const& jbutton)
 {
   if (wait_for_joystick >= 0)
   {

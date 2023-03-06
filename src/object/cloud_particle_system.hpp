@@ -27,7 +27,7 @@ class CloudParticleSystem final :
 {
 public:
   CloudParticleSystem();
-  CloudParticleSystem(const ReaderMapping& reader);
+  CloudParticleSystem(ReaderMapping const& reader);
   ~CloudParticleSystem() override;
 
   void init();
@@ -91,8 +91,8 @@ private:
   int m_current_real_amount;
 
 private:
-  CloudParticleSystem(const CloudParticleSystem&) = delete;
-  CloudParticleSystem& operator=(const CloudParticleSystem&) = delete;
+  CloudParticleSystem(CloudParticleSystem const&) = delete;
+  CloudParticleSystem& operator=(CloudParticleSystem const&) = delete;
 };
 
 #endif

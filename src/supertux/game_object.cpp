@@ -33,7 +33,7 @@ GameObject::GameObject() :
 {
 }
 
-GameObject::GameObject(const std::string& name) :
+GameObject::GameObject(std::string const& name) :
   m_name(name),
   m_fade_helpers(),
   m_uid(),
@@ -43,7 +43,7 @@ GameObject::GameObject(const std::string& name) :
 {
 }
 
-GameObject::GameObject(const ReaderMapping& reader) :
+GameObject::GameObject(ReaderMapping const& reader) :
   GameObject()
 {
   reader.read("name", m_name);
@@ -51,7 +51,7 @@ GameObject::GameObject(const ReaderMapping& reader) :
 
 GameObject::~GameObject()
 {
-  for (const auto& entry : m_remove_listeners) {
+  for (auto const& entry : m_remove_listeners) {
     entry->object_removed(this);
   }
   m_remove_listeners.clear();
@@ -80,7 +80,7 @@ GameObject::update(float dt_sec)
     h->update(dt_sec);
   }
 
-  auto new_end = std::remove_if(m_fade_helpers.begin(), m_fade_helpers.end(), [](const std::unique_ptr<FadeHelper>& h) {
+  auto new_end = std::remove_if(m_fade_helpers.begin(), m_fade_helpers.end(), [](std::unique_ptr<FadeHelper> const& h) {
     return h->completed();
   });
 

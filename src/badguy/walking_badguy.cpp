@@ -20,12 +20,12 @@
 
 #include "sprite/sprite.hpp"
 
-WalkingBadguy::WalkingBadguy(const Vector& pos,
-                             const std::string& sprite_name_,
-                             const std::string& walk_left_action_,
-                             const std::string& walk_right_action_,
+WalkingBadguy::WalkingBadguy(Vector const& pos,
+                             std::string const& sprite_name_,
+                             std::string const& walk_left_action_,
+                             std::string const& walk_right_action_,
                              int layer_,
-                             const std::string& light_sprite_name) :
+                             std::string const& light_sprite_name) :
   BadGuy(pos, sprite_name_, layer_, light_sprite_name),
   walk_left_action(walk_left_action_),
   walk_right_action(walk_right_action_),
@@ -36,13 +36,13 @@ WalkingBadguy::WalkingBadguy(const Vector& pos,
 {
 }
 
-WalkingBadguy::WalkingBadguy(const Vector& pos,
+WalkingBadguy::WalkingBadguy(Vector const& pos,
                              Direction direction,
-                             const std::string& sprite_name_,
-                             const std::string& walk_left_action_,
-                             const std::string& walk_right_action_,
+                             std::string const& sprite_name_,
+                             std::string const& walk_left_action_,
+                             std::string const& walk_right_action_,
                              int layer_,
-                             const std::string& light_sprite_name) :
+                             std::string const& light_sprite_name) :
   BadGuy(pos, direction, sprite_name_, layer_, light_sprite_name),
   walk_left_action(walk_left_action_),
   walk_right_action(walk_right_action_),
@@ -53,12 +53,12 @@ WalkingBadguy::WalkingBadguy(const Vector& pos,
 {
 }
 
-WalkingBadguy::WalkingBadguy(const ReaderMapping& reader,
-                             const std::string& sprite_name_,
-                             const std::string& walk_left_action_,
-                             const std::string& walk_right_action_,
+WalkingBadguy::WalkingBadguy(ReaderMapping const& reader,
+                             std::string const& sprite_name_,
+                             std::string const& walk_left_action_,
+                             std::string const& walk_right_action_,
                              int layer_,
-                             const std::string& light_sprite_name) :
+                             std::string const& light_sprite_name) :
   BadGuy(reader, sprite_name_, layer_, light_sprite_name),
   walk_left_action(walk_left_action_),
   walk_right_action(walk_right_action_),
@@ -88,7 +88,7 @@ WalkingBadguy::set_walk_speed (float ws)
 }
 
 void
-WalkingBadguy::add_velocity (const Vector& velocity)
+WalkingBadguy::add_velocity (Vector const& velocity)
 {
   m_physic.set_velocity(m_physic.get_velocity() + velocity);
 }
@@ -155,7 +155,7 @@ WalkingBadguy::active_update(float dt_sec)
 }
 
 void
-WalkingBadguy::collision_solid(const CollisionHit& hit)
+WalkingBadguy::collision_solid(CollisionHit const& hit)
 {
 
   update_on_ground_flag(hit);
@@ -180,7 +180,7 @@ WalkingBadguy::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-WalkingBadguy::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+WalkingBadguy::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (hit.top) {
     return FORCE_MOVE;

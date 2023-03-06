@@ -41,8 +41,8 @@ public:
   virtual TexturePtr get_texture() const override { return {}; }
 
 private:
-  GLScreenRenderer(const GLScreenRenderer&) = delete;
-  GLScreenRenderer& operator=(const GLScreenRenderer&) = delete;
+  GLScreenRenderer(GLScreenRenderer const&) = delete;
+  GLScreenRenderer& operator=(GLScreenRenderer const&) = delete;
 };
 
 #endif

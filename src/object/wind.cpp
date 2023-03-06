@@ -29,7 +29,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 
-Wind::Wind(const ReaderMapping& reader) :
+Wind::Wind(ReaderMapping const& reader) :
   MovingObject(reader),
   ExposedObject<Wind, scripting::Wind>(this),
   blowing(),
@@ -98,7 +98,7 @@ Wind::draw(DrawingContext& context)
 }
 
 HitResponse
-Wind::collision(GameObject& other, const CollisionHit& )
+Wind::collision(GameObject& other, CollisionHit const& )
 {
   if (!blowing) return ABORT_MOVE;
 

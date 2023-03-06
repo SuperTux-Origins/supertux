@@ -22,7 +22,7 @@
 class YetiStalactite final : public Stalactite
 {
 public:
-  YetiStalactite(const ReaderMapping& mapping);
+  YetiStalactite(ReaderMapping const& mapping);
 
   virtual void active_update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
@@ -38,8 +38,8 @@ public:
   bool is_hanging() const;
 
 private:
-  YetiStalactite(const YetiStalactite&) = delete;
-  YetiStalactite& operator=(const YetiStalactite&) = delete;
+  YetiStalactite(YetiStalactite const&) = delete;
+  YetiStalactite& operator=(YetiStalactite const&) = delete;
 };
 
 #endif

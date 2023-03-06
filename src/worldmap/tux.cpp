@@ -88,7 +88,7 @@ Tux::draw(DrawingContext& context)
 }
 
 std::string
-Tux::get_action_prefix_for_bonus(const BonusType& bonus) const
+Tux::get_action_prefix_for_bonus(BonusType const& bonus) const
 {
   if (bonus == GROWUP_BONUS)
     return "large";

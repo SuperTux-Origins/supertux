@@ -26,16 +26,16 @@ public:
   ItemScriptLine(std::string* input_, int id_ = -1);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns the minimum width of the menu item. */
   virtual int get_width() const override;
 
   /** Processes the menu action. */
-  virtual void process_action(const MenuAction& action) override;
+  virtual void process_action(MenuAction const& action) override;
 
   /** Processes the given event. */
-  virtual void event(const SDL_Event& ev) override;
+  virtual void event(SDL_Event const& ev) override;
 
   /** Calls when the user wants to remove an invalid char. */
   virtual void invalid_remove() override;
@@ -47,8 +47,8 @@ public:
   virtual void duplicate_line();
 
 private:
-  ItemScriptLine(const ItemScriptLine&) = delete;
-  ItemScriptLine& operator=(const ItemScriptLine&) = delete;
+  ItemScriptLine(ItemScriptLine const&) = delete;
+  ItemScriptLine& operator=(ItemScriptLine const&) = delete;
 };
 
 #endif

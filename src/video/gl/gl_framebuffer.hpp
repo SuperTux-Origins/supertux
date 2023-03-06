@@ -38,8 +38,8 @@ private:
   GLuint m_handle;
 
 private:
-  GLFramebuffer(const GLFramebuffer&) = delete;
-  GLFramebuffer& operator=(const GLFramebuffer&) = delete;
+  GLFramebuffer(GLFramebuffer const&) = delete;
+  GLFramebuffer& operator=(GLFramebuffer const&) = delete;
 };
 
 #endif

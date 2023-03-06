@@ -35,8 +35,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  CustomParticles(const CustomParticles&) = delete;
-  CustomParticles& operator=(const CustomParticles&) = delete;
+  CustomParticles(CustomParticles const&) = delete;
+  CustomParticles& operator=(CustomParticles const&) = delete;
 #endif
 
 public:

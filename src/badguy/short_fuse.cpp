@@ -25,7 +25,7 @@
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
-ShortFuse::ShortFuse(const ReaderMapping& reader) :
+ShortFuse::ShortFuse(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/short_fuse/short_fuse.sprite", "left", "right")
 {
   walk_speed = 100;
@@ -83,7 +83,7 @@ ShortFuse::collision_squished(GameObject& obj)
 }
 
 HitResponse
-ShortFuse::collision_player (Player& player, const CollisionHit&)
+ShortFuse::collision_player (Player& player, CollisionHit const&)
 {
   if (!m_frozen)
   {

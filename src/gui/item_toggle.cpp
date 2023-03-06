@@ -23,7 +23,7 @@
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
-ItemToggle::ItemToggle(const std::string& text_, bool* toggled, int id_, bool center_text) :
+ItemToggle::ItemToggle(std::string const& text_, bool* toggled, int id_, bool center_text) :
   MenuItem(text_, id_),
   m_center_text(center_text),
   m_get_func([toggled]{ return *toggled; }),
@@ -31,7 +31,7 @@ ItemToggle::ItemToggle(const std::string& text_, bool* toggled, int id_, bool ce
 {
 }
 
-ItemToggle::ItemToggle(const std::string& text_,
+ItemToggle::ItemToggle(std::string const& text_,
                        std::function<bool()> get_func,
                        std::function<void(bool)> set_func,
                        int id_,
@@ -44,7 +44,7 @@ ItemToggle::ItemToggle(const std::string& text_,
 }
 
 void
-ItemToggle::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active)
+ItemToggle::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active)
 {
   context.color().draw_text(Resources::normal_font, get_text(),
                             Vector(pos.x + (m_center_text ? static_cast<float>(menu_width) / 2.0f : 16),
@@ -71,7 +71,7 @@ ItemToggle::get_width() const
 }
 
 void
-ItemToggle::process_action(const MenuAction& action)
+ItemToggle::process_action(MenuAction const& action)
 {
   if (action == MenuAction::HIT) {
     m_set_func(!m_get_func());

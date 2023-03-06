@@ -34,7 +34,7 @@ private:
   static std::list<SpriteChange*> s_all_sprite_changes;
 
 public:
-  SpriteChange(const ReaderMapping& mapping);
+  SpriteChange(ReaderMapping const& mapping);
   ~SpriteChange() override;
 
   virtual void draw(DrawingContext& context) override;
@@ -85,8 +85,8 @@ private:
   bool m_in_stay_action;
 
 private:
-  SpriteChange(const SpriteChange&) = delete;
-  SpriteChange& operator=(const SpriteChange&) = delete;
+  SpriteChange(SpriteChange const&) = delete;
+  SpriteChange& operator=(SpriteChange const&) = delete;
 };
 
 } // namespace worldmap

@@ -21,7 +21,7 @@
 #include "video/drawing_context.hpp"
 
 
-ParticleZone::ParticleZone(const ReaderMapping& reader) :
+ParticleZone::ParticleZone(ReaderMapping const& reader) :
   MovingObject(reader),
   //ExposedObject<ParticleZone, scripting::Wind>(this),
   m_enabled(),
@@ -83,7 +83,7 @@ ParticleZone::draw(DrawingContext& context)
 }
 
 HitResponse
-ParticleZone::collision(GameObject& other, const CollisionHit& hit)
+ParticleZone::collision(GameObject& other, CollisionHit const& hit)
 {
   return ABORT_MOVE;
 }

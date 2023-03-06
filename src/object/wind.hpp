@@ -29,11 +29,11 @@ class Wind final :
   public ExposedObject<Wind, scripting::Wind>
 {
 public:
-  Wind(const ReaderMapping& reader);
+  Wind(ReaderMapping const& reader);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   virtual bool has_variable_size() const override { return true; }
   static std::string class_name() { return "wind"; }
@@ -70,8 +70,8 @@ private:
   bool fancy_wind;
 
 private:
-  Wind(const Wind&) = delete;
-  Wind& operator=(const Wind&) = delete;
+  Wind(Wind const&) = delete;
+  Wind& operator=(Wind const&) = delete;
 };
 
 #endif

@@ -26,12 +26,12 @@
 class SpecialRiser final : public MovingObject
 {
 public:
-  SpecialRiser(const Vector& pos, std::unique_ptr<MovingObject> child, bool is_solid = false);
+  SpecialRiser(Vector const& pos, std::unique_ptr<MovingObject> child, bool is_solid = false);
   virtual bool is_saveable() const override {
     return false;
   }
 
-  HitResponse collision(GameObject& other, const CollisionHit& hit) override {
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override {
     return FORCE_MOVE;
   }
 
@@ -46,8 +46,8 @@ private:
   std::unique_ptr<MovingObject> m_child;
 
 private:
-  SpecialRiser(const SpecialRiser&) = delete;
-  SpecialRiser& operator=(const SpecialRiser&) = delete;
+  SpecialRiser(SpecialRiser const&) = delete;
+  SpecialRiser& operator=(SpecialRiser const&) = delete;
 };
 
 #endif

@@ -33,17 +33,17 @@ public:
     STOPPED
   };
 
-  static Direction Direction_from_string(const std::string& s);
+  static Direction Direction_from_string(std::string const& s);
   static std::string Direction_to_string(Direction dir);
 
 public:
-  Spotlight(const ReaderMapping& reader);
+  Spotlight(ReaderMapping const& reader);
   ~Spotlight() override;
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit_) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit_) override;
 
   static std::string class_name() { return "spotlight"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -95,8 +95,8 @@ private:
   int m_layer;
 
 private:
-  Spotlight(const Spotlight&) = delete;
-  Spotlight& operator=(const Spotlight&) = delete;
+  Spotlight(Spotlight const&) = delete;
+  Spotlight& operator=(Spotlight const&) = delete;
 };
 
 #endif

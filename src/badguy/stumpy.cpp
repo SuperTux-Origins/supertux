@@ -29,7 +29,7 @@
 static const float STUMPY_SPEED = 120;
 static const float INVINCIBLE_TIME = 1;
 
-Stumpy::Stumpy(const ReaderMapping& reader) :
+Stumpy::Stumpy(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/mr_tree/stumpy.sprite","left","right", LAYER_OBJECTS,
                 "images/objects/lightmap_light/lightmap_light-large.sprite"),
   mystate(STATE_NORMAL),
@@ -40,7 +40,7 @@ Stumpy::Stumpy(const ReaderMapping& reader) :
   SoundManager::current()->preload("sounds/mr_treehit.ogg");
 }
 
-Stumpy::Stumpy(const Vector& pos, Direction d) :
+Stumpy::Stumpy(Vector const& pos, Direction d) :
   WalkingBadguy(pos, d, "images/creatures/mr_tree/stumpy.sprite","left","right"),
   mystate(STATE_INVINCIBLE),
   invincible_timer()
@@ -128,7 +128,7 @@ Stumpy::collision_squished(GameObject& object)
 }
 
 void
-Stumpy::collision_solid(const CollisionHit& hit)
+Stumpy::collision_solid(CollisionHit const& hit)
 {
   update_on_ground_flag(hit);
 
@@ -148,7 +148,7 @@ Stumpy::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Stumpy::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+Stumpy::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   switch (mystate) {
     case STATE_INVINCIBLE:

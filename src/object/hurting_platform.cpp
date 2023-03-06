@@ -19,14 +19,14 @@
 #include "badguy/badguy.hpp"
 #include "object/player.hpp"
 
-HurtingPlatform::HurtingPlatform(const ReaderMapping& reader)
+HurtingPlatform::HurtingPlatform(ReaderMapping const& reader)
   : Platform(reader, "images/objects/sawblade/sawblade.sprite")
 {
   set_group(COLGROUP_TOUCHABLE);
 }
 
 HitResponse
-HurtingPlatform::collision(GameObject& other, const CollisionHit& )
+HurtingPlatform::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*>(&other);
   if (player) {

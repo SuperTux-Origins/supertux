@@ -38,14 +38,14 @@ GameControllerManager::GameControllerManager(InputManager* parent) :
 
 GameControllerManager::~GameControllerManager()
 {
-  for (const auto& con : m_game_controllers)
+  for (auto const& con : m_game_controllers)
   {
     SDL_GameControllerClose(con.first);
   }
 }
 
 void
-GameControllerManager::process_button_event(const SDL_ControllerButtonEvent& ev)
+GameControllerManager::process_button_event(SDL_ControllerButtonEvent const& ev)
 {
   int player_id;
 
@@ -131,7 +131,7 @@ GameControllerManager::process_button_event(const SDL_ControllerButtonEvent& ev)
 }
 
 void
-GameControllerManager::process_axis_event(const SDL_ControllerAxisEvent& ev)
+GameControllerManager::process_axis_event(SDL_ControllerAxisEvent const& ev)
 {
   int player_id;
 

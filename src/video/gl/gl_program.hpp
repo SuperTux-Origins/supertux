@@ -34,8 +34,8 @@ public:
 
   GLuint get_handle() const { return m_program; }
 
-  GLint get_attrib_location(const char* name) const;
-  GLint get_uniform_location(const char* name) const;
+  GLint get_attrib_location(char const* name) const;
+  GLint get_uniform_location(char const* name) const;
 
 private:
   bool get_link_status() const;
@@ -49,8 +49,8 @@ private:
   std::unique_ptr<GLShader> m_vert_shader;
 
 private:
-  GLProgram(const GLProgram&) = delete;
-  GLProgram& operator=(const GLProgram&) = delete;
+  GLProgram(GLProgram const&) = delete;
+  GLProgram& operator=(GLProgram const&) = delete;
 };
 
 #endif

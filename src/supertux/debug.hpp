@@ -47,8 +47,8 @@ private:
   float m_game_speed_multiplier;
 
 private:
-  Debug(const Debug&) = delete;
-  Debug& operator=(const Debug&) = delete;
+  Debug(Debug const&) = delete;
+  Debug& operator=(Debug const&) = delete;
 };
 
 extern Debug g_debug;

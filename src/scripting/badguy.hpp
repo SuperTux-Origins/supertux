@@ -39,15 +39,15 @@ public:
   {}
 
 private:
-  BadGuy(const BadGuy&) = delete;
-  BadGuy& operator=(const BadGuy&) = delete;
+  BadGuy(BadGuy const&) = delete;
+  BadGuy& operator=(BadGuy const&) = delete;
 #endif
 
 public:
   void kill();
   void ignite();
-  void set_action(const std::string& action, int loops);
-  void set_sprite(const std::string& sprite);
+  void set_action(std::string const& action, int loops);
+  void set_sprite(std::string const& sprite);
 };
 
 } // namespace scripting

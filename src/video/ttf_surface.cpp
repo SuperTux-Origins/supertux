@@ -28,7 +28,7 @@
 #include "video/video_system.hpp"
 
 TTFSurfacePtr
-TTFSurface::create(const TTFFont& font, const std::string& text)
+TTFSurface::create(TTFFont const& font, std::string const& text)
 {
   SDLSurfacePtr text_surface(TTF_RenderUTF8_Blended(font.get_ttf_font(),
                                                     text.c_str(),
@@ -65,7 +65,7 @@ TTFSurface::create(const TTFFont& font, const std::string& text)
     };
 
     int shadow_size = std::min(2, font.get_shadow_size());
-    for (const auto& p : positions[shadow_size])
+    for (auto const& p : positions[shadow_size])
     {
       SDL_Rect dstrect{std::get<0>(p) + 2, std::get<1>(p) + 2, text_surface->w, text_surface->h};
       SDL_BlitSurface(text_surface.get(), nullptr,
@@ -87,7 +87,7 @@ TTFSurface::create(const TTFFont& font, const std::string& text)
     };
 
     int border = std::min(2, font.get_border());
-    for (const auto& p : positions[border])
+    for (auto const& p : positions[border])
     {
       SDL_Rect dstrect{std::get<0>(p), std::get<1>(p), text_surface->w, text_surface->h};
       SDL_BlitSurface(text_surface.get(), nullptr,
@@ -113,7 +113,7 @@ TTFSurface::create(const TTFFont& font, const std::string& text)
   return std::make_shared<TTFSurface>(result, Vector(0, 0));
 }
 
-TTFSurface::TTFSurface(const SurfacePtr& surface, const Vector& offset) :
+TTFSurface::TTFSurface(SurfacePtr const& surface, Vector const& offset) :
   m_surface(surface),
   m_offset(offset)
 {

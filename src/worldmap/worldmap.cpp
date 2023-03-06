@@ -68,7 +68,7 @@
 
 namespace worldmap {
 
-WorldMap::WorldMap(const std::string& filename, Savegame& savegame, const std::string& force_spawnpoint_) :
+WorldMap::WorldMap(std::string const& filename, Savegame& savegame, std::string const& force_spawnpoint_) :
   m_squirrel_environment(new SquirrelEnvironment(SquirrelVirtualMachine::current()->get_vm(), "worldmap")),
   m_camera(new Camera),
   m_enter_level(false),
@@ -139,7 +139,7 @@ WorldMap::before_object_remove(GameObject& object)
 }
 
 void
-WorldMap::move_to_spawnpoint(const std::string& spawnpoint, bool pan, bool main_as_default)
+WorldMap::move_to_spawnpoint(std::string const& spawnpoint, bool pan, bool main_as_default)
 {
   auto sp = get_spawnpoint_by_name(spawnpoint);
   if (sp != nullptr) {
@@ -159,7 +159,7 @@ WorldMap::move_to_spawnpoint(const std::string& spawnpoint, bool pan, bool main_
 }
 
 void
-WorldMap::change(const std::string& filename, const std::string& force_spawnpoint_)
+WorldMap::change(std::string const& filename, std::string const& force_spawnpoint_)
 {
   m_savegame.get_player_status().last_worldmap = filename;
   ScreenManager::current()->pop_screen();
@@ -180,7 +180,7 @@ WorldMap::on_escape_press()
 }
 
 Vector
-WorldMap::get_next_tile(const Vector& pos, const Direction& direction) const
+WorldMap::get_next_tile(Vector const& pos, Direction const& direction) const
 {
   auto position = pos;
   switch (direction) {
@@ -203,7 +203,7 @@ WorldMap::get_next_tile(const Vector& pos, const Direction& direction) const
 }
 
 bool
-WorldMap::path_ok(const Direction& direction, const Vector& old_pos, Vector* new_pos) const
+WorldMap::path_ok(Direction const& direction, Vector const& old_pos, Vector* new_pos) const
 {
   *new_pos = get_next_tile(old_pos, direction);
 
@@ -305,7 +305,7 @@ WorldMap::finished_level(Level* gamelevel)
 }
 
 void
-WorldMap::process_input(const Controller& controller)
+WorldMap::process_input(Controller const& controller)
 {
   m_enter_level = false;
 
@@ -427,12 +427,12 @@ WorldMap::update(float dt_sec)
 }
 
 int
-WorldMap::tile_data_at(const Vector& p) const
+WorldMap::tile_data_at(Vector const& p) const
 {
   int dirs = 0;
 
-  for (const auto& tilemap : get_solid_tilemaps()) {
-    const Tile& tile = tilemap->get_tile(static_cast<int>(p.x), static_cast<int>(p.y));
+  for (auto const& tilemap : get_solid_tilemaps()) {
+    Tile const& tile = tilemap->get_tile(static_cast<int>(p.x), static_cast<int>(p.y));
     int dirdata = tile.get_data();
     dirs |= dirdata;
   }
@@ -441,7 +441,7 @@ WorldMap::tile_data_at(const Vector& p) const
 }
 
 int
-WorldMap::available_directions_at(const Vector& p) const
+WorldMap::available_directions_at(Vector const& p) const
 {
   return tile_data_at(p) & Tile::WORLDMAP_DIR_MASK;
 }
@@ -469,7 +469,7 @@ WorldMap::at_special_tile() const
 }
 
 SpriteChange*
-WorldMap::at_sprite_change(const Vector& pos) const
+WorldMap::at_sprite_change(Vector const& pos) const
 {
   for (auto& sprite_change : get_objects_by_type<SpriteChange>()) {
     if (sprite_change.get_pos() == pos)
@@ -480,7 +480,7 @@ WorldMap::at_sprite_change(const Vector& pos) const
 }
 
 Teleporter*
-WorldMap::at_teleporter(const Vector& pos) const
+WorldMap::at_teleporter(Vector const& pos) const
 {
   for (auto& teleporter : get_objects_by_type<Teleporter>()) {
     if (teleporter.get_pos() == pos)
@@ -715,13 +715,13 @@ WorldMap::save_state()
 }
 
 void
-WorldMap::run_script(const std::string& script, const std::string& sourcename)
+WorldMap::run_script(std::string const& script, std::string const& sourcename)
 {
   m_squirrel_environment->run_script(script, sourcename);
 }
 
 void
-WorldMap::set_passive_message(const std::string& message, float time)
+WorldMap::set_passive_message(std::string const& message, float time)
 {
    m_passive_message = message;
    m_passive_message_timer.start(time);

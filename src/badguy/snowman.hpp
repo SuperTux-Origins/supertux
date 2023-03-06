@@ -22,7 +22,7 @@
 class Snowman final : public WalkingBadguy
 {
 public:
-  Snowman(const ReaderMapping& reader);
+  Snowman(ReaderMapping const& reader);
 
   static std::string class_name() { return "snowman"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -31,12 +31,12 @@ public:
 
 protected:
   void loose_head();
-  virtual HitResponse collision_bullet(Bullet& bullet, const CollisionHit& hit) override;
+  virtual HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  Snowman(const Snowman&) = delete;
-  Snowman& operator=(const Snowman&) = delete;
+  Snowman(Snowman const&) = delete;
+  Snowman& operator=(Snowman const&) = delete;
 };
 
 #endif

@@ -17,7 +17,7 @@
 
 #include "gui/item_intfield.hpp"
 
-ItemIntField::ItemIntField(const std::string& text_, int* input_, int id_, bool positive) :
+ItemIntField::ItemIntField(std::string const& text_, int* input_, int id_, bool positive) :
   ItemTextField(text_, new std::string, id_),
   number(input_),
   m_input(std::to_string(*input_)),
@@ -92,7 +92,7 @@ ItemIntField::on_input_update()
 // Text manipulation and navigation functions
 
 void
-ItemIntField::insert_text(const std::string& text, const int left_offset_pos)
+ItemIntField::insert_text(std::string const& text, const int left_offset_pos)
 {
   update_undo();
   for (auto& c : text)

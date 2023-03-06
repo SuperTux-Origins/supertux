@@ -36,8 +36,8 @@ private:
   int m_player_id;
 
 private:
-  KeyboardMenu(const KeyboardMenu&) = delete;
-  KeyboardMenu& operator=(const KeyboardMenu&) = delete;
+  KeyboardMenu(KeyboardMenu const&) = delete;
+  KeyboardMenu& operator=(KeyboardMenu const&) = delete;
 };
 
 #endif

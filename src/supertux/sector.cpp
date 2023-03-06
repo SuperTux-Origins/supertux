@@ -113,7 +113,7 @@ Sector::~Sector()
   {
     deactivate();
   }
-  catch(const std::exception& err)
+  catch(std::exception const& err)
   {
     log_warning << err.what() << std::endl;
   }
@@ -135,7 +135,7 @@ Sector::finish_construction(bool editable)
     convert_tiles2gameobject();
 
     bool has_background = std::any_of(get_objects().begin(), get_objects().end(),
-                                      [](const auto& obj) {
+                                      [](auto const& obj) {
                                         return (dynamic_cast<Background*>(obj.get()) ||
                                                 dynamic_cast<Gradient*>(obj.get()));
                                       });
@@ -188,7 +188,7 @@ Sector::get_level() const
 }
 
 void
-Sector::activate(const std::string& spawnpoint)
+Sector::activate(std::string const& spawnpoint)
 {
   SpawnPointMarker* sp = nullptr;
   for (auto& spawn_point : get_objects_by_type<SpawnPointMarker>()) {
@@ -211,7 +211,7 @@ Sector::activate(const std::string& spawnpoint)
 }
 
 void
-Sector::activate(const Vector& player_pos)
+Sector::activate(Vector const& player_pos)
 {
   BIND_SECTOR(*this);
 
@@ -222,7 +222,7 @@ Sector::activate(const Vector& player_pos)
 
     m_squirrel_environment->expose_self();
 
-    for (const auto& object : get_objects()) {
+    for (auto const& object : get_objects()) {
       m_squirrel_environment->try_expose(*object);
     }
   }
@@ -293,7 +293,7 @@ Sector::deactivate()
 
   m_squirrel_environment->unexpose_self();
 
-  for (const auto& object: get_objects()) {
+  for (auto const& object: get_objects()) {
     m_squirrel_environment->try_unexpose(*object);
   }
 
@@ -361,7 +361,7 @@ Sector::before_object_add(GameObject& object)
 {
   if (object.is_singleton())
   {
-    const auto& objects = get_objects_by_type_index(std::type_index(typeid(object)));
+    auto const& objects = get_objects_by_type_index(std::type_index(typeid(object)));
     if (!objects.empty())
     {
       log_warning << "Can't insert multiple GameObject of type '" << typeid(object).name() << "', ignoring" << std::endl;
@@ -489,13 +489,13 @@ Sector::draw(DrawingContext& context)
 }
 
 bool
-Sector::is_free_of_tiles(const Rectf& rect, const bool ignoreUnisolid, uint32_t tiletype) const
+Sector::is_free_of_tiles(Rectf const& rect, const bool ignoreUnisolid, uint32_t tiletype) const
 {
   return m_collision_system->is_free_of_tiles(rect, ignoreUnisolid, tiletype);
 }
 
 bool
-Sector::is_free_of_statics(const Rectf& rect, const MovingObject* ignore_object, const bool ignoreUnisolid) const
+Sector::is_free_of_statics(Rectf const& rect, MovingObject const* ignore_object, const bool ignoreUnisolid) const
 {
   return m_collision_system->is_free_of_statics(rect,
                                                 ignore_object ? ignore_object->get_collision_object() : nullptr,
@@ -503,21 +503,21 @@ Sector::is_free_of_statics(const Rectf& rect, const MovingObject* ignore_object,
 }
 
 bool
-Sector::is_free_of_movingstatics(const Rectf& rect, const MovingObject* ignore_object) const
+Sector::is_free_of_movingstatics(Rectf const& rect, MovingObject const* ignore_object) const
 {
   return m_collision_system->is_free_of_movingstatics(rect,
                                                       ignore_object ? ignore_object->get_collision_object() : nullptr);
 }
 
 bool
-Sector::free_line_of_sight(const Vector& line_start, const Vector& line_end, bool ignore_objects, const MovingObject* ignore_object) const
+Sector::free_line_of_sight(Vector const& line_start, Vector const& line_end, bool ignore_objects, MovingObject const* ignore_object) const
 {
   return m_collision_system->free_line_of_sight(line_start, line_end, ignore_objects,
                                                 ignore_object ? ignore_object->get_collision_object() : nullptr);
 }
 
 bool
-Sector::can_see_player(const Vector& eye) const
+Sector::can_see_player(Vector const& eye) const
 {
   for (auto player_ptr : get_objects_by_type_index(typeid(Player))) {
     Player& player = *static_cast<Player*>(player_ptr);
@@ -532,9 +532,9 @@ Sector::can_see_player(const Vector& eye) const
 }
 
 bool
-Sector::inside(const Rectf& rect) const
+Sector::inside(Rectf const& rect) const
 {
-  for (const auto& tilemap : get_all_tilemaps()) {
+  for (auto const& tilemap : get_all_tilemaps()) {
     Rectf bbox = tilemap->get_bbox();
 
     // the top of the sector extends to infinity
@@ -553,7 +553,7 @@ Sector::get_editor_size() const
   // Find the tilemap with the greatest surface
   size_t max_surface = 0;
   Size size;
-  for (const auto& tilemap : get_all_tilemaps()) {
+  for (auto const& tilemap : get_all_tilemaps()) {
     size_t surface = tilemap->get_width() * tilemap->get_height();
     if (surface > max_surface) {
       max_surface = surface;
@@ -565,14 +565,14 @@ Sector::get_editor_size() const
 }
 
 void
-Sector::resize_sector(const Size& old_size, const Size& new_size, const Size& resize_offset)
+Sector::resize_sector(Size const& old_size, Size const& new_size, Size const& resize_offset)
 {
   BIND_SECTOR(*this);
 
   bool is_offset = resize_offset.width || resize_offset.height;
   Vector obj_shift = Vector(static_cast<float>(resize_offset.width) * 32.0f,
                             static_cast<float>(resize_offset.height) * 32.0f);
-  for (const auto& object : get_objects()) {
+  for (auto const& object : get_objects()) {
     auto tilemap = dynamic_cast<TileMap*>(object.get());
     if (tilemap) {
       if (tilemap->get_size() == old_size) {
@@ -615,7 +615,7 @@ Sector::get_gravity() const
 }
 
 Player*
-Sector::get_nearest_player (const Vector& pos) const
+Sector::get_nearest_player (Vector const& pos) const
 {
   Player *nearest_player = nullptr;
   float nearest_dist = std::numeric_limits<float>::max();
@@ -638,7 +638,7 @@ Sector::get_nearest_player (const Vector& pos) const
 }
 
 std::vector<MovingObject*>
-Sector::get_nearby_objects(const Vector& center, float max_distance) const
+Sector::get_nearby_objects(Vector const& center, float max_distance) const
 {
   std::vector<MovingObject*> result;
   for (auto& object : m_collision_system->get_nearby_objects(center, max_distance))
@@ -661,7 +661,7 @@ Sector::stop_looping_sounds()
 
 void Sector::play_looping_sounds()
 {
-  for (const auto& object : get_objects()) {
+  for (auto const& object : get_objects()) {
     object->play_looping_sounds();
   }
 }
@@ -680,7 +680,7 @@ Sector::convert_tiles2gameobject()
     {
       for (int y=0; y < tm.get_height(); ++y)
       {
-        const Tile& tile = tm.get_tile(x, y);
+        Tile const& tile = tm.get_tile(x, y);
 
         if (!tile.get_object_name().empty())
         {
@@ -730,7 +730,7 @@ Sector::convert_tiles2gameobject()
 }
 
 void
-Sector::run_script(const std::string& script, const std::string& sourcename)
+Sector::run_script(std::string const& script, std::string const& sourcename)
 {
   m_squirrel_environment->run_script(script, sourcename);
 }

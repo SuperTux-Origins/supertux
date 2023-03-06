@@ -42,7 +42,7 @@
 
 namespace {
 
-bool less_than_volume(const std::string& lhs, const std::string& rhs) {
+bool less_than_volume(std::string const& lhs, std::string const& rhs) {
   int lhs_i, rhs_i;
   if (sscanf(lhs.c_str(), "%i", &lhs_i) == 1 &&
       sscanf(rhs.c_str(), "%i", &rhs_i) == 1)
@@ -128,7 +128,7 @@ OptionsMenu::OptionsMenu(bool complete) :
     out << (g_config->magnification*100) << "%";
     std::string magn = out.str();
     int count = 0;
-    for (const auto& magnification : magnifications)
+    for (auto const& magnification : magnifications)
     {
       if (magnification == magn)
       {
@@ -160,7 +160,7 @@ OptionsMenu::OptionsMenu(bool complete) :
     out << g_config->aspect_size.width << ":" << g_config->aspect_size.height;
     std::string aspect_ratio = out.str();
     int cnt_ = 0;
-    for (const auto& ratio : aspect_ratios)
+    for (auto const& ratio : aspect_ratios)
     {
       if (ratio == aspect_ratio)
       {
@@ -239,7 +239,7 @@ OptionsMenu::OptionsMenu(bool complete) :
   }
 
   int cnt = 0;
-  for (const auto& res : resolutions)
+  for (auto const& res : resolutions)
   {
     if (res == fullscreen_size_str)
     {
@@ -283,7 +283,7 @@ OptionsMenu::OptionsMenu(bool complete) :
 
   // Sound Volume
   sound_volumes.clear();
-  for (const char* percent : {"0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"}) {
+  for (char const* percent : {"0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"}) {
     sound_volumes.push_back(percent);
   }
 
@@ -303,7 +303,7 @@ OptionsMenu::OptionsMenu(bool complete) :
   out << g_config->sound_volume << "%";
   std::string sound_volume = out.str();
   int cnt_ = 0;
-  for (const auto& volume : sound_volumes)
+  for (auto const& volume : sound_volumes)
   {
     if (volume == sound_volume)
     {
@@ -316,7 +316,7 @@ OptionsMenu::OptionsMenu(bool complete) :
 
   // Music Volume
   music_volumes.clear();
-  for (const char* percent : {"0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"}) {
+  for (char const* percent : {"0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"}) {
     music_volumes.push_back(percent);
   }
 
@@ -337,7 +337,7 @@ OptionsMenu::OptionsMenu(bool complete) :
   out << g_config->music_volume << "%";
   std::string music_volume = out.str();
   cnt_ = 0;
-  for (const auto& volume : music_volumes)
+  for (auto const& volume : music_volumes)
   {
     if (volume == music_volume)
     {

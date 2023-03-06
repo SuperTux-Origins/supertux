@@ -51,8 +51,8 @@ private:
   std::optional<Key> m_cache_key;
 
 private:
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  Texture(Texture const&) = delete;
+  Texture& operator=(Texture const&) = delete;
 };
 
 #endif

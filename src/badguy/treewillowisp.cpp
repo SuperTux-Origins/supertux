@@ -29,7 +29,7 @@
 
 static const std::string TREEWILLOSOUND = "sounds/willowisp.wav";
 
-TreeWillOWisp::TreeWillOWisp(GhostTree* tree_, const Vector& pos,
+TreeWillOWisp::TreeWillOWisp(GhostTree* tree_, Vector const& pos,
                              float radius_, float speed_) :
   BadGuy(tree_->get_pos() + pos, "images/creatures/willowisp/willowisp.sprite",
          LAYER_OBJECTS - 20),
@@ -76,7 +76,7 @@ TreeWillOWisp::vanish()
 }
 
 void
-TreeWillOWisp::start_sucking(const Vector& suck_target_)
+TreeWillOWisp::start_sucking(Vector const& suck_target_)
 {
   mystate = STATE_SUCKED;
   suck_target = suck_target_;
@@ -84,14 +84,14 @@ TreeWillOWisp::start_sucking(const Vector& suck_target_)
 }
 
 HitResponse
-TreeWillOWisp::collision_player(Player& player, const CollisionHit& hit)
+TreeWillOWisp::collision_player(Player& player, CollisionHit const& hit)
 {
   //TODO: basically a no-op. Remove if this doesn't change.
   return BadGuy::collision_player(player, hit);
 }
 
 bool
-TreeWillOWisp::collides(GameObject& other, const CollisionHit& ) const
+TreeWillOWisp::collides(GameObject& other, CollisionHit const& ) const
 {
   auto lantern = dynamic_cast<Lantern*>(&other);
   if (lantern && lantern->is_open())
@@ -148,7 +148,7 @@ TreeWillOWisp::active_update(float dt_sec)
 }
 
 void
-TreeWillOWisp::set_color(const Color& color_)
+TreeWillOWisp::set_color(Color const& color_)
 {
   color = color_;
   m_sprite->set_color(color_);

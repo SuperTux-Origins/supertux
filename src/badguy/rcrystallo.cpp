@@ -24,7 +24,7 @@
 
 #include "util/reader_mapping.hpp"
 
-RCrystallo::RCrystallo(const ReaderMapping& reader) :
+RCrystallo::RCrystallo(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/crystallo/rcrystallo.sprite", "left", "right"),
   state(RCRYSTALLO_ROOF),
   m_radius()
@@ -111,7 +111,7 @@ RCrystallo::draw(DrawingContext& context)
 }
 
 void
-RCrystallo::collision_solid(const CollisionHit& hit)
+RCrystallo::collision_solid(CollisionHit const& hit)
 {
   if (state == RCRYSTALLO_FALLING && hit.bottom)
     kill_fall();
@@ -119,7 +119,7 @@ RCrystallo::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-RCrystallo::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+RCrystallo::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (state == RCRYSTALLO_FALLING)
   {
@@ -130,7 +130,7 @@ RCrystallo::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
 }
 
 HitResponse
-RCrystallo::collision_player(Player& player, const CollisionHit& hit)
+RCrystallo::collision_player(Player& player, CollisionHit const& hit)
 {
   if (state == RCRYSTALLO_FALLING)
     kill_fall();

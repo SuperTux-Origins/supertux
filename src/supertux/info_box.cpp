@@ -22,7 +22,7 @@
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
-InfoBox::InfoBox(const std::string& text) :
+InfoBox::InfoBox(std::string const& text) :
   firstline(0),
   // Split text string lines into a vector
   lines(InfoBoxLine::split(text, 400)),

@@ -36,10 +36,10 @@ public:
   SpriteManager();
 
   /** loads a sprite. */
-  SpritePtr create(const std::string& filename);
+  SpritePtr create(std::string const& filename);
 
 private:
-  SpriteData* load(const std::string& filename);
+  SpriteData* load(std::string const& filename);
 };
 
 #endif

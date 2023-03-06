@@ -49,29 +49,29 @@ class GameSession final : public Screen,
                           public Currenton<GameSession>
 {
 public:
-  GameSession(const std::string& levelfile, Savegame& savegame, Statistics* statistics = nullptr);
+  GameSession(std::string const& levelfile, Savegame& savegame, Statistics* statistics = nullptr);
 
   virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, const Controller& controller) override;
+  virtual void update(float dt_sec, Controller const& controller) override;
   virtual void setup() override;
   virtual void leave() override;
 
   /** ends the current level */
   void finish(bool win = true);
-  void respawn(const std::string& sectorname, const std::string& spawnpointname,
+  void respawn(std::string const& sectorname, std::string const& spawnpointname,
                bool retain_invincibility = false);
   void reset_level();
-  void set_start_point(const std::string& sectorname,
-                       const std::string& spawnpointname);
-  void set_start_pos(const std::string& sectorname, const Vector& pos);
-  void set_reset_point(const std::string& sectorname, const Vector& pos);
+  void set_start_point(std::string const& sectorname,
+                       std::string const& spawnpointname);
+  void set_start_pos(std::string const& sectorname, Vector const& pos);
+  void set_reset_point(std::string const& sectorname, Vector const& pos);
   std::string get_reset_point_sectorname() const { return m_reset_sector; }
 
   Vector get_reset_point_pos() const { return m_reset_pos; }
   Sector& get_current_sector() const { return *m_currentsector; }
   Level& get_current_level() const { return *m_level; }
 
-  void start_sequence(Player* caller, Sequence seq, const SequenceData* data = nullptr);
+  void start_sequence(Player* caller, Sequence seq, SequenceData const* data = nullptr);
 
   /**
    * returns the "working directory" usually this is the directory where the
@@ -164,8 +164,8 @@ private:
   Timer m_endsequence_timer;
 
 private:
-  GameSession(const GameSession&) = delete;
-  GameSession& operator=(const GameSession&) = delete;
+  GameSession(GameSession const&) = delete;
+  GameSession& operator=(GameSession const&) = delete;
 };
 
 #endif

@@ -32,30 +32,30 @@ public:
     m_flip(NO_FLIP)
   {}
 
-  PaintStyle& set_color(const Color& color) {
+  PaintStyle& set_color(Color const& color) {
     m_color = color;
     return *this;
   }
 
-  PaintStyle& set_alpha(const float& alpha) {
+  PaintStyle& set_alpha(float const& alpha) {
     m_alpha = alpha;
     return *this;
   }
 
-  PaintStyle& set_blend(const Blend& blend) {
+  PaintStyle& set_blend(Blend const& blend) {
     m_blend = blend;
     return *this;
   }
 
-  PaintStyle& set_flip(const Flip& flip) {
+  PaintStyle& set_flip(Flip const& flip) {
     m_flip = flip;
     return *this;
   }
 
-  const Color& get_color() const { return m_color; }
-  const float& get_alpha() const { return m_alpha; }
-  const Blend& get_blend() const { return m_blend; }
-  const Flip& get_flip() const { return m_flip; }
+  Color const& get_color() const { return m_color; }
+  float const& get_alpha() const { return m_alpha; }
+  Blend const& get_blend() const { return m_blend; }
+  Flip const& get_flip() const { return m_flip; }
 
 private:
   Color m_color;

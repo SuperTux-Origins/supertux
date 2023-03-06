@@ -48,8 +48,8 @@ private:
   bool m_panning;
 
 private:
-  Camera(const Camera&) = delete;
-  Camera& operator=(const Camera&) = delete;
+  Camera(Camera const&) = delete;
+  Camera& operator=(Camera const&) = delete;
 };
 
 } // namespace worldmap

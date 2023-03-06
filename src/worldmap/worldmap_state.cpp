@@ -113,7 +113,7 @@ WorldMapState::load_state()
         sq_pushnull(vm.get_vm()); // Null-iterator
         while (SQ_SUCCEEDED(sq_next(vm.get_vm(), -2)))
         {
-          const char* key; // Name of specific tilemap table
+          char const* key; // Name of specific tilemap table
           if (SQ_SUCCEEDED(sq_getstring(vm.get_vm(), -2, &key)))
           {
             auto tilemap = m_worldmap.get_object_by_name<TileMap>(key);
@@ -122,7 +122,7 @@ WorldMapState::load_state()
               sq_pushnull(vm.get_vm()); // null iterator (inner);
               while (SQ_SUCCEEDED(sq_next(vm.get_vm(), -2)))
               {
-                const char* property_key;
+                char const* property_key;
                 if (SQ_SUCCEEDED(sq_getstring(vm.get_vm(), -2, &property_key)))
                 {
                   auto propKey = std::string(property_key);
@@ -146,7 +146,7 @@ WorldMapState::load_state()
         sq_pop(vm.get_vm(), 1); // leave tilemaps table
       }
     }
-    catch(const SquirrelError&)
+    catch(SquirrelError const&)
     {
       // Failed to get tilemap entry. This could indicate
       // that no savable tilemaps have been found. In any
@@ -228,7 +228,7 @@ WorldMapState::save_state() const
     {
       vm.begin_table("sprite-changes");
 
-      for (const auto& sc : m_worldmap.get_objects_by_type<SpriteChange>())
+      for (auto const& sc : m_worldmap.get_objects_by_type<SpriteChange>())
       {
         auto key = std::to_string(int(sc.get_pos().x)) + "_" +
                    std::to_string(int(sc.get_pos().y));
@@ -264,7 +264,7 @@ WorldMapState::save_state() const
     // levels...
     vm.begin_table("levels");
 
-    for (const auto& level : m_worldmap.get_objects_by_type<LevelTile>())
+    for (auto const& level : m_worldmap.get_objects_by_type<LevelTile>())
     {
       vm.begin_table(level.get_level_filename().c_str());
 

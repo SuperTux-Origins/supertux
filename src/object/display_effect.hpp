@@ -25,7 +25,7 @@ class DisplayEffect final : public GameObject,
                       public ExposedObject<DisplayEffect, scripting::DisplayEffect>
 {
 public:
-  DisplayEffect(const std::string& name = std::string());
+  DisplayEffect(std::string const& name = std::string());
   ~DisplayEffect() override;
 
   virtual void update(float dt_sec) override;
@@ -63,8 +63,8 @@ private:
   bool borders;
 
 private:
-  DisplayEffect(const DisplayEffect&) = delete;
-  DisplayEffect& operator=(const DisplayEffect&) = delete;
+  DisplayEffect(DisplayEffect const&) = delete;
+  DisplayEffect& operator=(DisplayEffect const&) = delete;
 };
 
 #endif

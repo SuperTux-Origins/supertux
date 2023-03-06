@@ -25,7 +25,7 @@ static const float FISH_JUMP_POWER = -600.f;
 static const float FISH_WAIT_TIME = 1.f;
 static const float FISH_BEACH_TIME = 5.f;
 
-FishJumping::FishJumping(const ReaderMapping& reader) :
+FishJumping::FishJumping(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/fish/forest/jumpfish.sprite"),
   m_wait_timer(),
   m_beached_timer(),
@@ -35,7 +35,7 @@ FishJumping::FishJumping(const ReaderMapping& reader) :
 }
 
 void
-FishJumping::collision_solid(const CollisionHit& chit)
+FishJumping::collision_solid(CollisionHit const& chit)
 {
   hit(chit);
   if (!m_in_water && chit.bottom && !m_frozen)
@@ -49,7 +49,7 @@ FishJumping::collision_solid(const CollisionHit& chit)
 }
 
 HitResponse
-FishJumping::collision_badguy(BadGuy& , const CollisionHit& chit)
+FishJumping::collision_badguy(BadGuy& , CollisionHit const& chit)
 {
   if (m_beached_timer.started())
     collision_solid(chit);
@@ -58,7 +58,7 @@ FishJumping::collision_badguy(BadGuy& , const CollisionHit& chit)
 }
 
 HitResponse
-FishJumping::hit(const CollisionHit& hit_)
+FishJumping::hit(CollisionHit const& hit_)
 {
   if (hit_.top)
     m_physic.set_velocity_y(0);

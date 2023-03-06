@@ -22,7 +22,7 @@
 
 namespace physfsutil {
 
-std::string realpath(const std::string& path)
+std::string realpath(std::string const& path)
 {
   std::string result = FileSystem::normalize(path);
   if (result.empty()) {
@@ -34,7 +34,7 @@ std::string realpath(const std::string& path)
   }
 }
 
-bool is_directory(const std::string& path)
+bool is_directory(std::string const& path)
 {
   PHYSFS_Stat statbuf;
   if (!PHYSFS_stat(path.c_str(), &statbuf)) {
@@ -42,7 +42,7 @@ bool is_directory(const std::string& path)
   } else {
     if (statbuf.filetype == PHYSFS_FILETYPE_SYMLINK) {
       // PHYSFS_stat() doesn't follow symlinks, so we do it manually
-      const char* realdir = PHYSFS_getRealDir(path.c_str());
+      char const* realdir = PHYSFS_getRealDir(path.c_str());
       if (realdir == nullptr) {
         return false;
       } else {
@@ -55,17 +55,17 @@ bool is_directory(const std::string& path)
   }
 }
 
-bool remove(const std::string& filename)
+bool remove(std::string const& filename)
 {
   return PHYSFS_delete(filename.c_str()) == 0;
 }
 
 void
-remove_with_content(const std::string& filename)
+remove_with_content(std::string const& filename)
 {
   char** files = PHYSFS_enumerateFiles(filename.c_str());
 
-  for (const char* const* file = files; *file != nullptr; file++)
+  for (char const* const* file = files; *file != nullptr; file++)
   {
     std::string path = FileSystem::join(filename, *file);
     if (is_directory(path))

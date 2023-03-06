@@ -35,15 +35,15 @@ class BadGuy : public MovingSprite,
                public Portable
 {
 public:
-  BadGuy(const Vector& pos, const std::string& sprite_name, int layer = LAYER_OBJECTS,
-         const std::string& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite",
-         const std::string& ice_sprite_name = "images/creatures/overlays/iceoverlay/iceoverlay.sprite");
-  BadGuy(const Vector& pos, Direction direction, const std::string& sprite_name, int layer = LAYER_OBJECTS,
-         const std::string& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite",
-         const std::string& ice_sprite_name = "images/creatures/overlays/iceoverlay/iceoverlay.sprite");
-  BadGuy(const ReaderMapping& reader, const std::string& sprite_name, int layer = LAYER_OBJECTS,
-         const std::string& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite",
-         const std::string& ice_sprite_name = "images/creatures/overlays/iceoverlay/iceoverlay.sprite");
+  BadGuy(Vector const& pos, std::string const& sprite_name, int layer = LAYER_OBJECTS,
+         std::string const& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite",
+         std::string const& ice_sprite_name = "images/creatures/overlays/iceoverlay/iceoverlay.sprite");
+  BadGuy(Vector const& pos, Direction direction, std::string const& sprite_name, int layer = LAYER_OBJECTS,
+         std::string const& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite",
+         std::string const& ice_sprite_name = "images/creatures/overlays/iceoverlay/iceoverlay.sprite");
+  BadGuy(ReaderMapping const& reader, std::string const& sprite_name, int layer = LAYER_OBJECTS,
+         std::string const& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite",
+         std::string const& ice_sprite_name = "images/creatures/overlays/iceoverlay/iceoverlay.sprite");
 
   /** Called when the badguy is drawn. The default implementation
       simply draws the badguy sprite on screen */
@@ -63,7 +63,7 @@ public:
   /** Called when a collision with another object occurred. The
       default implementation calls collision_player, collision_solid,
       collision_badguy and collision_squished */
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   /** Called when a collision with tile with special attributes
       occurred */
@@ -81,9 +81,9 @@ public:
   virtual bool can_break() const { return false; }
 
   Vector get_start_position() const { return m_start_position; }
-  void set_start_position(const Vector& vec) { m_start_position = vec; }
+  void set_start_position(Vector const& vec) { m_start_position = vec; }
 
-  virtual void grab(MovingObject& object, const Vector& pos, Direction dir) override;
+  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   virtual void ungrab(MovingObject& object, Direction dir) override;
   virtual bool is_portable() const override;
 
@@ -120,7 +120,7 @@ public:
     return "images/objects/water_drop/water_drop.sprite";
   }
 
-  void set_sprite_action(const std::string& action, int loops = 1)
+  void set_sprite_action(std::string const& action, int loops = 1)
   {
     set_action(action, loops);
   }
@@ -136,7 +136,7 @@ public:
   virtual bool can_be_affected_by_wind() const;
 
   /** Adds velocity from wind */
-  virtual void add_wind_velocity(const Vector& velocity, const Vector& end_speed);
+  virtual void add_wind_velocity(Vector const& velocity, Vector const& end_speed);
 
 protected:
   enum State {
@@ -154,15 +154,15 @@ protected:
 
 protected:
   /** Called when the badguy collided with a player */
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit);
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit);
 
   /** Called when the badguy collided with solid ground */
-  virtual void collision_solid(const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
 
   virtual void on_flip(float height) override;
 
   /** Called when the badguy collided with another badguy */
-  virtual HitResponse collision_badguy(BadGuy& other, const CollisionHit& hit);
+  virtual HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit);
 
   /** Called when the player hit the badguy from above. You should
       return true if the badguy was squished, false if squishing
@@ -170,7 +170,7 @@ protected:
   virtual bool collision_squished(GameObject& object);
 
   /** Called when the badguy collided with a bullet */
-  virtual HitResponse collision_bullet(Bullet& bullet, const CollisionHit& hit);
+  virtual HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit);
 
   /** called each frame when the badguy is activated. */
   virtual void active_update(float dt_sec);
@@ -210,13 +210,13 @@ protected:
   bool might_fall(int height = 1) const;
 
   /** Get Direction from String. */
-  Direction str2dir(const std::string& dir_str) const;
+  Direction str2dir(std::string const& dir_str) const;
 
   /** Update on_ground_flag judging by solid collision @c hit. This
       gets called from the base implementation of collision_solid, so
       call this when overriding collision_solid's default
       behaviour. */
-  void update_on_ground_flag(const CollisionHit& hit);
+  void update_on_ground_flag(CollisionHit const& hit);
 
   /** Returns true if we touched ground in the past frame This only
       works if update_on_ground_flag() gets called in
@@ -297,8 +297,8 @@ private:
   CollisionGroup m_colgroup_active;
 
 private:
-  BadGuy(const BadGuy&) = delete;
-  BadGuy& operator=(const BadGuy&) = delete;
+  BadGuy(BadGuy const&) = delete;
+  BadGuy& operator=(BadGuy const&) = delete;
 };
 
 #endif

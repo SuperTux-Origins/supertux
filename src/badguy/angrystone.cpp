@@ -25,7 +25,7 @@ static const float CHARGE_TIME = .5;
 static const float ATTACK_TIME = 1;
 static const float RECOVER_TIME = .5;
 
-AngryStone::AngryStone(const ReaderMapping& reader) :
+AngryStone::AngryStone(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/angrystone/angrystone.sprite"),
   attackDirection(0.0f, 0.0f),
   oldWallDirection(0.0f, 0.0f),
@@ -40,7 +40,7 @@ AngryStone::AngryStone(const ReaderMapping& reader) :
 }
 
 void
-AngryStone::collision_solid(const CollisionHit& hit)
+AngryStone::collision_solid(CollisionHit const& hit)
 {
   if (m_frozen)
     BadGuy::collision_solid(hit);
@@ -69,7 +69,7 @@ AngryStone::kill_fall()
 }
 
 HitResponse
-AngryStone::collision_badguy(BadGuy& badguy, const CollisionHit& )
+AngryStone::collision_badguy(BadGuy& badguy, CollisionHit const& )
 {
   if (state == ATTACKING) {
     badguy.kill_fall();
@@ -93,8 +93,8 @@ AngryStone::active_update(float dt_sec) {
       auto player = get_nearest_player();
       if (player) {
         auto badguy = this;
-        const Vector& playerPos = player->get_pos();
-        const Vector& badguyPos = badguy->get_pos();
+        Vector const& playerPos = player->get_pos();
+        Vector const& badguyPos = badguy->get_pos();
         float dx = (playerPos.x - badguyPos.x);
         float dy = (playerPos.y - badguyPos.y);
 

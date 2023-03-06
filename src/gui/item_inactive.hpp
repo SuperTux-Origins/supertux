@@ -27,7 +27,7 @@ private:
   const bool m_default_color;
 
 public:
-  ItemInactive(const std::string& text_, bool default_color);
+  ItemInactive(std::string const& text_, bool default_color);
 
   /** Returns true when the menu item has no action and therefore can be skipped.
       Useful for labels and horizontal lines.*/
@@ -38,8 +38,8 @@ public:
   virtual Color get_color() const override;
 
 private:
-  ItemInactive(const ItemInactive&) = delete;
-  ItemInactive& operator=(const ItemInactive&) = delete;
+  ItemInactive(ItemInactive const&) = delete;
+  ItemInactive& operator=(ItemInactive const&) = delete;
 };
 
 #endif

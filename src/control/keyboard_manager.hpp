@@ -32,10 +32,10 @@ class KeyboardManager final
 public:
   KeyboardManager(InputManager* parent, KeyboardConfig& keyboard_config);
 
-  void process_key_event(const SDL_KeyboardEvent& event);
-  void process_text_input_event(const SDL_TextInputEvent& event);
-  void process_console_key_event(const SDL_KeyboardEvent& event);
-  void process_menu_key_event(const SDL_KeyboardEvent& event);
+  void process_key_event(SDL_KeyboardEvent const& event);
+  void process_text_input_event(SDL_TextInputEvent const& event);
+  void process_console_key_event(SDL_KeyboardEvent const& event);
+  void process_menu_key_event(SDL_KeyboardEvent const& event);
 
   void bind_next_event_to(int player_id, Control id);
 
@@ -46,8 +46,8 @@ private:
   bool m_lock_text_input;
 
 private:
-  KeyboardManager(const KeyboardManager&) = delete;
-  KeyboardManager& operator=(const KeyboardManager&) = delete;
+  KeyboardManager(KeyboardManager const&) = delete;
+  KeyboardManager& operator=(KeyboardManager const&) = delete;
 };
 
 #endif

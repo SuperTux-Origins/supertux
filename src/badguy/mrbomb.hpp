@@ -22,16 +22,16 @@
 class MrBomb final : public WalkingBadguy
 {
 public:
-  MrBomb(const ReaderMapping& reader);
+  MrBomb(ReaderMapping const& reader);
 
   virtual void kill_fall() override;
   virtual void ignite() override;
-  virtual HitResponse collision(GameObject& object, const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& object, CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
   virtual void active_update(float dt_sec) override;
 
-  virtual void grab(MovingObject& object, const Vector& pos, Direction dir) override;
+  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   virtual bool is_portable() const override;
 
   virtual bool is_freezable() const override;
@@ -44,8 +44,8 @@ protected:
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  MrBomb(const MrBomb&) = delete;
-  MrBomb& operator=(const MrBomb&) = delete;
+  MrBomb(MrBomb const&) = delete;
+  MrBomb& operator=(MrBomb const&) = delete;
 };
 
 #endif

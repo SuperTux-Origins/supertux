@@ -36,7 +36,7 @@ const float EXPLODING_WALK_SPEED = 200.0f;
 
 } // namespace
 
-Haywire::Haywire(const ReaderMapping& reader) :
+Haywire::Haywire(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/haywire/haywire.sprite", "left", "right"),
   is_exploding(false),
   time_until_explosion(0.0f),
@@ -313,7 +313,7 @@ void Haywire::play_looping_sounds()
   }
 }
 
-HitResponse Haywire::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+HitResponse Haywire::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (is_exploding)
   {

@@ -88,7 +88,7 @@ InfoBoxLine::LineType get_linetype_by_format_char(char format_char) {
 
 } // namespace
 
-InfoBoxLine::InfoBoxLine(char format_char, const std::string& text_) :
+InfoBoxLine::InfoBoxLine(char format_char, std::string const& text_) :
   lineType(get_linetype_by_format_char(format_char)),
   font(get_font_by_format_char(format_char)),
   color(get_color_by_format_char(format_char)),
@@ -102,7 +102,7 @@ InfoBoxLine::InfoBoxLine(char format_char, const std::string& text_) :
 }
 
 std::vector<std::unique_ptr<InfoBoxLine> >
-InfoBoxLine::split(const std::string& text, float width)
+InfoBoxLine::split(std::string const& text, float width)
 {
   std::vector<std::unique_ptr<InfoBoxLine> > lines;
 
@@ -156,7 +156,7 @@ InfoBoxLine::split(const std::string& text, float width)
 }
 
 void
-InfoBoxLine::draw(DrawingContext& context, const Rectf& bbox, int layer, LineAlignment alignment)
+InfoBoxLine::draw(DrawingContext& context, Rectf const& bbox, int layer, LineAlignment alignment)
 {
   Vector position = bbox.p1();
   switch (lineType) {

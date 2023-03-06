@@ -25,8 +25,8 @@
 class BouncyCoin final : public GameObject
 {
 public:
-  BouncyCoin(const Vector& pos, bool emerge = false,
-             const std::string& sprite_path = "images/objects/coin/coin.sprite");
+  BouncyCoin(Vector const& pos, bool emerge = false,
+             std::string const& sprite_path = "images/objects/coin/coin.sprite");
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
   virtual bool is_saveable() const override {
@@ -40,8 +40,8 @@ private:
   float emerge_distance;
 
 private:
-  BouncyCoin(const BouncyCoin&) = delete;
-  BouncyCoin& operator=(const BouncyCoin&) = delete;
+  BouncyCoin(BouncyCoin const&) = delete;
+  BouncyCoin& operator=(BouncyCoin const&) = delete;
 };
 
 #endif

@@ -56,18 +56,18 @@ public:
   void unserialize_from_squirrel(SquirrelVM& vm);
 
   void draw_worldmap_info(DrawingContext& context, float target_time); /**< draw worldmap stat HUD */
-  void draw_endseq_panel(DrawingContext& context, Statistics* best_stats, const SurfacePtr& backdrop, float target_time); /**< draw panel shown during level's end sequence */
+  void draw_endseq_panel(DrawingContext& context, Statistics* best_stats, SurfacePtr const& backdrop, float target_time); /**< draw panel shown during level's end sequence */
   void draw_ingame_stats(DrawingContext& context, bool on_pause_menu); /**< draw in-game stats */
 
   /** Updates the timers for in-game stats rendering. Should be used from the same object that calls draw_ingame_stats(). */
   void update_timers(float dt_sec);
 
-  void init(const Level& level);
+  void init(Level const& level);
   void finish(float time);
   void invalidate();
 
-  void update(const Statistics& stats); /**< Given another Statistics object finds the best of each one */
-  bool completed(const Statistics& stats, const float target_time) const; /* Check if stats match total stats */
+  void update(Statistics const& stats); /**< Given another Statistics object finds the best of each one */
+  bool completed(Statistics const& stats, const float target_time) const; /* Check if stats match total stats */
 
   int get_coins() const { return m_coins; }
   int get_badguys() const { return m_badguys; }
@@ -129,8 +129,8 @@ private:
   SurfacePtr secret_icon;
 
 private:
-  Statistics(const Statistics&) = delete;
-  Statistics& operator=(const Statistics&) = delete;
+  Statistics(Statistics const&) = delete;
+  Statistics& operator=(Statistics const&) = delete;
 };
 
 #endif

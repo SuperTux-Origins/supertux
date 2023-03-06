@@ -35,8 +35,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  Rain(const Rain&) = delete;
-  Rain& operator=(const Rain&) = delete;
+  Rain(Rain const&) = delete;
+  Rain& operator=(Rain const&) = delete;
 #endif
 
 public:
@@ -50,7 +50,7 @@ public:
   void fade_amount(float amount, float time);
 
   /** Smoothly changes the angle of the rain according to the easing function */
-  void fade_angle(float angle, float time, const std::string& ease);
+  void fade_angle(float angle, float time, std::string const& ease);
 };
 
 } // namespace scripting

@@ -31,7 +31,7 @@ const int MAX_SNAIL_SQUISHES = 10;
 const float SNAIL_KICK_SPEED_Y = -500; /**< y-velocity gained when kicked */
 }
 
-Snail::Snail(const ReaderMapping& reader) :
+Snail::Snail(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/snail/snail.sprite", "left", "right"),
   state(STATE_NORMAL),
   kicked_delay_timer(),
@@ -167,7 +167,7 @@ Snail::is_freezable() const
 }
 
 void
-Snail::collision_solid(const CollisionHit& hit)
+Snail::collision_solid(CollisionHit const& hit)
 {
   if (m_frozen)
   {
@@ -209,7 +209,7 @@ Snail::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Snail::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+Snail::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (m_frozen)
     return WalkingBadguy::collision_badguy(badguy, hit);
@@ -232,7 +232,7 @@ Snail::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
 }
 
 HitResponse
-Snail::collision_player(Player& player, const CollisionHit& hit)
+Snail::collision_player(Player& player, CollisionHit const& hit)
 {
   if (m_frozen)
     return BadGuy::collision_player(player, hit);
@@ -302,7 +302,7 @@ Snail::collision_squished(GameObject& object)
 }
 
 void
-Snail::grab(MovingObject& object, const Vector& pos, Direction dir_)
+Snail::grab(MovingObject& object, Vector const& pos, Direction dir_)
 {
   Portable::grab(object, pos, dir_);
   if (m_frozen)

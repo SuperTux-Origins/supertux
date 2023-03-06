@@ -24,13 +24,13 @@
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 
-ViciousIvy::ViciousIvy(const ReaderMapping& reader)
+ViciousIvy::ViciousIvy(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/vicious_ivy/vicious_ivy.sprite", "left", "right")
 {
   walk_speed = 80;
 }
 
-ViciousIvy::ViciousIvy(const Vector& pos, Direction d)
+ViciousIvy::ViciousIvy(Vector const& pos, Direction d)
   : WalkingBadguy(pos, d, "images/creatures/vicious_ivy/vicious_ivy.sprite", "left", "right")
 {
   walk_speed = 80;

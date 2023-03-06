@@ -25,7 +25,7 @@ public:
   ItemHorizontalLine();
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, const Vector& pos, int menu_width, bool active) override;
+  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns true when the menu item has no action and therefore can be skipped.
       Useful for labels and horizontal lines.*/
@@ -37,8 +37,8 @@ public:
   virtual int get_width() const override;
 
 private:
-  ItemHorizontalLine(const ItemHorizontalLine&) = delete;
-  ItemHorizontalLine& operator=(const ItemHorizontalLine&) = delete;
+  ItemHorizontalLine(ItemHorizontalLine const&) = delete;
+  ItemHorizontalLine& operator=(ItemHorizontalLine const&) = delete;
 };
 
 #endif

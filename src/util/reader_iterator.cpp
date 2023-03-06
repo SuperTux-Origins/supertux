@@ -114,7 +114,7 @@ ReaderIterator::as_mapping() const
   return ReaderMapping(std::make_unique<prio::SExprReaderMappingImpl>(dynamic_cast<prio::SExprReaderDocumentImpl const&>(m_doc.get_impl()), m_arr[m_idx]));
 }
 
-const sexp::Value&
+sexp::Value const&
 ReaderIterator::get_sexp() const
 {
   return m_arr[m_idx];

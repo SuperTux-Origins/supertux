@@ -32,7 +32,7 @@ class Thunderstorm final : public GameObject,
                      public ExposedObject<Thunderstorm, scripting::Thunderstorm>
 {
 public:
-  Thunderstorm(const ReaderMapping& reader);
+  Thunderstorm(ReaderMapping const& reader);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
@@ -81,8 +81,8 @@ private:
   std::map<uint32_t, uint32_t> changing_tiles; /**< preserves the tiles which an electrocution should change */
 
 private:
-  Thunderstorm(const Thunderstorm&) = delete;
-  Thunderstorm& operator=(const Thunderstorm&) = delete;
+  Thunderstorm(Thunderstorm const&) = delete;
+  Thunderstorm& operator=(Thunderstorm const&) = delete;
 };
 
 #endif

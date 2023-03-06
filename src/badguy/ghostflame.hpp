@@ -22,7 +22,7 @@
 class Ghostflame final : public Flame
 {
 public:
-  Ghostflame(const ReaderMapping& reader);
+  Ghostflame(ReaderMapping const& reader);
 
   virtual bool is_flammable() const override;
   virtual bool is_freezable() const override;
@@ -32,8 +32,8 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  Ghostflame(const Ghostflame&) = delete;
-  Ghostflame& operator=(const Ghostflame&) = delete;
+  Ghostflame(Ghostflame const&) = delete;
+  Ghostflame& operator=(Ghostflame const&) = delete;
 };
 
 #endif

@@ -51,13 +51,13 @@ public:
   Vector get_pos() const;
   Vector get_axis() const;
   Vector get_tile_pos() const { return m_tile_pos; }
-  void  set_tile_pos(const Vector& p) { m_tile_pos = p; }
+  void  set_tile_pos(Vector const& p) { m_tile_pos = p; }
 
   void process_special_tile(SpecialTile* special_tile);
 
 private:
   void stop();
-  std::string get_action_prefix_for_bonus(const BonusType& bonus) const;
+  std::string get_action_prefix_for_bonus(BonusType const& bonus) const;
   bool can_walk(int tile_data, Direction dir) const; /**< check if we can leave a tile (with given "tile_data") in direction "dir" */
   void update_input_direction(); /**< if controller was pressed, update input_direction */
   void try_start_walking(); /**< try starting to walk in input_direction */
@@ -84,8 +84,8 @@ private:
   bool m_ghost_mode;
 
 private:
-  Tux(const Tux&) = delete;
-  Tux& operator=(const Tux&) = delete;
+  Tux(Tux const&) = delete;
+  Tux& operator=(Tux const&) = delete;
 };
 
 } // namespace worldmap

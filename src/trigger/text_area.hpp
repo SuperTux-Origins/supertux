@@ -34,8 +34,8 @@ private:
   };
 
 public:
-  TextArea(const ReaderMapping& mapping);
-  TextArea(const Vector& pos);
+  TextArea(ReaderMapping const& mapping);
+  TextArea(Vector const& pos);
 
   virtual void draw(DrawingContext& context) override;
   virtual void event(Player& player, EventType type) override;
@@ -59,8 +59,8 @@ private:
   Vector m_anchor_offset;
 
 private:
-  TextArea(const TextArea&) = delete;
-  TextArea& operator=(const TextArea&) = delete;
+  TextArea(TextArea const&) = delete;
+  TextArea& operator=(TextArea const&) = delete;
 };
 
 #endif

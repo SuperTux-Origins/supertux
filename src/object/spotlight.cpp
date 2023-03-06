@@ -21,7 +21,7 @@
 #include "util/reader_mapping.hpp"
 
 Spotlight::Direction
-Spotlight::Direction_from_string(const std::string& s)
+Spotlight::Direction_from_string(std::string const& s)
 {
   if (s == "clockwise") {
     return Direction::CLOCKWISE;
@@ -49,7 +49,7 @@ Spotlight::Direction_to_string(Direction dir)
   throw std::runtime_error("Invalid spotlight direction '" + std::to_string(static_cast<int>(dir)) + "'");
 }
 
-Spotlight::Spotlight(const ReaderMapping& mapping) :
+Spotlight::Spotlight(ReaderMapping const& mapping) :
   MovingObject(mapping),
   ExposedObject<Spotlight, scripting::Spotlight>(this),
   angle(),
@@ -136,7 +136,7 @@ Spotlight::draw(DrawingContext& context)
 }
 
 HitResponse
-Spotlight::collision(GameObject& other, const CollisionHit& hit_)
+Spotlight::collision(GameObject& other, CollisionHit const& hit_)
 {
   return FORCE_MOVE;
 }

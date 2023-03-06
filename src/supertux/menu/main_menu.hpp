@@ -39,8 +39,8 @@ public:
   bool on_back_action() override { return false; }
 
 private:
-  MainMenu(const MainMenu&) = delete;
-  MainMenu& operator=(const MainMenu&) = delete;
+  MainMenu(MainMenu const&) = delete;
+  MainMenu& operator=(MainMenu const&) = delete;
 };
 
 #endif

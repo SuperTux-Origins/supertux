@@ -33,7 +33,7 @@ public:
   ~Portable() override {}
 
   /** called each frame when the object has been grabbed. */
-  virtual void grab(MovingObject& other, const Vector& pos, Direction dir) { m_owner = &other; }
+  virtual void grab(MovingObject& other, Vector const& pos, Direction dir) { m_owner = &other; }
   virtual void ungrab(MovingObject& other, Direction ) { m_owner = nullptr; }
 
   virtual MovingObject* get_owner() const { return m_owner; }
@@ -46,8 +46,8 @@ public:
 protected:
   MovingObject* m_owner = nullptr;
 private:
-  Portable(const Portable&) = delete;
-  Portable& operator=(const Portable&) = delete;
+  Portable(Portable const&) = delete;
+  Portable& operator=(Portable const&) = delete;
 };
 
 #endif

@@ -18,7 +18,7 @@
 
 #include "util/reader_mapping.hpp"
 
-Crystallo::Crystallo(const ReaderMapping& reader) :
+Crystallo::Crystallo(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/crystallo/crystallo.sprite", "left", "right"),
   m_radius()
 {

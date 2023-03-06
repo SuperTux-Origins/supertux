@@ -26,7 +26,7 @@ ItemColorDisplay::ItemColorDisplay(Color* color, int id_) :
 }
 
 void
-ItemColorDisplay::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active) {
+ItemColorDisplay::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active) {
   float m = static_cast<float>(menu_width) / 2.0f;
   context.color().draw_filled_rect(Rectf(pos + Vector(16, -8), pos + Vector(m, 8.0f)),
                                    old_color, 0.0f, LAYER_GUI-1);

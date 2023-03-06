@@ -23,7 +23,7 @@
 class SmartBall final : public WalkingBadguy
 {
 public:
-  SmartBall(const ReaderMapping& reader);
+  SmartBall(ReaderMapping const& reader);
 
   virtual std::string get_water_sprite() const override { return "images/objects/water_drop/pink_drop.sprite"; }
 
@@ -36,8 +36,8 @@ protected:
   virtual bool collision_squished(GameObject& object) override;
 
 private:
-  SmartBall(const SmartBall&) = delete;
-  SmartBall& operator=(const SmartBall&) = delete;
+  SmartBall(SmartBall const&) = delete;
+  SmartBall& operator=(SmartBall const&) = delete;
 };
 
 #endif

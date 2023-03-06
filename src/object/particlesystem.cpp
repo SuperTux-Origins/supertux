@@ -30,7 +30,7 @@
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
-ParticleSystem::ParticleSystem(const ReaderMapping& reader, float max_particle_size_) :
+ParticleSystem::ParticleSystem(ReaderMapping const& reader, float max_particle_size_) :
   GameObject(reader),
   ExposedObject<ParticleSystem, scripting::ParticleSystem>(this),
   max_particle_size(max_particle_size_),
@@ -68,13 +68,13 @@ ParticleSystem::draw(DrawingContext& context)
 
   float scrollx = context.get_translation().x;
   float scrolly = context.get_translation().y;
-  const auto& region = Sector::current()->get_active_region();
+  auto const& region = Sector::current()->get_active_region();
 
   context.push_transform();
   context.set_translation(Vector(max_particle_size,max_particle_size));
 
   std::unordered_map<SurfacePtr, SurfaceBatch> batches;
-  for (const auto& particle : particles)
+  for (auto const& particle : particles)
   {
     // remap x,y coordinates onto screencoordinates
     Vector pos(0.0f, 0.0f);
@@ -95,7 +95,7 @@ ParticleSystem::draw(DrawingContext& context)
 
     auto it = batches.find(particle->texture);
     if (it == batches.end()) {
-      const auto& batch_it = batches.emplace(particle->texture, SurfaceBatch(particle->texture));
+      auto const& batch_it = batches.emplace(particle->texture, SurfaceBatch(particle->texture));
       batch_it.first->second.draw(pos, particle->angle);
     } else {
       it->second.draw(pos, particle->angle);

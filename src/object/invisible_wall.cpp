@@ -19,7 +19,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 
-InvisibleWall::InvisibleWall(const ReaderMapping& mapping):
+InvisibleWall::InvisibleWall(ReaderMapping const& mapping):
   MovingObject(mapping),
   width(),
   height()
@@ -35,7 +35,7 @@ InvisibleWall::InvisibleWall(const ReaderMapping& mapping):
 }
 
 HitResponse
-InvisibleWall::collision(GameObject& , const CollisionHit& )
+InvisibleWall::collision(GameObject& , CollisionHit const& )
 {
   return FORCE_MOVE;
 }

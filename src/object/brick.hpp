@@ -23,10 +23,10 @@
 class Brick : public Block
 {
 public:
-  Brick(const Vector& pos, int data, const std::string& spriteName);
-  Brick(const ReaderMapping& mapping, const std::string& spriteName = "images/objects/bonus_block/brick.sprite");
+  Brick(Vector const& pos, int data, std::string const& spriteName);
+  Brick(ReaderMapping const& mapping, std::string const& spriteName = "images/objects/bonus_block/brick.sprite");
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   static std::string class_name() { return "brick"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -44,17 +44,17 @@ private:
   int m_coin_counter;
 
 private:
-  Brick(const Brick&) = delete;
-  Brick& operator=(const Brick&) = delete;
+  Brick(Brick const&) = delete;
+  Brick& operator=(Brick const&) = delete;
 };
 
 class HeavyBrick : public Brick
 {
 public:
-  HeavyBrick(const Vector& pos, int data, const std::string& spriteName);
-  HeavyBrick(const ReaderMapping& mapping);
+  HeavyBrick(Vector const& pos, int data, std::string const& spriteName);
+  HeavyBrick(ReaderMapping const& mapping);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   static std::string class_name() { return "heavy-brick"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Heavy Brick"); }

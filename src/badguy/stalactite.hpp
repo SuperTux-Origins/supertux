@@ -22,13 +22,13 @@
 class Stalactite : public BadGuy
 {
 public:
-  Stalactite(const ReaderMapping& reader);
+  Stalactite(ReaderMapping const& reader);
 
   virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& other, const CollisionHit& hit) override;
-  virtual HitResponse collision_bullet(Bullet& bullet, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
+  virtual HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
 
   virtual void kill_fall() override;
   virtual void draw(DrawingContext& context) override;
@@ -57,7 +57,7 @@ protected:
 
   static const std::vector<std::string> s_sprites;
 
-  static StalactiteType StalactiteType_from_string(const std::string& type_string);
+  static StalactiteType StalactiteType_from_string(std::string const& type_string);
 
 protected:
   StalactiteType m_type;
@@ -66,8 +66,8 @@ protected:
   Vector shake_delta;
 
 private:
-  Stalactite(const Stalactite&) = delete;
-  Stalactite& operator=(const Stalactite&) = delete;
+  Stalactite(Stalactite const&) = delete;
+  Stalactite& operator=(Stalactite const&) = delete;
 };
 
 #endif

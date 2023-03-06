@@ -291,14 +291,14 @@ GameObjectFactory::init_factories()
   // editor stuff
   add_factory<SpawnPointMarker>("spawnpoint");
 
-  add_factory("tilemap", TileMap::display_name(), [](const ReaderMapping& reader) {
+  add_factory("tilemap", TileMap::display_name(), [](ReaderMapping const& reader) {
       auto tileset = TileManager::current()->get_tileset(Level::current()->get_tileset());
       return std::make_unique<TileMap>(tileset, reader);
     });
 }
 
 std::unique_ptr<GameObject>
-GameObjectFactory::create(const std::string& name, const Vector& pos, const Direction& dir, const std::string& data) const
+GameObjectFactory::create(std::string const& name, Vector const& pos, Direction const& dir, std::string const& data) const
 {
   std::stringstream lisptext;
   lisptext << "(" << name << "\n"

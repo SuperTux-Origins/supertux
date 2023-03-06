@@ -29,7 +29,7 @@ class Rect;
 class Rectf final
 {
 public:
-  static Rectf from_center(const Vector& center, const Sizef& size)
+  static Rectf from_center(Vector const& center, Sizef const& size)
   {
     return Rectf(center.x - size.width / 2.0f,
                  center.y - size.height / 2.0f,
@@ -43,10 +43,10 @@ public:
     m_size()
   { }
 
-  Rectf(const Rectf& rhs) = default;
-  Rectf& operator=(const Rectf& rhs) = default;
+  Rectf(Rectf const& rhs) = default;
+  Rectf& operator=(Rectf const& rhs) = default;
 
-  Rectf(const Vector& np1, const Vector& np2) :
+  Rectf(Vector const& np1, Vector const& np2) :
     m_p1(np1), m_size(np2.x - np1.x, np2.y - np1.y)
   {
     assert(m_size.width >= 0 &&
@@ -60,15 +60,15 @@ public:
            m_size.height >= 0);
   }
 
-  Rectf(const Vector& p1, const Sizef& size) :
+  Rectf(Vector const& p1, Sizef const& size) :
     m_p1(p1),
     m_size(size)
   {
   }
 
-  Rectf(const Rect& rect);
+  Rectf(Rect const& rect);
 
-  bool operator==(const Rectf& other) const
+  bool operator==(Rectf const& other) const
   {
     return (m_p1 == other.m_p1 &&
             m_size == other.m_size);
@@ -95,21 +95,21 @@ public:
   Vector get_middle() const { return Vector(m_p1.x + m_size.width / 2.0f,
                                             m_p1.y + m_size.height / 2.0f); }
 
-  void set_pos(const Vector& v) { m_p1 = v; }
+  void set_pos(Vector const& v) { m_p1 = v; }
 
   void set_width(float width) { m_size.width = width; }
   void set_height(float height) { m_size.height = height; }
   void set_size(float width, float height) { m_size = Sizef(width, height); }
   Sizef get_size() const { return m_size; }
 
-  void move(const Vector& v) { m_p1 += v; }
-  Rectf moved(const Vector& v) const { return Rectf(m_p1 + v, m_size); }
+  void move(Vector const& v) { m_p1 += v; }
+  Rectf moved(Vector const& v) const { return Rectf(m_p1 + v, m_size); }
 
-  bool contains(const Vector& v) const {
+  bool contains(Vector const& v) const {
     return v.x >= m_p1.x && v.y >= m_p1.y && v.x < get_right() && v.y < get_bottom();
   }
 
-  bool contains(const Rectf& other) const
+  bool contains(Rectf const& other) const
   {
     // FIXME: This is overlaps(), not contains()!
     if (m_p1.x >= other.get_right() || other.get_left() >= get_right())
@@ -120,13 +120,13 @@ public:
     return true;
   }
 
-  float distance (const Vector& other, AnchorPoint ap = ANCHOR_MIDDLE) const
+  float distance (Vector const& other, AnchorPoint ap = ANCHOR_MIDDLE) const
   {
     Vector v = get_anchor_pos (*this, ap);
     return glm::distance(v, other);
   }
 
-  float distance (const Rectf& other, AnchorPoint ap = ANCHOR_MIDDLE) const
+  float distance (Rectf const& other, AnchorPoint ap = ANCHOR_MIDDLE) const
   {
     Vector v1 = get_anchor_pos(*this, ap);
     Vector v2 = get_anchor_pos(other, ap);
@@ -146,12 +146,12 @@ public:
   Vector p1() const { return m_p1; }
   Vector p2() const { return Vector(m_p1.x + m_size.width, m_p1.y + m_size.height); }
 
-  void set_p1(const Vector& p) {
+  void set_p1(Vector const& p) {
     m_size = Sizef(m_size.width + (m_p1.x - p.x),
                    m_size.height + (m_p1.y - p.y));
     m_p1 = p;
   }
-  void set_p2(const Vector& p) {
+  void set_p2(Vector const& p) {
     m_size = Sizef(p.x - m_p1.x,
                    p.y - m_p1.y);
   }
@@ -162,7 +162,7 @@ private:
   Sizef m_size;
 };
 
-std::ostream& operator<<(std::ostream& out, const Rectf& rect);
+std::ostream& operator<<(std::ostream& out, Rectf const& rect);
 
 #endif
 

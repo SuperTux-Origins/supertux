@@ -36,8 +36,8 @@ public:
   using GameObject::GameObject;
 
 private:
-  ParticleSystem(const ParticleSystem&) = delete;
-  ParticleSystem& operator=(const ParticleSystem&) = delete;
+  ParticleSystem(ParticleSystem const&) = delete;
+  ParticleSystem& operator=(ParticleSystem const&) = delete;
 #endif
 
 public:

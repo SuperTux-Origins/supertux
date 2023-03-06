@@ -26,7 +26,7 @@
 #include "gui/menu_manager.hpp"
 #include "gui/menu_item.hpp"
 #include "gui/item_action.hpp"
-SortedContribMenu::SortedContribMenu(std::vector<std::unique_ptr<World>>& worlds, const std::string& contrib_type, const std::string& title, const std::string& empty_message) :
+SortedContribMenu::SortedContribMenu(std::vector<std::unique_ptr<World>>& worlds, std::string const& contrib_type, std::string const& title, std::string const& empty_message) :
   m_world_folders()
 { 
   add_label(title);

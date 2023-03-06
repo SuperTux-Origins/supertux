@@ -28,7 +28,7 @@ static const float RESPAWNTIME = 5.f;
 static const float FADETIME = 0.5f;
 static const float DELAY_IF_TUX = 0.001f;
 
-SkullTile::SkullTile(const ReaderMapping& mapping) :
+SkullTile::SkullTile(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/skull_tile/skull_tile.sprite", LAYER_TILES, COLGROUP_STATIC),
   physic(),
   timer(),
@@ -42,7 +42,7 @@ SkullTile::SkullTile(const ReaderMapping& mapping) :
 }
 
 HitResponse
-SkullTile::collision(GameObject& other, const CollisionHit& )
+SkullTile::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player)

@@ -39,7 +39,7 @@ InputManager::~InputManager()
 {
 }
 
-const Controller&
+Controller const&
 InputManager::get_controller(int player_id) const
 {
   return *m_controllers[player_id];
@@ -72,7 +72,7 @@ InputManager::reset()
 }
 
 void
-InputManager::process_event(const SDL_Event& event)
+InputManager::process_event(SDL_Event const& event)
 {
   switch (event.type) {
     case SDL_TEXTINPUT:

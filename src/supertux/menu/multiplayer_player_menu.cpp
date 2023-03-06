@@ -44,7 +44,7 @@ MultiplayerPlayerMenu::MultiplayerPlayerMenu(int player_id)
   {
     bool player_is_in_sector = false;
 
-    for (const auto* player : GameSession::current()->get_current_sector().get_players())
+    for (auto const* player : GameSession::current()->get_current_sector().get_players())
     {
       if (player->get_id() == player_id)
       {

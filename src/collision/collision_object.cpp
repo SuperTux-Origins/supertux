@@ -33,19 +33,19 @@ CollisionObject::CollisionObject(CollisionGroup group, CollisionListener& listen
 }
 
 void
-CollisionObject::collision_solid(const CollisionHit& hit)
+CollisionObject::collision_solid(CollisionHit const& hit)
 {
   m_listener.collision_solid(hit);
 }
 
 bool
-CollisionObject::collides(CollisionObject& other, const CollisionHit& hit) const
+CollisionObject::collides(CollisionObject& other, CollisionHit const& hit) const
 {
   return m_listener.collides(dynamic_cast<GameObject&>(other.m_listener), hit);
 }
 
 HitResponse
-CollisionObject::collision(CollisionObject& other, const CollisionHit& hit)
+CollisionObject::collision(CollisionObject& other, CollisionHit const& hit)
 {
   return m_listener.collision(dynamic_cast<GameObject&>(other.m_listener), hit);
 }
@@ -78,7 +78,7 @@ CollisionObject::clear_bottom_collision_list()
   m_objects_hit_bottom.clear();
 }
 
-void CollisionObject::propagate_movement(const Vector& movement)
+void CollisionObject::propagate_movement(Vector const& movement)
 {
   for (CollisionObject* other_object : m_objects_hit_bottom) {
     m_ground_movement_manager->register_movement(*this, *other_object, movement);

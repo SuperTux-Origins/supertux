@@ -26,7 +26,7 @@
 #include "video/color.hpp"
 #include "video/drawing_context.hpp"
 
-ItemTextField::ItemTextField(const std::string& text_, std::string* input_, int id_) :
+ItemTextField::ItemTextField(std::string const& text_, std::string* input_, int id_) :
   MenuItem(text_, id_),
   input(input_),
   m_input_undo(),
@@ -38,7 +38,7 @@ ItemTextField::ItemTextField(const std::string& text_, std::string* input_, int 
 }
 
 void
-ItemTextField::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active)
+ItemTextField::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active)
 {
   const int index = active ? static_cast<int>(input->size()) - m_cursor_left_offset : -1;
   const std::string input_part_1 = active ? input->substr(0, index) : *input;
@@ -73,7 +73,7 @@ ItemTextField::get_width() const
 }
 
 void
-ItemTextField::event(const SDL_Event& ev)
+ItemTextField::event(SDL_Event const& ev)
 {
   if (ev.type == SDL_TEXTINPUT) // Text input
   {
@@ -120,7 +120,7 @@ ItemTextField::event(const SDL_Event& ev)
 }
 
 void
-ItemTextField::process_action(const MenuAction& action)
+ItemTextField::process_action(MenuAction const& action)
 {
   if (action == MenuAction::REMOVE) // Delete front (backspace)
   {
@@ -146,7 +146,7 @@ ItemTextField::update_undo()
 // Text manipulation and navigation functions
 
 void
-ItemTextField::insert_text(const std::string& text, const int left_offset_pos)
+ItemTextField::insert_text(std::string const& text, const int left_offset_pos)
 {
   update_undo();
   *input = input->substr(0, input->size() - left_offset_pos) + text +

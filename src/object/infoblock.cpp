@@ -25,7 +25,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 
-InfoBlock::InfoBlock(const ReaderMapping& mapping) :
+InfoBlock::InfoBlock(ReaderMapping const& mapping) :
   Block(mapping, "images/objects/bonus_block/infoblock.sprite"),
   m_message(),
   m_shown_pct(0),
@@ -60,7 +60,7 @@ InfoBlock::InfoBlock(const ReaderMapping& mapping) :
 
   // Split text string lines into a vector
   m_lines = InfoBoxLine::split(m_message, 400);
-  for (const auto& line : m_lines) m_lines_height += line->get_height();
+  for (auto const& line : m_lines) m_lines_height += line->get_height();
 }
 
 InfoBlock::~InfoBlock()
@@ -102,7 +102,7 @@ InfoBlock::hit(Player& player)
 }
 
 HitResponse
-InfoBlock::collision(GameObject& other, const CollisionHit& hit_)
+InfoBlock::collision(GameObject& other, CollisionHit const& hit_)
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player)

@@ -32,10 +32,10 @@ typedef std::shared_ptr<TTFSurface> TTFSurfacePtr;
 class TTFSurface final
 {
 public:
-  static TTFSurfacePtr create(const TTFFont& font, const std::string& text);
+  static TTFSurfacePtr create(TTFFont const& font, std::string const& text);
 
 public:
-  TTFSurface(const SurfacePtr& surface, const Vector& offset);
+  TTFSurface(SurfacePtr const& surface, Vector const& offset);
 
   SurfacePtr get_surface() { return m_surface; }
   Vector get_offset() const { return m_offset; }
@@ -48,8 +48,8 @@ private:
   Vector m_offset;
 
 private:
-  TTFSurface(const TTFSurface&) = delete;
-  TTFSurface& operator=(const TTFSurface&) = delete;
+  TTFSurface(TTFSurface const&) = delete;
+  TTFSurface& operator=(TTFSurface const&) = delete;
 };
 
 #endif

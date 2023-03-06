@@ -118,7 +118,7 @@ std::unordered_map<std::string, std::string> fallback_paths = {
   {"theme.ogg", "/music/misc/theme.ogg"},
 };
 
-const std::string& get_fallback_path(const std::string& file_path)
+std::string const& get_fallback_path(std::string const& file_path)
 {
   std::string file_name = FileSystem::basename(file_path);
   auto it = fallback_paths.find(file_name);
@@ -139,13 +139,13 @@ ReaderDocument doc_from_file_fallback(std::string& filename)
 {
   try {
     return load_reader_document(filename);
-  } catch(const std::exception&) {
+  } catch(std::exception const&) {
     filename = get_fallback_path(filename);
     return load_reader_document(filename);
   }
 }
 
-MusicFile load_music_file(const std::string& filename_original)
+MusicFile load_music_file(std::string const& filename_original)
 {
   // filename may be changed by doc_from_file_fallback
   std::string filename = filename_original;
@@ -187,7 +187,7 @@ SoundManager::SoundManager() :
 }
 
 void
-SoundManager::play(const std::string& name, const Vector& pos, const float gain)
+SoundManager::play(std::string const& name, Vector const& pos, const float gain)
 {
   auto source = m_sound_mgr.sound().play(name);
   source->set_position(pos.x, pos.y, 0.0f);
@@ -196,19 +196,19 @@ SoundManager::play(const std::string& name, const Vector& pos, const float gain)
 }
 
 void
-SoundManager::play(const std::string& name, const float gain)
+SoundManager::play(std::string const& name, const float gain)
 {
   play(name, Vector(-1, -1), gain);
 }
 
 /** preloads a sound, so that you don't get a lag later when playing it */
 void
-SoundManager::preload(const std::string& name)
+SoundManager::preload(std::string const& name)
 {
 }
 
 void
-SoundManager::play_music(const std::string& filename, float fadetime)
+SoundManager::play_music(std::string const& filename, float fadetime)
 {
   // music is currently active, figure out what to do with it
   if (m_music_source != nullptr) {
@@ -258,7 +258,7 @@ SoundManager::play_music(const std::string& filename, float fadetime)
 }
 
 void
-SoundManager::play_music(const std::string& filename, bool fade)
+SoundManager::play_music(std::string const& filename, bool fade)
 {
   play_music(filename, fade ? 0.5f : 0);
 }
@@ -343,7 +343,7 @@ SoundManager::update()
 }
 
 std::unique_ptr<SoundSource>
-SoundManager::create_sound_source(const std::string& filename)
+SoundManager::create_sound_source(std::string const& filename)
 {
   auto source = m_sound_mgr.create_sound_source(filename, m_sound_mgr.sound(),
                                                 wstsound::SoundSourceType::STATIC);
@@ -351,7 +351,7 @@ SoundManager::create_sound_source(const std::string& filename)
 }
 
 void
-SoundManager::set_listener_position(const Vector& position)
+SoundManager::set_listener_position(Vector const& position)
 {
   m_sound_mgr.listener().set_position(position.x, position.y, -300);
 }

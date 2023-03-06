@@ -17,7 +17,7 @@
 #include "object/text_array_object.hpp"
 #include "control/input_manager.hpp"
 
-TextArrayObject::TextArrayObject(const std::string& name) :
+TextArrayObject::TextArrayObject(std::string const& name) :
   ExposedObject<TextArrayObject, scripting::TextArray>(this),
   m_isDone(false),
   m_isAuto(false),
@@ -32,7 +32,7 @@ TextArrayObject::TextArrayObject(const std::string& name) :
   m_name = name;
 }
 
-TextArrayObject::TextArrayObject(const ReaderMapping& reader) :
+TextArrayObject::TextArrayObject(ReaderMapping const& reader) :
   GameObject(reader),
   ExposedObject<TextArrayObject, scripting::TextArray>(this),
   m_isDone(false),
@@ -55,7 +55,7 @@ TextArrayObject::clear()
 }
 
 void
-TextArrayObject::add_text(const std::string& text, float duration)
+TextArrayObject::add_text(std::string const& text, float duration)
 {
   auto pText = std::make_unique<TextArrayItem>();
   assert(pText);
@@ -248,7 +248,7 @@ TextArrayObject::reset_automation()
 void
 TextArrayObject::handle_input_requests()
 {
-  const Controller& controller = InputManager::current()->get_controller();
+  Controller const& controller = InputManager::current()->get_controller();
 
   if (controller.pressed(Control::MENU_SELECT)) {
     m_isAuto = false;

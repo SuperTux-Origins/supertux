@@ -28,7 +28,7 @@ namespace worldmap {
 class SpawnPoint final
 {
 public:
-  SpawnPoint(const ReaderMapping& mapping);
+  SpawnPoint(ReaderMapping const& mapping);
 
   std::string get_name() const { return m_name; }
   Vector get_pos() const { return m_pos; }
@@ -40,8 +40,8 @@ private:
   Direction m_auto_dir; /**< automatically start walking in this direction */
 
 private:
-  SpawnPoint(const SpawnPoint&) = delete;
-  SpawnPoint& operator=(const SpawnPoint&) = delete;
+  SpawnPoint(SpawnPoint const&) = delete;
+  SpawnPoint& operator=(SpawnPoint const&) = delete;
 };
 
 } // namespace worldmap

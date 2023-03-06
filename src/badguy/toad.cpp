@@ -27,7 +27,7 @@ const float TOAD_RECOVER_TIME = 0.5; /**< time to stand still before starting a 
 static const std::string HOP_SOUND = "sounds/hop.ogg";
 }
 
-Toad::Toad(const ReaderMapping& reader) :
+Toad::Toad(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/toad/toad.sprite"),
   recover_timer(),
   state()
@@ -82,7 +82,7 @@ Toad::collision_squished(GameObject& object)
 }
 
 void
-Toad::collision_solid(const CollisionHit& hit)
+Toad::collision_solid(CollisionHit const& hit)
 {
   // default behavior when frozen
   if (m_frozen || BadGuy::get_state() == STATE_BURNING)
@@ -129,7 +129,7 @@ Toad::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-Toad::collision_badguy(BadGuy& , const CollisionHit& hit)
+Toad::collision_badguy(BadGuy& , CollisionHit const& hit)
 {
   // behaviour for badguy collisions is the same as for collisions with solids
   collision_solid(hit);

@@ -45,7 +45,7 @@ SnowParticleSystem::SnowParticleSystem() :
   init();
 }
 
-SnowParticleSystem::SnowParticleSystem(const ReaderMapping& reader) :
+SnowParticleSystem::SnowParticleSystem(ReaderMapping const& reader) :
   ParticleSystem(reader),
   state(RELEASING),
   timer(),

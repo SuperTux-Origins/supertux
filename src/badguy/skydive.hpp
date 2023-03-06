@@ -22,16 +22,16 @@
 class SkyDive final : public BadGuy
 {
 public:
-  SkyDive(const ReaderMapping& reader);
+  SkyDive(ReaderMapping const& reader);
   
   virtual void kill_fall() override;
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   virtual void collision_tile(uint32_t tile_attributes) override;
 
   /* Inherited from Portable */
-  virtual void grab(MovingObject& object, const Vector& pos, Direction dir) override;
+  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   virtual void ungrab(MovingObject& object, Direction dir) override;
 
   virtual bool is_freezable() const override;
@@ -43,15 +43,15 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   virtual bool collision_squished (GameObject& obj) override;
 
   void explode();
   virtual bool is_portable() const override;
 
 private:
-  SkyDive(const SkyDive&) = delete;
-  SkyDive& operator=(const SkyDive&) = delete;
+  SkyDive(SkyDive const&) = delete;
+  SkyDive& operator=(SkyDive const&) = delete;
 };
 
 #endif

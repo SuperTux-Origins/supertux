@@ -27,7 +27,7 @@
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
 
-Coin::Coin(const Vector& pos) :
+Coin::Coin(Vector const& pos) :
   MovingSprite(pos, "images/objects/coin/coin.sprite", LAYER_OBJECTS - 1, COLGROUP_TOUCHABLE),
   PathObject(),
   m_offset(0.0f, 0.0f),
@@ -40,7 +40,7 @@ Coin::Coin(const Vector& pos) :
   SoundManager::current()->preload("sounds/coin.wav");
 }
 
-Coin::Coin(const ReaderMapping& reader) :
+Coin::Coin(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/coin/coin.sprite", LAYER_OBJECTS - 1, COLGROUP_TOUCHABLE),
   PathObject(),
   m_offset(0.0f, 0.0f),
@@ -175,7 +175,7 @@ Coin::collect()
 }
 
 HitResponse
-Coin::collision(GameObject& other, const CollisionHit& )
+Coin::collision(GameObject& other, CollisionHit const& )
 {
   auto player = dynamic_cast<Player*>(&other);
   if (player == nullptr)
@@ -186,7 +186,7 @@ Coin::collision(GameObject& other, const CollisionHit& )
 }
 
 /* The following defines a coin subject to gravity */
-HeavyCoin::HeavyCoin(const Vector& pos, const Vector& init_velocity) :
+HeavyCoin::HeavyCoin(Vector const& pos, Vector const& init_velocity) :
   Coin(pos),
   m_physic(),
   m_last_hit()
@@ -197,7 +197,7 @@ HeavyCoin::HeavyCoin(const Vector& pos, const Vector& init_velocity) :
   m_physic.set_velocity(init_velocity);
 }
 
-HeavyCoin::HeavyCoin(const ReaderMapping& reader) :
+HeavyCoin::HeavyCoin(ReaderMapping const& reader) :
   Coin(reader),
   m_physic(),
   m_last_hit()
@@ -215,7 +215,7 @@ HeavyCoin::update(float dt_sec)
 }
 
 void
-HeavyCoin::collision_solid(const CollisionHit& hit)
+HeavyCoin::collision_solid(CollisionHit const& hit)
 {
   float clink_threshold = 100.0f; // sets the minimum speed needed to result in collision noise
   //TODO: colliding HeavyCoins should have their own unique sound
@@ -249,7 +249,7 @@ HeavyCoin::collision_solid(const CollisionHit& hit)
 }
 
 void
-Coin::move_to(const Vector& pos)
+Coin::move_to(Vector const& pos)
 {
   Vector shift = pos - m_col.m_bbox.p1();
   if (get_path()) {

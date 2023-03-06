@@ -30,7 +30,7 @@ enum class DrawingTarget {
   LIGHTMAP
 };
 
-DrawingTarget DrawingTarget_from_string(const std::string& text);
+DrawingTarget DrawingTarget_from_string(std::string const& text);
 std::string to_string(DrawingTarget value);
 
 #endif

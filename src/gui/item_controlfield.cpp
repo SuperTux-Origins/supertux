@@ -22,14 +22,14 @@
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"
 
-ItemControlField::ItemControlField(const std::string& text, const std::string& input_, int id) :
+ItemControlField::ItemControlField(std::string const& text, std::string const& input_, int id) :
   MenuItem(text, id),
   input(input_)
 {
 }
 
 void
-ItemControlField::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active)
+ItemControlField::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active)
 {
   context.color().draw_text(Resources::normal_font, input,
                             Vector(pos.x + static_cast<float>(menu_width) - 16.0f,

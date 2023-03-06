@@ -32,7 +32,7 @@ const float POSITION_FIX_AX = 30; // x-wise acceleration applied to player when 
 const float POSITION_FIX_AY = 50; // y-wise acceleration applied to player when trying to align player and Climbable
 }
 
-Climbable::Climbable(const ReaderMapping& reader) :
+Climbable::Climbable(ReaderMapping const& reader) :
   climbed_by(),
   trying_to_climb(),
   message(),
@@ -49,7 +49,7 @@ Climbable::Climbable(const ReaderMapping& reader) :
   reader.read("message", message);
 }
 
-Climbable::Climbable(const Rectf& area) :
+Climbable::Climbable(Rectf const& area) :
   climbed_by(),
   trying_to_climb(),
   message(),
@@ -127,7 +127,7 @@ Climbable::event(Player& player, EventType type)
   if (type == EVENT_ACTIVATE) {
     if (player.get_grabbed_object() == nullptr){
       auto it = std::find_if(trying_to_climb.begin(), trying_to_climb.end(),
-        [&player](const ClimbPlayer& element)
+        [&player](ClimbPlayer const& element)
         {
           return element.m_player == &player;
         });

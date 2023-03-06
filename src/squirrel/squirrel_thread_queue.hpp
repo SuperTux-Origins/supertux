@@ -39,8 +39,8 @@ private:
   std::vector<HSQOBJECT> m_threads;
 
 private:
-  SquirrelThreadQueue(const SquirrelThreadQueue&) = delete;
-  SquirrelThreadQueue& operator=(const SquirrelThreadQueue&) = delete;
+  SquirrelThreadQueue(SquirrelThreadQueue const&) = delete;
+  SquirrelThreadQueue& operator=(SquirrelThreadQueue const&) = delete;
 };
 
 #endif

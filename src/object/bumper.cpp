@@ -29,7 +29,7 @@ const float BOUNCE_Y = -450.0f;
 const float BOUNCE_X = 700.0f;
 }
 
-Bumper::Bumper(const ReaderMapping& reader) :
+Bumper::Bumper(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/trampoline/bumper.sprite", LAYER_OBJECTS, COLGROUP_MOVING),
   physic(),
   left()
@@ -50,7 +50,7 @@ Bumper::update(float dt_sec)
 }
 
 HitResponse
-Bumper::collision(GameObject& other, const CollisionHit& hit)
+Bumper::collision(GameObject& other, CollisionHit const& hit)
 {
   auto player = dynamic_cast<Player*> (&other);
   if (player)

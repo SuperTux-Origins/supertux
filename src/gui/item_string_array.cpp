@@ -19,14 +19,14 @@
 #include "gui/menu_manager.hpp"
 #include "gui/menu_string_array.hpp"
 
-ItemStringArray::ItemStringArray(const std::string& text, std::vector<std::string>& items, int id) :
+ItemStringArray::ItemStringArray(std::string const& text, std::vector<std::string>& items, int id) :
   MenuItem(text, id),
   m_items(items)
 {
 }
 
 void
-ItemStringArray::process_action(const MenuAction& action)
+ItemStringArray::process_action(MenuAction const& action)
 {
   if (action == MenuAction::HIT)
   {

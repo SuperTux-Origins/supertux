@@ -28,7 +28,7 @@
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 
-BicyclePlatformChild::BicyclePlatformChild(const ReaderMapping& reader, float angle_offset, BicyclePlatform& parent) :
+BicyclePlatformChild::BicyclePlatformChild(ReaderMapping const& reader, float angle_offset, BicyclePlatform& parent) :
   MovingSprite(reader, "images/objects/platforms/small.sprite", LAYER_OBJECTS, COLGROUP_STATIC),
   m_parent(parent),
   m_angle_offset(angle_offset),
@@ -50,7 +50,7 @@ BicyclePlatformChild::update(float dt_sec)
 }
 
 HitResponse
-BicyclePlatformChild::collision(GameObject& other, const CollisionHit& )
+BicyclePlatformChild::collision(GameObject& other, CollisionHit const& )
 {
   const float gravity = Sector::get().get_gravity();
 
@@ -83,7 +83,7 @@ BicyclePlatformChild::on_flip(float height)
   FlipLevelTransformer::transform_flip(m_flip);
 }
 
-BicyclePlatform::BicyclePlatform(const ReaderMapping& reader) :
+BicyclePlatform::BicyclePlatform(ReaderMapping const& reader) :
   GameObject(reader),
   m_center(0.0f, 0.0f),
   m_radius(128),
@@ -136,7 +136,7 @@ void
 BicyclePlatform::update(float dt_sec)
 {
   float total_angular_momentum = 0.0f;
-  for (const auto& child : m_children)
+  for (auto const& child : m_children)
   {
     const float child_angle = m_angle + child->m_angle_offset;
     const float angular_momentum = cosf(child_angle) * child->m_momentum;

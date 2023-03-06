@@ -28,13 +28,13 @@ class Player;
 class SpriteParticle final : public GameObject
 {
 public:
-  SpriteParticle(SpritePtr sprite, const std::string& action,
-                 const Vector& position, AnchorPoint anchor,
-                 const Vector& velocity, const Vector& acceleration,
+  SpriteParticle(SpritePtr sprite, std::string const& action,
+                 Vector const& position, AnchorPoint anchor,
+                 Vector const& velocity, Vector const& acceleration,
                  int drawing_layer = LAYER_OBJECTS-1, bool notimeout = false);
-  SpriteParticle(const std::string& sprite_name, const std::string& action,
-                 const Vector& position, AnchorPoint anchor,
-                 const Vector& velocity, const Vector& acceleration,
+  SpriteParticle(std::string const& sprite_name, std::string const& action,
+                 Vector const& position, AnchorPoint anchor,
+                 Vector const& velocity, Vector const& acceleration,
                  int drawing_layer = LAYER_OBJECTS-1, bool notimeout = false);
   ~SpriteParticle() override;
 
@@ -56,8 +56,8 @@ private:
   bool no_time_out;
 
 private:
-  SpriteParticle(const SpriteParticle&) = delete;
-  SpriteParticle& operator=(const SpriteParticle&) = delete;
+  SpriteParticle(SpriteParticle const&) = delete;
+  SpriteParticle& operator=(SpriteParticle const&) = delete;
 };
 
 #endif

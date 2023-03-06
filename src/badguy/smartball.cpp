@@ -18,7 +18,7 @@
 
 #include "sprite/sprite.hpp"
 
-SmartBall::SmartBall(const ReaderMapping& reader)
+SmartBall::SmartBall(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/snowball/smart-snowball.sprite", "left", "right")
 {
   walk_speed = 80;

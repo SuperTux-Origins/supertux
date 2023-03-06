@@ -34,36 +34,36 @@ public:
 
   HSQUIRRELVM get_vm() const { return m_vm; }
 
-  void begin_table(const char* name);
-  void end_table(const char* name);
+  void begin_table(char const* name);
+  void end_table(char const* name);
 
   /** Creates an empty table with given name
       @param vm VM to create table on
       @param name Name of the table to create */
-  void create_empty_table(const char* name);
+  void create_empty_table(char const* name);
 
-  bool has_property(const char* name);
+  bool has_property(char const* name);
 
-  void store_bool(const char* name, bool val);
-  void store_int(const char* name, int val);
-  void store_float(const char* name, float val);
-  void store_string(const char* name, const std::string& val);
-  void store_object(const char* name, const HSQOBJECT& val);
+  void store_bool(char const* name, bool val);
+  void store_int(char const* name, int val);
+  void store_float(char const* name, float val);
+  void store_string(char const* name, std::string const& val);
+  void store_object(char const* name, HSQOBJECT const& val);
 
-  bool get_bool(const char* name, bool& val);
-  bool get_int(const char* name, int& val);
-  bool get_float(const char* name, float& val);
-  bool get_string(const char* name, std::string& val);
+  bool get_bool(char const* name, bool& val);
+  bool get_int(char const* name, int& val);
+  bool get_float(char const* name, float& val);
+  bool get_string(char const* name, std::string& val);
 
-  bool read_bool(const char* name);
-  int read_int(const char* name);
-  float read_float(const char* name);
-  std::string read_string(const char* name);
+  bool read_bool(char const* name);
+  int read_int(char const* name);
+  float read_float(char const* name);
+  std::string read_string(char const* name);
 
-  void get_table_entry(const std::string& name);
-  void get_or_create_table_entry(const std::string& name);
-  void delete_table_entry(const char* name);
-  void rename_table_entry(const char* oldname, const char* newname);
+  void get_table_entry(std::string const& name);
+  void get_or_create_table_entry(std::string const& name);
+  void delete_table_entry(char const* name);
+  void rename_table_entry(char const* oldname, char const* newname);
   std::vector<std::string> get_table_keys();
 
   HSQOBJECT create_thread();
@@ -72,8 +72,8 @@ private:
   HSQUIRRELVM m_vm;
 
 private:
-  SquirrelVM(const SquirrelVM&) = delete;
-  SquirrelVM& operator=(const SquirrelVM&) = delete;
+  SquirrelVM(SquirrelVM const&) = delete;
+  SquirrelVM& operator=(SquirrelVM const&) = delete;
 };
 
 #endif

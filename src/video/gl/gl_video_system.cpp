@@ -73,7 +73,7 @@ GLVideoSystem::get_name() const
   std::ostringstream out;
   out << m_context->get_name() << " - ";
 
-  const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+  char const* version = reinterpret_cast<char const*>(glGetString(GL_VERSION));
   if (version) {
     out << version;
   } else {
@@ -144,7 +144,7 @@ GLVideoSystem::create_gl_context()
 #    ifdef USE_GLBINDING_DEBUG_OUTPUT
   glbinding::setCallbackMask(glbinding::CallbackMask::After | glbinding::CallbackMask::ParametersAndReturnValue);
 
-  glbinding::setAfterCallback([](const glbinding::FunctionCall & call) {
+  glbinding::setAfterCallback([](glbinding::FunctionCall const& call) {
       std::cout << call.function.name() << "(";
 
       for (unsigned i = 0; i < call.parameters.size(); ++i)
@@ -244,7 +244,7 @@ GLVideoSystem::get_back_renderer() const
 }
 
 TexturePtr
-GLVideoSystem::new_texture(const SDL_Surface& image, const Sampler& sampler)
+GLVideoSystem::new_texture(SDL_Surface const& image, Sampler const& sampler)
 {
   return TexturePtr(new GLTexture(image, sampler));
 }
@@ -283,10 +283,10 @@ GLVideoSystem::make_screenshot()
   GLint viewport[4];
   glGetIntegerv(GL_VIEWPORT, viewport);
 
-  const int& viewport_x = viewport[0];
-  const int& viewport_y = viewport[1];
-  const int& viewport_width = viewport[2];
-  const int& viewport_height = viewport[3];
+  int const& viewport_x = viewport[0];
+  int const& viewport_y = viewport[1];
+  int const& viewport_width = viewport[2];
+  int const& viewport_height = viewport[3];
 
   SDLSurfacePtr surface = SDLSurface::create_rgb(viewport_width, viewport_height);
 

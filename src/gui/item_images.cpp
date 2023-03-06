@@ -20,7 +20,7 @@
 #include "video/surface.hpp"
 #include "video/drawing_context.hpp"
 
-ItemImages::ItemImages(const std::string& image_path, int max_image_width, int max_image_height, int id):
+ItemImages::ItemImages(std::string const& image_path, int max_image_width, int max_image_height, int id):
   MenuItem("", id),
   m_images(),
   m_gallery_mode(false),
@@ -35,7 +35,7 @@ ItemImages::ItemImages(const std::string& image_path, int max_image_width, int m
   m_item_height = (m_images[0]->get_height() > max_image_height && max_image_height > 0 ? max_image_height : m_images[0]->get_height()) + 4;
 }
 
-ItemImages::ItemImages(const std::vector<std::string>& image_paths, int max_image_width, int max_image_height, int id):
+ItemImages::ItemImages(std::vector<std::string> const& image_paths, int max_image_width, int max_image_height, int id):
   MenuItem("", id),
   m_images(),
   m_gallery_mode(image_paths.size() > 1),
@@ -60,7 +60,7 @@ ItemImages::ItemImages(const std::vector<std::string>& image_paths, int max_imag
 }
 
 void
-ItemImages::draw(DrawingContext& drawing_context, const Vector& pos, int menu_width, bool active)
+ItemImages::draw(DrawingContext& drawing_context, Vector const& pos, int menu_width, bool active)
 {
   if (m_images.empty())
     return;
@@ -81,7 +81,7 @@ ItemImages::draw(DrawingContext& drawing_context, const Vector& pos, int menu_wi
 }
 
 void
-ItemImages::process_action(const MenuAction& action)
+ItemImages::process_action(MenuAction const& action)
 {
   if (!m_gallery_mode)
     return;

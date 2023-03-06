@@ -30,7 +30,7 @@
 
 static const float MESSAGE_TIME=3.5;
 
-SecretAreaTrigger::SecretAreaTrigger(const ReaderMapping& reader) :
+SecretAreaTrigger::SecretAreaTrigger(ReaderMapping const& reader) :
   TriggerBase(reader),
   message_timer(),
   message_displayed(false),
@@ -55,7 +55,7 @@ SecretAreaTrigger::SecretAreaTrigger(const ReaderMapping& reader) :
   reader.read("script", script);
 }
 
-SecretAreaTrigger::SecretAreaTrigger(const Rectf& area, const std::string& fade_tilemap_) :
+SecretAreaTrigger::SecretAreaTrigger(Rectf const& area, std::string const& fade_tilemap_) :
   message_timer(),
   message_displayed(false),
   message(_("You found a secret area!")),

@@ -25,7 +25,7 @@ class Lantern;
 class GhostTree final : public BadGuy
 {
 public:
-  GhostTree(const ReaderMapping& mapping);
+  GhostTree(ReaderMapping const& mapping);
 
   virtual bool is_flammable() const override { return false; }
   virtual bool is_freezable() const override { return false; }
@@ -35,8 +35,8 @@ public:
   virtual void active_update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
 
-  virtual bool collides(GameObject& other, const CollisionHit& hit) const override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   static std::string class_name() { return "ghosttree"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -77,8 +77,8 @@ private:
   std::vector<TreeWillOWisp*> willowisps;
 
 private:
-  GhostTree(const GhostTree&) = delete;
-  GhostTree& operator=(const GhostTree&) = delete;
+  GhostTree(GhostTree const&) = delete;
+  GhostTree& operator=(GhostTree const&) = delete;
 };
 
 #endif

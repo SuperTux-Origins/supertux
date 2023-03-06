@@ -22,7 +22,7 @@
 static const float FLYTIME = 1.2f;
 static const float MOVE_SPEED = -100.0f;
 
-SpiderMite::SpiderMite(const ReaderMapping& reader) :
+SpiderMite::SpiderMite(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/spidermite/spidermite.sprite"),
   mode(),
   timer()
@@ -51,7 +51,7 @@ SpiderMite::collision_squished(GameObject& object)
 }
 
 void
-SpiderMite::collision_solid(const CollisionHit& hit)
+SpiderMite::collision_solid(CollisionHit const& hit)
 {
   if (hit.top || hit.bottom) { // hit floor or roof?
     m_physic.set_velocity_y(0);

@@ -57,12 +57,12 @@ NullVideoSystem::get_lightmap() const
 }
 
 TexturePtr
-NullVideoSystem::new_texture(const SDL_Surface& image, const Sampler& sampler)
+NullVideoSystem::new_texture(SDL_Surface const& image, Sampler const& sampler)
 {
   return TexturePtr(new NullTexture(Size(image.w, image.h)));
 }
 
-const Viewport&
+Viewport const&
 NullVideoSystem::get_viewport() const
 {
   return m_viewport;
@@ -112,13 +112,13 @@ NullVideoSystem::set_gamma(float gamma)
 }
 
 void
-NullVideoSystem::set_title(const std::string& title)
+NullVideoSystem::set_title(std::string const& title)
 {
   log_info << "VideoSystem::set_icon(\"" << title << "\")" << std::endl;
 }
 
 void
-NullVideoSystem::set_icon(const SDL_Surface& icon)
+NullVideoSystem::set_icon(SDL_Surface const& icon)
 {
   log_info << "VideoSystem::set_icon()" << std::endl;
 }

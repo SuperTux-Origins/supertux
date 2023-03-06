@@ -42,8 +42,8 @@ private:
   bool m_auto_joystick_cfg;
 
 private:
-  JoystickMenu(const JoystickMenu&) = delete;
-  JoystickMenu& operator=(const JoystickMenu&) = delete;
+  JoystickMenu(JoystickMenu const&) = delete;
+  JoystickMenu& operator=(JoystickMenu const&) = delete;
 };
 
 #endif

@@ -31,7 +31,7 @@ public:
     height(0.0f)
   {}
 
-  explicit Sizef(const Vector& v) :
+  explicit Sizef(Vector const& v) :
     width(v.x),
     height(v.y)
   {}
@@ -41,10 +41,10 @@ public:
     height(height_)
   {}
 
-  Sizef(const Sizef& rhs) = default;
-  Sizef& operator=(const Sizef& rhs) = default;
+  Sizef(Sizef const& rhs) = default;
+  Sizef& operator=(Sizef const& rhs) = default;
 
-  Sizef(const Size& rhs);
+  Sizef(Size const& rhs);
 
   Sizef& operator*=(float factor)
   {
@@ -60,14 +60,14 @@ public:
     return *this;
   }
 
-  Sizef& operator+=(const Sizef& rhs)
+  Sizef& operator+=(Sizef const& rhs)
   {
     width  += rhs.width;
     height += rhs.height;
     return *this;
   }
 
-  Sizef& operator-=(const Sizef& rhs)
+  Sizef& operator-=(Sizef const& rhs)
   {
     width  -= rhs.width;
     height -= rhs.height;
@@ -89,47 +89,47 @@ public:
   float height;
 };
 
-inline Sizef operator*(const Sizef& lhs, float factor)
+inline Sizef operator*(Sizef const& lhs, float factor)
 {
   return Sizef(lhs.width  * factor,
                lhs.height * factor);
 }
 
-inline Sizef operator*(float factor, const Sizef& rhs)
+inline Sizef operator*(float factor, Sizef const& rhs)
 {
   return Sizef(rhs.width  * factor,
                rhs.height * factor);
 }
 
-inline Sizef operator/(const Sizef& lhs, float divisor)
+inline Sizef operator/(Sizef const& lhs, float divisor)
 {
   return Sizef(lhs.width  / divisor,
                lhs.height / divisor);
 }
 
-inline Sizef operator+(const Sizef& lhs, const Sizef& rhs)
+inline Sizef operator+(Sizef const& lhs, Sizef const& rhs)
 {
   return Sizef(lhs.width  + rhs.width,
                lhs.height + rhs.height);
 }
 
-inline Sizef operator-(const Sizef& lhs, const Sizef& rhs)
+inline Sizef operator-(Sizef const& lhs, Sizef const& rhs)
 {
   return Sizef(lhs.width  - rhs.width,
                lhs.height - rhs.height);
 }
 
-inline bool operator==(const Sizef& lhs, const Sizef& rhs)
+inline bool operator==(Sizef const& lhs, Sizef const& rhs)
 {
   return (lhs.width == rhs.width) && (rhs.height == rhs.height);
 }
 
-inline bool operator!=(const Sizef& lhs, const Sizef& rhs)
+inline bool operator!=(Sizef const& lhs, Sizef const& rhs)
 {
   return (lhs.width != rhs.width) || (lhs.height != rhs.height);
 }
 
-std::ostream& operator<<(std::ostream& s, const Sizef& size);
+std::ostream& operator<<(std::ostream& s, Sizef const& size);
 
 #endif
 

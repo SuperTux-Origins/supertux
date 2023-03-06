@@ -42,10 +42,10 @@ public:
   ~Level();
 
   void add_sector(std::unique_ptr<Sector> sector);
-  const std::string& get_name() const { return m_name; }
-  const std::string& get_author() const { return m_author; }
+  std::string const& get_name() const { return m_name; }
+  std::string const& get_author() const { return m_author; }
 
-  Sector* get_sector(const std::string& name) const;
+  Sector* get_sector(std::string const& name) const;
 
   size_t get_sector_count() const;
   Sector* get_sector(size_t num) const;
@@ -64,7 +64,7 @@ public:
 
 private:
   void save(Writer& writer);
-  void load_old_format(const ReaderMapping& reader);
+  void load_old_format(ReaderMapping const& reader);
 
 public:
   bool m_is_worldmap;
@@ -86,8 +86,8 @@ public:
   std::string m_wmselect_bkg;
 
 private:
-  Level(const Level&) = delete;
-  Level& operator=(const Level&) = delete;
+  Level(Level const&) = delete;
+  Level& operator=(Level const&) = delete;
 };
 
 #endif

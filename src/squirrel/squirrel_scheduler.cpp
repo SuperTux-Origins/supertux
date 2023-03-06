@@ -52,7 +52,7 @@ SquirrelScheduler::update(float time)
         if (sq_gettype(scheduled_vm, -1) != OT_STRING) {
           msg << "(no info)";
         } else {
-          const char* lasterr;
+          char const* lasterr;
           sq_getstring(scheduled_vm, -1, &lasterr);
           msg << lasterr;
         }

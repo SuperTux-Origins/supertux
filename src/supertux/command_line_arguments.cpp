@@ -88,7 +88,7 @@ CommandLineArguments::print_acknowledgements() const
 }
 
 void
-CommandLineArguments::print_help(const char* arg0) const
+CommandLineArguments::print_help(char const* arg0) const
 {
   std::cerr
     << fmt::format(fmt::runtime(_("Usage: {} [OPTIONS] [LEVELFILE]")), arg0) << "\n" << "\n"

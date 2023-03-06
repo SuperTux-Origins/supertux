@@ -34,7 +34,7 @@ public:
 
   /// Sets velocity to a fixed value.
   void set_velocity(float nvx, float nvy);
-  void set_velocity(const Vector& vector);
+  void set_velocity(Vector const& vector);
 
   void set_velocity_x(float nvx) { vx = nvx; }
   void set_velocity_y(float nvy) { vy = nvy; }
@@ -52,7 +52,7 @@ public:
    * eventually added to the vertical acceleration)
    */
   void set_acceleration(float nax, float nay);
-  void set_acceleration(const Vector& vector);
+  void set_acceleration(Vector const& vector);
 
   void set_acceleration_x(float nax) { ax = nax; }
   void set_acceleration_y(float nay) { ay = nay; }

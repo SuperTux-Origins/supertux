@@ -40,15 +40,15 @@ public:
 
   virtual void blend_func(GLenum src, GLenum dst) override;
 
-  virtual void set_positions(const float* data, size_t size) override;
+  virtual void set_positions(float const* data, size_t size) override;
 
-  virtual void set_texcoords(const float* data, size_t size) override;
+  virtual void set_texcoords(float const* data, size_t size) override;
   virtual void set_texcoord(float u, float v) override;
 
-  virtual void set_colors(const float* data, size_t size) override;
-  virtual void set_color(const Color& color) override;
+  virtual void set_colors(float const* data, size_t size) override;
+  virtual void set_color(Color const& color) override;
 
-  virtual void bind_texture(const Texture& texture, const Texture* displacement_texture) override;
+  virtual void bind_texture(Texture const& texture, Texture const* displacement_texture) override;
   virtual void bind_no_texture() override;
   virtual void draw_arrays(GLenum type, GLint first, GLsizei count) override;
 
@@ -68,8 +68,8 @@ private:
   std::unique_ptr<GLTexture> m_transparent_texture;
 
 private:
-  GL33CoreContext(const GL33CoreContext&) = delete;
-  GL33CoreContext& operator=(const GL33CoreContext&) = delete;
+  GL33CoreContext(GL33CoreContext const&) = delete;
+  GL33CoreContext& operator=(GL33CoreContext const&) = delete;
 };
 
 #endif

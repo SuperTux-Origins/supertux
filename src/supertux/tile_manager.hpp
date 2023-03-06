@@ -33,7 +33,7 @@ private:
 public:
   TileManager();
 
-  TileSet* get_tileset(const std::string &filename);
+  TileSet* get_tileset(std::string const&filename);
 };
 
 #endif

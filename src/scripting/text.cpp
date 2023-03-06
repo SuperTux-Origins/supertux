@@ -23,14 +23,14 @@
 namespace scripting {
 
 void
-Text::set_text(const std::string& text)
+Text::set_text(std::string const& text)
 {
   SCRIPT_GUARD_VOID;
   object.set_text(text);
 }
 
 void
-Text::set_font(const std::string& fontname)
+Text::set_font(std::string const& fontname)
 {
   SCRIPT_GUARD_VOID;
   object.set_font(fontname);

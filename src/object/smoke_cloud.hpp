@@ -25,7 +25,7 @@
 class SmokeCloud final : public GameObject
 {
 public:
-  SmokeCloud(const Vector& pos);
+  SmokeCloud(Vector const& pos);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
@@ -39,8 +39,8 @@ private:
   Vector position;
 
 private:
-  SmokeCloud(const SmokeCloud&) = delete;
-  SmokeCloud& operator=(const SmokeCloud&) = delete;
+  SmokeCloud(SmokeCloud const&) = delete;
+  SmokeCloud& operator=(SmokeCloud const&) = delete;
 };
 
 #endif

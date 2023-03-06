@@ -35,8 +35,8 @@ public:
 public:
   using GameObject::GameObject;
 private:
-  TileMap(const TileMap&) = delete;
-  TileMap& operator=(const TileMap&) = delete;
+  TileMap(TileMap const&) = delete;
+  TileMap& operator=(TileMap const&) = delete;
 #endif
 
 public:

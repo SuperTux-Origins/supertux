@@ -23,7 +23,7 @@
 class ItemIntField final : public ItemTextField
 {
 public:
-  ItemIntField(const std::string& text_, int* input_, int id_ = -1, bool positive = false);
+  ItemIntField(std::string const& text_, int* input_, int id_ = -1, bool positive = false);
   ~ItemIntField() override;
 
   int* number;
@@ -33,7 +33,7 @@ public:
 
   // Text manipulation and navigation functions
 
-  virtual void insert_text(const std::string& text, const int left_offset_pos) override;
+  virtual void insert_text(std::string const& text, const int left_offset_pos) override;
 
 private:
   std::string m_input;
@@ -42,8 +42,8 @@ private:
   void add_char(char c, const int left_offset_pos);
 
 private:
-  ItemIntField(const ItemIntField&) = delete;
-  ItemIntField& operator=(const ItemIntField&) = delete;
+  ItemIntField(ItemIntField const&) = delete;
+  ItemIntField& operator=(ItemIntField const&) = delete;
 };
 
 #endif

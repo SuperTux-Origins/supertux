@@ -221,7 +221,7 @@ MobileController::apply(Controller& controller) const
 }
 
 bool
-MobileController::process_finger_down_event(const SDL_TouchFingerEvent& event)
+MobileController::process_finger_down_event(SDL_TouchFingerEvent const& event)
 {
   Vector pos(event.x * float(m_screen_width), event.y * float(m_screen_height));
   m_fingers[event.fingerId] = pos;
@@ -234,7 +234,7 @@ MobileController::process_finger_down_event(const SDL_TouchFingerEvent& event)
 }
 
 bool
-MobileController::process_finger_up_event(const SDL_TouchFingerEvent& event)
+MobileController::process_finger_up_event(SDL_TouchFingerEvent const& event)
 {
   Vector pos(event.x * float(m_screen_width), event.y * float(m_screen_height));
   m_fingers.erase(event.fingerId);
@@ -247,7 +247,7 @@ MobileController::process_finger_up_event(const SDL_TouchFingerEvent& event)
 }
 
 bool
-MobileController::process_finger_motion_event(const SDL_TouchFingerEvent& event)
+MobileController::process_finger_motion_event(SDL_TouchFingerEvent const& event)
 {
   Vector pos(event.x * float(m_screen_width), event.y * float(m_screen_height));
   m_fingers[event.fingerId] = pos;

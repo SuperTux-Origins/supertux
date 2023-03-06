@@ -22,7 +22,7 @@
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
-FallingCoin::FallingCoin(const Vector& start_position, float vel_x) :
+FallingCoin::FallingCoin(Vector const& start_position, float vel_x) :
   physic(),
   pos(start_position),
   sprite(SpriteManager::current()->create("images/objects/coin/coin.sprite"))

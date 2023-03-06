@@ -22,7 +22,7 @@
 class SCrystallo final : public WalkingBadguy
 {
 public:
-  SCrystallo(const ReaderMapping& reader);
+  SCrystallo(ReaderMapping const& reader);
 
   virtual void initialize() override;
   static std::string class_name() { return "scrystallo"; }
@@ -30,8 +30,8 @@ public:
   static std::string display_name() { return _("Sleeping Crystallo"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
   virtual void active_update(float dt_sec) override;
   virtual bool is_flammable() const override;
@@ -53,8 +53,8 @@ private:
   float m_range;
   Vector m_radius_anchor;
 private:
-  SCrystallo(const SCrystallo&) = delete;
-  SCrystallo& operator=(const SCrystallo&) = delete;
+  SCrystallo(SCrystallo const&) = delete;
+  SCrystallo& operator=(SCrystallo const&) = delete;
 };
 
 #endif

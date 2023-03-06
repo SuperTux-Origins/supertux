@@ -36,8 +36,8 @@ public:
 public:
   using GameObject::GameObject;
 private:
-  Torch(const Torch&) = delete;
-  Torch& operator=(const Torch&) = delete;
+  Torch(Torch const&) = delete;
+  Torch& operator=(Torch const&) = delete;
 #endif
 
 public:

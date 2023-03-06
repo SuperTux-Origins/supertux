@@ -19,7 +19,7 @@
 #include "supertux/colorscheme.hpp"
 #include "video/color.hpp"
 
-ItemInactive::ItemInactive(const std::string& text_, bool default_color) :
+ItemInactive::ItemInactive(std::string const& text_, bool default_color) :
   MenuItem(text_),
   m_default_color(default_color)
 {

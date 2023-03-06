@@ -24,12 +24,12 @@
 class Star final : public MovingSprite
 {
 public:
-  Star(const Vector& pos, Direction direction = Direction::RIGHT);
+  Star(Vector const& pos, Direction direction = Direction::RIGHT);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual bool is_saveable() const override {
     return false;
   }

@@ -33,12 +33,12 @@ class TextScroller;
 class TextScrollerScreen final : public Screen
 {
 public:
-  TextScrollerScreen(const std::string& file);
+  TextScrollerScreen(std::string const& file);
   ~TextScrollerScreen() override;
 
   virtual void setup() override;
   virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, const Controller& controller) override;
+  virtual void update(float dt_sec, Controller const& controller) override;
 
 private:
   float m_defaultspeed;
@@ -47,8 +47,8 @@ private:
   std::unique_ptr<TextScroller> m_text_scroller;
 
 private:
-  TextScrollerScreen(const TextScrollerScreen&) = delete;
-  TextScrollerScreen& operator=(const TextScrollerScreen&) = delete;
+  TextScrollerScreen(TextScrollerScreen const&) = delete;
+  TextScrollerScreen& operator=(TextScrollerScreen const&) = delete;
 };
 
 #endif

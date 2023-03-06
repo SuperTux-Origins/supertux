@@ -23,7 +23,7 @@
 
 namespace worldmap {
 
-SpawnPoint::SpawnPoint(const ReaderMapping& mapping) :
+SpawnPoint::SpawnPoint(ReaderMapping const& mapping) :
   m_name(),
   m_pos(-1.0f, -1.0f),
   m_auto_dir(Direction::NONE)

@@ -27,7 +27,7 @@ const float RANGE_OF_VISION = 256; /**< range in px at which we can see bullets 
 
 } // namespace
 
-Igel::Igel(const ReaderMapping& reader) :
+Igel::Igel(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/igel/igel.sprite", "walking-left", "walking-right"),
   turn_recover_timer()
 {
@@ -49,7 +49,7 @@ Igel::turn_around()
 }
 
 bool
-Igel::can_see(const MovingObject& o) const
+Igel::can_see(MovingObject const& o) const
 {
   Rectf ob = o.get_bbox();
 
@@ -67,7 +67,7 @@ Igel::active_update(float dt_sec)
   bool wants_to_flee = false;
 
   // check if we see a fire bullet
-  for (const auto& bullet : Sector::get().get_objects_by_type<Bullet>()) {
+  for (auto const& bullet : Sector::get().get_objects_by_type<Bullet>()) {
     if (bullet.get_type() != FIRE_BONUS) continue;
     if (can_see(bullet)) wants_to_flee = true;
   }
@@ -84,7 +84,7 @@ Igel::active_update(float dt_sec)
 }
 
 HitResponse
-Igel::collision_bullet(Bullet& bullet, const CollisionHit& hit)
+Igel::collision_bullet(Bullet& bullet, CollisionHit const& hit)
 {
   // default reaction if hit on front side or for freeze and unfreeze
   if (((m_dir == Direction::LEFT) && hit.left) || ((m_dir == Direction::RIGHT) && hit.right) ||

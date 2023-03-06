@@ -32,8 +32,8 @@ public:
   void press(Control c, bool pressed = true);
 
 private:
-  CodeController(const CodeController&) = delete;
-  CodeController& operator=(const CodeController&) = delete;
+  CodeController(CodeController const&) = delete;
+  CodeController& operator=(CodeController const&) = delete;
 };
 
 #endif

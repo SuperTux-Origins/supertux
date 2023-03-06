@@ -24,7 +24,7 @@
 class NullTexture : public Texture
 {
 public:
-  NullTexture(const Size& size);
+  NullTexture(Size const& size);
   ~NullTexture() override;
 
   virtual int get_texture_width() const override;
@@ -37,8 +37,8 @@ private:
   Size m_image_size;
 
 private:
-  NullTexture(const NullTexture&) = delete;
-  NullTexture& operator=(const NullTexture&) = delete;
+  NullTexture(NullTexture const&) = delete;
+  NullTexture& operator=(NullTexture const&) = delete;
 };
 
 #endif

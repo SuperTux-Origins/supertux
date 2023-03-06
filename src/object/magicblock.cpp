@@ -41,7 +41,7 @@ const float SWITCH_DELAY = 0.0f; /**< seconds to wait for stable conditions unti
 
 } // namespace
 
-MagicBlock::MagicBlock(const ReaderMapping& mapping) :
+MagicBlock::MagicBlock(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/magicblock/magicblock.sprite"),
   m_is_solid(false),
   m_trigger_red(),
@@ -162,13 +162,13 @@ MagicBlock::draw(DrawingContext& context)
 }
 
 bool
-MagicBlock::collides(GameObject& /*other*/, const CollisionHit& /*hit*/) const
+MagicBlock::collides(GameObject& /*other*/, CollisionHit const& /*hit*/) const
 {
   return m_is_solid;
 }
 
 HitResponse
-MagicBlock::collision(GameObject& /*other*/, const CollisionHit& /*hit*/)
+MagicBlock::collision(GameObject& /*other*/, CollisionHit const& /*hit*/)
 {
   return FORCE_MOVE;
 }

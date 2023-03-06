@@ -25,8 +25,8 @@ class Player;
 class SequenceTrigger final : public TriggerBase
 {
 public:
-  SequenceTrigger(const ReaderMapping& reader);
-  SequenceTrigger(const Vector& pos, const std::string& sequence_name);
+  SequenceTrigger(ReaderMapping const& reader);
+  SequenceTrigger(Vector const& pos, std::string const& sequence_name);
 
   static std::string class_name() { return "sequencetrigger"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -48,8 +48,8 @@ private:
   TilemapFadeType fade;
 
 private:
-  SequenceTrigger(const SequenceTrigger&) = delete;
-  SequenceTrigger& operator=(const SequenceTrigger&) = delete;
+  SequenceTrigger(SequenceTrigger const&) = delete;
+  SequenceTrigger& operator=(SequenceTrigger const&) = delete;
 };
 
 #endif

@@ -31,7 +31,7 @@ class CustomParticleSystemFile final :
 {
 public:
   CustomParticleSystemFile();
-  CustomParticleSystemFile(const ReaderMapping& reader);
+  CustomParticleSystemFile(ReaderMapping const& reader);
   ~CustomParticleSystemFile() override;
 
   static std::string class_name() { return "particles-custom-file"; }
@@ -50,8 +50,8 @@ private:
   std::string m_filename;
 
 private:
-  CustomParticleSystemFile(const CustomParticleSystemFile&) = delete;
-  CustomParticleSystemFile& operator=(const CustomParticleSystemFile&) = delete;
+  CustomParticleSystemFile(CustomParticleSystemFile const&) = delete;
+  CustomParticleSystemFile& operator=(CustomParticleSystemFile const&) = delete;
 };
 
 #endif

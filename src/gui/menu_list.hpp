@@ -22,7 +22,7 @@
 class ListMenu final : public Menu
 {
 public:
-  ListMenu(const std::vector<std::string>& items, std::string* selected, Menu* parent);
+  ListMenu(std::vector<std::string> const& items, std::string* selected, Menu* parent);
 
   void menu_action(MenuItem& item) override;
 
@@ -32,8 +32,8 @@ private:
 
 private:
   // non-copyable footer
-  ListMenu(const ListMenu&) = delete;
-  ListMenu& operator=(const ListMenu&) = delete;
+  ListMenu(ListMenu const&) = delete;
+  ListMenu& operator=(ListMenu const&) = delete;
 };
 
 #endif

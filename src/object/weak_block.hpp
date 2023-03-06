@@ -26,9 +26,9 @@ class Bullet;
 class WeakBlock final : public MovingSprite
 {
 public:
-  WeakBlock(const ReaderMapping& mapping);
+  WeakBlock(ReaderMapping const& mapping);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
   static std::string class_name() { return "weak_block"; }
@@ -41,7 +41,7 @@ public:
   void startBurning();
 
 private:
-  virtual HitResponse collision_bullet(Bullet& bullet, const CollisionHit& hit);
+  virtual HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit);
 
 private:
   /** called by self when hit by a bullet */
@@ -62,8 +62,8 @@ private:
   SpritePtr lightsprite;
 
 private:
-  WeakBlock(const WeakBlock&) = delete;
-  WeakBlock& operator=(const WeakBlock&) = delete;
+  WeakBlock(WeakBlock const&) = delete;
+  WeakBlock& operator=(WeakBlock const&) = delete;
 };
 
 #endif

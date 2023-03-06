@@ -25,7 +25,7 @@
 
 //static const float FLICK_CURSOR_TIME = 0.5f;
 
-MenuItem::MenuItem(const std::string& text, int id) :
+MenuItem::MenuItem(std::string const& text, int id) :
   m_id(id),
   m_text(text),
   m_help()
@@ -37,7 +37,7 @@ MenuItem::~MenuItem() {
 }
 
 void
-MenuItem::set_help(const std::string& help_text)
+MenuItem::set_help(std::string const& help_text)
 {
   std::string overflow;
   m_help = Resources::normal_font->wrap_to_width(help_text, 600, &overflow);
@@ -49,7 +49,7 @@ MenuItem::set_help(const std::string& help_text)
 }
 
 void
-MenuItem::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active)
+MenuItem::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active)
 {
   context.color().draw_text(Resources::normal_font, m_text,
                             Vector( pos.x + static_cast<float>(menu_width) / 2.0f,

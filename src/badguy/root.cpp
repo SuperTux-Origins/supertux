@@ -23,7 +23,7 @@ static const float SPEED_GROW = 256;
 static const float SPEED_SHRINK = 128;
 static const float HATCH_TIME = 0.75;
 
-Root::Root(const Vector& pos, Flip flip) :
+Root::Root(Vector const& pos, Flip flip) :
   BadGuy(pos, "images/creatures/ghosttree/root.sprite", LAYER_TILES-1),
   mystate(STATE_APPEARING),
   base_sprite(SpriteManager::current()->create("images/creatures/ghosttree/root-base.sprite")),

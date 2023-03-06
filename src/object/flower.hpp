@@ -33,7 +33,7 @@ public:
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void on_flip(float height) override;
 
   virtual int get_layer() const override { return LAYER_OBJECTS; }
@@ -46,8 +46,8 @@ private:
   SpritePtr lightsprite;
 
 private:
-  Flower(const Flower&) = delete;
-  Flower& operator=(const Flower&) = delete;
+  Flower(Flower const&) = delete;
+  Flower& operator=(Flower const&) = delete;
 };
 
 #endif

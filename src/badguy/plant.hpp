@@ -22,11 +22,11 @@
 class Plant final : public BadGuy
 {
 public:
-  Plant(const ReaderMapping& reader);
+  Plant(ReaderMapping const& reader);
 
   virtual void initialize() override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   virtual void active_update(float dt_sec) override;
   virtual void ignite() override;
   static std::string class_name() { return "plant"; }
@@ -46,8 +46,8 @@ private:
   PlantState state;
 
 private:
-  Plant(const Plant&) = delete;
-  Plant& operator=(const Plant&) = delete;
+  Plant(Plant const&) = delete;
+  Plant& operator=(Plant const&) = delete;
 };
 
 #endif

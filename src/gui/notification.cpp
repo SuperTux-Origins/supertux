@@ -62,7 +62,7 @@ Notification::~Notification()
 }
 
 void
-Notification::set_text(const std::string& text)
+Notification::set_text(std::string const& text)
 {
   m_text = text;
 
@@ -72,7 +72,7 @@ Notification::set_text(const std::string& text)
 }
 
 void
-Notification::set_mini_text(const std::string& text)
+Notification::set_mini_text(std::string const& text)
 {
   m_mini_text = text;
 
@@ -162,7 +162,7 @@ Notification::draw(DrawingContext& context)
 }
 
 void
-Notification::event(const SDL_Event& ev)
+Notification::event(SDL_Event const& ev)
 {
   Rectf bg_rect(m_pos, m_size);
   bg_rect = bg_rect.grown(12.0f);
@@ -207,7 +207,7 @@ Notification::event(const SDL_Event& ev)
 }
 
 void
-Notification::process_input(const Controller& controller)
+Notification::process_input(Controller const& controller)
 {
   if (controller.pressed(Control::MENU_BACK) && !MenuManager::instance().previous_menu())
   {
@@ -248,7 +248,7 @@ bool
 Notification::is_disabled(std::string id) // Check if a notification is disabled by its ID.
 {
   return std::any_of(g_config->notifications.begin(), g_config->notifications.end(),
-                     [id](const auto& notif)
+                     [id](auto const& notif)
                      {
                        return notif.id == id && notif.disabled;
                      });

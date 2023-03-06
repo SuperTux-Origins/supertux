@@ -20,14 +20,14 @@
 namespace scripting {
 
 void
-Decal::change_sprite(const std::string& new_sprite_name)
+Decal::change_sprite(std::string const& new_sprite_name)
 {
   SCRIPT_GUARD_VOID;
   object.change_sprite(new_sprite_name);
 }
 
 void
-Decal::fade_sprite(const std::string& new_sprite_name, float fade_time)
+Decal::fade_sprite(std::string const& new_sprite_name, float fade_time)
 {
   SCRIPT_GUARD_VOID;
   object.fade_sprite(new_sprite_name, fade_time);

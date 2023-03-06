@@ -30,15 +30,15 @@ class WorldMapParser
 public:
   WorldMapParser(WorldMap& worldmap);
 
-  void load_worldmap(const std::string& filename);
+  void load_worldmap(std::string const& filename);
   void load_level_information(LevelTile& level);
 
 private:
   WorldMap& m_worldmap;
 
 private:
-  WorldMapParser(const WorldMapParser&) = delete;
-  WorldMapParser& operator=(const WorldMapParser&) = delete;
+  WorldMapParser(WorldMapParser const&) = delete;
+  WorldMapParser& operator=(WorldMapParser const&) = delete;
 };
 
 } // namespace worldmap

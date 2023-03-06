@@ -30,7 +30,7 @@ class MusicObject : public GameObject
 {
 public:
   MusicObject();
-  MusicObject(const ReaderMapping& mapping);
+  MusicObject(ReaderMapping const& mapping);
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
@@ -47,7 +47,7 @@ public:
   void resume_music();
   MusicType get_music_type() const;
 
-  void set_music(const std::string& music);
+  void set_music(std::string const& music);
   std::string get_music() const;
 
 private:
@@ -55,8 +55,8 @@ private:
   std::string m_music;
 
 private:
-  MusicObject(const MusicObject&) = delete;
-  MusicObject& operator=(const MusicObject&) = delete;
+  MusicObject(MusicObject const&) = delete;
+  MusicObject& operator=(MusicObject const&) = delete;
 };
 
 #endif

@@ -38,7 +38,7 @@ ParticleSystem_Interactive::ParticleSystem_Interactive() :
   z_pos = 0;
 }
 
-ParticleSystem_Interactive::ParticleSystem_Interactive(const ReaderMapping& mapping) :
+ParticleSystem_Interactive::ParticleSystem_Interactive(ReaderMapping const& mapping) :
   ParticleSystem(mapping)
 {
   virtual_width = static_cast<float>(SCREEN_WIDTH);
@@ -57,15 +57,15 @@ ParticleSystem_Interactive::draw(DrawingContext& context)
     return;
 
   context.push_transform();
-  const auto& region = Sector::current()->get_active_region();
+  auto const& region = Sector::current()->get_active_region();
   std::unordered_map<SurfacePtr, SurfaceBatch> batches;
-  for (const auto& particle : particles) {
+  for (auto const& particle : particles) {
     if(!region.contains(particle->pos))
       continue;
 
     auto it = batches.find(particle->texture);
     if (it == batches.end()) {
-      const auto& batch_it = batches.emplace(particle->texture,
+      auto const& batch_it = batches.emplace(particle->texture,
         SurfaceBatch(particle->texture));
       batch_it.first->second.draw(particle->pos, particle->angle);
     } else {
@@ -85,7 +85,7 @@ ParticleSystem_Interactive::draw(DrawingContext& context)
 }
 
 int
-ParticleSystem_Interactive::collision(Particle* object, const Vector& movement)
+ParticleSystem_Interactive::collision(Particle* object, Vector const& movement)
 {
   using namespace collision;
 
@@ -118,11 +118,11 @@ ParticleSystem_Interactive::collision(Particle* object, const Vector& movement)
   dest.move(movement);
   Constraints constraints;
 
-  for (const auto& solids : Sector::get().get_solid_tilemaps()) {
+  for (auto const& solids : Sector::get().get_solid_tilemaps()) {
     // FIXME Handle a nonzero tilemap offset
     for (int x = starttilex; x*32 < max_x; ++x) {
       for (int y = starttiley; y*32 < max_y; ++y) {
-        const Tile& tile = solids->get_tile(x, y);
+        Tile const& tile = solids->get_tile(x, y);
 
         // skip non-solid tiles, except water
         if (! (tile.get_attributes() & (Tile::WATER | Tile::SOLID)))
@@ -153,7 +153,7 @@ ParticleSystem_Interactive::collision(Particle* object, const Vector& movement)
   if (!constraints.has_constraints())
     return -1;
 
-  const CollisionHit& hit = constraints.hit;
+  CollisionHit const& hit = constraints.hit;
   if (water) {
     return 0; //collision with water tile - don't draw splash
   } else {

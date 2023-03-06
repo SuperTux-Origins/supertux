@@ -22,7 +22,7 @@
 #include "physfs/ofile_stream.hpp"
 #include "util/log.hpp"
 
-Writer::Writer(const std::string& filename) :
+Writer::Writer(std::string const& filename) :
   m_filename(filename),
   out(new OFileStream(filename)),
   out_owned(true),
@@ -52,13 +52,13 @@ Writer::~Writer()
 }
 
 void
-Writer::write_comment(const std::string& comment)
+Writer::write_comment(std::string const& comment)
 {
   *out << "; " << comment << "\n";
 }
 
 void
-Writer::start_list(const std::string& listname, bool string)
+Writer::start_list(std::string const& listname, bool string)
 {
   indent();
   *out << '(';
@@ -73,7 +73,7 @@ Writer::start_list(const std::string& listname, bool string)
 }
 
 void
-Writer::end_list(const std::string& listname)
+Writer::end_list(std::string const& listname)
 {
   if (lists.size() == 0) {
     log_warning << m_filename << ": Trying to close list '" << listname << "', which is not open" << std::endl;
@@ -91,14 +91,14 @@ Writer::end_list(const std::string& listname)
 }
 
 void
-Writer::write(const std::string& name, int value)
+Writer::write(std::string const& name, int value)
 {
   indent();
   *out << '(' << name << ' ' << value << ")\n";
 }
 
 void
-Writer::write(const std::string& name, float value)
+Writer::write(std::string const& name, float value)
 {
   indent();
   *out << '(' << name << ' ' << value << ")\n";
@@ -108,13 +108,13 @@ Writer::write(const std::string& name, float value)
     function, without it the call write("foo", "bar") would call
     write(name, bool), not write(name, string, bool) */
 void
-Writer::write(const std::string& name, const char* value)
+Writer::write(std::string const& name, char const* value)
 {
   write(name, value, false);
 }
 
 void
-Writer::write(const std::string& name, const std::string& value,
+Writer::write(std::string const& name, std::string const& value,
               bool translatable)
 {
   indent();
@@ -131,25 +131,25 @@ Writer::write(const std::string& name, const std::string& value,
 }
 
 void
-Writer::write(const std::string& name, bool value)
+Writer::write(std::string const& name, bool value)
 {
   indent();
   *out << '(' << name << ' ' << (value ? "#t" : "#f") << ")\n";
 }
 
 void
-Writer::write(const std::string& name,
-              const std::vector<int>& value)
+Writer::write(std::string const& name,
+              std::vector<int> const& value)
 {
   indent();
   *out << '(' << name;
-  for (const auto& i : value)
+  for (auto const& i : value)
     *out << " " << i;
   *out << ")\n";
 }
 
 void
-Writer::write(const std::string& name,
+Writer::write(std::string const& name,
               const std::vector<unsigned int>& value,
               int width)
 {
@@ -157,7 +157,7 @@ Writer::write(const std::string& name,
   *out << '(' << name;
   if (!width)
   {
-    for (const auto& i : value)
+    for (auto const& i : value)
       *out << " " << i;
   }
   else
@@ -165,7 +165,7 @@ Writer::write(const std::string& name,
     *out << "\n";
     indent();
     int count = 0;
-    for (const auto& i : value) {
+    for (auto const& i : value) {
       *out << i;
       count += 1;
       if (count >= width) {
@@ -181,23 +181,23 @@ Writer::write(const std::string& name,
 }
 
 void
-Writer::write(const std::string& name,
-              const std::vector<float>& value)
+Writer::write(std::string const& name,
+              std::vector<float> const& value)
 {
   indent();
   *out << '(' << name;
-  for (const auto& i : value)
+  for (auto const& i : value)
     *out << " " << i;
   *out << ")\n";
 }
 
 void
-Writer::write(const std::string& name,
-              const std::vector<std::string>& value)
+Writer::write(std::string const& name,
+              std::vector<std::string> const& value)
 {
   indent();
   *out << '(' << name;
-  for (const auto& i : value) {
+  for (auto const& i : value) {
     *out << " ";
     write_escaped_string(i);
   }
@@ -205,7 +205,7 @@ Writer::write(const std::string& name,
 }
 
 void
-Writer::write_sexp(const sexp::Value& value, bool fudge)
+Writer::write_sexp(sexp::Value const& value, bool fudge)
 {
   if (value.is_array()) {
     if (fudge) {
@@ -230,7 +230,7 @@ Writer::write_sexp(const sexp::Value& value, bool fudge)
 }
 
 void
-Writer::write(const std::string& name, const sexp::Value& value)
+Writer::write(std::string const& name, sexp::Value const& value)
 {
   indent();
   *out << '(' << name << "\n";
@@ -242,10 +242,10 @@ Writer::write(const std::string& name, const sexp::Value& value)
 }
 
 void
-Writer::write_escaped_string(const std::string& str)
+Writer::write_escaped_string(std::string const& str)
 {
   *out << '"';
-  for (const char* c = str.c_str(); *c != 0; ++c) {
+  for (char const* c = str.c_str(); *c != 0; ++c) {
     if (*c == '\"')
       *out << "\\\"";
     else if (*c == '\\')

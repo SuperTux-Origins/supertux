@@ -37,15 +37,15 @@ public:
   SoundManager();
 
   /** Convenience functions to simply play a sound at a given position. */
-  void play(const std::string& name, const Vector& pos = Vector(-1, -1),
+  void play(std::string const& name, Vector const& pos = Vector(-1, -1),
             const float gain = 0.5f);
-  void play(const std::string& name, const float gain);
+  void play(std::string const& name, const float gain);
 
   /** preloads a sound, so that you don't get a lag later when playing it */
-  void preload(const std::string& name);
+  void preload(std::string const& name);
 
-  void play_music(const std::string& filename, float fadetime);
-  void play_music(const std::string& filename, bool fade = false);
+  void play_music(std::string const& filename, float fadetime);
+  void play_music(std::string const& filename, bool fade = false);
 
   void pause_music(float fadetime = 0.0f);
   void resume_music(float fadetime = 0.0f);
@@ -59,9 +59,9 @@ public:
 
   void update();
 
-  std::unique_ptr<SoundSource> create_sound_source(const std::string& filename);
+  std::unique_ptr<SoundSource> create_sound_source(std::string const& filename);
 
-  void set_listener_position(const Vector& position);
+  void set_listener_position(Vector const& position);
 
   void manage_source(std::unique_ptr<SoundSource> source);
 
@@ -84,8 +84,8 @@ private:
   std::string m_current_music;
 
 private:
-  SoundManager(const SoundManager&) = delete;
-  SoundManager& operator=(const SoundManager&) = delete;
+  SoundManager(SoundManager const&) = delete;
+  SoundManager& operator=(SoundManager const&) = delete;
 };
 
 #endif

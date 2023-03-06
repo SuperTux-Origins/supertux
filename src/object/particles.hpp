@@ -27,13 +27,13 @@
 class Particles final : public GameObject
 {
 public:
-  Particles(const Vector& epicenter, int min_angle, int max_angle,
-            const Vector& initial_velocity, const Vector& acceleration,
+  Particles(Vector const& epicenter, int min_angle, int max_angle,
+            Vector const& initial_velocity, Vector const& acceleration,
             int number, Color color, int size, float life_time,
             int drawing_layer);
-  Particles(const Vector& epicenter, int min_angle, int max_angle,
+  Particles(Vector const& epicenter, int min_angle, int max_angle,
             const float min_initial_velocity, const float max_initial_velocity,
-            const Vector& acceleration, int number, Color color,
+            Vector const& acceleration, int number, Color color,
             int size, float life_time, int drawing_layer);
   virtual bool is_saveable() const override {
     return false;

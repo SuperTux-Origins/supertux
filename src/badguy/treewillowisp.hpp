@@ -25,7 +25,7 @@ class GhostTree;
 class TreeWillOWisp final : public BadGuy
 {
 public:
-  TreeWillOWisp(GhostTree* tree, const Vector& pos, float radius, float speed);
+  TreeWillOWisp(GhostTree* tree, Vector const& pos, float radius, float speed);
   ~TreeWillOWisp() override;
 
   virtual void activate() override;
@@ -42,14 +42,14 @@ public:
 
   /** make TreeWillOWisp vanish */
   void vanish();
-  void start_sucking(const Vector& suck_target);
+  void start_sucking(Vector const& suck_target);
 
-  void set_color(const Color& color);
+  void set_color(Color const& color);
   Color get_color() const;
 
 protected:
-  virtual bool collides(GameObject& other, const CollisionHit& hit) const override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
 private:
   enum MyState {
@@ -73,8 +73,8 @@ private:
   Vector suck_target;
 
 private:
-  TreeWillOWisp(const TreeWillOWisp&) = delete;
-  TreeWillOWisp& operator=(const TreeWillOWisp&) = delete;
+  TreeWillOWisp(TreeWillOWisp const&) = delete;
+  TreeWillOWisp& operator=(TreeWillOWisp const&) = delete;
 };
 
 #endif

@@ -24,11 +24,11 @@
 class UTF8Iterator
 {
 public:
-  const std::string&     text;
+  std::string const&     text;
   std::string::size_type pos;
   uint32_t chr;
 
-  UTF8Iterator(const std::string& text_);
+  UTF8Iterator(std::string const& text_);
 
   bool done() const;
   UTF8Iterator& operator++();

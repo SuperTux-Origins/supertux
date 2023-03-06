@@ -40,15 +40,15 @@ public:
 
   virtual void blend_func(GLenum src, GLenum dst) = 0;
 
-  virtual void set_positions(const float* data, size_t size) = 0;
+  virtual void set_positions(float const* data, size_t size) = 0;
 
-  virtual void set_texcoords(const float* data, size_t size) = 0;
+  virtual void set_texcoords(float const* data, size_t size) = 0;
   virtual void set_texcoord(float u, float v) = 0;
 
-  virtual void set_colors(const float* data, size_t size) = 0;
-  virtual void set_color(const Color& color) = 0;
+  virtual void set_colors(float const* data, size_t size) = 0;
+  virtual void set_color(Color const& color) = 0;
 
-  virtual void bind_texture(const Texture& texture, const Texture* displacement_texture) = 0;
+  virtual void bind_texture(Texture const& texture, Texture const* displacement_texture) = 0;
   virtual void bind_no_texture() = 0;
 
   virtual void draw_arrays(GLenum type, GLint first, GLsizei count) = 0;
@@ -56,8 +56,8 @@ public:
   virtual bool supports_framebuffer() const = 0;
 
 private:
-  GLContext(const GLContext&) = delete;
-  GLContext& operator=(const GLContext&) = delete;
+  GLContext(GLContext const&) = delete;
+  GLContext& operator=(GLContext const&) = delete;
 };
 
 #endif

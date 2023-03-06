@@ -32,7 +32,7 @@ class Background final : public GameObject,
 {
 public:
   Background();
-  Background(const ReaderMapping& reader);
+  Background(ReaderMapping const& reader);
   ~Background() override;
 
   virtual void update(float dt_sec) override;
@@ -49,11 +49,11 @@ public:
 
   virtual void on_flip(float height) override;
 
-  void set_image(const std::string& name);
-  void set_images(const std::string& name_top, const std::string& name_middle, const std::string& name_bottom);
+  void set_image(std::string const& name);
+  void set_images(std::string const& name_top, std::string const& name_middle, std::string const& name_bottom);
   void set_speed(float bgd_speed);
 
-  void draw_image(DrawingContext& context, const Vector& pos);
+  void draw_image(DrawingContext& context, Vector const& pos);
 
   std::string get_image() const { return m_imagefile; }
   float get_speed() const { return m_parallax_speed.x; }
@@ -73,7 +73,7 @@ private:
   };
 
 private:
-  SurfacePtr load_background(const std::string& image_path);
+  SurfacePtr load_background(std::string const& image_path);
 
 private:
   /** Backgrounds with NO_ALIGNMENT are repeated over the whole
@@ -108,8 +108,8 @@ private:
   Flip m_flip;
 
 private:
-  Background(const Background&) = delete;
-  Background& operator=(const Background&) = delete;
+  Background(Background const&) = delete;
+  Background& operator=(Background const&) = delete;
 };
 
 #endif

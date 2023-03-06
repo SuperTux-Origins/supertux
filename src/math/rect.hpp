@@ -52,8 +52,8 @@ public:
     bottom(0)
   {}
 
-  Rect(const Rect& rhs) = default;
-  Rect& operator=(const Rect& rhs) = default;
+  Rect(Rect const& rhs) = default;
+  Rect& operator=(Rect const& rhs) = default;
 
   Rect(int left_, int top_, int right_, int bottom_) :
     left(left_),
@@ -62,23 +62,23 @@ public:
     bottom(bottom_)
   {}
 
-  Rect(int left_, int top_, const Size& size) :
+  Rect(int left_, int top_, Size const& size) :
     left(left_),
     top(top_),
     right(left_ + size.width),
     bottom(top_ + size.height)
   {}
 
-  Rect(const SDL_Rect& rect) :
+  Rect(SDL_Rect const& rect) :
     left(rect.x),
     top(rect.y),
     right(rect.x + rect.w),
     bottom(rect.y + rect.h)
   {}
 
-  explicit Rect(const Rectf& other);
+  explicit Rect(Rectf const& other);
 
-  bool operator==(const Rect& other) const
+  bool operator==(Rect const& other) const
   {
     return (left == other.left &&
             top == other.top &&
@@ -92,7 +92,7 @@ public:
             top <= y && y < bottom);
   }
 
-  bool contains(const Rect& other) const
+  bool contains(Rect const& other) const
   {
     return (left <= other.left && other.right <= right &&
             top <= other.top && other.bottom <= bottom);
@@ -143,7 +143,7 @@ public:
     return {left, top, get_width(), get_height()};
   }
 
-  bool operator<(const Rect& other) const {
+  bool operator<(Rect const& other) const {
 #ifdef __clang__
 #  pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 #endif
@@ -151,7 +151,7 @@ public:
   }
 };
 
-std::ostream& operator<<(std::ostream& out, const Rect& rect);
+std::ostream& operator<<(std::ostream& out, Rect const& rect);
 
 #endif
 

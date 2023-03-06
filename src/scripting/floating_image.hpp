@@ -33,7 +33,7 @@ class FloatingImage final
 #endif
 {
 public:
-  FloatingImage(const std::string& spritefile);
+  FloatingImage(std::string const& spritefile);
 
   /**
    * Sets the layer of the floating image
@@ -81,7 +81,7 @@ public:
    * This is only useful when the image is a sprite
    * @param action Name of the action, as defined in the sprite
    */
-  void set_action(const std::string& action);
+  void set_action(std::string const& action);
   /**
    * Returns the action of the image
    * This is only useful when the image is a sprite
@@ -93,8 +93,8 @@ public:
 
 #ifndef SCRIPTING_API
 private:
-  FloatingImage(const FloatingImage&) = delete;
-  FloatingImage& operator=(const FloatingImage&) = delete;
+  FloatingImage(FloatingImage const&) = delete;
+  FloatingImage& operator=(FloatingImage const&) = delete;
 #endif
 };
 

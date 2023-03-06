@@ -25,9 +25,9 @@
 class Ispy final : public MovingSprite
 {
 public:
-  Ispy(const ReaderMapping& mapping);
+  Ispy(ReaderMapping const& mapping);
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   virtual void update(float dt_sec) override;
   static std::string class_name() { return "ispy"; }
@@ -38,7 +38,7 @@ public:
   virtual void on_flip(float height) override;
 
 private:
-  void set_sprite_action(const std::string& action, int loops = -1);
+  void set_sprite_action(std::string const& action, int loops = -1);
 
 private:
   enum IspyState {
@@ -55,8 +55,8 @@ private:
   Direction m_dir;
 
 private:
-  Ispy(const Ispy&) = delete;
-  Ispy& operator=(const Ispy&) = delete;
+  Ispy(Ispy const&) = delete;
+  Ispy& operator=(Ispy const&) = delete;
 };
 
 #endif

@@ -27,11 +27,11 @@
 class Firefly final : public MovingSprite
 {
 public:
-  Firefly(const ReaderMapping& mapping);
+  Firefly(ReaderMapping const& mapping);
 
   virtual void draw(DrawingContext& context) override;
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   static std::string class_name() { return "firefly"; }
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Checkpoint"); }
@@ -48,8 +48,8 @@ private:
   Vector initial_position; /**< position as in level file. This is where Tux will have to respawn, as the level is reset every time */
 
 private:
-  Firefly(const Firefly&) = delete;
-  Firefly& operator=(const Firefly&) = delete;
+  Firefly(Firefly const&) = delete;
+  Firefly& operator=(Firefly const&) = delete;
 };
 
 #endif

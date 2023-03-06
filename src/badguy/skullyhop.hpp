@@ -23,11 +23,11 @@
 class SkullyHop final : public BadGuy
 {
 public:
-  SkullyHop(const ReaderMapping& reader);
+  SkullyHop(ReaderMapping const& reader);
 
   virtual void initialize() override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   virtual bool collision_squished(GameObject& object) override;
   virtual void active_update(float dt_sec) override;
 
@@ -53,8 +53,8 @@ private:
   SkullyHopState state;
 
 private:
-  SkullyHop(const SkullyHop&) = delete;
-  SkullyHop& operator=(const SkullyHop&) = delete;
+  SkullyHop(SkullyHop const&) = delete;
+  SkullyHop& operator=(SkullyHop const&) = delete;
 };
 
 #endif

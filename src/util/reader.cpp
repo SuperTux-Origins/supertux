@@ -28,7 +28,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 
-int reader_get_layer(const ReaderMapping& reader, int def)
+int reader_get_layer(ReaderMapping const& reader, int def)
 {
   int tmp = 0;
   bool status;
@@ -51,7 +51,7 @@ int reader_get_layer(const ReaderMapping& reader, int def)
 
 namespace {
 
-std::string dirname(const std::string& filename)
+std::string dirname(std::string const& filename)
 {
   std::string::size_type p = filename.find_last_of('/');
   if (p == std::string::npos) {

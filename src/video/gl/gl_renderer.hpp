@@ -37,8 +37,8 @@ protected:
   GLPainter m_painter;
 
 private:
-  GLRenderer(const GLRenderer&) = delete;
-  GLRenderer& operator=(const GLRenderer&) = delete;
+  GLRenderer(GLRenderer const&) = delete;
+  GLRenderer& operator=(GLRenderer const&) = delete;
 };
 
 #endif

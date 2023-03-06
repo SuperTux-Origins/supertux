@@ -49,41 +49,41 @@ public:
   Canvas(DrawingContext& context, obstack& obst);
   ~Canvas();
 
-  void draw_surface(const SurfacePtr& surface, const Vector& position, int layer);
-  void draw_surface(const SurfacePtr& surface, const Vector& position, float angle, const Color& color, const Blend& blend,
+  void draw_surface(SurfacePtr const& surface, Vector const& position, int layer);
+  void draw_surface(SurfacePtr const& surface, Vector const& position, float angle, Color const& color, Blend const& blend,
                     int layer);
-  void draw_surface_part(const SurfacePtr& surface, const Rectf& srcrect, const Rectf& dstrect,
-                         int layer, const PaintStyle& style = PaintStyle());
-  void draw_surface_scaled(const SurfacePtr& surface, const Rectf& dstrect,
-                           int layer, const PaintStyle& style = PaintStyle());
-  void draw_surface_batch(const SurfacePtr& surface,
+  void draw_surface_part(SurfacePtr const& surface, Rectf const& srcrect, Rectf const& dstrect,
+                         int layer, PaintStyle const& style = PaintStyle());
+  void draw_surface_scaled(SurfacePtr const& surface, Rectf const& dstrect,
+                           int layer, PaintStyle const& style = PaintStyle());
+  void draw_surface_batch(SurfacePtr const& surface,
                           std::vector<Rectf> srcrects,
                           std::vector<Rectf> dstrects,
-                          const Color& color,
+                          Color const& color,
                           int layer);
-  void draw_surface_batch(const SurfacePtr& surface,
+  void draw_surface_batch(SurfacePtr const& surface,
                           std::vector<Rectf> srcrects,
                           std::vector<Rectf> dstrects,
                           std::vector<float> angles,
-                          const Color& color,
+                          Color const& color,
                           int layer);
-  void draw_text(const FontPtr& font, const std::string& text,
-                 const Vector& position, FontAlignment alignment, int layer, const Color& color = Color(1.0,1.0,1.0));
+  void draw_text(FontPtr const& font, std::string const& text,
+                 Vector const& position, FontAlignment alignment, int layer, Color const& color = Color(1.0,1.0,1.0));
   /** Draw text to the center of the screen */
-  void draw_center_text(const FontPtr& font, const std::string& text,
-                        const Vector& position, int layer, const Color& color = Color(1.0,1.0,1.0));
-  void draw_gradient(const Color& from, const Color& to, int layer, const GradientDirection& direction,
-                     const Rectf& region, const Blend& blend = Blend());
-  void draw_filled_rect(const Rectf& rect, const Color& color, int layer);
-  void draw_filled_rect(const Rectf& rect, const Color& color, float radius, int layer);
+  void draw_center_text(FontPtr const& font, std::string const& text,
+                        Vector const& position, int layer, Color const& color = Color(1.0,1.0,1.0));
+  void draw_gradient(Color const& from, Color const& to, int layer, GradientDirection const& direction,
+                     Rectf const& region, Blend const& blend = Blend());
+  void draw_filled_rect(Rectf const& rect, Color const& color, int layer);
+  void draw_filled_rect(Rectf const& rect, Color const& color, float radius, int layer);
 
-  void draw_inverse_ellipse(const Vector& pos, const Vector& size, const Color& color, int layer);
+  void draw_inverse_ellipse(Vector const& pos, Vector const& size, Color const& color, int layer);
 
-  void draw_line(const Vector& pos1, const Vector& pos2, const Color& color, int layer);
-  void draw_triangle(const Vector& pos1, const Vector& pos2, const Vector& pos3, const Color& color, int layer);
+  void draw_line(Vector const& pos1, Vector const& pos2, Color const& color, int layer);
+  void draw_triangle(Vector const& pos1, Vector const& pos2, Vector const& pos3, Color const& color, int layer);
 
   /** on next update, set color to lightmap's color at position */
-  void get_pixel(const Vector& position, const std::shared_ptr<Color>& color_out);
+  void get_pixel(Vector const& position, std::shared_ptr<Color> const& color_out);
 
   void clear();
   void render(Renderer& renderer, Filter filter);
@@ -91,7 +91,7 @@ public:
   DrawingContext& get_context() { return m_context; }
 
 private:
-  Vector apply_translate(const Vector& pos) const;
+  Vector apply_translate(Vector const& pos) const;
   float scale() const;
 
 private:
@@ -100,8 +100,8 @@ private:
   std::vector<DrawingRequest*> m_requests;
 
 private:
-  Canvas(const Canvas&) = delete;
-  Canvas& operator=(const Canvas&) = delete;
+  Canvas(Canvas const&) = delete;
+  Canvas& operator=(Canvas const&) = delete;
 };
 
 #endif

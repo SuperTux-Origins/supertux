@@ -36,8 +36,8 @@ private:
 private:
   ErrorHandler() = delete;
   ~ErrorHandler() = delete;
-  ErrorHandler(const ErrorHandler&) = delete;
-  ErrorHandler& operator=(const ErrorHandler&) = delete;
+  ErrorHandler(ErrorHandler const&) = delete;
+  ErrorHandler& operator=(ErrorHandler const&) = delete;
 };
 
 #endif

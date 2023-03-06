@@ -37,12 +37,12 @@ public:
   enum LineType { NORMAL, NORMAL_LEFT, SMALL, HEADING, REFERENCE, IMAGE};
   enum LineAlignment { LEFT, CENTER, RIGHT };
 
-  InfoBoxLine(char format_char, const std::string& text);
+  InfoBoxLine(char format_char, std::string const& text);
 
-  void draw(DrawingContext& context, const Rectf& bbox, int layer, LineAlignment alignment = CENTER);
+  void draw(DrawingContext& context, Rectf const& bbox, int layer, LineAlignment alignment = CENTER);
   float get_height() const;
 
-  static std::vector<std::unique_ptr<InfoBoxLine> > split(const std::string& text, float width);
+  static std::vector<std::unique_ptr<InfoBoxLine> > split(std::string const& text, float width);
 
   static bool is_valid_format_char(char format_char)
   {
@@ -68,8 +68,8 @@ private:
   SurfacePtr image;
 
 private:
-  InfoBoxLine(const InfoBoxLine&) = delete;
-  InfoBoxLine& operator=(const InfoBoxLine&) = delete;
+  InfoBoxLine(InfoBoxLine const&) = delete;
+  InfoBoxLine& operator=(InfoBoxLine const&) = delete;
 };
 
 #endif

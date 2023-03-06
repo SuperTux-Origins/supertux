@@ -30,8 +30,8 @@ private:
   Color* color;
 
 private:
-  ColorMenu(const ColorMenu&) = delete;
-  ColorMenu& operator=(const ColorMenu&) = delete;
+  ColorMenu(ColorMenu const&) = delete;
+  ColorMenu& operator=(ColorMenu const&) = delete;
 };
 
 #endif

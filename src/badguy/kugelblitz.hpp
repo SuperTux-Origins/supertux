@@ -22,12 +22,12 @@
 class Kugelblitz final : public BadGuy
 {
 public:
-  Kugelblitz(const ReaderMapping& reader);
+  Kugelblitz(ReaderMapping const& reader);
 
   virtual void initialize() override;
-  virtual HitResponse collision_badguy(BadGuy& other, const CollisionHit& hit) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
   virtual void active_update(float) override;
   virtual void kill_fall() override;
@@ -44,7 +44,7 @@ public:
 
 private:
   void try_activate();
-  HitResponse hit(const CollisionHit& hit);
+  HitResponse hit(CollisionHit const& hit);
 
 private:
   Vector pos_groundhit;
@@ -56,8 +56,8 @@ private:
   SpritePtr lightsprite;
 
 private:
-  Kugelblitz(const Kugelblitz&) = delete;
-  Kugelblitz& operator=(const Kugelblitz&) = delete;
+  Kugelblitz(Kugelblitz const&) = delete;
+  Kugelblitz& operator=(Kugelblitz const&) = delete;
 };
 
 #endif

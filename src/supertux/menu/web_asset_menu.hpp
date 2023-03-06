@@ -36,8 +36,8 @@ private:
   std::string m_add_path;
 
 private:
-  WebAssetMenu(const WebAssetMenu&) = delete;
-  WebAssetMenu& operator=(const WebAssetMenu&) = delete;
+  WebAssetMenu(WebAssetMenu const&) = delete;
+  WebAssetMenu& operator=(WebAssetMenu const&) = delete;
 };
 
 #endif

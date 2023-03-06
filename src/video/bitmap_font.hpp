@@ -44,7 +44,7 @@ public:
    *  @param fontfile     file in format supertux-font
    *  @param sgadowsize   offset of shadow
    */
-  BitmapFont(GlyphWidth glyph_width, const std::string& fontfile, int shadowsize = 2);
+  BitmapFont(GlyphWidth glyph_width, std::string const& fontfile, int shadowsize = 2);
   ~BitmapFont() override;
 
   int get_shadow_size() const { return shadowsize; }
@@ -54,13 +54,13 @@ public:
    * future.)
    * Supports breaklines.
    */
-  virtual float get_text_width(const std::string& text) const override;
+  virtual float get_text_width(std::string const& text) const override;
 
   /** returns the height of a given text. This function supports breaklines.
    * In case, you are positive that your text doesn't use break lines, you can
    * just use get_height().
    */
-  virtual float get_text_height(const std::string& text) const override;
+  virtual float get_text_height(std::string const& text) const override;
 
   /**
    * returns the height of the font.
@@ -70,24 +70,24 @@ public:
   /**
    * returns the given string, truncated (preferably at whitespace) to be at most "width" pixels wide
    */
-  virtual std::string wrap_to_width(const std::string& text, float width, std::string* overflow) override;
+  virtual std::string wrap_to_width(std::string const& text, float width, std::string* overflow) override;
 
-  virtual void draw_text(Canvas& canvas, const std::string& text,
-                         const Vector& pos, FontAlignment alignment, int layer, const Color& color) override;
+  virtual void draw_text(Canvas& canvas, std::string const& text,
+                         Vector const& pos, FontAlignment alignment, int layer, Color const& color) override;
 
 private:
   friend class DrawingContext;
 
-  void draw_text(Canvas& painter, const std::string& text, const Vector& pos, int layer,
+  void draw_text(Canvas& painter, std::string const& text, Vector const& pos, int layer,
                  Color color = Color(1.0,1.0,1.0)) const;
 
-  void draw_chars(Canvas& painter, bool nonshadow, const std::string& text,
-                  const Vector& position, int layer, Color color) const;
+  void draw_chars(Canvas& painter, bool nonshadow, std::string const& text,
+                  Vector const& position, int layer, Color color) const;
 
-  void loadFontFile(const std::string &filename);
-  void loadFontSurface(const std::string &glyphimage,
-                       const std::string &shadowimage,
-                       const std::vector<std::string> &chars,
+  void loadFontFile(std::string const&filename);
+  void loadFontSurface(std::string const&glyphimage,
+                       std::string const&shadowimage,
+                       std::vector<std::string> const&chars,
                        GlyphWidth glyph_width,
                        int char_width);
 private:

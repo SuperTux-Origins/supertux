@@ -23,14 +23,14 @@
 class Bomb final : public BadGuy
 {
 public:
-  Bomb(const Vector& pos, Direction dir, const std::string& custom_sprite = "images/creatures/mr_bomb/bomb.sprite" );
+  Bomb(Vector const& pos, Direction dir, std::string const& custom_sprite = "images/creatures/mr_bomb/bomb.sprite" );
   virtual bool is_saveable() const override {
     return false;
   }
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
   virtual void active_update(float dt_sec) override;
   virtual void kill_fall() override;
@@ -38,7 +38,7 @@ public:
   void explode();
 
   virtual bool is_portable() const override;
-  virtual void grab(MovingObject& object, const Vector& pos, Direction dir) override;
+  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   virtual void ungrab(MovingObject& object, Direction dir) override;
 
   virtual void stop_looping_sounds() override;
@@ -48,8 +48,8 @@ private:
   std::unique_ptr<SoundSource> ticking;
 
 private:
-  Bomb(const Bomb&) = delete;
-  Bomb& operator=(const Bomb&) = delete;
+  Bomb(Bomb const&) = delete;
+  Bomb& operator=(Bomb const&) = delete;
 };
 
 #endif

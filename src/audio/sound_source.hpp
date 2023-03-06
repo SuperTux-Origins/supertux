@@ -30,7 +30,7 @@ public:
   void stop();
   bool playing() const;
   void set_pitch(float pitch);
-  void set_position(const Vector& pos);
+  void set_position(Vector const& pos);
   void set_looping(bool looping);
   void set_gain(float gain);
   void set_reference_distance(float distance);
@@ -39,8 +39,8 @@ private:
   wstsound::SoundSourcePtr m_source;
 
 private:
-  SoundSource(const SoundSource&) = delete;
-  SoundSource& operator=(const SoundSource&) = delete;
+  SoundSource(SoundSource const&) = delete;
+  SoundSource& operator=(SoundSource const&) = delete;
 };
 
 #endif

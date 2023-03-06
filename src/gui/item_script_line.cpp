@@ -35,7 +35,7 @@ ItemScriptLine::ItemScriptLine(std::string* input_, int id_) :
 }
 
 void
-ItemScriptLine::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active)
+ItemScriptLine::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active)
 {
   const int index = active ? static_cast<int>(input->size()) - m_cursor_left_offset : -1;
   const std::string input_part_1 = active ? input->substr(0, index) : *input;
@@ -66,7 +66,7 @@ ItemScriptLine::get_width() const
 }
 
 void
-ItemScriptLine::event(const SDL_Event& ev)
+ItemScriptLine::event(SDL_Event const& ev)
 {
   if (ev.type == SDL_KEYDOWN)
   {
@@ -83,10 +83,10 @@ ItemScriptLine::event(const SDL_Event& ev)
 }
 
 void
-ItemScriptLine::process_action(const MenuAction& action)
+ItemScriptLine::process_action(MenuAction const& action)
 {
   ItemTextField::process_action(action);
-  const Controller& controller = InputManager::current()->get_controller();
+  Controller const& controller = InputManager::current()->get_controller();
   if (action == MenuAction::HIT && controller.pressed(Control::MENU_SELECT))
   {
     new_line();

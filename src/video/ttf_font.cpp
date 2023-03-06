@@ -28,7 +28,7 @@
 #include "video/surface.hpp"
 #include "video/ttf_surface_manager.hpp"
 
-TTFFont::TTFFont(const std::string& filename, int font_size, float line_spacing, int shadow_size, int border) :
+TTFFont::TTFFont(std::string const& filename, int font_size, float line_spacing, int shadow_size, int border) :
   m_font(),
   m_filename(filename),
   m_font_size(font_size),
@@ -51,7 +51,7 @@ TTFFont::~TTFFont()
 }
 
 float
-TTFFont::get_text_width(const std::string& text) const
+TTFFont::get_text_width(std::string const& text) const
 {
   if (text.empty())
     return 0.0f;
@@ -61,7 +61,7 @@ TTFFont::get_text_width(const std::string& text) const
   LineIterator iter(text);
   while (iter.next())
   {
-    const std::string& line = iter.get();
+    std::string const& line = iter.get();
 
     // Since get_cached_surface_width() takes a surface from the cache
     // instead of generating it from scratch,
@@ -85,7 +85,7 @@ TTFFont::get_text_width(const std::string& text) const
 }
 
 float
-TTFFont::get_text_height(const std::string& text) const
+TTFFont::get_text_height(std::string const& text) const
 {
   if (text.empty())
     return 0.0f;
@@ -99,8 +99,8 @@ TTFFont::get_text_height(const std::string& text) const
 }
 
 void
-TTFFont::draw_text(Canvas& canvas, const std::string& text,
-                   const Vector& pos, FontAlignment alignment, int layer, const Color& color)
+TTFFont::draw_text(Canvas& canvas, std::string const& text,
+                   Vector const& pos, FontAlignment alignment, int layer, Color const& color)
 
 {
   float last_y = pos.y - (static_cast<float>(TTF_FontHeight(m_font)) - get_height()) / 2.0f;
@@ -108,7 +108,7 @@ TTFFont::draw_text(Canvas& canvas, const std::string& text,
   LineIterator iter(text);
   while (iter.next())
   {
-    const std::string& line = iter.get();
+    std::string const& line = iter.get();
 
     if (!line.empty())
     {
@@ -134,7 +134,7 @@ TTFFont::draw_text(Canvas& canvas, const std::string& text,
 }
 
 std::string
-TTFFont::wrap_to_width(const std::string& text, float width, std::string* overflow)
+TTFFont::wrap_to_width(std::string const& text, float width, std::string* overflow)
 {
   std::string s = text;
 

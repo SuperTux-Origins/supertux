@@ -33,7 +33,7 @@ const float VY_MIN = -900; //negative, upwards
 const float VY_INITIAL = -500;
 }
 
-Trampoline::Trampoline(const ReaderMapping& mapping) :
+Trampoline::Trampoline(ReaderMapping const& mapping) :
   Rock(mapping, "images/objects/trampoline/trampoline.sprite"),
   portable(true)
 {
@@ -51,7 +51,7 @@ Trampoline::Trampoline(const ReaderMapping& mapping) :
   }
 }
 
-Trampoline::Trampoline(const Vector& pos, bool port) :
+Trampoline::Trampoline(Vector const& pos, bool port) :
   Rock(pos, "images/objects/trampoline/trampoline.sprite"),
   portable(port)
 {
@@ -74,7 +74,7 @@ Trampoline::update(float dt_sec)
 }
 
 HitResponse
-Trampoline::collision(GameObject& other, const CollisionHit& hit)
+Trampoline::collision(GameObject& other, CollisionHit const& hit)
 {
   auto heavy_coin = dynamic_cast<HeavyCoin*> (&other);
   if (heavy_coin) {
@@ -134,7 +134,7 @@ Trampoline::collision(GameObject& other, const CollisionHit& hit)
 }
 
 void
-Trampoline::grab(MovingObject& object, const Vector& pos, Direction dir) {
+Trampoline::grab(MovingObject& object, Vector const& pos, Direction dir) {
   m_sprite->set_animation_loops(0);
   Rock::grab(object, pos, dir);
 }

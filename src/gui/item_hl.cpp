@@ -26,7 +26,7 @@ ItemHorizontalLine::ItemHorizontalLine() :
 }
 
 void
-ItemHorizontalLine::draw(DrawingContext& context, const Vector& pos, int menu_width, bool active) {
+ItemHorizontalLine::draw(DrawingContext& context, Vector const& pos, int menu_width, bool active) {
   // TODO
   /* Draw a horizontal line with a little 3d effect */
   context.color().draw_filled_rect(Rectf(Vector(pos.x, pos.y - 6.0f),

@@ -57,7 +57,7 @@ public:
     dir(SOUTHWEST)
   {
   }
-  AATriangle(const Rectf& newbbox, int newdir) :
+  AATriangle(Rectf const& newbbox, int newdir) :
     bbox(newbbox),
     dir(newdir)
   {

@@ -52,13 +52,13 @@
  *                              num));
  */
 
-static inline std::string _(const std::string& message)
+static inline std::string _(std::string const& message)
 {
   return message;
 }
 
-static inline std::string __(const std::string& message,
-                             const std::string& message_plural, int num)
+static inline std::string __(std::string const& message,
+                             std::string const& message_plural, int num)
 {
   if (num == 1) {
     return message;

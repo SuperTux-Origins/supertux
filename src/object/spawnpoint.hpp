@@ -27,8 +27,8 @@ class DrawingContext;
 class SpawnPointMarker final : public MovingObject
 {
 public:
-  SpawnPointMarker(const std::string& name, const Vector& pos);
-  SpawnPointMarker(const ReaderMapping& mapping);
+  SpawnPointMarker(std::string const& name, Vector const& pos);
+  SpawnPointMarker(ReaderMapping const& mapping);
 
   virtual void update(float dt_sec) override {
     // No updates needed
@@ -36,11 +36,11 @@ public:
 
   virtual void draw(DrawingContext& context) override;
 
-  virtual void collision_solid(const CollisionHit& hit) override {
+  virtual void collision_solid(CollisionHit const& hit) override {
     // This function wouldn't be called anyway.
   }
 
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override { return FORCE_MOVE; }
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override { return FORCE_MOVE; }
 
   static std::string class_name() { return "spawnpoint"; }
   virtual std::string get_class_name() const override { return class_name(); }
@@ -53,8 +53,8 @@ private:
   SurfacePtr m_surface;
 
 private:
-  SpawnPointMarker(const SpawnPointMarker&) = delete;
-  SpawnPointMarker& operator=(const SpawnPointMarker&) = delete;
+  SpawnPointMarker(SpawnPointMarker const&) = delete;
+  SpawnPointMarker& operator=(SpawnPointMarker const&) = delete;
 };
 
 #endif

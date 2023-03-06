@@ -19,7 +19,7 @@
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 
-SSpiky::SSpiky(const ReaderMapping& reader) :
+SSpiky::SSpiky(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/spiky/sleepingspiky.sprite", "left", "right"), state(SSPIKY_SLEEPING)
 {
   walk_speed = 80;
@@ -35,7 +35,7 @@ SSpiky::initialize()
 }
 
 void
-SSpiky::collision_solid(const CollisionHit& hit)
+SSpiky::collision_solid(CollisionHit const& hit)
 {
   if (state != SSPIKY_WALKING) {
     BadGuy::collision_solid(hit);
@@ -45,7 +45,7 @@ SSpiky::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-SSpiky::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+SSpiky::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   if (state != SSPIKY_WALKING) {
     return BadGuy::collision_badguy(badguy, hit);

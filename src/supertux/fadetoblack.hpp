@@ -44,8 +44,8 @@ private:
   float m_accum_time;
 
 private:
-  FadeToBlack(const FadeToBlack&) = delete;
-  FadeToBlack& operator=(const FadeToBlack&) = delete;
+  FadeToBlack(FadeToBlack const&) = delete;
+  FadeToBlack& operator=(FadeToBlack const&) = delete;
 };
 
 #endif

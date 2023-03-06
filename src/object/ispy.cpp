@@ -24,7 +24,7 @@
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
 
-Ispy::Ispy(const ReaderMapping& reader) :
+Ispy::Ispy(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/ispy/ispy.sprite", LAYER_TILES + 5, COLGROUP_DISABLED),
   m_state(ISPYSTATE_IDLE),
   m_script(),
@@ -45,7 +45,7 @@ Ispy::Ispy(const ReaderMapping& reader) :
 }
 
 HitResponse
-Ispy::collision(GameObject& , const CollisionHit& )
+Ispy::collision(GameObject& , CollisionHit const& )
 {
   return ABORT_MOVE;
 }
@@ -103,7 +103,7 @@ Ispy::update(float dt_sec)
 }
 
 void
-Ispy::set_sprite_action(const std::string& action, int loops)
+Ispy::set_sprite_action(std::string const& action, int loops)
 {
   switch (m_dir)
   {

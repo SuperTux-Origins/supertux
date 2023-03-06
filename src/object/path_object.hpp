@@ -34,8 +34,8 @@ public:
 
   /** For compatibilty reasons this needs to get the GameObjects
       main mapping, not the (path ...) mapping */
-  void init_path(const ReaderMapping& mapping, bool running_default);
-  void init_path_pos(const Vector& pos, bool running = false);
+  void init_path(ReaderMapping const& mapping, bool running_default);
+  void init_path_pos(Vector const& pos, bool running = false);
 
   PathGameObject* get_path_gameobject() const;
   Path* get_path() const;
@@ -53,8 +53,8 @@ private:
   std::unique_ptr<PathWalker> m_walker;
 
 private:
-  PathObject(const PathObject&) = delete;
-  PathObject& operator=(const PathObject&) = delete;
+  PathObject(PathObject const&) = delete;
+  PathObject& operator=(PathObject const&) = delete;
 };
 
 #endif

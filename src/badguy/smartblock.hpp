@@ -22,7 +22,7 @@
 class SmartBlock final : public MrIceBlock
 {
 public:
-  SmartBlock(const ReaderMapping& reader);
+  SmartBlock(ReaderMapping const& reader);
 
   virtual std::string get_water_sprite() const override { return "images/objects/water_drop/pink_drop.sprite"; }
   static std::string class_name() { return "smartblock"; }
@@ -31,8 +31,8 @@ public:
   virtual std::string get_display_name() const override { return display_name(); }
 
 private:
-  SmartBlock(const SmartBlock&) = delete;
-  SmartBlock& operator=(const SmartBlock&) = delete;
+  SmartBlock(SmartBlock const&) = delete;
+  SmartBlock& operator=(SmartBlock const&) = delete;
 };
 
 #endif

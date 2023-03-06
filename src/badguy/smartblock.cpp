@@ -19,7 +19,7 @@
 #include "sprite/sprite_manager.hpp"
 #include "util/reader_mapping.hpp"
 
-SmartBlock::SmartBlock(const ReaderMapping& reader) :
+SmartBlock::SmartBlock(ReaderMapping const& reader) :
   MrIceBlock(reader)
 {
   max_drop_height = 16;

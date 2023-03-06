@@ -30,7 +30,7 @@
 const std::vector<std::string> Dispenser::s_sprites = { "cannon.sprite", "dropper.sprite", "invisible.sprite" };
 
 Dispenser::DispenserType
-Dispenser::DispenserType_from_string(const std::string& type_string)
+Dispenser::DispenserType_from_string(std::string const& type_string)
 {
   if (type_string == "dropper") {
     return DispenserType::DROPPER;
@@ -78,7 +78,7 @@ Dispenser::Cannon_Direction_to_string(Direction direction)
   }
 }
 
-Dispenser::Dispenser(const ReaderMapping& reader) :
+Dispenser::Dispenser(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/dispenser/dropper.sprite"),
   ExposedObject<Dispenser, scripting::Dispenser>(this),
   m_cycle(),
@@ -160,7 +160,7 @@ Dispenser::deactivate()
 }
 
 HitResponse
-Dispenser::collision(GameObject& other, const CollisionHit& hit)
+Dispenser::collision(GameObject& other, CollisionHit const& hit)
 {
   auto bullet = dynamic_cast<Bullet*> (&other);
   if (bullet)
@@ -303,7 +303,7 @@ Dispenser::launch_badguy()
       }
 
       Sector::get().add_object(std::move(game_object));
-    } catch(const std::exception& e) {
+    } catch(std::exception const& e) {
       log_warning << "Error dispensing badguy: " << e.what() << std::endl;
       return;
     }

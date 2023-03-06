@@ -30,7 +30,7 @@ namespace {
   const float NOKICK_TIME = 0.1f;
 }
 
-MrIceBlock::MrIceBlock(const ReaderMapping& reader) :
+MrIceBlock::MrIceBlock(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/mr_iceblock/mr_iceblock.sprite", "left", "right"),
   ice_state(ICESTATE_NORMAL),
   nokick_timer(),
@@ -80,7 +80,7 @@ MrIceBlock::can_break() const {
 }
 
 void
-MrIceBlock::collision_solid(const CollisionHit& hit)
+MrIceBlock::collision_solid(CollisionHit const& hit)
 {
   update_on_ground_flag(hit);
 
@@ -114,7 +114,7 @@ MrIceBlock::collision_solid(const CollisionHit& hit)
 }
 
 HitResponse
-MrIceBlock::collision(GameObject& object, const CollisionHit& hit)
+MrIceBlock::collision(GameObject& object, CollisionHit const& hit)
 {
   if (ice_state == ICESTATE_GRABBED)
     return FORCE_MOVE;
@@ -123,7 +123,7 @@ MrIceBlock::collision(GameObject& object, const CollisionHit& hit)
 }
 
 HitResponse
-MrIceBlock::collision_player(Player& player, const CollisionHit& hit)
+MrIceBlock::collision_player(Player& player, CollisionHit const& hit)
 {
   // handle kicks from left or right side
   if ((ice_state == ICESTATE_WAKING || ice_state == ICESTATE_FLAT) && get_state() == STATE_ACTIVE) {
@@ -145,7 +145,7 @@ MrIceBlock::collision_player(Player& player, const CollisionHit& hit)
 }
 
 HitResponse
-MrIceBlock::collision_badguy(BadGuy& badguy, const CollisionHit& hit)
+MrIceBlock::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
 {
   switch (ice_state) {
   case ICESTATE_NORMAL:
@@ -260,7 +260,7 @@ MrIceBlock::set_state(IceState state_)
 }
 
 void
-MrIceBlock::grab(MovingObject& object, const Vector& pos, Direction dir_)
+MrIceBlock::grab(MovingObject& object, Vector const& pos, Direction dir_)
 {
   Portable::grab(object, pos, dir_);
   m_col.set_movement(pos - get_pos());

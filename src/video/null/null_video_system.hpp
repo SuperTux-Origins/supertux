@@ -37,9 +37,9 @@ public:
   virtual Renderer& get_renderer() const override;
   virtual Renderer& get_lightmap() const override;
 
-  virtual TexturePtr new_texture(const SDL_Surface& image, const Sampler& sampler)  override;
+  virtual TexturePtr new_texture(SDL_Surface const& image, Sampler const& sampler)  override;
 
-  virtual const Viewport& get_viewport() const override;
+  virtual Viewport const& get_viewport() const override;
   virtual void apply_config() override;
   virtual void flip() override;
   virtual void on_resize(int w, int h) override;
@@ -48,8 +48,8 @@ public:
   virtual void set_vsync(int mode) override;
   virtual int get_vsync() const override;
   virtual void set_gamma(float gamma) override;
-  virtual void set_title(const std::string& title) override;
-  virtual void set_icon(const SDL_Surface& icon) override;
+  virtual void set_title(std::string const& title) override;
+  virtual void set_icon(SDL_Surface const& icon) override;
   virtual SDLSurfacePtr make_screenshot() override;
 
 private:
@@ -61,8 +61,8 @@ private:
   std::unique_ptr<TextureManager> m_texture_manager;
 
 private:
-  NullVideoSystem(const NullVideoSystem&) = delete;
-  NullVideoSystem& operator=(const NullVideoSystem&) = delete;
+  NullVideoSystem(NullVideoSystem const&) = delete;
+  NullVideoSystem& operator=(NullVideoSystem const&) = delete;
 };
 
 #endif

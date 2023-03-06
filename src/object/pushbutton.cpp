@@ -29,7 +29,7 @@ const std::string BUTTON_SOUND = "sounds/switch.ogg";
 //14 -> 8
 }
 
-PushButton::PushButton(const ReaderMapping& mapping) :
+PushButton::PushButton(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/pushbutton/pushbutton.sprite", LAYER_BACKGROUNDTILES+1, COLGROUP_MOVING),
   script(),
   state(OFF),
@@ -55,7 +55,7 @@ PushButton::update(float /*dt_sec*/)
 }
 
 HitResponse
-PushButton::collision(GameObject& other, const CollisionHit& hit)
+PushButton::collision(GameObject& other, CollisionHit const& hit)
 {
   auto player = dynamic_cast<Player*>(&other);
   auto rock = dynamic_cast<Rock*>(&other);

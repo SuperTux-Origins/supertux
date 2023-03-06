@@ -24,7 +24,7 @@
 class FloatingImage final : public GameObject
 {
 public:
-  FloatingImage(const std::string& sprite);
+  FloatingImage(std::string const& sprite);
   ~FloatingImage() override;
   virtual bool is_saveable() const override {
     return false;
@@ -38,10 +38,10 @@ public:
     return layer;
   }
 
-  void set_pos(const Vector& pos_) {
+  void set_pos(Vector const& pos_) {
     pos = pos_;
   }
-  const Vector& get_pos() const {
+  Vector const& get_pos() const {
     return pos;
   }
 
@@ -59,7 +59,7 @@ public:
     return visible;
   }
 
-  void set_action(const std::string& action);
+  void set_action(std::string const& action);
   std::string get_action();
 
   void fade_in(float fadetime);

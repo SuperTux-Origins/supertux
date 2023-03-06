@@ -21,7 +21,7 @@
 namespace scripting {
 
 void
-ScriptedObject::set_action(const std::string& animation)
+ScriptedObject::set_action(std::string const& animation)
 {
   SCRIPT_GUARD_VOID;
   object.set_action(animation);

@@ -30,7 +30,7 @@
 #include "video/gl/gl_video_system.hpp"
 #include "video/glutil.hpp"
 
-GLTextureRenderer::GLTextureRenderer(GLVideoSystem& video_system, const Size& size, int downscale) :
+GLTextureRenderer::GLTextureRenderer(GLVideoSystem& video_system, Size const& size, int downscale) :
   GLRenderer(video_system),
   m_size(size),
   m_downscale(downscale),

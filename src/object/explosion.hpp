@@ -27,15 +27,15 @@ class Explosion final : public MovingSprite
 {
 public:
   /** Create new Explosion centered(!) at @c pos */
-  Explosion(const Vector& pos, float push_strength, int num_particles=100);
-  Explosion(const ReaderMapping& reader);
+  Explosion(Vector const& pos, float push_strength, int num_particles=100);
+  Explosion(ReaderMapping const& reader);
 
   static std::string display_name() { return _("Explosion"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual bool is_saveable() const override { return false; }
 
   bool hurts() const { return hurt; }
@@ -59,8 +59,8 @@ private:
   SpritePtr lightsprite;
 
 private:
-  Explosion(const Explosion&) = delete;
-  Explosion& operator=(const Explosion&) = delete;
+  Explosion(Explosion const&) = delete;
+  Explosion& operator=(Explosion const&) = delete;
 };
 
 #endif

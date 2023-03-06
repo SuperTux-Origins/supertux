@@ -25,7 +25,7 @@
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
-Iceflame::Iceflame(const ReaderMapping& reader) :
+Iceflame::Iceflame(ReaderMapping const& reader) :
   Flame(reader, "images/creatures/flame/iceflame.sprite")
 {
   m_lightsprite->set_color(Color(0.00f, 0.13f, 0.18f));

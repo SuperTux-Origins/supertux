@@ -24,7 +24,7 @@ namespace{
   static const float BOARDING_SPEED = 200;
 }
 
-CaptainSnowball::CaptainSnowball(const ReaderMapping& reader)
+CaptainSnowball::CaptainSnowball(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/snowball/cpt-snowball.sprite", "left", "right")
 {
   walk_speed = BOARDING_SPEED;
@@ -69,7 +69,7 @@ CaptainSnowball::active_update(float dt_sec)
 }
 
 void
-CaptainSnowball::collision_solid(const CollisionHit& hit)
+CaptainSnowball::collision_solid(CollisionHit const& hit)
 {
   if (is_active() && (walk_speed == BOARDING_SPEED)) {
     walk_speed = CAPTAIN_WALK_SPEED;

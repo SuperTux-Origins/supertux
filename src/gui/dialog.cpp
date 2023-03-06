@@ -47,7 +47,7 @@ Dialog::~Dialog()
 }
 
 void
-Dialog::set_text(const std::string& text)
+Dialog::set_text(std::string const& text)
 {
   m_text = text;
 
@@ -66,27 +66,27 @@ Dialog::clear_buttons()
 }
 
 void
-Dialog::add_default_button(const std::string& text, const std::function<void ()>& callback)
+Dialog::add_default_button(std::string const& text, const std::function<void ()>& callback)
 {
   add_button(text, callback);
   m_selected_button = static_cast<int>(m_buttons.size()) - 1;
 }
 
 void
-Dialog::add_cancel_button(const std::string& text, const std::function<void ()>& callback)
+Dialog::add_cancel_button(std::string const& text, const std::function<void ()>& callback)
 {
   add_button(text, callback);
   m_cancel_button = static_cast<int>(m_buttons.size() - 1);
 }
 
 void
-Dialog::add_button(const std::string& text, const std::function<void ()>& callback)
+Dialog::add_button(std::string const& text, const std::function<void ()>& callback)
 {
   m_buttons.push_back({text, callback});
 }
 
 int
-Dialog::get_button_at(const Vector& mouse_pos) const
+Dialog::get_button_at(Vector const& mouse_pos) const
 {
   Rectf bg_rect(Vector(static_cast<float>(SCREEN_WIDTH) / 2.0f - m_text_size.width / 2.0f,
                        static_cast<float>(SCREEN_HEIGHT) / 2.0f - m_text_size.height / 2.0f),
@@ -110,7 +110,7 @@ Dialog::get_button_at(const Vector& mouse_pos) const
 }
 
 void
-Dialog::event(const SDL_Event& ev)
+Dialog::event(SDL_Event const& ev)
 {
   if (m_passive) // Passive dialogs don't accept events
     return;
@@ -153,7 +153,7 @@ Dialog::event(const SDL_Event& ev)
 }
 
 void
-Dialog::process_input(const Controller& controller)
+Dialog::process_input(Controller const& controller)
 {
   if (m_passive) // Passive dialogs don't accept events
     return;

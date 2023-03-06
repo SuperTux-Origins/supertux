@@ -18,7 +18,7 @@
 #include "video/font.hpp"
 
 std::string
-Font::wrap_to_chars(const std::string& s, int line_length, std::string* overflow)
+Font::wrap_to_chars(std::string const& s, int line_length, std::string* overflow)
 {
   // if text is already smaller, return full text
   if (static_cast<int>(s.length()) <= line_length) {

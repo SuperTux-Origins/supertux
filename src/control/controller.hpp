@@ -52,7 +52,7 @@ enum class Control {
 std::ostream& operator<<(std::ostream& os, Control control);
 
 std::string Control_to_string(Control control);
-std::optional<Control> Control_from_string(const std::string& text);
+std::optional<Control> Control_from_string(std::string const& text);
 
 class Controller
 {
@@ -97,8 +97,8 @@ protected:
   bool m_jump_key_pressed;
 
 private:
-  Controller(const Controller&) = delete;
-  Controller& operator=(const Controller&) = delete;
+  Controller(Controller const&) = delete;
+  Controller& operator=(Controller const&) = delete;
 };
 
 #endif

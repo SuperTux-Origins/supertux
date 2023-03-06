@@ -60,21 +60,21 @@ private:
     Player& m_player;
 
   private:
-    GrabListener(const GrabListener&) = delete;
-    GrabListener& operator=(const GrabListener&) = delete;
+    GrabListener(GrabListener const&) = delete;
+    GrabListener& operator=(GrabListener const&) = delete;
   };
 
 public:
   static Color get_player_color(int id);
 
 public:
-  Player(PlayerStatus& player_status, const std::string& name, int player_id);
+  Player(PlayerStatus& player_status, std::string const& name, int player_id);
   ~Player() override;
 
   virtual void update(float dt_sec) override;
   virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision(GameObject& other, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   virtual void collision_tile(uint32_t tile_attributes) override;
   virtual void on_flip(float height) override;
   virtual bool is_saveable() const override { return false; }
@@ -86,7 +86,7 @@ public:
 
   virtual int get_layer() const override { return LAYER_OBJECTS + 1; }
 
-  void set_controller(const Controller* controller);
+  void set_controller(Controller const* controller);
   /** Level solved. Don't kill Tux any more. */
   void set_winning();
   bool is_winning() const { return m_winning; }
@@ -95,10 +95,10 @@ public:
   void set_speedlimit(float newlimit);
   float get_speedlimit() const;
 
-  const Controller& get_controller() const { return *m_controller; }
+  Controller const& get_controller() const { return *m_controller; }
 
   void use_scripting_controller(bool use_or_release);
-  void do_scripting_controller(const std::string& control, bool pressed);
+  void do_scripting_controller(std::string const& control, bool pressed);
 
   void make_invincible();
 
@@ -109,10 +109,10 @@ public:
   Direction peeking_direction_y() const { return m_peekingY; }
 
   void kill(bool completely);
-  void move(const Vector& vector);
+  void move(Vector const& vector);
 
-  bool add_bonus(const std::string& bonus);
-  bool set_bonus(const std::string& bonus);
+  bool add_bonus(std::string const& bonus);
+  bool set_bonus(std::string const& bonus);
   void add_coins(int count);
   int get_coins() const;
 
@@ -151,10 +151,10 @@ public:
   void do_jump(float yspeed);
 
   /** Adds velocity to the player (be careful when using this) */
-  void add_velocity(const Vector& velocity);
+  void add_velocity(Vector const& velocity);
 
   /** Adds velocity to the player until given end speed is reached */
-  void add_velocity(const Vector& velocity, const Vector& end_speed);
+  void add_velocity(Vector const& velocity, Vector const& end_speed);
 
   /** Returns the current velocity of the player */
   Vector get_velocity() const;
@@ -182,7 +182,7 @@ public:
 
   /** Checks whether the player has grabbed a certain object
       @param name Name of the object to check */
-  bool has_grabbed(const std::string& object_name) const;
+  bool has_grabbed(std::string const& object_name) const;
 
   /** Switches ghost mode on/off.
       Lets Tux float around and through solid objects. */
@@ -202,12 +202,12 @@ public:
   /** Orders the current GameSession to start a sequence
       @param sequence_name Name of the sequence to start
       @param data Custom additional sequence data */
-  void trigger_sequence(const std::string& sequence_name, const SequenceData* data = nullptr);
+  void trigger_sequence(std::string const& sequence_name, SequenceData const* data = nullptr);
 
   /** Orders the current GameSession to start a sequence
       @param sequence Sequence to start
       @param data Custom additional sequence data */
-  void trigger_sequence(Sequence seq, const SequenceData* data = nullptr);
+  void trigger_sequence(Sequence seq, SequenceData const* data = nullptr);
 
   /** Requests that the player start climbing the given Climbable */
   void start_climbing(Climbable& climbable);
@@ -251,7 +251,7 @@ private:
 
   void swim(float pointx, float pointy, bool boost);
 
-  BonusType string_to_bonus(const std::string& bonus) const;
+  BonusType string_to_bonus(std::string const& bonus) const;
 
   /** slows Tux down a little, based on where he's standing */
   void apply_friction();
@@ -276,7 +276,7 @@ private:
   std::unique_ptr<UID> m_target; /**< (Multiplayer) If not null, then the player does not exist in game and is offering the player to spawn at that player's position */
   bool m_deactivated;
 
-  const Controller* m_controller;
+  Controller const* m_controller;
   std::unique_ptr<CodeController> m_scripting_controller; /**< This controller is used when the Player is controlled via scripting */
   PlayerStatus& m_player_status;
   bool m_duck;
@@ -298,7 +298,7 @@ private:
   float m_boost;
   float m_speedlimit;
   bool m_velocity_override;
-  const Controller* m_scripting_controller_old; /**< Saves the old controller while the scripting_controller is used */
+  Controller const* m_scripting_controller_old; /**< Saves the old controller while the scripting_controller is used */
   bool m_jump_early_apex;
   bool m_on_ice;
   bool m_ice_this_frame;
@@ -380,8 +380,8 @@ private:
   int m_ending_direction;
 
 private:
-  Player(const Player&) = delete;
-  Player& operator=(const Player&) = delete;
+  Player(Player const&) = delete;
+  Player& operator=(Player const&) = delete;
 };
 
 #endif

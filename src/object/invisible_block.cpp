@@ -22,7 +22,7 @@
 #include "sprite/sprite_manager.hpp"
 #include "supertux/constants.hpp"
 
-InvisibleBlock::InvisibleBlock(const Vector& pos) :
+InvisibleBlock::InvisibleBlock(Vector const& pos) :
    Block(SpriteManager::current()->create("images/objects/bonus_block/invisibleblock.sprite")),
    visible(false)
 {
@@ -31,7 +31,7 @@ InvisibleBlock::InvisibleBlock(const Vector& pos) :
   m_sprite->set_action("default-editor");
 }
 
-InvisibleBlock::InvisibleBlock(const ReaderMapping& mapping) :
+InvisibleBlock::InvisibleBlock(ReaderMapping const& mapping) :
    Block(mapping, "images/objects/bonus_block/invisibleblock.sprite"),
    visible(false)
 {
@@ -46,7 +46,7 @@ InvisibleBlock::draw(DrawingContext& context)
 }
 
 bool
-InvisibleBlock::collides(GameObject& other, const CollisionHit& ) const
+InvisibleBlock::collides(GameObject& other, CollisionHit const& ) const
 {
   if (visible)
     return true;
@@ -63,7 +63,7 @@ InvisibleBlock::collides(GameObject& other, const CollisionHit& ) const
 }
 
 HitResponse
-InvisibleBlock::collision(GameObject& other, const CollisionHit& hit_)
+InvisibleBlock::collision(GameObject& other, CollisionHit const& hit_)
 {
   return Block::collision(other, hit_);
 }

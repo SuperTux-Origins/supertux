@@ -121,8 +121,8 @@ private:
 
 private:
   // non-copyable footer
-  Foo(const Foo&) = delete;
-  Foo& operator=(const Foo&) = delete;
+  Foo(Foo const&) = delete;
+  Foo& operator=(Foo const&) = delete;
 };
 ```
 
@@ -137,8 +137,9 @@ Only use `std::smart_ptr<>` when sharing of data is required, prefer
 Pass and return values as value, `&` or `const&`, only use `*` when
 the value is expected to be `nullptr`.
 
-Do not pass values as `const std::unique_ptr<T>&` or `const
-std::shared_ptr<T>&`, dereference the pointer and pass as `const&`.
+Do not pass values as `std::unique_ptr<T> const&` or
+`std::shared_ptr<T> const&`, dereference the pointer and pass as
+`const&`.
 
 To check for nullptr, use an `if` statements with initializer when possible:
 
@@ -158,7 +159,7 @@ Foo::create()`)
 
 Capture pointers as `auto*`, not just `auto`.
 
-Use `const auto&` for loops to avoid copies.
+Use `auto const&` for loops to avoid copies.
 
 ## Namespaces
 

@@ -27,7 +27,7 @@
 #include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
 
-Door::Door(const ReaderMapping& mapping) :
+Door::Door(ReaderMapping const& mapping) :
   TriggerBase(mapping),
   state(CLOSED),
   target_sector(),
@@ -53,7 +53,7 @@ Door::Door(const ReaderMapping& mapping) :
   SoundManager::current()->preload("sounds/door.wav");
 }
 
-Door::Door(int x, int y, const std::string& sector, const std::string& spawnpoint) :
+Door::Door(int x, int y, std::string const& sector, std::string const& spawnpoint) :
   TriggerBase(),
   state(CLOSED),
   target_sector(sector),
@@ -136,7 +136,7 @@ Door::event(Player& , EventType type)
 }
 
 HitResponse
-Door::collision(GameObject& other, const CollisionHit& hit_)
+Door::collision(GameObject& other, CollisionHit const& hit_)
 {
   switch (state) {
     case CLOSED:

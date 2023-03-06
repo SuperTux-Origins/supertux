@@ -40,8 +40,8 @@ public:
   GameControllerManager(InputManager* parent);
   ~GameControllerManager();
 
-  void process_button_event(const SDL_ControllerButtonEvent& ev);
-  void process_axis_event(const SDL_ControllerAxisEvent& ev);
+  void process_button_event(SDL_ControllerButtonEvent const& ev);
+  void process_axis_event(SDL_ControllerAxisEvent const& ev);
 
   void on_controller_added(int joystick_index);
   void on_controller_removed(int instance_id);
@@ -64,8 +64,8 @@ private:
   std::array<bool, static_cast<int>(Control::CONTROLCOUNT)> m_button_state;
 
 private:
-  GameControllerManager(const GameControllerManager&) = delete;
-  GameControllerManager& operator=(const GameControllerManager&) = delete;
+  GameControllerManager(GameControllerManager const&) = delete;
+  GameControllerManager& operator=(GameControllerManager const&) = delete;
 };
 
 #endif

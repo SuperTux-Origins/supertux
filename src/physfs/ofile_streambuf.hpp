@@ -24,7 +24,7 @@ struct PHYSFS_File;
 class OFileStreambuf final : public std::streambuf
 {
 public:
-  OFileStreambuf(const std::string& filename);
+  OFileStreambuf(std::string const& filename);
   ~OFileStreambuf() override;
 
 protected:
@@ -36,8 +36,8 @@ private:
   char buf[1024];
 
 private:
-  OFileStreambuf(const OFileStreambuf&) = delete;
-  OFileStreambuf& operator=(const OFileStreambuf&) = delete;
+  OFileStreambuf(OFileStreambuf const&) = delete;
+  OFileStreambuf& operator=(OFileStreambuf const&) = delete;
 };
 
 #endif

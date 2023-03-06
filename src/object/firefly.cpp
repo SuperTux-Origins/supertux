@@ -33,7 +33,7 @@
 static const Color TORCH_LIGHT_COLOR = Color(0.87f, 0.64f, 0.12f); /** Color of the light specific to the torch firefly sprite */
 static const Vector TORCH_LIGHT_OFFSET = Vector(0, 12); /** Offset of the light specific to the torch firefly sprite */
 
-Firefly::Firefly(const ReaderMapping& mapping) :
+Firefly::Firefly(ReaderMapping const& mapping) :
    MovingSprite(mapping, "images/objects/resetpoints/default-resetpoint.sprite", LAYER_TILES, COLGROUP_TOUCHABLE),
    m_sprite_light(),
    activated(false),
@@ -101,7 +101,7 @@ Firefly::reactivate()
 }
 
 HitResponse
-Firefly::collision(GameObject& other, const CollisionHit& )
+Firefly::collision(GameObject& other, CollisionHit const& )
 {
   // If the bell is already activated, don't ring it again!
   if (activated || m_sprite->get_action() == "ringing")

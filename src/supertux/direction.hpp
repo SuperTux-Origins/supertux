@@ -23,10 +23,10 @@ class ObjectOption;
 
 enum class Direction { AUTO, LEFT, RIGHT, UP, DOWN };
 
-std::ostream& operator<<(std::ostream& o, const Direction& dir);
+std::ostream& operator<<(std::ostream& o, Direction const& dir);
 
-std::string dir_to_string(const Direction& dir);
-Direction string_to_dir(const std::string& dir_str);
+std::string dir_to_string(Direction const& dir);
+Direction string_to_dir(std::string const& dir_str);
 
 #endif
 

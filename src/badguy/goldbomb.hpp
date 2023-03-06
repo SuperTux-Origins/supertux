@@ -25,16 +25,16 @@
 class GoldBomb final : public WalkingBadguy
 {
 public:
-  GoldBomb(const ReaderMapping& reader);
+  GoldBomb(ReaderMapping const& reader);
 
-  virtual void collision_solid(const CollisionHit& hit) override;
-  virtual HitResponse collision(GameObject& object, const CollisionHit& hit) override;
-  virtual HitResponse collision_player(Player& player, const CollisionHit& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, const CollisionHit& hit) override;
+  virtual void collision_solid(CollisionHit const& hit) override;
+  virtual HitResponse collision(GameObject& object, CollisionHit const& hit) override;
+  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
   virtual void active_update(float dt_sec) override;
 
-  virtual void grab(MovingObject& object, const Vector& pos, Direction dir) override;
+  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   virtual void ungrab(MovingObject& object, Direction dir) override;
   virtual bool is_portable() const override;
 
@@ -66,8 +66,8 @@ private:
   std::unique_ptr<SoundSource> ticking;
 
 private:
-  GoldBomb(const GoldBomb&) = delete;
-  GoldBomb& operator=(const GoldBomb&) = delete;
+  GoldBomb(GoldBomb const&) = delete;
+  GoldBomb& operator=(GoldBomb const&) = delete;
 };
 
 #endif

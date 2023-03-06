@@ -50,7 +50,7 @@ SoundSource::set_pitch(float pitch)
 }
 
 void
-SoundSource::set_position(const Vector& pos)
+SoundSource::set_position(Vector const& pos)
 {
   m_source->set_position(pos.x, pos.y, 0.0f);
 }

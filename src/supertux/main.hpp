@@ -54,7 +54,7 @@ private:
   std::optional<std::string> m_forced_userdir;
 
 public:
-  PhysfsSubsystem(const char* argv0,
+  PhysfsSubsystem(char const* argv0,
                   std::optional<std::string> forced_datadir,
                   std::optional<std::string> forced_userdir);
   ~PhysfsSubsystem();
@@ -82,7 +82,7 @@ public:
 private:
   void init_video();
 
-  void launch_game(const CommandLineArguments& args);
+  void launch_game(CommandLineArguments const& args);
 
 private:
   // Using pointers allows us to initialize them whenever we want
@@ -104,8 +104,8 @@ private:
   std::unique_ptr<Savegame> m_savegame;
 
 private:
-  Main(const Main&) = delete;
-  Main& operator=(const Main&) = delete;
+  Main(Main const&) = delete;
+  Main& operator=(Main const&) = delete;
 };
 
 #endif

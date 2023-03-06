@@ -48,13 +48,13 @@ std::string anchor_point_to_string(AnchorPoint point)
   {
     return g_anchor_keys.at(point);
   }
-  catch(const std::out_of_range&)
+  catch(std::out_of_range const&)
   {
     throw std::runtime_error("Invalid anchor point");
   }
 }
 
-AnchorPoint string_to_anchor_point(const std::string& str)
+AnchorPoint string_to_anchor_point(std::string const& str)
 {
   for (size_t i = 0; i < g_anchor_keys.size(); i++)
     if (g_anchor_keys.at(i) == str)
@@ -65,7 +65,7 @@ AnchorPoint string_to_anchor_point(const std::string& str)
   throw std::runtime_error(msg.str());
 }
 
-Vector get_anchor_pos(const Rectf& rect, AnchorPoint point)
+Vector get_anchor_pos(Rectf const& rect, AnchorPoint point)
 {
   Vector result(0.0f, 0.0f);
 
@@ -104,7 +104,7 @@ Vector get_anchor_pos(const Rectf& rect, AnchorPoint point)
   return result;
 }
 
-Vector get_anchor_pos(const Rectf& destrect, float width, float height,
+Vector get_anchor_pos(Rectf const& destrect, float width, float height,
                       AnchorPoint point)
 {
   Vector result(0.0f, 0.0f);

@@ -34,8 +34,8 @@ private:
   WorldMap& m_worldmap;
 
 private:
-  WorldMapState(const WorldMapState&) = delete;
-  WorldMapState& operator=(const WorldMapState&) = delete;
+  WorldMapState(WorldMapState const&) = delete;
+  WorldMapState& operator=(WorldMapState const&) = delete;
 };
 
 } // namespace worldmap

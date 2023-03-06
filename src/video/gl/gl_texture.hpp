@@ -33,7 +33,7 @@ class GLTexture final : public Texture
 {
 public:
   GLTexture(int width, int height, std::optional<Color> fill_color = std::nullopt);
-  GLTexture(const SDL_Surface& image, const Sampler& sampler);
+  GLTexture(SDL_Surface const& image, Sampler const& sampler);
   ~GLTexture() override;
 
   virtual int get_texture_width() const override { return m_texture_width; }
@@ -43,9 +43,9 @@ public:
   virtual int get_image_height() const override { return m_image_height; }
 
   void set_handle(GLuint handle) { m_handle = handle; }
-  const GLuint &get_handle() const { return m_handle; }
+  GLuint const&get_handle() const { return m_handle; }
 
-  const Sampler& get_sampler() const { return m_sampler; }
+  Sampler const& get_sampler() const { return m_sampler; }
 
   void set_image_width(int width) { m_image_width = width; }
   void set_image_height(int height) { m_image_height = height; }
@@ -62,8 +62,8 @@ private:
   int m_image_height;
 
 private:
-  GLTexture(const GLTexture&) = delete;
-  GLTexture& operator=(const GLTexture&) = delete;
+  GLTexture(GLTexture const&) = delete;
+  GLTexture& operator=(GLTexture const&) = delete;
 };
 
 #endif

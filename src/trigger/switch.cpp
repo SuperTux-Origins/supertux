@@ -30,7 +30,7 @@ namespace {
 const std::string SWITCH_SOUND = "sounds/switch.ogg";
 }
 
-Switch::Switch(const ReaderMapping& reader) :
+Switch::Switch(ReaderMapping const& reader) :
   sprite_name(),
   sprite(),
   script(),

@@ -52,8 +52,8 @@ private:
   void do_cheat(PlayerStatus& status, std::function<void(int, int)> callback);
 
 private:
-  WorldmapCheatMenu(const WorldmapCheatMenu&) = delete;
-  WorldmapCheatMenu& operator=(const WorldmapCheatMenu&) = delete;
+  WorldmapCheatMenu(WorldmapCheatMenu const&) = delete;
+  WorldmapCheatMenu& operator=(WorldmapCheatMenu const&) = delete;
 };
 
 class WorldmapLevelSelectMenu final : public Menu
@@ -64,8 +64,8 @@ public:
   void menu_action(MenuItem& item) override;
 
 private:
-  WorldmapLevelSelectMenu(const WorldmapLevelSelectMenu&) = delete;
-  WorldmapLevelSelectMenu& operator=(const WorldmapLevelSelectMenu&) = delete;
+  WorldmapLevelSelectMenu(WorldmapLevelSelectMenu const&) = delete;
+  WorldmapLevelSelectMenu& operator=(WorldmapLevelSelectMenu const&) = delete;
 };
 
 #endif

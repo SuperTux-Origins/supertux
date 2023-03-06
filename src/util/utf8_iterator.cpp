@@ -24,7 +24,7 @@
 namespace {
 
 bool     has_multibyte_mark(unsigned char c);
-uint32_t decode_utf8(const std::string& text, size_t& p);
+uint32_t decode_utf8(std::string const& text, size_t& p);
 
 /**
  * returns true if this byte matches a bitmask of 10xx.xxxx, i.e. it is the 2nd, 3rd or 4th byte of a multibyte utf8 string
@@ -40,7 +40,7 @@ bool has_multibyte_mark(unsigned char c) {
  * @throws std::runtime_error if decoding fails.
  * See unicode standard section 3.10 table 3-5 and 3-6 for details.
  */
-uint32_t decode_utf8(const std::string& text, size_t& p)
+uint32_t decode_utf8(std::string const& text, size_t& p)
 {
   uint32_t c1 = static_cast<unsigned char>(text[p+0]);
 
@@ -89,7 +89,7 @@ uint32_t decode_utf8(const std::string& text, size_t& p)
 } // namespace
 
 
-UTF8Iterator::UTF8Iterator(const std::string& text_) :
+UTF8Iterator::UTF8Iterator(std::string const& text_) :
   text(text_),
   pos(0),
   chr()
