@@ -33,8 +33,6 @@ public:
   static std::string display_name() { return _("Bouncing Snowball"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual bool is_snipable() const override { return true; }
-
 protected:
   virtual bool collision_squished(GameObject& object) override;
 

@@ -102,14 +102,10 @@ Brick::collision(GameObject& other, const CollisionHit& hit)
 }
 
 void
-Brick::try_break(Player* player, bool slider)
+Brick::try_break(Player* player)
 {
   if (m_sprite->get_action() == "empty")
     return;
-
-  //takes too long for sliding tux to barrel through crates and ends up stopping him otherwise
-  if (slider && m_breakable && m_coin_counter <= 0)
-    break_me();
 
   SoundManager::current()->play("sounds/brick.wav", get_pos());
   if (m_coin_counter > 0 ) {

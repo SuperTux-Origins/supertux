@@ -45,8 +45,6 @@ public:
   static std::string display_name() { return _("Owl"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  virtual bool is_snipable() const override { return true; }
-
 protected:
   bool is_above_player() const;
   virtual void active_update (float dt_sec) override;

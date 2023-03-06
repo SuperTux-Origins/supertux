@@ -32,7 +32,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Snowshot"); }
   virtual std::string get_display_name() const override { return display_name(); }
-  virtual bool is_snipable() const override { return true; }
 
 protected:
   virtual bool collision_squished(GameObject& object) override;
@@ -61,7 +60,6 @@ public:
   virtual std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Leafshot"); }
   virtual std::string get_display_name() const override { return display_name(); }
-  virtual bool is_snipable() const override { return true; }
 
 protected:
   virtual bool collision_squished(GameObject& object) override;

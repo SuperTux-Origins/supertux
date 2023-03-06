@@ -33,8 +33,8 @@ public:
   static std::string display_name() { return _("Brick"); }
   virtual std::string get_display_name() const override { return display_name(); }
 
-  void try_break(Player* player, bool slider = false);
-  void break_for_crusher(Crusher* crusher);
+  void try_break(Player* player);
+  void break_for_crusher(Crusher* icecrusher);
 
 protected:
   virtual void hit(Player& player) override;
