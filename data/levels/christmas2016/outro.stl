@@ -2,7 +2,7 @@
   (version 2)
   (name "Christmas Time!")
   (author "SuperTux Team")
-  (tileset "images/tiles.strf")
+  (tileset "images/tiles.stts")
   (license "GPL 2 / CC-by-sa 3.0")
   (sector
     (name "main")
