@@ -47,17 +47,17 @@ SpriteData::Action::Action() :
 SpriteData::SpriteData(ReaderMapping const& mapping) :
   actions()
 {
-  ReaderIterator iter(mapping);
-  while (iter.next()) {
-    if (iter.get_key() == "action") {
-      parse_action(iter.as_mapping());
-    } else {
-      log_warning << "Unknown sprite field: " << iter.get_key() << std::endl;
+  ReaderCollection actions_collection;
+  mapping.must_read("actions", actions_collection);
+  for (auto const& action : actions_collection.get_objects()) {
+    if (action.get_name() == "action") {
+      parse_action(action.get_mapping());
     }
   }
 
-  if (actions.empty())
+  if (actions.empty()) {
     throw std::runtime_error("Error: Sprite without actions.");
+  }
 }
 
 void

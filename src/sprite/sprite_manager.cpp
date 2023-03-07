@@ -57,9 +57,9 @@ SpriteManager::load(std::string const& filename)
         return load_reader_document(filename);
       } else {
         std::stringstream text;
-        text << "(supertux-sprite (action "
+        text << "(supertux-sprite (actions (action "
              << "(name \"default\") "
-             << "(images \"" << FileSystem::basename(filename) << "\")))";
+             << "(images \"" << FileSystem::basename(filename) << "\"))))";
         return ReaderDocument::from_stream(text, prio::ErrorHandler::THROW, filename);
       }
     } catch(std::exception const& e) {
