@@ -1,9 +1,11 @@
 (supertux-sprite
-  (action
-  (name "normal")
-  (hitbox 0 0 0 0)
-(fps 5)
-  (images 
-"icecube.png"
-))
+  (version 2)
+  (actions
+    (action
+      (name "normal")
+      (hitbox 0 0 0 0)
+      (fps 5)
+      (images "icecube.png")
+    )
+  )
 )

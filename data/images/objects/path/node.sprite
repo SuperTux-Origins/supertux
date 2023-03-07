@@ -1,5 +1,10 @@
 (supertux-sprite
- (action
-  (name "default")
-  (hitbox 8 8 16 16)
-  (images "node.png")))
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (hitbox 8 8 16 16)
+      (images "node.png")
+    )
+  )
+)

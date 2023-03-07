@@ -1,1516 +1,1535 @@
 (supertux-sprite
-
-       (action
-         (name "gameover")
-         (fps 10.0)
-         (hitbox 13 6 32 32)
-         (images "small/gameover-0.png"
-		         "small/gameover-1.png"))
-
-
-; Small Tux
-
-       (action
-         (name "small-walk-right")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (images "small/walk-0.png"
-                 "small/walk-1.png"
-                 "small/walk-2.png"
-                 "small/walk-3.png"
-                 "small/walk-4.png"
-                 "small/walk-5.png"
-                 "small/walk-6.png"
-                 "small/walk-7.png"))
-
-       (action
-         (name "small-walk-left")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (mirror-action "small-walk-right"))
-
-       (action
-         (name "small-run-right")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (clone-action "small-walk-right"))
-
-       (action
-         (name "small-run-left")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (mirror-action "small-walk-right"))
-
-       (action
-         (name "small-stand-right")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (images "small/stand-0.png"))
-
-       (action
-         (name "small-stand-left")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (mirror-action "small-stand-right"))
-
-       (action
-         (name "small-walljump-right")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 12 16 32 32)
-         (images "small/small-walljump-0.png"
-                 "small/small-walljump-1.png"
-                 "small/small-walljump-2.png"))
-
-       (action
-         (name "small-walljump-left")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 6 16 32 32)
-         (mirror-action "small-walljump-right"))
-
-       (action
-         (name "small-jump-right")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (images "small/jump-0.png"))
-
-       (action
-         (name "small-jump-left")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (mirror-action "small-jump-right"))
-		 
-	   (action
-         (name "small-fall-right")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (images "small/jump-0.png"))
-
-       (action
-         (name "small-fall-left")
-         (fps 15.0)
-         (hitbox 8 16 32 32)
-         (mirror-action "small-jump-right"))
-		 
-       (action
-         (name "small-skid-right")
-         (hitbox 8 17 32 32)
-         (images "small/skid-0.png"))
-
-       (action
-         (name "small-skid-left")
-         (hitbox 8 17 32 32)
-         (mirror-action "small-skid-right"))
-
-       (action
-         (name "small-kick-right")
-         (hitbox 8 16 32 32)
-         (images "small/kick-0.png"))
-
-       (action
-         (name "small-kick-left")
-         (hitbox 8 16 32 32)
-         (mirror-action "small-kick-right"))
-
-       (action
-         (name "small-idle-right")
-         (fps 5.0)
-         (hitbox 8 16 32 32)
-         (images "small/idle-0.png"
-                 "small/idle-1.png"
-                 "small/idle-0.png"))
-
-       (action
-         (name "small-idle-left")
-         (hitbox 8 16 32 32)
-         (mirror-action "small-idle-right"))
-
-       (action
-         (name "small-climbing-right")
-         (hitbox 12 19 36 35)
-         (fps 15.0)
-         (images "small/ladder-0.png"
-                 "small/ladder-1.png"
-                 "small/ladder-2.png"
-                 "small/ladder-3.png"
-                 "small/ladder-4.png"
-                 "small/ladder-5.png"
-                 "small/ladder-6.png"
-                 "small/ladder-7.png"))
-
-       (action
-         (name "small-climbing-left")
-         (hitbox 12 19 36 35)
-         (fps 15.0)
-         (mirror-action "small-climbing-right"))
-
-       (action
-         (name "small-swimming-right")
-         (fps 15.0)
-         (hitbox 29 24 32 32)
-         (images "small/swimsmall1.png"
-                 "small/swimsmall2.png"
-                 "small/swimsmall3.png"
-                 "small/swimsmall4.png"
-                 "small/swimsmall5.png"))
-
-       (action
-         (name "small-swimming-left")
-         (fps 15.0)
-         (hitbox 29 24 32 32)
-         (mirror-action "small-swimming-right"))
-
-       (action
-         (name "small-floating-right")
-         (fps 11.0)
-         (hitbox 29 24 32 32)
-         (images "small/swimsmall1.png"
-                 "small/swimsmall2.png"
-                 "small/swimsmall3.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"))
-
-       (action
-         (name "small-floating-left")
-         (fps 11.0)
-         (hitbox 29 24 32 32)
-         (mirror-action "small-floating-right"))
-
-       (action
-         (name "small-swimjump-right")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 36 35)
-         (images "small/swimsmall1.png"))
-
-       (action
-         (name "small-swimjump-left")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 36 35)
-         (mirror-action "small-swimjump-right"))
-
-       (action
-         (name "grow-right")
-         (fps 15.0)
-         (hitbox 16 13 32 64)
-         (images "small/grow-0.png"
-                 "small/grow-1.png"
-                 "small/grow-2.png"
-                 "small/grow-3.png"
-                 "small/grow-4.png"
-                 "small/grow-5.png"
-                 "small/grow-6.png"))
-				 
-       (action
-         (name "grow-left")
-         (hitbox 16 13 32 64)
-         (mirror-action "grow-right"))
-         
-       (action
-         (name "swimgrow-right")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (images "small/swimsmallidle.png"
-                 "small/swimsmallidle.png"
-                 "small/swimgrow1.png"
-                 "small/swimgrow2.png"
-                 "small/swimgrow3.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"))
-
-       (action
-         (name "swimgrow-left")
-         (hitbox 29 24 32 64)
-         (mirror-action "swimgrow-right"))
-		 
-       (action
-         (name "grow-ladder-right")
-         (fps 15.0)
-         (hitbox 12 14 25 64)
-         (images "small/grow-ladder-0.png"
-                 "small/grow-ladder-1.png"
-                 "small/grow-ladder-2.png"
-                 "small/grow-ladder-3.png"
-                 "small/grow-ladder-4.png"
-                 "small/grow-ladder-5.png"
-                 "small/grow-ladder-6.png"))
-
-       (action
-         (name "grow-ladder-left")
-         (hitbox 12 14 25 64)
-         (mirror-action "grow-ladder-right"))
-
-
-; Big Tux
-
-       (action
-         (name "big-walk-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (images "big/walk-0.png"
-                 "big/walk-1.png"
-                 "big/walk-2.png"
-                 "big/walk-3.png"
-                 "big/walk-4.png"
-                 "big/walk-5.png"
-                 "big/walk-6.png"
-                 "big/walk-7.png"))
-
-       (action
-         (name "big-walk-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-walk-right"))
-
-       (action
-         (name "big-stand-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (images "big/stand-0.png"))
-
-       (action
-         (name "big-stand-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-stand-right"))
-		 
-	   (action
-         (name "big-walljump-right")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 24 14 32 64)
-         (images "big/big-walljump-0.png"
-                 "big/big-walljump-1.png"
-                 "big/big-walljump-2.png"))
-
-       (action
-         (name "big-walljump-left")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 8 14 32 64)
-         (mirror-action "big-walljump-right"))
-
-       (action
-         (name "big-jump-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (images "big/jump-0.png"))
-
-       (action
-         (name "big-jump-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-jump-right"))
-		 
-	   (action
-         (name "big-fall-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (images "big/jump-0.png"))
-
-       (action
-         (name "big-fall-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-jump-right"))
-
-       (action
-         (name "big-skid-right")
-         (hitbox 16 14 32 64)
-         (images "big/skid-0.png"))
-
-       (action
-         (name "big-skid-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-skid-right"))
-
-       (action
-         (name "big-kick-right")
-         (hitbox 16 14 32 64)
-         (images "big/kick-0.png"))
-
-       (action
-         (name "big-kick-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-kick-right"))
-
-       (action
-         (name "big-idle-right")
-         (fps 5.0)
-         (hitbox 16 14 32 64)
-         (images "big/idle-0.png"
-                 "big/idle-1.png"
-                 "big/idle-0.png"))
-
-       (action
-         (name "big-idle-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-idle-right"))
-
-       (action
-         (name "big-climbing-right")
-         (hitbox 9 14 25 64)
-         (fps 15.0)
-         (images "big/ladder-0.png"
-                 "big/ladder-1.png"
-                 "big/ladder-2.png"
-                 "big/ladder-3.png"
-                 "big/ladder-4.png"
-                 "big/ladder-5.png"
-                 "big/ladder-6.png"
-                 "big/ladder-7.png"))
-
-       (action
-         (name "big-climbing-left")
-         (hitbox 9 14 25 64)
-         (fps 15.0)
-         (mirror-action "big-climbing-right"))
-
-       (action
-         (name "big-duck-right")
-         (hitbox 16 45 32 32)
-         (images "big/duck-0.png"))
-
-       (action
-         (name "big-duck-left")
-         (hitbox 16 45 32 32)
-         (mirror-action "big-duck-right"))
-
-       (action
-         (name "big-backflip-right")
-         (hitbox 16 37 32 32)
-         (images "big/backflip.png"))
-
-       (action
-         (name "big-backflip-left")
-         (hitbox 16 37 32 32)
-         (fps 18.0)
-         (mirror-action "big-backflip-right"))
-
-       (action
-         (name "big-buttjump-right")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (images "big/buttjump-0.png"
-                 "big/buttjump-1.png"
-                 "big/buttjump-2.png"
-                 "big/buttjump-3.png"
-                 "big/buttjump-4.png"
-                 "big/buttjump-5.png"
-                 "big/buttjump-6.png"))
-
-       (action
-         (name "big-buttjump-left")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (mirror-action "big-buttjump-right"))
-
-       (action
-         (name "big-swimming-right")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (images "big/swim-0.png"
-                 "big/swim-1.png"
-                 "big/swim-2.png"
-                 "big/swim-3.png"
-                 "big/swim-4.png"))
-
-       (action
-         (name "big-swimming-left")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimming-right"))
-				 
-	   (action
-         (name "big-floating-right")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (images "big/swim-0.png"
-                 "big/swim-1.png"
-                 "big/swim-2.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"
-                 "big/swimidle1.png"))
-
-       (action
-         (name "big-floating-left")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-floating-right"))
-
-       (action
-         (name "big-swimjump-right")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (images "big/swim-0.png"))
-
-       (action
-         (name "big-swimjump-left")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimjump-right"))
-
-; Fire Tux
-
-       (action
-         (name "fire-walk-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-walk-right"))
-
-       (action
-         (name "fire-walk-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-walk-right"))
-
-       (action
-         (name "fire-stand-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-stand-right"))
-
-       (action
-         (name "fire-stand-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-stand-right"))
-
-       (action
-         (name "fire-walljump-right")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 24 14 32 64)
-         (clone-action "big-walljump-right"))
-
-       (action
-         (name "fire-walljump-left")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 8 14 32 64)
-         (mirror-action "fire-walljump-right"))
-
-       (action
-         (name "fire-jump-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "fire-jump-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-		 
-	   (action
-         (name "fire-fall-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "fire-fall-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-
-       (action
-         (name "fire-skid-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-skid-right"))
-
-       (action
-         (name "fire-skid-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-skid-right"))
-
-       (action
-         (name "fire-kick-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-kick-right"))
-
-       (action
-         (name "fire-kick-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-kick-right"))
-
-       (action
-         (name "fire-idle-right")
-         (fps 5.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-idle-right"))
-
-       (action
-         (name "fire-idle-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-idle-right"))
-
-       (action
-         (name "fire-climbing-right")
-         (hitbox 9 14 25 64)
-         (fps 15.0)
-         (clone-action "big-climbing-right"))
-
-       (action
-         (name "fire-climbing-left")
-         (hitbox 9 14 25 64)
-         (fps 15.0)
-         (mirror-action "big-climbing-right"))
-
-       (action
-         (name "fire-duck-right")
-         (hitbox 16 45 32 32)
-         (clone-action "big-duck-right"))
-
-       (action
-         (name "fire-duck-left")
-         (hitbox 16 45 32 32)
-         (mirror-action "big-duck-right"))
-
-       (action
-         (name "fire-backflip-right")
-         (hitbox 16 37 32 32)
-         (clone-action "big-backflip-right"))
-
-       (action
-         (name "fire-backflip-left")
-         (hitbox 16 37 32 32)
-         (fps 18.0)
-         (mirror-action "big-backflip-right"))
-
-       (action
-         (name "fire-buttjump-right")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (clone-action "big-buttjump-right"))
-
-       (action
-         (name "fire-buttjump-left")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (mirror-action "big-buttjump-right"))
-
-       (action
-         (name "fire-swimming-right")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimming-right"))
-
-       (action
-         (name "fire-swimming-left")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimming-right"))
-
-       (action
-         (name "fire-floating-right")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-floating-right"))
-
-       (action
-         (name "fire-floating-left")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-floating-right"))
-
-       (action
-         (name "fire-swimjump-right")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimjump-right"))
-
-       (action
-         (name "fire-swimjump-left")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimjump-right"))
-
-; Ice Tux
-
-	     (action
-         (name "ice-walk-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-walk-right"))
-
-       (action
-         (name "ice-walk-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-walk-right"))
-
-       (action
-         (name "ice-stand-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-stand-right"))
-
-       (action
-         (name "ice-stand-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-stand-right"))
-
-       (action
-         (name "ice-walljump-right")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 24 14 32 64)
-         (clone-action "big-walljump-right"))
-
-       (action
-         (name "ice-walljump-left")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 8 14 32 64)
-         (mirror-action "ice-walljump-right"))
-
-       (action
-         (name "ice-jump-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "ice-jump-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-		 
-	   (action
-         (name "ice-fall-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "ice-fall-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-
-       (action
-         (name "ice-skid-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-skid-right"))
-
-       (action
-         (name "ice-skid-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-skid-right"))
-
-       (action
-         (name "ice-kick-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-kick-right"))
-
-       (action
-         (name "ice-kick-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-kick-right"))
-
-       (action
-         (name "ice-idle-right")
-         (fps 5.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-idle-right"))
-
-       (action
-         (name "ice-idle-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-idle-right"))
-
-       (action
-         (name "ice-climbing-right")
-         (hitbox 9 14 25 64)
-         (fps 15.0)
-         (clone-action "big-climbing-right"))
-
-       (action
-         (name "ice-climbing-left")
-         (hitbox 9 14 25 64)
-         (fps 15.0)
-         (mirror-action "big-climbing-right"))
-
-       (action
-         (name "ice-duck-right")
-         (hitbox 16 45 32 32)
-         (clone-action "big-duck-right"))
-
-       (action
-         (name "ice-duck-left")
-         (hitbox 16 45 32 32)
-         (mirror-action "big-duck-right"))
-
-       (action
-         (name "ice-backflip-right")
-         (hitbox 16 37 32 32)
-         (clone-action "big-backflip-right"))
-
-       (action
-         (name "ice-backflip-left")
-         (hitbox 16 37 32 32)
-         (fps 18.0)
-         (mirror-action "big-backflip-right"))
-
-       (action
-         (name "ice-buttjump-right")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (clone-action "big-buttjump-right"))
-
-       (action
-         (name "ice-buttjump-left")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (mirror-action "big-buttjump-right"))
-
-       (action
-         (name "ice-swimming-right")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimming-right"))
-
-       (action
-         (name "ice-swimming-left")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimming-right"))
-
-       (action
-         (name "ice-floating-right")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-floating-right"))
-
-       (action
-         (name "ice-floating-left")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-floating-right"))
-
-       (action
-         (name "ice-swimjump-right")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimjump-right"))
-
-       (action
-         (name "ice-swimjump-left")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimjump-right"))
-
-; Earth Tux
-
-       (action
-         (name "earth-walk-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-walk-right"))
-
-       (action
-         (name "earth-walk-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-walk-right"))
-
-       (action
-         (name "earth-stand-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-stand-right"))
-
-       (action
-         (name "earth-stand-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-stand-right"))
-
-       (action
-         (name "earth-walljump-right")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 24 14 32 64)
-         (clone-action "big-walljump-right"))
-
-       (action
-         (name "earth-walljump-left")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 8 14 32 64)
-         (mirror-action "earth-walljump-right"))
-
-       (action
-         (name "earth-jump-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "earth-jump-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-		 
-       (action
-         (name "earth-fall-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "earth-fall-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-
-       (action
-         (name "earth-skid-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-skid-right"))
-
-       (action
-         (name "earth-skid-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-skid-right"))
-
-       (action
-         (name "earth-kick-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-kick-right"))
-
-       (action
-         (name "earth-kick-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-kick-right"))
-
-       (action
-         (name "earth-idle-right")
-         (fps 5.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-idle-right"))
-
-       (action
-         (name "earth-idle-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-idle-right"))
-
-       (action
-         (name "earth-climbing-right")
-         (fps 15.0)
-         (hitbox 9 14 25 64)
-         (clone-action "big-climbing-right"))
-
-       (action
-         (name "earth-climbing-left")
-         (fps 15.0)
-         (hitbox 9 14 25 64)
-         (mirror-action "big-climbing-right"))
-
-       (action
-         (name "earth-duck-right")
-         (hitbox 16 45 32 32)
-         (clone-action "big-duck-right"))
-
-       (action
-         (name "earth-duck-left")
-         (hitbox 16 45 32 32)
-         (mirror-action "big-duck-right"))
-
-       (action
-         (name "earth-backflip-right")
-         (hitbox 16 37 32 32)
-         (clone-action "big-backflip-right"))
-
-       (action
-         (name "earth-backflip-left")
-         (hitbox 16 37 32 32)
-         (fps 18.0)
-         (mirror-action "big-backflip-right"))
-
-       (action
-         (name "earth-buttjump-right")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (clone-action "big-buttjump-right"))
-
-       (action
-         (name "earth-buttjump-left")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (mirror-action "big-buttjump-right"))
-
-       (action
-         (name "earth-swimming-right")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimming-right"))
-
-       (action
-         (name "earth-swimming-left")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimming-right"))
-
-       (action
-         (name "earth-floating-right")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-floating-right"))
-
-       (action
-         (name "earth-floating-left")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-floating-right"))
-
-       (action
-         (name "earth-swimjump-right")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimjump-right"))
-
-       (action
-         (name "earth-swimjump-left")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimjump-right"))
-
-; Stone Tux
-
-       (action
-         (name "earth-walk-right-stone")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-walk-left-stone")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "earth-walk-right-stone"))
-
-       (action
-         (name "earth-stand-right-stone")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-stand-left-stone")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "earth-stand-right-stone"))
-
-       (action
-         (name "earth-jump-right-stone")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-jump-left-stone")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "earth-jump-right-stone"))
-
-       (action
-         (name "earth-skid-right-stone")
-         (hitbox 16 14 32 64)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-skid-left-stone")
-         (hitbox 16 14 32 64)
-         (mirror-action "earth-skid-right-stone"))
-
-       (action
-         (name "earth-kick-right-stone")
-         (hitbox 16 14 32 64)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-kick-left-stone")
-         (hitbox 16 14 32 64)
-         (mirror-action "earth-kick-right-stone"))
-
-       (action
-         (name "earth-idle-right-stone")
-         (fps 5.0)
-         (hitbox 16 14 32 64)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-idle-left-stone")
-         (hitbox 16 14 32 64)
-         (mirror-action "earth-idle-right-stone"))
-
-       (action
-         (name "earth-climbing-right-stone")
-         (hitbox 16 14 32 64)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-climbing-left-stone")
-         (hitbox 16 14 32 64)
-         (mirror-action "earth-climbing-right-stone"))
-
-       (action
-         (name "earth-duck-right-stone")
-         (hitbox 16 45 32 32)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-duck-left-stone")
-         (hitbox 16 45 32 32)
-         (mirror-action "earth-duck-right-stone"))
-
-       (action
-         (name "earth-backflip-right-stone")
-         (hitbox 16 37 32 32)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-backflip-left-stone")
-         (hitbox 16 37 32 32)
-         (fps 18.0)
-         (mirror-action "earth-backflip-right-stone"))
-
-       (action
-         (name "earth-buttjump-right-stone")
-         (hitbox 16 14 32 64)
-         (images "earth/statue.png"))
-
-       (action
-         (name "earth-buttjump-left-stone")
-         (hitbox 16 14 32 64)
-         (mirror-action "earth-buttjump-right-stone"))
-
-; Air Tux
-
-       (action
-         (name "air-walk-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-walk-right"))
-
-       (action
-         (name "air-walk-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-walk-right"))
-
-       (action
-         (name "air-stand-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-stand-right"))
-
-       (action
-         (name "air-stand-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-stand-right"))
-
-       (action
-         (name "air-walljump-right")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 24 14 32 64)
-         (clone-action "big-walljump-right"))
-
-       (action
-         (name "air-walljump-left")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 8 14 32 64)
-         (mirror-action "air-walljump-right"))
-
-       (action
-         (name "air-jump-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "air-jump-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-		 
-	   (action
-         (name "air-fall-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loos 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "air-fall-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-
-       (action
-         (name "air-skid-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-skid-right"))
-
-       (action
-         (name "air-skid-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-skid-right"))
-
-       (action
-         (name "air-kick-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-kick-right"))
-
-       (action
-         (name "air-kick-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-kick-right"))
-
-       (action
-         (name "air-idle-right")
-         (fps 5.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-idle-right"))
-
-       (action
-         (name "air-idle-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-idle-right"))
-
-       (action
-         (name "air-climbing-right")
-         (fps 15.0)
-         (hitbox 9 14 25 64)
-         (clone-action "big-climbing-right"))
-
-       (action
-         (name "air-climbing-left")
-         (fps 15.0)
-         (hitbox 9 14 25 64)
-         (mirror-action "big-climbing-right"))
-
-       (action
-         (name "air-duck-right")
-         (hitbox 16 45 32 32)
-         (clone-action "big-duck-right"))
-
-       (action
-         (name "air-duck-left")
-         (hitbox 16 45 32 32)
-         (mirror-action "big-duck-right"))
-
-       (action
-         (name "air-backflip-right")
-         (hitbox 16 37 32 32)
-         (clone-action "big-backflip-right"))
-
-       (action
-         (name "air-backflip-left")
-         (hitbox 16 37 32 32)
-         (fps 18.0)
-         (mirror-action "big-backflip-right"))
-
-       (action
-         (name "air-buttjump-right")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (clone-action "big-buttjump-right"))
-
-       (action
-         (name "air-buttjump-left")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (mirror-action "big-buttjump-right"))
-
-       (action
-         (name "air-swimming-right")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimming-right"))
-
-       (action
-         (name "air-swimming-left")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimming-right"))
-
-       (action
-         (name "air-floating-right")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-floating-right"))
-
-       (action
-         (name "air-floating-left")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-floating-right"))
-
-       (action
-         (name "air-swimjump-right")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimjump-right"))
-
-       (action
-         (name "air-swimjump-left")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimjump-right"))
-
-; Santa Tux
-
-       (action
-         (name "santa-walk-right")
-         (fps 20.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-walk-right"))
-
-       (action
-         (name "santa-walk-left")
-         (fps 20.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-walk-right"))
-
-       (action
-         (name "santa-stand-right")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-stand-right"))
-
-       (action
-         (name "santa-stand-left")
-         (fps 15.0)
-         (hitbox 16 14 32 64)
-         (mirror-action "big-stand-right"))
-
-       (action
-         (name "santa-walljump-right")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 24 14 32 64)
-         (clone-action "big-walljump-right"))
-
-       (action
-         (name "santa-walljump-left")
-         (fps 24.0)
-         (loops 1)
-         (hitbox 8 14 32 64)
-         (mirror-action "santa-walljump-right"))
-
-       (action
-         (name "santa-jump-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "santa-jump-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-		 
-	   (action
-         (name "santa-fall-right")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (clone-action "big-jump-right"))
-
-       (action
-         (name "santa-fall-left")
-         (fps 16.0)
-         (hitbox 16 14 32 64)
-         (loops 1)
-         (mirror-action "big-jump-right"))
-
-       (action
-         (name "santa-skid-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-skid-right"))
-
-       (action
-         (name "santa-skid-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-skid-right"))
-
-       (action
-         (name "santa-kick-right")
-         (hitbox 16 14 32 64)
-         (clone-action "big-kick-right"))
-
-       (action
-         (name "santa-kick-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-kick-right"))
-
-       (action
-         (name "santa-idle-right")
-         (fps 5.0)
-         (hitbox 16 14 32 64)
-         (clone-action "big-idle-right"))
-
-       (action
-         (name "santa-idle-left")
-         (hitbox 16 14 32 64)
-         (mirror-action "big-idle-right"))
-
-       (action
-         (name "santa-climbing-right")
-         (fps 15.0)
-         (hitbox 9 14 25 64)
-         (clone-action "big-climbing-right"))
-
-       (action
-         (name "santa-climbing-left")
-         (fps 15.0)
-         (hitbox 9 14 25 64)
-         (mirror-action "big-climbing-right"))
-
-       (action
-         (name "santa-duck-right")
-         (hitbox 16 45 32 32)
-         (clone-action "big-duck-right"))
-
-       (action
-         (name "santa-duck-left")
-         (hitbox 16 45 32 32)
-         (mirror-action "big-duck-right"))
-
-       (action
-         (name "santa-backflip-right")
-         (hitbox 16 37 32 32)
-         (clone-action "big-backflip-right"))
-
-       (action
-         (name "santa-backflip-left")
-         (hitbox 16 37 32 32)
-         (fps 18.0)
-         (mirror-action "big-backflip-right"))
-
-       (action
-         (name "santa-buttjump-right")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (clone-action "big-buttjump-right"))
-
-       (action
-         (name "santa-buttjump-left")
-         (hitbox 16 14 32 46)
-         (fps 20.0)
-         (loops 1)
-         (mirror-action "big-buttjump-right"))
-
-       (action
-         (name "santa-swimming-right")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimming-right"))
-
-       (action
-         (name "santa-swimming-left")
-         (fps 15.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimming-right"))
-
-       (action
-         (name "santa-floating-right")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (clone-action "big-floating-right"))
-
-       (action
-         (name "santa-floating-left")
-         (fps 11.0)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-floating-right"))
-
-       (action
-         (name "santa-swimjump-right")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (clone-action "big-swimjump-right"))
-
-       (action
-         (name "santa-swimjump-left")
-         (fps 10.0)
-         (loops 1)
-         (hitbox 29 24 32 64)
-         (mirror-action "big-swimjump-right"))
+  (version 2)
+  (actions
+    (action
+      (name "gameover")
+      (fps 10.0)
+      (hitbox 13 6 32 32)
+      (images
+        "small/gameover-0.png"
+        "small/gameover-1.png"
+      )
+    )
+    (action
+      (name "small-walk-right")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (images
+        "small/walk-0.png"
+        "small/walk-1.png"
+        "small/walk-2.png"
+        "small/walk-3.png"
+        "small/walk-4.png"
+        "small/walk-5.png"
+        "small/walk-6.png"
+        "small/walk-7.png"
+      )
+    )
+    (action
+      (name "small-walk-left")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (mirror-action "small-walk-right")
+    )
+    (action
+      (name "small-run-right")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (clone-action "small-walk-right")
+    )
+    (action
+      (name "small-run-left")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (mirror-action "small-walk-right")
+    )
+    (action
+      (name "small-stand-right")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (images "small/stand-0.png")
+    )
+    (action
+      (name "small-stand-left")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (mirror-action "small-stand-right")
+    )
+    (action
+      (name "small-walljump-right")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 12 16 32 32)
+      (images
+        "small/small-walljump-0.png"
+        "small/small-walljump-1.png"
+        "small/small-walljump-2.png"
+      )
+    )
+    (action
+      (name "small-walljump-left")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 6 16 32 32)
+      (mirror-action "small-walljump-right")
+    )
+    (action
+      (name "small-jump-right")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (images "small/jump-0.png")
+    )
+    (action
+      (name "small-jump-left")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (mirror-action "small-jump-right")
+    )
+    (action
+      (name "small-fall-right")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (images "small/jump-0.png")
+    )
+    (action
+      (name "small-fall-left")
+      (fps 15.0)
+      (hitbox 8 16 32 32)
+      (mirror-action "small-jump-right")
+    )
+    (action
+      (name "small-skid-right")
+      (hitbox 8 17 32 32)
+      (images "small/skid-0.png")
+    )
+    (action
+      (name "small-skid-left")
+      (hitbox 8 17 32 32)
+      (mirror-action "small-skid-right")
+    )
+    (action
+      (name "small-kick-right")
+      (hitbox 8 16 32 32)
+      (images "small/kick-0.png")
+    )
+    (action
+      (name "small-kick-left")
+      (hitbox 8 16 32 32)
+      (mirror-action "small-kick-right")
+    )
+    (action
+      (name "small-idle-right")
+      (fps 5.0)
+      (hitbox 8 16 32 32)
+      (images
+        "small/idle-0.png"
+        "small/idle-1.png"
+        "small/idle-0.png"
+      )
+    )
+    (action
+      (name "small-idle-left")
+      (hitbox 8 16 32 32)
+      (mirror-action "small-idle-right")
+    )
+    (action
+      (name "small-climbing-right")
+      (hitbox 12 19 36 35)
+      (fps 15.0)
+      (images
+        "small/ladder-0.png"
+        "small/ladder-1.png"
+        "small/ladder-2.png"
+        "small/ladder-3.png"
+        "small/ladder-4.png"
+        "small/ladder-5.png"
+        "small/ladder-6.png"
+        "small/ladder-7.png"
+      )
+    )
+    (action
+      (name "small-climbing-left")
+      (hitbox 12 19 36 35)
+      (fps 15.0)
+      (mirror-action "small-climbing-right")
+    )
+    (action
+      (name "small-swimming-right")
+      (fps 15.0)
+      (hitbox 29 24 32 32)
+      (images
+        "small/swimsmall1.png"
+        "small/swimsmall2.png"
+        "small/swimsmall3.png"
+        "small/swimsmall4.png"
+        "small/swimsmall5.png"
+      )
+    )
+    (action
+      (name "small-swimming-left")
+      (fps 15.0)
+      (hitbox 29 24 32 32)
+      (mirror-action "small-swimming-right")
+    )
+    (action
+      (name "small-floating-right")
+      (fps 11.0)
+      (hitbox 29 24 32 32)
+      (images
+        "small/swimsmall1.png"
+        "small/swimsmall2.png"
+        "small/swimsmall3.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+      )
+    )
+    (action
+      (name "small-floating-left")
+      (fps 11.0)
+      (hitbox 29 24 32 32)
+      (mirror-action "small-floating-right")
+    )
+    (action
+      (name "small-swimjump-right")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 36 35)
+      (images "small/swimsmall1.png")
+    )
+    (action
+      (name "small-swimjump-left")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 36 35)
+      (mirror-action "small-swimjump-right")
+    )
+    (action
+      (name "grow-right")
+      (fps 15.0)
+      (hitbox 16 13 32 64)
+      (images
+        "small/grow-0.png"
+        "small/grow-1.png"
+        "small/grow-2.png"
+        "small/grow-3.png"
+        "small/grow-4.png"
+        "small/grow-5.png"
+        "small/grow-6.png"
+      )
+    )
+    (action
+      (name "grow-left")
+      (hitbox 16 13 32 64)
+      (mirror-action "grow-right")
+    )
+    (action
+      (name "swimgrow-right")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (images
+        "small/swimsmallidle.png"
+        "small/swimsmallidle.png"
+        "small/swimgrow1.png"
+        "small/swimgrow2.png"
+        "small/swimgrow3.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+      )
+    )
+    (action
+      (name "swimgrow-left")
+      (hitbox 29 24 32 64)
+      (mirror-action "swimgrow-right")
+    )
+    (action
+      (name "grow-ladder-right")
+      (fps 15.0)
+      (hitbox 12 14 25 64)
+      (images
+        "small/grow-ladder-0.png"
+        "small/grow-ladder-1.png"
+        "small/grow-ladder-2.png"
+        "small/grow-ladder-3.png"
+        "small/grow-ladder-4.png"
+        "small/grow-ladder-5.png"
+        "small/grow-ladder-6.png"
+      )
+    )
+    (action
+      (name "grow-ladder-left")
+      (hitbox 12 14 25 64)
+      (mirror-action "grow-ladder-right")
+    )
+    (action
+      (name "big-walk-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (images
+        "big/walk-0.png"
+        "big/walk-1.png"
+        "big/walk-2.png"
+        "big/walk-3.png"
+        "big/walk-4.png"
+        "big/walk-5.png"
+        "big/walk-6.png"
+        "big/walk-7.png"
+      )
+    )
+    (action
+      (name "big-walk-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-walk-right")
+    )
+    (action
+      (name "big-stand-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (images "big/stand-0.png")
+    )
+    (action
+      (name "big-stand-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-stand-right")
+    )
+    (action
+      (name "big-walljump-right")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 24 14 32 64)
+      (images
+        "big/big-walljump-0.png"
+        "big/big-walljump-1.png"
+        "big/big-walljump-2.png"
+      )
+    )
+    (action
+      (name "big-walljump-left")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 8 14 32 64)
+      (mirror-action "big-walljump-right")
+    )
+    (action
+      (name "big-jump-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (images "big/jump-0.png")
+    )
+    (action
+      (name "big-jump-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "big-fall-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (images "big/jump-0.png")
+    )
+    (action
+      (name "big-fall-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "big-skid-right")
+      (hitbox 16 14 32 64)
+      (images "big/skid-0.png")
+    )
+    (action
+      (name "big-skid-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-skid-right")
+    )
+    (action
+      (name "big-kick-right")
+      (hitbox 16 14 32 64)
+      (images "big/kick-0.png")
+    )
+    (action
+      (name "big-kick-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-kick-right")
+    )
+    (action
+      (name "big-idle-right")
+      (fps 5.0)
+      (hitbox 16 14 32 64)
+      (images
+        "big/idle-0.png"
+        "big/idle-1.png"
+        "big/idle-0.png"
+      )
+    )
+    (action
+      (name "big-idle-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-idle-right")
+    )
+    (action
+      (name "big-climbing-right")
+      (hitbox 9 14 25 64)
+      (fps 15.0)
+      (images
+        "big/ladder-0.png"
+        "big/ladder-1.png"
+        "big/ladder-2.png"
+        "big/ladder-3.png"
+        "big/ladder-4.png"
+        "big/ladder-5.png"
+        "big/ladder-6.png"
+        "big/ladder-7.png"
+      )
+    )
+    (action
+      (name "big-climbing-left")
+      (hitbox 9 14 25 64)
+      (fps 15.0)
+      (mirror-action "big-climbing-right")
+    )
+    (action
+      (name "big-duck-right")
+      (hitbox 16 45 32 32)
+      (images "big/duck-0.png")
+    )
+    (action
+      (name "big-duck-left")
+      (hitbox 16 45 32 32)
+      (mirror-action "big-duck-right")
+    )
+    (action
+      (name "big-backflip-right")
+      (hitbox 16 37 32 32)
+      (images "big/backflip.png")
+    )
+    (action
+      (name "big-backflip-left")
+      (hitbox 16 37 32 32)
+      (fps 18.0)
+      (mirror-action "big-backflip-right")
+    )
+    (action
+      (name "big-buttjump-right")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (images
+        "big/buttjump-0.png"
+        "big/buttjump-1.png"
+        "big/buttjump-2.png"
+        "big/buttjump-3.png"
+        "big/buttjump-4.png"
+        "big/buttjump-5.png"
+        "big/buttjump-6.png"
+      )
+    )
+    (action
+      (name "big-buttjump-left")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (mirror-action "big-buttjump-right")
+    )
+    (action
+      (name "big-swimming-right")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (images
+        "big/swim-0.png"
+        "big/swim-1.png"
+        "big/swim-2.png"
+        "big/swim-3.png"
+        "big/swim-4.png"
+      )
+    )
+    (action
+      (name "big-swimming-left")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimming-right")
+    )
+    (action
+      (name "big-floating-right")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (images
+        "big/swim-0.png"
+        "big/swim-1.png"
+        "big/swim-2.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+        "big/swimidle1.png"
+      )
+    )
+    (action
+      (name "big-floating-left")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-floating-right")
+    )
+    (action
+      (name "big-swimjump-right")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (images "big/swim-0.png")
+    )
+    (action
+      (name "big-swimjump-left")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimjump-right")
+    )
+    (action
+      (name "fire-walk-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-walk-right")
+    )
+    (action
+      (name "fire-walk-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-walk-right")
+    )
+    (action
+      (name "fire-stand-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-stand-right")
+    )
+    (action
+      (name "fire-stand-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-stand-right")
+    )
+    (action
+      (name "fire-walljump-right")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 24 14 32 64)
+      (clone-action "big-walljump-right")
+    )
+    (action
+      (name "fire-walljump-left")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 8 14 32 64)
+      (mirror-action "fire-walljump-right")
+    )
+    (action
+      (name "fire-jump-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "fire-jump-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "fire-fall-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "fire-fall-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "fire-skid-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-skid-right")
+    )
+    (action
+      (name "fire-skid-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-skid-right")
+    )
+    (action
+      (name "fire-kick-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-kick-right")
+    )
+    (action
+      (name "fire-kick-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-kick-right")
+    )
+    (action
+      (name "fire-idle-right")
+      (fps 5.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-idle-right")
+    )
+    (action
+      (name "fire-idle-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-idle-right")
+    )
+    (action
+      (name "fire-climbing-right")
+      (hitbox 9 14 25 64)
+      (fps 15.0)
+      (clone-action "big-climbing-right")
+    )
+    (action
+      (name "fire-climbing-left")
+      (hitbox 9 14 25 64)
+      (fps 15.0)
+      (mirror-action "big-climbing-right")
+    )
+    (action
+      (name "fire-duck-right")
+      (hitbox 16 45 32 32)
+      (clone-action "big-duck-right")
+    )
+    (action
+      (name "fire-duck-left")
+      (hitbox 16 45 32 32)
+      (mirror-action "big-duck-right")
+    )
+    (action
+      (name "fire-backflip-right")
+      (hitbox 16 37 32 32)
+      (clone-action "big-backflip-right")
+    )
+    (action
+      (name "fire-backflip-left")
+      (hitbox 16 37 32 32)
+      (fps 18.0)
+      (mirror-action "big-backflip-right")
+    )
+    (action
+      (name "fire-buttjump-right")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (clone-action "big-buttjump-right")
+    )
+    (action
+      (name "fire-buttjump-left")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (mirror-action "big-buttjump-right")
+    )
+    (action
+      (name "fire-swimming-right")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimming-right")
+    )
+    (action
+      (name "fire-swimming-left")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimming-right")
+    )
+    (action
+      (name "fire-floating-right")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-floating-right")
+    )
+    (action
+      (name "fire-floating-left")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-floating-right")
+    )
+    (action
+      (name "fire-swimjump-right")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimjump-right")
+    )
+    (action
+      (name "fire-swimjump-left")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimjump-right")
+    )
+    (action
+      (name "ice-walk-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-walk-right")
+    )
+    (action
+      (name "ice-walk-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-walk-right")
+    )
+    (action
+      (name "ice-stand-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-stand-right")
+    )
+    (action
+      (name "ice-stand-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-stand-right")
+    )
+    (action
+      (name "ice-walljump-right")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 24 14 32 64)
+      (clone-action "big-walljump-right")
+    )
+    (action
+      (name "ice-walljump-left")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 8 14 32 64)
+      (mirror-action "ice-walljump-right")
+    )
+    (action
+      (name "ice-jump-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "ice-jump-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "ice-fall-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "ice-fall-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "ice-skid-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-skid-right")
+    )
+    (action
+      (name "ice-skid-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-skid-right")
+    )
+    (action
+      (name "ice-kick-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-kick-right")
+    )
+    (action
+      (name "ice-kick-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-kick-right")
+    )
+    (action
+      (name "ice-idle-right")
+      (fps 5.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-idle-right")
+    )
+    (action
+      (name "ice-idle-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-idle-right")
+    )
+    (action
+      (name "ice-climbing-right")
+      (hitbox 9 14 25 64)
+      (fps 15.0)
+      (clone-action "big-climbing-right")
+    )
+    (action
+      (name "ice-climbing-left")
+      (hitbox 9 14 25 64)
+      (fps 15.0)
+      (mirror-action "big-climbing-right")
+    )
+    (action
+      (name "ice-duck-right")
+      (hitbox 16 45 32 32)
+      (clone-action "big-duck-right")
+    )
+    (action
+      (name "ice-duck-left")
+      (hitbox 16 45 32 32)
+      (mirror-action "big-duck-right")
+    )
+    (action
+      (name "ice-backflip-right")
+      (hitbox 16 37 32 32)
+      (clone-action "big-backflip-right")
+    )
+    (action
+      (name "ice-backflip-left")
+      (hitbox 16 37 32 32)
+      (fps 18.0)
+      (mirror-action "big-backflip-right")
+    )
+    (action
+      (name "ice-buttjump-right")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (clone-action "big-buttjump-right")
+    )
+    (action
+      (name "ice-buttjump-left")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (mirror-action "big-buttjump-right")
+    )
+    (action
+      (name "ice-swimming-right")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimming-right")
+    )
+    (action
+      (name "ice-swimming-left")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimming-right")
+    )
+    (action
+      (name "ice-floating-right")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-floating-right")
+    )
+    (action
+      (name "ice-floating-left")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-floating-right")
+    )
+    (action
+      (name "ice-swimjump-right")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimjump-right")
+    )
+    (action
+      (name "ice-swimjump-left")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimjump-right")
+    )
+    (action
+      (name "earth-walk-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-walk-right")
+    )
+    (action
+      (name "earth-walk-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-walk-right")
+    )
+    (action
+      (name "earth-stand-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-stand-right")
+    )
+    (action
+      (name "earth-stand-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-stand-right")
+    )
+    (action
+      (name "earth-walljump-right")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 24 14 32 64)
+      (clone-action "big-walljump-right")
+    )
+    (action
+      (name "earth-walljump-left")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 8 14 32 64)
+      (mirror-action "earth-walljump-right")
+    )
+    (action
+      (name "earth-jump-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "earth-jump-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "earth-fall-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "earth-fall-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "earth-skid-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-skid-right")
+    )
+    (action
+      (name "earth-skid-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-skid-right")
+    )
+    (action
+      (name "earth-kick-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-kick-right")
+    )
+    (action
+      (name "earth-kick-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-kick-right")
+    )
+    (action
+      (name "earth-idle-right")
+      (fps 5.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-idle-right")
+    )
+    (action
+      (name "earth-idle-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-idle-right")
+    )
+    (action
+      (name "earth-climbing-right")
+      (fps 15.0)
+      (hitbox 9 14 25 64)
+      (clone-action "big-climbing-right")
+    )
+    (action
+      (name "earth-climbing-left")
+      (fps 15.0)
+      (hitbox 9 14 25 64)
+      (mirror-action "big-climbing-right")
+    )
+    (action
+      (name "earth-duck-right")
+      (hitbox 16 45 32 32)
+      (clone-action "big-duck-right")
+    )
+    (action
+      (name "earth-duck-left")
+      (hitbox 16 45 32 32)
+      (mirror-action "big-duck-right")
+    )
+    (action
+      (name "earth-backflip-right")
+      (hitbox 16 37 32 32)
+      (clone-action "big-backflip-right")
+    )
+    (action
+      (name "earth-backflip-left")
+      (hitbox 16 37 32 32)
+      (fps 18.0)
+      (mirror-action "big-backflip-right")
+    )
+    (action
+      (name "earth-buttjump-right")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (clone-action "big-buttjump-right")
+    )
+    (action
+      (name "earth-buttjump-left")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (mirror-action "big-buttjump-right")
+    )
+    (action
+      (name "earth-swimming-right")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimming-right")
+    )
+    (action
+      (name "earth-swimming-left")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimming-right")
+    )
+    (action
+      (name "earth-floating-right")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-floating-right")
+    )
+    (action
+      (name "earth-floating-left")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-floating-right")
+    )
+    (action
+      (name "earth-swimjump-right")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimjump-right")
+    )
+    (action
+      (name "earth-swimjump-left")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimjump-right")
+    )
+    (action
+      (name "earth-walk-right-stone")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-walk-left-stone")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "earth-walk-right-stone")
+    )
+    (action
+      (name "earth-stand-right-stone")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-stand-left-stone")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "earth-stand-right-stone")
+    )
+    (action
+      (name "earth-jump-right-stone")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-jump-left-stone")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "earth-jump-right-stone")
+    )
+    (action
+      (name "earth-skid-right-stone")
+      (hitbox 16 14 32 64)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-skid-left-stone")
+      (hitbox 16 14 32 64)
+      (mirror-action "earth-skid-right-stone")
+    )
+    (action
+      (name "earth-kick-right-stone")
+      (hitbox 16 14 32 64)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-kick-left-stone")
+      (hitbox 16 14 32 64)
+      (mirror-action "earth-kick-right-stone")
+    )
+    (action
+      (name "earth-idle-right-stone")
+      (fps 5.0)
+      (hitbox 16 14 32 64)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-idle-left-stone")
+      (hitbox 16 14 32 64)
+      (mirror-action "earth-idle-right-stone")
+    )
+    (action
+      (name "earth-climbing-right-stone")
+      (hitbox 16 14 32 64)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-climbing-left-stone")
+      (hitbox 16 14 32 64)
+      (mirror-action "earth-climbing-right-stone")
+    )
+    (action
+      (name "earth-duck-right-stone")
+      (hitbox 16 45 32 32)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-duck-left-stone")
+      (hitbox 16 45 32 32)
+      (mirror-action "earth-duck-right-stone")
+    )
+    (action
+      (name "earth-backflip-right-stone")
+      (hitbox 16 37 32 32)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-backflip-left-stone")
+      (hitbox 16 37 32 32)
+      (fps 18.0)
+      (mirror-action "earth-backflip-right-stone")
+    )
+    (action
+      (name "earth-buttjump-right-stone")
+      (hitbox 16 14 32 64)
+      (images "earth/statue.png")
+    )
+    (action
+      (name "earth-buttjump-left-stone")
+      (hitbox 16 14 32 64)
+      (mirror-action "earth-buttjump-right-stone")
+    )
+    (action
+      (name "air-walk-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-walk-right")
+    )
+    (action
+      (name "air-walk-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-walk-right")
+    )
+    (action
+      (name "air-stand-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-stand-right")
+    )
+    (action
+      (name "air-stand-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-stand-right")
+    )
+    (action
+      (name "air-walljump-right")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 24 14 32 64)
+      (clone-action "big-walljump-right")
+    )
+    (action
+      (name "air-walljump-left")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 8 14 32 64)
+      (mirror-action "air-walljump-right")
+    )
+    (action
+      (name "air-jump-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "air-jump-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "air-fall-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loos 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "air-fall-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "air-skid-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-skid-right")
+    )
+    (action
+      (name "air-skid-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-skid-right")
+    )
+    (action
+      (name "air-kick-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-kick-right")
+    )
+    (action
+      (name "air-kick-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-kick-right")
+    )
+    (action
+      (name "air-idle-right")
+      (fps 5.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-idle-right")
+    )
+    (action
+      (name "air-idle-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-idle-right")
+    )
+    (action
+      (name "air-climbing-right")
+      (fps 15.0)
+      (hitbox 9 14 25 64)
+      (clone-action "big-climbing-right")
+    )
+    (action
+      (name "air-climbing-left")
+      (fps 15.0)
+      (hitbox 9 14 25 64)
+      (mirror-action "big-climbing-right")
+    )
+    (action
+      (name "air-duck-right")
+      (hitbox 16 45 32 32)
+      (clone-action "big-duck-right")
+    )
+    (action
+      (name "air-duck-left")
+      (hitbox 16 45 32 32)
+      (mirror-action "big-duck-right")
+    )
+    (action
+      (name "air-backflip-right")
+      (hitbox 16 37 32 32)
+      (clone-action "big-backflip-right")
+    )
+    (action
+      (name "air-backflip-left")
+      (hitbox 16 37 32 32)
+      (fps 18.0)
+      (mirror-action "big-backflip-right")
+    )
+    (action
+      (name "air-buttjump-right")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (clone-action "big-buttjump-right")
+    )
+    (action
+      (name "air-buttjump-left")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (mirror-action "big-buttjump-right")
+    )
+    (action
+      (name "air-swimming-right")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimming-right")
+    )
+    (action
+      (name "air-swimming-left")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimming-right")
+    )
+    (action
+      (name "air-floating-right")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-floating-right")
+    )
+    (action
+      (name "air-floating-left")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-floating-right")
+    )
+    (action
+      (name "air-swimjump-right")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimjump-right")
+    )
+    (action
+      (name "air-swimjump-left")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimjump-right")
+    )
+    (action
+      (name "santa-walk-right")
+      (fps 20.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-walk-right")
+    )
+    (action
+      (name "santa-walk-left")
+      (fps 20.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-walk-right")
+    )
+    (action
+      (name "santa-stand-right")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-stand-right")
+    )
+    (action
+      (name "santa-stand-left")
+      (fps 15.0)
+      (hitbox 16 14 32 64)
+      (mirror-action "big-stand-right")
+    )
+    (action
+      (name "santa-walljump-right")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 24 14 32 64)
+      (clone-action "big-walljump-right")
+    )
+    (action
+      (name "santa-walljump-left")
+      (fps 24.0)
+      (loops 1)
+      (hitbox 8 14 32 64)
+      (mirror-action "santa-walljump-right")
+    )
+    (action
+      (name "santa-jump-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "santa-jump-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "santa-fall-right")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (clone-action "big-jump-right")
+    )
+    (action
+      (name "santa-fall-left")
+      (fps 16.0)
+      (hitbox 16 14 32 64)
+      (loops 1)
+      (mirror-action "big-jump-right")
+    )
+    (action
+      (name "santa-skid-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-skid-right")
+    )
+    (action
+      (name "santa-skid-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-skid-right")
+    )
+    (action
+      (name "santa-kick-right")
+      (hitbox 16 14 32 64)
+      (clone-action "big-kick-right")
+    )
+    (action
+      (name "santa-kick-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-kick-right")
+    )
+    (action
+      (name "santa-idle-right")
+      (fps 5.0)
+      (hitbox 16 14 32 64)
+      (clone-action "big-idle-right")
+    )
+    (action
+      (name "santa-idle-left")
+      (hitbox 16 14 32 64)
+      (mirror-action "big-idle-right")
+    )
+    (action
+      (name "santa-climbing-right")
+      (fps 15.0)
+      (hitbox 9 14 25 64)
+      (clone-action "big-climbing-right")
+    )
+    (action
+      (name "santa-climbing-left")
+      (fps 15.0)
+      (hitbox 9 14 25 64)
+      (mirror-action "big-climbing-right")
+    )
+    (action
+      (name "santa-duck-right")
+      (hitbox 16 45 32 32)
+      (clone-action "big-duck-right")
+    )
+    (action
+      (name "santa-duck-left")
+      (hitbox 16 45 32 32)
+      (mirror-action "big-duck-right")
+    )
+    (action
+      (name "santa-backflip-right")
+      (hitbox 16 37 32 32)
+      (clone-action "big-backflip-right")
+    )
+    (action
+      (name "santa-backflip-left")
+      (hitbox 16 37 32 32)
+      (fps 18.0)
+      (mirror-action "big-backflip-right")
+    )
+    (action
+      (name "santa-buttjump-right")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (clone-action "big-buttjump-right")
+    )
+    (action
+      (name "santa-buttjump-left")
+      (hitbox 16 14 32 46)
+      (fps 20.0)
+      (loops 1)
+      (mirror-action "big-buttjump-right")
+    )
+    (action
+      (name "santa-swimming-right")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimming-right")
+    )
+    (action
+      (name "santa-swimming-left")
+      (fps 15.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimming-right")
+    )
+    (action
+      (name "santa-floating-right")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (clone-action "big-floating-right")
+    )
+    (action
+      (name "santa-floating-left")
+      (fps 11.0)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-floating-right")
+    )
+    (action
+      (name "santa-swimjump-right")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (clone-action "big-swimjump-right")
+    )
+    (action
+      (name "santa-swimjump-left")
+      (fps 10.0)
+      (loops 1)
+      (hitbox 29 24 32 64)
+      (mirror-action "big-swimjump-right")
+    )
+  )
 )

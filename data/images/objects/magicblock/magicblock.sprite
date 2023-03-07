@@ -1,9 +1,14 @@
 (supertux-sprite
-      (action
+  (version 2)
+  (actions
+    (action
       (hitbox 0 0 31.8 31.8)
-        (name "normal")
-        (images "magicblock.png"))
-      (action
-        (name "solid")
-        (images "magicblock-solid.png"))
+      (name "normal")
+      (images "magicblock.png")
+    )
+    (action
+      (name "solid")
+      (images "magicblock-solid.png")
+    )
+  )
 )

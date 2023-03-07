@@ -1,7 +1,10 @@
 (supertux-sprite
+  (version 2)
+  (actions
     (action
       (name "default")
       (images "lightmap_light.png")
       (hitbox 256 256 0 0)
     )
+  )
 )

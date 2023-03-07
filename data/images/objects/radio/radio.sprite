@@ -1,13 +1,19 @@
 (supertux-sprite
- (action
-  (name "quiet")
-  (hitbox 0 0 0 0)
-  (images "radio1.png"))
- (action
-  (name "loud")
-  (hitbox 0 0 0 0)
-  (images "radio1.png"
-   "radio2.png"
-   "radio3.png")
+  (version 2)
+  (actions
+    (action
+      (name "quiet")
+      (hitbox 0 0 0 0)
+      (images "radio1.png")
+    )
+    (action
+      (name "loud")
+      (hitbox 0 0 0 0)
+      (images
+        "radio1.png"
+        "radio2.png"
+        "radio3.png"
+      )
+    )
   )
 )

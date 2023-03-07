@@ -1,4 +1,6 @@
 (supertux-sprite
+  (version 2)
+  (actions
     (action
       (name "default")
       (images "candle-light-2.png")
@@ -9,4 +11,5 @@
       (images "candle-light-white-2.png")
       (hitbox 256 256 0 0)
     )
+  )
 )

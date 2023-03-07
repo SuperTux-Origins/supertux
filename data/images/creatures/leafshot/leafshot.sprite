@@ -1,64 +1,71 @@
 (supertux-sprite
-  (action
-    (name "left")
-	(fps 15)
-    (hitbox 5 15 50 25)
-    (images "leafshot-0.png"
-            "leafshot-1.png"
-            "leafshot-2.png"
-            "leafshot-3.png"
-            "leafshot-4.png"
-            "leafshot-5.png")
-  )
-  (action
-    (name "right")
-	(fps 15)
-    (hitbox 9 15 50 25)
-    (mirror-action "left")
-  )
-  (action
-    (name "iced-left")
-    (hitbox 4 18 36 18)
-    (images "frozen.png")
-  )
-  (action
-    (name "iced-right")
-    (mirror-action "iced-left")
-  )
-  (action
-    (name "squished-left")
-	(hitbox 1 -21 32 32)
-    (images "../vicious_ivy/squished.png")
-  )
-  (action
-    (name "squished-right")
-	(hitbox -1 -21 32 32)
-    (mirror-action "squished-left")
-  )
-  (action
-    (name "collision-left")
-	(hitbox 2 1 21 25)
-    (images "collision-left.png")
-  )
-  (action
-    (name "collision-right")
-    (hitbox 2 1 21 25)
-    (mirror-action "collision-left")
-  )
-  (action
-    (name "burning-left")
-    (hitbox 4 28 36 18)
-    (images "burning-0.png"
-            "burning-1.png"
-            "burning-2.png"
-            "burning-3.png"
-            "burning-4.png"
-            "burning-5.png"
-            "burning-6.png"
-            "burning-7.png")
-  )
-  (action
-    (name "burning-right")
-    (mirror-action "burning-left")
+  (version 2)
+  (actions
+    (action
+      (name "left")
+      (fps 15)
+      (hitbox 5 15 50 25)
+      (images
+        "leafshot-0.png"
+        "leafshot-1.png"
+        "leafshot-2.png"
+        "leafshot-3.png"
+        "leafshot-4.png"
+        "leafshot-5.png"
+      )
+    )
+    (action
+      (name "right")
+      (fps 15)
+      (hitbox 9 15 50 25)
+      (mirror-action "left")
+    )
+    (action
+      (name "iced-left")
+      (hitbox 4 18 36 18)
+      (images "frozen.png")
+    )
+    (action
+      (name "iced-right")
+      (mirror-action "iced-left")
+    )
+    (action
+      (name "squished-left")
+      (hitbox 1 -21 32 32)
+      (images "../vicious_ivy/squished.png")
+    )
+    (action
+      (name "squished-right")
+      (hitbox -1 -21 32 32)
+      (mirror-action "squished-left")
+    )
+    (action
+      (name "collision-left")
+      (hitbox 2 1 21 25)
+      (images "collision-left.png")
+    )
+    (action
+      (name "collision-right")
+      (hitbox 2 1 21 25)
+      (mirror-action "collision-left")
+    )
+    (action
+      (name "burning-left")
+      (hitbox 4 28 36 18)
+      (images
+        "burning-0.png"
+        "burning-1.png"
+        "burning-2.png"
+        "burning-3.png"
+        "burning-4.png"
+        "burning-5.png"
+        "burning-6.png"
+        "burning-7.png"
+      )
+    )
+    (action
+      (name "burning-right")
+      (mirror-action "burning-left")
+    )
   )
 )

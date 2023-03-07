@@ -1,6 +1,10 @@
 (supertux-sprite
-  (action
-    (name "default")
-    (hitbox 11 16 32 20)
-    (images "crystallo-overlay.png"))
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (hitbox 11 16 32 20)
+      (images "crystallo-overlay.png")
+    )
+  )
 )

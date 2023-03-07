@@ -1,11 +1,13 @@
 (supertux-sprite
-  (action
-    (name "default")
-    (images "egg.png")
-  )
-  (action
-    (name "shadow")
-    (images "egg-shade.png")
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (images "egg.png")
+    )
+    (action
+      (name "shadow")
+      (images "egg-shade.png")
+    )
   )
 )
-
