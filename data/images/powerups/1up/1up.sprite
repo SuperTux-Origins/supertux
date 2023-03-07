@@ -1,4 +1,9 @@
 (supertux-sprite
-       (action
-         (name "default")
-         (images "1up.png")))
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (images "1up.png")
+    )
+  )
+)

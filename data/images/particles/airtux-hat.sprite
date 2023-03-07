@@ -1,14 +1,15 @@
 (supertux-sprite
- (action
-  (name "right")
-  (fps 1)
-  (images
-    "airtux-hat.png"
+  (version 2)
+  (actions
+    (action
+      (name "right")
+      (fps 1)
+      (images "airtux-hat.png")
+    )
+    (action
+      (name "left")
+      (fps 1)
+      (mirror-action "right")
+    )
   )
- )
- (action
-  (name "left")
-  (fps 1)
-  (mirror-action "right")
- )
 )

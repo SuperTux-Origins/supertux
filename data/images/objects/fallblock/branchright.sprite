@@ -1,7 +1,10 @@
 (supertux-sprite
-  (action
-    (name "normal")
-    (hitbox 5 32 123 32)
-    (images "branchright.png")
+  (version 2)
+  (actions
+    (action
+      (name "normal")
+      (hitbox 5 32 123 32)
+      (images "branchright.png")
+    )
   )
 )

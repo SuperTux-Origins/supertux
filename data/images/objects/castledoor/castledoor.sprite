@@ -1,8 +1,11 @@
 (supertux-sprite
- (action
-  (name "closed")
-  (hitbox 0 0 0 0)
-(fps 4)
-  (images "castledoor.png"
-))
+  (version 2)
+  (actions
+    (action
+      (name "closed")
+      (hitbox 0 0 0 0)
+      (fps 4)
+      (images "castledoor.png")
+    )
+  )
 )

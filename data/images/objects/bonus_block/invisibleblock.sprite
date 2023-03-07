@@ -1,11 +1,22 @@
 (supertux-sprite
-      (action
-        (name "default-editor")
-        (images "bonus-invisible.png"))
-      (action
-         (name "empty")
-         (surfaces
-          (surface
-           (diffuse-texture (file "empty.png"))
-           (displacement-texture (file "displacement.png")))))
+  (version 2)
+  (actions
+    (action
+      (name "default-editor")
+      (images "bonus-invisible.png")
+    )
+    (action
+      (name "empty")
+      (surfaces
+        (surface
+          (diffuse-texture
+            (file "empty.png")
+          )
+          (displacement-texture
+            (file "displacement.png")
+          )
+        )
+      )
+    )
+  )
 )

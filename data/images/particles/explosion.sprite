@@ -1,21 +1,23 @@
 (supertux-sprite
- (action
-  (name "default")
-(fps 4.0)
-  (images 
-    "explosion-0.png"
-"explosion-0.png"
-"explosion-0.png"
-"explosion-0.png"
-"explosion-1.png"
-"explosion-1.png"
-"explosion-1.png"
-"explosion-2.png"
-"explosion-2.png"
-"explosion-2.png"
-"explosion-2.png"
-"explosion-2.png"
- 
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (fps 4.0)
+      (images
+        "explosion-0.png"
+        "explosion-0.png"
+        "explosion-0.png"
+        "explosion-0.png"
+        "explosion-1.png"
+        "explosion-1.png"
+        "explosion-1.png"
+        "explosion-2.png"
+        "explosion-2.png"
+        "explosion-2.png"
+        "explosion-2.png"
+        "explosion-2.png"
+      )
+    )
   )
- )
 )

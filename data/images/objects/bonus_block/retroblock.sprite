@@ -1,13 +1,23 @@
 (supertux-sprite
-      (action
-         (fps 15)
-         (name "normal")
-         (images "box-full.png"
-                 ))
-      (action
-         (name "empty")
-         (surfaces
-          (surface
-           (diffuse-texture (file "box-empty.png"))
-           (displacement-texture (file "displacement.png")))))
+  (version 2)
+  (actions
+    (action
+      (fps 15)
+      (name "normal")
+      (images "box-full.png")
+    )
+    (action
+      (name "empty")
+      (surfaces
+        (surface
+          (diffuse-texture
+            (file "box-empty.png")
+          )
+          (displacement-texture
+            (file "displacement.png")
+          )
+        )
+      )
+    )
+  )
 )

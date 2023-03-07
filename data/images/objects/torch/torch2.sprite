@@ -1,7 +1,10 @@
 (supertux-sprite
-  (action
-    (name "default")
-    (hitbox 0 0 16 100)
-    (images "torch2.png")
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (hitbox 0 0 16 100)
+      (images "torch2.png")
+    )
   )
 )

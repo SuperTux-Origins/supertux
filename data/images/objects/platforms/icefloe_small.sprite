@@ -1,7 +1,9 @@
 (supertux-sprite
-  (action
-    (name "default")
-    (images "icefloe_small.png")
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (images "icefloe_small.png")
+    )
   )
 )
-

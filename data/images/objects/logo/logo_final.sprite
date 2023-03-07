@@ -1,6 +1,9 @@
 (supertux-sprite
-  (action
-    (name "default")
-    (images "../../engine/menu/logo.png")
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (images "../../engine/menu/logo.png")
+    )
   )
 )

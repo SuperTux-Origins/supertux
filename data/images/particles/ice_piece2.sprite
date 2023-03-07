@@ -1,6 +1,10 @@
 (supertux-sprite
-  (action
-    (name "normal")
-    (fps 1)
-    (images "ice_piece2.png"))
- )
+  (version 2)
+  (actions
+    (action
+      (name "normal")
+      (fps 1)
+      (images "ice_piece2.png")
+    )
+  )
+)

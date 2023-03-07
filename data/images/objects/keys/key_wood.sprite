@@ -1,14 +1,17 @@
 (supertux-sprite
- (action
-  (name "default")
-  (images "wood.png")
- )
- (action
-  (name "display")
-  (images "wood_display.png")
- )
- (action
-  (name "outline")
-  (images "l_outline.png")
- )               
+  (version 2)
+  (actions
+    (action
+      (name "default")
+      (images "wood.png")
+    )
+    (action
+      (name "display")
+      (images "wood_display.png")
+    )
+    (action
+      (name "outline")
+      (images "l_outline.png")
+    )
+  )
 )
