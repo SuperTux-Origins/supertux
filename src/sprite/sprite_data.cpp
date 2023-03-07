@@ -45,14 +45,11 @@ SpriteData::Action::Action() :
 }
 
 SpriteData::SpriteData(ReaderMapping const& mapping) :
-  actions(),
-  name()
+  actions()
 {
   ReaderIterator iter(mapping);
   while (iter.next()) {
-    if (iter.get_key() == "name") {
-      iter.get(name);
-    } else if (iter.get_key() == "action") {
+    if (iter.get_key() == "action") {
       parse_action(iter.as_mapping());
     } else {
       log_warning << "Unknown sprite field: " << iter.get_key() << std::endl;
@@ -100,7 +97,7 @@ SpriteData::parse_action(ReaderMapping const& mapping)
   {
     if (action->loop_frame < 1)
     {
-      log_warning << "'loop-frame' of action '" << action->name << "' in sprite '" << name << "' set to a value below 1." << std::endl;
+      log_warning << "'loop-frame' of action '" << action->name << "' set to a value below 1." << std::endl;
       action->loop_frame = 1;
     }
   }
@@ -198,7 +195,7 @@ SpriteData::parse_action(ReaderMapping const& mapping)
         else
         {
           std::stringstream msg;
-          msg << "Sprite '" << name << "' unknown tag in 'surfaces' << " << i.get_name();
+          msg << "unknown tag in 'surfaces' << " << i.get_name();
           throw std::runtime_error(msg.str());
         }
       }
@@ -217,7 +214,7 @@ SpriteData::parse_action(ReaderMapping const& mapping)
     else
     {
       std::stringstream msg;
-      msg << "Sprite '" << name << "' contains no images in action '"
+      msg << "sprite contains no images in action '"
           << action->name << "'.";
       throw std::runtime_error(msg.str());
     }
@@ -227,7 +224,7 @@ SpriteData::parse_action(ReaderMapping const& mapping)
   const int frames = static_cast<int>(action->surfaces.size());
   if (action->loop_frame > frames && frames > 0)
   {
-    log_warning << "'loop-frame' of action '" << action->name << "' in sprite '" << name << "' not-in-range of total frames." << std::endl;
+    log_warning << "'loop-frame' of action '" << action->name << "' in sprite not-in-range of total frames." << std::endl;
     action->loop_frame = 1;
   }
 

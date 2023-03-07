@@ -30,11 +30,6 @@ public:
   /** cur has to be a pointer to data in the form of ((hitbox 5 10 0 0) ...) */
   SpriteData(ReaderMapping const& cur);
 
-  std::string const& get_name() const
-  {
-    return name;
-  }
-
 private:
   friend class Sprite;
 
@@ -83,7 +78,6 @@ private:
   Action const* get_action(std::string const& act) const;
 
   Actions actions;
-  std::string name;
 };
 
 #endif
