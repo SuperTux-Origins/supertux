@@ -1,4 +1,4 @@
-(supertux-tiles
+(supertux-tileset
   (tile
     (id 1)
     (images "worldmap/shared/water_01.png"

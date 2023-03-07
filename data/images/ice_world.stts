@@ -1,4 +1,4 @@
-(supertux-tiles
+(supertux-tileset
 
   (autotileset
     (source "autotiles_ice_world.satc")

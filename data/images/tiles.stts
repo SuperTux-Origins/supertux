@@ -14,7 +14,7 @@
 ;;  - the meaning of the values in (attributes ...) can be seen in
 ;;    src/tile.cpp, unisolid is 3 not 2
 
-(supertux-tiles
+(supertux-tileset
   (autotileset
     (source "autotiles.satc")
     )
