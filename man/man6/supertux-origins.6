@@ -6,7 +6,7 @@ supertux-origins \- SuperTux, a classic jump'n'run platformer featuring Tux
 .RI [ options ]
 .br
 .B supertux-origins
-.RI [ options ] " level.stl"
+.RI [ options ] " level.stlv"
 .br
 .B supertux-origins
 .RI [ options ] " worldmap.stwm"
@@ -130,21 +130,21 @@ Contains configuration and savegames.
 Also acts as an overlay of the SuperTux game data path: 
 Files placed here will override or supplement game data files.
 .SH EXAMPLES
-To play level /tmp/mylevel.stl in a window of size 800x600, run 
+To play level /tmp/mylevel.stlv in a window of size 800x600, run 
 the program like this:
 .IP
-.B supertux-origins --window --geometry 800x600 /tmp/mylevel.stl
+.B supertux-origins --window --geometry 800x600 /tmp/mylevel.stlv
 .LP
 To play a previously recorded demo /tmp/mylevel.demo of level 
-/tmp/mylevel.stl, run SuperTux like this: 
+/tmp/mylevel.stlv, run SuperTux like this: 
 .IP
-.B supertux-origins --play-demo /tmp/mylevel.demo /tmp/mylevel.stl
+.B supertux-origins --play-demo /tmp/mylevel.demo /tmp/mylevel.stlv
 .LP
 .PP
 Custom-made levels can be conveniently stored in the overlay data folder. 
 .PP
 .TP
-.B ~/.config/supertux-origins/levels/sample_collection/level01.stl
+.B ~/.config/supertux-origins/levels/sample_collection/level01.stlv
 .nf
 (supertux-level
   (version 2)
@@ -172,7 +172,7 @@ archive.
 .B ~/.config/supertux-origins/sample_collection.zip
 .nf
 levels/sample_collection/info
-levels/sample_collection/level01.stl
+levels/sample_collection/level01.stlv
  ...
 .fi
 .SH BUGS

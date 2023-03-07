@@ -20,9 +20,9 @@
 
 TEST(FileSystemTest, relpath)
 {
-  ASSERT_EQ(FileSystem::relpath("/levels/juser/level.stl", "/"), "levels/juser/level.stl");
-  ASSERT_EQ(FileSystem::relpath("/levels/juser/level.stl", "/levels"), "juser/level.stl");
-  ASSERT_EQ(FileSystem::relpath("/levels/juser/level.stl", "/levels/juser"), "level.stl");
+  ASSERT_EQ(FileSystem::relpath("/levels/juser/level.stlv", "/"), "levels/juser/level.stlv");
+  ASSERT_EQ(FileSystem::relpath("/levels/juser/level.stlv", "/levels"), "juser/level.stlv");
+  ASSERT_EQ(FileSystem::relpath("/levels/juser/level.stlv", "/levels/juser"), "level.stlv");
 }
 
 TEST(FileSystemTest, join)

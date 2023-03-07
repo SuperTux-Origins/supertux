@@ -21,32 +21,32 @@
       (y 320)
     )
     (level
-      (level "antarctica.stl")
+      (level "antarctica.stlv")
       (x 13)
       (y 9)
     )
     (level
-      (level "who_is_gown.stl")
+      (level "who_is_gown.stlv")
       (x 13)
       (y 11)
     )
     (level
-      (level "long_office_nights.stl")
+      (level "long_office_nights.stlv")
       (x 14)
       (y 15)
     )
     (level
-      (level "get_to_choppa.stl")
+      (level "get_to_choppa.stlv")
       (x 16)
       (y 15)
     )
     (level
-      (level "where_my_super_cape.stl")
+      (level "where_my_super_cape.stlv")
       (x 16)
       (y 12)
     )
     (level
-      (level "redmond_headquarters.stl")
+      (level "redmond_headquarters.stlv")
       (x 20)
       (y 13)
     )

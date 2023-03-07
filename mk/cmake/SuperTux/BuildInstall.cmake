@@ -90,7 +90,7 @@ else()
     PATTERN "data/levels/misc/menu.stl.in" EXCLUDE)
 endif()
 
-install(FILES "${CMAKE_BINARY_DIR}/data/levels/misc/menu.stl" DESTINATION "${INSTALL_SUBDIR_SHARE}/levels/misc")
+install(FILES "${CMAKE_BINARY_DIR}/data/levels/misc/menu.stlv" DESTINATION "${INSTALL_SUBDIR_SHARE}/levels/misc")
 
 # move some config clutter to the advanced section
 mark_as_advanced(

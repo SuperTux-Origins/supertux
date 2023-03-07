@@ -82,10 +82,10 @@ LevelParser::from_nothing(std::string const& basedir)
   int num = 0;
   do {
     num++;
-    level_file = basedir + "/level" + std::to_string(num) + ".stl";
+    level_file = basedir + "/level" + std::to_string(num) + ".stlv";
   } while ( PHYSFS_exists(level_file.c_str()) );
   std::string level_name = "Level " + std::to_string(num);
-  level_file = "level" + std::to_string(num) + ".stl";
+  level_file = "level" + std::to_string(num) + ".stlv";
 
   parser.create(level_file, level_name);
   return level;
