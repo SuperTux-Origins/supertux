@@ -210,7 +210,7 @@ LevelParser::create(std::string const& filepath, std::string const& levelname)
   m_level.m_filename = filepath;
   m_level.m_name = levelname;
   m_level.m_license = "CC-BY-SA 4.0 International";
-  m_level.m_tileset = m_worldmap ? "images/ice_world.strf" : "images/tiles.strf";
+  m_level.m_tileset = m_worldmap ? "images/ice_world.stts" : "images/tiles.stts";
 
   auto sector = SectorParser::from_nothing(m_level);
   sector->set_name("main");

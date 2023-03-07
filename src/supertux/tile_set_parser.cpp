@@ -65,8 +65,8 @@ TileSetParser::parse(int32_t start, int32_t end, int32_t offset, bool imported)
   auto doc = load_reader_document(m_filename);
   auto root = doc.get_root();
 
-  if (root.get_name() != "supertux-tiles") {
-    throw std::runtime_error("file is not a supertux tiles file.");
+  if (root.get_name() != "supertux-tileset") {
+    throw std::runtime_error("file is not a supertux-tileset file.");
   }
 
   ReaderIterator iter(root.get_mapping());
@@ -170,7 +170,7 @@ TileSetParser::parse(int32_t start, int32_t end, int32_t offset, bool imported)
     }
   }
 
-  /* only create the unassigned tilegroup from the parent strf */
+  /* only create the unassigned tilegroup from the parent stts */
   if (g_config->developer_mode && !imported)
   {
     m_tileset.add_unassigned_tilegroup();

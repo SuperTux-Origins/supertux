@@ -308,5 +308,5 @@
       (y 10)
     )
   )
-  (tileset "/images/ice_world.strf")
+  (tileset "/images/ice_world.stts")
 )

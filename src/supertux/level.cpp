@@ -42,7 +42,7 @@ Level::Level(bool worldmap) :
   m_sectors(),
   m_stats(),
   m_target_time(),
-  m_tileset("images/tiles.strf"),
+  m_tileset("images/tiles.stts"),
   m_suppress_pause_menu(),
   m_is_in_cutscene(false),
   m_skip_cutscene(false),
