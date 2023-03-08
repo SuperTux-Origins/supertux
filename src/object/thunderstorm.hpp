@@ -17,8 +17,6 @@
 #ifndef HEADER_SUPERTUX_OBJECT_THUNDERSTORM_HPP
 #define HEADER_SUPERTUX_OBJECT_THUNDERSTORM_HPP
 
-#include <map>
-
 #include "squirrel/exposed_object.hpp"
 #include "scripting/thunderstorm.hpp"
 #include "supertux/game_object.hpp"
@@ -77,8 +75,6 @@ private:
   Timer time_to_thunder; /**< counts down until next thunder */
   Timer time_to_lightning; /**< counts down until next lightning */
   Timer flash_display_timer; /**< counts down while flash is displayed */
-
-  std::map<uint32_t, uint32_t> changing_tiles; /**< preserves the tiles which an electrocution should change */
 
 private:
   Thunderstorm(Thunderstorm const&) = delete;

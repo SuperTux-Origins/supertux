@@ -38,13 +38,13 @@ private:
 public:
   TileSetParser(TileSet& tileset, std::string const& filename);
 
-  void parse(int32_t start = 0, int32_t end = 0, int32_t offset = 0, bool imported = false);
+  void parse();
 
 private:
-  void parse_tile(ReaderMapping const& reader, int32_t min, int32_t max, int32_t offset);
-  void parse_tiles(ReaderMapping const& reader, int32_t min, int32_t max, int32_t offset);
-  std::vector<SurfacePtr> parse_imagespecs(ReaderMapping const& cur,
-                                           std::optional<Rect> const& region = std::nullopt) const;
+  void parse_tile(ReaderMapping const& reader);
+  void parse_tiles(ReaderMapping const& reader);
+  std::vector<SurfacePtr> parse_imagespecs(const ReaderMapping& cur,
+                                           std::optional<Rect> const& region = {}) const;
 
 private:
   TileSetParser(TileSetParser const&) = delete;
