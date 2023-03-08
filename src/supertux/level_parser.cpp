@@ -55,19 +55,19 @@ LevelParser::get_level_name(std::string const& filename)
 }
 
 std::unique_ptr<Level>
-LevelParser::from_stream(std::istream& stream, std::string const& context, bool worldmap, bool editable)
+LevelParser::from_stream(std::istream& stream, std::string const& context, bool worldmap)
 {
   auto level = std::make_unique<Level>(worldmap);
-  LevelParser parser(*level, worldmap, editable);
+  LevelParser parser(*level, worldmap);
   parser.load(stream, context);
   return level;
 }
 
 std::unique_ptr<Level>
-LevelParser::from_file(std::string const& filename, bool worldmap, bool editable)
+LevelParser::from_file(std::string const& filename, bool worldmap)
 {
   auto level = std::make_unique<Level>(worldmap);
-  LevelParser parser(*level, worldmap, editable);
+  LevelParser parser(*level, worldmap);
   parser.load(filename);
   return level;
 }
@@ -76,7 +76,7 @@ std::unique_ptr<Level>
 LevelParser::from_nothing(std::string const& basedir)
 {
   auto level = std::make_unique<Level>(false);
-  LevelParser parser(*level, false, false);
+  LevelParser parser(*level, false);
 
   // Find a free level filename
   std::string level_file;
@@ -96,7 +96,7 @@ std::unique_ptr<Level>
 LevelParser::from_nothing_worldmap(std::string const& basedir, std::string const& name)
 {
   auto level = std::make_unique<Level>(true);
-  LevelParser parser(*level, true, false);
+  LevelParser parser(*level, true);
 
   // Find a free level filename
   std::string level_file = basedir + "/worldmap.stwm";
@@ -115,10 +115,9 @@ LevelParser::from_nothing_worldmap(std::string const& basedir, std::string const
   return level;
 }
 
-LevelParser::LevelParser(Level& level, bool worldmap, bool editable) :
+LevelParser::LevelParser(Level& level, bool worldmap) :
   m_level(level),
-  m_worldmap(worldmap),
-  m_editable(editable)
+  m_worldmap(worldmap)
 {
 }
 
@@ -178,7 +177,7 @@ LevelParser::load(ReaderDocument const& doc)
       {
         if (sector_obj.get_name() == "sector")
         {
-          auto sector = SectorParser::from_reader(m_level, sector_obj.get_mapping(), m_editable);
+          auto sector = SectorParser::from_reader(m_level, sector_obj.get_mapping());
           m_level.add_sector(std::move(sector));
         }
       }

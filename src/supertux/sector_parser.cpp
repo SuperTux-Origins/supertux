@@ -46,11 +46,11 @@
 static const std::string DEFAULT_BG = "images/background/antarctic/arctis2.png";
 
 std::unique_ptr<Sector>
-SectorParser::from_reader(Level& level, ReaderMapping const& reader, bool editable)
+SectorParser::from_reader(Level& level, ReaderMapping const& reader)
 {
   auto sector = std::make_unique<Sector>(level);
   BIND_SECTOR(*sector);
-  SectorParser parser(*sector, editable);
+  SectorParser parser(*sector);
   parser.parse(reader);
   return sector;
 }
@@ -60,14 +60,13 @@ SectorParser::from_nothing(Level& level)
 {
   auto sector = std::make_unique<Sector>(level);
   BIND_SECTOR(*sector);
-  SectorParser parser(*sector, false);
+  SectorParser parser(*sector);
   parser.create_sector();
   return sector;
 }
 
-SectorParser::SectorParser(Sector& sector, bool editable) :
-  m_sector(sector),
-  m_editable(editable)
+SectorParser::SectorParser(Sector& sector) :
+  m_sector(sector)
 {
 }
 
@@ -139,7 +138,7 @@ SectorParser::parse(ReaderMapping const& sector)
     }
   }
 
-  m_sector.finish_construction(m_editable);
+  m_sector.finish_construction();
 }
 
 void
@@ -196,7 +195,7 @@ SectorParser::create_sector()
 
   m_sector.flush_game_objects();
 
-  m_sector.finish_construction(m_editable);
+  m_sector.finish_construction();
 }
 
 /* EOF */

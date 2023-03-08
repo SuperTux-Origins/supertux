@@ -122,7 +122,7 @@ Sector::~Sector()
 }
 
 void
-Sector::finish_construction(bool editable)
+Sector::finish_construction()
 {
   flush_game_objects();
 
@@ -131,7 +131,7 @@ Sector::finish_construction(bool editable)
   // but I don't know if it's going to introduce other bugs..   ~ Semphris
   try_process_resolve_requests();
 
-  if (!editable) {
+  {
     convert_tiles2gameobject();
 
     bool has_background = std::any_of(get_objects().begin(), get_objects().end(),
