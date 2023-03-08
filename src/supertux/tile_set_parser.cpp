@@ -29,6 +29,7 @@
 #include "supertux/tile_set.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
+#include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
@@ -46,53 +47,63 @@ TileSetParser::parse()
 {
   m_tiles_path = FileSystem::dirname(m_filename);
 
-  auto doc = load_reader_document(m_filename);
-  auto root = doc.get_root();
+  auto const& doc = load_reader_document(m_filename);
+  auto const& root = doc.get_root();
+  auto const& mapping = doc.get_mapping();
 
   if (root.get_name() != "supertux-tileset") {
     throw std::runtime_error("file is not a supertux-tileset file.");
   }
 
-  ReaderIterator iter(root.get_mapping());
-  while (iter.next())
+  ReaderCollection tiles_collection;
+  if (mapping.read("tiles", tiles_collection))
   {
-    if (iter.get_key() == "tile")
+    for (auto const& tiledef : tiles_collection.get_objects())
     {
-      ReaderMapping tile_mapping = iter.as_mapping();
-      parse_tile(tile_mapping);
-    }
-    else if (iter.get_key() == "tilegroup")
-    {
-      /* tilegroups are only interesting for the editor */
-      ReaderMapping reader = iter.as_mapping();
-      Tilegroup tilegroup;
-      reader.read("name", tilegroup.name);
-      reader.read("tiles", tilegroup.tiles);
-      m_tileset.add_tilegroup(tilegroup);
-    }
-    else if (iter.get_key() == "tiles")
-    {
-      ReaderMapping tiles_mapping = iter.as_mapping();
-      parse_tiles(tiles_mapping);
-    }
-    else if (iter.get_key() == "autotileset")
-    {
-      ReaderMapping reader = iter.as_mapping();
-      std::string autotile_filename;
-      if (!reader.read("source", autotile_filename))
-      {
-        log_warning << "No source path for autotiles in file '" << m_filename << "'" << std::endl;
-      }
-      else
-      {
-        AutotileParser* parser = new AutotileParser(m_tileset.m_autotilesets,
-            FileSystem::normalize(m_tiles_path + autotile_filename));
-        parser->parse();
+      if (tiledef.get_name() == "tile") {
+        ReaderMapping tile_mapping = tiledef.get_mapping();
+        parse_tile(tile_mapping);
+      } else if (tiledef.get_name() == "tiles") {
+        ReaderMapping tiles_mapping = tiledef.get_mapping();
+        parse_tiles(tiles_mapping);
       }
     }
-    else
+  }
+
+  ReaderCollection tilegroups_collection;
+  if (mapping.read("tilegroups", tilegroups_collection))
+  {
+    for (auto const& tilegroup_obj : tiles_collection.get_objects())
     {
-      log_warning << "Unknown symbol '" << iter.get_key() << "' in tileset file" << std::endl;
+      if (tilegroup_obj.get_name() == "tilegroup") {
+        ReaderMapping reader = tilegroup_obj.get_mapping();
+        Tilegroup tilegroup;
+        reader.read("name", tilegroup.name);
+        reader.read("tiles", tilegroup.tiles);
+        m_tileset.add_tilegroup(tilegroup);
+      }
+    }
+  }
+
+  ReaderCollection autotilesets_collection;
+  if (mapping.read("autotilesets", autotilesets_collection))
+  {
+    for (auto const& autotileset_obj : autotilesets_collection.get_objects())
+    {
+      if (autotileset_obj.get_name() == "autotileset") {
+        ReaderMapping reader = autotileset_obj.get_mapping();
+        std::string autotile_filename;
+        if (!reader.read("source", autotile_filename))
+        {
+          log_warning << "No source path for autotiles in file '" << m_filename << "'" << std::endl;
+        }
+        else
+        {
+          AutotileParser* parser = new AutotileParser(m_tileset.m_autotilesets,
+                                                      FileSystem::normalize(m_tiles_path + autotile_filename));
+          parser->parse();
+        }
+      }
     }
   }
 
