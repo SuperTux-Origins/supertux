@@ -42,22 +42,15 @@ TileSetParser::TileSetParser(TileSet& tileset, std::string const& filename) :
 }
 
 void
-TileSetParser::parse(int32_t start, int32_t end, int32_t offset, bool imported)
+TileSetParser::parse(uint32_t start, uint32_t end, int32_t offset, bool imported)
 {
-  if (offset && start + offset < 1) {
+  if (offset && static_cast<int32_t>(start) + offset < 1) {
     start = -offset + 1;
     log_warning << "The defined offset would assign non-positive ids to tiles, tiles below " << -offset + 1 << " will be ignored." << std::endl;
   }
-  if (end < 0) {
-    log_warning << "Cannot import tiles with negative IDs." << std::endl;
+  if (end < start) {
+    log_warning << "The defined range has a negative size, no tiles will be imported." << std::endl;
     return;
-  }
-  if (start < 0) {
-    log_warning << "Cannot import tiles with negative IDs. Importing will start at ID 1." << std::endl;
-    start = 1;
-  }
-  if (imported && !end) {
-    log_warning << "Importing a tileset with no upper ID limit can cause ID conflicts if the imported tileset is expanded in the future." <<std::endl;
   }
 
   m_tiles_path = FileSystem::dirname(m_filename);
@@ -114,22 +107,13 @@ TileSetParser::parse(int32_t start, int32_t end, int32_t offset, bool imported)
     {
       ReaderMapping reader = iter.as_mapping();
       std::string import_filename;
-      int32_t import_start = 0, import_end = 0, import_offset = 0;
-      reader.read("file", import_filename);
-      reader.read("start", import_start);
-      reader.read("end", import_end);
-      reader.read("offset", import_offset);
-      if (import_start + import_offset < start) {
-        import_start = (start - import_offset) < 0 ? 0 : (start - import_offset);
-      }
-      if (end && (!import_end || (import_end + import_offset) > end)) {
-        import_end = end - import_offset;
-      }
-      if (import_end < import_start) {
-        if (!imported) log_warning << "The defined range has a negative size, no tiles will be imported." << std::endl;
-        continue;
-      }
-      import_offset += offset;
+      uint32_t import_start = 0, import_end = 0;
+      int32_t import_offset = 0;
+      reader.get("file", import_filename);
+      reader.get("start", import_start);
+      reader.get("end", import_end);
+      reader.get("offset", import_offset);
+
       TileSetParser import_parser(m_tileset, import_filename);
       import_parser.parse(import_start, import_end, import_offset, true);
     }
@@ -154,7 +138,7 @@ TileSetParser::parse_tile(ReaderMapping const& reader, int32_t min, int32_t max,
   {
     throw std::runtime_error("Missing tile-id.");
   }
-  if (max && (id < static_cast<uint32_t>(min) || id > static_cast<uint32_t>(max))) return;
+  if (max && (id < min || id > max)) return;
   id += offset;
 
   uint32_t attributes = 0;
@@ -325,7 +309,7 @@ TileSetParser::parse_tiles(ReaderMapping const& reader, int32_t min, int32_t max
 
       for (size_t i = 0; i < ids.size(); ++i)
       {
-        if (!ids[i] || (max && (ids[i] < static_cast<uint32_t>(min) || ids[i] > static_cast<uint32_t>(max)))) continue;
+        if (!ids[i] || (max && (ids[i] < min || ids[i] > max))) continue;
         ids[i] += offset;
 
         const int x = static_cast<int>(32 * (i % width));
@@ -358,7 +342,7 @@ TileSetParser::parse_tiles(ReaderMapping const& reader, int32_t min, int32_t max
     {
       for (size_t i = 0; i < ids.size(); ++i)
       {
-        if(!ids[i] || (max && (ids[i] < static_cast<uint32_t>(min) || ids[i] > static_cast<uint32_t>(max)))) continue;
+        if(!ids[i] || (max && (ids[i] < min || ids[i] > max))) continue;
         ids[i] += offset;
 
         int x = static_cast<int>(32 * (i % width));
