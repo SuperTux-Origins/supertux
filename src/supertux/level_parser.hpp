@@ -40,7 +40,6 @@ private:
   void load(ReaderDocument const& doc);
   void load(std::istream& stream, std::string const& context);
   void load(std::string const& filepath);
-  void load_old_format(ReaderMapping const& reader);
   void create(std::string const& filepath, std::string const& levelname);
 
 private:

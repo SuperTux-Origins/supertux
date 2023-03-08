@@ -17,6 +17,7 @@
 #include "supertux/level_parser.hpp"
 
 #include <physfs.h>
+#include <fmt/format.h>
 #include <sstream>
 
 #include "supertux/level.hpp"
@@ -24,9 +25,9 @@
 #include "supertux/sector_parser.hpp"
 #include "util/log.hpp"
 #include "util/reader.hpp"
+#include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/reader_iterator.hpp"
 
 std::string
 LevelParser::get_level_name(std::string const& filename)
@@ -154,10 +155,10 @@ LevelParser::load(ReaderDocument const& doc)
 
   int version = 1;
   level.read("version", version);
-  if (version == 1) {
-    log_info << "[" << doc.get_filename() << "] level uses old format: version 1" << std::endl;
-    load_old_format(level);
-  } else if (version == 2 || version == 3) {
+  if (version != 4) {
+    throw std::runtime_error(fmt::format("{}: level format version {} is not supported",
+                                         doc.get_filename(), version));
+  } else {
     level.read("tileset", m_level.m_tileset);
 
     level.read("name", m_level.m_name);
@@ -171,13 +172,15 @@ LevelParser::load(ReaderDocument const& doc)
     level.read("icon-locked", m_level.m_icon_locked);
     level.read("bkg", m_level.m_wmselect_bkg);
 
-    ReaderIterator iter(level);
-    while (iter.next())
-    {
-      if (iter.get_key() == "sector")
+    ReaderCollection sectors_collection;
+    if (level.read("sectors", sectors_collection)) {
+      for (auto const& sector_obj : sectors_collection.get_objects())
       {
-        auto sector = SectorParser::from_reader(m_level, iter.as_mapping(), m_editable);
-        m_level.add_sector(std::move(sector));
+        if (sector_obj.get_name() == "sector")
+        {
+          auto sector = SectorParser::from_reader(m_level, sector_obj.get_mapping(), m_editable);
+          m_level.add_sector(std::move(sector));
+        }
       }
     }
 
@@ -187,21 +190,9 @@ LevelParser::load(ReaderDocument const& doc)
                   << m_level.m_name << "\". You might not be allowed to share it."
                   << std::endl;
     }
-  } else {
-    log_warning << "[" << doc.get_filename() << "] level format version " << version << " is not supported" << std::endl;
   }
 
   m_level.m_stats.init(m_level);
-}
-
-void
-LevelParser::load_old_format(ReaderMapping const& reader)
-{
-  reader.read("name", m_level.m_name);
-  reader.read("author", m_level.m_author);
-
-  auto sector = SectorParser::from_reader_old_format(m_level, reader, m_editable);
-  m_level.add_sector(std::move(sector));
 }
 
 void
