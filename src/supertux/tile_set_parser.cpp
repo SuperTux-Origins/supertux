@@ -42,17 +42,8 @@ TileSetParser::TileSetParser(TileSet& tileset, std::string const& filename) :
 }
 
 void
-TileSetParser::parse(uint32_t start, uint32_t end, int32_t offset)
+TileSetParser::parse()
 {
-  if (offset && static_cast<int32_t>(start) + offset < 1) {
-    start = -offset + 1;
-    log_warning << "The defined offset would assign non-positive ids to tiles, tiles below " << -offset + 1 << " will be ignored." << std::endl;
-  }
-  if (end < start) {
-    log_warning << "The defined range has a negative size, no tiles will be imported." << std::endl;
-    return;
-  }
-
   m_tiles_path = FileSystem::dirname(m_filename);
 
   auto doc = load_reader_document(m_filename);
@@ -68,13 +59,11 @@ TileSetParser::parse(uint32_t start, uint32_t end, int32_t offset)
     if (iter.get_key() == "tile")
     {
       ReaderMapping tile_mapping = iter.as_mapping();
-      parse_tile(tile_mapping, start, end, offset);
+      parse_tile(tile_mapping);
     }
     else if (iter.get_key() == "tilegroup")
     {
       /* tilegroups are only interesting for the editor */
-      /* ignore tilegroups for imported tilesets unless there's no limit and no offset*/
-      if (start || end || offset) continue;
       ReaderMapping reader = iter.as_mapping();
       Tilegroup tilegroup;
       reader.read("name", tilegroup.name);
@@ -84,12 +73,10 @@ TileSetParser::parse(uint32_t start, uint32_t end, int32_t offset)
     else if (iter.get_key() == "tiles")
     {
       ReaderMapping tiles_mapping = iter.as_mapping();
-      parse_tiles(tiles_mapping, start, end, offset);
+      parse_tiles(tiles_mapping);
     }
     else if (iter.get_key() == "autotileset")
     {
-      /* ignore autotiles for imported tilesets unless there's no limit and no offset */
-      if (start || end || offset) continue;
       ReaderMapping reader = iter.as_mapping();
       std::string autotile_filename;
       if (!reader.read("source", autotile_filename))
@@ -103,43 +90,26 @@ TileSetParser::parse(uint32_t start, uint32_t end, int32_t offset)
         parser->parse();
       }
     }
-    else if (iter.get_key() == "import-tileset")
-    {
-      ReaderMapping reader = iter.as_mapping();
-      std::string import_filename;
-      uint32_t import_start = 0, import_end = 0;
-      int32_t import_offset = 0;
-      reader.get("file", import_filename);
-      reader.get("start", import_start);
-      reader.get("end", import_end);
-      reader.get("offset", import_offset);
-
-      TileSetParser import_parser(m_tileset, import_filename);
-      import_parser.parse(import_start, import_end, import_offset);
-    }
     else
     {
       log_warning << "Unknown symbol '" << iter.get_key() << "' in tileset file" << std::endl;
     }
   }
 
-  /* only create the unassigned tilegroup from the parent stts */
-  if (g_config->developer_mode && !end)
+  if (g_config->developer_mode)
   {
     m_tileset.add_unassigned_tilegroup();
   }
 }
 
 void
-TileSetParser::parse_tile(ReaderMapping const& reader, int32_t min, int32_t max, int32_t offset)
+TileSetParser::parse_tile(ReaderMapping const& reader)
 {
   uint32_t id;
   if (!reader.read("id", id))
   {
     throw std::runtime_error("Missing tile-id.");
   }
-  if (max && (id < min || id > max)) return;
-  id += offset;
 
   uint32_t attributes = 0;
 
@@ -216,7 +186,7 @@ TileSetParser::parse_tile(ReaderMapping const& reader, int32_t min, int32_t max,
 }
 
 void
-TileSetParser::parse_tiles(ReaderMapping const& reader, int32_t min, int32_t max, int32_t offset)
+TileSetParser::parse_tiles(ReaderMapping const& reader)
 {
   // List of ids (use 0 if the tile should be ignored)
   std::vector<uint32_t> ids;
@@ -303,71 +273,71 @@ TileSetParser::parse_tiles(ReaderMapping const& reader, int32_t min, int32_t max
       std::vector<SurfacePtr> surfaces;
       ReaderMapping surfaces_mapping;
       if (reader.read("image", surfaces_mapping) ||
-         reader.read("images", surfaces_mapping)) {
+          reader.read("images", surfaces_mapping)) {
         surfaces = parse_imagespecs(surfaces_mapping);
       }
 
       for (size_t i = 0; i < ids.size(); ++i)
       {
-        if (!ids[i] || (max && (ids[i] < min || ids[i] > max))) continue;
-        ids[i] += offset;
+        if (ids[i] != 0)
+        {
+          const int x = static_cast<int>(32 * (i % width));
+          const int y = static_cast<int>(32 * (i / width));
 
-        const int x = static_cast<int>(32 * (i % width));
-        const int y = static_cast<int>(32 * (i / width));
+          std::vector<SurfacePtr> regions;
+          regions.reserve(surfaces.size());
+          std::transform(surfaces.begin(), surfaces.end(), std::back_inserter(regions),
+                         [x, y] (const SurfacePtr& surface) { 
+                           return surface->region(Rect(x, y, Size(32, 32)));
+                         });
 
-        std::vector<SurfacePtr> regions;
-        regions.reserve(surfaces.size());
-        std::transform(surfaces.begin(), surfaces.end(), std::back_inserter(regions),
-            [x, y] (SurfacePtr const& surface) { 
-              return surface->region(Rect(x, y, Size(32, 32)));
-            });
+          std::vector<SurfacePtr> editor_regions;
+          editor_regions.reserve(editor_surfaces.size());
+          std::transform(editor_surfaces.begin(), editor_surfaces.end(), std::back_inserter(editor_regions),
+                         [x, y] (SurfacePtr const& surface) { 
+                           return surface->region(Rect(x, y, Size(32, 32)));
+                         });
 
-        std::vector<SurfacePtr> editor_regions;
-        editor_regions.reserve(editor_surfaces.size());
-        std::transform(editor_surfaces.begin(), editor_surfaces.end(), std::back_inserter(editor_regions),
-            [x, y] (SurfacePtr const& surface) { 
-              return surface->region(Rect(x, y, Size(32, 32)));
-            });
+          auto tile = std::make_unique<Tile>(regions,
+                                             editor_regions,
+                                             (has_attributes ? attributes[i] : 0),
+                                             (has_datas ? datas[i] : 0),
+                                             fps);
 
-        auto tile = std::make_unique<Tile>(regions,
-                                           editor_regions,
-                                           (has_attributes ? attributes[i] : 0),
-                                           (has_datas ? datas[i] : 0),
-                                           fps);
-
-        m_tileset.add_tile(ids[i], std::move(tile));
+          m_tileset.add_tile(ids[i], std::move(tile));
+        }
       }
     }
     else // (!shared_surface)
     {
       for (size_t i = 0; i < ids.size(); ++i)
       {
-        if(!ids[i] || (max && (ids[i] < min || ids[i] > max))) continue;
-        ids[i] += offset;
+        if (ids[i] != 0)
+        {
+          int x = static_cast<int>(32 * (i % width));
+          int y = static_cast<int>(32 * (i / width));
 
-        int x = static_cast<int>(32 * (i % width));
-        int y = static_cast<int>(32 * (i / width));
+          std::vector<SurfacePtr> surfaces;
+          ReaderMapping surfaces_mapping;
+          if (reader.read("image", surfaces_mapping) ||
+              reader.read("images", surfaces_mapping)) {
+            surfaces = parse_imagespecs(surfaces_mapping, Rect(x, y, Size(32, 32)));
+          }
 
-        std::vector<SurfacePtr> surfaces;
-        ReaderMapping surfaces_mapping;
-        if (reader.read("image", surfaces_mapping) ||
-            reader.read("images", surfaces_mapping)) {
-          surfaces = parse_imagespecs(surfaces_mapping, Rect(x, y, Size(32, 32)));
+          std::vector<SurfacePtr> editor_surfaces;
+          ReaderMapping editor_surfaces_mapping;
+          if (reader.read("editor-images", editor_surfaces_mapping)) {
+            editor_surfaces = parse_imagespecs(editor_surfaces_mapping, Rect(x, y, Size(32, 32)));
+          }
+
+          auto tile = std::make_unique<Tile>(surfaces,
+                                             editor_surfaces,
+                                             (has_attributes ? attributes[i] : 0),
+                                             (has_datas ? datas[i] : 0),
+                                             fps);
+
+          m_tileset.add_tile(ids[i], std::move(tile));
         }
-
-        std::vector<SurfacePtr> editor_surfaces;
-        ReaderMapping editor_surfaces_mapping;
-        if (reader.read("editor-images", editor_surfaces_mapping)) {
-          editor_surfaces = parse_imagespecs(editor_surfaces_mapping, Rect(x, y, Size(32, 32)));
-        }
-
-        auto tile = std::make_unique<Tile>(surfaces,
-                                           editor_surfaces,
-                                           (has_attributes ? attributes[i] : 0),
-                                           (has_datas ? datas[i] : 0),
-                                           fps);
-
-        m_tileset.add_tile(ids[i], std::move(tile));
       }
     }
   }
