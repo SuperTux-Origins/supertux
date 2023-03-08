@@ -211,8 +211,6 @@ if(WIN32)
   endif()
 endif()
 
-include(SuperTux/CompileAmalgation)
-
 ## Generate supertux executable in the right place
 
 #set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
