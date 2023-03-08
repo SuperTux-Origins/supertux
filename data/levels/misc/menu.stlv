@@ -1,5 +1,5 @@
 (supertux-level
-  (version 3)
+  (version 4)
   (name "Menu Level")
   (author "SuperTux Team")
   (license "GPL 2+ / CC-by-sa 3.0")
@@ -7,7 +7,7 @@
   (sector
     (name "main")
     (init-script "
-logo <- FloatingImage(\"images/objects/logo/@LOGO_FILE@\");
+logo <- FloatingImage(\"images/objects/logo/logo.sprite\");
 if(is_christmas()) {
   christmas_hat <- FloatingImage(\"images/particles/santa-cap-big.sprite\");
   christmas_hat.set_anchor_point(ANCHOR_MIDDLE);
