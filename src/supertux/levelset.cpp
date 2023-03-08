@@ -63,7 +63,7 @@ Levelset::walk_directory(std::string const& directory, bool recursively)
     {
       walk_directory(filepath, true);
     }
-    if (std::string_view(*filename).ends_with(".stl"))
+    if (std::string_view(*filename).ends_with(".stlv"))
     {
       if (is_basedir)
       {

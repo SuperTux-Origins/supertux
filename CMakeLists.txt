@@ -292,7 +292,7 @@ if(("${SUPERTUX_VERSION_STRING}" MATCHES "^v[0-9]+\\.[0-9]+\\.[0-9]+$") OR IS_SU
 else()
   set(LOGO_FILE "logo.sprite")
 endif()
-configure_file(data/levels/misc/menu.stl.in ${CMAKE_BINARY_DIR}/data/levels/misc/menu.stl )
+configure_file(data/levels/misc/menu.stlv.in ${CMAKE_BINARY_DIR}/data/levels/misc/menu.stlv )
 
 ## Build tests
 include(SuperTux/BuildTests)

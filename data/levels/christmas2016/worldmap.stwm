@@ -15,7 +15,7 @@
       (y 0)
     )
     (level
-      (level "outro.stl")
+      (level "outro.stlv")
       (extro-script "wait_for_screenswitch();
     display_text_file( \"levels/christmas2016/outro.txt\" );")
       (sprite "/images/objects/invisible/invisible.sprite")
@@ -23,22 +23,22 @@
       (y 10)
     )
     (level
-      (level "christmas1.stl")
+      (level "christmas1.stlv")
       (x 14)
       (y 11)
     )
     (level
-      (level "christmas2.stl")
+      (level "christmas2.stlv")
       (x 18)
       (y 14)
     )
     (level
-      (level "christmas3.stl")
+      (level "christmas3.stlv")
       (x 23)
       (y 12)
     )
     (level
-      (level "intro.stl")
+      (level "intro.stlv")
       (extro-script "wait_for_screenswitch();
     display_text_file( \"levels/christmas2016/intro.txt\" );")
       (auto-play #t)

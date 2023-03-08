@@ -38,7 +38,7 @@
 TitleScreen::TitleScreen(Savegame& savegame) :
   m_frame(Surface::from_file("images/engine/menu/frame.png")),
   m_controller(new CodeController()),
-  m_titlesession(new GameSession("levels/misc/menu.stl", savegame)),
+  m_titlesession(new GameSession("levels/misc/menu.stlv", savegame)),
   m_copyright_text("SuperTux " PACKAGE_VERSION "\n" +
     _("Copyright") + " (c) 2003-2023 SuperTux Devel Team\n" +
     _("This game comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to\n"

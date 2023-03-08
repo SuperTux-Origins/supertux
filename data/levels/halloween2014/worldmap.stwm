@@ -123,32 +123,32 @@
       (y 0)
     )
     (level
-      (level "halloween1.stl")
+      (level "halloween1.stlv")
       (x 11)
       (y 12)
     )
     (level
-      (level "mound.stl")
+      (level "mound.stlv")
       (x 23)
       (y 14)
     )
     (level
-      (level "halloween3.stl")
+      (level "halloween3.stlv")
       (x 17)
       (y 13)
     )
     (level
-      (level "halloween2.stl")
+      (level "halloween2.stlv")
       (x 15)
       (y 9)
     )
     (level
-      (level "pools.stl")
+      (level "pools.stlv")
       (x 28)
       (y 13)
     )
     (level
-      (level "intro.stl")
+      (level "intro.stlv")
       (extro-script " wait_for_screenswitch();
 			  display_text_file( \"levels/halloween2014/intro.txt\"	);")
       (auto-play #t)
@@ -157,7 +157,7 @@
       (y 10)
     )
     (level
-      (level "outro.stl")
+      (level "outro.stlv")
       (extro-script "wait_for_screenswitch(); display_text_file( \"levels/halloween2014/outro.txt\"); wait_for_screenswitch(); exit_worldmap();")
       (sprite "images/objects/invisible/invisible.sprite")
       (x 32)

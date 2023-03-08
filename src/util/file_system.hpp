@@ -40,7 +40,7 @@ std::string dirname(std::string const& filename);
 std::string basename(std::string const& filename);
 
 /** Return a path to 'filename' that is relative to 'basedir', e.g.
-    reldir("/levels/juser/level1.stl", "/levels") -> "juser/level1.stl" */
+    reldir("/levels/juser/level1.stlv", "/levels") -> "juser/level1.stlv" */
 std::string relpath(std::string const& filename, std::string const& basedir);
 
 /** Return the extension of a file */
