@@ -30,13 +30,11 @@ class SectorParser final
 {
 public:
   static std::unique_ptr<Sector> from_reader(Level& level, ReaderMapping const& sector, bool editable);
-  static std::unique_ptr<Sector> from_reader_old_format(Level& level, ReaderMapping const& sector, bool editable);
   static std::unique_ptr<Sector> from_nothing(Level& level);
 
 private:
   SectorParser(Sector& sector, bool editable);
 
-  void parse_old_format(ReaderMapping const& reader);
   void parse(ReaderMapping const& sector);
   void create_sector();
   std::unique_ptr<GameObject> parse_object(std::string const& name_, ReaderMapping const& reader);
