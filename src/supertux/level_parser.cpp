@@ -17,6 +17,7 @@
 #include "supertux/level_parser.hpp"
 
 #include <physfs.h>
+#include <fmt/format.h>
 #include <sstream>
 
 #include "supertux/level.hpp"
@@ -154,10 +155,10 @@ LevelParser::load(ReaderDocument const& doc)
 
   int version = 1;
   level.read("version", version);
-  if (version == 1) {
-    log_info << "[" << doc.get_filename() << "] level uses old format: version 1" << std::endl;
-    load_old_format(level);
-  } else if (version == 4) {
+  if (version != 4) {
+    throw std::runtime_error(fmt::format("{}: level format version {} is not supported",
+                                         doc.get_filename(), version));
+  } else {
     level.read("tileset", m_level.m_tileset);
 
     level.read("name", m_level.m_name);
@@ -189,21 +190,9 @@ LevelParser::load(ReaderDocument const& doc)
                   << m_level.m_name << "\". You might not be allowed to share it."
                   << std::endl;
     }
-  } else {
-    log_warning << "[" << doc.get_filename() << "] level format version " << version << " is not supported" << std::endl;
   }
 
   m_level.m_stats.init(m_level);
-}
-
-void
-LevelParser::load_old_format(ReaderMapping const& reader)
-{
-  reader.read("name", m_level.m_name);
-  reader.read("author", m_level.m_author);
-
-  auto sector = SectorParser::from_reader_old_format(m_level, reader, m_editable);
-  m_level.add_sector(std::move(sector));
 }
 
 void
