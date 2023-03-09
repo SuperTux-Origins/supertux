@@ -34,6 +34,12 @@ after the main game is in a more presentable state. No point in having
 mod support when all it does is constantly break and bring development
 to a crawl.
 
+## Community
+
+In case you need help, feel free to reach out using the following means:
+
+* Matrix: https://matrix.to/#/#supertux-origins:matrix.org
+
 ## Run, Install and Develop
 
 [Nix](https://nixos.org/download.html) is the only officially
