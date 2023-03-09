@@ -19,6 +19,9 @@
 #include <assert.h>
 #include <math.h>
 
+#include <fmt/format.h>
+#include <prio/reader_error.hpp>
+
 #include "util/writer.hpp"
 #include "collision/collision.hpp"
 #include "gui/menu_manager.hpp"
@@ -34,9 +37,9 @@
 #include "supertux/sector.hpp"
 #include "supertux/tile.hpp"
 #include "util/reader.hpp"
+#include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/reader_iterator.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 #include "video/surface_batch.hpp"
@@ -129,74 +132,38 @@ CustomParticleSystem::CustomParticleSystem(ReaderMapping const& reader) :
 {
   m_particle_main_texture = reader.get("main-texture", std::string("/images/engine/editor/sparkle.png"));
 
-  ReaderIterator iter(reader);
-  while (iter.next())
+  ReaderCollection textures_collection;
+  reader.read("textures", textures_collection);
+  for (auto const& texture_obj : textures_collection.get_objects())
   {
-    if (iter.get_key() == "texture")
+    if (texture_obj.get_name() == "texture")
     {
-      ReaderMapping mapping = iter.as_mapping();
+      try {
+        ReaderMapping const& mapping = texture_obj.get_mapping();
 
-      std::string tex;
-      if (!mapping.read("surface", tex))
-      {
-        log_warning << "Texture without surface data ('surface') in "
-                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
-        continue;
-      }
+        std::string tex;
+        mapping.must_read("surface", tex);
 
-      float color_r, color_g, color_b, color_a;
-      if (!mapping.read("color_r", color_r))
-      {
-        log_warning << "Texture without red color field ('color_r') in "
-                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
-        continue;
-      }
-      if (!mapping.read("color_g", color_g))
-      {
-        log_warning << "Texture without green color field ('color_g') in "
-                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
-        continue;
-      }
-      if (!mapping.read("color_b", color_b))
-      {
-        log_warning << "Texture without blue color field ('color_b') in "
-                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
-        continue;
-      }
-      if (!mapping.read("color_a", color_a))
-      {
-        log_warning << "Texture without alpha channel field ('color_a') in "
-                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
-        continue;
-      }
+        Color color;
+        mapping.must_read("color", color);
 
-      float likeliness;
-      if (!mapping.read("likeliness", likeliness))
-      {
-        log_warning << "Texture without likeliness field in "
-                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
-        continue;
-      }
+        float likeliness;
+        mapping.must_read("likeliness", likeliness);
 
-      float scale_x, scale_y;
-      if (!mapping.read("scale_x", scale_x))
-      {
-        log_warning << "Texture without horizontal scale ('scale_x') field in "
-                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
-        continue;
-      }
-      if (!mapping.read("scale_y", scale_y))
-      {
-        log_warning << "Texture without vertical scale ('scale_y') field in "
-                    << mapping.get_document().get_filename() << ", skipping" << std::endl;
-        continue;
-      }
+        float scale_x, scale_y;
+        mapping.must_read("scale_x", scale_x);
+        mapping.must_read("scale_y", scale_y);
 
-      auto props = SpriteProperties(Surface::from_file(tex));
-      props.likeliness = likeliness;
-      props.color = Color(color_r, color_g, color_b, color_a);
-      props.scale = Vector(scale_x, scale_y);
-      m_textures.push_back(props);
+        auto props = SpriteProperties(Surface::from_file(tex));
+        props.likeliness = likeliness;
+        props.color = color;
+        props.scale = Vector(scale_x, scale_y);
+        m_textures.push_back(props);
+      } catch (prio::ReaderError const& err) {
+        log_warning << fmt::format("{}: failed to read texture, skipping: {}",
+                                   texture_obj.get_document().get_filename(),
+                                   err.what()) << std::endl;
+      }
     }
   }
 
@@ -372,9 +339,9 @@ CustomParticleSystem::CustomParticleSystem(ReaderMapping const& reader) :
   reinit_textures();
 }
 
-CustomParticleSystem::~CustomParticleSystem()
-{
-}
+  CustomParticleSystem::~CustomParticleSystem()
+  {
+  }
 
 void
 CustomParticleSystem::reinit_textures()
@@ -425,34 +392,34 @@ CustomParticleSystem::update(float dt_sec)
 
     if (particle->birth_time > dt_sec) {
       switch(particle->birth_mode) {
-      case FadeMode::Shrink:
-        particle->scale = static_cast<float>(
-                          getEasingByName(particle->birth_easing)(
-                            static_cast<double>(
-                              1.f - (particle->birth_time / particle->total_birth)
-                            )
-                          ));
-        break;
-      case FadeMode::Fade:
-        particle->props = SpriteProperties(particle->original_props,
-                                           1.f - (particle->birth_time /
-                                                  particle->total_birth));
-        break;
-      default:
-        break;
+        case FadeMode::Shrink:
+          particle->scale = static_cast<float>(
+            getEasingByName(particle->birth_easing)(
+              static_cast<double>(
+                1.f - (particle->birth_time / particle->total_birth)
+                )
+              ));
+          break;
+        case FadeMode::Fade:
+          particle->props = SpriteProperties(particle->original_props,
+                                             1.f - (particle->birth_time /
+                                                    particle->total_birth));
+          break;
+        default:
+          break;
       }
       particle->birth_time -= dt_sec;
     } else if (particle->birth_time > 0.f) {
       particle->birth_time = 0.f;
       switch(particle->birth_mode) {
-      case FadeMode::Shrink:
-        particle->scale = 1.f;
-        break;
-      case FadeMode::Fade:
-        particle->props = particle->original_props;
-        break;
-      default:
-        break;
+        case FadeMode::Shrink:
+          particle->scale = 1.f;
+          break;
+        case FadeMode::Fade:
+          particle->props = particle->original_props;
+          break;
+        default:
+          break;
       }
     }
 
@@ -464,34 +431,34 @@ CustomParticleSystem::update(float dt_sec)
     if (particle->birth_time <= 0.f && particle->lifetime <= 0.f) {
       if (particle->death_time > dt_sec) {
         switch(particle->death_mode) {
-        case FadeMode::Shrink:
-          particle->scale = 1.f - static_cast<float>(
-                            getEasingByName(particle->death_easing)(
-                              static_cast<double>(
-                                1.f - (particle->death_time / particle->total_death)
-                              )
-                            ));
-          break;
-        case FadeMode::Fade:
-          particle->props = SpriteProperties(particle->original_props,
-                                                   (particle->death_time /
-                                                    particle->total_death));
-          break;
-        default:
-          break;
+          case FadeMode::Shrink:
+            particle->scale = 1.f - static_cast<float>(
+              getEasingByName(particle->death_easing)(
+                static_cast<double>(
+                  1.f - (particle->death_time / particle->total_death)
+                  )
+                ));
+            break;
+          case FadeMode::Fade:
+            particle->props = SpriteProperties(particle->original_props,
+                                               (particle->death_time /
+                                                particle->total_death));
+            break;
+          default:
+            break;
         }
         particle->death_time -= dt_sec;
       } else {
         particle->death_time = 0.f;
         switch(particle->death_mode) {
-        case FadeMode::Shrink:
-          particle->scale = 0.f;
-          break;
-        case FadeMode::Fade:
-          particle->props = SpriteProperties(particle->original_props, 0.f);
-          break;
-        default:
-          break;
+          case FadeMode::Shrink:
+            particle->scale = 0.f;
+            break;
+          case FadeMode::Fade:
+            particle->props = SpriteProperties(particle->original_props, 0.f);
+            break;
+          default:
+            break;
         }
         particle->ready_for_deletion = true;
       }
@@ -510,55 +477,55 @@ CustomParticleSystem::update(float dt_sec)
     }
 
     switch(particle->offscreen_mode) {
-    case OffscreenMode::Always:
-      if (particle->pos.y > static_cast<float>(SCREEN_HEIGHT) + abs_y
-          || particle->pos.y < abs_y
-          || particle->pos.x > static_cast<float>(SCREEN_WIDTH) + abs_x
-          || particle->pos.x < abs_x) {
-        particle->ready_for_deletion = true;
-      }
-      break;
-    case OffscreenMode::OnlyOnExit:
-      if ((particle->pos.y > static_cast<float>(SCREEN_HEIGHT) + abs_y
-          || particle->pos.y < abs_y
-          || particle->pos.x > static_cast<float>(SCREEN_WIDTH) + abs_x
-          || particle->pos.x < abs_x)
-          && particle->has_been_on_screen) {
-        particle->ready_for_deletion = true;
-      }
-      break;
-    case OffscreenMode::Never:
-      break;
+      case OffscreenMode::Always:
+        if (particle->pos.y > static_cast<float>(SCREEN_HEIGHT) + abs_y
+            || particle->pos.y < abs_y
+            || particle->pos.x > static_cast<float>(SCREEN_WIDTH) + abs_x
+            || particle->pos.x < abs_x) {
+          particle->ready_for_deletion = true;
+        }
+        break;
+      case OffscreenMode::OnlyOnExit:
+        if ((particle->pos.y > static_cast<float>(SCREEN_HEIGHT) + abs_y
+             || particle->pos.y < abs_y
+             || particle->pos.x > static_cast<float>(SCREEN_WIDTH) + abs_x
+             || particle->pos.x < abs_x)
+            && particle->has_been_on_screen) {
+          particle->ready_for_deletion = true;
+        }
+        break;
+      case OffscreenMode::Never:
+        break;
     }
 
     bool is_in_life_zone = false;
     for (auto& zone : get_zones()) {
       if (zone.get_rect().contains(particle->pos) && zone.get_particle_name() == m_name) {
         switch(zone.get_type()) {
-        case ParticleZone::ParticleZoneType::Killer:
-          particle->lifetime = 0.f;
-          particle->birth_time = 0.f;
-          break;
+          case ParticleZone::ParticleZoneType::Killer:
+            particle->lifetime = 0.f;
+            particle->birth_time = 0.f;
+            break;
 
-        case ParticleZone::ParticleZoneType::Destroyer:
-          particle->ready_for_deletion = true;
-          break;
+          case ParticleZone::ParticleZoneType::Destroyer:
+            particle->ready_for_deletion = true;
+            break;
 
-        case ParticleZone::ParticleZoneType::LifeClear:
-          particle->last_life_zone_required_instakill = true;
-          particle->has_been_in_life_zone = true;
-          is_in_life_zone = true;
-          break;
+          case ParticleZone::ParticleZoneType::LifeClear:
+            particle->last_life_zone_required_instakill = true;
+            particle->has_been_in_life_zone = true;
+            is_in_life_zone = true;
+            break;
 
-        case ParticleZone::ParticleZoneType::Life:
-          particle->last_life_zone_required_instakill = false;
-          particle->has_been_in_life_zone = true;
-          is_in_life_zone = true;
-          break;
+          case ParticleZone::ParticleZoneType::Life:
+            particle->last_life_zone_required_instakill = false;
+            particle->has_been_in_life_zone = true;
+            is_in_life_zone = true;
+            break;
 
-          // Nothing to do; there's a warning if I don't put that here
-        case ParticleZone::ParticleZoneType::Spawn:
-          break;
+            // Nothing to do; there's a warning if I don't put that here
+          case ParticleZone::ParticleZoneType::Spawn:
+            break;
         }
       }
     } // For each ParticleZone object
@@ -574,76 +541,76 @@ CustomParticleSystem::update(float dt_sec)
 
     if (!particle->stuck) {
       particle->speedX += graphicsRandom.randf(-particle->feather_factor,
-                                      particle->feather_factor) * dt_sec * 1000.f;
+                                               particle->feather_factor) * dt_sec * 1000.f;
       particle->speedY += graphicsRandom.randf(-particle->feather_factor,
-                                      particle->feather_factor) * dt_sec * 1000.f;
+                                               particle->feather_factor) * dt_sec * 1000.f;
       particle->speedX += particle->accX * dt_sec;
       particle->speedY += particle->accY * dt_sec;
       particle->speedX *= 1.f - particle->frictionX * dt_sec;
       particle->speedY *= 1.f - particle->frictionY * dt_sec;
 
       if (Sector::current() && collision(particle,
-                    Vector(particle->speedX,particle->speedY) * dt_sec) > 0) {
+                                         Vector(particle->speedX,particle->speedY) * dt_sec) > 0) {
         switch(particle->collision_mode) {
-        case CollisionMode::Ignore:
-          particle->pos.x += particle->speedX * dt_sec;
-          particle->pos.y += particle->speedY * dt_sec;
-          break;
-        case CollisionMode::Stick:
-          // Just don't move
-          break;
-        case CollisionMode::StickForever:
-          particle->stuck = true;
-          break;
-        case CollisionMode::BounceHeavy:
-        case CollisionMode::BounceLight:
-          {
-            auto c = get_collision(particle, Vector(particle->speedX, particle->speedY) * dt_sec);
-
-            float speed_angle = atanf(-particle->speedY / particle->speedX);
-            float face_angle = atanf(c.slope_normal.y / c.slope_normal.x);
-            if (c.slope_normal.x == 0.f && c.slope_normal.y == 0.f) {
-              auto cX = get_collision(particle, Vector(particle->speedX, 0) * dt_sec);
-              if (cX.left != cX.right)
-                particle->speedX *= -1;
-              auto cY = get_collision(particle, Vector(0, particle->speedY) * dt_sec);
-              if (cY.top != cY.bottom)
-                particle->speedY *= -1;
-            } else {
-              float dest_angle = face_angle * 2.f - speed_angle; // Reflect the angle around face_angle
-              float dX = cosf(dest_angle),
-                    dY = sinf(dest_angle);
-
-              float true_speed = static_cast<float>(sqrt(pow(particle->speedY, 2)
-                                                      + pow(particle->speedX, 2)));
-
-              particle->speedX = dX * true_speed;
-              particle->speedY = dY * true_speed;
-            }
-
-            switch(particle->collision_mode) {
-              case CollisionMode::BounceHeavy:
-                particle->speedX *= .2f;
-                particle->speedY *= .2f;
-                break;
-              case CollisionMode::BounceLight:
-                particle->speedX *= .7f;
-                particle->speedY *= .7f;
-                break;
-              default:
-                assert(false);
-            }
-
+          case CollisionMode::Ignore:
             particle->pos.x += particle->speedX * dt_sec;
             particle->pos.y += particle->speedY * dt_sec;
-          }
-          break;
-        case CollisionMode::Destroy:
-          particle->ready_for_deletion = true;
-          break;
-        case CollisionMode::FadeOut:
-          particle->lifetime = 0.f;
-          break;
+            break;
+          case CollisionMode::Stick:
+            // Just don't move
+            break;
+          case CollisionMode::StickForever:
+            particle->stuck = true;
+            break;
+          case CollisionMode::BounceHeavy:
+          case CollisionMode::BounceLight:
+            {
+              auto c = get_collision(particle, Vector(particle->speedX, particle->speedY) * dt_sec);
+
+              float speed_angle = atanf(-particle->speedY / particle->speedX);
+              float face_angle = atanf(c.slope_normal.y / c.slope_normal.x);
+              if (c.slope_normal.x == 0.f && c.slope_normal.y == 0.f) {
+                auto cX = get_collision(particle, Vector(particle->speedX, 0) * dt_sec);
+                if (cX.left != cX.right)
+                  particle->speedX *= -1;
+                auto cY = get_collision(particle, Vector(0, particle->speedY) * dt_sec);
+                if (cY.top != cY.bottom)
+                  particle->speedY *= -1;
+              } else {
+                float dest_angle = face_angle * 2.f - speed_angle; // Reflect the angle around face_angle
+                float dX = cosf(dest_angle),
+                  dY = sinf(dest_angle);
+
+                float true_speed = static_cast<float>(sqrt(pow(particle->speedY, 2)
+                                                           + pow(particle->speedX, 2)));
+
+                particle->speedX = dX * true_speed;
+                particle->speedY = dY * true_speed;
+              }
+
+              switch(particle->collision_mode) {
+                case CollisionMode::BounceHeavy:
+                  particle->speedX *= .2f;
+                  particle->speedY *= .2f;
+                  break;
+                case CollisionMode::BounceLight:
+                  particle->speedX *= .7f;
+                  particle->speedY *= .7f;
+                  break;
+                default:
+                  assert(false);
+              }
+
+              particle->pos.x += particle->speedX * dt_sec;
+              particle->pos.y += particle->speedY * dt_sec;
+            }
+            break;
+          case CollisionMode::Destroy:
+            particle->ready_for_deletion = true;
+            break;
+          case CollisionMode::FadeOut:
+            particle->lifetime = 0.f;
+            break;
         }
       } else {
         particle->pos.x += particle->speedX * dt_sec;
@@ -651,18 +618,18 @@ CustomParticleSystem::update(float dt_sec)
       }
 
       switch(particle->angle_mode) {
-      case RotationMode::Facing:
-        particle->angle = atanf(particle->speedY / particle->speedX) * 180.f / math::PI;
-        break;
-      case RotationMode::Wiggling:
-        particle->angle += graphicsRandom.randf(-particle->angle_speed / 2.f,
-                                            particle->angle_speed / 2.f) * dt_sec;
-        break;
-      case RotationMode::Fixed:
-      default:
-        particle->angle_speed += particle->angle_acc * dt_sec;
-        particle->angle_speed *= 1.f - particle->angle_decc * dt_sec;
-        particle->angle += particle->angle_speed * dt_sec;
+        case RotationMode::Facing:
+          particle->angle = atanf(particle->speedY / particle->speedX) * 180.f / math::PI;
+          break;
+        case RotationMode::Wiggling:
+          particle->angle += graphicsRandom.randf(-particle->angle_speed / 2.f,
+                                                  particle->angle_speed / 2.f) * dt_sec;
+          break;
+        case RotationMode::Fixed:
+        default:
+          particle->angle_speed += particle->angle_acc * dt_sec;
+          particle->angle_speed *= 1.f - particle->angle_decc * dt_sec;
+          particle->angle += particle->angle_speed * dt_sec;
       }
     }
 
@@ -723,41 +690,41 @@ CustomParticleSystem::draw(DrawingContext& context)
     auto it = batches.find(&(particle->props));
     if (it == batches.end()) {
       auto const& batch_it = batches.emplace(&(particle->props),
-        SurfaceBatch(particle->props.texture, particle->props.color));
+                                             SurfaceBatch(particle->props.texture, particle->props.color));
       batch_it.first->second.draw(Rectf(Vector(
-                                               particle->pos.x - particle->scale
-                                                 * static_cast<float>(
-                                                 particle->props.texture->get_width()
-                                               ) * particle->props.scale.x / 2,
-                                               particle->pos.y - particle->scale
-                                                 * static_cast<float>(
-                                                 particle->props.texture->get_height()
-                                               ) * particle->props.scale.y / 2
-                                        ),
+                                          particle->pos.x - particle->scale
+                                          * static_cast<float>(
+                                            particle->props.texture->get_width()
+                                            ) * particle->props.scale.x / 2,
+                                          particle->pos.y - particle->scale
+                                          * static_cast<float>(
+                                            particle->props.texture->get_height()
+                                            ) * particle->props.scale.y / 2
+                                          ),
                                         Vector(
-                                               particle->pos.x + particle->scale
-                                                 * static_cast<float>(
-                                                 particle->props.texture->get_width()
-                                               ) * particle->props.scale.x / 2,
-                                               particle->pos.y + particle->scale
-                                                 * static_cast<float>(
-                                                 particle->props.texture->get_height()
-                                               ) * particle->props.scale.y / 2
-                                        )
-                                 ), particle->angle);
+                                          particle->pos.x + particle->scale
+                                          * static_cast<float>(
+                                            particle->props.texture->get_width()
+                                            ) * particle->props.scale.x / 2,
+                                          particle->pos.y + particle->scale
+                                          * static_cast<float>(
+                                            particle->props.texture->get_height()
+                                            ) * particle->props.scale.y / 2
+                                          )
+                                    ), particle->angle);
     } else {
       it->second.draw(Rectf(particle->pos,
-                                        Vector(
-                                               particle->pos.x + particle->scale
-                                                 * static_cast<float>(
-                                                 particle->texture->get_width()
-                                               ) * particle->props.scale.x,
-                                               particle->pos.y + particle->scale
-                                                 * static_cast<float>(
-                                                 particle->texture->get_height()
-                                               ) * particle->props.scale.y
-                                        )
-                                 ), particle->angle);
+                            Vector(
+                              particle->pos.x + particle->scale
+                              * static_cast<float>(
+                                particle->texture->get_width()
+                                ) * particle->props.scale.x,
+                              particle->pos.y + particle->scale
+                              * static_cast<float>(
+                                particle->texture->get_height()
+                                ) * particle->props.scale.y
+                              )
+                        ), particle->angle);
     }
   }
 
@@ -765,7 +732,7 @@ CustomParticleSystem::draw(DrawingContext& context)
     auto& surface = it.first->texture;
     auto& batch = it.second;
     context.color().draw_surface_batch(surface, batch.move_srcrects(),
-      batch.move_dstrects(), batch.move_angles(), it.first->color, z_pos);
+                                       batch.move_dstrects(), batch.move_angles(), it.first->color, z_pos);
   }
 
   context.pop_transform();
@@ -786,7 +753,7 @@ CustomParticleSystem::collision(Particle* object, Vector const& movement)
   float y1, y2;
 
   x1 = object->pos.x - particle->props.hb_scale.x * static_cast<float>(particle->props.texture->get_width()) / 2
-          + particle->props.hb_offset.x * static_cast<float>(particle->props.texture->get_width());
+    + particle->props.hb_offset.x * static_cast<float>(particle->props.texture->get_width());
   x2 = x1 + particle->props.hb_scale.x * static_cast<float>(particle->props.texture->get_width()) + movement.x;
   if (x2 < x1) {
     float temp_x = x1;
@@ -795,7 +762,7 @@ CustomParticleSystem::collision(Particle* object, Vector const& movement)
   }
 
   y1 = object->pos.y - particle->props.hb_scale.y * static_cast<float>(particle->props.texture->get_height()) / 2
-          + particle->props.hb_offset.y * static_cast<float>(particle->props.texture->get_height());
+    + particle->props.hb_offset.y * static_cast<float>(particle->props.texture->get_height());
   y2 = y1 + particle->props.hb_scale.y * static_cast<float>(particle->props.texture->get_height()) + movement.y;
   if (y2 < y1) {
     float temp_y = y1;
@@ -1015,11 +982,11 @@ CustomParticleSystem::add_particle(float lifetime, float x, float y)
   particle->death_easing = m_particle_death_easing;
 
   switch(particle->birth_mode) {
-  case FadeMode::Shrink:
-    particle->scale = 0.f;
-    break;
-  default:
-    break;
+    case FadeMode::Shrink:
+      particle->scale = 0.f;
+      break;
+    default:
+      break;
   }
 
   float speedx_delta = m_particle_speed_variation_x / 2;
