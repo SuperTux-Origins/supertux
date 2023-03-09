@@ -34,17 +34,39 @@ after the main game is in a more presentable state. No point in having
 mod support when all it does is constantly break and bring development
 to a crawl.
 
-## Installation
+## Run, Install and Develop
 
 [Nix](https://nixos.org/download.html) is the only officially
 supported platform, meaning it can work on most Linux distributions
-via the Nix packgae manager. To run the game:
+via the Nix packgae manager, Mac might work too with Nix (untested)
+and Windows is handled via cross-compile (see below). The [experimental
+nix-command needs to be enabled](https://nixos.wiki/wiki/Nix_command).
+
+To run the game:
 
     nix run github:supertux-origins/supertux
 
 To install the game:
 
     nix profile install github:supertux-origins/supertux
+
+To develop and build the game manually:
+
+    git clone https://github.com/SuperTux-Origins/supertux.git
+    cd supertux
+    nix develop .
+    mkdir build
+    cd build
+    cmake ..
+    make
+
+The Windows version can be cross-compiled from Linux with (32bit):
+
+    nix build .#packages.i686-windows.supertux-origins-win32
+
+or (64bit):
+
+    nix build .#packages.x86_64-windows.supertux-origins-win32
 
 ## Documentation
 
