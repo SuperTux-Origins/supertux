@@ -30,6 +30,10 @@
 #  include <unistd.h>
 #endif
 
+#if !defined(WIN32) || !defined(EMSCRIPTEN)
+#  include <xdgcpp/xdg.h>
+#endif
+
 #include "audio/sound_manager.hpp"
 #include "gui/dialog.hpp"
 #include "gui/menu_manager.hpp"
@@ -234,67 +238,19 @@ void PhysfsSubsystem::find_userdir() const
   }
   else
   {
-  userdir = PHYSFS_getPrefDir("SuperTux","supertux-origins");
-  }
-//Kept for backwards-compatability only, hence the silence
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-std::string physfs_userdir = PHYSFS_getUserDir();
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
-#ifndef __HAIKU__
-#ifdef _WIN32
-std::string olduserdir = FileSystem::join(physfs_userdir, PACKAGE_NAME);
+#if defined(WIN32)
+    userdir = PHYSFS_getPrefDir("SuperTux","supertux-origins");
+#elif defined(EMSCRIPTEN)
+    userdir = "/home/web_user/.local/share/supertux-origins/";
 #else
-std::string olduserdir = FileSystem::join(physfs_userdir, "." PACKAGE_NAME);
+    userdir = xdg::config().home() / "supertux-origins";
 #endif
-if (FileSystem::is_directory(olduserdir)) {
-  std::filesystem::path olduserpath(olduserdir);
-  std::filesystem::path userpath(userdir);
-
-  bool success = true;
-
-  // cycle through the directory
-  for (auto const& entry: std::filesystem::directory_iterator(olduserpath)) {
-  try
-  {
-    std::filesystem::rename(entry.path(), userpath / entry.path().filename());
   }
-  catch (std::filesystem::filesystem_error const& err)
-  {
-    success = false;
-    log_warning << "Failed to move contents of config directory: " << err.what() << std::endl;
-  }
-  }
-  if (success) {
-    try
-    {
-      std::filesystem::remove_all(olduserpath);
-    }
-    catch (std::filesystem::filesystem_error const& err)
-    {
-      success = false;
-      log_warning << "Failed to remove old config directory: " << err.what();
-    }
-  }
-  if (success) {
-    log_info << "Moved old config dir " << olduserdir << " to " << userdir << std::endl;
-  }
-}
-#endif
-
-#ifdef EMSCRIPTEN
-  userdir = "/home/web_user/.local/share/supertux-origins/";
-#endif
 
   if (!FileSystem::is_directory(userdir))
   {
-  FileSystem::mkdir(userdir);
-  log_info << "Created SuperTux userdir: " << userdir << std::endl;
+    FileSystem::mkdir(userdir);
+    log_info << "Created SuperTux userdir: " << userdir << std::endl;
   }
 
 #ifdef EMSCRIPTEN
