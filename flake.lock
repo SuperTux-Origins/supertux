@@ -665,7 +665,8 @@
         "squirrel": "squirrel",
         "strutcpp": "strutcpp",
         "tinycmmc": "tinycmmc_2",
-        "wstsound": "wstsound"
+        "wstsound": "wstsound",
+        "xdgcpp": "xdgcpp"
       }
     },
     "sexpcpp": {
@@ -833,6 +834,29 @@
       "original": {
         "owner": "WindstilleTeam",
         "repo": "wstsound",
+        "type": "github"
+      }
+    },
+    "xdgcpp": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1658512131,
+        "narHash": "sha256-F4D3HyaJ5djL8YzLl1tzIuum6HYirxERIsNYchBcxdU=",
+        "owner": "grumbel",
+        "repo": "xdgcpp",
+        "rev": "569bf5b6df6092e92ce60bebb125b75b301185e4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "grumbel",
+        "repo": "xdgcpp",
         "type": "github"
       }
     }

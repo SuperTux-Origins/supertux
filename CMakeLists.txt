@@ -270,6 +270,11 @@ target_link_libraries(supertux-origins_lib PUBLIC LibPhysfs)
 target_link_libraries(supertux-origins_lib PUBLIC wstsound::wstsound)
 target_link_libraries(supertux-origins_lib PUBLIC prio::prio)
 
+if(NOT EMSCRIPTEN AND NOT WIN32)
+  find_package(xdgcpp CONFIG)
+  target_link_libraries(supertux-origins_lib PUBLIC xdgcpp)
+endif()
+
 if(HAVE_OPENGL)
   target_link_libraries(supertux-origins_lib PUBLIC LibOpenGL)
 endif()

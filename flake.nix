@@ -67,6 +67,10 @@
     miniswig.inputs.nixpkgs.follows = "nixpkgs";
     miniswig.inputs.flake-utils.follows = "flake-utils";
 
+    xdgcpp.url = "github:grumbel/xdgcpp";
+    xdgcpp.inputs.nixpkgs.follows = "nixpkgs";
+    xdgcpp.inputs.flake-utils.follows = "flake-utils";
+
     wstsound.url = "github:WindstilleTeam/wstsound";
     wstsound.inputs.nixpkgs.follows = "nixpkgs";
     wstsound.inputs.flake-utils.follows = "flake-utils";
@@ -91,7 +95,7 @@
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, curl-win32,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
-              strutcpp, miniswig, wstsound, squirrel, glew-win32, priocpp }:
+              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, priocpp }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {
@@ -134,6 +138,10 @@
             SDL2_image = if pkgs.targetPlatform.isWindows
                          then SDL2_image-win32.packages.${pkgs.system}.default
                          else pkgs.SDL2_image;
+
+            xdgcpp = if !pkgs.targetPlatform.isWindows
+                     then xdgcpp.packages.${pkgs.system}.default
+                     else null;
 
             mcfgthreads = pkgs.windows.mcfgthreads;
             gtest = pkgs.gtest;

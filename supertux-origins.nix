@@ -25,6 +25,7 @@
 , miniswig
 , wstsound
 , priocpp
+, xdgcpp
 , gtest
 }:
 
@@ -107,5 +108,6 @@ EOF
 
     # checkInputs
     gtest
-  ];
+  ]
+  ++ (lib.optional (!stdenv.targetPlatform.isWindows) xdgcpp);
 }
