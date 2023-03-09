@@ -19,6 +19,8 @@
 
 #include <prio/reader_mapping.hpp>
 
+#include "video/color.hpp"
+
 using prio::ReaderMapping;
 
 namespace prio {
@@ -46,6 +48,25 @@ inline bool read_custom(ReaderMapping const& mapping, std::string_view key, uint
   } else {
     value = static_cast<uint32_t>(tmp);
     return true;
+  }
+}
+
+template<>
+inline bool read_custom(ReaderMapping const& mapping, std::string_view key, Color& color)
+{
+  std::vector<float> values;
+  if (!mapping.read(key, values)) {
+    return false;
+  } else {
+    if (values.size() == 3) {
+      color = Color(values[0], values[1], values[2]);
+      return true;
+    } else if (values.size() == 4) {
+      color = Color(values[0], values[1], values[2], values[3]);
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
