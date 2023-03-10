@@ -17,6 +17,10 @@
 #include "worldmap/worldmap_parser.hpp"
 
 #include <physfs.h>
+#include <string>
+#include <stdexcept>
+
+#include <fmt/format.h>
 
 #include "object/ambient_light.hpp"
 #include "object/background.hpp"
@@ -32,6 +36,7 @@
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/reader_object.hpp"
+#include "util/reader_collection.hpp"
 #include "worldmap/level_tile.hpp"
 #include "worldmap/spawn_point.hpp"
 #include "worldmap/special_tile.hpp"
@@ -82,68 +87,41 @@ WorldMapParser::load_worldmap(std::string const& filename)
     ReaderMapping sector;
     if (level_.read("sector", sector))
     {
-      ReaderMapping tilemap_mapping;
-      if (sector.read("tilemap", tilemap_mapping)) {
-        m_worldmap.add<TileMap>(m_worldmap.m_tileset, tilemap_mapping);
-      }
-
-      ReaderMapping background_mapping;
-      if (sector.read("background", background_mapping)) {
-        m_worldmap.add<Background>(background_mapping);
-      }
-
-      std::string music_file;
-      if (sector.read("music", music_file)) {
-        m_worldmap.add<MusicObject>().set_music(music_file);
-      }
-
-      ReaderMapping music_mapping;
-      if (sector.read("music", music_mapping)) {
-        m_worldmap.add<MusicObject>(music_mapping);
-      }
-
       sector.read("init-script", m_worldmap.m_init_script);
 
-      ReaderMapping worldmap_spawnpoint_mapping;
-      if (sector.read("worldmap-spawnpoint", worldmap_spawnpoint_mapping)) {
-        auto sp = std::make_unique<SpawnPoint>(worldmap_spawnpoint_mapping);
-        m_worldmap.m_spawn_points.push_back(std::move(sp));
-      }
-
-      ReaderMapping level_mapping;
-      if (sector.read("level", level_mapping)) {
-        auto& level = m_worldmap.add<LevelTile>(m_worldmap.m_levels_path, level_mapping);
-        load_level_information(level);
-      }
-
-      ReaderMapping special_tile_mapping;
-      if (sector.read("special-tile", special_tile_mapping)) {
-        m_worldmap.add<SpecialTile>(special_tile_mapping);
-      }
-
-      ReaderMapping sprite_change_mapping;
-      if (sector.read("sprite-change", sprite_change_mapping)) {
-        m_worldmap.add<SpriteChange>(sprite_change_mapping);
-      }
-
-      ReaderMapping teleporter_mapping;
-      if (sector.read("teleporter", teleporter_mapping)) {
-        m_worldmap.add<Teleporter>(teleporter_mapping);
-      }
-
-      ReaderMapping decal_mapping;
-      if (sector.read("decal", decal_mapping)) {
-        m_worldmap.add<Decal>(decal_mapping);
-      }
-
-      ReaderMapping path_mapping;
-      if (sector.read("path", path_mapping)) {
-        m_worldmap.add<PathGameObject>(path_mapping);
-      }
-
-      ReaderMapping ambient_light_mapping;
-      if (sector.read("ambient-light", ambient_light_mapping)) {
-        m_worldmap.add<AmbientLight>(ambient_light_mapping);
+      ReaderCollection sector_objects;
+      if (sector.read("objects", sector_objects))
+      {
+        for (auto const& obj : sector_objects.get_objects())
+        {
+          if (obj.get_name() == "music") {
+            m_worldmap.add<MusicObject>(obj.get_mapping());
+          } else if (obj.get_name() == "worldmap-spawnpoint") {
+            auto sp = std::make_unique<SpawnPoint>(obj.get_mapping());
+            m_worldmap.m_spawn_points.push_back(std::move(sp));
+          } else if (obj.get_name() == "tilemap") {
+            m_worldmap.add<TileMap>(m_worldmap.m_tileset, obj.get_mapping());
+          } else if (obj.get_name() == "background") {
+            m_worldmap.add<Background>(obj.get_mapping());
+          } else if (obj.get_name() == "level") {
+            auto& level = m_worldmap.add<LevelTile>(m_worldmap.m_levels_path, obj.get_mapping());
+            load_level_information(level);
+          } else if (obj.get_name() == "special-tile") {
+            m_worldmap.add<SpecialTile>(obj.get_mapping());
+          } else if (obj.get_name() == "sprite-change") {
+            m_worldmap.add<SpriteChange>(obj.get_mapping());
+          } else if (obj.get_name() == "teleporter") {
+            m_worldmap.add<Teleporter>(obj.get_mapping());
+          } else if (obj.get_name() == "decal") {
+            m_worldmap.add<Decal>(obj.get_mapping());
+          } else if (obj.get_name() == "path") {
+            m_worldmap.add<PathGameObject>(obj.get_mapping());
+          } else if (obj.get_name() == "ambient-light") {
+            m_worldmap.add<AmbientLight>(obj.get_mapping());
+          } else {
+            throw std::runtime_error(fmt::format("unknown worldmap object: '{}'", obj.get_name()));
+          }
+        }
       }
     }
 
@@ -154,7 +132,7 @@ WorldMapParser::load_worldmap(std::string const& filename)
 
     m_worldmap.move_to_spawnpoint("main");
 
-  } catch(std::exception& e) {
+  } catch(std::exception const& e) {
     std::stringstream msg;
     msg << "Problem when parsing worldmap '" << m_worldmap.m_map_filename << "': " <<
       e.what();
