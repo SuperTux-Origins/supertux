@@ -1,11 +1,12 @@
 (supertux-level
-  (version 3)
+  (version 4)
   (name "Halloween 2014")
   (author "Ingo Ruhnke")
   (contact "grumbel@gmail.com")
   (license "CC-BY-SA 4.0 International")
   (sector
     (name "main")
+    (objects
     (ambient-light
       (color 0.75 0.75 0.75)
     )
@@ -306,7 +307,7 @@
       (name "main")
       (x 9)
       (y 10)
-    )
+    ))
   )
   (tileset "/images/ice_world.stts")
 )

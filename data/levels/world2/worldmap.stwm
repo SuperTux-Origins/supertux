@@ -1,5 +1,5 @@
 (supertux-level
-  (version 3)
+  (version 4)
   (name "Rooted Forest")
   (author "Carsten Wirtz")
   (contact "https://supertux.org")
@@ -9,6 +9,7 @@
   (sector
     (name "main")
     (init-script "import(\"levels/world2/ghostforest.nut\");")
+    (objects
     (ambient-light
       (color 1 1 1)
     )
@@ -3382,7 +3383,7 @@ state.ambient_b <- 1;")
       (name "world1")
       (x 36)
       (y 72)
-    )
+    ))
   )
   (tileset "/images/ice_world.stts")
 )

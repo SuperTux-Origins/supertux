@@ -1,5 +1,5 @@
 (supertux-level
-  (version 3)
+  (version 4)
   (name "Icy Island")
   (author "Carsten Wirtz")
   (contact "https://supertux.org")
@@ -10,6 +10,7 @@
   (sector
     (name "main")
     (init-script "import(\"levels/world1/worldmap.nut\");")
+    (objects
     (ambient-light
       (color 1 1 1)
     )
@@ -3225,7 +3226,7 @@ state.ambient_b <- 1;")
       (name "world2")
       (x 28)
       (y 23)
-    )
+    ))
   )
   (tileset "/images/ice_world.stts")
 )

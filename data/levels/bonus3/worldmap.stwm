@@ -1,10 +1,11 @@
 (supertux-level
-  (version 3)
+  (version 4)
   (name "Bonus Island III")
   (author "Various Authors")
   (license "GPL 2 / CC-by-sa 3.0")
   (sector
     (name "main")
+    (objects
     (ambient-light
       (color 1 1 1)
     )
@@ -1331,7 +1332,7 @@
       (name "ice")
       (x 31)
       (y 10)
-    )
+    ))
   )
   (tileset "/images/ice_world.stts")
 )

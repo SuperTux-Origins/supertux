@@ -1,11 +1,12 @@
 (supertux-level
-  (version 3)
+  (version 4)
   (name "Bonus Island II")
   (author "SuperTux Team")
   (contact "http://developer.berlios.de/projects/supertux/")
   (license "GPL 2+ / CC-by-sa 3.0")
   (sector
     (name "main")
+    (objects
     (ambient-light
       (color 1 1 1)
     )
@@ -535,7 +536,7 @@
       (name "castle")
       (x 25)
       (y 8)
-    )
+    ))
   )
   (tileset "/images/ice_world.stts")
 )
