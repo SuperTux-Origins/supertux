@@ -4,7 +4,6 @@
   (author "SuperTux Team")
   (contact "http://developer.berlios.de/projects/supertux/")
   (license "GPL 2+ / CC-by-sa 3.0")
-  (tileset "/images/ice_world.stts")
   (sectors
     (sector
       (name "main")

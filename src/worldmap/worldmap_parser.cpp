@@ -69,20 +69,9 @@ WorldMapParser::load_worldmap(std::string const& filename)
 
     auto level_ = root.get_mapping();
 
-    level_.read("name", m_worldmap.m_name);
+    m_worldmap.m_tileset = TileManager::current()->get_tileset("images/ice_world.stts");
 
-    std::string tileset_name;
-    if (level_.read("tileset", tileset_name)) {
-      if (m_worldmap.m_tileset != nullptr) {
-        log_warning << "multiple tilesets specified in level_" << std::endl;
-      } else {
-        m_worldmap.m_tileset = TileManager::current()->get_tileset(tileset_name);
-      }
-    }
-    /* load default tileset */
-    if (m_worldmap.m_tileset == nullptr) {
-      m_worldmap.m_tileset = TileManager::current()->get_tileset("images/ice_world.stts");
-    }
+    level_.read("name", m_worldmap.m_name);
 
     ReaderCollection sectors_collection;
     if (level_.read("sectors", sectors_collection))
