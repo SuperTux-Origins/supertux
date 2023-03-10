@@ -201,8 +201,6 @@ private:
 
   bool m_in_level;
 
-  bool m_in_world_select;
-
 private:
   WorldMap(WorldMap const&) = delete;
   WorldMap& operator=(WorldMap const&) = delete;
