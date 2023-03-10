@@ -90,48 +90,25 @@ SectorParser::parse_object(std::string const& name_, ReaderMapping const& reader
 void
 SectorParser::parse(ReaderMapping const& sector)
 {
-  ReaderIterator iter(sector);
-  while (iter.next()) {
-    if (iter.get_key() == "name") {
-      std::string value;
-      iter.get(value);
-      m_sector.set_name(value);
-    } else if (iter.get_key() == "gravity") {
-      float value;
-      iter.get(value);
-      m_sector.set_gravity(value);
-    } else if (iter.get_key() == "music") {
-      auto const& sx = iter.get_sexp();
-      if (sx.is_array() && sx.as_array().size() == 2 && sx.as_array()[1].is_string()) {
-        std::string value;
-        iter.get(value);
-        m_sector.add<MusicObject>().set_music(value);
-      } else {
-        m_sector.add<MusicObject>(iter.as_mapping());
-      }
-    } else if (iter.get_key() == "init-script") {
-      std::string value;
-      iter.get(value);
-      m_sector.set_init_script(value);
-    } else if (iter.get_key() == "ambient-light") {
-      auto const& sx = iter.get_sexp();
-      if (sx.is_array() && sx.as_array().size() >= 3 &&
-          sx.as_array()[1].is_real() && sx.as_array()[2].is_real() && sx.as_array()[3].is_real())
-      {
-        // for backward compatibilty
-        std::vector<float> vColor;
-        bool hasColor = sector.read("ambient-light", vColor);
-        if (vColor.size() < 3 || !hasColor) {
-          log_warning << "(ambient-light) requires a color as argument" << std::endl;
-        } else {
-          m_sector.add<AmbientLight>(Color(vColor));
-        }
-      } else {
-        // modern format
-        m_sector.add<AmbientLight>(iter.as_mapping());
-      }
-    } else {
-      auto object = parse_object(iter.get_key(), iter.as_mapping());
+  std::string sector_name;
+  if (sector.read("name", sector_name)) {
+    m_sector.set_name(sector_name);
+  }
+
+  float sector_gravity;
+  if (sector.read("gravity", sector_gravity)) {
+    m_sector.set_gravity(sector_gravity);
+  }
+
+  std::string sector_init_script;
+  if (sector.read("init-script", sector_init_script)) {
+    m_sector.set_init_script(sector_init_script);
+  }
+
+  ReaderCollection sector_objects;
+  if (sector.read("objects", sector_objects)) {
+    for (auto const& obj : sector_objects.get_objects()) {
+      auto object = parse_object(obj.get_name(), obj.get_mapping());
       if (object) {
         m_sector.add_object(std::move(object));
       }
