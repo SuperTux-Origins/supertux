@@ -37,31 +37,6 @@ function go_underground(under){
 go_underground(state.underground);
 
 
-
-// ============================================================================
-//   ROAD FORKS
-// ============================================================================
-
-if(! ("fitr_down" in state)){
-	state.fitr_down <- false;
-  print("[DEBUG] 'Fork in the Road' road fork (down) initialized\n");
-}
-
-if(! ("fitr_up" in state)){
-	state.fitr_up <- false;
-  print("[DEBUG] 'Fork in the Road' road fork (up) initialized\n");
-}
-
-function reset_forks(fade_time = 0.35) {
-  fitr_down.set_solid(state.fitr_down);
-  fitr_up.set_solid(state.fitr_up);
-  fitr_down_boulder.fade(state.fitr_down ? 0 : 1, fade_time);
-  fitr_up_boulder.fade(state.fitr_up ? 0 : 1, fade_time);
-}
-
-reset_forks(0.0);
-
-
 // ============================================================================
 //   SECRET AREAS
 // ============================================================================

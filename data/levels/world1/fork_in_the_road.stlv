@@ -228,22 +228,6 @@
           (x 9440)
           (y -128)
         )
-        (scripttrigger
-          (width 32)
-          (height 448)
-          (script "state.fitr_up = true;")
-          (button #f)
-          (x 15104)
-          (y 0)
-        )
-        (scripttrigger
-          (width 32)
-          (height 448)
-          (script "state.fitr_down = true;")
-          (button #f)
-          (x 15104)
-          (y 544)
-        )
         (sequencetrigger
           (sequence "stoptux")
           (width 64)
