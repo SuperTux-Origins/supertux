@@ -3,8 +3,6 @@
   (name "Coconut Fortress")
   (author "Anja")
   (target-time 120)
-  (icon "")
-  (icon-locked "")
   (sectors
     (sector
       (name "main")

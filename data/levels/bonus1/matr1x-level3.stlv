@@ -4,8 +4,6 @@
   (author "Matr1x")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 65)
-  (icon "")
-  (icon-locked "")
   (sectors
     (sector
       (name "main")

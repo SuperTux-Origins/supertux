@@ -5,8 +5,6 @@
   (contact "DevynCJohnson@Gmail.com")
   (license "GPLv3")
   (target-time 20)
-  (icon "")
-  (icon-locked "")
   (sectors
     (sector
       (name "main")

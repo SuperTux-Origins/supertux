@@ -4,8 +4,6 @@
   (author "CT. da'Bomb")
   (license "GPL 2+ / CC-by-sa 3.0")
   (target-time 30)
-  (icon "")
-  (icon-locked "")
   (sectors
     (sector
       (name "main")

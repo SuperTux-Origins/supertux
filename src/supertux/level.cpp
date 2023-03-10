@@ -45,10 +45,7 @@ Level::Level(bool worldmap) :
   m_tileset("images/tiles.stts"),
   m_suppress_pause_menu(),
   m_is_in_cutscene(false),
-  m_skip_cutscene(false),
-  m_icon(),
-  m_icon_locked(),
-  m_wmselect_bkg()
+  m_skip_cutscene(false)
 {
   s_current = this;
 }

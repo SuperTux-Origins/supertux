@@ -4,8 +4,6 @@
   (author "alex")
   (license "CC-BY-SA 4.0 International")
   (target-time 80)
-  (icon "")
-  (icon-locked "")
   (sectors
     (sector
       (name "main")

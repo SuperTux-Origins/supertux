@@ -3,8 +3,6 @@
   (name "In the Spring")
   (author "Anja")
   (target-time 40)
-  (icon "")
-  (icon-locked "")
   (sectors
     (sector
       (name "main")

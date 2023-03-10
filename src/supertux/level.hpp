@@ -81,9 +81,6 @@ public:
   bool m_suppress_pause_menu;
   bool m_is_in_cutscene;
   bool m_skip_cutscene;
-  std::string m_icon;
-  std::string m_icon_locked;
-  std::string m_wmselect_bkg;
 
 private:
   Level(Level const&) = delete;

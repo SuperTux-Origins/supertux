@@ -3,8 +3,6 @@
   (name "A good start")
   (author "Torfi Gunnarsson")
   (license "GPL 2+ / CC-by-sa 3.0")
-  (icon "")
-  (icon-locked "")
   (sectors
     (sector
       (name "main")

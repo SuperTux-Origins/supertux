@@ -167,9 +167,6 @@ LevelParser::load(ReaderDocument const& doc)
     level.read("target-time", m_level.m_target_time);
     level.read("suppress-pause-menu", m_level.m_suppress_pause_menu);
     level.read("note", m_level.m_note);
-    level.read("icon", m_level.m_icon);
-    level.read("icon-locked", m_level.m_icon_locked);
-    level.read("bkg", m_level.m_wmselect_bkg);
 
     ReaderCollection sectors_collection;
     if (level.read("sectors", sectors_collection)) {

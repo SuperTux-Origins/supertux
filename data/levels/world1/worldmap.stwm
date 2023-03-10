@@ -4,9 +4,6 @@
   (author "Carsten Wirtz")
   (contact "https://supertux.org")
   (license "CC-BY-SA 4.0 International")
-  (icon "/images/worlds/icon/icyisland.png")
-  (icon-locked "/images/worlds/locked/icyisland.png")
-  (bkg "/images/worlds/background/icyisland.png")
   (sectors
     (sector
       (name "main")
