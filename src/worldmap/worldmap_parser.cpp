@@ -84,42 +84,49 @@ WorldMapParser::load_worldmap(std::string const& filename)
       m_worldmap.m_tileset = TileManager::current()->get_tileset("images/ice_world.stts");
     }
 
-    ReaderMapping sector;
-    if (level_.read("sector", sector))
+    ReaderCollection sectors_collection;
+    if (level_.read("sectors", sectors_collection))
     {
-      sector.read("init-script", m_worldmap.m_init_script);
-
-      ReaderCollection sector_objects;
-      if (sector.read("objects", sector_objects))
+      for (auto const& sectors_item : sectors_collection.get_objects())
       {
-        for (auto const& obj : sector_objects.get_objects())
+        if (sectors_item.get_name() == "sector")
         {
-          if (obj.get_name() == "music") {
-            m_worldmap.add<MusicObject>(obj.get_mapping());
-          } else if (obj.get_name() == "worldmap-spawnpoint") {
-            auto sp = std::make_unique<SpawnPoint>(obj.get_mapping());
-            m_worldmap.m_spawn_points.push_back(std::move(sp));
-          } else if (obj.get_name() == "tilemap") {
-            m_worldmap.add<TileMap>(m_worldmap.m_tileset, obj.get_mapping());
-          } else if (obj.get_name() == "background") {
-            m_worldmap.add<Background>(obj.get_mapping());
-          } else if (obj.get_name() == "level") {
-            auto& level = m_worldmap.add<LevelTile>(m_worldmap.m_levels_path, obj.get_mapping());
-            load_level_information(level);
-          } else if (obj.get_name() == "special-tile") {
-            m_worldmap.add<SpecialTile>(obj.get_mapping());
-          } else if (obj.get_name() == "sprite-change") {
-            m_worldmap.add<SpriteChange>(obj.get_mapping());
-          } else if (obj.get_name() == "teleporter") {
-            m_worldmap.add<Teleporter>(obj.get_mapping());
-          } else if (obj.get_name() == "decal") {
-            m_worldmap.add<Decal>(obj.get_mapping());
-          } else if (obj.get_name() == "path") {
-            m_worldmap.add<PathGameObject>(obj.get_mapping());
-          } else if (obj.get_name() == "ambient-light") {
-            m_worldmap.add<AmbientLight>(obj.get_mapping());
-          } else {
-            throw std::runtime_error(fmt::format("unknown worldmap object: '{}'", obj.get_name()));
+          ReaderMapping const& sector = sectors_item.get_mapping();
+          sector.read("init-script", m_worldmap.m_init_script);
+
+          ReaderCollection sector_objects;
+          if (sector.read("objects", sector_objects))
+          {
+            for (auto const& obj : sector_objects.get_objects())
+            {
+              if (obj.get_name() == "music") {
+                m_worldmap.add<MusicObject>(obj.get_mapping());
+              } else if (obj.get_name() == "worldmap-spawnpoint") {
+                auto sp = std::make_unique<SpawnPoint>(obj.get_mapping());
+                m_worldmap.m_spawn_points.push_back(std::move(sp));
+              } else if (obj.get_name() == "tilemap") {
+                m_worldmap.add<TileMap>(m_worldmap.m_tileset, obj.get_mapping());
+              } else if (obj.get_name() == "background") {
+                m_worldmap.add<Background>(obj.get_mapping());
+              } else if (obj.get_name() == "level") {
+                auto& level = m_worldmap.add<LevelTile>(m_worldmap.m_levels_path, obj.get_mapping());
+                load_level_information(level);
+              } else if (obj.get_name() == "special-tile") {
+                m_worldmap.add<SpecialTile>(obj.get_mapping());
+              } else if (obj.get_name() == "sprite-change") {
+                m_worldmap.add<SpriteChange>(obj.get_mapping());
+              } else if (obj.get_name() == "teleporter") {
+                m_worldmap.add<Teleporter>(obj.get_mapping());
+              } else if (obj.get_name() == "decal") {
+                m_worldmap.add<Decal>(obj.get_mapping());
+              } else if (obj.get_name() == "path") {
+                m_worldmap.add<PathGameObject>(obj.get_mapping());
+              } else if (obj.get_name() == "ambient-light") {
+                m_worldmap.add<AmbientLight>(obj.get_mapping());
+              } else {
+                throw std::runtime_error(fmt::format("unknown worldmap object: '{}'", obj.get_name()));
+              }
+            }
           }
         }
       }
