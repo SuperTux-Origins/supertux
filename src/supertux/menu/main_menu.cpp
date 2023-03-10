@@ -139,10 +139,6 @@ MainMenu::menu_action(MenuItem& item)
       }
       break;
 
-    case MNID_MANAGEASSETS:
-      MenuManager::instance().push_menu(MenuStorage::ASSET_MENU);
-      break;
-
     case MNID_CREDITS:
       {
         // Credits Level

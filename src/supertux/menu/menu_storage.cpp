@@ -27,7 +27,6 @@
 #include "supertux/menu/multiplayer_menu.hpp"
 #include "supertux/menu/multiplayer_players_menu.hpp"
 #include "supertux/menu/options_menu.hpp"
-#include "supertux/menu/web_asset_menu.hpp"
 #include "supertux/menu/worldmap_menu.hpp"
 #include "supertux/menu/worldmap_cheat_menu.hpp"
 #include "util/log.hpp"
@@ -89,9 +88,6 @@ MenuStorage::create(MenuId menu_id)
 
     case DEBUG_MENU:
       return std::make_unique<DebugMenu>();
-
-    case ASSET_MENU:
-      return std::make_unique<WebAssetMenu>();
 
     case MULTIPLAYER_MENU:
       return std::make_unique<MultiplayerMenu>();

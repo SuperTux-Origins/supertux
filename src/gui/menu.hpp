@@ -87,24 +87,7 @@ public:
   ItemGoTo& add_submenu(std::string const& text, int submenu, int id = -1);
   ItemControlField& add_controlfield(int id, std::string const& text, std::string const& mapping = "");
   ItemStringSelect& add_string_select(int id, std::string const& text, int* selected, std::vector<std::string> const& strings);
-  ItemTextField& add_textfield(std::string const& text, std::string* input, int id = -1);
-  ItemScript& add_script(std::string const& text, std::string* script, int id = -1);
-  ItemScriptLine& add_script_line(std::string* input, int id = -1);
-  ItemIntField& add_intfield(std::string const& text, int* input, int id = -1, bool positive = false);
-  ItemFloatField& add_floatfield(std::string const& text, float* input, int id = -1, bool positive = false);
-  ItemBadguySelect& add_badguy_select(std::string const& text, std::vector<std::string>* badguys, int id = -1);
-  ItemFile& add_file(std::string const& text, std::string* input, std::vector<std::string> const& extensions,
-                     std::string const& basedir, bool path_relative_to_basedir, int id = -1);
-
-  ItemColor& add_color(std::string const& text, Color* color, int id = -1);
-  ItemColorDisplay& add_color_display(Color* color, int id = -1);
-  ItemColorChannelRGBA& add_color_channel_rgba(float* input, Color channel, int id = -1,
-    bool is_linear = false);
-  ItemColorChannelOKLab& add_color_channel_oklab(Color* color, int channel);
   ItemStringArray& add_string_array(std::string const& text, std::vector<std::string>& items, int id = -1);
-  ItemImages& add_images(std::string const& image_path, int max_image_width = 0, int max_image_height = 0, int id = -1);
-  ItemImages& add_images(std::vector<std::string> const& image_paths, int max_image_width = 0, int max_image_height = 0, int id = -1);
-  ItemList& add_list(std::string const& text, std::vector<std::string> const& items, std::string* value_ptr, int id = -1);
 
   void process_input(Controller const& controller);
 

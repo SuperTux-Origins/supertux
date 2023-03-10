@@ -21,25 +21,13 @@
 #include "control/input_manager.hpp"
 #include "gui/item_action.hpp"
 #include "gui/item_back.hpp"
-#include "gui/item_color.hpp"
-#include "gui/item_colorchannel.hpp"
-#include "gui/item_colordisplay.hpp"
 #include "gui/item_controlfield.hpp"
-#include "gui/item_file.hpp"
-#include "gui/item_floatfield.hpp"
 #include "gui/item_goto.hpp"
 #include "gui/item_hl.hpp"
 #include "gui/item_inactive.hpp"
-#include "gui/item_intfield.hpp"
 #include "gui/item_label.hpp"
-#include "gui/item_script.hpp"
-#include "gui/item_script_line.hpp"
 #include "gui/item_stringselect.hpp"
-#include "gui/item_textfield.hpp"
-#include "gui/item_list.hpp"
 #include "gui/item_toggle.hpp"
-#include "gui/item_string_array.hpp"
-#include "gui/item_images.hpp"
 #include "gui/menu_item.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/mousecursor.hpp"
@@ -173,51 +161,6 @@ Menu::add_controlfield(int id, std::string const& text,
   return *item_ptr;
 }
 
-ItemTextField&
-Menu::add_textfield(std::string const& text, std::string* input, int id)
-{
-  auto item = std::make_unique<ItemTextField>(text, input, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemScript&
-Menu::add_script(std::string const& text, std::string* script, int id)
-{
-  auto item = std::make_unique<ItemScript>(text, script, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemScriptLine&
-Menu::add_script_line(std::string* input, int id)
-{
-  auto item = std::make_unique<ItemScriptLine>(input, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemIntField&
-Menu::add_intfield(std::string const& text, int* input, int id, bool positive)
-{
-  auto item = std::make_unique<ItemIntField>(text, input, id, positive);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemFloatField&
-Menu::add_floatfield(std::string const& text, float* input, int id, bool positive)
-{
-  auto item = std::make_unique<ItemFloatField>(text, input, id, positive);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
 ItemAction&
 Menu::add_entry(int id, std::string const& text)
 {
@@ -275,16 +218,6 @@ Menu::add_string_select(int id, std::string const& text, int* selected, std::vec
   return *item_ptr;
 }
 
-ItemFile&
-Menu::add_file(std::string const& text, std::string* input, std::vector<std::string> const& extensions,
-               std::string const& basedir, bool path_relative_to_basedir, int id)
-{
-  auto item = std::make_unique<ItemFile>(text, input, extensions, basedir, path_relative_to_basedir, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
 ItemBack&
 Menu::add_back(std::string const& text, int id)
 {
@@ -298,74 +231,6 @@ ItemGoTo&
 Menu::add_submenu(std::string const& text, int submenu, int id)
 {
   auto item = std::make_unique<ItemGoTo>(text, submenu, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemColorChannelRGBA&
-Menu::add_color_channel_rgba(float* input, Color channel, int id, bool is_linear) {
-  auto item = std::make_unique<ItemColorChannelRGBA>(input, channel, id, is_linear);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemColorChannelOKLab&
-Menu::add_color_channel_oklab(Color* color, int channel) {
-  auto item = std::make_unique<ItemColorChannelOKLab>(color, channel, this);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemColorDisplay&
-Menu::add_color_display(Color* color, int id) {
-  auto item = std::make_unique<ItemColorDisplay>(color, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemColor&
-Menu::add_color(std::string const& text, Color* color, int id) {
-  auto item = std::make_unique<ItemColor>(text, color, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemStringArray&
-Menu::add_string_array(std::string const& text, std::vector<std::string>& items, int id)
-{
-  auto item = std::make_unique<ItemStringArray>(text, items, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemImages&
-Menu::add_images(std::string const& image_path, int max_image_width, int max_image_height, int id)
-{
-  auto item = std::make_unique<ItemImages>(image_path, max_image_width, max_image_height, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-
-ItemImages&
-Menu::add_images(std::vector<std::string> const& image_paths, int max_image_width, int max_image_height, int id)
-{
-  auto item = std::make_unique<ItemImages>(image_paths, max_image_width, max_image_height, id);
-  auto item_ptr = item.get();
-  add_item(std::move(item));
-  return *item_ptr;
-}
-  
-ItemList&
-Menu::add_list(std::string const& text, std::vector<std::string> const& items, std::string* value_ptr, int id)
-{
-  auto item = std::make_unique<ItemList>(text, items, value_ptr, id);
   auto item_ptr = item.get();
   add_item(std::move(item));
   return *item_ptr;

@@ -52,7 +52,7 @@ WorldmapCheatApplyMenu::WorldmapCheatApplyMenu(int num_players,
   add_label(_("Apply cheat to player"));
   add_hl();
 
-  add_intfield("Count", &m_stack_count, -2);
+  //FIXME: add_intfield("Count", &m_stack_count, -2);
   add_hl();
   add_entry(-1, _("All Players"));
 
