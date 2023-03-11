@@ -203,21 +203,21 @@ Player::has_grabbed(std::string const& name) const
   return object.has_grabbed(name);
 }
 
-float 
+float
 Player::get_x() const
 {
   SCRIPT_GUARD_DEFAULT;
   return object.get_bbox().get_left();
 }
 
-float 
+float
 Player::get_y() const
 {
   SCRIPT_GUARD_DEFAULT;
   return object.get_bbox().get_top();
 }
 
-void 
+void
 Player::set_pos(float x, float y)
 {
   SCRIPT_GUARD_VOID;

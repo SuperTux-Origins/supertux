@@ -232,7 +232,7 @@ Notification::disable()
       notif.disabled = true;
     }
   }
-  if (!defined) g_config->notifications.push_back({m_id, true}); 
+  if (!defined) g_config->notifications.push_back({m_id, true});
 }
 
 void

@@ -179,7 +179,7 @@ public:
 
   std::vector<TileMap*> const& get_solid_tilemaps() const { return m_solid_tilemaps; }
   std::vector<TileMap*> const& get_all_tilemaps() const { return m_all_tilemaps; }
-  
+
   void update_solid(TileMap* solid);
 
 protected:

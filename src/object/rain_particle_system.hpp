@@ -94,7 +94,7 @@ private:
   float m_current_amount;
   float m_target_amount;
   float m_amount_fade_time_remaining;
-  
+
   float m_current_real_amount;
 
 private:

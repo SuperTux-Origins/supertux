@@ -95,18 +95,18 @@ void
 Ghoul::active_update(float dt_sec)
 {
   auto player = get_nearest_player();
-  if (!player) 
+  if (!player)
   return;
   Vector p1 = m_col.m_bbox.get_middle();
   Vector p2 = player->get_bbox().get_middle();
   Vector dist = (p2 - p1);
-  
+
   Rectf const& player_bbox = player->get_bbox();
-  
+
   if (player_bbox.get_right() < m_col.m_bbox.get_left()) {
     m_sprite->set_action("left", -1);
   }
-  
+
   if (player_bbox.get_left() > m_col.m_bbox.get_right()) {
     m_sprite->set_action("right", -1);
   }

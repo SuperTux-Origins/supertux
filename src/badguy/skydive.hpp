@@ -23,7 +23,7 @@ class SkyDive final : public BadGuy
 {
 public:
   SkyDive(ReaderMapping const& reader);
-  
+
   void kill_fall() override;
 
   void collision_solid(CollisionHit const& hit) override;

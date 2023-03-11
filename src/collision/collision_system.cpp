@@ -55,7 +55,7 @@ CollisionSystem::remove(CollisionObject* object)
   m_objects.erase(
     std::find(m_objects.begin(), m_objects.end(),
               object));
-  
+
   // FIXME: this is a patch. A better way of fixing this is coming.
   for (auto* collision_object : m_objects) {
     collision_object->notify_object_removal(object);
@@ -114,7 +114,7 @@ collision::Constraints check_collisions(Vector const& obj_movement, Rectf const&
 
   if (!collision::intersects(moving_obj_rect, grown_other_obj_rect))
     return constraints;
-  
+
   const CollisionHit dummy;
 
   if (other_object != nullptr && moving_object != nullptr && !other_object->collides(*moving_object, dummy))
@@ -642,7 +642,7 @@ CollisionSystem::is_free_of_tiles(Rectf const& rect, const bool ignoreUnisolid, 
       }
     }
   }
-  
+
   return true;
 }
 
@@ -703,7 +703,7 @@ CollisionSystem::free_line_of_sight(Vector const& line_start, Vector const& line
         {
           continue;
         }
-        
+
         Tile const& tile = solids->get_tile_at(test_vector);
         // FIXME: check collision with slope tiles
         if ((tile.get_attributes() & Tile::SOLID)) return false;

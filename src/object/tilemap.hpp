@@ -150,7 +150,7 @@ public:
 
   /** Puts the correct autotile block at the given position */
   void autotile(int x, int y, uint32_t tile);
-  
+
   enum class AutotileCornerOperation {
     ADD_TOP_LEFT,
     ADD_TOP_RIGHT,
@@ -161,10 +161,10 @@ public:
     REMOVE_BOTTOM_LEFT,
     REMOVE_BOTTOM_RIGHT,
   };
-  
+
   /** Puts the correct autotile blocks at the tiles around the given corner */
   void autotile_corner(int x, int y, uint32_t tile, AutotileCornerOperation op);
-  
+
   /** Erases in autotile mode */
   void autotile_erase(Vector const& pos, Vector const& corner_pos);
 

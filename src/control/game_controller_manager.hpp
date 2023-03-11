@@ -31,7 +31,7 @@ typedef struct _SDL_GameController SDL_GameController;
 
 /**
  * Manages GameControllers.
- * 
+ *
  * WARNING: Any edit done to this class should also be done to JoystickManager!
  */
 class GameControllerManager final

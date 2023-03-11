@@ -103,7 +103,7 @@ std::string CustomParticles::get_birth_mode()
 
   case CustomParticleSystem::FadeMode::Shrink:
     return "Shrink";
-  
+
   default:
     return "";
   }
@@ -144,7 +144,7 @@ std::string CustomParticles::get_death_mode()
 
   case CustomParticleSystem::FadeMode::Shrink:
     return "Shrink";
-  
+
   default:
     return "";
   }
@@ -185,7 +185,7 @@ std::string CustomParticles::get_rotation_mode()
 
   case CustomParticleSystem::RotationMode::Wiggling:
     return "Wiggling";
-  
+
   default:
     return "";
   }
@@ -235,7 +235,7 @@ std::string CustomParticles::get_collision_mode()
 
   case CustomParticleSystem::CollisionMode::Destroy:
     return "Destroy";
-  
+
   default:
     return "";
   }
@@ -288,7 +288,7 @@ std::string CustomParticles::get_offscreen_mode()
 
   case CustomParticleSystem::OffscreenMode::Always:
     return "Always";
-  
+
   default:
     return "";
   }

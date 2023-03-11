@@ -46,7 +46,7 @@ public:
 #if 0
     if (!object)
     {
-      *this = UID(); 
+      *this = UID();
     }
 #endif
 

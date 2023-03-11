@@ -30,7 +30,7 @@ class JoystickConfig;
 
 /**
  * Manages Joysticks.
- * 
+ *
  * WARNING: Any edit done to this class should also be done to GameControllerManager!
  */
 class JoystickManager final

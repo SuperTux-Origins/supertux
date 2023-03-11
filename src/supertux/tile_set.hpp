@@ -58,7 +58,7 @@ public:
   void add_tilegroup(Tilegroup const& tilegroup);
 
   Tile const& get(const uint32_t id) const;
-  
+
   AutotileSet* get_autotileset_from_tile(uint32_t tile_id) const;
 
   uint32_t get_max_tileid() const {
@@ -70,7 +70,7 @@ public:
   }
 
   void print_debug_info(std::string const& filename);
-  
+
 public:
   // Must be public because of tile_set_parser.cpp
   std::vector<AutotileSet*>* m_autotilesets;

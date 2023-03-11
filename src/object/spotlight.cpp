@@ -106,7 +106,7 @@ Spotlight::update(float dt_sec)
   case Direction::COUNTERCLOCKWISE:
     angle -= dt_sec * speed;
     break;
-  
+
   case Direction::STOPPED:
     break;
   }

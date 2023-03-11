@@ -34,7 +34,7 @@ public:
   void activate() override;
   void deactivate() override;
   void active_update(float dt_sec) override;
-  
+
   void goto_node(int node_no);
   void set_state(std::string const& state);
   void start_moving();
@@ -44,17 +44,17 @@ public:
 
 protected:
   bool collision_squished(GameObject& object) override;
-  
+
 private:
   enum MyState {
     STATE_STOPPED, STATE_IDLE, STATE_TRACKING, STATE_PATHMOVING, STATE_PATHMOVING_TRACK
   };
-  
+
 private:
   MyState m_mystate;
   float m_flyspeed;
   float m_track_range;
-  
+
 private:
   Ghoul(Ghoul const&) = delete;
   Ghoul& operator=(Ghoul const&) = delete;

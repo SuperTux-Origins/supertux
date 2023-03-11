@@ -40,7 +40,7 @@ public:
 
   bool is_levelset() const { return m_is_levelset; }
   bool is_worldmap() const { return !m_is_levelset; }
-  
+
   std::string get_contrib_type() const { return m_contrib_type; }
 
   std::string get_worldmap_filename() const;

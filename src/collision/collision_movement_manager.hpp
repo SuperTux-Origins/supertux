@@ -26,7 +26,7 @@
 /**
  * This class takes care of moving objects that have collided on top of other moving
  * objects or on top of moving solid tiles.
- * 
+ *
  * This step is performed after the object updates and before the collision detection.
  */
 class CollisionGroundMovementManager final
@@ -54,7 +54,7 @@ private:
     {
       return m_moving_tilemaps;
     }
-    
+
   private:
     std::unordered_map<CollisionObject*, Vector> m_moving_objects;
     std::unordered_map<TileMap*, Vector> m_moving_tilemaps;

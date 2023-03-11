@@ -93,7 +93,7 @@ PowerUp::collision(GameObject& other, CollisionHit const&)
 
   if (m_sprite_name == "images/powerups/potions/blue-potion.sprite" ||
       m_sprite_name == "images/powerups/potions/red-potion.sprite" ||
-	  m_sprite_name == "/images/powerups/potions/blue-potion.sprite" || 
+	  m_sprite_name == "/images/powerups/potions/blue-potion.sprite" ||
 	  m_sprite_name == "/images/powerups/potions/red-potion.sprite") {
       SoundManager::current()->play("sounds/gulp.wav", get_pos());
   }

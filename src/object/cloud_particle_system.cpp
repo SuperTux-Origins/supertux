@@ -128,7 +128,7 @@ void CloudParticleSystem::update(float dt_sec)
   //   the index of all elements after it (prevents buggy behavior)
   for (int i = static_cast<int>(particles.size()) - 1; i >= 0; --i) {
     auto particle = dynamic_cast<CloudParticle*>(particles.at(i).get());
-    
+
     if (particle->target_alpha == 0.f && particle->target_time_remaining == 0.f)
       particles.erase(particles.begin()+i);
   }
@@ -173,7 +173,7 @@ int CloudParticleSystem::remove_clouds(int amount, float fade_time)
 
   int i = 0;
   for (; i < amount_to_remove && i < static_cast<int>(particles.size()); ++i) {
-  
+
     auto particle = dynamic_cast<CloudParticle*>(particles.at(i).get());
     if (particle->target_alpha != 1.f || particle->target_time_remaining != 0.f) {
       // Skip that one, it doesn't count
@@ -196,7 +196,7 @@ void CloudParticleSystem::fade_speed(float new_speed, float fade_time)
   {
     m_current_speed = new_speed;
   }
-  
+
   m_target_speed = new_speed;
   m_speed_fade_time_remaining = fade_time;
 }

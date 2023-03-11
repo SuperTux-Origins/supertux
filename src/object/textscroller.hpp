@@ -42,7 +42,7 @@ public:
   void set_default_speed(float default_speed);
   void scroll(float offset);
   bool is_finished() const { return m_finished; }
-  
+
 protected:
   Controller const* controller;
 

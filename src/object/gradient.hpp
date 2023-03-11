@@ -63,7 +63,7 @@ private:
 private:
   Gradient(Gradient const&) = delete;
   Gradient& operator=(Gradient const&) = delete;
-  
+
   Color m_start_gradient_top;
   Color m_start_gradient_bottom;
   Color m_fade_gradient_top;

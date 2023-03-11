@@ -79,7 +79,7 @@ public:
     return Vector(width, height);
   }
 
-  bool is_valid() const 
+  bool is_valid() const
   {
     return width > 0 && height > 0;
   }

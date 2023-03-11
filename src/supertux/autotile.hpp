@@ -122,7 +122,7 @@ public:
 
   /** true if this is a corner-based autotileset */
   bool is_corner() const { return m_corner; }
-  
+
   /** Returns the first mask corresponding to the current tile
    *  (useful for corners-based autotilesets)
    */

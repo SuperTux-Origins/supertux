@@ -96,7 +96,7 @@ void
 Statistics::serialize_to_squirrel(SquirrelVM& vm) const
 {
   if (m_status != FINAL) return;
-  
+
   vm.begin_table("statistics");
   vm.store_int("coins-collected", m_coins);
   vm.store_int("badguys-killed", m_badguys);

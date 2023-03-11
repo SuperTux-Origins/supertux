@@ -33,7 +33,7 @@ public:
 
   /**
    * Increases the internal timer of the FadeHelper.
-   * 
+   *
    * @param dt_sec The increase in time since last call to update().
    * @returns The new value for the internal value.
    */

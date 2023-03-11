@@ -202,7 +202,7 @@ GameObjectManager::flush_game_objects()
   update_tilemaps();
 }
 
-void 
+void
 GameObjectManager::update_solid(TileMap* tm) {
   auto it = std::find(m_solid_tilemaps.begin(), m_solid_tilemaps.end(), tm);
   bool found = it != m_solid_tilemaps.end();

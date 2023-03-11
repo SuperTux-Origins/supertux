@@ -39,7 +39,7 @@ public:
   void set_action(std::string const& name, int loops = -1);
 
   /** Composes action (or state) string from an action name and a particular direction
-   * in the form of "name-direction", eg. "walk-left" 
+   * in the form of "name-direction", eg. "walk-left"
    */
   void set_action(std::string const& name, Direction const& dir, int loops = -1);
 
