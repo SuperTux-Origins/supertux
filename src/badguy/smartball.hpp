@@ -25,9 +25,6 @@ class SmartBall final : public WalkingBadguy
 public:
   SmartBall(ReaderMapping const& reader);
 
-  std::string get_water_sprite() const override { return "images/objects/water_drop/pink_drop.sprite"; }
-
-
 protected:
   bool collision_squished(GameObject& object) override;
 

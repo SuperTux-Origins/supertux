@@ -60,15 +60,12 @@ BadGuy::BadGuy(Vector const& pos, Direction direction, std::string const& sprite
   m_ignited(false),
   m_in_water(false),
   m_dead_script(),
-  m_melting_time(0),
   m_lightsprite(SpriteManager::current()->create(light_sprite_name)),
-  m_freezesprite(SpriteManager::current()->create(ice_sprite_name)),
   m_glowing(false),
   m_parent_dispenser(),
   m_state(STATE_INIT),
   m_is_active_flag(),
   m_state_timer(),
-  m_unfreeze_timer(),
   m_on_ground_flag(false),
   m_floor_normal(0.0f, 0.0f),
   m_colgroup_active(COLGROUP_MOVING)
@@ -97,15 +94,12 @@ BadGuy::BadGuy(ReaderMapping const& reader, std::string const& sprite_name_, int
   m_ignited(false),
   m_in_water(false),
   m_dead_script(),
-  m_melting_time(0),
   m_lightsprite(SpriteManager::current()->create(light_sprite_name)),
-  m_freezesprite(SpriteManager::current()->create(ice_sprite_name)),
   m_glowing(false),
   m_parent_dispenser(),
   m_state(STATE_INIT),
   m_is_active_flag(),
   m_state_timer(),
-  m_unfreeze_timer(),
   m_on_ground_flag(false),
   m_floor_normal(0.0f, 0.0f),
   m_colgroup_active(COLGROUP_MOVING)
@@ -146,18 +140,7 @@ BadGuy::draw(DrawingContext& context)
     }
     else
     {
-      if (m_unfreeze_timer.started() && m_unfreeze_timer.get_timeleft() <= 1.f)
-      {
-        m_sprite->draw(context.color(), get_pos() + Vector(graphicsRandom.randf(-3, 3), 0.f), m_layer-1, m_flip);
-        if (is_portable())
-          m_freezesprite->draw(context.color(), get_pos() + Vector(graphicsRandom.randf(-3, 3), 0.f), m_layer);
-      }
-      else
-      {
-        if (m_frozen && is_portable())
-          m_freezesprite->draw(context.color(), get_pos(), m_layer);
-        m_sprite->draw(context.color(), get_pos(), m_layer - (m_frozen ? 1 : 0), m_flip);
-      }
+      m_sprite->draw(context.color(), get_pos(), m_layer - (m_frozen ? 1 : 0), m_flip);
 
       if (m_glowing)
       {
@@ -206,8 +189,6 @@ BadGuy::update(float dt_sec)
   switch (m_state) {
     case STATE_ACTIVE:
       m_is_active_flag = true;
-      //won't work if defined anywhere else for some reason
-      m_freezesprite->set_action("default", 1);
       active_update(dt_sec);
       break;
 
@@ -235,41 +216,6 @@ BadGuy::update(float dt_sec)
       }
       m_col.set_movement(m_physic.get_movement(dt_sec));
       break;
-
-    case STATE_MELTING: {
-      m_is_active_flag = false;
-      m_col.set_movement(m_physic.get_movement(dt_sec));
-      if ( m_sprite->animation_done() || on_ground() ) {
-        Sector::get().add<WaterDrop>(m_col.m_bbox.p1(), get_water_sprite(), m_physic.get_velocity());
-        remove_me();
-        break;
-      }
-    } break;
-
-    case STATE_GROUND_MELTING:
-      m_is_active_flag = false;
-      m_col.set_movement(m_physic.get_movement(dt_sec));
-      if ( m_sprite->animation_done() ) {
-        remove_me();
-      }
-      break;
-
-    case STATE_INSIDE_MELTING: {
-      m_is_active_flag = false;
-      m_col.set_movement(m_physic.get_movement(dt_sec));
-      if ( on_ground() && m_sprite->animation_done() ) {
-        m_sprite->set_action("gear", m_dir, 1);
-        set_state(STATE_GEAR);
-      }
-      int pa = graphicsRandom.rand(0,3);
-      float px = graphicsRandom.randf(m_col.m_bbox.get_left(), m_col.m_bbox.get_right());
-      float py = graphicsRandom.randf(m_col.m_bbox.get_top(), m_col.m_bbox.get_bottom());
-      Vector ppos = Vector(px, py);
-      Sector::get().add<SpriteParticle>(get_water_sprite(), "particle_" + std::to_string(pa),
-                                             ppos, ANCHOR_MIDDLE,
-                                             Vector(0, 0), Vector(0, 100 * Sector::get().get_gravity()),
-                                             LAYER_OBJECTS-1);
-    } break;
 
     case STATE_FALLING:
       m_is_active_flag = false;
@@ -339,10 +285,6 @@ BadGuy::collision_tile(uint32_t tile_attributes)
       if (tile_attributes & Tile::FIRE)
       {
         if (is_flammable()) ignite();
-      }
-      else if (tile_attributes & Tile::ICE)
-      {
-        if (is_freezable()) freeze();
       }
       else
       {
@@ -944,38 +886,8 @@ BadGuy::ignite()
   m_sprite->stop_animation();
   m_ignited = true;
 
-  if (m_sprite->has_action("melting-left")) {
-
-    // melt it!
-    if (m_sprite->has_action("ground-melting-left") && on_ground()) {
-      m_sprite->set_action("ground-melting", m_dir, 1);
-      SoundManager::current()->play("sounds/splash.ogg", get_pos());
-      set_state(STATE_GROUND_MELTING);
-    } else {
-      m_sprite->set_action("melting", m_dir, 1);
-      SoundManager::current()->play("sounds/sizzle.ogg", get_pos());
-      set_state(STATE_MELTING);
-    }
-
-    run_dead_script();
-
-  } else if (m_sprite->has_action("burning-left")) {
-    // burn it!
-    m_glowing = true;
-    SoundManager::current()->play("sounds/fire.ogg", get_pos());
-    m_sprite->set_action("burning", m_dir, 1);
-    set_state(STATE_BURNING);
-    run_dead_script();
-  } else if (m_sprite->has_action("inside-melting-left")) {
-    // melt it inside!
-    SoundManager::current()->play("sounds/splash.ogg", get_pos());
-    m_sprite->set_action("inside-melting", m_dir, 1);
-    set_state(STATE_INSIDE_MELTING);
-    run_dead_script();
-  } else {
-    // Let it fall off the screen then.
-    kill_fall();
-  }
+  // Let it fall off the screen then.
+  kill_fall();
 }
 
 void

@@ -108,11 +108,6 @@ public:
 
   bool is_in_water() const;
 
-  /** Get melting particle sprite filename */
-  virtual std::string get_water_sprite() const {
-    return "images/objects/water_drop/water_drop.sprite";
-  }
-
   void set_sprite_action(std::string const& action, int loops = 1)
   {
     set_action(action, loops);
@@ -139,9 +134,6 @@ protected:
     STATE_SQUISHED,
     STATE_FALLING,
     STATE_BURNING,
-    STATE_MELTING,
-    STATE_GROUND_MELTING,
-    STATE_INSIDE_MELTING,
     STATE_GEAR
   };
 
@@ -255,10 +247,7 @@ protected:
 
   std::string m_dead_script; /**< script to execute when badguy is killed */
 
-  float m_melting_time;
-
   SpritePtr m_lightsprite;
-  SpritePtr m_freezesprite;
   bool m_glowing;
 
   /** If this badguy was dispensed from a dispenser,

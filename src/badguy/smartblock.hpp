@@ -24,8 +24,6 @@ class SmartBlock final : public MrIceBlock
 public:
   SmartBlock(ReaderMapping const& reader);
 
-  std::string get_water_sprite() const override { return "images/objects/water_drop/pink_drop.sprite"; }
-
 private:
   SmartBlock(SmartBlock const&) = delete;
   SmartBlock& operator=(SmartBlock const&) = delete;
