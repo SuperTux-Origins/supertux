@@ -27,8 +27,6 @@ public:
 
   HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
-  std::string get_overlay_size() const override { return "1x1"; }
-
 private:
   FishHarmless(FishHarmless const&) = delete;
   FishHarmless& operator=(FishHarmless const&) = delete;

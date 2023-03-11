@@ -33,8 +33,6 @@ public:
   void unfreeze(bool melt = true) override;
   bool is_freezable() const override;
 
-  std::string get_overlay_size() const override { return "2x1"; }
-
 private:
   bool collision_squished(GameObject& object) override;
 

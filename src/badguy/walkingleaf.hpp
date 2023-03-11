@@ -28,8 +28,6 @@ public:
   bool is_freezable() const override;
   void active_update(float dt_sec) override;
 
-  std::string get_overlay_size() const override { return "2x1"; }
-
 protected:
   bool collision_squished(GameObject& object) override;
 

@@ -36,8 +36,6 @@ public:
 
   bool is_freezable() const override;
 
-  std::string get_overlay_size() const override { return "2x2"; }
-
 private:
   HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   bool collision_squished (GameObject& obj) override;

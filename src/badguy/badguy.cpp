@@ -207,11 +207,7 @@ BadGuy::update(float dt_sec)
     case STATE_ACTIVE:
       m_is_active_flag = true;
       //won't work if defined anywhere else for some reason
-      if (m_frozen && is_portable())
-        m_freezesprite->set_action(get_overlay_size(), 1);
-      else
-        m_freezesprite->set_action("default", 1);
-        
+      m_freezesprite->set_action("default", 1);
       active_update(dt_sec);
       break;
 
@@ -871,19 +867,7 @@ BadGuy::freeze()
   set_colgroup_active(COLGROUP_MOVING_STATIC);
   SoundManager::current()->play("sounds/sizzle.ogg", get_pos());
 
-  float freezesize_x =
-    get_overlay_size() == "3x3" ? 96.f :
-    get_overlay_size() == "2x2" ? 64.f :
-    get_overlay_size() == "2x1" ? 64.f : 45.f;
-
-  float freezesize_y =
-    get_overlay_size() == "3x3" ? 94.f :
-    get_overlay_size() == "2x2" ? 62.f :
-    get_overlay_size() == "2x1" ? 43.f :
-    get_overlay_size() == "1x2" ? 62.f : 43.f;
-
-  m_col.set_size(freezesize_x, freezesize_y);
-  set_pos(Vector(get_bbox().get_left(), get_bbox().get_bottom() - freezesize_y));
+  set_pos(Vector(get_bbox().get_left(), get_bbox().get_bottom()));
 
   if (m_sprite->has_action("iced-left"))
     m_sprite->set_action("iced", m_dir, 1);

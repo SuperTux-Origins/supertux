@@ -158,27 +158,6 @@ FishSwimming::active_update(float dt_sec) {
 }
 
 void
-FishSwimming::freeze()
-{
-  BadGuy::freeze();
-  if (m_beached_timer.started())
-    m_beached_timer.stop();
-}
-
-void
-FishSwimming::unfreeze(bool melt)
-{
-  BadGuy::unfreeze();
-  initialize();
-}
-
-bool
-FishSwimming::is_freezable() const
-{
-  return true;
-}
-
-void
 FishSwimming::turn_around()
 {
   if (m_frozen)

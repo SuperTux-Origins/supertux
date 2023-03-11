@@ -35,8 +35,6 @@ public:
   void kill_fall() override;
   bool is_freezable() const override;
 
-  std::string get_overlay_size() const override { return "1x2"; }
-
 private:
   HitResponse hit(CollisionHit const& );
   void start_waiting();

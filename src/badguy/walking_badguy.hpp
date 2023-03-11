@@ -48,8 +48,6 @@ public:
   void active_update(float dt_sec) override;
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  void freeze() override;
-  void unfreeze(bool melt = true) override;
 
   void active_update(float dt_sec, float target_velocity, float modifier = 1.f);
 

@@ -219,19 +219,6 @@ WalkingBadguy::turn_around()
 }
 
 void
-WalkingBadguy::freeze()
-{
-  BadGuy::freeze();
-}
-
-void
-WalkingBadguy::unfreeze(bool melt)
-{
-  BadGuy::unfreeze(melt);
-  WalkingBadguy::initialize();
-}
-
-void
 WalkingBadguy::set_velocity_y(float vy)
 {
   m_physic.set_velocity_y(vy);

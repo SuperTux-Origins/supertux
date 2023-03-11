@@ -31,11 +31,6 @@ public:
   HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   void active_update(float dt_sec) override;
 
-  void freeze() override;
-  void unfreeze(bool melt = true) override;
-  bool is_freezable() const override;
-  std::string get_overlay_size() const override { return "2x1"; }
-
   void turn_around();
   void maintain_velocity(float goal_x_velocity);
 

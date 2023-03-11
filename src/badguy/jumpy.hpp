@@ -34,8 +34,6 @@ public:
   bool is_freezable() const override;
   bool is_flammable() const override;
 
-  std::string get_overlay_size() const override { return "1x2"; }
-
 private:
   HitResponse hit(CollisionHit const& hit);
 

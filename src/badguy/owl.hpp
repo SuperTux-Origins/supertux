@@ -39,8 +39,6 @@ public:
   bool is_freezable() const override;
   void ignite() override;
 
-  std::string get_overlay_size() const override { return "2x2"; }
-
 protected:
   bool is_above_player() const;
   void active_update (float dt_sec) override;

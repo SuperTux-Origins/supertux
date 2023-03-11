@@ -33,8 +33,6 @@ public:
   bool is_freezable() const override;
   bool is_flammable() const override;
 
-  std::string get_overlay_size() const override { return "3x3"; }
-
 protected:
   enum AngryStoneState {
     IDLE,
