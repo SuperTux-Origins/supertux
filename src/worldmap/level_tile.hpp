@@ -33,8 +33,8 @@ public:
   LevelTile(std::string const& basedir, ReaderMapping const& mapping);
   ~LevelTile() override;
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
 
   void set_solved(bool v);
   bool is_solved() const { return m_solved; }

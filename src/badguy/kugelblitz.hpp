@@ -24,21 +24,21 @@ class Kugelblitz final : public BadGuy
 public:
   Kugelblitz(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  void initialize() override;
+  HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
-  virtual void active_update(float) override;
-  virtual void kill_fall() override;
+  void active_update(float) override;
+  void kill_fall() override;
 
-  virtual bool is_flammable() const override;
+  bool is_flammable() const override;
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
   static std::string class_name() { return "kugelblitz"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Kugelblitz"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   void explode();
 

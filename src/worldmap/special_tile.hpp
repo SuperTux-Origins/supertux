@@ -32,8 +32,8 @@ public:
   SpecialTile(ReaderMapping const& mapping);
   ~SpecialTile() override;
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
 
   Vector get_pos() const { return m_pos; }
   std::string get_map_message() const { return m_map_message; }

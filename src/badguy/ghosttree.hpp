@@ -27,23 +27,23 @@ class GhostTree final : public BadGuy
 public:
   GhostTree(ReaderMapping const& mapping);
 
-  virtual bool is_flammable() const override { return false; }
-  virtual bool is_freezable() const override { return false; }
-  virtual void kill_fall() override { }
+  bool is_flammable() const override { return false; }
+  bool is_freezable() const override { return false; }
+  void kill_fall() override { }
 
-  virtual void activate() override;
-  virtual void active_update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void activate() override;
+  void active_update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
-  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  bool collides(GameObject& other, CollisionHit const& hit) const override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   static std::string class_name() { return "ghosttree"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Ghost Tree"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   void willowisp_died(TreeWillOWisp* willowisp);
   void die();

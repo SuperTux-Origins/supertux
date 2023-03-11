@@ -24,15 +24,15 @@ class Iceflame final : public Flame
 public:
   Iceflame(ReaderMapping const& reader);
 
-  virtual void active_update(float dt_sec) override;
+  void active_update(float dt_sec) override;
 
-  virtual void ignite() override;
-  virtual bool is_flammable() const override;
-  virtual bool is_freezable() const override;
+  void ignite() override;
+  bool is_flammable() const override;
+  bool is_freezable() const override;
   static std::string class_name() { return "iceflame"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Ice Flame"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   Iceflame(Iceflame const&) = delete;

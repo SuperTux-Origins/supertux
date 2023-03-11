@@ -26,16 +26,16 @@ public:
   PowerUp(ReaderMapping const& mapping);
   PowerUp(Vector const& pos, std::string const& sprite_name);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual void on_flip(float height) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void collision_solid(CollisionHit const& hit) override;
+  void on_flip(float height) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   static std::string class_name() { return "powerup"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Powerup"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   /** Initialize power up sprites and other defaults */

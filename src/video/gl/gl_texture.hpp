@@ -36,11 +36,11 @@ public:
   GLTexture(SDL_Surface const& image, Sampler const& sampler);
   ~GLTexture() override;
 
-  virtual int get_texture_width() const override { return m_texture_width; }
-  virtual int get_texture_height() const override { return m_texture_height; }
+  int get_texture_width() const override { return m_texture_width; }
+  int get_texture_height() const override { return m_texture_height; }
 
-  virtual int get_image_width() const override { return m_image_width; }
-  virtual int get_image_height() const override { return m_image_height; }
+  int get_image_width() const override { return m_image_width; }
+  int get_image_height() const override { return m_image_height; }
 
   void set_handle(GLuint handle) { m_handle = handle; }
   GLuint const&get_handle() const { return m_handle; }

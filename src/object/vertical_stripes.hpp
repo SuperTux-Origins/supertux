@@ -28,10 +28,10 @@ public:
 	VerticalStripes();
 	~VerticalStripes() override;
 
-  virtual bool is_singleton() const override { return true; }
-  virtual bool is_saveable() const override { return false; }
-  virtual void update(float dt_sec) override;
- 	virtual void draw(DrawingContext& context) override;
+  bool is_singleton() const override { return true; }
+  bool is_saveable() const override { return false; }
+  void update(float dt_sec) override;
+ 	void draw(DrawingContext& context) override;
 
 private:
   bool m_visible;

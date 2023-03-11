@@ -32,16 +32,16 @@ public:
   Rock(ReaderMapping const& reader);
   Rock(ReaderMapping const& reader, std::string const& spritename);
 
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual void update(float dt_sec) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
 
-  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
-  virtual void ungrab(MovingObject& object, Direction dir) override;
+  void grab(MovingObject& object, Vector const& pos, Direction dir) override;
+  void ungrab(MovingObject& object, Direction dir) override;
   static std::string class_name() { return "rock"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Rock"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   /** Adds velocity from wind */
   virtual void add_wind_velocity(Vector const& velocity, Vector const& end_speed);

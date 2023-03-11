@@ -161,8 +161,8 @@ public:
   Vector get_tux_pos();
 
 protected:
-  virtual bool before_object_add(GameObject& object) override;
-  virtual void before_object_remove(GameObject& object) override;
+  bool before_object_add(GameObject& object) override;
+  void before_object_remove(GameObject& object) override;
 
 private:
   void draw_status(DrawingContext& context);

@@ -26,16 +26,16 @@ class KamikazeSnowball : public BadGuy
 public:
   KamikazeSnowball(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual void collision_solid(CollisionHit const& hit) override;
+  void initialize() override;
+  void collision_solid(CollisionHit const& hit) override;
   static std::string class_name() { return "kamikazesnowball"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Snowshot"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  bool collision_squished(GameObject& object) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   virtual void kill_collision();
 
 private:
@@ -48,21 +48,21 @@ class LeafShot final : public KamikazeSnowball
 public:
   LeafShot(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual bool is_freezable() const override;
+  void initialize() override;
+  bool is_freezable() const override;
 
-  virtual void freeze() override;
-  virtual void unfreeze(bool melt = true) override;
-  virtual void kill_collision() override;
+  void freeze() override;
+  void unfreeze(bool melt = true) override;
+  void kill_collision() override;
 
-  virtual std::string get_overlay_size() const override { return "2x1"; }
+  std::string get_overlay_size() const override { return "2x1"; }
   static std::string class_name() { return "leafshot"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Leafshot"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
 
 private:
   LeafShot(LeafShot const&) = delete;

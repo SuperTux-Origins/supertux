@@ -40,17 +40,17 @@ public:
   Spotlight(ReaderMapping const& reader);
   ~Spotlight() override;
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit_) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit_) override;
 
   static std::string class_name() { return "spotlight"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Spotlight"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual int get_layer() const override { return m_layer; }
+  int get_layer() const override { return m_layer; }
 
   void set_angle(float angle_) { angle = angle_; }
   void set_speed(float speed_) { speed = speed_; }

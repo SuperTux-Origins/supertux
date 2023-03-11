@@ -24,20 +24,20 @@ class WalkingCandle final : public WalkingBadguy
 public:
   WalkingCandle(ReaderMapping const& reader);
 
-  virtual bool is_freezable() const override;
-  virtual bool is_flammable() const override;
+  bool is_freezable() const override;
+  bool is_flammable() const override;
 
-  virtual void freeze() override;
-  virtual void unfreeze(bool melt = true) override;
+  void freeze() override;
+  void unfreeze(bool melt = true) override;
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  virtual void kill_fall() override;
+  void kill_fall() override;
 
   static std::string class_name() { return "walking_candle"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Walking Candle"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   Color lightcolor;

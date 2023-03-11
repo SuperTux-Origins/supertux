@@ -24,19 +24,19 @@ class LiveFire : public WalkingBadguy
 public:
   LiveFire(ReaderMapping const& reader);
 
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  virtual void active_update(float dt_sec) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  void active_update(float dt_sec) override;
 
-  virtual void freeze() override;
-  virtual bool is_freezable() const override;
-  virtual bool is_flammable() const override;
+  void freeze() override;
+  bool is_freezable() const override;
+  bool is_flammable() const override;
 
-  virtual void kill_fall() override;
+  void kill_fall() override;
   static std::string class_name() { return "livefire"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Walking Flame"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   std::string death_sound;
@@ -63,13 +63,13 @@ class LiveFireAsleep final : public LiveFire
 public:
   LiveFireAsleep(ReaderMapping const& reader);
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
-  virtual void initialize() override;
+  void initialize() override;
   static std::string class_name() { return "livefire_asleep"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Sleeping Flame"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   LiveFireAsleep(LiveFireAsleep const&) = delete;
@@ -81,13 +81,13 @@ class LiveFireDormant final : public LiveFire
 public:
   LiveFireDormant(ReaderMapping const& reader);
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
-  virtual void initialize() override;
+  void initialize() override;
   static std::string class_name() { return "livefire_dormant"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Dormant Flame"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   LiveFireDormant(LiveFireDormant const&) = delete;

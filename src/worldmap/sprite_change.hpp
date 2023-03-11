@@ -37,8 +37,8 @@ public:
   SpriteChange(ReaderMapping const& mapping);
   ~SpriteChange() override;
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
 
   /**
    * Activates the SpriteChange's stay action, if applicable

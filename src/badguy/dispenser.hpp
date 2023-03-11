@@ -38,31 +38,31 @@ private:
 public:
   Dispenser(ReaderMapping const& reader);
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void initialize() override;
-  virtual void activate() override;
-  virtual void deactivate() override;
-  virtual void active_update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void initialize() override;
+  void activate() override;
+  void deactivate() override;
+  void active_update(float dt_sec) override;
 
-  virtual void freeze() override;
-  virtual void unfreeze(bool melt = true) override;
-  virtual bool is_freezable() const override;
-  virtual bool is_flammable() const override;
-  virtual bool is_portable() const override;
+  void freeze() override;
+  void unfreeze(bool melt = true) override;
+  bool is_freezable() const override;
+  bool is_flammable() const override;
+  bool is_portable() const override;
 
   static std::string class_name() { return "dispenser"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Dispenser"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
-  virtual void expose(HSQUIRRELVM vm, SQInteger table_idx) override
+  void expose(HSQUIRRELVM vm, SQInteger table_idx) override
   {
     ExposedObject<Dispenser, scripting::Dispenser>::expose(vm, table_idx);
   }
 
-  virtual void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override
+  void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override
   {
     ExposedObject<Dispenser, scripting::Dispenser>::unexpose(vm, table_idx);
   }
@@ -74,7 +74,7 @@ public:
   }
 
 protected:
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void launch_badguy();
 
 private:

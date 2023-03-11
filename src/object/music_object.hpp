@@ -32,16 +32,16 @@ public:
   MusicObject();
   MusicObject(ReaderMapping const& mapping);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
-  virtual bool is_singleton() const override { return true; }
+  bool is_singleton() const override { return true; }
 
   static std::string class_name() { return "music"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Music"); }
-  virtual std::string get_display_name() const override { return display_name(); }
-  virtual const std::string get_icon_path() const override { return "images/engine/editor/music.png"; }
+  std::string get_display_name() const override { return display_name(); }
+  const std::string get_icon_path() const override { return "images/engine/editor/music.png"; }
 
   void play_music(MusicType musictype);
   void resume_music();

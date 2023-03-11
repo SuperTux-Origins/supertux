@@ -57,30 +57,30 @@ public:
   AmbientSound(Vector const& pos, float factor, float bias, float vol, std::string const& file);
   ~AmbientSound() override;
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit_) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit_) override;
 
   static std::string class_name() { return "ambient-sound"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Ambient Sound"); }
-  virtual std::string get_display_name() const override { return display_name(); }
-  virtual bool has_variable_size() const override { return true; }
+  std::string get_display_name() const override { return display_name(); }
+  bool has_variable_size() const override { return true; }
 
   /** @name Scriptable Methods
       @{ */
 #ifndef SCRIPTING_API
-  virtual void set_pos(Vector const& pos) override;
+  void set_pos(Vector const& pos) override;
 #endif
   void set_pos(float x, float y);
   float get_pos_x() const;
   float get_pos_y() const;
   /** @} */
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
-  virtual int get_layer() const override { return LAYER_OBJECTS; }
+  int get_layer() const override { return LAYER_OBJECTS; }
 
 protected:
-  virtual void update(float dt_sec) override;
+  void update(float dt_sec) override;
   virtual void start_playing();
   virtual void stop_playing();
 

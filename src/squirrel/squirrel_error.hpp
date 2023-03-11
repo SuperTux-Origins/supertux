@@ -33,7 +33,7 @@ public:
   SquirrelError& operator=(SquirrelError const&) = default;
   ~SquirrelError() throw() override;
 
-  virtual char const* what() const throw() override;
+  char const* what() const throw() override;
 
 private:
   std::string message;

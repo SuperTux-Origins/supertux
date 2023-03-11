@@ -25,17 +25,17 @@ class DartTrap final : public BadGuy
 public:
   DartTrap(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual void activate() override;
-  virtual void active_update(float dt_sec) override;
+  void initialize() override;
+  void activate() override;
+  void active_update(float dt_sec) override;
 
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   static std::string class_name() { return "darttrap"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Dart Trap"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
 protected:
   enum State {

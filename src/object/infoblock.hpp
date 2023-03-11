@@ -29,20 +29,20 @@ public:
   InfoBlock(ReaderMapping const& mapping);
   ~InfoBlock() override;
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
   static std::string class_name() { return "infoblock"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Info Block"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   void show_message();
   void hide_message();
 
 private:
-  virtual void hit(Player& player) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void hit(Player& player) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   Player* get_nearest_player() const;
 

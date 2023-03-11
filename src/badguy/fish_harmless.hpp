@@ -25,13 +25,13 @@ class FishHarmless final : public FishSwimming
 public:
   FishHarmless(ReaderMapping const& reader);
 
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
   static std::string class_name() { return "fish-harmless"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Harmless Fish"); }
-  virtual std::string get_display_name() const override { return display_name(); }
-  virtual std::string get_overlay_size() const override { return "1x1"; }
+  std::string get_display_name() const override { return display_name(); }
+  std::string get_overlay_size() const override { return "1x1"; }
 
 private:
   FishHarmless(FishHarmless const&) = delete;

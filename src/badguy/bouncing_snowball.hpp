@@ -24,17 +24,17 @@ class BouncingSnowball final : public BadGuy
 public:
   BouncingSnowball(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual void active_update(float) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  void initialize() override;
+  void active_update(float) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   static std::string class_name() { return "bouncingsnowball"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Bouncing Snowball"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
 
 private:
   BouncingSnowball(BouncingSnowball const&) = delete;

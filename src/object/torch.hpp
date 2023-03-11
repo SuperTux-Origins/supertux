@@ -32,19 +32,19 @@ class Torch final :
 public:
   Torch(ReaderMapping const& reader);
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float) override;
+  void draw(DrawingContext& context) override;
+  void update(float) override;
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& ) override;
+  HitResponse collision(GameObject& other, CollisionHit const& ) override;
 
   static std::string class_name() { return "torch"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Torch"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual int get_layer() const override { return m_layer; }
+  int get_layer() const override { return m_layer; }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   /** @name Scriptable Methods
       @{ */

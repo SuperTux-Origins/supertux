@@ -25,18 +25,18 @@ class SkullyHop final : public BadGuy
 public:
   SkullyHop(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  virtual bool collision_squished(GameObject& object) override;
-  virtual void active_update(float dt_sec) override;
+  void initialize() override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  bool collision_squished(GameObject& object) override;
+  void active_update(float dt_sec) override;
 
-  virtual void unfreeze(bool melt = true) override;
-  virtual bool is_freezable() const override;
+  void unfreeze(bool melt = true) override;
+  bool is_freezable() const override;
   static std::string class_name() { return "skullyhop"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Skullyhop"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   enum SkullyHopState {

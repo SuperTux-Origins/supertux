@@ -27,16 +27,16 @@ class Flower final : public MovingObject
 
 public:
   Flower(BonusType type);
-  virtual bool is_saveable() const override {
+  bool is_saveable() const override {
     return false;
   }
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual void on_flip(float height) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void on_flip(float height) override;
 
-  virtual int get_layer() const override { return LAYER_OBJECTS; }
+  int get_layer() const override { return LAYER_OBJECTS; }
 
 private:
   BonusType type;

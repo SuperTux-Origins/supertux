@@ -49,12 +49,12 @@ public:
   ParticleSystem(float max_particle_size = 60);
   ~ParticleSystem() override;
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
   static std::string class_name() { return "particle-system"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Particle system"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   void set_enabled(bool enabled_);
   bool get_enabled() const;

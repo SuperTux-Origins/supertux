@@ -51,10 +51,10 @@ class GameSession final : public Screen,
 public:
   GameSession(std::string const& levelfile, Savegame& savegame, Statistics* statistics = nullptr);
 
-  virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, Controller const& controller) override;
-  virtual void setup() override;
-  virtual void leave() override;
+  void draw(Compositor& compositor) override;
+  void update(float dt_sec, Controller const& controller) override;
+  void setup() override;
+  void leave() override;
 
   /** ends the current level */
   void finish(bool win = true);

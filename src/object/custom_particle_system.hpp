@@ -36,31 +36,31 @@ public:
   CustomParticleSystem(ReaderMapping const& reader);
   ~CustomParticleSystem() override;
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
   void reinit_textures();
-  virtual void update(float dt_sec) override;
+  void update(float dt_sec) override;
 
   static std::string class_name() { return "particles-custom"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Custom Particles"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual const std::string get_icon_path() const override {
+  const std::string get_icon_path() const override {
     return "images/engine/editor/sparkle.png";
   }
 
-  virtual void expose(HSQUIRRELVM vm, SQInteger table_idx) override {
+  void expose(HSQUIRRELVM vm, SQInteger table_idx) override {
     ExposedObject<CustomParticleSystem, scripting::CustomParticles>::expose(vm, table_idx);
   }
 
-  virtual void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override {
+  void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override {
     ExposedObject<CustomParticleSystem, scripting::CustomParticles>::unexpose(vm, table_idx);
   }
 
   //void fade_amount(int new_amount, float fade_time);
 protected:
-  virtual int collision(Particle* particle, Vector const& movement) override;
+  int collision(Particle* particle, Vector const& movement) override;
   CollisionHit get_collision(Particle* particle, Vector const& movement);
 
 private:

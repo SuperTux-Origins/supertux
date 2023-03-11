@@ -32,15 +32,15 @@ public:
   Block(SpritePtr sprite);
   Block(ReaderMapping const& mapping, std::string const& sprite_file);
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
   virtual std::string get_default_sprite_name() const { return m_default_sprite_name; }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
-  virtual int get_layer() const override { return LAYER_OBJECTS + 1; }
+  int get_layer() const override { return LAYER_OBJECTS + 1; }
 
   void start_bounce(GameObject* hitter);
 

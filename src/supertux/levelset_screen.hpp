@@ -40,11 +40,11 @@ public:
   LevelsetScreen(std::string const& basedir, std::string const& level_filename, Savegame& savegame,
                  const std::optional<std::pair<std::string, Vector>>& start_pos);
 
-  virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, Controller const& controller) override;
+  void draw(Compositor& compositor) override;
+  void update(float dt_sec, Controller const& controller) override;
 
-  virtual void setup() override;
-  virtual void leave() override;
+  void setup() override;
+  void leave() override;
 
   void finished_level(bool win);
 

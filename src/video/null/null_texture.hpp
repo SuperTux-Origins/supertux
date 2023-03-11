@@ -27,10 +27,10 @@ public:
   NullTexture(Size const& size);
   ~NullTexture() override;
 
-  virtual int get_texture_width() const override;
-  virtual int get_texture_height() const override;
-  virtual int get_image_width() const override;
-  virtual int get_image_height() const override;
+  int get_texture_width() const override;
+  int get_texture_height() const override;
+  int get_image_width() const override;
+  int get_image_height() const override;
 
 private:
   Size m_texture_size;

@@ -52,7 +52,7 @@ private:
     GrabListener(Player& player) : m_player(player)
     {}
 
-    virtual void object_removed(GameObject* object) override {
+    void object_removed(GameObject* object) override {
       m_player.ungrab_object(object);
     }
 
@@ -71,20 +71,20 @@ public:
   Player(PlayerStatus& player_status, std::string const& name, int player_id);
   ~Player() override;
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual void collision_tile(uint32_t tile_attributes) override;
-  virtual void on_flip(float height) override;
-  virtual bool is_saveable() const override { return false; }
-  virtual bool is_singleton() const override { return false; }
-  virtual void remove_me() override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void collision_tile(uint32_t tile_attributes) override;
+  void on_flip(float height) override;
+  bool is_saveable() const override { return false; }
+  bool is_singleton() const override { return false; }
+  void remove_me() override;
 
   int get_id() const { return m_id; }
   void set_id(int id);
 
-  virtual int get_layer() const override { return LAYER_OBJECTS + 1; }
+  int get_layer() const override { return LAYER_OBJECTS + 1; }
 
   void set_controller(Controller const* controller);
   /** Level solved. Don't kill Tux any more. */

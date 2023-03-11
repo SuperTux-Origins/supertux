@@ -30,7 +30,7 @@ public:
   {
   }
 
-  virtual GLPainter& get_painter() override { return m_painter; }
+  GLPainter& get_painter() override { return m_painter; }
 
 protected:
   GLVideoSystem& m_video_system;

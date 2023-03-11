@@ -32,15 +32,15 @@ class Thunderstorm final : public GameObject,
 public:
   Thunderstorm(ReaderMapping const& reader);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
   static std::string class_name() { return "thunderstorm"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Thunderstorm"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual const std::string get_icon_path() const override { return "images/engine/editor/thunderstorm.png"; }
+  const std::string get_icon_path() const override { return "images/engine/editor/thunderstorm.png"; }
 
   /** @name Scriptable Methods
       @{ */

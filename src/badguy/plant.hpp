@@ -24,15 +24,15 @@ class Plant final : public BadGuy
 public:
   Plant(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  virtual void active_update(float dt_sec) override;
-  virtual void ignite() override;
+  void initialize() override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  void active_update(float dt_sec) override;
+  void ignite() override;
   static std::string class_name() { return "plant"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Plant"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
   enum PlantState {

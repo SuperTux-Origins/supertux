@@ -34,11 +34,11 @@ public:
   WorldMapScreen(std::unique_ptr<WorldMap> worldmap);
   ~WorldMapScreen() override;
 
-  virtual void setup() override;
-  virtual void leave() override;
+  void setup() override;
+  void leave() override;
 
-  virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, Controller const& controller) override;
+  void draw(Compositor& compositor) override;
+  void update(float dt_sec, Controller const& controller) override;
 
 private:
   std::unique_ptr<WorldMap> m_worldmap;

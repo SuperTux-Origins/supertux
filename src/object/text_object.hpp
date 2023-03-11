@@ -39,16 +39,16 @@ public:
   ~TextObject() override;
 
   static std::string class_name() { return "textobject"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Text"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual const std::string get_icon_path() const override { return "images/engine/editor/textarray.png"; }
+  const std::string get_icon_path() const override { return "images/engine/editor/textarray.png"; }
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
-  virtual bool is_singleton() const override { return true; }
-  virtual bool is_saveable() const override { return false; }
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  bool is_singleton() const override { return true; }
+  bool is_saveable() const override { return false; }
 
 
   void set_text(std::string const& text);

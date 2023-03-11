@@ -54,23 +54,23 @@ public:
    * future.)
    * Supports breaklines.
    */
-  virtual float get_text_width(std::string const& text) const override;
+  float get_text_width(std::string const& text) const override;
 
   /** returns the height of a given text. This function supports breaklines.
    * In case, you are positive that your text doesn't use break lines, you can
    * just use get_height().
    */
-  virtual float get_text_height(std::string const& text) const override;
+  float get_text_height(std::string const& text) const override;
 
   /**
    * returns the height of the font.
    */
-  virtual float get_height() const override;
+  float get_height() const override;
 
   /**
    * returns the given string, truncated (preferably at whitespace) to be at most "width" pixels wide
    */
-  virtual std::string wrap_to_width(std::string const& text, float width, std::string* overflow) override;
+  std::string wrap_to_width(std::string const& text, float width, std::string* overflow) override;
 
   virtual void draw_text(Canvas& canvas, std::string const& text,
                          Vector const& pos, FontAlignment alignment, int layer, Color const& color) override;

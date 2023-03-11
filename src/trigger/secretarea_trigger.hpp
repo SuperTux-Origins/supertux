@@ -32,13 +32,13 @@ public:
   SecretAreaTrigger(Rectf const& area, std::string const& fade_tilemap = "");
 
   static std::string class_name() { return "secretarea"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Secret Area"); }
-  virtual std::string get_display_name() const override { return display_name(); }
-  virtual bool has_variable_size() const override { return true; }
+  std::string get_display_name() const override { return display_name(); }
+  bool has_variable_size() const override { return true; }
 
-  virtual void event(Player& player, EventType type) override;
-  virtual void draw(DrawingContext& context) override;
+  void event(Player& player, EventType type) override;
+  void draw(DrawingContext& context) override;
 
   std::string get_fade_tilemap_name() const;
 

@@ -27,26 +27,26 @@ class Snail final :
 public:
   Snail(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
-  virtual bool can_break() const override;
+  void initialize() override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  bool can_break() const override;
 
-  virtual void active_update(float dt_sec) override;
+  void active_update(float dt_sec) override;
 
-  virtual bool is_freezable() const override;
+  bool is_freezable() const override;
   static std::string class_name() { return "snail"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Snail"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual bool is_portable() const override;
-  virtual void ungrab(MovingObject& , Direction dir_) override;
-  virtual void grab(MovingObject&, Vector const& pos, Direction dir_) override;
+  bool is_portable() const override;
+  void ungrab(MovingObject& , Direction dir_) override;
+  void grab(MovingObject&, Vector const& pos, Direction dir_) override;
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
 
   void be_normal(); /**< switch to state STATE_NORMAL */
   void be_flat(); /**< switch to state STATE_FLAT */

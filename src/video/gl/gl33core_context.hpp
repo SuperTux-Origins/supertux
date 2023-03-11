@@ -32,27 +32,27 @@ public:
   GL33CoreContext(GLVideoSystem& video_system);
   ~GL33CoreContext() override;
 
-  virtual std::string get_name() const override { return "opengl33"; }
+  std::string get_name() const override { return "opengl33"; }
 
-  virtual void bind() override;
+  void bind() override;
 
-  virtual void ortho(float width, float height, bool vflip) override;
+  void ortho(float width, float height, bool vflip) override;
 
-  virtual void blend_func(GLenum src, GLenum dst) override;
+  void blend_func(GLenum src, GLenum dst) override;
 
-  virtual void set_positions(float const* data, size_t size) override;
+  void set_positions(float const* data, size_t size) override;
 
-  virtual void set_texcoords(float const* data, size_t size) override;
-  virtual void set_texcoord(float u, float v) override;
+  void set_texcoords(float const* data, size_t size) override;
+  void set_texcoord(float u, float v) override;
 
-  virtual void set_colors(float const* data, size_t size) override;
-  virtual void set_color(Color const& color) override;
+  void set_colors(float const* data, size_t size) override;
+  void set_color(Color const& color) override;
 
-  virtual void bind_texture(Texture const& texture, Texture const* displacement_texture) override;
-  virtual void bind_no_texture() override;
-  virtual void draw_arrays(GLenum type, GLint first, GLsizei count) override;
+  void bind_texture(Texture const& texture, Texture const* displacement_texture) override;
+  void bind_no_texture() override;
+  void draw_arrays(GLenum type, GLint first, GLsizei count) override;
 
-  virtual bool supports_framebuffer() const override { return true; }
+  bool supports_framebuffer() const override { return true; }
 
   GLProgram& get_program() const { return *m_program; }
   GLVertexArrays& get_vertex_arrays() const { return *m_vertex_arrays; }

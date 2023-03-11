@@ -45,17 +45,17 @@ public:
   TriggerBase();
   ~TriggerBase() override;
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   /** Receive trigger events */
   virtual void event(Player& player, EventType type) = 0;
 
   /** Called by GameObject destructor of an object in losetouch_listeners */
-  virtual void object_removed(GameObject* object) override;
+  void object_removed(GameObject* object) override;
 
-  virtual int get_layer() const override { return LAYER_TILES + 1; }
+  int get_layer() const override { return LAYER_TILES + 1; }
 
 private:
   SpritePtr m_sprite;

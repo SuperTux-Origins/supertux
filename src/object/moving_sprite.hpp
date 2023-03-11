@@ -44,13 +44,13 @@ public:
                int layer = LAYER_OBJECTS,
                CollisionGroup collision_group = COLGROUP_MOVING);
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
   static std::string class_name() { return "moving-sprite"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   virtual std::string get_default_sprite_name() const { return m_default_sprite_name; }
 
-  virtual int get_layer() const override { return m_layer; }
+  int get_layer() const override { return m_layer; }
 
   std::string get_sprite_name() const;
   bool change_sprite(std::string const& new_sprite_name);

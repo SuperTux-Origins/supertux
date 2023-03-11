@@ -27,15 +27,15 @@ public:
   ItemStringSelect(std::string const& text, std::vector<std::string> items, int* selected, int id = -1);
 
   /** Draws the menu item. */
-  virtual void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
+  void draw(DrawingContext&, Vector const& pos, int menu_width, bool active) override;
 
   /** Returns the minimum width of the menu item. */
-  virtual int get_width() const override;
+  int get_width() const override;
 
   /** Processes the menu action. */
-  virtual void process_action(MenuAction const& action) override;
+  void process_action(MenuAction const& action) override;
 
-  virtual bool changes_width() const override {
+  bool changes_width() const override {
     return false;
   }
 

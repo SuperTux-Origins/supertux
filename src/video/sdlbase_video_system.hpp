@@ -28,12 +28,12 @@ public:
   SDLBaseVideoSystem();
   ~SDLBaseVideoSystem() override;
 
-  virtual void set_title(std::string const& title) override;
-  virtual void set_icon(SDL_Surface const& icon) override;
-  virtual void set_gamma(float gamma) override;
+  void set_title(std::string const& title) override;
+  void set_icon(SDL_Surface const& icon) override;
+  void set_gamma(float gamma) override;
 
-  virtual Size get_window_size() const override;
-  virtual void on_resize(int w, int h) override;
+  Size get_window_size() const override;
+  void on_resize(int w, int h) override;
 
 protected:
   void create_sdl_window(Uint32 flags);

@@ -30,15 +30,15 @@ public:
   NullRenderer();
   ~NullRenderer() override;
 
-  virtual void start_draw() override;
-  virtual void end_draw() override;
+  void start_draw() override;
+  void end_draw() override;
 
-  virtual Painter& get_painter() override;
+  Painter& get_painter() override;
 
-  virtual Rect get_rect() const override;
-  virtual Size get_logical_size() const override;
+  Rect get_rect() const override;
+  Size get_logical_size() const override;
 
-  virtual TexturePtr get_texture() const override;
+  TexturePtr get_texture() const override;
 
 private:
   std::unique_ptr<NullPainter> m_painter;

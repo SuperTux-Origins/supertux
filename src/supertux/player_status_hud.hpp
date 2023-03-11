@@ -35,11 +35,11 @@ private:
 public:
   PlayerStatusHUD(PlayerStatus& player_status);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
-  virtual bool is_saveable() const override { return false; }
-  virtual bool is_singleton() const override { return true; }
+  bool is_saveable() const override { return false; }
+  bool is_singleton() const override { return true; }
 
   void reset();
 

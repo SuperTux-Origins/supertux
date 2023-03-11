@@ -29,14 +29,14 @@ public:
   SkullTile(ReaderMapping const& mapping);
 
   static std::string class_name() { return "skull_tile"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Skull Tile"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual void on_flip(float height) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void on_flip(float height) override;
 
 private:
   Physic physic;

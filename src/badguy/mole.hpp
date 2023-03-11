@@ -24,21 +24,21 @@ class Mole final : public BadGuy
 public:
   Mole(ReaderMapping const& );
 
-  virtual void kill_fall() override;
-  virtual HitResponse collision_badguy(BadGuy& , CollisionHit const& ) override;
-  virtual bool collision_squished(GameObject& object) override;
+  void kill_fall() override;
+  HitResponse collision_badguy(BadGuy& , CollisionHit const& ) override;
+  bool collision_squished(GameObject& object) override;
 
-  virtual void activate() override;
-  virtual void active_update(float) override;
+  void activate() override;
+  void active_update(float) override;
 
-  virtual void ignite() override;
+  void ignite() override;
 
   static std::string class_name() { return "mole"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Mole"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
 private:
   enum MoleState {

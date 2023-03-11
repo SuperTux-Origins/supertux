@@ -30,25 +30,25 @@ private:
 public:
   Owl(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual void kill_fall() override;
+  void initialize() override;
+  void collision_solid(CollisionHit const& hit) override;
+  void kill_fall() override;
 
-  virtual void freeze() override;
-  virtual void unfreeze(bool melt = true) override;
-  virtual bool is_freezable() const override;
-  virtual void ignite() override;
+  void freeze() override;
+  void unfreeze(bool melt = true) override;
+  bool is_freezable() const override;
+  void ignite() override;
 
-  virtual std::string get_overlay_size() const override { return "2x2"; }
+  std::string get_overlay_size() const override { return "2x2"; }
   static std::string class_name() { return "owl"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Owl"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
   bool is_above_player() const;
-  virtual void active_update (float dt_sec) override;
-  virtual bool collision_squished(GameObject& object) override;
+  void active_update (float dt_sec) override;
+  bool collision_squished(GameObject& object) override;
 
   std::string carried_obj_name;
   Portable *carried_object;

@@ -26,12 +26,12 @@ public:
   SnowBall(Vector const& pos, Direction d, std::string const& script);
 
   static std::string class_name() { return "snowball"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Snowball"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
 
 private:
   SnowBall(SnowBall const&) = delete;

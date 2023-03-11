@@ -26,15 +26,15 @@ public:
   Trampoline(ReaderMapping const& reader);
   Trampoline(Vector const& pos, bool port);
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual void update(float dt_sec) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
 
-  virtual void grab(MovingObject&, Vector const& pos, Direction) override;
-  virtual bool is_portable() const override;
+  void grab(MovingObject&, Vector const& pos, Direction) override;
+  bool is_portable() const override;
   static std::string class_name() { return "trampoline"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Trampoline"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   bool portable;

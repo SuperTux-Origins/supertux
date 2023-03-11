@@ -31,21 +31,21 @@ public:
   RainParticleSystem(ReaderMapping const& reader);
   ~RainParticleSystem() override;
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
   void init();
-  virtual void update(float dt_sec) override;
+  void update(float dt_sec) override;
 
   static std::string class_name() { return "particles-rain"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Rain Particles"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   void fade_speed(float new_speed, float fade_time);
   void fade_angle(float new_angle, float fade_time, easing ease_func);
   void fade_amount(float new_amount, float fade_time);
 
-  virtual const std::string get_icon_path() const override {
+  const std::string get_icon_path() const override {
     return "images/engine/editor/rain.png";
   }
 
@@ -59,11 +59,11 @@ public:
   // When m_current_amount == max_amount, fog is this value
   static float constexpr const fog_max_value = 0.6f;
 
-  virtual void expose(HSQUIRRELVM vm, SQInteger table_idx) override {
+  void expose(HSQUIRRELVM vm, SQInteger table_idx) override {
     ExposedObject<RainParticleSystem, scripting::Rain>::expose(vm, table_idx);
   }
 
-  virtual void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override {
+  void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override {
     ExposedObject<RainParticleSystem, scripting::Rain>::unexpose(vm, table_idx);
   }
 

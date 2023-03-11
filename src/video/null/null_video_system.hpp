@@ -31,26 +31,26 @@ public:
   NullVideoSystem();
   ~NullVideoSystem() override;
 
-  virtual std::string get_name() const override { return "Null"; }
+  std::string get_name() const override { return "Null"; }
 
-  virtual Renderer* get_back_renderer() const override;
-  virtual Renderer& get_renderer() const override;
-  virtual Renderer& get_lightmap() const override;
+  Renderer* get_back_renderer() const override;
+  Renderer& get_renderer() const override;
+  Renderer& get_lightmap() const override;
 
-  virtual TexturePtr new_texture(SDL_Surface const& image, Sampler const& sampler)  override;
+  TexturePtr new_texture(SDL_Surface const& image, Sampler const& sampler)  override;
 
-  virtual Viewport const& get_viewport() const override;
-  virtual void apply_config() override;
-  virtual void flip() override;
-  virtual void on_resize(int w, int h) override;
-  virtual Size get_window_size() const override;
+  Viewport const& get_viewport() const override;
+  void apply_config() override;
+  void flip() override;
+  void on_resize(int w, int h) override;
+  Size get_window_size() const override;
 
-  virtual void set_vsync(int mode) override;
-  virtual int get_vsync() const override;
-  virtual void set_gamma(float gamma) override;
-  virtual void set_title(std::string const& title) override;
-  virtual void set_icon(SDL_Surface const& icon) override;
-  virtual SDLSurfacePtr make_screenshot() override;
+  void set_vsync(int mode) override;
+  int get_vsync() const override;
+  void set_gamma(float gamma) override;
+  void set_title(std::string const& title) override;
+  void set_icon(SDL_Surface const& icon) override;
+  SDLSurfacePtr make_screenshot() override;
 
 private:
   Size m_window_size;

@@ -37,21 +37,21 @@ public:
   PathGameObject(ReaderMapping const& mapping, bool backward_compatibility_hack=false);
   ~PathGameObject() override;
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
   static std::string class_name() { return "path"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Path"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual const std::string get_icon_path() const override {
+  const std::string get_icon_path() const override {
     return "images/engine/editor/path.png";
   }
 
-  virtual void remove_me() override;
+  void remove_me() override;
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   Path& get_path() { return *m_path; }
 

@@ -26,23 +26,23 @@ public:
   MoleRock(ReaderMapping const& reader);
   MoleRock(Vector const& pos, Vector const& velocity, BadGuy const* parent);
 
-  virtual void initialize() override;
-  virtual void deactivate() override;
+  void initialize() override;
+  void deactivate() override;
 
-  virtual void active_update(float dt_sec) override;
+  void active_update(float dt_sec) override;
 
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
   virtual bool updatePointers(GameObject const* from_object, GameObject* to_object);
 
-  virtual bool is_flammable() const override;
-  virtual bool is_hurtable() const override { return false; }
+  bool is_flammable() const override;
+  bool is_hurtable() const override { return false; }
   static std::string class_name() { return "mole_rock"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Mole's rock"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
   BadGuy const* parent; /**< collisions with this BadGuy will be ignored */

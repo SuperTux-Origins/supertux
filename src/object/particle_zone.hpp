@@ -30,17 +30,17 @@ class ParticleZone final :
 public:
   ParticleZone(ReaderMapping const& reader);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
-  virtual bool has_variable_size() const override { return true; }
+  bool has_variable_size() const override { return true; }
   static std::string class_name() { return "particle-zone"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Particle zone"); }
-  virtual std::string get_display_name() const override { return display_name(); }
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  std::string get_display_name() const override { return display_name(); }
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  virtual int get_layer() const override { return LAYER_OBJECTS; }
+  int get_layer() const override { return LAYER_OBJECTS; }
 
   Rectf get_rect() {return m_col.m_bbox;}
 

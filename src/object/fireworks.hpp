@@ -27,9 +27,9 @@ class Fireworks final : public GameObject
 public:
   Fireworks();
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual bool is_saveable() const override {
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  bool is_saveable() const override {
     return false;
   }
 

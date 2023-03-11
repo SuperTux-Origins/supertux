@@ -27,15 +27,15 @@ class Ispy final : public MovingSprite
 public:
   Ispy(ReaderMapping const& mapping);
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  virtual void update(float dt_sec) override;
+  void update(float dt_sec) override;
   static std::string class_name() { return "ispy"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Ispy"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
 private:
   void set_sprite_action(std::string const& action, int loops = -1);

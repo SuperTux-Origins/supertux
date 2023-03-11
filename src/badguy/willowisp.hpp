@@ -31,40 +31,40 @@ class WillOWisp final :
 public:
   WillOWisp(ReaderMapping const& reader);
 
-  virtual void finish_construction() override;
+  void finish_construction() override;
 
-  virtual void activate() override;
-  virtual void deactivate() override;
+  void activate() override;
+  void deactivate() override;
 
-  virtual void active_update(float dt_sec) override;
-  virtual bool is_flammable() const override { return false; }
-  virtual bool is_freezable() const override { return false; }
-  virtual bool is_hurtable() const override { return false; }
-  virtual void kill_fall() override { vanish(); }
+  void active_update(float dt_sec) override;
+  bool is_flammable() const override { return false; }
+  bool is_freezable() const override { return false; }
+  bool is_hurtable() const override { return false; }
+  void kill_fall() override { vanish(); }
 
   virtual void goto_node(int node_no);
   virtual void set_state(std::string const& state);
   virtual void start_moving();
   virtual void stop_moving();
 
-  virtual void stop_looping_sounds() override;
-  virtual void play_looping_sounds() override;
+  void stop_looping_sounds() override;
+  void play_looping_sounds() override;
 
   static std::string class_name() { return "willowisp"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Will o' Wisp"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void move_to(Vector const& pos) override;
+  void move_to(Vector const& pos) override;
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
-  virtual void expose(HSQUIRRELVM vm, SQInteger table_idx) override
+  void expose(HSQUIRRELVM vm, SQInteger table_idx) override
   {
     ExposedObject<WillOWisp, scripting::WillOWisp>::expose(vm, table_idx);
   }
 
-  virtual void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override
+  void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override
   {
     ExposedObject<WillOWisp, scripting::WillOWisp>::unexpose(vm, table_idx);
   }
@@ -75,8 +75,8 @@ public:
   Color get_color() const { return m_color; }
 
 private:
-  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  bool collides(GameObject& other, CollisionHit const& hit) const override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
 private:
   enum MyState {

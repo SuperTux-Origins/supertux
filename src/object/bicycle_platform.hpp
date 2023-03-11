@@ -31,10 +31,10 @@ class BicyclePlatformChild : public MovingSprite
 public:
   BicyclePlatformChild(ReaderMapping const& reader, float angle_offset, BicyclePlatform& parent);
 
-  virtual void update(float dt_sec) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual bool is_saveable() const override { return false; }
-  virtual void on_flip(float height) override;
+  void update(float dt_sec) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  bool is_saveable() const override { return false; }
+  void on_flip(float height) override;
 
 private:
   BicyclePlatform& m_parent;
@@ -58,14 +58,14 @@ public:
   BicyclePlatform(ReaderMapping const& reader);
   ~BicyclePlatform() override;
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
-  virtual void on_flip(float height) override;
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void on_flip(float height) override;
 
   static std::string class_name() { return "bicycle-platform"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Bicycle Platform"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   Vector m_center; /**< pivot point */

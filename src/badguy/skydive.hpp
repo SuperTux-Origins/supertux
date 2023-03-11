@@ -24,30 +24,30 @@ class SkyDive final : public BadGuy
 public:
   SkyDive(ReaderMapping const& reader);
   
-  virtual void kill_fall() override;
+  void kill_fall() override;
 
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  virtual void collision_tile(uint32_t tile_attributes) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  void collision_tile(uint32_t tile_attributes) override;
 
   /* Inherited from Portable */
-  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
-  virtual void ungrab(MovingObject& object, Direction dir) override;
+  void grab(MovingObject& object, Vector const& pos, Direction dir) override;
+  void ungrab(MovingObject& object, Direction dir) override;
 
-  virtual bool is_freezable() const override;
+  bool is_freezable() const override;
 
-  virtual std::string get_overlay_size() const override { return "2x2"; }
+  std::string get_overlay_size() const override { return "2x2"; }
   static std::string class_name() { return "skydive"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Skydive"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
-  virtual bool collision_squished (GameObject& obj) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  bool collision_squished (GameObject& obj) override;
 
   void explode();
-  virtual bool is_portable() const override;
+  bool is_portable() const override;
 
 private:
   SkyDive(SkyDive const&) = delete;

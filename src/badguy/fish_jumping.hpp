@@ -24,22 +24,22 @@ class FishJumping final : public BadGuy
 public:
   FishJumping(ReaderMapping const& );
 
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& , CollisionHit const& ) override;
-  virtual void collision_tile(uint32_t tile_attributes) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& , CollisionHit const& ) override;
+  void collision_tile(uint32_t tile_attributes) override;
 
-  virtual void active_update(float) override;
+  void active_update(float) override;
 
-  virtual void freeze() override;
-  virtual void unfreeze(bool melt = true) override;
-  virtual void kill_fall() override;
-  virtual bool is_freezable() const override;
+  void freeze() override;
+  void unfreeze(bool melt = true) override;
+  void kill_fall() override;
+  bool is_freezable() const override;
 
-  virtual std::string get_overlay_size() const override { return "1x2"; }
+  std::string get_overlay_size() const override { return "1x2"; }
   static std::string class_name() { return "fish-jumping"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Jumping Fish"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   HitResponse hit(CollisionHit const& );

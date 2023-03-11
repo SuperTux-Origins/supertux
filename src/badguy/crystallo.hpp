@@ -26,15 +26,15 @@ public:
   Crystallo(ReaderMapping const& reader);
 
   static std::string class_name() { return "crystallo"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Crystallo"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void active_update(float dt_sec) override;
-  virtual bool is_flammable() const override;
+  void active_update(float dt_sec) override;
+  bool is_flammable() const override;
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
 
 private:
   float m_radius;

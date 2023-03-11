@@ -28,17 +28,17 @@ public:
   TreeWillOWisp(GhostTree* tree, Vector const& pos, float radius, float speed);
   ~TreeWillOWisp() override;
 
-  virtual void activate() override;
-  virtual void active_update(float dt_sec) override;
+  void activate() override;
+  void active_update(float dt_sec) override;
 
-  virtual bool is_flammable() const override { return false; }
-  virtual bool is_freezable() const override { return false; }
-  virtual void kill_fall() override { vanish(); }
+  bool is_flammable() const override { return false; }
+  bool is_freezable() const override { return false; }
+  void kill_fall() override { vanish(); }
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
-  virtual void stop_looping_sounds() override;
-  virtual void play_looping_sounds() override;
+  void stop_looping_sounds() override;
+  void play_looping_sounds() override;
 
   /** make TreeWillOWisp vanish */
   void vanish();
@@ -48,8 +48,8 @@ public:
   Color get_color() const;
 
 protected:
-  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  bool collides(GameObject& other, CollisionHit const& hit) const override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
 private:
   enum MyState {

@@ -41,22 +41,22 @@ public:
   GLVideoSystem();
   ~GLVideoSystem() override;
 
-  virtual std::string get_name() const override;
+  std::string get_name() const override;
 
-  virtual Renderer* get_back_renderer() const override;
-  virtual Renderer& get_renderer() const override;
-  virtual Renderer& get_lightmap() const override;
+  Renderer* get_back_renderer() const override;
+  Renderer& get_renderer() const override;
+  Renderer& get_lightmap() const override;
 
-  virtual TexturePtr new_texture(SDL_Surface const& image, Sampler const& sampler) override;
+  TexturePtr new_texture(SDL_Surface const& image, Sampler const& sampler) override;
 
-  virtual Viewport const& get_viewport() const override { return m_viewport; }
-  virtual void apply_config() override;
-  virtual void flip() override;
+  Viewport const& get_viewport() const override { return m_viewport; }
+  void apply_config() override;
+  void flip() override;
 
-  virtual void set_vsync(int mode) override;
-  virtual int get_vsync() const override;
+  void set_vsync(int mode) override;
+  int get_vsync() const override;
 
-  virtual SDLSurfacePtr make_screenshot() override;
+  SDLSurfacePtr make_screenshot() override;
 
   GLContext& get_context() const { return *m_context; }
 

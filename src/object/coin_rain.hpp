@@ -26,9 +26,9 @@ class CoinRain final : public GameObject
 {
 public:
   CoinRain(Vector const& pos, bool emerge=false);
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual bool is_saveable() const override {
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  bool is_saveable() const override {
     return false;
   }
 

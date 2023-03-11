@@ -41,9 +41,9 @@ public:
   LevelIntro(Level const& level, Statistics const* best_level_statistics, PlayerStatus const& player_status);
   ~LevelIntro() override;
 
-  virtual void setup() override;
-  virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, Controller const& controller) override;
+  void setup() override;
+  void draw(Compositor& compositor) override;
+  void update(float dt_sec, Controller const& controller) override;
 
 private:
   void draw_stats_line(DrawingContext& context, int& py, std::string const& name, std::string const& stat, bool isPerfect);

@@ -26,7 +26,7 @@ class FloatingImage final : public GameObject
 public:
   FloatingImage(std::string const& sprite);
   ~FloatingImage() override;
-  virtual bool is_saveable() const override {
+  bool is_saveable() const override {
     return false;
   }
 
@@ -65,8 +65,8 @@ public:
   void fade_in(float fadetime);
   void fade_out(float fadetime);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
 private:
   SpritePtr sprite;

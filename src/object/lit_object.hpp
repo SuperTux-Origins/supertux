@@ -30,20 +30,20 @@ class LitObject final :
 public:
   LitObject(ReaderMapping const& reader);
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float) override;
+  void draw(DrawingContext& context) override;
+  void update(float) override;
 
-  virtual HitResponse collision(GameObject&, CollisionHit const&) override
+  HitResponse collision(GameObject&, CollisionHit const&) override
     { return ABORT_MOVE; }
 
   static std::string class_name() { return "lit-object"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Lit object"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual int get_layer() const override { return m_layer; }
+  int get_layer() const override { return m_layer; }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   std::string const& get_action() const;
   void set_action(std::string const& action);

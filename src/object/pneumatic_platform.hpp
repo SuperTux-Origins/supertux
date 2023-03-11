@@ -31,10 +31,10 @@ public:
   PneumaticPlatformChild(ReaderMapping const& reader, bool left, PneumaticPlatform& parent);
   ~PneumaticPlatformChild() override;
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual void update(float dt_sec) override;
-  virtual bool is_saveable() const override { return false; }
-  virtual void on_flip(float height) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
+  bool is_saveable() const override { return false; }
+  void on_flip(float height) override;
 
 protected:
   PneumaticPlatform& m_parent;
@@ -56,14 +56,14 @@ public:
   PneumaticPlatform(ReaderMapping const& mapping);
   ~PneumaticPlatform() override;
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
-  virtual void on_flip(float height) override;
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void on_flip(float height) override;
 
   static std::string class_name() { return "pneumatic-platform"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Pneumatic Platform"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   Vector m_pos;

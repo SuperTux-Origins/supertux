@@ -30,8 +30,8 @@ class LevelTime final : public GameObject,
 public:
   LevelTime(ReaderMapping const& reader);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
   /** @name Scriptable Methods
       @{ */
@@ -50,11 +50,11 @@ public:
 
   /** @} */
   static std::string class_name() { return "leveltime"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Time Limit"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual const std::string get_icon_path() const override { return "images/engine/editor/clock.png"; }
+  const std::string get_icon_path() const override { return "images/engine/editor/clock.png"; }
 
 private:
   SurfacePtr time_surface;

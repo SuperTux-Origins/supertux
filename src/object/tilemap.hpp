@@ -50,18 +50,18 @@ public:
   TileMap(TileSet const*tileset, ReaderMapping const& reader);
   ~TileMap() override;
 
-  virtual void finish_construction() override;
+  void finish_construction() override;
 
   static std::string class_name() { return "tilemap"; }
-  virtual std::string get_class_name() const override { return class_name(); }
-  virtual const std::string get_icon_path() const override { return "images/engine/editor/tilemap.png"; }
+  std::string get_class_name() const override { return class_name(); }
+  const std::string get_icon_path() const override { return "images/engine/editor/tilemap.png"; }
   static std::string display_name() { return _("Tilemap"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   /** Move tilemap until at given node, then stop */
   void goto_node(int node_no);

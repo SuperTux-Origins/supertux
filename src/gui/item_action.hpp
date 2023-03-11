@@ -24,7 +24,7 @@ class ItemAction final : public MenuItem
 public:
   ItemAction(std::string const& text, int id = -1, std::function<void()> callback = {});
 
-  virtual void process_action(MenuAction const& action) override;
+  void process_action(MenuAction const& action) override;
 
 private:
   std::function<void()> m_callback;

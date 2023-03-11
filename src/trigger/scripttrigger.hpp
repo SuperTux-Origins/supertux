@@ -28,13 +28,13 @@ public:
   ScriptTrigger(Vector const& pos, std::string const& script);
 
   static std::string class_name() { return "scripttrigger"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Script Trigger"); }
-  virtual std::string get_display_name() const override { return display_name(); }
-  virtual bool has_variable_size() const override { return true; }
+  std::string get_display_name() const override { return display_name(); }
+  bool has_variable_size() const override { return true; }
 
-  virtual void event(Player& player, EventType type) override;
-  virtual void draw(DrawingContext& context) override;
+  void event(Player& player, EventType type) override;
+  void draw(DrawingContext& context) override;
 
   void write(Writer& writer);
 

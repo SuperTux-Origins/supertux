@@ -28,14 +28,14 @@ class RainSplash final : public GameObject
 public:
   RainSplash(Vector const& pos, bool vertical);
   ~RainSplash() override;
-  virtual bool is_saveable() const override {
+  bool is_saveable() const override {
     return false;
   }
 
 protected:
   virtual void hit(Player& );
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
 private:
   SpritePtr sprite;

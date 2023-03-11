@@ -27,9 +27,9 @@ class FallingCoin final : public GameObject
 public:
   FallingCoin(Vector const& start_position, float x_vel);
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
-  virtual bool is_saveable() const override {
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  bool is_saveable() const override {
     return false;
   }
 

@@ -27,7 +27,7 @@ public:
   CodeController();
   ~CodeController() override;
 
-  virtual void update() override;
+  void update() override;
 
   void press(Control c, bool pressed = true);
 

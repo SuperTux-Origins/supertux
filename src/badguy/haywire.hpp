@@ -26,27 +26,27 @@ class Haywire final : public WalkingBadguy
 public:
   Haywire(ReaderMapping const& reader);
 
-  virtual void kill_fall() override;
-  virtual void ignite() override;
+  void kill_fall() override;
+  void ignite() override;
 
-  virtual void active_update(float dt_sec) override;
-  virtual void deactivate() override;
+  void active_update(float dt_sec) override;
+  void deactivate() override;
 
-  virtual bool is_freezable() const override;
-  virtual void freeze() override;
+  bool is_freezable() const override;
+  void freeze() override;
 
-  virtual void stop_looping_sounds() override;
-  virtual void play_looping_sounds() override;
+  void stop_looping_sounds() override;
+  void play_looping_sounds() override;
 
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
   static std::string class_name() { return "haywire"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Haywire"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
 
 private:
   void start_exploding();

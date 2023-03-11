@@ -35,19 +35,19 @@ public:
   Background(ReaderMapping const& reader);
   ~Background() override;
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
   static std::string class_name() { return "background"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Background"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual const std::string get_icon_path() const override {
+  const std::string get_icon_path() const override {
     return "images/engine/editor/background.png";
   }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   void set_image(std::string const& name);
   void set_images(std::string const& name_top, std::string const& name_middle, std::string const& name_bottom);

@@ -27,7 +27,7 @@ class SpecialRiser final : public MovingObject
 {
 public:
   SpecialRiser(Vector const& pos, std::unique_ptr<MovingObject> child, bool is_solid = false);
-  virtual bool is_saveable() const override {
+  bool is_saveable() const override {
     return false;
   }
 
@@ -35,10 +35,10 @@ public:
     return FORCE_MOVE;
   }
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
-  virtual int get_layer() const override { return m_child ? m_child->get_layer() : -2147483648; }
+  int get_layer() const override { return m_child ? m_child->get_layer() : -2147483648; }
 
 private:
   Vector m_start_pos; 

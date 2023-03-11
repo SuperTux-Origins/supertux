@@ -27,16 +27,16 @@ public:
   AmbientLight(Color const& color);
   AmbientLight(ReaderMapping const& mapping);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
-  virtual bool is_singleton() const override { return true; }
+  bool is_singleton() const override { return true; }
 
   static std::string class_name() { return "ambient-light"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Ambient Light"); }
-  virtual std::string get_display_name() const override { return display_name(); }
-  virtual const std::string get_icon_path() const override { return "images/engine/editor/ambient_light.png"; }
+  std::string get_display_name() const override { return display_name(); }
+  const std::string get_icon_path() const override { return "images/engine/editor/ambient_light.png"; }
 
   void set_ambient_light(Color const& ambient_light);
   Color get_ambient_light() const;

@@ -24,25 +24,25 @@ class Bomb final : public BadGuy
 {
 public:
   Bomb(Vector const& pos, Direction dir, std::string const& custom_sprite = "images/creatures/mr_bomb/bomb.sprite" );
-  virtual bool is_saveable() const override {
+  bool is_saveable() const override {
     return false;
   }
 
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
-  virtual void active_update(float dt_sec) override;
-  virtual void kill_fall() override;
-  virtual void ignite() override;
+  void active_update(float dt_sec) override;
+  void kill_fall() override;
+  void ignite() override;
   void explode();
 
-  virtual bool is_portable() const override;
-  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
-  virtual void ungrab(MovingObject& object, Direction dir) override;
+  bool is_portable() const override;
+  void grab(MovingObject& object, Vector const& pos, Direction dir) override;
+  void ungrab(MovingObject& object, Direction dir) override;
 
-  virtual void stop_looping_sounds() override;
-  virtual void play_looping_sounds() override;
+  void stop_looping_sounds() override;
+  void play_looping_sounds() override;
 
 private:
   std::unique_ptr<SoundSource> ticking;

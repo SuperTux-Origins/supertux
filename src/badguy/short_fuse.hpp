@@ -26,17 +26,17 @@ public:
   ShortFuse(ReaderMapping const& reader);
 
   static std::string class_name() { return "short_fuse"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Short Fuse"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  virtual HitResponse collision_player (Player& player, CollisionHit const& hit) override;
-  virtual bool collision_squished (GameObject& object) override;
-  virtual bool is_freezable() const override;
-  virtual void freeze() override;
-  virtual void kill_fall() override;
-  virtual void ignite() override;
+  HitResponse collision_player (Player& player, CollisionHit const& hit) override;
+  bool collision_squished (GameObject& object) override;
+  bool is_freezable() const override;
+  void freeze() override;
+  void kill_fall() override;
+  void ignite() override;
 
   void explode();
 

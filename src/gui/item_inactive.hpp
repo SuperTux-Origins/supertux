@@ -31,11 +31,11 @@ public:
 
   /** Returns true when the menu item has no action and therefore can be skipped.
       Useful for labels and horizontal lines.*/
-  virtual bool skippable() const override {
+  bool skippable() const override {
     return true;
   }
 
-  virtual Color get_color() const override;
+  Color get_color() const override;
 
 private:
   ItemInactive(ItemInactive const&) = delete;

@@ -25,20 +25,20 @@ class Igel final : public WalkingBadguy
 public:
   Igel(ReaderMapping const& reader);
 
-  virtual HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
+  HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
 
-  virtual void active_update(float dt_sec) override;
+  void active_update(float dt_sec) override;
 
-  virtual bool is_freezable() const override;
+  bool is_freezable() const override;
 
-  virtual std::string get_overlay_size() const override { return "2x1"; }
+  std::string get_overlay_size() const override { return "2x1"; }
   static std::string class_name() { return "igel"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Igel"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  //  virtual bool collision_squished(GameObject& object) override;
+  //  bool collision_squished(GameObject& object) override;
   // Enable this and the igel will no longer be butt-jumpable when frozen.
   // Remember to enable it in .cpp too!
   void be_normal(); /**< switch to state STATE_NORMAL */

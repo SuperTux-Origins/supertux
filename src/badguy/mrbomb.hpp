@@ -24,24 +24,24 @@ class MrBomb final : public WalkingBadguy
 public:
   MrBomb(ReaderMapping const& reader);
 
-  virtual void kill_fall() override;
-  virtual void ignite() override;
-  virtual HitResponse collision(GameObject& object, CollisionHit const& hit) override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  void kill_fall() override;
+  void ignite() override;
+  HitResponse collision(GameObject& object, CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
-  virtual void active_update(float dt_sec) override;
+  void active_update(float dt_sec) override;
 
-  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
-  virtual bool is_portable() const override;
+  void grab(MovingObject& object, Vector const& pos, Direction dir) override;
+  bool is_portable() const override;
 
-  virtual bool is_freezable() const override;
+  bool is_freezable() const override;
   static std::string class_name() { return "mrbomb"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Bomb"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
 
 private:
   MrBomb(MrBomb const&) = delete;

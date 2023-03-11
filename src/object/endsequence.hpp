@@ -28,8 +28,8 @@ public:
   EndSequence();
   ~EndSequence() override;
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
   void start(); /**< play EndSequence */
   void stop_tux(int player); /**< called when Tux has reached his final position */
@@ -37,7 +37,7 @@ public:
   bool is_running() const; /**< returns true if the ending cinematic started */
   bool is_tux_stopped(int player); /**< returns true if Tux has reached his final position */
   bool is_done() const; /**< returns true if EndSequence has finished playing */
-  virtual bool is_saveable() const override {
+  bool is_saveable() const override {
     return false;
   }
 

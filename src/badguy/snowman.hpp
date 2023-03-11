@@ -25,14 +25,14 @@ public:
   Snowman(ReaderMapping const& reader);
 
   static std::string class_name() { return "snowman"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Snowman"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
   void loose_head();
-  virtual HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
-  virtual bool collision_squished(GameObject& object) override;
+  HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
+  bool collision_squished(GameObject& object) override;
 
 private:
   Snowman(Snowman const&) = delete;

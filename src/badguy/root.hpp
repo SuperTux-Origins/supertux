@@ -25,12 +25,12 @@ public:
   Root(Vector const& pos, Flip flip);
   ~Root() override;
 
-  virtual void deactivate() override;
-  virtual void active_update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual bool is_flammable() const override { return false; }
-  virtual bool is_freezable() const override { return false; }
-  virtual void kill_fall() override { }
+  void deactivate() override;
+  void active_update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  bool is_flammable() const override { return false; }
+  bool is_freezable() const override { return false; }
+  void kill_fall() override { }
 
 protected:
   enum MyState {

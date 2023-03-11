@@ -24,15 +24,15 @@ class CirclePlatform : public MovingSprite
 public:
   CirclePlatform(ReaderMapping const& reader);
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  virtual void update(float dt_sec) override;
-  virtual void on_flip(float height) override;
+  void update(float dt_sec) override;
+  void on_flip(float height) override;
   
   static std::string class_name() { return "circleplatform"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Circular Platform"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   virtual void initialize();

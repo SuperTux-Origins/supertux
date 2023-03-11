@@ -34,19 +34,19 @@ friend class HeavyCoin;
 public:
   Coin(Vector const& pos);
   Coin(ReaderMapping const& reader);
-  virtual void finish_construction() override;
+  void finish_construction() override;
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  virtual void update(float dt_sec) override;
+  void update(float dt_sec) override;
   static std::string class_name() { return "coin"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Coin"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void move_to(Vector const& pos) override;
+  void move_to(Vector const& pos) override;
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   void collect();
 
@@ -70,15 +70,15 @@ public:
   HeavyCoin(Vector const& pos, Vector const& init_velocity);
   HeavyCoin(ReaderMapping const& reader);
 
-  virtual void update(float dt_sec) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
+  void update(float dt_sec) override;
+  void collision_solid(CollisionHit const& hit) override;
 
   static std::string class_name() { return "heavycoin"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Heavy Coin"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
 private:
   Physic m_physic;

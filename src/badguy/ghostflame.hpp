@@ -24,12 +24,12 @@ class Ghostflame final : public Flame
 public:
   Ghostflame(ReaderMapping const& reader);
 
-  virtual bool is_flammable() const override;
-  virtual bool is_freezable() const override;
+  bool is_flammable() const override;
+  bool is_freezable() const override;
   static std::string class_name() { return "ghostflame"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Ghost Flame"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   Ghostflame(Ghostflame const&) = delete;

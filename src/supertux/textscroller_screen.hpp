@@ -36,9 +36,9 @@ public:
   TextScrollerScreen(std::string const& file);
   ~TextScrollerScreen() override;
 
-  virtual void setup() override;
-  virtual void draw(Compositor& compositor) override;
-  virtual void update(float dt_sec, Controller const& controller) override;
+  void setup() override;
+  void draw(Compositor& compositor) override;
+  void update(float dt_sec, Controller const& controller) override;
 
 private:
   float m_defaultspeed;

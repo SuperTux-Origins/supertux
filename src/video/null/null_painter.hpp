@@ -27,18 +27,18 @@ public:
   NullPainter();
   ~NullPainter() override;
 
-  virtual void draw_texture(TextureRequest const& request) override;
-  virtual void draw_gradient(GradientRequest const& request) override;
-  virtual void draw_filled_rect(FillRectRequest const& request) override;
-  virtual void draw_inverse_ellipse(InverseEllipseRequest const& request) override;
-  virtual void draw_line(LineRequest const& request) override;
-  virtual void draw_triangle(TriangleRequest const& request) override;
+  void draw_texture(TextureRequest const& request) override;
+  void draw_gradient(GradientRequest const& request) override;
+  void draw_filled_rect(FillRectRequest const& request) override;
+  void draw_inverse_ellipse(InverseEllipseRequest const& request) override;
+  void draw_line(LineRequest const& request) override;
+  void draw_triangle(TriangleRequest const& request) override;
 
-  virtual void clear(Color const& color) override;
-  virtual void get_pixel(GetPixelRequest const& request) const override;
+  void clear(Color const& color) override;
+  void get_pixel(GetPixelRequest const& request) const override;
 
-  virtual void set_clip_rect(Rect const& rect) override;
-  virtual void clear_clip_rect() override;
+  void set_clip_rect(Rect const& rect) override;
+  void clear_clip_rect() override;
 
 private:
   std::optional<Rect> m_clip_rect;

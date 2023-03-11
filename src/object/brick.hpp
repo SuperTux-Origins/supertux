@@ -26,18 +26,18 @@ public:
   Brick(Vector const& pos, int data, std::string const& spriteName);
   Brick(ReaderMapping const& mapping, std::string const& spriteName = "images/objects/bonus_block/brick.sprite");
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   static std::string class_name() { return "brick"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Brick"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   void try_break(Player* player);
   void break_for_crusher(Crusher* icecrusher);
 
 protected:
-  virtual void hit(Player& player) override;
+  void hit(Player& player) override;
 
 private:
   bool m_breakable;
@@ -54,17 +54,17 @@ public:
   HeavyBrick(Vector const& pos, int data, std::string const& spriteName);
   HeavyBrick(ReaderMapping const& mapping);
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   static std::string class_name() { return "heavy-brick"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Heavy Brick"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   void ricochet(GameObject* collider);
 
 protected:
-  virtual void hit(Player& player) override;
+  void hit(Player& player) override;
 };
 
 #endif

@@ -47,27 +47,27 @@ public:
 
   /** Called when the badguy is drawn. The default implementation
       simply draws the badguy sprite on screen */
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
   /** Called each frame. The default implementation checks badguy
       state and calls active_update and inactive_update */
-  virtual void update(float dt_sec) override;
+  void update(float dt_sec) override;
 
   static std::string class_name() { return "badguy"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Badguy"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   virtual std::string get_overlay_size() const { return "1x1"; }
 
   /** Called when a collision with another object occurred. The
       default implementation calls collision_player, collision_solid,
       collision_badguy and collision_squished */
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   /** Called when a collision with tile with special attributes
       occurred */
-  virtual void collision_tile(uint32_t tile_attributes) override;
+  void collision_tile(uint32_t tile_attributes) override;
 
   /** Set the badguy to kill/falling state, which makes him falling of
       the screen (his sprite is turned upside-down) */
@@ -83,9 +83,9 @@ public:
   Vector get_start_position() const { return m_start_position; }
   void set_start_position(Vector const& vec) { m_start_position = vec; }
 
-  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
-  virtual void ungrab(MovingObject& object, Direction dir) override;
-  virtual bool is_portable() const override;
+  void grab(MovingObject& object, Vector const& pos, Direction dir) override;
+  void ungrab(MovingObject& object, Direction dir) override;
+  bool is_portable() const override;
 
   /** Called when hit by a fire bullet, and is_flammable() returns true */
   virtual void ignite();
@@ -157,9 +157,9 @@ protected:
   virtual HitResponse collision_player(Player& player, CollisionHit const& hit);
 
   /** Called when the badguy collided with solid ground */
-  virtual void collision_solid(CollisionHit const& hit) override;
+  void collision_solid(CollisionHit const& hit) override;
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   /** Called when the badguy collided with another badguy */
   virtual HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit);

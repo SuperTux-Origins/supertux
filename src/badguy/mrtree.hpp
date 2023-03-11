@@ -24,16 +24,16 @@ class MrTree final : public WalkingBadguy
 public:
   MrTree(ReaderMapping const& reader);
 
-  virtual bool is_freezable() const override;
+  bool is_freezable() const override;
 
-  virtual std::string get_overlay_size() const override { return "3x3"; }
+  std::string get_overlay_size() const override { return "3x3"; }
   static std::string class_name() { return "mrtree"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Mr. Tree"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
 
 private:
   MrTree(MrTree const&) = delete;

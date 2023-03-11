@@ -31,11 +31,11 @@ public:
 public:
   FadeToBlack(Direction direction, float fade_time, Color dest_color = Color(0, 0, 0));
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
   /// returns true if the effect is completed
-  virtual bool done() const override;
+  bool done() const override;
 
 private:
   Direction m_direction;

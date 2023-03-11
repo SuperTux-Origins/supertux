@@ -24,22 +24,22 @@ class Stalactite : public BadGuy
 public:
   Stalactite(ReaderMapping const& reader);
 
-  virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
-  virtual HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
+  void active_update(float dt_sec) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
+  HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
 
-  virtual void kill_fall() override;
-  virtual void draw(DrawingContext& context) override;
-  virtual void deactivate() override;
+  void kill_fall() override;
+  void draw(DrawingContext& context) override;
+  void deactivate() override;
 
   static std::string class_name() { return "stalactite"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Stalactite"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   void squish();
 

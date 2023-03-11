@@ -26,16 +26,16 @@ public:
   InvisibleBlock(ReaderMapping const& mapping);
 
   static std::string class_name() { return "invisible_block"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Invisible Block"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void draw(DrawingContext& context) override;
-  virtual bool collides(GameObject& other, CollisionHit const& hit) const override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void draw(DrawingContext& context) override;
+  bool collides(GameObject& other, CollisionHit const& hit) const override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
 private:
-  virtual void hit(Player& player) override;
+  void hit(Player& player) override;
 
 private:
   bool visible;

@@ -32,19 +32,19 @@ public:
   Platform(ReaderMapping const& reader);
   Platform(ReaderMapping const& reader, std::string const& default_sprite);
 
-  virtual void finish_construction() override;
+  void finish_construction() override;
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual void update(float dt_sec) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
 
-  virtual void move_to(Vector const& pos) override;
+  void move_to(Vector const& pos) override;
 
   static std::string class_name() { return "platform"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Platform"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   Vector const& get_speed() const { return m_speed; }
 

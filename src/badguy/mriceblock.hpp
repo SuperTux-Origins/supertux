@@ -24,26 +24,26 @@ class MrIceBlock : public WalkingBadguy
 public:
   MrIceBlock(ReaderMapping const& reader);
 
-  virtual void initialize() override;
-  virtual HitResponse collision(GameObject& object, CollisionHit const& hit) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  virtual HitResponse collision_player(Player& player, CollisionHit const& hit) override;
+  void initialize() override;
+  HitResponse collision(GameObject& object, CollisionHit const& hit) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
-  virtual void active_update(float dt_sec) override;
+  void active_update(float dt_sec) override;
 
-  virtual void grab(MovingObject& object, Vector const& pos, Direction dir) override;
-  virtual void ungrab(MovingObject& object, Direction dir) override;
-  virtual bool is_portable() const override;
+  void grab(MovingObject& object, Vector const& pos, Direction dir) override;
+  void ungrab(MovingObject& object, Direction dir) override;
+  bool is_portable() const override;
 
-  virtual bool can_break() const override;
+  bool can_break() const override;
 
-  virtual void ignite() override;
+  void ignite() override;
 
   static std::string class_name() { return "mriceblock"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Iceblock"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   bool can_break();
 
@@ -57,7 +57,7 @@ protected:
   };
 
 protected:
-  virtual bool collision_squished(GameObject& object) override;
+  bool collision_squished(GameObject& object) override;
   void set_state(IceState state);
 
 private:

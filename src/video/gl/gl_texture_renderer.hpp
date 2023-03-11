@@ -37,13 +37,13 @@ public:
   GLTextureRenderer(GLVideoSystem& video_system, Size const& size, int downscale);
   ~GLTextureRenderer() override;
 
-  virtual void start_draw() override;
-  virtual void end_draw() override;
+  void start_draw() override;
+  void end_draw() override;
 
-  virtual Rect get_rect() const override;
-  virtual Size get_logical_size() const override;
+  Rect get_rect() const override;
+  Size get_logical_size() const override;
 
-  virtual TexturePtr get_texture() const override { return m_texture; }
+  TexturePtr get_texture() const override { return m_texture; }
 
   bool is_rendering() const;
 

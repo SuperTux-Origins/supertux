@@ -36,9 +36,9 @@ class Tux final : public GameObject
 public:
   Tux(WorldMap* worldmap);
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
-  virtual bool is_singleton() const override { return true; }
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  bool is_singleton() const override { return true; }
 
   void setup(); /**< called prior to first update */
 

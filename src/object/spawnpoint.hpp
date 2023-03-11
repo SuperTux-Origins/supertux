@@ -30,24 +30,24 @@ public:
   SpawnPointMarker(std::string const& name, Vector const& pos);
   SpawnPointMarker(ReaderMapping const& mapping);
 
-  virtual void update(float dt_sec) override {
+  void update(float dt_sec) override {
     // No updates needed
   }
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
-  virtual void collision_solid(CollisionHit const& hit) override {
+  void collision_solid(CollisionHit const& hit) override {
     // This function wouldn't be called anyway.
   }
 
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override { return FORCE_MOVE; }
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override { return FORCE_MOVE; }
 
   static std::string class_name() { return "spawnpoint"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Spawnpoint"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual int get_layer() const override { return LAYER_FOREGROUND1; }
+  int get_layer() const override { return LAYER_FOREGROUND1; }
 
 private:
   SurfacePtr m_surface;

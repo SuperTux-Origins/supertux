@@ -32,17 +32,17 @@ public:
   Decal(ReaderMapping const& reader);
   ~Decal() override;
 
-  virtual HitResponse collision(GameObject& , CollisionHit const& ) override { return FORCE_MOVE; }
+  HitResponse collision(GameObject& , CollisionHit const& ) override { return FORCE_MOVE; }
 
   static std::string class_name() { return "decal"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Decal"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   void fade_in(float fade_time);
   void fade_out(float fade_time);

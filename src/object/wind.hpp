@@ -31,19 +31,19 @@ class Wind final :
 public:
   Wind(ReaderMapping const& reader);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  virtual bool has_variable_size() const override { return true; }
+  bool has_variable_size() const override { return true; }
   static std::string class_name() { return "wind"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Wind"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual int get_layer() const override { return LAYER_OBJECTS; }
+  int get_layer() const override { return LAYER_OBJECTS; }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   /** @name Scriptable Methods
       @{ */

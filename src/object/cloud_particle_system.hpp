@@ -31,16 +31,16 @@ public:
   ~CloudParticleSystem() override;
 
   void init();
-  virtual void update(float dt_sec) override;
+  void update(float dt_sec) override;
 
-  virtual void draw(DrawingContext& context) override;
+  void draw(DrawingContext& context) override;
 
   static std::string class_name() { return "particles-clouds"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Cloud Particles"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual const std::string get_icon_path() const override {
+  const std::string get_icon_path() const override {
     return "images/engine/editor/clouds.png";
   }
 
@@ -51,11 +51,11 @@ public:
   static int constexpr const max_amount = 500;
   static int constexpr const min_amount = 0;
 
-  virtual void expose(HSQUIRRELVM vm, SQInteger table_idx) override {
+  void expose(HSQUIRRELVM vm, SQInteger table_idx) override {
     ExposedObject<CloudParticleSystem, scripting::Clouds>::expose(vm, table_idx);
   }
 
-  virtual void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override {
+  void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override {
     ExposedObject<CloudParticleSystem, scripting::Clouds>::unexpose(vm, table_idx);
   }
 

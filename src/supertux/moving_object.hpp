@@ -39,16 +39,16 @@ public:
   MovingObject(ReaderMapping const& reader);
   ~MovingObject() override;
 
-  virtual void collision_solid(CollisionHit const& /*hit*/) override
+  void collision_solid(CollisionHit const& /*hit*/) override
   {
   }
 
-  virtual bool collides(GameObject& /*other*/, CollisionHit const& /*hit*/) const override
+  bool collides(GameObject& /*other*/, CollisionHit const& /*hit*/) const override
   {
     return true;
   }
 
-  virtual void collision_tile(uint32_t /*tile_attributes*/) override
+  void collision_tile(uint32_t /*tile_attributes*/) override
   {
   }
 
@@ -62,7 +62,7 @@ public:
     m_col.move_to(pos);
   }
 
-  virtual bool listener_is_valid() const override { return is_valid(); }
+  bool listener_is_valid() const override { return is_valid(); }
 
   Vector get_pos() const
   {
@@ -93,9 +93,9 @@ public:
   }
 
   static std::string class_name() { return "moving-object"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
   virtual int get_layer() const = 0;
 

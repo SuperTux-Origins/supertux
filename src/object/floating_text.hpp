@@ -28,12 +28,12 @@ class FloatingText final : public GameObject
 public:
   FloatingText(Vector const& pos, std::string const& text_);
   FloatingText(Vector const& pos, int s);  // use this for score, for instance
-  virtual bool is_saveable() const override {
+  bool is_saveable() const override {
     return false;
   }
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
 
 private:
   Vector position;

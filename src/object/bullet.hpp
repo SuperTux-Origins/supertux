@@ -31,13 +31,13 @@ class Bullet final : public MovingObject
 public:
   Bullet(Vector const& pos, Vector const& xm, Direction dir, BonusType type, Player& player);
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual bool is_saveable() const override { return false; }
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void collision_solid(CollisionHit const& hit) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  bool is_saveable() const override { return false; }
 
-  virtual int get_layer() const override { return LAYER_OBJECTS; }
+  int get_layer() const override { return LAYER_OBJECTS; }
 
   /** Makes bullet bounce off an object (that got hit). To be called
       by the collision handler of that object. Note that the @c hit

@@ -24,15 +24,15 @@ class YetiStalactite final : public Stalactite
 public:
   YetiStalactite(ReaderMapping const& mapping);
 
-  virtual void active_update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual void update(float dt_sec) override;
+  void active_update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void update(float dt_sec) override;
 
-  virtual bool is_flammable() const override;
+  bool is_flammable() const override;
   static std::string class_name() { return "yeti_stalactite"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Yeti's Stalactite"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   void start_shaking();
   bool is_hanging() const;

@@ -25,18 +25,18 @@ class Yeti final : public BadGuy
 public:
   Yeti(ReaderMapping const& mapping);
 
-  virtual void draw(DrawingContext& context) override;
-  virtual void initialize() override;
-  virtual void active_update(float dt_sec) override;
-  virtual void collision_solid(CollisionHit const& hit) override;
-  virtual bool collision_squished(GameObject& object) override;
-  virtual void kill_fall() override;
+  void draw(DrawingContext& context) override;
+  void initialize() override;
+  void active_update(float dt_sec) override;
+  void collision_solid(CollisionHit const& hit) override;
+  bool collision_squished(GameObject& object) override;
+  void kill_fall() override;
 
-  virtual bool is_flammable() const override;
+  bool is_flammable() const override;
   static std::string class_name() { return "yeti"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Yeti"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
   void kill_squished(GameObject& object);
 

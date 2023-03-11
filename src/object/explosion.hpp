@@ -31,12 +31,12 @@ public:
   Explosion(ReaderMapping const& reader);
 
   static std::string display_name() { return _("Explosion"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  virtual bool is_saveable() const override { return false; }
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  bool is_saveable() const override { return false; }
 
   bool hurts() const { return hurt; }
   void hurts (bool val) { hurt = val; }

@@ -28,14 +28,14 @@ public:
   ~GhostParticleSystem() override;
 
   void init();
-  virtual void update(float dt_sec) override;
+  void update(float dt_sec) override;
 
   static std::string class_name() { return "particles-ghosts"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Ghost Particles"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual const std::string get_icon_path() const override {
+  const std::string get_icon_path() const override {
     return "images/engine/editor/ghostparticles.png";
   }
 

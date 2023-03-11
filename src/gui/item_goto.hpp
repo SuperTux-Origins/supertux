@@ -25,7 +25,7 @@ public:
   ItemGoTo(std::string const& text_, int target_menu_, int id = -1);
 
   /** Processes the menu action. */
-  virtual void process_action(MenuAction const& action) override;
+  void process_action(MenuAction const& action) override;
 
   int target_menu;
 

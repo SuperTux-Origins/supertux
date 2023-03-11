@@ -24,12 +24,12 @@ class Spiky final : public WalkingBadguy
 public:
   Spiky(ReaderMapping const& reader);
 
-  virtual bool is_freezable() const override;
-  virtual bool is_flammable() const override;
+  bool is_freezable() const override;
+  bool is_flammable() const override;
   static std::string class_name() { return "spiky"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Spiky"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
 private:
   Spiky(Spiky const&) = delete;

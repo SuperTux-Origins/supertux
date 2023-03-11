@@ -29,15 +29,15 @@ public:
   ~Switch() override;
 
   static std::string class_name() { return "switch"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Switch"); }
-  virtual std::string get_display_name() const override { return display_name(); }
+  std::string get_display_name() const override { return display_name(); }
 
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
-  virtual void event(Player& player, EventType type) override;
+  void update(float dt_sec) override;
+  void draw(DrawingContext& context) override;
+  void event(Player& player, EventType type) override;
 
-  virtual void on_flip(float height) override;
+  void on_flip(float height) override;
 
 private:
   enum SwitchState {
