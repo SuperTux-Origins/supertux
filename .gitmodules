@@ -1,3 +1,0 @@
-[submodule "external/sexp-cpp"]
-	path = external/sexp-cpp
-	url = https://github.com/SuperTux/sexp-cpp.git
