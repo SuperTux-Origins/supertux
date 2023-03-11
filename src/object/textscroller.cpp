@@ -130,7 +130,7 @@ TextScroller::parse_root(ReaderObject const& root)
     mapping.read("version", version);
     if (version == 1)
     {
-      log_info << "[" << mapping.get_document().get_filename() << "] Text uses old format: version 1" << std::endl;
+      log_info("[{}] Text uses old format: version 1", mapping.get_document().get_filename());
 
       std::string text;
       if (!mapping.read("text", text)) {
@@ -180,7 +180,7 @@ TextScroller::parse_content(ReaderCollection const& collection)
         }
 
         if (mapping.read("image", image_file)) {
-          log_warning << "[" << collection.get_document().get_filename() << "] Simple person entry shouldn't specify images" << std::endl;
+          log_warning("[{}] Simple person entry shouldn't specify images", collection.get_document().get_filename());
         }
 
         m_lines.emplace_back(new InfoBoxLine(' ', name + " (" + info + ")")); // NOLINT
@@ -227,13 +227,13 @@ TextScroller::parse_content(ReaderCollection const& collection)
       else if (type == "reference")
         m_lines.emplace_back(new InfoBoxLine('*', string));
       else {
-        log_warning << "[" << item.get_document().get_filename() << "] Unknown text type '" << type << "'" << std::endl;
+        log_warning("[{}] Unknown text type '{}'", item.get_document().get_filename(), type);
         m_lines.emplace_back(new InfoBoxLine('\t', string));
       }
     }
     else
     {
-      log_warning << "[" << item.get_document().get_filename() << "] Unknown token '" << item.get_name() << "'" << std::endl;
+      log_warning("[{}] Unknown token '{}'", item.get_document().get_filename(), item.get_name());
     }
   }
 }

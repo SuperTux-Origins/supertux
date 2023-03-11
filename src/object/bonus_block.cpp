@@ -103,21 +103,21 @@ BonusBlock::BonusBlock(ReaderMapping const& mapping) :
       ReaderCollection content_collection;
       if (!mapping.read("custom-contents", content_collection))
       {
-        log_warning << "bonusblock is missing 'custom-contents' tag" << std::endl;
+        log_warning("bonusblock is missing 'custom-contents' tag");
       }
       else
       {
         auto const& object_specs = content_collection.get_objects();
         if (!object_specs.empty()) {
           if (object_specs.size() > 1) {
-            log_warning << "only one object allowed in bonusblock 'custom-contents', ignoring the rest" << std::endl;
+            log_warning("only one object allowed in bonusblock 'custom-contents', ignoring the rest");
           }
 
           ReaderObject const& spec = object_specs[0];
           auto game_object = GameObjectFactory::instance().create(spec.get_name(), spec.get_mapping());
           m_object = to_moving_object(std::move(game_object));
           if (!m_object) {
-            log_warning << "Only MovingObjects are allowed inside BonusBlocks" << std::endl;
+            log_warning("Only MovingObjects are allowed inside BonusBlocks");
           }
         }
       }
@@ -159,7 +159,7 @@ BonusBlock::get_content_by_data(int tile_data) const
     case 14: return Content::EARTHGROW;
     case 15: return Content::LIGHT_ON;
     default:
-      log_warning << "Invalid box contents" << std::endl;
+      log_warning("Invalid box contents");
       return Content::COIN;
   }
 }
@@ -537,7 +537,7 @@ BonusBlock::get_content_from_string(std::string const& contentstring) const
   } else if (contentstring == "explode") {
     return Content::EXPLODE;
   } else {
-    log_warning << "Invalid box contents '" << contentstring << "'" << std::endl;
+    log_warning("Invalid box contents '{}'", contentstring);
     return Content::COIN;
   }
 }

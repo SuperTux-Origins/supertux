@@ -326,7 +326,7 @@ MenuManager::pop_menu(bool skip_transition)
 {
   if (m_menu_stack.empty())
   {
-    log_warning << "trying to pop on an empty menu_stack" << std::endl;
+    log_warning("trying to pop on an empty menu_stack");
   }
   else
   {

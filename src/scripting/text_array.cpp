@@ -181,7 +181,7 @@ TextArray::get_pos_x() const
   if (auto* textItem = object.get_current_text_item()) {
     return textItem->text_object.get_pos().x;
   } else {
-    log_warning << "TextArray position is not set. Assuming (0,0)" << std::endl;
+    log_warning("TextArray position is not set. Assuming (0,0)");
     return 0;
   }
 }
@@ -194,7 +194,7 @@ TextArray::get_pos_y() const
   if (auto* textItem = object.get_current_text_item()) {
     return textItem->text_object.get_pos().y;
   } else {
-    log_warning << "TextArray position is not set. Assuming (0,0)" << std::endl;
+    log_warning("TextArray position is not set. Assuming (0,0)");
     return 0;
   }
 }

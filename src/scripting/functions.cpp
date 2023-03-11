@@ -47,7 +47,7 @@ bool validate_sector_player()
 {
   if (::Sector::current() == nullptr)
   {
-    log_info << "No current sector." << std::endl;
+    log_info("No current sector.");
     return false;
   }
 
@@ -85,13 +85,13 @@ void start_cutscene()
   auto session = GameSession::current();
   if (session == nullptr)
   {
-    log_info << "No game session" << std::endl;
+    log_info("No game session");
     return;
   }
 
   if (session->get_current_level().m_is_in_cutscene)
   {
-    log_warning << "start_cutscene(): starting a new cutscene above another one, ending preceding cutscene (use end_cutscene() in scripts!)" << std::endl;
+    log_warning("start_cutscene(): starting a new cutscene above another one, ending preceding cutscene (use end_cutscene() in scripts!)");
 
     // Remove all sounds that started playing while skipping
     if (session->get_current_level().m_skip_cutscene)
@@ -107,13 +107,13 @@ void end_cutscene()
   auto session = GameSession::current();
   if (session == nullptr)
   {
-    log_info << "No game session" << std::endl;
+    log_info("No game session");
     return;
   }
 
   if (!session->get_current_level().m_is_in_cutscene)
   {
-    log_warning << "end_cutscene(): no cutscene to end, resetting status anyways" << std::endl;
+    log_warning("end_cutscene(): no cutscene to end, resetting status anyways");
   }
 
   // Remove all sounds that started playing while skipping
@@ -129,7 +129,7 @@ bool check_cutscene()
   auto session = GameSession::current();
   if (session == nullptr)
   {
-    log_info << "No game session" << std::endl;
+    log_info("No game session");
     return false;
   }
 
@@ -151,7 +151,7 @@ void wait(HSQUIRRELVM vm, float seconds)
     }
     else
     {
-      log_warning << "wait(): no VM or environment available\n";
+      log_warning("wait(): no VM or environment available\n");
     }
   }
   else if(GameSession::current()->get_current_level().m_is_in_cutscene)
@@ -169,7 +169,7 @@ void wait(HSQUIRRELVM vm, float seconds)
     }
     else
     {
-      log_warning << "wait(): no VM or environment available\n";
+      log_warning("wait(): no VM or environment available\n");
     }
   }
   else
@@ -184,7 +184,7 @@ void wait(HSQUIRRELVM vm, float seconds)
     }
     else
     {
-      log_warning << "wait(): no VM or environment available\n";
+      log_warning("wait(): no VM or environment available\n");
     }
   }
 }
@@ -395,7 +395,7 @@ void restart()
   auto session = GameSession::current();
   if (session == nullptr)
   {
-    log_info << "No game session" << std::endl;
+    log_info("No game session");
     return;
   }
   session->restart_level();
@@ -406,7 +406,7 @@ void whereami()
   if (!validate_sector_player()) return;
   // FIXME: This only has effect on the first player
   ::Player& tux = *(::Sector::get().get_players()[0]);
-  log_info << "You are at x " << (static_cast<int>(tux.get_pos().x)) << ", y " << (static_cast<int>(tux.get_pos().y)) << std::endl;
+  log_info("You are at x {}, y {}", (static_cast<int>(tux.get_pos().x)), (static_cast<int>(tux.get_pos().y)));
 }
 
 void gotoend()
@@ -435,7 +435,7 @@ void camera()
 {
   if (!validate_sector_player()) return;
   auto const& cam_pos = ::Sector::get().get_camera().get_translation();
-  log_info << "Camera is at " << cam_pos.x << "," << cam_pos.y << std::endl;
+  log_info("Camera is at {},{}", cam_pos.x, cam_pos.y);
 }
 
 void set_gamma(float gamma)
@@ -460,7 +460,7 @@ void set_game_speed(float speed)
     // Always put a minimum speed above 0 - if the user enabled transitions,
     // executing transitions would take an unreaonably long time if we allow
     // game speeds like 0.00001
-    log_warning << "Cannot set game speed to less than 0.05" << std::endl;
+    log_warning("Cannot set game speed to less than 0.05");
     throw std::runtime_error("Cannot set game speed to less than 0.05");
   }
 

@@ -99,7 +99,7 @@ UTF8Iterator::UTF8Iterator(std::string const& text_) :
   } catch (std::exception&) {
     uint32_t value;
     memcpy(&value, text.c_str() + pos, sizeof(value));
-    log_debug << "Malformed utf-8 sequence beginning with " << value << " found " << std::endl;
+    log_debug("Malformed utf-8 sequence beginning with {} found ", value);
     chr = 0;
   }
 }
@@ -117,7 +117,7 @@ UTF8Iterator::operator++() {
     } catch (std::exception&) {
       uint32_t value;
       memcpy(&value, text.c_str() + pos, sizeof(value));
-      log_debug << "Malformed utf-8 sequence beginning with " << value << " found " << std::endl;
+      log_debug("Malformed utf-8 sequence beginning with {} found ", value);
       chr = 0;
       ++pos;
     }

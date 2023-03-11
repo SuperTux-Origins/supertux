@@ -17,27 +17,11 @@
 #ifndef HEADER_SUPERTUX_UTIL_LOG_HPP
 #define HEADER_SUPERTUX_UTIL_LOG_HPP
 
-#include <ostream>
+#include <iosfwd>
 
-enum LogLevel { LOG_NONE, LOG_FATAL, LOG_WARNING, LOG_INFO, LOG_DEBUG };
-extern LogLevel g_log_level;
+#include <logmich/log.hpp>
 
-std::ostream& log_debug_f(char const* file, int line, bool use_console_buffer);
-#define log_debug if (g_log_level >= LOG_DEBUG) log_debug_f(__FILE__, __LINE__, true)
-#define log_debug_ if (g_log_level >= LOG_DEBUG) log_debug_f(__FILE__, __LINE__, false)
-
-std::ostream& log_info_f(char const* file, int line);
-#define log_info if (g_log_level >= LOG_INFO) log_info_f(__FILE__, __LINE__)
-
-std::ostream& log_warning_f(char const* file, int line);
-#define log_warning if (g_log_level >= LOG_WARNING) log_warning_f(__FILE__, __LINE__)
-
-std::ostream& log_fatal_f(char const* file, int line);
-#define log_fatal if (g_log_level >= LOG_FATAL) log_fatal_f(__FILE__, __LINE__)
-
-void log_info_callback(std::string const& str);
-void log_error_callback(std::string const& str);
-void log_warning_callback(std::string const& str);
+#define log_warning log_warn
 
 std::ostream& get_logging_instance(bool use_console_buffer = true);
 

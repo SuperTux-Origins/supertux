@@ -43,7 +43,7 @@ dir_to_string(Direction const& dir)
       if (dir != Direction::AUTO)
       {
         // Display a warning when an invalid direction has been provided.
-        log_warning << "Unknown direction \"" << dir << "\". Switching to \"auto\"." << std::endl;
+        log_warning("Unknown direction \"{}\". Switching to \"auto\".", dir);
       }
       return "auto";
   }
@@ -65,7 +65,7 @@ string_to_dir(std::string const& dir_str)
     if (dir_str != "auto")
     {
       // Display a warning when an invalid direction has been provided.
-      log_warning << "Unknown direction \"" << dir_str << "\". Switching to \"auto\"." << std::endl;
+      log_warning("Unknown direction \"{}\". Switching to \"auto\".", dir_str);
     }
     return Direction::AUTO;
   }

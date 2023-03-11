@@ -59,7 +59,7 @@ GameObjectManager::process_resolve_requests()
     GameObject* object = get_object_by_name<GameObject>(request.name);
     if (!object)
     {
-      log_warning << "GameObjectManager: name resolve for '" << request.name << "' failed" << std::endl;
+      log_warning("GameObjectManager: name resolve for '{}' failed", request.name);
       request.callback({});
     }
     else

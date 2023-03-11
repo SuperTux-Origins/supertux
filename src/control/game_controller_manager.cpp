@@ -58,7 +58,7 @@ GameControllerManager::process_button_event(SDL_ControllerButtonEvent const& ev)
     player_id = it->second;
   }
 
-  //log_info << "button event: " << static_cast<int>(ev.button) << " " << static_cast<int>(ev.state) << std::endl;
+  //log_info("button event: {} {}", static_cast<int>(ev.button), static_cast<int>(ev.state));
   Controller& controller = m_parent->get_controller(player_id);
   auto set_control = [this, &controller](Control control, Uint8 value)
   {
@@ -147,7 +147,7 @@ GameControllerManager::process_axis_event(SDL_ControllerAxisEvent const& ev)
   // FIXME: buttons and axis are fighting for control ownership, need
   // to OR the values together
 
-  //log_info << "axis event: " << static_cast<int>(ev.axis) << " " << ev.value << std::endl;
+  //log_info("axis event: {} {}", static_cast<int>(ev.axis), ev.value);
   Controller& controller = m_parent->get_controller(player_id);
   auto set_control = [this, &controller](Control control, bool value)
   {
@@ -208,15 +208,14 @@ GameControllerManager::on_controller_added(int joystick_index)
 {
   if (!SDL_IsGameController(joystick_index))
   {
-    log_warning << "joystick is not a game controller, ignoring: " << joystick_index << std::endl;
+    log_warning("joystick is not a game controller, ignoring: {}", joystick_index);
   }
   else
   {
     SDL_GameController* game_controller = SDL_GameControllerOpen(joystick_index);
     if (!game_controller)
     {
-      log_warning << "failed to open game_controller: " << joystick_index
-                  << ": " << SDL_GetError() << std::endl;
+      log_warning("failed to open game_controller: {}: {}", joystick_index, SDL_GetError());
     }
     else
     {
@@ -295,9 +294,7 @@ GameControllerManager::on_controller_removed(int instance_id)
   }
   else
   {
-    log_debug << "Controller was unplugged but was not initially detected: "
-              << SDL_JoystickName(SDL_JoystickFromInstanceID(instance_id))
-              << std::endl;
+    log_debug("Controller was unplugged but was not initially detected: {}", SDL_JoystickName(SDL_JoystickFromInstanceID(instance_id)));
   }
 }
 

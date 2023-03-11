@@ -52,7 +52,7 @@ Levelset::walk_directory(std::string const& directory, bool recursively)
   char** files = PHYSFS_enumerateFiles(directory.c_str());
   if (!files)
   {
-    log_warning << "Couldn't read subset dir '" << directory << "'" << std::endl;
+    log_warning("Couldn't read subset dir '{}'", directory);
     return;
   }
 

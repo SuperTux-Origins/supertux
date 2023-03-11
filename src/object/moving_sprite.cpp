@@ -159,7 +159,7 @@ MovingSprite::change_sprite(std::string const& new_sprite_name)
   }
   catch (std::exception& err)
   {
-    log_warning << "Sprite change failed: Sprite '" << new_sprite_name << "' cannot be loaded: " << err.what() << std::endl;
+    log_warning("Sprite change failed: Sprite '{}' cannot be loaded: {}", new_sprite_name, err.what());
     return false;
   }
 

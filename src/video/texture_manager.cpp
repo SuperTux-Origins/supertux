@@ -51,7 +51,7 @@ GLenum string2wrap(std::string const& text)
   }
   else
   {
-    log_warning << "unknown texture wrap: " << text << std::endl;
+    log_warning("unknown texture wrap: {}", text);
     return GL_CLAMP_TO_EDGE;
   }
 }
@@ -68,7 +68,7 @@ GLenum string2filter(std::string const& text)
   }
   else
   {
-    log_warning << "unknown texture filter: " << text << std::endl;
+    log_warning("unknown texture filter: {}", text);
     return GL_LINEAR;
   }
 }
@@ -87,7 +87,7 @@ TextureManager::~TextureManager()
   {
     if (!texture.second.expired())
     {
-      log_warning << "Texture '" << std::get<0>(texture.first) << "' not freed" << std::endl;
+      log_warning("Texture '{}' not freed", std::get<0>(texture.first));
     }
   }
   m_image_textures.clear();
@@ -100,7 +100,7 @@ TextureManager::get(ReaderMapping const& mapping, std::optional<Rect> const& reg
   std::string filename;
   if (!mapping.read("file", filename))
   {
-    log_warning << "'file' tag missing" << std::endl;
+    log_warning("'file' tag missing");
   }
   else
   {
@@ -117,7 +117,7 @@ TextureManager::get(ReaderMapping const& mapping, std::optional<Rect> const& reg
     }
     else
     {
-      log_warning << "'rect' requires four elements" << std::endl;
+      log_warning("'rect' requires four elements");
     }
   }
 
@@ -139,7 +139,7 @@ TextureManager::get(ReaderMapping const& mapping, std::optional<Rect> const& reg
     }
     else
     {
-      log_warning << "unknown number of wrap arguments" << std::endl;
+      log_warning("unknown number of wrap arguments");
     }
   }
 
@@ -244,7 +244,7 @@ TextureManager::reap_cache_entry(Texture::Key const& key)
   auto i = m_image_textures.find(key);
   if (i == m_image_textures.end())
   {
-    log_warning << "no cache entry for '" << std::get<0>(key) << "'" << std::endl;
+    log_warning("no cache entry for '{}'", std::get<0>(key));
   }
   else
   {
@@ -262,7 +262,7 @@ TextureManager::create_image_texture(std::string const& filename, Rect const& re
   }
   catch(std::exception const& err)
   {
-    log_warning << "Couldn't load texture '" << filename << "' (now using dummy texture): " << err.what() << std::endl;
+    log_warning("Couldn't load texture '{}' (now using dummy texture): {}", filename, err.what());
     return create_dummy_texture();
   }
 }
@@ -302,7 +302,7 @@ TextureManager::create_image_texture_raw(std::string const& filename, Rect const
       src_surface.format->Bmask == 0 &&
       src_surface.format->Amask == 0)
   {
-    log_debug << "Wrong surface format for image " << filename << ". Compensating." << std::endl;
+    log_debug("Wrong surface format for image {}. Compensating.", filename);
     convert.reset(SDL_ConvertSurfaceFormat(const_cast<SDL_Surface*>(&src_surface), SDL_PIXELFORMAT_RGBA8888, 0));
   }
 
@@ -311,8 +311,7 @@ TextureManager::create_image_texture_raw(std::string const& filename, Rect const
   SDLSurfacePtr subimage;
   if (!Rect(0, 0, surface.w, surface.h).contains(rect))
   {
-    log_warning << filename << ": invalid subregion requested: image="
-                << surface.w << "x" << surface.h << ", rect=" << rect << std::endl;
+    log_warning("{}: invalid subregion requested: image={}x{}, rect={}", filename, surface.w, surface.h, rect);
 
     subimage = SDLSurfacePtr(SDL_CreateRGBSurface(0,
                                                   rect.get_width(),
@@ -361,7 +360,7 @@ TextureManager::create_image_texture(std::string const& filename, Sampler const&
   }
   catch (std::exception const& err)
   {
-    log_warning << "Couldn't load texture '" << filename << "' (now using dummy texture): " << err.what() << std::endl;
+    log_warning("Couldn't load texture '{}' (now using dummy texture): {}", filename, err.what());
     return create_dummy_texture();
   }
 }
@@ -406,7 +405,7 @@ TextureManager::create_dummy_texture()
     }
     else
     {
-      log_warning << "Couldn't load texture '" << dummy_texture_fname << "' (now using empty one): " << err.what() << std::endl;
+      log_warning("Couldn't load texture '{}' (now using empty one): {}", dummy_texture_fname, err.what());
       TexturePtr texture = VideoSystem::current()->new_texture(*image);
       return texture;
     }

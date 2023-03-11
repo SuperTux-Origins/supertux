@@ -210,7 +210,7 @@ OptionsMenu::OptionsMenu(bool complete) :
     int ret = SDL_GetDisplayMode(0, i, &mode);
     if (ret != 0)
     {
-      log_warning << "failed to get display mode: " << SDL_GetError() << std::endl;
+      log_warning("failed to get display mode: {}", SDL_GetError());
     }
     else
     {
@@ -276,7 +276,7 @@ OptionsMenu::OptionsMenu(bool complete) :
         break;
 
       default:
-        log_warning << "Unknown swap mode: " << mode << std::endl;
+        log_warning("Unknown swap mode: {}", mode);
         next_vsync = 0;
     }
   }
@@ -476,7 +476,7 @@ OptionsMenu::menu_action(MenuItem& item)
         }
         else
         {
-          log_fatal << "Invalid aspect ratio " << aspect_ratios[next_aspect_ratio] << " specified" << std::endl;
+          log_fatal("Invalid aspect ratio {} specified", aspect_ratios[next_aspect_ratio]);
           assert(false);
         }
       }
@@ -508,7 +508,7 @@ OptionsMenu::menu_action(MenuItem& item)
         if (sscanf(window_resolutions[next_window_resolution].c_str(), "%dx%d",
                    &width, &height) != 2)
         {
-          log_fatal << "can't parse " << window_resolutions[next_window_resolution] << std::endl;
+          log_fatal("can't parse {}", window_resolutions[next_window_resolution]);
         }
         else
         {

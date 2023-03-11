@@ -93,7 +93,7 @@ GLProgram::get_attrib_location(char const* name) const
   GLint loc = glGetAttribLocation(m_program, name);
   if (loc == -1)
   {
-    log_debug << "GLProgram::get_attrib_location(\"" << name << "\") failed" << std::endl;
+    log_debug("GLProgram::get_attrib_location(\"{}\") failed", name);
   }
 
   assert_gl();
@@ -109,7 +109,7 @@ GLProgram::get_uniform_location(char const* name) const
   GLint loc = glGetUniformLocation(m_program, name);
   if (loc == -1)
   {
-    log_debug << "GLProgram::get_uniform_location(\"" << name << "\") failed" << std::endl;
+    log_debug("GLProgram::get_uniform_location(\"{}\") failed", name);
   }
 
   assert_gl();

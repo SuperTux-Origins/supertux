@@ -151,7 +151,7 @@ FileSystemMenu::menu_action(MenuItem& item)
 
         MenuManager::instance().pop_menu();
       } else {
-        log_warning << "Selected invalid file or directory" << std::endl;
+        log_warning("Selected invalid file or directory");
       }
     }
   }

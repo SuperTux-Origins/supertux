@@ -81,7 +81,7 @@ SectorParser::parse_object(std::string const& name_, ReaderMapping const& reader
     try {
       return GameObjectFactory::instance().create(name_, reader);
     } catch(std::exception& e) {
-      log_warning << e.what() << "" << std::endl;
+      log_warning("{}", e.what());
       return {};
     }
   }

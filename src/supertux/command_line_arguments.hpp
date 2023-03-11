@@ -42,7 +42,7 @@ public:
 
 private:
   Action m_action;
-  LogLevel m_log_level;
+  logmich::LogLevel m_log_level;
 
 public:
   std::optional<std::string> datadir;
@@ -88,7 +88,7 @@ public:
   CommandLineArguments();
 
   Action get_action() const { return m_action; }
-  LogLevel get_log_level() const { return m_log_level; }
+  logmich::LogLevel get_log_level() const { return m_log_level; }
 
   void parse_args(int argc, char** argv);
 

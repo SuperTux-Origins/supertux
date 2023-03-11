@@ -115,7 +115,7 @@ Sector::~Sector()
   }
   catch(std::exception const& err)
   {
-    log_warning << err.what() << std::endl;
+    log_warning("{}", err.what());
   }
 
   clear_objects();
@@ -146,11 +146,11 @@ Sector::finish_construction()
   }
 
   if (get_solid_tilemaps().empty()) {
-    log_warning << "sector '" << get_name() << "' does not contain a solid tile layer." << std::endl;
+    log_warning("sector '{}' does not contain a solid tile layer.", get_name());
   }
 
   if (!get_object_by_type<Camera>()) {
-    log_warning << "sector '" << get_name() << "' does not contain a camera." << std::endl;
+    log_warning("sector '{}' does not contain a camera.", get_name());
     add<Camera>("Camera");
   }
 
@@ -199,7 +199,7 @@ Sector::activate(std::string const& spawnpoint)
   }
 
   if (!sp) {
-    log_warning << "Spawnpoint '" << spawnpoint << "' not found." << std::endl;
+    log_warning("Spawnpoint '{}' not found.", spawnpoint);
     if (spawnpoint != "main") {
       activate("main");
     } else {
@@ -244,7 +244,7 @@ Sector::activate(Vector const& player_pos)
     // spawning tux in the ground would kill him
     if (!is_free_of_tiles(player.get_bbox())) {
       std::string current_level = "[" + Sector::get().get_level().m_filename + "] ";
-      log_warning << current_level << "Tried spawning Tux in solid matter. Compensating." << std::endl;
+      log_warning("{}Tried spawning Tux in solid matter. Compensating.", current_level);
       Vector npos = player.get_bbox().p1();
       npos.y-=32;
       player.move(npos);
@@ -330,7 +330,7 @@ Sector::calculate_foremost_layer() const
       }
     }
   }
-  log_debug << "Calculated baduy falling layer was: " << layer << std::endl;
+  log_debug("Calculated baduy falling layer was: {}", layer);
   return layer;
 }
 
@@ -364,7 +364,7 @@ Sector::before_object_add(GameObject& object)
     auto const& objects = get_objects_by_type_index(std::type_index(typeid(object)));
     if (!objects.empty())
     {
-      log_warning << "Can't insert multiple GameObject of type '" << typeid(object).name() << "', ignoring" << std::endl;
+      log_warning("Can't insert multiple GameObject of type '{}', ignoring", typeid(object).name());
       return false;
     }
   }
@@ -602,7 +602,7 @@ Sector::set_gravity(float gravity)
 {
   if (gravity != 10.0f)
   {
-    log_warning << "Changing a Sector's gravitational constant might have unforeseen side-effects: " << gravity << std::endl;
+    log_warning("Changing a Sector's gravitational constant might have unforeseen side-effects: {}", gravity);
   }
 
   m_gravity = gravity;
@@ -695,7 +695,7 @@ Sector::convert_tiles2gameobject()
               add_object(std::move(object));
               tm.change(x, y, 0);
             } catch(std::exception& e) {
-              log_warning << e.what() << "" << std::endl;
+              log_warning("{}", e.what());
             }
           }
         }

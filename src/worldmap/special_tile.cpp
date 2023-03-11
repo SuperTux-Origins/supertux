@@ -37,10 +37,10 @@ SpecialTile::SpecialTile(ReaderMapping const& mapping) :
   m_apply_action_west(true)
 {
   if (!mapping.read("x", m_pos.x)) {
-    log_warning << "X coordinate of special tile not set, defaulting to 0" << std::endl;
+    log_warning("X coordinate of special tile not set, defaulting to 0");
   }
   if (!mapping.read("y", m_pos.y)) {
-    log_warning << "Y coordinate of special tile not set, defaulting to 0" << std::endl;
+    log_warning("Y coordinate of special tile not set, defaulting to 0");
   }
   if (!mapping.read("invisible-tile", m_invisible)) {
     // Ignore attribute if it's not specified. Tile is visible.
@@ -49,7 +49,7 @@ SpecialTile::SpecialTile(ReaderMapping const& mapping) :
   if (!m_invisible) {
     std::string spritefile = "";
     if (!mapping.read("sprite", spritefile)) {
-      log_warning << "No sprite specified for visible special tile." << std::endl;
+      log_warning("No sprite specified for visible special tile.");
     }
     m_sprite = SpriteManager::current()->create(spritefile);
   }

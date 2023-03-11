@@ -34,7 +34,7 @@ Gradient::set_direction(std::string const& direction)
   else if (direction == "vertical_sector")
     object.set_direction(GradientDirection::VERTICAL_SECTOR);
   else
-    log_info << "Invalid direction for gradient \"" << direction << "\"";
+    log_info("Invalid direction for gradient \"{}\"", direction);
 }
 
 std::string

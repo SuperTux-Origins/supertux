@@ -253,7 +253,7 @@ SoundManager::play_music(std::string const& filename, float fadetime)
     m_music_source->set_relative(true);
     m_music_source->play();
   } catch(std::exception& e) {
-    log_warning << "Couldn't play music file '" << filename << "': " << e.what() << std::endl;
+    log_warning("Couldn't play music file '{}': {}", filename, e.what());
   }
 }
 

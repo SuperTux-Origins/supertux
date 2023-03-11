@@ -60,8 +60,7 @@ CustomParticleSystemFile::update_data()
   }
   catch (std::exception& e)
   {
-    log_warning << "Could not update custom particle from file (fallback to default settings): "
-                    << e.what() << std::endl;
+    log_warning("Could not update custom particle from file (fallback to default settings): {}", e.what());
     set_props(CustomParticleSystem().get_props().get());
   }
 }

@@ -58,7 +58,7 @@ Camera::set_mode(std::string const& mode)
   } else if (mode == "manual") {
     object.set_mode(::Camera::Mode::MANUAL);
   } else {
-    log_fatal << "Camera mode '" << mode << "' unknown.";
+    log_fatal("Camera mode '{}' unknown.", mode);
   }
 }
 

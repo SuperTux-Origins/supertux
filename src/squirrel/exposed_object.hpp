@@ -91,7 +91,7 @@ public:
       return;
     }
 
-    log_debug << "Unexposing object " << name << std::endl;
+    log_debug("Unexposing object {}", name);
 
     unexpose_object(vm, table_idx, name);
   }

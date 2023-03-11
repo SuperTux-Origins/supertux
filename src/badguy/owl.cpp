@@ -54,14 +54,14 @@ Owl::initialize()
   auto game_object = GameObjectFactory::instance().create(carried_obj_name, get_pos(), m_dir);
   if (game_object == nullptr)
   {
-    log_fatal << "Creating \"" << carried_obj_name << "\" object failed." << std::endl;
+    log_fatal("Creating \"{}\" object failed.", carried_obj_name);
   }
   else
   {
     carried_object = dynamic_cast<Portable*>(game_object.get());
     if (carried_object == nullptr)
     {
-      log_warning << "Object is not portable: " << carried_obj_name << std::endl;
+      log_warning("Object is not portable: {}", carried_obj_name);
     }
     else
     {

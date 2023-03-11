@@ -39,7 +39,7 @@ ScriptedObject::ScriptedObject(ReaderMapping const& mapping) :
 
   if (m_name.empty()) {
     m_name = "unnamed" + std::to_string(graphicsRandom.rand());
-    log_warning << "Scripted object must have a name specified, setting to: " << m_name << std::endl;
+    log_warning("Scripted object must have a name specified, setting to: {}", m_name);
   }
 
   solid = mapping.get("solid", true);

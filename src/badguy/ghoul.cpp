@@ -184,7 +184,7 @@ Ghoul::set_state(std::string const& new_state)
   } else if (new_state == "normal") {
     m_mystate = STATE_IDLE;
   } else {
-    log_warning << "Can't set unknown state '" << new_state << std::endl;
+    log_warning("Can't set unknown state '{}", new_state);
   }
 }
 

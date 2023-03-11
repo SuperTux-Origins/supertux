@@ -209,7 +209,7 @@ LevelIntro::push_player()
 
   if (i > InputManager::current()->get_num_users())
   {
-    log_warning << "Attempt to push more players in intro scene than connected" << std::endl;
+    log_warning("Attempt to push more players in intro scene than connected");
     return;
   }
 
@@ -240,7 +240,7 @@ LevelIntro::pop_player()
 {
   if (m_player_sprite.size() <= 1)
   {
-    log_warning << "Attempt to pop last player in intro scene" << std::endl;
+    log_warning("Attempt to pop last player in intro scene");
     return;
   }
 

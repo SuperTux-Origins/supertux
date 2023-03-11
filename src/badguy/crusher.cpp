@@ -165,7 +165,7 @@ Crusher::collision_solid(CollisionHit const& hit)
       spawn_roots(Direction::RIGHT);
     break;
   default:
-    log_debug << "Crusher in invalid state" << std::endl;
+    log_debug("Crusher in invalid state");
     break;
   }
 }
@@ -319,7 +319,7 @@ Crusher::update(float dt_sec)
     }
     break;
   default:
-    log_debug << "Crusher in invalid state" << std::endl;
+    log_debug("Crusher in invalid state");
     break;
   }
 }
@@ -475,7 +475,7 @@ Crusher::set_state(CrusherState state_, bool force)
       m_sprite->set_action("recovering");
     break;
   default:
-    log_debug << "Crusher in invalid state" << std::endl;
+    log_debug("Crusher in invalid state");
     break;
   }
   m_physic.enable_gravity(false);
@@ -557,7 +557,7 @@ Crusher::eye_position(bool right) const
       static_cast<float>(m_sprite->get_width()) / 64.0f * 2.0f -  // Amplitude dependent on size
       static_cast<float>(m_sprite->get_width()) / 64.0f * 2.0f); // Offset to keep eyes visible
   default:
-    log_debug << "Crusher in invalid state" << std::endl;
+    log_debug("Crusher in invalid state");
     break;
   }
   return Vector(0, 0);

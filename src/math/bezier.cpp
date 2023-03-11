@@ -87,7 +87,7 @@ Bezier::get_point_at_length(Vector const& p1, Vector const& p2, Vector const& p3
   // was equal or close to the total length, due to float's limited precision.
   // We'll consider it a problem if the difference is greater than 0.001
   if (length > 0.001f)
-    log_warning << "Attempt to get point on Bezier curve further than the end: " << length << std::endl;
+    log_warning("Attempt to get point on Bezier curve further than the end: {}", length);
 
   return p4;
 }

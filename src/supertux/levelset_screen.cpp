@@ -68,7 +68,7 @@ LevelsetScreen::setup()
 {
   if (m_level_started)
   {
-    log_info << "Saving Levelset state" << std::endl;
+    log_info("Saving Levelset state");
     // this gets called when the GameSession is done and we return back to the
     m_savegame.set_levelset_state(m_basedir, m_level_filename, m_solved);
     m_savegame.save();

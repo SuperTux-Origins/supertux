@@ -336,8 +336,7 @@ ColorOKLCh::to_srgb() const
   }
   if (!(rgb.r > -0.001f && rgb.r < 1.001f && rgb.g > -0.001f && rgb.g < 1.001f
       && rgb.b > -0.001f && rgb.b < 1.001f)) {
-    log_warning << "Colour out of bounds (after clipping): (" << rgb.r <<
-      ", " << rgb.g << ", " << rgb.b << ")" << std::endl;
+    log_warning("Colour out of bounds (after clipping): ({}, {}, {})", rgb.r, rgb.g, rgb.b);
   }
   return linear_srgb_to_srgb(rgb);
 }

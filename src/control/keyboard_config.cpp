@@ -122,7 +122,7 @@ KeyboardConfig::read(ReaderMapping const& keymap_mapping)
           }
           catch (std::exception const&)
           {
-            log_warning << "Could not parse player ID '" << control_text.substr(0, pos) << "' to number" << std::endl;
+            log_warning("Could not parse player ID '{}' to number", control_text.substr(0, pos));
           }
           control_text = control_text.substr(pos + 1);
         }
@@ -133,7 +133,7 @@ KeyboardConfig::read(ReaderMapping const& keymap_mapping)
             bind_key(static_cast<SDL_Keycode>(key), player_id, *maybe_control);
           }
         } else {
-          log_warning << "Invalid control '" << control_text << "' in keymap" << std::endl;
+          log_warning("Invalid control '{}' in keymap", control_text);
         }
       }
     }

@@ -54,7 +54,7 @@ Sint64 funcSeek(struct SDL_RWops* context, Sint64 offset, int whence)
       break;
   }
   if (res == 0) {
-    log_warning << "Error seeking in file: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
+    log_warning("Error seeking in file: {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     return -1;
   }
   int i = static_cast<int>(PHYSFS_tell(file));

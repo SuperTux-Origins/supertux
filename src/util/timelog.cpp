@@ -33,9 +33,7 @@ Timelog::log(char const* component)
   Uint32 current_ticks = SDL_GetTicks();
 
   if (m_last_component != nullptr) {
-    log_info << "Component '" << m_last_component <<  "' finished after "
-             << (current_ticks - m_last_ticks) / 1000.0 << " seconds"
-             << std::endl;
+    log_info("Component '{}' finished after {} seconds", m_last_component, (current_ticks - m_last_ticks) / 1000.0);
   }
 
   m_last_ticks = current_ticks;

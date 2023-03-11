@@ -84,7 +84,7 @@ GLPixelRequest::is_ready() const
   }
   else
   {
-    log_warning << "unknown glClientWaitSync() return value: " << static_cast<int>(ret) << std::endl;
+    log_warning("unknown glClientWaitSync() return value: {}", static_cast<int>(ret));
     return true;
   }
 

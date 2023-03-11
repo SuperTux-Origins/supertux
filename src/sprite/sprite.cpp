@@ -83,7 +83,7 @@ Sprite::set_action(std::string const& name, int loops)
 
   SpriteData::Action const* newaction = m_data.get_action(name);
   if (!newaction) {
-    log_debug << "Action '" << name << "' not found." << std::endl;
+    log_debug("Action '{}' not found.", name);
     return;
   }
 
@@ -108,7 +108,7 @@ Sprite::set_action_continued(std::string const& name)
 
   SpriteData::Action const* newaction = m_data.get_action(name);
   if (!newaction) {
-    log_debug << "Action '" << name << "' not found." << std::endl;
+    log_debug("Action '{}' not found.", name);
     return;
   }
 

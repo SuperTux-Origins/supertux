@@ -39,14 +39,12 @@ SpawnPoint::SpawnPoint(ReaderMapping const& mapping) :
 
   if (m_name.empty())
   {
-    log_warning << "Spawn point at location '" << m_pos
-                << "' does not have a name" << std::endl;
+    log_warning("Spawn point at location '{}' does not have a name", m_pos);
   }
 
   if (m_pos.x < 0 || m_pos.y < 0)
   {
-    log_warning << "Spawn point '" << m_name << "' has invalid coordinates: "
-                << m_pos << std::endl;
+    log_warning("Spawn point '{}' has invalid coordinates: {}", m_name, m_pos);
   }
 }
 

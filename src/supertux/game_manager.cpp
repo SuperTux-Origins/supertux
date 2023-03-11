@@ -79,7 +79,7 @@ GameManager::start_worldmap(World const& world, std::string const& spawnpoint, s
   }
   catch(std::exception& e)
   {
-    log_fatal << "Couldn't start world: " << e.what() << std::endl;
+    log_fatal("Couldn't start world: {}", e.what());
   }
 }
 
@@ -94,7 +94,7 @@ GameManager::load_next_worldmap()
   m_next_worldmap = "";
   if (!world)
   {
-    log_warning << "Can't load world '" << m_next_worldmap << "'" <<  std::endl;
+    log_warning("Can't load world '{}'", m_next_worldmap);
     return false;
   }
   start_worldmap(*world, m_next_spawnpoint); // New world, new savegame

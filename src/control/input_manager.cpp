@@ -118,17 +118,17 @@ InputManager::process_event(SDL_Event const& event)
       break;
 
     case SDL_CONTROLLERDEVICEADDED:
-      log_debug << "SDL_CONTROLLERDEVICEADDED" << std::endl;
+      log_debug("SDL_CONTROLLERDEVICEADDED");
       game_controller_manager->on_controller_added(event.cdevice.which);
       break;
 
     case SDL_CONTROLLERDEVICEREMOVED:
-      log_debug << "SDL_CONTROLLERDEVICEREMOVED" << std::endl;
+      log_debug("SDL_CONTROLLERDEVICEREMOVED");
       game_controller_manager->on_controller_removed(event.cdevice.which);
       break;
 
     case SDL_CONTROLLERDEVICEREMAPPED:
-      log_debug << "SDL_CONTROLLERDEVICEREMAPPED" << std::endl;
+      log_debug("SDL_CONTROLLERDEVICEREMAPPED");
       break;
 
     default:

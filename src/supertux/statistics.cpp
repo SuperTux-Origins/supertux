@@ -195,7 +195,7 @@ Statistics::draw_worldmap_info(DrawingContext& context, float target_time)
         }
         break;
       default:
-        log_debug << "Invalid stat requested to be drawn" << std::endl;
+        log_debug("Invalid stat requested to be drawn");
         break;
     }
 

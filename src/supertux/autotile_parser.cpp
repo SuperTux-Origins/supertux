@@ -64,7 +64,7 @@ AutotileParser::parse()
     }
     else
     {
-      log_warning << "Unknown symbol '" << iter.get_key() << "' in autotile config file" << std::endl;
+      log_warning("Unknown symbol '{}' in autotile config file", iter.get_key());
     }
   }
 }
@@ -77,13 +77,13 @@ AutotileParser::parse_autotileset(ReaderMapping const& reader, bool corner)
   std::string name = "[unnamed]";
   if (!reader.read("name", name))
   {
-    log_warning << "Unnamed autotileset parsed" << std::endl;
+    log_warning("Unnamed autotileset parsed");
   }
 
   int default_id = 0;
   if (!reader.read("default", default_id))
   {
-    log_warning << "No default tile for autotileset " << name << std::endl;
+    log_warning("No default tile for autotileset {}", name);
   }
 
   ReaderMapping tile_mapping;
@@ -149,13 +149,13 @@ AutotileParser::parse_autotile(ReaderMapping const& reader, bool corner)
       uint32_t alt_id = 0;
       if (!alt_reader.read("id", alt_id))
       {
-        log_warning << "No alt tile for autotileset" << std::endl;
+        log_warning("No alt tile for autotileset");
       }
 
       float weight = 0.0f;
       if (!alt_reader.read("weight", weight))
       {
-        log_warning << "No weight for alt tile id" << std::endl;
+        log_warning("No weight for alt tile id");
       }
 
       if (alt_id != 0 && weight != 0.0f)
@@ -165,7 +165,7 @@ AutotileParser::parse_autotile(ReaderMapping const& reader, bool corner)
     }
     else if (iter.get_key() != "id" && iter.get_key() != "solid")
     {
-      log_warning << "Unknown symbol '" << iter.get_key() << "' in autotile config file" << std::endl;
+      log_warning("Unknown symbol '{}' in autotile config file", iter.get_key());
     }
   }
 

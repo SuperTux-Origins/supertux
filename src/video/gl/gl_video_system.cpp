@@ -96,7 +96,7 @@ GLVideoSystem::create_gl_window()
   SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  5);
 
 #if defined(USE_OPENGLES2)
-  log_info << "Requesting OpenGLES2 context" << std::endl;
+  log_info("Requesting OpenGLES2 context");
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -104,7 +104,7 @@ GLVideoSystem::create_gl_window()
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #else
-    log_info << "Requesting OpenGL 3.3 Core context" << std::endl;
+    log_info("Requesting OpenGL 3.3 Core context");
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -125,10 +125,10 @@ GLVideoSystem::create_gl_context()
     // we want vsync for smooth scrolling
     if (SDL_GL_SetSwapInterval(-1) != 0)
     {
-      log_info << "no support for late swap tearing vsync: " << SDL_GetError() << std::endl;
+      log_info("no support for late swap tearing vsync: {}", SDL_GetError());
       if (SDL_GL_SetSwapInterval(1))
       {
-        log_info << "no support for vsync: " << SDL_GetError() << std::endl;
+        log_info("no support for vsync: {}", SDL_GetError());
       }
     }
   }
@@ -165,8 +165,8 @@ GLVideoSystem::create_gl_context()
     });
 #    endif
   static auto extensions = glbinding::ContextInfo::extensions();
-  log_info << "Using glbinding" << std::endl;
-  log_info << "ARB_texture_non_power_of_two: " << static_cast<int>(extensions.find(GLextension::GL_ARB_texture_non_power_of_two) != extensions.end()) << std::endl;
+  log_info("Using glbinding");
+  log_info("ARB_texture_non_power_of_two: {}", static_cast<int>(extensions.find(GLextension::GL_ARB_texture_non_power_of_two) != extensions.end()));
 #  else
   GLenum err = glewInit();
 #    ifdef GLEW_ERROR_NO_GLX_DISPLAY
@@ -179,7 +179,7 @@ GLVideoSystem::create_gl_context()
   // just crash.
   if (GLEW_ERROR_NO_GLX_DISPLAY == err)
   {
-    log_info << "GLEW couldn't open GLX display" << std::endl;
+    log_info("GLEW couldn't open GLX display");
   }
   else
 #    endif
@@ -193,10 +193,10 @@ GLVideoSystem::create_gl_context()
   // older GLEW throws 'invalid enum' error in OpenGL3.3Core, thus we eat up the error code here
   glGetError();
 
-  // log_info << "OpenGL 3.3: " << GLEW_VERSION_3_3 << std::endl;
-  log_info << "OpenGL: " << glGetString(GL_VERSION) << std::endl;
-  log_info << "Using GLEW " << glewGetString(GLEW_VERSION) << std::endl;
-  log_info << "GLEW_ARB_texture_non_power_of_two: " << static_cast<int>(GLEW_ARB_texture_non_power_of_two) << std::endl;
+  // log_info("OpenGL 3.3: {}", GLEW_VERSION_3_3);
+  log_info("OpenGL: {}", glGetString(GL_VERSION));
+  log_info("Using GLEW {}", glewGetString(GLEW_VERSION));
+  log_info("GLEW_ARB_texture_non_power_of_two: {}", static_cast<int>(GLEW_ARB_texture_non_power_of_two));
 #  endif
 #endif
 
@@ -261,11 +261,11 @@ GLVideoSystem::set_vsync(int mode)
 {
   if (SDL_GL_SetSwapInterval(mode) < 0)
   {
-    log_warning << "Setting vsync mode failed: " << SDL_GetError() << std::endl;
+    log_warning("Setting vsync mode failed: {}", SDL_GetError());
   }
   else
   {
-    log_info << "Setting vsync mode to " << mode << std::endl;
+    log_info("Setting vsync mode to {}", mode);
   }
 }
 

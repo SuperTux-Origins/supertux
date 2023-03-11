@@ -41,7 +41,7 @@ ScriptTrigger::ScriptTrigger(ReaderMapping const& reader) :
   reader.read("button", must_activate);
   reader.read("oneshot", oneshot);
   if (script.empty()) {
-    log_warning << "No script set in script trigger" << std::endl;
+    log_warning("No script set in script trigger");
   }
 
   if (must_activate)

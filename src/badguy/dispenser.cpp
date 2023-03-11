@@ -34,7 +34,7 @@ Dispenser::DispenserType_from_string(std::string const& type_string)
   if (type_string == "dropper") {
     return DispenserType::DROPPER;
   } else if (type_string == "rocketlauncher") { // Retro-compatibility with "rocketlauncher"
-    log_warning << "Rocket launcher is no longer available. Replacing with cannon." << std::endl;
+    log_warning("Rocket launcher is no longer available. Replacing with cannon.");
     return DispenserType::CANNON;
   } else if (type_string == "cannon") {
     return DispenserType::CANNON;
@@ -72,7 +72,7 @@ Dispenser::Cannon_Direction_to_string(Direction direction)
       return "right";
     default:
       if (direction != Direction::AUTO)
-        log_warning << "Direction \"" << direction << "\" not valid for cannon. Switching to \"auto\"." << std::endl;
+        log_warning("Direction \"{}\" not valid for cannon. Switching to \"auto\".", direction);
       return "center";
   }
 }
@@ -108,11 +108,11 @@ Dispenser::Dispenser(ReaderMapping const& reader) :
   {
     if (type_s.empty())
     {
-      log_warning << "No dispenser type set, setting to cannon." << std::endl;
+      log_warning("No dispenser type set, setting to cannon.");
     }
     else
     {
-      log_warning << "Unknown type of dispenser:" << type_s << ", setting to cannon." << std::endl;
+      log_warning("Unknown type of dispenser:{}, setting to cannon.", type_s);
     }
 
     m_type = DispenserType::CANNON;
@@ -234,12 +234,12 @@ Dispenser::launch_badguy()
 
     if (badguy == "random")
     {
-      log_warning << "random is outdated; use a list of badguys to select from." << std::endl;
+      log_warning("random is outdated; use a list of badguys to select from.");
       return;
     }
     if (badguy == "goldbomb")
     {
-      log_warning << "goldbomb is not allowed to be dispensed" << std::endl;
+      log_warning("goldbomb is not allowed to be dispensed");
       return;
     }
 
@@ -303,7 +303,7 @@ Dispenser::launch_badguy()
 
       Sector::get().add_object(std::move(game_object));
     } catch(std::exception const& e) {
-      log_warning << "Error dispensing badguy: " << e.what() << std::endl;
+      log_warning("Error dispensing badguy: {}", e.what());
       return;
     }
   }

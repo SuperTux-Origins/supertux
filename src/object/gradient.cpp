@@ -92,9 +92,8 @@ Gradient::Gradient(ReaderMapping const& reader) :
     if (!reader.read("left_color", bkgd_top_color) ||
        !reader.read("right_color", bkgd_bottom_color))
     {
-      log_warning <<
-        "Horizontal gradients should use left_color and right_color, respectively. "
-        "Trying to parse top and bottom color instead" << std::endl;
+      log_warning("Horizontal gradients should use left_color and right_color, respectively. "
+        "Trying to parse top and bottom color instead");
     }
     else
     {
@@ -167,7 +166,7 @@ Gradient::set_gradient(Color top, Color bottom)
       m_gradient_top.blue > 1.0f ||
       m_gradient_top.alpha > 1.0f)
   {
-    log_warning << "top gradient color has values above 1.0" << std::endl;
+    log_warning("top gradient color has values above 1.0");
   }
 
   if (m_gradient_bottom.red > 1.0f ||
@@ -175,7 +174,7 @@ Gradient::set_gradient(Color top, Color bottom)
       m_gradient_bottom.blue > 1.0f ||
       m_gradient_bottom.alpha > 1.0f)
   {
-    log_warning << "bottom gradient color has values above 1.0" << std::endl;
+    log_warning("bottom gradient color has values above 1.0");
   }
 }
 

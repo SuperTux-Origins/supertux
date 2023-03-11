@@ -60,7 +60,7 @@ SquirrelThreadQueue::wakeup()
        SQ_SUCCEEDED(sq_getthread(m_vm.get_vm(), -1, &scheduled_vm)))
     {
       if (SQ_FAILED(sq_wakeupvm(scheduled_vm, SQFalse, SQFalse, SQTrue, SQFalse))) {
-        log_warning << "Couldn't wakeup scheduled squirrel VM" << std::endl;
+        log_warning("Couldn't wakeup scheduled squirrel VM");
       }
     }
 

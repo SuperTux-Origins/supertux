@@ -1368,7 +1368,7 @@ Player::handle_input()
         m_released_object = true;
       }
     } else {
-      log_debug << "Non MovingObject grabbed?!?" << std::endl;
+      log_debug("Non MovingObject grabbed?!?");
     }
   }
 
@@ -1561,7 +1561,7 @@ Player::set_bonus(BonusType type, bool animate)
     {
       if (!adjust_height(BIG_TUX_HEIGHT))
       {
-        log_debug << "Can't adjust Tux height" << std::endl;
+        log_debug("Can't adjust Tux height");
         return false;
       }
     }
@@ -1577,7 +1577,7 @@ Player::set_bonus(BonusType type, bool animate)
 
   if (type == NO_BONUS) {
     if (!adjust_height(SMALL_TUX_HEIGHT)) {
-      log_debug << "Can't adjust Tux height" << std::endl;
+      log_debug("Can't adjust Tux height");
       return false;
     }
     if (m_does_buttjump) m_does_buttjump = false;
@@ -1767,7 +1767,7 @@ Player::draw(DrawingContext& context)
       if (m_swimming || m_water_jump)
       {
         if (m_water_jump && m_dir != m_old_dir)
-          log_debug << "Obracanko (:" << std::endl;
+          log_debug("Obracanko (:");
         if (glm::length(m_physic.get_velocity()) < 50.f)
           m_sprite->set_action(sa_prefix + "-floating" + sa_postfix);
         else if (m_water_jump)
@@ -2228,12 +2228,12 @@ Player::set_ghost_mode(bool enable)
     m_ghost_mode = true;
     set_group(COLGROUP_DISABLED);
     m_physic.enable_gravity(false);
-    log_debug << "You feel lightheaded. Use movement controls to float around, press ACTION to scare badguys." << std::endl;
+    log_debug("You feel lightheaded. Use movement controls to float around, press ACTION to scare badguys.");
   } else {
     m_ghost_mode = false;
     set_group(COLGROUP_MOVING);
     m_physic.enable_gravity(true);
-    log_debug << "You feel solid again." << std::endl;
+    log_debug("You feel solid again.");
   }
 }
 
@@ -2290,7 +2290,7 @@ void
 Player::handle_input_climbing()
 {
   if (!m_climbing) {
-    log_warning << "handle_input_climbing called with climbing set to 0. Input handling skipped" << std::endl;
+    log_warning("handle_input_climbing called with climbing set to 0. Input handling skipped");
     return;
   }
 
@@ -2553,7 +2553,7 @@ Player::multiplayer_respawn()
 {
   if (!m_target)
   {
-    log_warning << "Can't respawn multiplayer player, no target" << std::endl;
+    log_warning("Can't respawn multiplayer player, no target");
     return;
   }
 
@@ -2561,7 +2561,7 @@ Player::multiplayer_respawn()
 
   if (!target)
   {
-    log_warning << "Can't respawn multiplayer player, target missing" << std::endl;
+    log_warning("Can't respawn multiplayer player, target missing");
     return;
   }
 

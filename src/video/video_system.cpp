@@ -44,7 +44,7 @@ VideoSystem::create(VideoSystem::Enum video_system)
       return std::make_unique<NullVideoSystem>();
 
     default:
-      log_fatal << "invalid video system in config" << std::endl;
+      log_fatal("invalid video system in config");
       assert(false);
       return {};
   }
@@ -83,7 +83,7 @@ VideoSystem::get_video_string(VideoSystem::Enum video)
     case VIDEO_NULL:
       return "null";
     default:
-      log_fatal << "invalid video system in config" << std::endl;
+      log_fatal("invalid video system in config");
       assert(false);
       return "auto";
   }
@@ -103,14 +103,14 @@ VideoSystem::do_take_screenshot()
 {
   SDLSurfacePtr surface = make_screenshot();
   if (!surface) {
-    log_warning << "Creating the screenshot has failed" << std::endl;
+    log_warning("Creating the screenshot has failed");
     return;
   }
 
   const std::string screenshots_dir = "/screenshots";
   if (!PHYSFS_exists(screenshots_dir.c_str())) {
     if (!PHYSFS_mkdir(screenshots_dir.c_str())) {
-      log_warning << "Creating '" << screenshots_dir << "' failed" << std::endl;
+      log_warning("Creating '{}' failed", screenshots_dir);
       return;
     }
   }
@@ -132,12 +132,12 @@ VideoSystem::do_take_screenshot()
   auto filename = find_filename();
   if (!filename)
   {
-    log_info << "Failed to find filename to save screenshot" << std::endl;
+    log_info("Failed to find filename to save screenshot");
   }
   else
   {
     if (SDLSurface::save_png(*surface, *filename)) {
-      log_info << "Wrote screenshot to \"" << *filename << "\"" << std::endl;
+      log_info("Wrote screenshot to \"{}\"", *filename);
     }
   }
 }

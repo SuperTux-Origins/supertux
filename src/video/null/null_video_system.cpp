@@ -76,13 +76,13 @@ NullVideoSystem::apply_config()
 void
 NullVideoSystem::flip()
 {
-  log_info << "NullVideoSystem::flip()" << std::endl;
+  log_info("NullVideoSystem::flip()");
 }
 
 void
 NullVideoSystem::on_resize(int w, int h)
 {
-  log_info << "NullVideoSystem::on_resize(" << w << ", " << h << ")" << std::endl;
+  log_info("NullVideoSystem::on_resize({}, {})", w, h);
   m_window_size = Size(w, h);
 }
 
@@ -95,7 +95,7 @@ NullVideoSystem::get_window_size() const
 void
 NullVideoSystem::set_vsync(int mode)
 {
-  log_info << "VideoSystem::set_vsync(" << mode << ")" << std::endl;
+  log_info("VideoSystem::set_vsync({})", mode);
   m_vsync_mode = mode;
 }
 
@@ -108,19 +108,19 @@ NullVideoSystem::get_vsync() const
 void
 NullVideoSystem::set_gamma(float gamma)
 {
-  log_info << "VideoSystem::set_gamma(" << gamma << ")" << std::endl;
+  log_info("VideoSystem::set_gamma({})", gamma);
 }
 
 void
 NullVideoSystem::set_title(std::string const& title)
 {
-  log_info << "VideoSystem::set_icon(\"" << title << "\")" << std::endl;
+  log_info("VideoSystem::set_icon(\"{}\")", title);
 }
 
 void
 NullVideoSystem::set_icon(SDL_Surface const& icon)
 {
-  log_info << "VideoSystem::set_icon()" << std::endl;
+  log_info("VideoSystem::set_icon()");
 }
 
 SDLSurfacePtr

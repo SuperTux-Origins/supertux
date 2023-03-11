@@ -48,8 +48,7 @@ LevelParser::get_level_name(std::string const& filename)
   }
   catch(std::exception const& e)
   {
-    log_warning << "Problem getting name of '" << filename << "': "
-                << e.what() << std::endl;
+    log_warning("Problem getting name of '{}': {}", filename, e.what());
     return "";
   }
 }
@@ -181,10 +180,7 @@ LevelParser::load(ReaderDocument const& doc)
     }
 
     if (m_level.m_license.empty()) {
-      log_warning << "[" <<  doc.get_filename() << "] The level author \"" << m_level.m_author
-                  << "\" did not specify a license for this level \""
-                  << m_level.m_name << "\". You might not be allowed to share it."
-                  << std::endl;
+      log_warning("[{}] The level author \"{}\" did not specify a license for this level \"{}\". You might not be allowed to share it.", doc.get_filename(), m_level.m_author, m_level.m_name);
     }
   }
 

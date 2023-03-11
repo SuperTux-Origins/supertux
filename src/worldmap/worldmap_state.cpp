@@ -38,7 +38,7 @@ WorldMapState::WorldMapState(WorldMap& worldmap) :
 void
 WorldMapState::load_state()
 {
-  log_debug << "loading worldmap state" << std::endl;
+  log_debug("loading worldmap state");
 
   SquirrelVM& vm = SquirrelVirtualMachine::current()->get_vm();
   SQInteger oldtop = sq_gettop(vm.get_vm());
@@ -66,7 +66,7 @@ WorldMapState::load_state()
     bool position_was_reset = false;
     if (!vm.get_float("x", p.x) || !vm.get_float("y", p.y))
     {
-      log_warning << "Player position not set, respawning." << std::endl;
+      log_warning("Player position not set, respawning.");
       m_worldmap.move_to_spawnpoint("main");
       position_was_reset = true;
     }
@@ -76,7 +76,7 @@ WorldMapState::load_state()
 
     int tile_data = m_worldmap.tile_data_at(p);
     if (!( tile_data & ( Tile::WORLDMAP_NORTH | Tile::WORLDMAP_SOUTH | Tile::WORLDMAP_WEST | Tile::WORLDMAP_EAST ))) {
-      log_warning << "Player at illegal position " << p.x << ", " << p.y << " respawning." << std::endl;
+      log_warning("Player at illegal position {}, {} respawning.", p.x, p.y);
       m_worldmap.move_to_spawnpoint("main");
       position_was_reset = true;
     }
@@ -188,7 +188,7 @@ WorldMapState::load_state()
     }
 
   } catch(std::exception& e) {
-    log_debug << "Not loading worldmap state: " << e.what() << std::endl;
+    log_debug("Not loading worldmap state: {}", e.what());
     save_state(); // make new initial save
     m_worldmap.move_to_spawnpoint("main"); // set tux to main spawnpoint
   }

@@ -71,7 +71,7 @@ string_to_direction(std::string const& directory)
   else if (directory == "none")
     return Direction::NONE;
   else {
-    log_warning << "unknown direction: \"" << directory << "\"" << std::endl;
+    log_warning("unknown direction: \"{}\"", directory);
     return Direction::NONE;
   }
 }

@@ -124,7 +124,7 @@ WorldMapParser::load_worldmap(std::string const& filename)
     m_worldmap.flush_game_objects();
 
     if (m_worldmap.get_solid_tilemaps().empty())
-      log_warning << "No solid tilemap specified" << std::endl;
+      log_warning("No solid tilemap specified");
 
     m_worldmap.move_to_spawnpoint("main");
 
@@ -153,12 +153,12 @@ WorldMapParser::load_level_information(LevelTile& level)
 
     if (!PHYSFS_exists(filename.c_str()))
     {
-      log_warning << "Level file '" << filename << "' does not exist. Skipping." << std::endl;
+      log_warning("Level file '{}' does not exist. Skipping.", filename);
       return;
     }
     if (physfsutil::is_directory(filename))
     {
-      log_warning << "Level file '" << filename << "' is a directory. Skipping." << std::endl;
+      log_warning("Level file '{}' is a directory. Skipping.", filename);
       return;
     }
 
@@ -172,7 +172,7 @@ WorldMapParser::load_level_information(LevelTile& level)
       level_mapping.read("target-time", level.m_target_time);
     }
   } catch(std::exception& e) {
-    log_warning << "Problem when reading level information: " << e.what() << std::endl;
+    log_warning("Problem when reading level information: {}", e.what());
     return;
   }
 }

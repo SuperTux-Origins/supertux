@@ -137,7 +137,7 @@ std::string normalize(std::string const& filename)
     if (pathelem == "..") {
       if (path_stack.empty()) {
 
-        log_warning << "Invalid '..' in path '" << filename << "'" << std::endl;
+        log_warning("Invalid '..' in path '{}'", filename);
         // push it into the result path so that the user sees his error...
         path_stack.push_back(pathelem);
       } else {
@@ -207,11 +207,11 @@ void open_path(std::string const& path)
   int ret = system(cmd.c_str());
   if (ret < 0)
   {
-    log_fatal << "failed to spawn: " << cmd << std::endl;
+    log_fatal("failed to spawn: {}", cmd);
   }
   else if (ret > 0)
   {
-    log_fatal << "error " << ret << " while executing: " << cmd << std::endl;
+    log_fatal("error {} while executing: {}", ret, cmd);
   }
 #endif
 }

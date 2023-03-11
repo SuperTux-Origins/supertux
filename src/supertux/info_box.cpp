@@ -38,7 +38,7 @@ InfoBox::InfoBox(std::string const& text) :
   }
   catch (std::exception& e)
   {
-    log_warning << "Could not load scrolling images: " << e.what() << std::endl;
+    log_warning("Could not load scrolling images: {}", e.what());
     arrow_scrollup.reset();
     arrow_scrolldown.reset();
   }

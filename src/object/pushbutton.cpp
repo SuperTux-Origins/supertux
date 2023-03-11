@@ -40,7 +40,7 @@ PushButton::PushButton(ReaderMapping const& mapping) :
 
   if (!mapping.read("script", script))
   {
-    log_warning << "No script set for pushbutton." << std::endl;
+    log_warning("No script set for pushbutton.");
   }
 
   mapping.read("upside-down", m_upside_down);

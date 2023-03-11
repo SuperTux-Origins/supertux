@@ -30,7 +30,7 @@ DrawingTarget DrawingTarget_from_string(std::string const& text)
   }
   else
   {
-    log_warning << "unknown drawing target: " << text << std::endl;
+    log_warning("unknown drawing target: {}", text);
     return DrawingTarget::COLORMAP;
   }
 }

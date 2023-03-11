@@ -54,12 +54,11 @@ JoystickManager::~JoystickManager()
 void
 JoystickManager::on_joystick_added(int joystick_index)
 {
-  log_debug << "on_joystick_added(): " << joystick_index << std::endl;
+  log_debug("on_joystick_added(): {}", joystick_index);
   SDL_Joystick* joystick = SDL_JoystickOpen(joystick_index);
   if (!joystick)
   {
-    log_warning << "failed to open joystick: " << joystick_index
-                << ": " << SDL_GetError() << std::endl;
+    log_warning("failed to open joystick: {}: {}", joystick_index, SDL_GetError());
   }
   else
   {
@@ -114,7 +113,7 @@ JoystickManager::on_joystick_added(int joystick_index)
 void
 JoystickManager::on_joystick_removed(int instance_id)
 {
-  log_debug << "on_joystick_removed: " << static_cast<int>(instance_id) << std::endl;
+  log_debug("on_joystick_removed: {}", static_cast<int>(instance_id));
 
   std::vector<SDL_Joystick*> erase_us;
 
@@ -151,9 +150,7 @@ JoystickManager::on_joystick_removed(int instance_id)
   }
   else
   {
-    log_debug << "Joystick was unplugged but was not initially detected: "
-              << SDL_JoystickName(SDL_JoystickFromInstanceID(instance_id))
-              << std::endl;
+    log_debug("Joystick was unplugged but was not initially detected: {}", SDL_JoystickName(SDL_JoystickFromInstanceID(instance_id)));
   }
 }
 
@@ -274,7 +271,7 @@ JoystickManager::process_button_event(SDL_JoyButtonEvent const& jbutton)
   {
     auto i = m_joystick_config.m_joy_button_map.find(std::make_pair(jbutton.which, jbutton.button));
     if (i == m_joystick_config.m_joy_button_map.end()) {
-      log_debug << "Unmapped joybutton " << static_cast<int>(jbutton.button) << " pressed" << std::endl;
+      log_debug("Unmapped joybutton {} pressed", static_cast<int>(jbutton.button));
     } else {
       set_joy_controls(jbutton.which, i->second, (jbutton.state == SDL_PRESSED));
     }

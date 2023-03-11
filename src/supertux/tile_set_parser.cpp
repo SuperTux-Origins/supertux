@@ -95,7 +95,7 @@ TileSetParser::parse()
         std::string autotile_filename;
         if (!reader.read("source", autotile_filename))
         {
-          log_warning << "No source path for autotiles in file '" << m_filename << "'" << std::endl;
+          log_warning("No source path for autotiles in file '{}'", m_filename);
         }
         else
         {
@@ -380,7 +380,7 @@ TileSetParser::parse_imagespecs(ReaderMapping const& images_mapping,
       auto const& arr = sx.as_array();
       if (arr.size() != 6)
       {
-        log_warning << "(region X Y WIDTH HEIGHT) tag malformed: " << sx << std::endl;
+        log_warning("(region X Y WIDTH HEIGHT) tag malformed: {}", sx);
       }
       else
       {
@@ -407,7 +407,7 @@ TileSetParser::parse_imagespecs(ReaderMapping const& images_mapping,
     }
     else
     {
-      log_warning << "Expected string or list in images tag" << std::endl;
+      log_warning("Expected string or list in images tag");
     }
   }
 

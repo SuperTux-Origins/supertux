@@ -38,7 +38,7 @@ Ispy::Ispy(ReaderMapping const& reader) :
     m_dir = Direction::LEFT;
 
   if (m_dir == Direction::AUTO)
-    log_warning << "Setting an Ispy's direction to AUTO is no good idea." << std::endl;
+    log_warning("Setting an Ispy's direction to AUTO is no good idea.");
 
   set_sprite_action("idle");
 }

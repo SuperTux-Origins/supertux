@@ -29,7 +29,7 @@ Background::set_image(std::string const& image)
 
   if (image.empty())
   {
-    log_info << "No filename / path for background image specified" << std::endl;
+    log_info("No filename / path for background image specified");
     return;
   }
 
@@ -50,7 +50,7 @@ Background::set_images(std::string const& top_image, std::string const& middle_i
 
   if (top_image.empty() || middle_image.empty() || bottom_image.empty())
   {
-    log_info << "No filename / path for background image specified" << std::endl;
+    log_info("No filename / path for background image specified");
     return;
   }
 

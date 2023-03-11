@@ -35,7 +35,7 @@ TTFSurface::create(TTFFont const& font, std::string const& text)
                                                     SDL_Color{255, 255, 255, 255}));
   if (!text_surface)
   {
-    log_warning << "Couldn't render text '" << text << "' :" << SDL_GetError();
+    log_warning("Couldn't render text '{}' :{}", text, SDL_GetError());
     return std::make_shared<TTFSurface>(SurfacePtr(), Vector(0.0f, 0.0f));
   }
 

@@ -49,7 +49,7 @@ GameSessionRecorder::start_recording()
       newSeed = gameRandom.rand();
     g_config->random_seed = newSeed;
     gameRandom.seed(g_config->random_seed);
-    log_info << "Next run uses random seed " << g_config->random_seed <<std::endl;
+    log_info("Next run uses random seed {}", g_config->random_seed);
     record_demo(m_capture_file);
   }
 }
@@ -85,12 +85,12 @@ GameSessionRecorder::get_demo_random_seed(std::string const& filename) const
 
     if (sscanf(buf, "random_seed=%10d", &seed) == 1)
     {
-      log_info << "Random seed " << seed << " from demo file" << std::endl;
+      log_info("Random seed {} from demo file", seed);
       return seed;
     }
     else
     {
-      log_info << "Demo file contains no random number" << std::endl;
+      log_info("Demo file contains no random number");
     }
   }
   return 0;

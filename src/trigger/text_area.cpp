@@ -87,7 +87,7 @@ TextArea::event(Player& player, EventType type)
       {
         if (m_items.size() < 1)
         {
-          log_warning << "Attempt to run a TextArea with no text, aborting" << std::endl;
+          log_warning("Attempt to run a TextArea with no text, aborting");
           return;
         }
 

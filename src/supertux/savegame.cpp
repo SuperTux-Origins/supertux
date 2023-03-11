@@ -101,7 +101,7 @@ LevelsetState::get_level_state(std::string const& filename) const
   }
   else
   {
-    log_info << "creating new level state for " << filename << std::endl;
+    log_info("creating new level state for {}", filename);
     LevelState state;
     state.filename = filename;
     return state;
@@ -134,7 +134,7 @@ Savegame::load()
 {
   if (m_filename.empty())
   {
-    log_debug << "no filename set for savegame, skipping load" << std::endl;
+    log_debug("no filename set for savegame, skipping load");
     return;
   }
 
@@ -142,16 +142,16 @@ Savegame::load()
 
   if (!PHYSFS_exists(m_filename.c_str()))
   {
-    log_info << m_filename << " doesn't exist, not loading state" << std::endl;
+    log_info("{} doesn't exist, not loading state", m_filename);
   }
   else
   {
     if (physfsutil::is_directory(m_filename))
     {
-      log_info << m_filename << " is a directory, not loading state" << std::endl;
+      log_info("{} is a directory, not loading state", m_filename);
       return;
     }
-    log_debug << "loading savegame from " << m_filename << std::endl;
+    log_debug("loading savegame from {}", m_filename);
 
     try
     {
@@ -202,7 +202,7 @@ Savegame::load()
     }
     catch(std::exception const& e)
     {
-      log_fatal << "Couldn't load savegame: " << e.what() << std::endl;
+      log_fatal("Couldn't load savegame: {}", e.what());
     }
   }
 }
@@ -226,11 +226,11 @@ Savegame::save()
 {
   if (m_filename.empty())
   {
-    log_debug << "no filename set for savegame, skipping save" << std::endl;
+    log_debug("no filename set for savegame, skipping save");
     return;
   }
 
-  log_debug << "saving savegame to " << m_filename << std::endl;
+  log_debug("saving savegame to {}", m_filename);
 
   { // make sure the savegame directory exists
     std::string dirname = FileSystem::dirname(m_filename);
@@ -309,7 +309,7 @@ Savegame::get_worldmaps()
   }
   catch(std::exception const& err)
   {
-    log_warning << err.what() << std::endl;
+    log_warning("{}", err.what());
   }
 
   sq_settop(vm.get_vm(), oldtop);
@@ -349,7 +349,7 @@ Savegame::get_worldmap_state(std::string const& name)
   }
   catch(std::exception const& err)
   {
-    log_warning << err.what() << std::endl;
+    log_warning("{}", err.what());
   }
 
   sq_settop(vm.get_vm(), oldtop);
@@ -374,7 +374,7 @@ Savegame::get_levelsets()
   }
   catch(std::exception const& err)
   {
-    log_warning << err.what() << std::endl;
+    log_warning("{}", err.what());
   }
 
   sq_settop(vm.get_vm(), oldtop);
@@ -402,7 +402,7 @@ Savegame::get_levelset_state(std::string const& basedir)
   }
   catch(std::exception const& err)
   {
-    log_warning << err.what() << std::endl;
+    log_warning("{}", err.what());
   }
 
   sq_settop(vm.get_vm(), oldtop);
@@ -435,7 +435,7 @@ Savegame::set_levelset_state(std::string const& basedir,
   }
   catch(std::exception const& err)
   {
-    log_warning << err.what() << std::endl;
+    log_warning("{}", err.what());
   }
 
   sq_settop(vm.get_vm(), oldtop);

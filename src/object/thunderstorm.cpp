@@ -46,7 +46,7 @@ Thunderstorm::Thunderstorm(ReaderMapping const& reader) :
   reader.read("interval", interval);
   m_strike_script = reader.get("strike-script", std::string());
   if (interval <= 0) {
-    log_warning << "Running a thunderstorm with non-positive time interval is a bad idea" << std::endl;
+    log_warning("Running a thunderstorm with non-positive time interval is a bad idea");
   }
   layer = reader_get_layer (reader, LAYER_BACKGROUNDTILES - 1);
 

@@ -41,7 +41,7 @@ void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, ReaderMapping cons
     // Ignore key value pairs with invalid length
     if (pair.size() < 2)
     {
-      log_debug << "Found key/value pair with invalid length. Ignoring." << std::endl;
+      log_debug("Found key/value pair with invalid length. Ignoring.");
       continue;
     }
 
@@ -51,7 +51,7 @@ void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, ReaderMapping cons
     // ignore empty / null values
     if (value.is_nil())
     {
-      log_debug << "Found null value for key " << key << ". Ignoring." << std::endl;
+      log_debug("Found null value for key {}. Ignoring.", key);
       continue;
     }
     // push the key
@@ -80,7 +80,7 @@ void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, ReaderMapping cons
         sq_pushbool(vm, value.as_bool() ? SQTrue : SQFalse);
         break;
       case sexp::Value::Type::SYMBOL:
-        log_fatal << "Unexpected symbol in file: " << value.as_string() << std::endl;
+        log_fatal("Unexpected symbol in file: {}", value.as_string());
         sq_pushnull(vm);
         break;
       default:

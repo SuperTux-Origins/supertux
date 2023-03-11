@@ -81,7 +81,7 @@ Tux::draw(DrawingContext& context)
   }
   else
   {
-    log_debug << "Bonus type not handled in worldmap." << std::endl;
+    log_debug("Bonus type not handled in worldmap.");
     m_sprite->set_action("large-stop");
   }
   m_sprite->draw(context.color(), get_pos(), LAYER_OBJECTS);
@@ -302,7 +302,7 @@ Tux::try_continue_walking(float dt_sec)
 
     if (dir == Direction::NONE) {
       // Should never be reached if tiledata is good
-      log_warning << "Could not determine where to walk next" << std::endl;
+      log_warning("Could not determine where to walk next");
       stop();
       return;
     }
@@ -318,7 +318,7 @@ Tux::try_continue_walking(float dt_sec)
 
   Vector next_tile(0.0f, 0.0f);
   if (!m_ghost_mode && !m_worldmap->path_ok(m_direction, m_tile_pos, &next_tile)) {
-    log_debug << "Tilemap data is buggy" << std::endl;
+    log_debug("Tilemap data is buggy");
     stop();
     return;
   }
@@ -329,7 +329,7 @@ Tux::try_continue_walking(float dt_sec)
   }
   //SpriteChange* last_sprite = m_worldmap->at_sprite_change(tile_pos);
   if (sprite_change != nullptr && next_sprite != nullptr) {
-    log_debug << "Old: " << m_tile_pos << " New: " << next_tile << std::endl;
+    log_debug("Old: {} New: {}", m_tile_pos, next_tile);
     sprite_change->set_stay_action();
   }
 
@@ -382,8 +382,7 @@ Tux::process_special_tile(SpecialTile* special_tile)
     try {
       m_worldmap->run_script(special_tile->get_script(), "specialtile");
     } catch(std::exception& e) {
-      log_warning << "Couldn't execute special tile script: " << e.what()
-                  << std::endl;
+      log_warning("Couldn't execute special tile script: {}", e.what());
     }
   }
 }

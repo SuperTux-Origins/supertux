@@ -49,7 +49,7 @@ Notification::Notification(std::string id, bool no_auto_hide, bool no_auto_disab
 {
   if (is_disabled(id)) // The notification exists in the config as disabled.
   {
-    log_warning << "Requested launch of disabled notification with ID \"" << m_id << "\". Closing." << std::endl;
+    log_warning("Requested launch of disabled notification with ID \"{}\". Closing.", m_id);
     m_quit = true;
     return;
   }

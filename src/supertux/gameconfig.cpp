@@ -150,7 +150,7 @@ Config::load()
       }
       else
       {
-        log_warning << "Unknown token in config file: " << profile_node.get_name() << std::endl;
+        log_warning("Unknown token in config file: {}", profile_node.get_name());
       }
     }
   }
@@ -181,7 +181,7 @@ Config::load()
       }
       else
       {
-        log_warning << "Unknown token in config file: " << notification_node.get_name() << std::endl;
+        log_warning("Unknown token in config file: {}", notification_node.get_name());
       }
     }
   }
@@ -301,7 +301,7 @@ Config::load()
       }
       else
       {
-        log_warning << "Unknown token in config file: " << addon_node.get_name() << std::endl;
+        log_warning("Unknown token in config file: {}", addon_node.get_name());
       }
     }
   }

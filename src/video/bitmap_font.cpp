@@ -79,7 +79,7 @@ BitmapFont::BitmapFont(GlyphWidth glyph_width_,
       }
       catch(std::exception const& e)
       {
-        log_fatal << "Couldn't load font file: " << e.what() << std::endl;
+        log_fatal("Couldn't load font file: {}", e.what());
       }
     }
   }
@@ -90,7 +90,8 @@ void
 BitmapFont::loadFontFile(std::string const&filename)
 {
   // FIXME: Workaround for a crash on MSYS2 when starting with --debug
-  log_debug_ << "Loading font: " << filename << std::endl;
+  // log_debug("Loading font: {}", filename);
+
   auto doc = load_reader_document(filename);
   auto root = doc.get_root();
   if (root.get_name() != "supertux-font") {
@@ -104,7 +105,7 @@ BitmapFont::loadFontFile(std::string const&filename)
   int def_char_width=0;
 
   if ( !config_l.read("glyph-width",def_char_width) ) {
-    log_warning << "Font:"<< filename << ": misses default glyph-width" << std::endl;
+    log_warning("Font:{}: misses default glyph-width", filename);
   }
 
   if ( !config_l.read("glyph-height",char_height) ) {
@@ -221,7 +222,7 @@ BitmapFont::loadFontSurface(std::string const& glyphimage,
       {
         if (y + char_height > surface->h)
         {
-          log_warning << "error: font definition contains more letter then the images: " << glyphimage << std::endl;
+          log_warning("error: font definition contains more letter then the images: {}", glyphimage);
           goto abort;
         }
 

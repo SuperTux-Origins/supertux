@@ -183,7 +183,7 @@ Console::ready_vm()
       IFileStream stream(filename);
       compile_and_run(m_vm, stream, filename);
     } catch(std::exception& e) {
-      log_warning << "Couldn't load console.nut: " << e.what() << std::endl;
+      log_warning("Couldn't load console.nut: {}", e.what());
     }
   }
 }
@@ -210,7 +210,7 @@ Console::execute_script(std::string const& command)
   }
   SQInteger newtop = sq_gettop(m_vm);
   if (newtop < oldtop) {
-    log_fatal << "Script destroyed squirrel stack..." << std::endl;
+    log_fatal("Script destroyed squirrel stack...");
   } else {
     sq_settop(m_vm, oldtop);
   }

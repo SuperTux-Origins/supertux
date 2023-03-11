@@ -153,7 +153,7 @@ ScreenManager::~ScreenManager()
 void
 ScreenManager::push_screen(std::unique_ptr<Screen> screen, std::unique_ptr<ScreenFade> screen_fade)
 {
-  log_debug << "ScreenManager::push_screen(): " << screen.get() << std::endl;
+  log_debug("ScreenManager::push_screen(): {}", static_cast<void*>(screen.get()));
   assert(screen);
   if (g_config->transitions_enabled)
   {
@@ -165,7 +165,7 @@ ScreenManager::push_screen(std::unique_ptr<Screen> screen, std::unique_ptr<Scree
 void
 ScreenManager::pop_screen(std::unique_ptr<ScreenFade> screen_fade)
 {
-  log_debug << "ScreenManager::pop_screen(): stack_size: " << m_screen_stack.size() << std::endl;
+  log_debug("ScreenManager::pop_screen(): stack_size: {}", m_screen_stack.size());
   if (g_config->transitions_enabled)
   {
     m_screen_fade = std::move(screen_fade);
@@ -460,7 +460,7 @@ ScreenManager::process_events()
                  event.key.keysym.mod & KMOD_CTRL)
         {
           g_config->developer_mode = !g_config->developer_mode;
-          log_info << "developer mode: " << g_config->developer_mode << std::endl;
+          log_info("developer mode: {}", g_config->developer_mode);
         }
         break;
 

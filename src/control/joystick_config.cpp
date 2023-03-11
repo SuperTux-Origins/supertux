@@ -180,7 +180,7 @@ JoystickConfig::read(ReaderMapping const& joystick_mapping)
         const std::optional<Control> maybe_control = Control_from_string(control_text);
         if (!maybe_control)
         {
-          log_info << "Invalid control '" << control_text << "' in buttonmap" << std::endl;
+          log_info("Invalid control '{}' in buttonmap", control_text);
         }
         else
         {
@@ -204,7 +204,7 @@ JoystickConfig::read(ReaderMapping const& joystick_mapping)
                 hat != SDL_HAT_DOWN &&
                 hat != SDL_HAT_LEFT &&
                 hat != SDL_HAT_RIGHT) {
-              log_info << "Invalid axis '" << axis << "' in axismap" << std::endl;
+              log_info("Invalid axis '{}' in axismap", axis);
             }
             else
             {

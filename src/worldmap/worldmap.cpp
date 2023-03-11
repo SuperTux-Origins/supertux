@@ -150,7 +150,7 @@ WorldMap::move_to_spawnpoint(std::string const& spawnpoint, bool pan, bool main_
     return;
   }
 
-  log_warning << "Spawnpoint '" << spawnpoint << "' not found." << std::endl;
+  log_warning("Spawnpoint '{}' not found.", spawnpoint);
   if (spawnpoint != "main" && main_as_default) {
     move_to_spawnpoint("main");
   }
@@ -233,7 +233,7 @@ WorldMap::path_ok(Direction const& direction, Vector const& old_pos, Vector* new
                 && new_tile_data & Tile::WORLDMAP_NORTH);
 
       case Direction::NONE:
-        log_warning << "path_ok() can't walk if direction is NONE" << std::endl;
+        log_warning("path_ok() can't walk if direction is NONE");
         assert(false);
     }
     return false;
@@ -297,7 +297,7 @@ WorldMap::finished_level(Level* gamelevel)
     try {
       run_script(level->get_extro_script(), "worldmap:extro_script");
     } catch(std::exception& e) {
-      log_warning << "Couldn't run level-extro-script: " << e.what() << std::endl;
+      log_warning("Couldn't run level-extro-script: {}", e.what());
     }
   }
 }
@@ -382,11 +382,11 @@ WorldMap::update(float dt_sec)
         //Respawn if player on a tile with no level and nowhere to go.
         int tile_data = tile_data_at(m_tux->get_tile_pos());
         if (!( tile_data & ( Tile::WORLDMAP_NORTH |  Tile::WORLDMAP_SOUTH | Tile::WORLDMAP_WEST | Tile::WORLDMAP_EAST ))){
-          log_warning << "Player at illegal position " << m_tux->get_tile_pos().x << ", " << m_tux->get_tile_pos().y << " respawning." << std::endl;
+          log_warning("Player at illegal position {}, {} respawning.", m_tux->get_tile_pos().x, m_tux->get_tile_pos().y);
           move_to_spawnpoint("main");
           return;
         }
-        log_warning << "No level to enter at: " << m_tux->get_tile_pos().x << ", " << m_tux->get_tile_pos().y << std::endl;
+        log_warning("No level to enter at: {}, {}", m_tux->get_tile_pos().x, m_tux->get_tile_pos().y);
         return;
       }
 
@@ -403,7 +403,7 @@ WorldMap::update(float dt_sec)
 
           m_in_level = true;
         } catch(std::exception& e) {
-          log_fatal << "Couldn't load level: " << e.what() << std::endl;
+          log_fatal("Couldn't load level: {}", e.what());
         }
       }
     }

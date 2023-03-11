@@ -175,7 +175,7 @@ BadGuy::update(float dt_sec)
         badguy = badguy.substr(path_chars + 1, badguy.length() - path_chars);
         // log warning since badguys_killed can no longer reach total_badguys
         std::string current_level = "[" + Sector::get().get_level()->filename + "] ";
-        log_warning << current_level << "Counted badguy " << badguy << " starting at " << start_position << " has left the sector" <<std::endl;
+        log_warning("{}Counted badguy {} starting at {} has left the sector", current_level, badguy, start_position);
       }*/
       return;
     }

@@ -73,7 +73,7 @@ TTFFont::get_text_width(std::string const& text) const
       int h = 0;
       int ret = TTF_SizeUTF8(m_font, line.c_str(), &w, &h);
       if (ret < 0) {
-        get_logging_instance(false) << "TTFFont::get_text_width(): " << TTF_GetError() << std::endl;
+        log_error("TTFFont::get_text_width(): {}", TTF_GetError());
       }
       int const grow = std::max(get_border() * 2, get_shadow_size() * 2);
       line_width = w + grow;

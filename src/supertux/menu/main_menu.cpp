@@ -123,13 +123,13 @@ MainMenu::menu_action(MenuItem& item)
               }
               else
               {
-                log_warning << "unknown World type" << std::endl;
+                log_warning("unknown World type");
               }
             }
           }
           catch(std::exception& e)
           {
-            log_info << "Couldn't parse levelset info for '" << *it << "': " << e.what() << std::endl;
+            log_info("Couldn't parse levelset info for '{}': {}", *it, e.what());
           }
         }
 

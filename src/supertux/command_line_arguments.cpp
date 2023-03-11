@@ -28,7 +28,7 @@
 
 CommandLineArguments::CommandLineArguments() :
   m_action(NO_ACTION),
-  m_log_level(LOG_WARNING),
+  m_log_level(logmich::LogLevel::WARNING),
   datadir(),
   userdir(),
   fullscreen_size(),
@@ -175,13 +175,13 @@ CommandLineArguments::parse_args(int argc, char** argv)
     }
     else if (arg == "--debug")
     {
-      m_log_level = LOG_DEBUG;
+      m_log_level = logmich::LogLevel::DEBUG;
     }
     else if (arg == "--verbose")
     {
-      if (m_log_level < LOG_INFO)
+      if (m_log_level < logmich::LogLevel::INFO)
       {
-        m_log_level = LOG_INFO;
+        m_log_level = logmich::LogLevel::INFO;
       }
     }
     else if (arg == "--datadir")

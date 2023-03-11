@@ -97,7 +97,7 @@ SpriteData::parse_action(ReaderMapping const& mapping)
   {
     if (action->loop_frame < 1)
     {
-      log_warning << "'loop-frame' of action '" << action->name << "' set to a value below 1." << std::endl;
+      log_warning("'loop-frame' of action '{}' set to a value below 1.", action->name);
       action->loop_frame = 1;
     }
   }
@@ -224,7 +224,7 @@ SpriteData::parse_action(ReaderMapping const& mapping)
   const int frames = static_cast<int>(action->surfaces.size());
   if (action->loop_frame > frames && frames > 0)
   {
-    log_warning << "'loop-frame' of action '" << action->name << "' in sprite not-in-range of total frames." << std::endl;
+    log_warning("'loop-frame' of action '{}' in sprite not-in-range of total frames.", action->name);
     action->loop_frame = 1;
   }
 

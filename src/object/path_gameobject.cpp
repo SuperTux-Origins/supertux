@@ -40,7 +40,7 @@ PathStyle PathStyle_from_string(std::string const& text)
   } else if (text == "solid") {
     return PathStyle::SOLID;
   } else {
-    log_warning << "unknown PathStyle: " << text << std::endl;
+    log_warning("unknown PathStyle: {}", text);
     return PathStyle::NONE;
   }
 }
@@ -173,7 +173,7 @@ PathGameObject::remove_me()
   {
     if (path_obj.get_path_gameobject() == this)
     {
-      log_warning << "Attempt to delete path " << get_name() << " while bound to object" << std::endl;
+      log_warning("Attempt to delete path {} while bound to object", get_name());
       return;
     }
   }

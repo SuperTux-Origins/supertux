@@ -82,10 +82,10 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
       throw SquirrelError(m_vm.get_vm(), "Couldn't initialize squirrel debugger");
 
     sq_enabledebuginfo(m_vm.get_vm(), SQTrue);
-    log_info << "Waiting for debug client..." << std::endl;
+    log_info("Waiting for debug client...");
     if (SQ_FAILED(sq_rdbg_waitforconnections(debugger)))
       throw SquirrelError(m_vm.get_vm(), "Waiting for debug clients failed");
-    log_info << "debug client connected." << std::endl;
+    log_info("debug client connected.");
 #endif
   }
 
@@ -117,7 +117,7 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
     IFileStream stream(filename);
     compile_and_run(m_vm.get_vm(), stream, filename);
   } catch(std::exception& e) {
-    log_warning << "Couldn't load default.nut: " << e.what() << std::endl;
+    log_warning("Couldn't load default.nut: {}", e.what());
   }
 }
 

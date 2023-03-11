@@ -50,7 +50,7 @@ void CustomParticles::spawn_particles(int amount, bool instantly)
   else
   {
     // TODO
-    log_warning << "Delayed spawn mode not yet implemented for scripting" << std::endl;
+    log_warning("Delayed spawn mode not yet implemented for scripting");
   }
 }
 
@@ -126,7 +126,7 @@ void CustomParticles::set_birth_mode(std::string mode)
   }
   else
   {
-    log_warning << "Invalid option " + mode + "; valid options are: None, Fade, Shrink" << std::endl;
+    log_warning("Invalid option {} valid options are: None, Fade, Shrink", mode);
   }
 }
 
@@ -167,7 +167,7 @@ void CustomParticles::set_death_mode(std::string mode)
   }
   else
   {
-    log_warning << "Invalid option " + mode + "; valid options are: None, Fade, Shrink" << std::endl;
+    log_warning("Invalid option {} valid options are: None, Fade, Shrink", mode);
   }
 }
 
@@ -208,7 +208,7 @@ void CustomParticles::set_rotation_mode(std::string mode)
   }
   else
   {
-    log_warning << "Invalid option " + mode + "; valid options are: Fixed, Facing, Wiggling" << std::endl;
+    log_warning("Invalid option {} valid options are: Fixed, Facing, Wiggling", mode);
   }
 }
 
@@ -270,7 +270,7 @@ void CustomParticles::set_collision_mode(std::string mode)
   }
   else
   {
-    log_warning << "Invalid option " + mode + "; valid options are: Ignore, Stick, StickForever, BounceHeavy, BounceLight, Destroy" << std::endl;
+    log_warning("Invalid option {} valid options are: Ignore, Stick, StickForever, BounceHeavy, BounceLight, Destroy", mode);
   }
 }
 
@@ -311,7 +311,7 @@ void CustomParticles::set_offscreen_mode(std::string mode)
   }
   else
   {
-    log_warning << "Invalid option " + mode + "; valid options are: Never, OnlyOnExit, Always" << std::endl;
+    log_warning("Invalid option {} valid options are: Never, OnlyOnExit, Always", mode);
   }
 }
 

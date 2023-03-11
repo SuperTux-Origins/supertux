@@ -59,11 +59,11 @@ Stalactite::Stalactite(ReaderMapping const& mapping) :
   {
     if (type.empty())
     {
-      log_warning << "No stalactite type set, setting to ice." << std::endl;
+      log_warning("No stalactite type set, setting to ice.");
     }
     else
     {
-      log_warning << "Unknown type of stalactite:" << type << ", setting to ice." << std::endl;
+      log_warning("Unknown type of stalactite:{}, setting to ice.", type);
     }
 
     m_type = StalactiteType::ICE;

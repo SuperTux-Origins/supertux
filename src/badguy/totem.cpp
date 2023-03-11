@@ -213,7 +213,7 @@ void
 Totem::jump_on(Totem* target)
 {
   if (target->carrying) {
-    log_warning << "target is already carrying someone" << std::endl;
+    log_warning("target is already carrying someone");
     return;
   }
 
@@ -231,7 +231,7 @@ Totem::jump_on(Totem* target)
 void
 Totem::jump_off() {
   if (!carried_by) {
-    log_warning << "not carried by anyone" << std::endl;
+    log_warning("not carried by anyone");
     return;
   }
 

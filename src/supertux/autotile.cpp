@@ -278,7 +278,7 @@ AutotileSet::is_solid(uint32_t tile_id) const
     }
   }
 
-  //log_warning << "Called AutotileSet::is_solid() with a tile_id that isn't in the Autotileset, yet that returns is_member() = true." << std::endl;
+  //log_warning("Called AutotileSet::is_solid() with a tile_id that isn't in the Autotileset, yet that returns is_member() = true.");
 
   // m_default should *never* be 0 (always a valid solid tile,
   //   even if said tile isn't part of the tileset)
@@ -314,7 +314,7 @@ AutotileSet::validate() const
       {
         if (tile_exists)
         {
-          log_warning << "Autotileset '" << m_name << "': mask " << (m_corner ? std::bitset<4>(mask).to_string() : std::bitset<8>(mask).to_string()) << " corresponds both to tile " << tile_with_that_mask << " and " << autotile->get_tile_id() << std::endl;
+          log_warning("Autotileset '{}': mask {} corresponds both to tile {} and {}", m_name, (m_corner ? std::bitset<4>(mask).to_string() : std::bitset<8>(mask).to_string()), tile_with_that_mask, autotile->get_tile_id());
         }
         else
         {
@@ -326,7 +326,7 @@ AutotileSet::validate() const
 
     if (!tile_exists)
     {
-      log_warning << "Autotileset '" << m_name << "': mask " << (m_corner ? std::bitset<4>(mask).to_string() : std::bitset<8>(mask).to_string()) << " has no corresponding tile" << std::endl;
+      log_warning("Autotileset '{}': mask {} has no corresponding tile", m_name, (m_corner ? std::bitset<4>(mask).to_string() : std::bitset<8>(mask).to_string()));
     }
   }
 }

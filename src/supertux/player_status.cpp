@@ -140,7 +140,7 @@ PlayerStatus::write(Writer& writer)
         writer.write("bonus", "earthflower");
         break;
       default:
-        log_warning << "Unknown bonus type." << std::endl;
+        log_warning("Unknown bonus type.");
         writer.write("bonus", "none");
     }
 
@@ -180,7 +180,7 @@ PlayerStatus::read(ReaderMapping const& mapping)
 
         if (id >= m_num_players)
         {
-          log_warning << "ID larger than amount of players when reading player state: " << id << std::endl;
+          log_warning("ID larger than amount of players when reading player state: {}", id);
 
           // Keep this in sync with reset()
           if (bonus.size() < static_cast<size_t>(id))
@@ -200,9 +200,9 @@ PlayerStatus::read(ReaderMapping const& mapping)
         }
         else if (id == 0)
         {
-          log_warning << "Refusing to parse player 1 when reading player state,"
+          log_warning("Refusing to parse player 1 when reading player state,"
                          "please don't put player 1 data in a (tux1 ...)"
-                         "wrapper for retrocompatibiility" << std::endl;
+                         "wrapper for retrocompatibiility");
         }
 
         auto map = iter.as_mapping();
@@ -222,7 +222,7 @@ PlayerStatus::read(ReaderMapping const& mapping)
           } else if (bonusname == "earthflower") {
             bonus[id] = EARTH_BONUS;
           } else {
-            log_warning << "Unknown bonus '" << bonusname << "' in savefile for player " << (id + 1) << std::endl;
+            log_warning("Unknown bonus '{}' in savefile for player {}", bonusname, (id + 1));
             bonus[id] = NO_BONUS;
           }
         }
@@ -234,7 +234,7 @@ PlayerStatus::read(ReaderMapping const& mapping)
     }
     catch (std::exception const& e)
     {
-      log_warning << "Couldn't parse player from player status save: " << e.what() << std::endl;
+      log_warning("Couldn't parse player from player status save: {}", e.what());
     }
   }
 
@@ -253,7 +253,7 @@ PlayerStatus::read(ReaderMapping const& mapping)
     } else if (bonusname == "earthflower") {
       bonus[0] = EARTH_BONUS;
     } else {
-      log_warning << "Unknown bonus '" << bonusname << "' in savefile" << std::endl;
+      log_warning("Unknown bonus '{}' in savefile", bonusname);
       bonus[0] = NO_BONUS;
     }
   }

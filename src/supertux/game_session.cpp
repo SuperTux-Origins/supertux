@@ -178,7 +178,7 @@ GameSession::restart_level(bool after_death)
       }
     }
   } catch(std::exception& e) {
-    log_fatal << "Couldn't start level: " << e.what() << std::endl;
+    log_fatal("Couldn't start level: {}", e.what());
     ScreenManager::current()->pop_screen();
     return (-1);
   }
@@ -462,7 +462,7 @@ GameSession::update(float dt_sec, Controller const& controller)
     auto sector = m_level->get_sector(m_newsector);
     std::string current_music = m_currentsector->get_singleton_by_type<MusicObject>().get_music();
     if (sector == nullptr) {
-      log_warning << "Sector '" << m_newsector << "' not found" << std::endl;
+      log_warning("Sector '{}' not found", m_newsector);
       sector = m_level->get_sector(m_start_sector);
     }
     assert(m_currentsector != nullptr);
@@ -652,7 +652,7 @@ GameSession::start_sequence(Player* caller, Sequence seq, SequenceData const* da
   // handle special "stoptux" sequence
   if (seq == SEQ_STOPTUX) {
     if (!m_end_sequence) {
-      log_warning << "Final target reached without an active end sequence" << std::endl;
+      log_warning("Final target reached without an active end sequence");
       start_sequence(caller, SEQ_ENDSEQUENCE);
     }
 
@@ -690,7 +690,7 @@ GameSession::start_sequence(Player* caller, Sequence seq, SequenceData const* da
     } else if (seq == SEQ_FIREWORKS) {
       end_sequence = std::make_unique<EndSequenceFireworks>();
     } else {
-      log_warning << "Unknown sequence '" << static_cast<int>(seq) << "'. Ignoring." << std::endl;
+      log_warning("Unknown sequence '{}'. Ignoring.", static_cast<int>(seq));
       return;
     }
 

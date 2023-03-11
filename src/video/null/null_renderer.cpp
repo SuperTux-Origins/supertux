@@ -31,13 +31,13 @@ NullRenderer::~NullRenderer()
 void
 NullRenderer::start_draw()
 {
-  log_info << "NullRenderer::start_draw()" << std::endl;
+  log_info("NullRenderer::start_draw()");
 }
 
 void
 NullRenderer::end_draw()
 {
-  log_info << "NullRenderer::end_draw()" << std::endl;
+  log_info("NullRenderer::end_draw()");
 }
 
 Painter&

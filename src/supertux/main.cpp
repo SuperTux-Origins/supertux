@@ -86,14 +86,14 @@ ConfigSubsystem::ConfigSubsystem() :
   }
   catch(std::exception const& e)
   {
-    log_info << "Couldn't load config file: " << e.what() << ", using default settings" << std::endl;
+    log_info("Couldn't load config file: {}, using default settings", e.what());
   }
 
   // init random number stuff
   gameRandom.seed(m_config.random_seed);
   graphicsRandom.seed(0);
   //const char *how = config->random_seed? ", user fixed.": ", from time().";
-  //log_info << "Using random seed " << config->random_seed << how << std::endl;
+  //log_info("Using random seed {}{}", config->random_seed, how);
 }
 
 ConfigSubsystem::~ConfigSubsystem()
@@ -104,7 +104,7 @@ ConfigSubsystem::~ConfigSubsystem()
   }
   catch(std::exception& e)
   {
-    log_warning << "Error saving config: " << e.what() << std::endl;
+    log_warning("Error saving config: {}", e.what());
   }
 }
 
@@ -158,20 +158,20 @@ void PhysfsSubsystem::find_datadir() const
     // Android asset pack has a hardcoded prefix for data files, and PhysFS cannot strip it, so we mount an archive inside an archive
     if (!PHYSFS_mount(std::filesystem::canonical(assetpack).string().c_str(), nullptr, 1))
     {
-      log_warning << "Couldn't add '" << assetpack << "' to physfs searchpath: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
+      log_warning("Couldn't add '{}' to physfs searchpath: {}", assetpack, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
       return;
     }
 
     PHYSFS_File* data = PHYSFS_openRead("assets/data.zip");
     if (!data)
     {
-      log_warning << "Couldn't open assets/data.zip inside '" << assetpack << "' : " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
+      log_warning("Couldn't open assets/data.zip inside '{}' : {}", assetpack, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
       return;
     }
 
     if (!PHYSFS_mountHandle(data, "assets/data.zip", nullptr, 1))
     {
-      log_warning << "Couldn't add assets/data.zip inside '" << assetpack << "' to physfs searchpath: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
+      log_warning("Couldn't add assets/data.zip inside '{}' to physfs searchpath: {}", assetpack, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     }
 
     return;
@@ -215,12 +215,12 @@ void PhysfsSubsystem::find_datadir() const
   // An additional .string() call is necessary as Windows returns const wchar_t* for .c_str()
   if (!PHYSFS_mount(std::filesystem::canonical(datadir).string().c_str(), nullptr, 1))
   {
-    log_warning << "Couldn't add '" << datadir << "' to physfs searchpath: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
+    log_warning("Couldn't add '{}' to physfs searchpath: {}", datadir, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 #else
   if (!PHYSFS_mount(BUILD_CONFIG_DATA_DIR, nullptr, 1))
   {
-    log_warning << "Couldn't add '" << BUILD_CONFIG_DATA_DIR << "' to physfs searchpath: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
+    log_warning("Couldn't add '{}' to physfs searchpath: {}", BUILD_CONFIG_DATA_DIR, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 #endif
 }
@@ -250,7 +250,7 @@ void PhysfsSubsystem::find_userdir() const
   if (!FileSystem::is_directory(userdir))
   {
     FileSystem::mkdir(userdir);
-    log_info << "Created SuperTux userdir: " << userdir << std::endl;
+    log_info("Created SuperTux userdir: {}", userdir);
   }
 
 #ifdef EMSCRIPTEN
@@ -276,12 +276,12 @@ void PhysfsSubsystem::find_userdir() const
 void PhysfsSubsystem::print_search_path()
 {
   char const* writedir = PHYSFS_getWriteDir();
-  log_info << "PhysfsWriteDir: " << (writedir ? writedir : "(null)") << std::endl;
-  log_info << "PhysfsSearchPath:" << std::endl;
+  log_info("PhysfsWriteDir: {}", (writedir ? writedir : "(null)"));
+  log_info("PhysfsSearchPath:");
   char** searchpath = PHYSFS_getSearchPath();
   for (char** i = searchpath; *i != nullptr; ++i)
   {
-    log_info << "  " << *i << std::endl;
+    log_info("  {}", *i);
   }
   PHYSFS_freeList(searchpath);
 }
@@ -334,10 +334,7 @@ Main::init_video()
 
   SDL_ShowCursor(g_config->custom_mouse_cursor ? 0 : 1);
 
-  log_info << (g_config->use_fullscreen?"fullscreen ":"window ")
-           << " Window: "     << g_config->window_size
-           << " Fullscreen: " << g_config->fullscreen_size << "@" << g_config->fullscreen_refresh_rate
-           << " Area: "       << g_config->aspect_size << std::endl;
+  log_info("{} Window: {} Fullscreen: {}@{} Area: {}", (g_config->use_fullscreen?"fullscreen ":"window "), g_config->window_size, g_config->fullscreen_size, g_config->fullscreen_refresh_rate, g_config->aspect_size);
 }
 
 void
@@ -406,7 +403,7 @@ Main::launch_game(CommandLineArguments const& args)
       if (position != std::string::npos) {
         dir = dir.replace(position, fileProtocol.length(), "");
       }
-      log_debug << "Adding dir: " << dir << std::endl;
+      log_debug("Adding dir: {}", dir);
       PHYSFS_mount(dir.c_str(), nullptr, true);
 
       if (start_level.ends_with(".stwm"))
@@ -494,7 +491,7 @@ Main::run(int argc, char** argv)
     try
     {
       args.parse_args(argc, argv);
-      g_log_level = args.get_log_level();
+      logmich::g_logger.set_log_level(args.get_log_level());
     }
     catch(std::exception const& err)
     {
@@ -536,12 +533,12 @@ Main::run(int argc, char** argv)
   }
   catch(std::exception const& e)
   {
-    log_fatal << "Unexpected exception: " << e.what() << std::endl;
+    log_fatal("Unexpected exception: {}", e.what());
     result = 1;
   }
   catch(...)
   {
-    log_fatal << "Unexpected exception" << std::endl;
+    log_fatal("Unexpected exception");
     result = 1;
   }
 

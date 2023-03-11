@@ -271,7 +271,7 @@ WillOWisp::set_state(std::string const& new_state)
   } else if (new_state == "vanish") {
     vanish();
   } else {
-    log_warning << "Can't set unknown willowisp state '" << new_state << std::endl;
+    log_warning("Can't set unknown willowisp state '{}", new_state);
   }
 }
 

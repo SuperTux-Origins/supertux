@@ -124,7 +124,7 @@ AmbientSound::start_playing()
     currentvolume=targetvolume=1e-20f;
     sound_source->play();
   } catch(std::exception& e) {
-    log_warning << "Couldn't play '" << sample << "': " << e.what() << "" << std::endl;
+    log_warning("Couldn't play '{}': {}", sample, e.what());
     sound_source.reset();
     remove_me();
   }

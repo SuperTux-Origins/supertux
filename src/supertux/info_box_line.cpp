@@ -41,7 +41,7 @@ FontPtr get_font_by_format_char(char format_char) {
       return Resources::normal_font;
     default:
       return Resources::normal_font;
-      //log_warning << "Unknown format_char: '" << format_char << "'" << std::endl;
+      //log_warning("Unknown format_char: '{}'", format_char);
   }
 }
 
@@ -60,7 +60,7 @@ Color get_color_by_format_char(char format_char) {
       return ColorScheme::Text::normal_color;
     default:
       return ColorScheme::Text::normal_color;
-      //log_warning << "Unknown format_char: '" << format_char << "'" << std::endl;
+      //log_warning("Unknown format_char: '{}'", format_char);
   }
 }
 
@@ -82,7 +82,7 @@ InfoBoxLine::LineType get_linetype_by_format_char(char format_char) {
       return InfoBoxLine::IMAGE;
     default:
       return InfoBoxLine::SMALL;
-      //log_warning << "Unknown format_char: '" << format_char << "'" << std::endl;
+      //log_warning("Unknown format_char: '{}'", format_char);
   }
 }
 

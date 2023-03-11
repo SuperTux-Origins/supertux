@@ -34,7 +34,7 @@ SDLBaseVideoSystem::SDLBaseVideoSystem() :
   SDL_DisplayMode mode;
   if (SDL_GetDesktopDisplayMode(0, &mode) != 0)
   {
-    log_warning << "Couldn't get desktop display mode: " << SDL_GetError() << std::endl;
+    log_warning("Couldn't get desktop display mode: {}", SDL_GetError());
   }
   else
   {
@@ -168,12 +168,11 @@ SDLBaseVideoSystem::apply_video_mode()
     {
       if (SDL_SetWindowFullscreen(m_sdl_window.get(), SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
       {
-        log_warning << "failed to switch to desktop fullscreen mode: "
-                    << SDL_GetError() << std::endl;
+        log_warning("failed to switch to desktop fullscreen mode: {}", SDL_GetError());
       }
       else
       {
-        log_info << "switched to desktop fullscreen mode" << std::endl;
+        log_info("switched to desktop fullscreen mode");
       }
     }
     else
@@ -187,22 +186,17 @@ SDLBaseVideoSystem::apply_video_mode()
 
       if (SDL_SetWindowDisplayMode(m_sdl_window.get(), &mode) != 0)
       {
-        log_warning << "failed to set display mode: "
-                    << mode.w << "x" << mode.h << "@" << mode.refresh_rate << ": "
-                    << SDL_GetError() << std::endl;
+        log_warning("failed to set display mode: {}x{}@{}: {}", mode.w, mode.h, mode.refresh_rate, SDL_GetError());
       }
       else
       {
         if (SDL_SetWindowFullscreen(m_sdl_window.get(), SDL_WINDOW_FULLSCREEN) != 0)
         {
-          log_warning << "failed to switch to fullscreen mode: "
-                      << mode.w << "x" << mode.h << "@" << mode.refresh_rate << ": "
-                      << SDL_GetError() << std::endl;
+          log_warning("failed to switch to fullscreen mode: {}x{}@{}: {}", mode.w, mode.h, mode.refresh_rate, SDL_GetError());
         }
         else
         {
-          log_info << "switched to fullscreen mode: "
-                   << mode.w << "x" << mode.h << "@" << mode.refresh_rate << std::endl;
+          log_info("switched to fullscreen mode: {}x{}@{}", mode.w, mode.h, mode.refresh_rate);
         }
       }
     }

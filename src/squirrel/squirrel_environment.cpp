@@ -100,7 +100,7 @@ SquirrelEnvironment::try_unexpose(GameObject& object)
     try {
       script_object->unexpose(m_vm.get_vm(), -1);
     } catch(std::exception& e) {
-      log_warning << "Couldn't unregister object: " << e.what() << std::endl;
+      log_warning("Couldn't unregister object: {}", e.what());
     }
     sq_settop(m_vm.get_vm(), oldtop);
   }
@@ -114,7 +114,7 @@ SquirrelEnvironment::unexpose(std::string const& name)
   try {
     unexpose_object(m_vm.get_vm(), -1, name.c_str());
   } catch(std::exception& e) {
-    log_warning << "Couldn't unregister object: " << e.what() << std::endl;
+    log_warning("Couldn't unregister object: {}", e.what());
   }
   sq_settop(m_vm.get_vm(), oldtop);
 }
@@ -168,7 +168,7 @@ SquirrelEnvironment::run_script(std::istream& in, std::string const& sourcename)
   }
   catch(std::exception const& e)
   {
-    log_warning << "Error running script: " << e.what() << std::endl;
+    log_warning("Error running script: {}", e.what());
   }
 }
 

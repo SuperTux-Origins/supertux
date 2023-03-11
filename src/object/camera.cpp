@@ -213,7 +213,7 @@ Camera::Camera(ReaderMapping const& reader) :
   else
   {
     m_mode = Mode::NORMAL;
-    log_warning << "invalid camera mode '" << modename << "'found in worldfile." << std::endl;
+    log_warning("invalid camera mode '{}'found in worldfile.", modename);
   }
   m_defaultmode = m_mode;
 
@@ -329,10 +329,9 @@ Camera::reload_config()
   if (PHYSFS_exists("camera.cfg")) {
     try {
       m_config->load("camera.cfg");
-      log_info << "Loaded camera.cfg." << std::endl;
+      log_info("Loaded camera.cfg.");
     } catch(std::exception &e) {
-      log_debug << "Couldn't load camera.cfg, using defaults ("
-                << e.what() << ")" << std::endl;
+      log_debug("Couldn't load camera.cfg, using defaults ({})", e.what());
     }
   }
 }

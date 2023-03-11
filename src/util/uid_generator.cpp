@@ -37,7 +37,7 @@ UIDGenerator::next()
 
   if (m_id_counter > 0xffffff)
   {
-    log_warning << "UIDGenerator overflow" << std::endl;
+    log_warning("UIDGenerator overflow");
     m_id_counter = 0;
   }
 

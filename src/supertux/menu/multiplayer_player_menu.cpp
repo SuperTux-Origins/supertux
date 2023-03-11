@@ -60,8 +60,7 @@ MultiplayerPlayerMenu::MultiplayerPlayerMenu(int player_id)
         // (e. g. when unplugging a controller with auto-management enabled)
         if (!GameSession::current() || GameSession::current()->get_savegame().is_title_screen())
         {
-          log_warning << "Attempt to force player to despawn while not in session"
-                      << std::endl;
+          log_warning("Attempt to force player to despawn while not in session");
           return;
         }
 
@@ -74,9 +73,7 @@ MultiplayerPlayerMenu::MultiplayerPlayerMenu(int player_id)
           }
         }
 
-        log_warning << "Could not find player with ID " << player_id
-                    << " (number " << (player_id + 1) << "in sector"
-                    << std::endl;
+        log_warning("Could not find player with ID {} (number {}in sector", player_id, (player_id + 1));
       });
 
       add_entry(_("Respawn Player"), [player_id] {
@@ -84,8 +81,7 @@ MultiplayerPlayerMenu::MultiplayerPlayerMenu(int player_id)
         // (e. g. when unplugging a controller with auto-management enabled)
         if (!GameSession::current() || GameSession::current()->get_savegame().is_title_screen())
         {
-          log_warning << "Attempt to force player to respawn while not in session"
-                      << std::endl;
+          log_warning("Attempt to force player to respawn while not in session");
           return;
         }
 
@@ -98,9 +94,7 @@ MultiplayerPlayerMenu::MultiplayerPlayerMenu(int player_id)
           }
         }
 
-        log_warning << "Could not find player with ID " << player_id
-                    << " (number " << (player_id + 1) << "in sector"
-                    << std::endl;
+        log_warning("Could not find player with ID {} (number {}in sector", player_id, (player_id + 1));
       });
     }
     else
@@ -110,8 +104,7 @@ MultiplayerPlayerMenu::MultiplayerPlayerMenu(int player_id)
         // (e. g. when unplugging a controller with auto-management enabled)
         if (!GameSession::current() || GameSession::current()->get_savegame().is_title_screen())
         {
-          log_warning << "Attempt to force player to spawn while not in session"
-                      << std::endl;
+          log_warning("Attempt to force player to spawn while not in session");
           return;
         }
 
