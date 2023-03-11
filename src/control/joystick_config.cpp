@@ -20,7 +20,9 @@
 
 #include "util/gettext.hpp"
 #include "util/log.hpp"
+#include "util/reader_collection.hpp"
 #include "util/reader_mapping.hpp"
+#include "util/reader_object.hpp"
 #include "util/writer.hpp"
 
 JoystickConfig::JoystickConfig() :
@@ -163,44 +165,52 @@ JoystickConfig::read(ReaderMapping const& joystick_mapping)
   joystick_mapping.read("jump-with-up", m_jump_with_up_joy);
   joystick_mapping.read("use-game-controller", m_use_game_controller);
 
-  ReaderMapping map;
-  if (joystick_mapping.read("map", map))
+  ReaderCollection bindings_collection;
+  if (joystick_mapping.read("bindings", bindings_collection))
   {
-    std::string control_text;
-    map.read("control", control_text);
-
-    const std::optional<Control> maybe_control = Control_from_string(control_text);
-    if (!maybe_control)
+    for (auto const& item : bindings_collection.get_objects())
     {
-      log_info << "Invalid control '" << control_text << "' in buttonmap" << std::endl;
-    }
-    else
-    {
-      const Control control = *maybe_control;
+      if (item.get_name() == "bind")
+      {
+        auto const& map = item.get_mapping();
 
-      int button = -1;
-      int axis   = 0;
-      int hat    = -1;
+        std::string control_text;
+        map.read("control", control_text);
 
-      if (map.read("button", button))
-      {
-        bind_joybutton(0, button, control);
-      }
-      else if (map.read("axis",   axis))
-      {
-        bind_joyaxis(0, axis, control);
-      }
-      else if (map.read("hat",   hat))
-      {
-        if (hat != SDL_HAT_UP   &&
-            hat != SDL_HAT_DOWN &&
-            hat != SDL_HAT_LEFT &&
-            hat != SDL_HAT_RIGHT) {
-          log_info << "Invalid axis '" << axis << "' in axismap" << std::endl;
+        const std::optional<Control> maybe_control = Control_from_string(control_text);
+        if (!maybe_control)
+        {
+          log_info << "Invalid control '" << control_text << "' in buttonmap" << std::endl;
         }
         else
         {
-          bind_joyhat(0, hat, control);
+          const Control control = *maybe_control;
+
+          int button = -1;
+          int axis   = 0;
+          int hat    = -1;
+
+          if (map.read("button", button))
+          {
+            bind_joybutton(0, button, control);
+          }
+          else if (map.read("axis",   axis))
+          {
+            bind_joyaxis(0, axis, control);
+          }
+          else if (map.read("hat",   hat))
+          {
+            if (hat != SDL_HAT_UP   &&
+                hat != SDL_HAT_DOWN &&
+                hat != SDL_HAT_LEFT &&
+                hat != SDL_HAT_RIGHT) {
+              log_info << "Invalid axis '" << axis << "' in axismap" << std::endl;
+            }
+            else
+            {
+              bind_joyhat(0, hat, control);
+            }
+          }
         }
       }
     }
@@ -214,26 +224,28 @@ JoystickConfig::write(Writer& writer)
   writer.write("jump-with-up", m_jump_with_up_joy);
   writer.write("use-game-controller", m_use_game_controller);
 
+  writer.start_list("bindings");
   for (auto const& i : m_joy_button_map) {
-    writer.start_list("map");
+    writer.start_list("bind");
     writer.write("button", i.first.second);
     writer.write("control", Control_to_string(i.second));
-    writer.end_list("map");
+    writer.end_list("bind");
   }
 
   for (auto const& i : m_joy_hat_map) {
-    writer.start_list("map");
+    writer.start_list("bind");
     writer.write("hat", i.first.second);
     writer.write("control", Control_to_string(i.second));
-    writer.end_list("map");
+    writer.end_list("bind");
   }
 
   for (auto const& i : m_joy_axis_map) {
-    writer.start_list("map");
+    writer.start_list("bind");
     writer.write("axis", i.first.second);
     writer.write("control", Control_to_string(i.second));
-    writer.end_list("map");
+    writer.end_list("bind");
   }
+  writer.end_list("bindings");
 }
 
 /* EOF */

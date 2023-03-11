@@ -19,7 +19,9 @@
 #include <optional>
 
 #include "util/log.hpp"
+#include "util/reader_collection.hpp"
 #include "util/reader_mapping.hpp"
+#include "util/reader_object.hpp"
 #include "util/writer.hpp"
 
 /** Delimiter used for config save/load between the control and the player id */
@@ -96,37 +98,44 @@ KeyboardConfig::read(ReaderMapping const& keymap_mapping)
 
   keymap_mapping.read("jump-with-up", m_jump_with_up_kbd);
 
-  ReaderMapping map;
-  if (keymap_mapping.read("map", map))
+  ReaderCollection bindings_collection;
+  if (keymap_mapping.read("bindings", bindings_collection))
   {
-    int key = -1;
-    map.read("key", key);
-
-    std::string control_text;
-    map.read("control", control_text);
-
-    int player_id = 0;
-    size_t pos = control_text.find(DELIMITER);
-    if (pos != std::string::npos)
+    for (auto const& item : bindings_collection.get_objects())
     {
-      try
+      if (item.get_name() == "bind")
       {
-        player_id = std::stoi(control_text.substr(0, pos));
-      }
-      catch (std::exception const&)
-      {
-        log_warning << "Could not parse player ID '" << control_text.substr(0, pos) << "' to number" << std::endl;
-      }
-      control_text = control_text.substr(pos + 1);
-    }
+        auto const& binding = item.get_mapping();
+        int key = -1;
+        binding.read("key", key);
 
-    const std::optional<Control> maybe_control = Control_from_string(control_text);
-    if (maybe_control) {
-      if (m_configurable_controls.count(*maybe_control)) {
-        bind_key(static_cast<SDL_Keycode>(key), player_id, *maybe_control);
+        std::string control_text;
+        binding.read("control", control_text);
+
+        int player_id = 0;
+        size_t pos = control_text.find(DELIMITER);
+        if (pos != std::string::npos)
+        {
+          try
+          {
+            player_id = std::stoi(control_text.substr(0, pos));
+          }
+          catch (std::exception const&)
+          {
+            log_warning << "Could not parse player ID '" << control_text.substr(0, pos) << "' to number" << std::endl;
+          }
+          control_text = control_text.substr(pos + 1);
+        }
+
+        const std::optional<Control> maybe_control = Control_from_string(control_text);
+        if (maybe_control) {
+          if (m_configurable_controls.count(*maybe_control)) {
+            bind_key(static_cast<SDL_Keycode>(key), player_id, *maybe_control);
+          }
+        } else {
+          log_warning << "Invalid control '" << control_text << "' in keymap" << std::endl;
+        }
       }
-    } else {
-      log_warning << "Invalid control '" << control_text << "' in keymap" << std::endl;
     }
   }
 }
@@ -181,14 +190,16 @@ KeyboardConfig::write(Writer& writer)
 
   writer.write("jump-with-up", m_jump_with_up_kbd);
 
+  writer.start_list("bindings");
   for (auto const& i : m_keymap)
   {
     std::string player_prefix = (i.second.player > 0) ? std::to_string(i.second.player) + DELIMITER : "";
-    writer.start_list("map");
+    writer.start_list("bind");
     writer.write("key", static_cast<int>(i.first));
     writer.write("control", player_prefix + Control_to_string(i.second.control));
-    writer.end_list("map");
+    writer.end_list("bind");
   }
+  writer.end_list("bindings");
 }
 
 /* EOF */
