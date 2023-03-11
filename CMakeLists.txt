@@ -68,13 +68,6 @@ set(APPDATADIR "${CMAKE_INSTALL_PREFIX}/share/games/supertux-origins")
 set(BUILD_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data")
 set(BUILD_CONFIG_DATA_DIR "${CMAKE_BINARY_DIR}/data")
 
-## Add definitions
-if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
-  add_definitions(-DRELEASE)
-elseif(CMAKE_BUILD_TYPE MATCHES Debug)
-  add_definitions(-DDEBUG)
-endif()
-
 # Options for install
 if(WIN32 AND NOT UNIX)
   set(INSTALL_SUBDIR_BIN "bin" CACHE STRING "Installation subdir for binaries")
