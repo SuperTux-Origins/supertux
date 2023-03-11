@@ -29,11 +29,6 @@ std::string realpath(std::string const& path);
     pointing to a directory */
 bool is_directory(std::string const& path);
 
-bool remove(std::string const& filenam);
-
-/** Removes directory with content */
-void remove_with_content(std::string const& filename);
-
 } // namespace physfsutil
 
 #endif
