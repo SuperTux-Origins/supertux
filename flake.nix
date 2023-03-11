@@ -36,6 +36,10 @@
     sexpcpp.inputs.flake-utils.follows = "flake-utils";
     sexpcpp.inputs.tinycmmc.follows = "tinycmmc";
 
+    logmich.url = "github:logmich/logmich";
+    logmich.inputs.nixpkgs.follows = "nixpkgs";
+    logmich.inputs.tinycmmc.follows = "tinycmmc";
+
     curl-win32.url = "github:grumnix/curl-win32";
     curl-win32.inputs.nixpkgs.follows = "nixpkgs";
     curl-win32.inputs.tinycmmc.follows = "tinycmmc";
@@ -88,12 +92,12 @@
     priocpp.inputs.nixpkgs.follows = "nixpkgs";
     priocpp.inputs.flake-utils.follows = "flake-utils";
     priocpp.inputs.tinycmmc.follows = "tinycmmc";
-    # priocpp.inputs.logmich.follows = "logmich";
+    priocpp.inputs.logmich.follows = "logmich";
     priocpp.inputs.sexpcpp.follows = "sexpcpp";
   };
 
   outputs = { self, nixpkgs, flake-utils,
-              tinycmmc, sexpcpp, curl-win32,
+              tinycmmc, sexpcpp, curl-win32, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
               strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, priocpp }:
 
@@ -116,6 +120,7 @@
             miniswig = miniswig.packages.${pkgs.system}.default;
             wstsound = wstsound.packages.${pkgs.system}.default;
             priocpp = priocpp.packages.${pkgs.system}.default;
+            logmich = logmich.packages.${pkgs.system}.default;
 
             physfs = if pkgs.targetPlatform.isWindows
                      then physfs-win32.packages.${pkgs.system}.default

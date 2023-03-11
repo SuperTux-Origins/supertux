@@ -18,6 +18,7 @@
 , mcfgthreads
 , mesa
 , physfs
+, logmich
 , sexpcpp
 , squirrel
 , tinycmmc
@@ -98,6 +99,7 @@ EOF
     glm
     libpng
     physfs
+    logmich
     sexpcpp
     squirrel
     tinycmmc
