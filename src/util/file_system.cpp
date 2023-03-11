@@ -65,11 +65,6 @@ void mkdir(std::string const& directory)
   }
 }
 
-void copy(std::string const& source_path, std::string const& target_path)
-{
-  fs::copy_file(source_path, target_path, fs::copy_options::overwrite_existing);
-}
-
 std::string dirname(std::string const& filename)
 {
   std::string::size_type p = filename.find_last_of('/');
@@ -191,12 +186,6 @@ std::string join(std::string const& lhs, std::string const& rhs)
   {
     return lhs + "/" + rhs;
   }
-}
-
-bool remove(std::string const& path)
-{
-  fs::path location = fs::u8path(path);
-  return fs::remove(location);
 }
 
 void open_path(std::string const& path)
