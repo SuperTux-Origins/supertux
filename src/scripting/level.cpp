@@ -16,7 +16,6 @@
 
 #include "scripting/level.hpp"
 
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/game_session.hpp"
 
 namespace scripting {
@@ -37,13 +36,6 @@ Level_spawn(std::string const& sector, std::string const& spawnpoint)
     return;
 
   GameSession::current()->respawn(sector, spawnpoint);
-}
-
-void
-Level_flip_vertically()
-{
-  FlipLevelTransformer flip_transformer;
-  flip_transformer.transform(GameSession::current()->get_current_level());
 }
 
 void

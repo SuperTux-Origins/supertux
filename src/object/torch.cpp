@@ -20,7 +20,6 @@
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
 
 Torch::Torch(ReaderMapping const& reader) :
@@ -109,13 +108,6 @@ void
 Torch::set_burning(bool burning_)
 {
   m_burning = burning_;
-}
-
-void
-Torch::on_flip(float height)
-{
-  MovingObject::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

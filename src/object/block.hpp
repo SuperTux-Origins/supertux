@@ -38,8 +38,6 @@ public:
 
   virtual std::string get_default_sprite_name() const { return m_default_sprite_name; }
 
-  void on_flip(float height) override;
-
   int get_layer() const override { return LAYER_OBJECTS + 1; }
 
   void start_bounce(GameObject* hitter);

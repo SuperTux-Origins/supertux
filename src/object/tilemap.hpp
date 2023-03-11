@@ -57,8 +57,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
 
-  void on_flip(float height) override;
-
   /** Move tilemap until at given node, then stop */
   void goto_node(int node_no);
 

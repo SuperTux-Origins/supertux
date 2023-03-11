@@ -25,7 +25,6 @@
 #include "object/sprite_particle.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
@@ -139,13 +138,6 @@ Firefly::collision(GameObject& other, CollisionHit const& )
   }
 
   return ABORT_MOVE;
-}
-
-void
-Firefly::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

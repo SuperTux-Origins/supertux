@@ -39,8 +39,6 @@ public:
 
   int get_layer() const override { return m_layer; }
 
-  void on_flip(float height) override;
-
   std::string const& get_action() const;
   void set_action(std::string const& action);
   std::string const& get_light_action() const;

@@ -31,8 +31,6 @@ public:
 
   HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
-  void on_flip(float height) override;
-
 protected:
   enum State {
     IDLE, LOADING

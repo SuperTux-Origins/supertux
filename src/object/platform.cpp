@@ -18,7 +18,6 @@
 
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
 
@@ -149,14 +148,6 @@ Platform::move_to(Vector const& pos)
     get_path()->move_by(shift);
   }
   set_pos(pos);
-}
-
-void
-Platform::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  PathObject::on_flip();
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

@@ -20,7 +20,6 @@
 #include "object/player.hpp"
 #include "object/rock.hpp"
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -45,8 +44,6 @@ PushButton::PushButton(ReaderMapping const& mapping) :
   }
 
   mapping.read("upside-down", m_upside_down);
-  if (m_upside_down)
-    FlipLevelTransformer::transform_flip(m_flip);
 }
 
 void
@@ -104,14 +101,6 @@ PushButton::collision(GameObject& other, CollisionHit const& hit)
   Sector::get().run_script(script, "PushButton");
 
   return FORCE_MOVE;
-}
-
-void
-PushButton::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
-  m_upside_down = !m_upside_down;
 }
 
 /* EOF */

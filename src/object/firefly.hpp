@@ -33,8 +33,6 @@ public:
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  void on_flip(float height) override;
-
 private:
   void reactivate();
 

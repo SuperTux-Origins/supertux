@@ -107,11 +107,4 @@ PathObject::get_path_ref() const
   return path_gameobject->get_name();
 }
 
-void
-PathObject::on_flip()
-{
-  m_path_handle.m_scalar_pos.y = 1 - m_path_handle.m_scalar_pos.y;
-  m_path_handle.m_pixel_offset.y = -m_path_handle.m_pixel_offset.y;
-}
-
 /* EOF */

@@ -34,7 +34,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  void on_flip(float height) override;
 
   int get_layer() const override { return LAYER_OBJECTS; }
 

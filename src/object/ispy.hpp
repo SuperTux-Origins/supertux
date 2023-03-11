@@ -31,8 +31,6 @@ public:
 
   void update(float dt_sec) override;
 
-  void on_flip(float height) override;
-
 private:
   void set_sprite_action(std::string const& action, int loops = -1);
 

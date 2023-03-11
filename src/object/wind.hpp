@@ -39,8 +39,6 @@ public:
 
   int get_layer() const override { return LAYER_OBJECTS; }
 
-  void on_flip(float height) override;
-
   /** @name Scriptable Methods
       @{ */
 

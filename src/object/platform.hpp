@@ -39,9 +39,6 @@ public:
 
   void move_to(Vector const& pos) override;
 
-
-  void on_flip(float height) override;
-
   Vector const& get_speed() const { return m_speed; }
 
   /** @name Scriptable Methods

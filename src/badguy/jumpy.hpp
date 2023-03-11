@@ -28,7 +28,6 @@ public:
   HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
 
   void active_update(float) override;
-  void on_flip(float height) override;
 
   void freeze() override;
   bool is_freezable() const override;

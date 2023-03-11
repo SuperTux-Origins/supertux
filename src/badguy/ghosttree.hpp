@@ -38,9 +38,6 @@ public:
   bool collides(GameObject& other, CollisionHit const& hit) const override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-
-  void on_flip(float height) override;
-
   void willowisp_died(TreeWillOWisp* willowisp);
   void die();
 

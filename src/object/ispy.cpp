@@ -18,7 +18,6 @@
 #include "object/ispy.hpp"
 
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
@@ -112,22 +111,6 @@ Ispy::set_sprite_action(std::string const& action, int loops)
     case Direction::LEFT:  m_sprite->set_action(action + "-left",  loops); break;
     case Direction::RIGHT: m_sprite->set_action(action + "-right", loops); break;
     default: break;
-  }
-}
-
-void
-Ispy::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  if (m_dir == Direction::UP)
-  {
-    m_dir = Direction::DOWN;
-    m_sprite->set_action("idle-down");
-  }
-  else if (m_dir == Direction::DOWN)
-  {
-    m_dir = Direction::UP;
-    m_sprite->set_action("idle-up");
   }
 }
 

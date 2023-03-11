@@ -34,9 +34,6 @@ public:
   void draw(DrawingContext& context) override;
   void deactivate() override;
 
-
-  void on_flip(float height) override;
-
   void squish();
 
 protected:

@@ -37,10 +37,7 @@ public:
 
   HitResponse collision(GameObject& other, CollisionHit const& ) override;
 
-
   int get_layer() const override { return m_layer; }
-
-  void on_flip(float height) override;
 
   /** @name Scriptable Methods
       @{ */

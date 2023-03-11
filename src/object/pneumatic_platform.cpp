@@ -18,7 +18,6 @@
 
 #include "object/player.hpp"
 #include "object/portable.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -64,13 +63,6 @@ PneumaticPlatformChild::collision(GameObject& other, CollisionHit const& )
 
   m_contacts.insert(&other);
   return FORCE_MOVE;
-}
-
-void
-PneumaticPlatformChild::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 PneumaticPlatform::PneumaticPlatform(ReaderMapping const& mapping) :
@@ -126,13 +118,6 @@ PneumaticPlatform::update(float dt_sec)
     m_offset_y = 256;
     m_speed_y = -0;
   }
-}
-
-void
-PneumaticPlatform::on_flip(float height)
-{
-  m_pos.y = height - m_pos.y - m_children[0]->m_col.m_bbox.get_height();
-  m_start_y = height - m_start_y - m_children[0]->m_col.m_bbox.get_height();
 }
 
 /* EOF */

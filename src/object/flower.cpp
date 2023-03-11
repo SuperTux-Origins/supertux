@@ -20,7 +20,6 @@
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 
 Flower::Flower(BonusType _type) :
   type(_type),
@@ -82,13 +81,6 @@ Flower::collision(GameObject& other, CollisionHit const& )
   SoundManager::current()->play("sounds/fire-flower.wav", get_pos());
   remove_me();
   return ABORT_MOVE;
-}
-
-void
-Flower::on_flip(float height)
-{
-  MovingObject::on_flip(height);
-  FlipLevelTransformer::transform_flip(flip);
 }
 
 /* EOF */

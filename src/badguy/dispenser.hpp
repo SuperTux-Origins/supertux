@@ -50,9 +50,6 @@ public:
   bool is_flammable() const override;
   bool is_portable() const override;
 
-
-  void on_flip(float height) override;
-
   void expose(HSQUIRRELVM vm, SQInteger table_idx) override
   {
     ExposedObject<Dispenser, scripting::Dispenser>::expose(vm, table_idx);

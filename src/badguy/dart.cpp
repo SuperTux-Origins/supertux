@@ -19,7 +19,6 @@
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 
 namespace {
 const float DART_SPEED = 200;
@@ -141,13 +140,6 @@ Dart::play_looping_sounds()
   if (sound_source) {
     sound_source->play();
   }
-}
-
-void
-Dart::on_flip(float height)
-{
-  BadGuy::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

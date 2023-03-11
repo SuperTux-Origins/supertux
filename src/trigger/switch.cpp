@@ -21,7 +21,6 @@
 #include "audio/sound_manager.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
@@ -121,13 +120,6 @@ Switch::event(Player& , EventType type)
     case TURN_OFF:
       break;
   }
-}
-
-void
-Switch::on_flip(float height)
-{
-  TriggerBase::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

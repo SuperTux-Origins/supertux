@@ -19,7 +19,6 @@
 #include "math/random.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 
 static const float CRACKTIME = 0.3f;
@@ -106,13 +105,6 @@ SkullTile::update(float dt_sec)
 
   if (m_respawn && !m_respawn->completed())
     m_respawn->update(dt_sec);
-}
-
-void
-SkullTile::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

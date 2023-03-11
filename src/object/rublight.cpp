@@ -21,7 +21,6 @@
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/constants.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "video/color.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -122,13 +121,6 @@ RubLight::draw(DrawingContext& context)
   }
 
   m_sprite->draw(context.color(), get_pos(), m_layer, m_flip);
-}
-
-void
-RubLight::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

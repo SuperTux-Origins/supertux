@@ -16,7 +16,6 @@
 #include "object/circleplatform.hpp"
 
 #include "math/util.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
 
@@ -58,14 +57,6 @@ CirclePlatform::update(float dt_sec)
     m_col.set_movement(newpos - get_pos());
     m_col.propagate_movement(newpos - get_pos());
   }
-}
-
-void
-CirclePlatform::on_flip(float height)
-{
-  MovingObject::on_flip(height);
-  start_position.y = height - start_position.y - get_bbox().get_height();
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 void

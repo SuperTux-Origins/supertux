@@ -100,13 +100,6 @@ Jumpy::active_update(float dt_sec)
 }
 
 void
-Jumpy::on_flip(float height)
-{
-  BadGuy::on_flip(height);
-  groundhit_pos_set = false;
-}
-
-void
 Jumpy::freeze()
 {
   BadGuy::freeze();

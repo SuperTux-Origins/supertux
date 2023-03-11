@@ -12794,25 +12794,6 @@ static SQInteger Level_spawn_wrapper(HSQUIRRELVM vm)
 
 }
 
-static SQInteger Level_flip_vertically_wrapper(HSQUIRRELVM vm)
-{
-  (void) vm;
-
-  try {
-    scripting::Level_flip_vertically();
-
-    return 0;
-
-  } catch(std::exception& e) {
-    sq_throwerror(vm, e.what());
-    return SQ_ERROR;
-  } catch(...) {
-    sq_throwerror(vm, _SC("Unexpected exception while executing function 'Level_flip_vertically'"));
-    return SQ_ERROR;
-  }
-
-}
-
 static SQInteger Level_toggle_pause_wrapper(HSQUIRRELVM vm)
 {
   (void) vm;
@@ -14040,13 +14021,6 @@ void register_supertux_wrapper(HSQUIRRELVM v)
   sq_setparamscheck(v, SQ_MATCHTYPEMASKSTRING, "x|tss");
   if(SQ_FAILED(sq_createslot(v, -3))) {
     throw SquirrelError(v, "Couldn't register function 'Level_spawn'");
-  }
-
-  sq_pushstring(v, "Level_flip_vertically", -1);
-  sq_newclosure(v, &Level_flip_vertically_wrapper, 0);
-  sq_setparamscheck(v, SQ_MATCHTYPEMASKSTRING, "x|t");
-  if(SQ_FAILED(sq_createslot(v, -3))) {
-    throw SquirrelError(v, "Couldn't register function 'Level_flip_vertically'");
   }
 
   sq_pushstring(v, "Level_toggle_pause", -1);

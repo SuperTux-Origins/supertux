@@ -29,7 +29,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
   void collision_solid(CollisionHit const& hit) override;
-  void on_flip(float height) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
 

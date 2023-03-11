@@ -20,7 +20,6 @@
 #include <utility>
 
 #include "supertux/d_scope.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "util/reader.hpp"
@@ -432,20 +431,5 @@ Background::load_background(std::string const& image_path)
   new_path = default_dir + it->second;
   return Surface::from_file(new_path);
 }
-
-void
-Background::on_flip(float height)
-{
-  GameObject::on_flip(height);
-  std::swap(m_image_bottom, m_image_top);
-  m_pos.y = height - m_pos.y - static_cast<float>(m_image->get_height());
-  m_scroll_offset.y = -m_scroll_offset.y;
-  if (m_alignment == BOTTOM_ALIGNMENT)
-    m_alignment = TOP_ALIGNMENT;
-  else if (m_alignment == TOP_ALIGNMENT)
-    m_alignment = BOTTOM_ALIGNMENT;
-  FlipLevelTransformer::transform_flip(m_flip);
-}
-
 
 /* EOF */

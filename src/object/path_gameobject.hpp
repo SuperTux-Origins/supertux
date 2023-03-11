@@ -47,8 +47,6 @@ public:
 
   void remove_me() override;
 
-  void on_flip(float height) override;
-
   Path& get_path() { return *m_path; }
 
   void copy_into(PathGameObject& other);

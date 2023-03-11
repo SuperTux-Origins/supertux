@@ -41,8 +41,6 @@ public:
   void stop_looping_sounds() override;
   void play_looping_sounds() override;
 
-  void on_flip(float height) override;
-
 protected:
   float angle;
   float radius;

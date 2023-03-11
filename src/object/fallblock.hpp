@@ -27,17 +27,14 @@ class FallBlock : public MovingSprite
 {
 public:
   FallBlock(ReaderMapping const& reader);
-  
+
   void update(float dt_sec) override;
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void collision_solid(CollisionHit const& hit) override;
 
   void draw(DrawingContext& context) override;
-  
 
-  void on_flip(float height) override;
-  
 protected:
   enum State
   {
@@ -46,13 +43,13 @@ protected:
     FALL,
     LAND
   };
-  
+
 private:
   State state;
-    
+
   Physic physic;
   Timer timer;
-  
+
   bool found_victim_down() const;
 
 private:

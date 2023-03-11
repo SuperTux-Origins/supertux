@@ -34,7 +34,6 @@ public:
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void update(float dt_sec) override;
   bool is_saveable() const override { return false; }
-  void on_flip(float height) override;
 
 protected:
   PneumaticPlatform& m_parent;
@@ -58,8 +57,6 @@ public:
 
   void draw(DrawingContext& context) override;
   void update(float dt_sec) override;
-  void on_flip(float height) override;
-
 
 private:
   Vector m_pos;

@@ -33,8 +33,6 @@ public:
   void draw(DrawingContext& context) override;
   void event(Player& player, EventType type) override;
 
-  void on_flip(float height) override;
-
 private:
   enum SwitchState {
     OFF,

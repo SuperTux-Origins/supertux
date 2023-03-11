@@ -20,7 +20,6 @@
 #include "object/player.hpp"
 #include "object/camera.hpp"
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "supertux/tile.hpp"
 #include "math/random.hpp"
@@ -162,13 +161,6 @@ FallBlock::found_victim_down() const
     }
   }
   return false;
-}
-
-void
-FallBlock::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

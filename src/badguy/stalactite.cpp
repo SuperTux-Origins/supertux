@@ -21,7 +21,6 @@
 #include "object/bullet.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/file_system.hpp"
@@ -204,13 +203,6 @@ Stalactite::deactivate()
 {
   if (state != STALACTITE_HANGING)
     remove_me();
-}
-
-void
-Stalactite::on_flip(float height)
-{
-  BadGuy::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

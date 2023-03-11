@@ -38,8 +38,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
 
-  void on_flip(float height) override;
-
 private:
   bool m_is_solid;
   float m_trigger_red;

@@ -92,9 +92,6 @@ public:
     return &m_col;
   }
 
-
-  void on_flip(float height) override;
-
   virtual int get_layer() const = 0;
 
 protected:

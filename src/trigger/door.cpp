@@ -24,7 +24,6 @@
 #include "supertux/game_session.hpp"
 #include "supertux/screen_manager.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
 
 Door::Door(ReaderMapping const& mapping) :
@@ -167,13 +166,6 @@ Door::collision(GameObject& other, CollisionHit const& hit_)
   }
 
   return TriggerBase::collision(other, hit_);
-}
-
-void
-Door::on_flip(float height)
-{
-  MovingObject::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

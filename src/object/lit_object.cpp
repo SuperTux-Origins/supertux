@@ -18,7 +18,6 @@
 
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "util/reader_mapping.hpp"
 
 LitObject::LitObject(ReaderMapping const& reader) :
@@ -68,13 +67,6 @@ LitObject::draw(DrawingContext& context)
 void
 LitObject::update(float)
 {
-}
-
-void
-LitObject::on_flip(float height)
-{
-  MovingObject::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 std::string const&

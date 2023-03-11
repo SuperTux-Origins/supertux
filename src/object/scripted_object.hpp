@@ -35,9 +35,6 @@ public:
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-
-  void on_flip(float height) override;
-
   // --- scripting Interface stuff ---
   void set_action(std::string const& animation);
   std::string get_action() const;

@@ -33,9 +33,6 @@ public:
 
   void ignite() override;
 
-
-  void on_flip(float height) override;
-
 private:
   enum MoleState {
     PRE_THROWING,

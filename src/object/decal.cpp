@@ -16,7 +16,6 @@
 
 #include "object/decal.hpp"
 #include "scripting/decal.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
@@ -79,13 +78,6 @@ Decal::fade_sprite(std::string const& new_sprite, float fade_time)
   // From now on flip_sprite == the old one
   m_sprite.get()->set_alpha(0);
   m_sprite_timer.start(fade_time);
-}
-
-void
-Decal::on_flip(float height)
-{
-  MovingObject::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 void

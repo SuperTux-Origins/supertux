@@ -45,12 +45,4 @@ MovingObject::~MovingObject()
 {
 }
 
-void
-MovingObject::on_flip(float height)
-{
-  Vector pos = get_pos();
-  pos.y = height - pos.y - get_bbox().get_height();
-  set_pos(pos);
-}
-
 /* EOF */

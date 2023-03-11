@@ -21,7 +21,6 @@
 #include "object/bouncy_coin.hpp"
 #include "object/player.hpp"
 #include "object/tilemap.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/level.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
@@ -256,22 +255,6 @@ Coin::move_to(Vector const& pos)
     get_path()->move_by(shift);
   }
   set_pos(pos);
-}
-
-void
-Coin::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  PathObject::on_flip();
-  FlipLevelTransformer::transform_flip(m_flip);
-}
-
-void
-HeavyCoin::on_flip(float height)
-{
-  // Call on_flip from grandparent class MovingSprite to
-  // avoid flipping of gravity-affected object HeavyCoin
-  MovingSprite::on_flip(height);
 }
 
 /* EOF */

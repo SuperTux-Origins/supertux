@@ -29,9 +29,6 @@ public:
   void update(float dt_sec) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-
-  void on_flip(float height) override;
-
   Physic physic;
 
 private:

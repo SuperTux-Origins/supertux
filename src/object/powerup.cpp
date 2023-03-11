@@ -23,7 +23,6 @@
 #include "scripting/level.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -130,8 +129,6 @@ PowerUp::collision(GameObject& other, CollisionHit const&)
     player->make_invincible();
   } else if (m_sprite_name == "images/powerups/1up/1up.sprite" || m_sprite_name == "/images/powerups/1up/1up.sprite") {
     player->get_status().add_coins(100);
-  } else if (m_sprite_name == "images/powerups/potions/red-potion.sprite" || m_sprite_name == "/images/powerups/potions/red-potion.sprite") {
-    scripting::Level_flip_vertically();
   }
 
   remove_me();
@@ -181,14 +178,6 @@ PowerUp::draw(DrawingContext& context)
   }
 
   lightsprite->draw(context.light(), m_col.m_bbox.get_middle(), 0);
-}
-
-void
-PowerUp::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  if (no_physics)
-    FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

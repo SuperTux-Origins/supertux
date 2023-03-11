@@ -152,8 +152,6 @@ protected:
   /** Called when the badguy collided with solid ground */
   void collision_solid(CollisionHit const& hit) override;
 
-  void on_flip(float height) override;
-
   /** Called when the badguy collided with another badguy */
   virtual HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit);
 

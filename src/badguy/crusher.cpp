@@ -30,7 +30,6 @@
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
@@ -562,14 +561,6 @@ Crusher::eye_position(bool right) const
     break;
   }
   return Vector(0, 0);
-}
-
-void
-Crusher::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  m_start_position.y = height - m_col.m_bbox.get_height() - m_start_position.y;
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 CrusherRoot::CrusherRoot(Vector position, Crusher::Direction direction, float delay, int layer) :

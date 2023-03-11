@@ -58,9 +58,6 @@ public:
 
   virtual bool is_sideways() const { return m_sideways; }
 
-
-  void on_flip(float height) override;
-
   Physic& get_physic() { return m_physic; }
   bool is_big() const { return m_ic_size == LARGE; }
   CrusherState get_state() const { return m_state; }

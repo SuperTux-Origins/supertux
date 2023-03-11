@@ -21,7 +21,6 @@
 #include "object/bullet.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/game_object_factory.hpp"
 #include "supertux/sector.hpp"
 #include "util/file_system.hpp"
@@ -395,14 +394,6 @@ Dispenser::set_correct_action()
     default:
       break;
   }
-}
-
-void
-Dispenser::on_flip(float height)
-{
-  BadGuy::on_flip(height);
-  if (!m_gravity)
-    FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

@@ -19,7 +19,6 @@
 #include "math/random.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
@@ -193,14 +192,6 @@ ScriptedObject::collision(GameObject& other, CollisionHit const& )
   }
 
   return FORCE_MOVE;
-}
-
-void
-ScriptedObject::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  if(!physic_enabled)
-    FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

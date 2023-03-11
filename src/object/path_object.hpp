@@ -44,8 +44,6 @@ public:
   std::string get_path_ref() const;
 
 protected:
-  void on_flip();
-
   PathWalker::Handle m_path_handle;
 
 private:

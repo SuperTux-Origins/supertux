@@ -38,8 +38,6 @@ public:
   void draw(DrawingContext& context) override;
   void update(float dt_sec) override;
 
-  void on_flip(float height) override;
-
   void fade_in(float fade_time);
   void fade_out(float fade_time);
   void fade_sprite(std::string const& new_sprite, float fade_time);

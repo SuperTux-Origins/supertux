@@ -21,7 +21,6 @@
 #include "object/sprite_particle.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -128,13 +127,6 @@ void Flame::play_looping_sounds()
   if (sound_source) {
     sound_source->play();
   }
-}
-
-void
-Flame::on_flip(float height)
-{
-  BadGuy::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

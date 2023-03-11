@@ -43,8 +43,6 @@ public:
     return "images/engine/editor/background.png";
   }
 
-  void on_flip(float height) override;
-
   void set_image(std::string const& name);
   void set_images(std::string const& name_top, std::string const& name_middle, std::string const& name_bottom);
   void set_speed(float bgd_speed);

@@ -29,7 +29,6 @@
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/constants.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
@@ -220,14 +219,6 @@ Block::break_me()
   }
 
   remove_me();
-}
-
-void
-Block::on_flip(float height)
-{
-  MovingObject::on_flip(height);
-  if (m_original_y != -1) m_original_y = height - m_original_y - get_bbox().get_height();
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

@@ -23,7 +23,6 @@
 #include "badguy/badguy.hpp"
 #include "math/random.hpp"
 #include "object/bullet.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/sector.hpp"
 #include "sprite/sprite.hpp"
@@ -198,13 +197,6 @@ WeakBlock::spreadHit()
       }
     }
   }
-}
-
-void
-WeakBlock::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

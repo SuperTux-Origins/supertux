@@ -19,7 +19,6 @@
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -61,21 +60,14 @@ Bumper::collision(GameObject& other, CollisionHit const& hit)
     SoundManager::current()->play(TRAMPOLINE_SOUND, get_pos());
     m_sprite->set_action((left ? "left-swinging" : "right-swinging"), 1);
   }
-	
-	auto bumper = dynamic_cast<Bumper*> (&other);
-	if (bumper)
+
+  auto bumper = dynamic_cast<Bumper*> (&other);
+  if (bumper)
   {
     physic.set_velocity_y(0);
 	  return FORCE_MOVE;
 	}
   return ABORT_MOVE;
-}
-
-void
-Bumper::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */

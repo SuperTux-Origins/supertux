@@ -23,7 +23,6 @@
 #include "object/player.hpp"
 #include "object/portable.hpp"
 #include "supertux/debug.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
@@ -74,13 +73,6 @@ BicyclePlatformChild::collision(GameObject& other, CollisionHit const& )
   }
 
   return FORCE_MOVE;
-}
-
-void
-BicyclePlatformChild::on_flip(float height)
-{
-  MovingSprite::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 BicyclePlatform::BicyclePlatform(ReaderMapping const& reader) :
@@ -162,12 +154,6 @@ BicyclePlatform::update(float dt_sec)
   {
     m_center += Vector(m_angular_speed, 0) * dt_sec * 32.0f;
   }
-}
-
-void
-BicyclePlatform::on_flip(float height)
-{
-  m_center.y = height - m_center.y;
 }
 
 /* EOF */

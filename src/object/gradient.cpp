@@ -228,12 +228,4 @@ Gradient::is_saveable() const
            Level::current()->is_worldmap());
 }
 
-void
-Gradient::on_flip(float height)
-{
-  GameObject::on_flip(height);
-  if (m_gradient_direction == VERTICAL || m_gradient_direction == VERTICAL_SECTOR)
-    std::swap(m_gradient_top, m_gradient_bottom);
-}
-
 /* EOF */

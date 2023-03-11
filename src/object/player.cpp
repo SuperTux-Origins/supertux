@@ -2001,14 +2001,6 @@ Player::collision(GameObject& other, CollisionHit const& hit)
 }
 
 void
-Player::on_flip(float height)
-{
-  Vector pos = get_pos();
-  pos.y = height - pos.y - get_bbox().get_height();
-  move(pos);
-}
-
-void
 Player::remove_me()
 {
   InputManager::current()->on_player_removed(get_id());

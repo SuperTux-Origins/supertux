@@ -42,8 +42,6 @@ public:
 
   void move_to(Vector const& pos) override;
 
-  void on_flip(float height) override;
-
   void collect();
 
 private:
@@ -68,9 +66,6 @@ public:
 
   void update(float dt_sec) override;
   void collision_solid(CollisionHit const& hit) override;
-
-
-  void on_flip(float height) override;
 
 private:
   Physic m_physic;

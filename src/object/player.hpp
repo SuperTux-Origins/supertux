@@ -76,7 +76,6 @@ public:
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void collision_tile(uint32_t tile_attributes) override;
-  void on_flip(float height) override;
   bool is_saveable() const override { return false; }
   bool is_singleton() const override { return false; }
   void remove_me() override;

@@ -46,8 +46,6 @@ public:
   void stop_looping_sounds() override;
   void play_looping_sounds() override;
 
-  void on_flip(float height) override;
-
 protected:
   BadGuy const* parent; /**< collisions with this BadGuy will be ignored */
   std::unique_ptr<SoundSource> sound_source; /**< SoundSource for ambient sound */

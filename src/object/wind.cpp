@@ -151,11 +151,4 @@ Wind::stop()
   blowing = false;
 }
 
-void
-Wind::on_flip(float height)
-{
-  MovingObject::on_flip(height);
-  speed.y = -speed.y;
-}
-
 /* EOF */

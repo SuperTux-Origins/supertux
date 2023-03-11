@@ -41,8 +41,6 @@ public:
     return "images/engine/editor/gradient.png";
   }
 
-  void on_flip(float height) override;
-
   void set_gradient(Color top, Color bottom);
   void fade_gradient(Color top, Color bottom, float time);
   Color get_gradient_top() const { return m_gradient_top; }

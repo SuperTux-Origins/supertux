@@ -89,9 +89,6 @@ public:
       will display Tip and ObjectMenu. */
   virtual bool has_settings() const { return is_saveable(); }
 
-  /** When level is flipped vertically */
-  virtual void on_flip(float height) {}
-
   /** schedules this object to be removed at the end of the frame */
   virtual void remove_me() { m_scheduled_for_removal = true; }
 

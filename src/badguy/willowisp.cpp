@@ -299,11 +299,4 @@ WillOWisp::move_to(Vector const& pos)
   set_pos(pos);
 }
 
-void
-WillOWisp::on_flip(float height)
-{
-  BadGuy::on_flip(height);
-  PathObject::on_flip();
-}
-
 /* EOF */

@@ -20,7 +20,6 @@
 #include "audio/sound_source.hpp"
 #include "badguy/dart.hpp"
 #include "sprite/sprite.hpp"
-#include "supertux/flip_level_transformer.hpp"
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
@@ -117,13 +116,6 @@ DartTrap::fire()
   Sector::get().add<Dart>(Vector(px, py), m_dir, this);
   state = IDLE;
   m_sprite->set_action("idle", m_dir);
-}
-
-void
-DartTrap::on_flip(float height)
-{
-  BadGuy::on_flip(height);
-  FlipLevelTransformer::transform_flip(m_flip);
 }
 
 /* EOF */
