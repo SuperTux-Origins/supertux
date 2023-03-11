@@ -17,9 +17,10 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_GAME_MANAGER_HPP
 #define HEADER_SUPERTUX_SUPERTUX_GAME_MANAGER_HPP
 
-#include <optional>
 #include <memory>
+#include <optional>
 #include <string>
+
 #include "math/vector.hpp"
 #include "util/currenton.hpp"
 

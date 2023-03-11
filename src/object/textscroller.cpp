@@ -21,8 +21,8 @@
 #include <sexp/value.hpp>
 
 #include "control/input_manager.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/fadetoblack.hpp"
+#include "supertux/globals.hpp"
 #include "supertux/info_box_line.hpp"
 #include "supertux/screen_manager.hpp"
 #include "supertux/sector.hpp"

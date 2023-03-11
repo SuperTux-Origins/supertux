@@ -17,8 +17,8 @@
 #include "sprite/sprite_data.hpp"
 
 #include <algorithm>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 
 #include "util/file_system.hpp"
 #include "util/log.hpp"

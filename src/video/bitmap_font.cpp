@@ -18,8 +18,8 @@
 #include "video/bitmap_font.hpp"
 
 #include <algorithm>
-#include <physfs.h>
 #include <cmath>
+#include <physfs.h>
 #include <sstream>
 
 #include "physfs/physfs_sdl.hpp"
@@ -30,8 +30,8 @@
 #include "util/utf8_iterator.hpp"
 #include "video/drawing_request.hpp"
 #include "video/painter.hpp"
-#include "video/surface.hpp"
 #include "video/sdl_surface.hpp"
+#include "video/surface.hpp"
 
 namespace {
 

@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_OBJECT_THUNDERSTORM_HPP
 #define HEADER_SUPERTUX_OBJECT_THUNDERSTORM_HPP
 
-#include "squirrel/exposed_object.hpp"
 #include "scripting/thunderstorm.hpp"
+#include "squirrel/exposed_object.hpp"
 #include "supertux/game_object.hpp"
 #include "supertux/timer.hpp"
 

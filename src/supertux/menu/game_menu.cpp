@@ -19,13 +19,13 @@
 #include "gui/dialog.hpp"
 #include "gui/menu_item.hpp"
 #include "gui/menu_manager.hpp"
+#include "object/player.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/level.hpp"
 #include "supertux/menu/menu_storage.hpp"
 #include "supertux/sector.hpp"
-#include "object/player.hpp"
 #include "util/gettext.hpp"
 
 GameMenu::GameMenu() :

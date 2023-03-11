@@ -15,14 +15,14 @@
 
 #include "object/rublight.hpp"
 
-#include "object/explosion.hpp"
 #include "badguy/walking_badguy.hpp"
+#include "object/explosion.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/constants.hpp"
-#include "video/color.hpp"
 #include "util/reader_mapping.hpp"
+#include "video/color.hpp"
 
 
 RubLight::RubLight(ReaderMapping const& mapping) :

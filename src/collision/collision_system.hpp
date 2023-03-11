@@ -18,13 +18,13 @@
 #ifndef HEADER_SUPERTUX_COLLISION_COLLISION_SYSTEM_HPP
 #define HEADER_SUPERTUX_COLLISION_COLLISION_SYSTEM_HPP
 
-#include <vector>
 #include <memory>
 #include <stdint.h>
+#include <vector>
 
 #include "collision/collision.hpp"
-#include "supertux/tile.hpp"
 #include "math/fwd.hpp"
+#include "supertux/tile.hpp"
 
 class CollisionObject;
 class CollisionGroundMovementManager;

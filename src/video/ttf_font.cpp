@@ -21,8 +21,8 @@
 #include <numeric>
 #include <sstream>
 
-#include "util/line_iterator.hpp"
 #include "physfs/physfs_sdl.hpp"
+#include "util/line_iterator.hpp"
 #include "util/log.hpp"
 #include "video/canvas.hpp"
 #include "video/surface.hpp"

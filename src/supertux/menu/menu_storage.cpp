@@ -27,8 +27,8 @@
 #include "supertux/menu/multiplayer_menu.hpp"
 #include "supertux/menu/multiplayer_players_menu.hpp"
 #include "supertux/menu/options_menu.hpp"
-#include "supertux/menu/worldmap_menu.hpp"
 #include "supertux/menu/worldmap_cheat_menu.hpp"
+#include "supertux/menu/worldmap_menu.hpp"
 #include "util/log.hpp"
 
 MenuStorage* MenuStorage::s_instance = nullptr;

@@ -18,8 +18,8 @@
 #define HEADER_SUPERTUX_CONTROL_CONTROLLER_HPP
 
 #include <iosfwd>
-#include <string>
 #include <optional>
+#include <string>
 
 enum class Control {
   LEFT = 0,

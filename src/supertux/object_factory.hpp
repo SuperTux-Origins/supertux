@@ -19,9 +19,9 @@
 #define HEADER_SUPERTUX_SUPERTUX_OBJECT_FACTORY_HPP
 
 #include <assert.h>
+#include <functional>
 #include <map>
 #include <memory>
-#include <functional>
 #include <vector>
 
 #include "math/fwd.hpp"

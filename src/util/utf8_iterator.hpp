@@ -18,8 +18,8 @@
 #ifndef HEADER_SUPERTUX_UTIL_UTF8_ITERATOR_HPP
 #define HEADER_SUPERTUX_UTIL_UTF8_ITERATOR_HPP
 
-#include <string>
 #include <stdint.h>
+#include <string>
 
 class UTF8Iterator
 {

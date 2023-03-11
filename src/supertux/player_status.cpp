@@ -20,8 +20,8 @@
 #include <sstream>
 
 #include "audio/sound_manager.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/game_session.hpp"
+#include "supertux/globals.hpp"
 #include "util/log.hpp"
 #include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"

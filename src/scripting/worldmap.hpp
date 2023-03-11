@@ -20,6 +20,7 @@
 
 #ifndef SCRIPTING_API
 #include <string>
+
 #include "scripting/game_object_manager.hpp"
 namespace worldmap {
 class WorldMap;

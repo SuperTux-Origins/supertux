@@ -17,22 +17,22 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_AUTOTILE_HPP
 #define HEADER_SUPERTUX_SUPERTUX_AUTOTILE_HPP
 
+#include <algorithm>
 #include <memory>
 #include <stdint.h>
 #include <string>
-#include <algorithm>
 
 #include "math/rect.hpp"
 #include "math/rectf.hpp"
 #include "math/size.hpp"
 #include "object/path_object.hpp"
 #include "object/path_walker.hpp"
-#include "squirrel/exposed_object.hpp"
 #include "scripting/tilemap.hpp"
+#include "squirrel/exposed_object.hpp"
 #include "supertux/game_object.hpp"
 #include "video/color.hpp"
-#include "video/flip.hpp"
 #include "video/drawing_target.hpp"
+#include "video/flip.hpp"
 
 class AutotileMask final
 {

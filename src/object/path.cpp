@@ -20,9 +20,9 @@
 
 #include "math/easing.hpp"
 #include "supertux/sector.hpp"
+#include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
-#include "util/log.hpp"
 
 WalkMode
 string_to_walk_mode(std::string const& mode_string)

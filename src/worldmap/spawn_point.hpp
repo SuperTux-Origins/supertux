@@ -20,8 +20,8 @@
 #include <string>
 
 #include "math/vector.hpp"
-#include "worldmap/direction.hpp"
 #include "util/reader_fwd.hpp"
+#include "worldmap/direction.hpp"
 
 namespace worldmap {
 

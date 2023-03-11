@@ -19,8 +19,8 @@
 
 #include "object/moving_sprite.hpp"
 #include "object/portable.hpp"
-#include "squirrel/exposed_object.hpp"
 #include "scripting/rock.hpp"
+#include "squirrel/exposed_object.hpp"
 #include "supertux/physic.hpp"
 
 class Rock : public MovingSprite,

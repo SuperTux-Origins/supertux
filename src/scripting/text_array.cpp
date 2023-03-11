@@ -14,8 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "scripting/text_array.hpp"
 #include "object/text_array_object.hpp"
+#include "scripting/text_array.hpp"
 
 #include "object/text_object.hpp"
 

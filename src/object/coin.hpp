@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_OBJECT_COIN_HPP
 #define HEADER_SUPERTUX_OBJECT_COIN_HPP
 
-#include "object/path_object.hpp"
 #include "object/moving_sprite.hpp"
+#include "object/path_object.hpp"
 #include "supertux/physic.hpp"
 
 class Path;

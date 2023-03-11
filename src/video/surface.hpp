@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_VIDEO_SURFACE_HPP
 #define HEADER_SUPERTUX_VIDEO_SURFACE_HPP
 
-#include <string>
 #include <optional>
+#include <string>
 
 #include "math/rect.hpp"
 #include "math/vector.hpp"

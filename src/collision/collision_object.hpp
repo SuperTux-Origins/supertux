@@ -18,8 +18,8 @@
 #ifndef HEADER_SUPERTUX_COLLISION_COLLISION_OBJECT_HPP
 #define HEADER_SUPERTUX_COLLISION_COLLISION_OBJECT_HPP
 
-#include <stdint.h>
 #include <memory>
+#include <stdint.h>
 #include <unordered_set>
 
 #include "collision/collision_group.hpp"

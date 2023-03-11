@@ -16,8 +16,8 @@
 
 #include "util/writer.hpp"
 
-#include <sexp/value.hpp>
 #include <sexp/io.hpp>
+#include <sexp/value.hpp>
 
 #include "physfs/ofile_stream.hpp"
 #include "util/log.hpp"

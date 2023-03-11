@@ -20,8 +20,8 @@
 #include <vector>
 
 #include "math/vector.hpp"
-#include "squirrel/exposed_object.hpp"
 #include "scripting/particlesystem.hpp"
+#include "squirrel/exposed_object.hpp"
 #include "supertux/game_object.hpp"
 #include "video/surface_ptr.hpp"
 

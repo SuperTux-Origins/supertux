@@ -22,11 +22,11 @@
 #include "control/input_manager.hpp"
 #include "control/joystick_manager.hpp"
 #include "gui/dialog.hpp"
+#include "object/player.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/menu/multiplayer_player_menu.hpp"
 #include "supertux/savegame.hpp"
 #include "supertux/sector.hpp"
-#include "object/player.hpp"
 #include "util/gettext.hpp"
 
 MultiplayerPlayersMenu::MultiplayerPlayersMenu()

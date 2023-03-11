@@ -22,8 +22,8 @@
 #include "gui/menu_manager.hpp"
 #include "physfs/util.hpp"
 #include "util/file_system.hpp"
-#include "util/log.hpp"
 #include "util/gettext.hpp"
+#include "util/log.hpp"
 
 FileSystemMenu::FileSystemMenu(std::string* filename, std::vector<std::string> const& extensions,
                                std::string const& basedir, bool path_relative_to_basedir, std::function<void(std::string)> callback) :

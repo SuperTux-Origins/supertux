@@ -18,8 +18,8 @@
 
 #include "math/random.hpp"
 #include "math/util.hpp"
-#include "object/sprite_particle.hpp"
 #include "object/player.hpp"
+#include "object/sprite_particle.hpp"
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 

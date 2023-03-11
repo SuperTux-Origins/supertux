@@ -19,8 +19,8 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_TILE_HPP
 #define HEADER_SUPERTUX_SUPERTUX_TILE_HPP
 
-#include <vector>
 #include <stdint.h>
+#include <vector>
 
 #include "math/rectf.hpp"
 #include "video/color.hpp"

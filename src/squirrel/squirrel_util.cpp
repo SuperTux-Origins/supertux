@@ -18,12 +18,12 @@
 
 #include <config.h>
 
-#include <stdio.h>
 #include <sqstdaux.h>
 #include <sqstdblob.h>
 #include <sqstdmath.h>
 #include <sqstdstring.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #include "squirrel/script_interface.hpp"
 #include "supertux/game_object.hpp"

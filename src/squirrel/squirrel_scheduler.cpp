@@ -18,8 +18,8 @@
 
 #include <algorithm>
 
-#include "squirrel/squirrel_virtual_machine.hpp"
 #include "squirrel/squirrel_util.hpp"
+#include "squirrel/squirrel_virtual_machine.hpp"
 #include "supertux/level.hpp"
 #include "util/log.hpp"
 

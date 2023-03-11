@@ -19,6 +19,7 @@
 
 #ifndef SCRIPTING_API
 #include <string>
+
 #include "scripting/game_object.hpp"
 
 class ScriptedObject;

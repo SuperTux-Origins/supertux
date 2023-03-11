@@ -25,9 +25,9 @@
 #include "object/particles.hpp"
 #include "object/player.hpp"
 #include "object/weak_block.hpp"
-#include "supertux/sector.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
+#include "supertux/sector.hpp"
 #include "supertux/sector.hpp"
 
 Explosion::Explosion(Vector const& pos, float p_push_strength,

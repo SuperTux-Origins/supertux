@@ -16,8 +16,8 @@
 
 #include "util/utf8_iterator.hpp"
 
-#include <string.h>
 #include <stdexcept>
+#include <string.h>
 
 #include "util/log.hpp"
 

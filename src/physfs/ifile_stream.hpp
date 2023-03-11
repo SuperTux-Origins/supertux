@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_PHYSFS_IFILE_STREAM_HPP
 #define HEADER_SUPERTUX_PHYSFS_IFILE_STREAM_HPP
 
-#include <memory>
 #include <istream>
+#include <memory>
 
 class IFileStream final : public std::istream
 {

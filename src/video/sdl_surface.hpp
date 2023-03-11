@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_VIDEO_SDL_SURFACE_HPP
 #define HEADER_SUPERTUX_VIDEO_SDL_SURFACE_HPP
 
-#include <string>
 #include <SDL.h>
+#include <string>
 
 #include "video/sdl_surface_ptr.hpp"
 

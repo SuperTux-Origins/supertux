@@ -14,8 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "object/text_array_object.hpp"
 #include "control/input_manager.hpp"
+#include "object/text_array_object.hpp"
 
 TextArrayObject::TextArrayObject(std::string const& name) :
   ExposedObject<TextArrayObject, scripting::TextArray>(this),

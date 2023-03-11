@@ -17,15 +17,16 @@
 #include "supertux/menu/sorted_contrib_menu.hpp"
 
 #include <sstream>
-#include "util/gettext.hpp"
-#include "supertux/savegame.hpp"
-#include "supertux/player_status.hpp"
-#include "supertux/levelset.hpp"
-#include "supertux/game_manager.hpp"
-#include "supertux/menu/contrib_levelset_menu.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/menu_item.hpp"
+
 #include "gui/item_action.hpp"
+#include "gui/menu_item.hpp"
+#include "gui/menu_manager.hpp"
+#include "supertux/game_manager.hpp"
+#include "supertux/levelset.hpp"
+#include "supertux/menu/contrib_levelset_menu.hpp"
+#include "supertux/player_status.hpp"
+#include "supertux/savegame.hpp"
+#include "util/gettext.hpp"
 SortedContribMenu::SortedContribMenu(std::vector<std::unique_ptr<World>>& worlds, std::string const& contrib_type, std::string const& title, std::string const& empty_message) :
   m_world_folders()
 {

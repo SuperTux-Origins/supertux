@@ -19,9 +19,9 @@
 
 #include <iosfwd>
 
+#include <SDL.h>
 #include <algorithm>
 #include <tuple>
-#include <SDL.h>
 
 #include "math/size.hpp"
 

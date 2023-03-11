@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_VIDEO_COMPOSITOR_HPP
 #define HEADER_SUPERTUX_VIDEO_COMPOSITOR_HPP
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "util/obstackpp.hpp"
 

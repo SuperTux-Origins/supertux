@@ -18,14 +18,14 @@
 
 #include <tuple>
 
+#include "collision/collision_movement_manager.hpp"
+#include "collision/collision_object.hpp"
 #include "supertux/autotile.hpp"
 #include "supertux/debug.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/sector.hpp"
 #include "supertux/tile.hpp"
 #include "supertux/tile_set.hpp"
-#include "collision/collision_object.hpp"
-#include "collision/collision_movement_manager.hpp"
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"

@@ -17,15 +17,15 @@
 #include "object/rock.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/crusher.hpp"
 #include "badguy/badguy.hpp"
+#include "badguy/crusher.hpp"
 #include "object/coin.hpp"
 #include "object/explosion.hpp"
 #include "object/lit_object.hpp"
+#include "object/player.hpp"
 #include "object/pushbutton.hpp"
 #include "supertux/sector.hpp"
 #include "supertux/tile.hpp"
-#include "object/player.hpp"
 #include "util/reader_mapping.hpp"
 
 namespace {

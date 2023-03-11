@@ -17,9 +17,9 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_INFO_BOX_LINE_HPP
 #define HEADER_SUPERTUX_SUPERTUX_INFO_BOX_LINE_HPP
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "video/color.hpp"
 #include "video/font_ptr.hpp"

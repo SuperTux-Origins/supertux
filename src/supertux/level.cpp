@@ -26,8 +26,8 @@
 #include "util/log.hpp"
 #include "util/writer.hpp"
 
-#include <physfs.h>
 #include <numeric>
+#include <physfs.h>
 
 Level* Level::s_current = nullptr;
 

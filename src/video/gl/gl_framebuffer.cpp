@@ -16,8 +16,8 @@
 
 #include "video/gl/gl_framebuffer.hpp"
 
-#include "video/glutil.hpp"
 #include "video/gl/gl_texture.hpp"
+#include "video/glutil.hpp"
 
 GLFramebuffer::GLFramebuffer(/*GLVideoSystem& video_system,*/ GLTexture& texture) :
   //m_video_system(video_system),

@@ -18,8 +18,8 @@
 #define HEADER_SUPERTUX_CONTROL_GAME_CONTROLLER_MANAGER_HPP
 
 #include <array>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "control/controller.hpp"
 

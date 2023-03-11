@@ -17,9 +17,9 @@
 #include "video/video_system.hpp"
 
 #include <assert.h>
-#include <optional>
 #include <config.h>
 #include <iomanip>
+#include <optional>
 #include <physfs.h>
 #include <sstream>
 

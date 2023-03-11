@@ -18,8 +18,8 @@
 #define HEADER_SUPERTUX_COLLISION_COLLISION_MOVEMENT_MANAGER_HPP
 
 #include "collision/collision_object.hpp"
-#include "object/tilemap.hpp"
 #include "math/vector.hpp"
+#include "object/tilemap.hpp"
 
 #include <unordered_map>
 

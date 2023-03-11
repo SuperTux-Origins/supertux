@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_CONTROL_JOYSTICK_CONFIG_HPP
 #define HEADER_SUPERTUX_CONTROL_JOYSTICK_CONFIG_HPP
 
-#include <map>
 #include <SDL.h>
+#include <map>
 
 #include "control/controller.hpp"
 #include "util/reader_fwd.hpp"

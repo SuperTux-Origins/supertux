@@ -18,9 +18,9 @@
 
 #include <SDL.h>
 
+#include "sprite/sprite.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
-#include "sprite/sprite.hpp"
 #include "video/drawing_context.hpp"
 #include "video/renderer.hpp"
 #include "video/surface.hpp"

@@ -17,10 +17,10 @@
 #ifndef HEADER_SUPERTUX_VIDEO_TTF_SURFACE_MANAGER_HPP
 #define HEADER_SUPERTUX_VIDEO_TTF_SURFACE_MANAGER_HPP
 
-#include <tuple>
+#include <iosfwd>
 #include <map>
 #include <string>
-#include <iosfwd>
+#include <tuple>
 
 #include "util/currenton.hpp"
 #include "video/color.hpp"

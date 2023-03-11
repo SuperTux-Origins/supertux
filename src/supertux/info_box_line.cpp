@@ -16,9 +16,9 @@
 
 #include "supertux/info_box_line.hpp"
 
-#include "supertux/textscroller_screen.hpp"
-#include "supertux/resources.hpp"
 #include "supertux/colorscheme.hpp"
+#include "supertux/resources.hpp"
+#include "supertux/textscroller_screen.hpp"
 #include "video/drawing_context.hpp"
 #include "video/font.hpp"
 #include "video/surface.hpp"

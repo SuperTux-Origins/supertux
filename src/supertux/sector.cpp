@@ -16,8 +16,8 @@
 
 #include "supertux/sector.hpp"
 
-#include <physfs.h>
 #include <algorithm>
+#include <physfs.h>
 
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"

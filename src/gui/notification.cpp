@@ -23,12 +23,12 @@
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
+#include "util/gettext.hpp"
+#include "util/log.hpp"
 #include "video/color.hpp"
 #include "video/renderer.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
-#include "util/gettext.hpp"
-#include "util/log.hpp"
 
 Notification::Notification(std::string id, bool no_auto_hide, bool no_auto_disable) :
   m_id(id),

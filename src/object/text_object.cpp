@@ -16,11 +16,11 @@
 
 #include "object/text_object.hpp"
 
+#include "supertux/globals.hpp"
+#include "supertux/resources.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
-#include "supertux/globals.hpp"
-#include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"
 
 TextObject::TextObject(std::string const& name) :

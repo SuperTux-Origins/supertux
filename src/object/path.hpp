@@ -23,8 +23,8 @@
 #include <string>
 #include <vector>
 
-#include "math/vector.hpp"
 #include "math/easing.hpp"
+#include "math/vector.hpp"
 #include "util/gettext.hpp"
 #include "util/reader_fwd.hpp"
 

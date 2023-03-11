@@ -20,11 +20,11 @@
 #include <config.h>
 #include <map>
 #include <memory>
+#include <optional>
 #include <ostream>
 #include <set>
 #include <string>
 #include <vector>
-#include <optional>
 
 #include "math/rect.hpp"
 #include "util/currenton.hpp"

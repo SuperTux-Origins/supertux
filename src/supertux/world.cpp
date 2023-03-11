@@ -16,8 +16,8 @@
 
 #include "supertux/world.hpp"
 
-#include <sstream>
 #include <physfs.h>
+#include <sstream>
 
 #include "physfs/util.hpp"
 #include "supertux/gameconfig.hpp"

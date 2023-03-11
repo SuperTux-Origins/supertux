@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_VIDEO_DRAWING_REQUEST_HPP
 #define HEADER_SUPERTUX_VIDEO_DRAWING_REQUEST_HPP
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "math/rectf.hpp"
 #include "math/sizef.hpp"

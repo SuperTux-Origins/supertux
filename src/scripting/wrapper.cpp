@@ -8,11 +8,11 @@
 
 #include <assert.h>
 #include <limits>
-#include <sstream>
 #include <squirrel.h>
+#include <sstream>
 
-#include "squirrel/squirrel_error.hpp"
 #include "scripting/wrapper.interface.hpp"
+#include "squirrel/squirrel_error.hpp"
 
 namespace scripting {
 namespace wrapper {

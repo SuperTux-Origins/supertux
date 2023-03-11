@@ -19,8 +19,8 @@
 
 #include <math.h>
 #include <stdexcept>
-#include <string>
 #include <string.h>
+#include <string>
 
 // Modeled after the line y = x
 double LinearInterpolation(double p)

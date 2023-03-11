@@ -17,11 +17,11 @@
 #ifndef HEADER_SUPERTUX_MATH_VECTOR_HPP
 #define HEADER_SUPERTUX_MATH_VECTOR_HPP
 
-#include <math.h>
-#include <iosfwd>
-#include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/glm.hpp>
 #include <glm/gtx/io.hpp>
+#include <iosfwd>
+#include <math.h>
 
 using Vector = glm::vec2;
 

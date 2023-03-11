@@ -16,9 +16,9 @@
 
 #include "supertux/command_line_arguments.hpp"
 
-#include <iostream>
-#include <fmt/format.h>
 #include <config.h>
+#include <fmt/format.h>
+#include <iostream>
 #include <physfs.h>
 
 #include "physfs/ifile_stream.hpp"

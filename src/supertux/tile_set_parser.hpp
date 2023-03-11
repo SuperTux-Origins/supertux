@@ -18,9 +18,9 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_TILE_SET_PARSER_HPP
 #define HEADER_SUPERTUX_SUPERTUX_TILE_SET_PARSER_HPP
 
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 
 #include "math/rect.hpp"
 #include "supertux/tile.hpp"

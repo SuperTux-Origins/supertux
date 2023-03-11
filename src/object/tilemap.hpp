@@ -25,13 +25,13 @@
 #include "math/size.hpp"
 #include "object/path_object.hpp"
 #include "object/path_walker.hpp"
-#include "squirrel/exposed_object.hpp"
 #include "scripting/tilemap.hpp"
+#include "squirrel/exposed_object.hpp"
 #include "supertux/autotile.hpp"
 #include "supertux/game_object.hpp"
 #include "video/color.hpp"
-#include "video/flip.hpp"
 #include "video/drawing_target.hpp"
+#include "video/flip.hpp"
 
 class DrawingContext;
 class CollisionObject;

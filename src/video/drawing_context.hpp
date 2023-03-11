@@ -17,10 +17,10 @@
 #ifndef HEADER_SUPERTUX_VIDEO_DRAWING_CONTEXT_HPP
 #define HEADER_SUPERTUX_VIDEO_DRAWING_CONTEXT_HPP
 
-#include <string>
-#include <vector>
 #include <obstack.h>
 #include <optional>
+#include <string>
+#include <vector>
 
 #include "math/rect.hpp"
 #include "math/rectf.hpp"

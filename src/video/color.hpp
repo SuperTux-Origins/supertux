@@ -17,9 +17,9 @@
 #ifndef HEADER_SUPERTUX_VIDEO_COLOR_HPP
 #define HEADER_SUPERTUX_VIDEO_COLOR_HPP
 
+#include <math.h>
 #include <string>
 #include <vector>
-#include <math.h>
 
 #include <SDL_image.h>
 

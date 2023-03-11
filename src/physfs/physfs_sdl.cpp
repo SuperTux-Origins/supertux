@@ -16,10 +16,10 @@
 
 #include "physfs/physfs_sdl.hpp"
 
+#include <assert.h>
 #include <physfs.h>
 #include <sstream>
 #include <stdexcept>
-#include <assert.h>
 #include <stdio.h>
 
 #include "util/log.hpp"

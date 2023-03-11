@@ -23,8 +23,8 @@
 #include "supertux/game_object_component.hpp"
 #include "util/fade_helper.hpp"
 #include "util/gettext.hpp"
-#include "util/uid.hpp"
 #include "util/reader_fwd.hpp"
+#include "util/uid.hpp"
 
 class DrawingContext;
 class GameObjectComponent;

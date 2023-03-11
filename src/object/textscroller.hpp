@@ -21,9 +21,9 @@
 #include <memory>
 #include <vector>
 
-#include "supertux/info_box_line.hpp"
-#include "supertux/game_object.hpp"
 #include "control/controller.hpp"
+#include "supertux/game_object.hpp"
+#include "supertux/info_box_line.hpp"
 
 class DrawingContext;
 class InfoBoxLine;

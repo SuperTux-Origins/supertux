@@ -23,8 +23,8 @@
 
 #include "control/controller.hpp"
 #include "math/vector.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/gameconfig.hpp"
+#include "supertux/globals.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 

@@ -39,9 +39,9 @@
 #include "supertux/tile.hpp"
 #include "supertux/tile_manager.hpp"
 #include "util/reader_collection.hpp"
+#include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/reader_object.hpp"
-#include "util/reader_iterator.hpp"
 
 static const std::string DEFAULT_BG = "images/background/antarctic/arctis2.png";
 

@@ -19,8 +19,8 @@
 #ifndef EASING_H
 #define EASING_H
 
-#include <string>
 #include <string.h>
+#include <string>
 
 extern "C" {
 

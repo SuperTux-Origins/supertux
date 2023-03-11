@@ -16,8 +16,8 @@
 
 #include "squirrel/squirrel_thread_queue.hpp"
 
-#include "squirrel/squirrel_virtual_machine.hpp"
 #include "squirrel/squirrel_util.hpp"
+#include "squirrel/squirrel_virtual_machine.hpp"
 #include "util/log.hpp"
 
 SquirrelThreadQueue::SquirrelThreadQueue(SquirrelVM& vm) :

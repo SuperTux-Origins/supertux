@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_COLLISION_COLLISION_HPP
 #define HEADER_SUPERTUX_COLLISION_COLLISION_HPP
 
-#include <limits>
 #include <algorithm>
+#include <limits>
 
 #include "collision/collision_hit.hpp"
 #include "math/fwd.hpp"

@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_VIDEO_NULL_NULL_VIDEO_SYSTEM_HPP
 #define HEADER_SUPERTUX_VIDEO_NULL_NULL_VIDEO_SYSTEM_HPP
 
-#include "video/viewport.hpp"
 #include "video/video_system.hpp"
+#include "video/viewport.hpp"
 
 class TextureManager;
 class NullRenderer;

@@ -17,9 +17,9 @@
 #include "video/ttf_surface_manager.hpp"
 
 #include <SDL_ttf.h>
+#include <iostream>
 #include <numeric>
 #include <sstream>
-#include <iostream>
 
 #include "supertux/globals.hpp"
 #include "video/sdl_surface_ptr.hpp"

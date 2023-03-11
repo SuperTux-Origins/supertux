@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_SECTOR_HPP
 #define HEADER_SUPERTUX_SUPERTUX_SECTOR_HPP
 
-#include <vector>
 #include <stdint.h>
+#include <vector>
 
 #include "math/anchor_point.hpp"
 #include "math/easing.hpp"

@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_OBJECT_WIND_HPP
 #define HEADER_SUPERTUX_OBJECT_WIND_HPP
 
-#include "squirrel/exposed_object.hpp"
 #include "scripting/wind.hpp"
+#include "squirrel/exposed_object.hpp"
 #include "supertux/moving_object.hpp"
 
 #include "video/layer.hpp"

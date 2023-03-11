@@ -16,16 +16,16 @@
 
 #include "object/path_walker.hpp"
 
-#include <math.h>
 #include <assert.h>
+#include <math.h>
 
 #include "math/bezier.hpp"
+#include "math/easing.hpp"
 #include "math/random.hpp"
 #include "object/path_gameobject.hpp"
 #include "supertux/d_scope.hpp"
 #include "supertux/sector.hpp"
 #include "util/gettext.hpp"
-#include "math/easing.hpp"
 
 Vector
 PathWalker::Handle::get_pos(Sizef const& size, Vector const& pos) const

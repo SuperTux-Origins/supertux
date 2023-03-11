@@ -19,6 +19,7 @@
 
 #ifndef SCRIPTING_API
 #include <memory>
+
 #include "scripting/game_object.hpp"
 
 class TextObject;

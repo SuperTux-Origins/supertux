@@ -19,8 +19,8 @@
 #define HEADER_SUPERTUX_CONTROL_JOYSTICK_MANAGER_HPP
 
 #include <SDL.h>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "control/controller.hpp"
 

@@ -21,10 +21,10 @@
 
 #include <SDL.h>
 #include <map>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "util/currenton.hpp"
 

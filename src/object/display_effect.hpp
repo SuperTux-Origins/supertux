@@ -17,9 +17,9 @@
 #ifndef HEADER_SUPERTUX_OBJECT_DISPLAY_EFFECT_HPP
 #define HEADER_SUPERTUX_OBJECT_DISPLAY_EFFECT_HPP
 
-#include "supertux/game_object.hpp"
 #include "scripting/display_effect.hpp"
 #include "squirrel/exposed_object.hpp"
+#include "supertux/game_object.hpp"
 
 class DisplayEffect final : public GameObject,
                       public ExposedObject<DisplayEffect, scripting::DisplayEffect>

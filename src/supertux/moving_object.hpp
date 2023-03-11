@@ -18,8 +18,8 @@
 #define HEADER_SUPERTUX_SUPERTUX_MOVING_OBJECT_HPP
 
 #include "collision/collision_hit.hpp"
-#include "collision/collision_object.hpp"
 #include "collision/collision_listener.hpp"
+#include "collision/collision_object.hpp"
 #include "math/rectf.hpp"
 #include "supertux/game_object.hpp"
 

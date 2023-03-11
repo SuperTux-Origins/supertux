@@ -17,9 +17,9 @@
 #ifndef HEADER_SUPERTUX_GUI_MENU_HPP
 #define HEADER_SUPERTUX_GUI_MENU_HPP
 
+#include <SDL.h>
 #include <functional>
 #include <memory>
-#include <SDL.h>
 
 #include "gui/menu_action.hpp"
 #include "math/vector.hpp"

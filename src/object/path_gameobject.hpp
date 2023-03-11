@@ -17,9 +17,9 @@
 #ifndef HEADER_SUPERTUX_OBJECT_PATH_GAMEOBJECT_HPP
 #define HEADER_SUPERTUX_OBJECT_PATH_GAMEOBJECT_HPP
 
+#include "math/fwd.hpp"
 #include "sprite/sprite_ptr.hpp"
 #include "supertux/game_object.hpp"
-#include "math/fwd.hpp"
 
 class Path;
 

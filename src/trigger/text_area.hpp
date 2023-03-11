@@ -18,8 +18,8 @@
 #ifndef HEADER_SUPERTUX_TRIGGER_TEXT_AREA_HPP
 #define HEADER_SUPERTUX_TRIGGER_TEXT_AREA_HPP
 
-#include "trigger/trigger_base.hpp"
 #include "supertux/timer.hpp"
+#include "trigger/trigger_base.hpp"
 
 class TextArea final : public TriggerBase
 {

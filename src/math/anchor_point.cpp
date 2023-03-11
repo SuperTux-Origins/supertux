@@ -18,12 +18,12 @@
 
 #include <config.h>
 
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 
 #include "math/rectf.hpp"
-#include "util/log.hpp"
 #include "util/gettext.hpp"
+#include "util/log.hpp"
 
 std::vector<std::string> get_anchor_names()
 {

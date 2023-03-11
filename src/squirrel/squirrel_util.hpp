@@ -23,9 +23,9 @@
 #include <sstream>
 #include <vector>
 
-#include "squirrel/squirrel_virtual_machine.hpp"
-#include "squirrel/squirrel_error.hpp"
 #include "scripting/wrapper.hpp"
+#include "squirrel/squirrel_error.hpp"
+#include "squirrel/squirrel_virtual_machine.hpp"
 
 typedef std::vector<HSQOBJECT> ScriptList;
 

@@ -18,8 +18,8 @@
 
 #include <algorithm>
 
-#include "object/player.hpp"
 #include "object/camera.hpp"
+#include "object/player.hpp"
 #include "supertux/info_box_line.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"

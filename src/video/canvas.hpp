@@ -18,10 +18,10 @@
 #ifndef HEADER_SUPERTUX_VIDEO_CANVAS_HPP
 #define HEADER_SUPERTUX_VIDEO_CANVAS_HPP
 
-#include <string>
-#include <vector>
 #include <memory>
 #include <obstack.h>
+#include <string>
+#include <vector>
 
 #include "math/rectf.hpp"
 #include "math/vector.hpp"

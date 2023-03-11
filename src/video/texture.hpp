@@ -17,9 +17,9 @@
 #ifndef HEADER_SUPERTUX_VIDEO_TEXTURE_HPP
 #define HEADER_SUPERTUX_VIDEO_TEXTURE_HPP
 
+#include <optional>
 #include <string>
 #include <tuple>
-#include <optional>
 
 #include "math/rect.hpp"
 #include "video/flip.hpp"

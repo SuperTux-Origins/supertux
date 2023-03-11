@@ -40,9 +40,9 @@
 #include "video/compositor.hpp"
 #include "video/drawing_context.hpp"
 
-#include <stdio.h>
 #include <chrono>
 #include <iostream>
+#include <stdio.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

@@ -17,8 +17,8 @@
 
 #include "control/keyboard_manager.hpp"
 
-#include "control/joystick_manager.hpp"
 #include "control/input_manager.hpp"
+#include "control/joystick_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "supertux/console.hpp"
 

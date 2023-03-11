@@ -21,11 +21,11 @@
 #include "config.h"
 
 #include "supertux/colorscheme.hpp"
+#include "util/log.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
-#include "util/log.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
 

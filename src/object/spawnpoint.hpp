@@ -19,8 +19,8 @@
 
 #include "supertux/moving_object.hpp"
 
-#include "video/surface_ptr.hpp"
 #include "video/layer.hpp"
+#include "video/surface_ptr.hpp"
 
 class DrawingContext;
 

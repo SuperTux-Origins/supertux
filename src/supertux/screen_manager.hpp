@@ -18,8 +18,8 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_SCREEN_MANAGER_HPP
 #define HEADER_SUPERTUX_SUPERTUX_SCREEN_MANAGER_HPP
 
-#include <memory>
 #include <SDL.h>
+#include <memory>
 
 #include "config.h"
 

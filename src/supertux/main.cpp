@@ -17,14 +17,13 @@
 #include "supertux/main.hpp"
 
 #include <config.h>
-#include <version.h>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <physfs.h>
 #include <fmt/format.h>
+#include <physfs.h>
 
 #ifdef __ANDROID__
 #  include <unistd.h>
@@ -33,6 +32,8 @@
 #if !defined(WIN32) || !defined(EMSCRIPTEN)
 #  include <xdgcpp/xdg.h>
 #endif
+
+#include <version.h>
 
 #include "audio/sound_manager.hpp"
 #include "gui/dialog.hpp"

@@ -17,12 +17,12 @@
 #ifndef HEADER_SUPERTUX_OBJECT_CUSTOM_PARTICLE_SYSTEM_HPP
 #define HEADER_SUPERTUX_OBJECT_CUSTOM_PARTICLE_SYSTEM_HPP
 
-#include "video/color.hpp"
 #include "math/easing.hpp"
 #include "math/vector.hpp"
-#include "object/particlesystem_interactive.hpp"
 #include "object/particle_zone.hpp"
+#include "object/particlesystem_interactive.hpp"
 #include "scripting/custom_particles.hpp"
+#include "video/color.hpp"
 #include "video/surface.hpp"
 #include "video/surface_ptr.hpp"
 

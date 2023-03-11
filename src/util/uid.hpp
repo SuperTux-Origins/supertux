@@ -18,9 +18,9 @@
 #define HEADER_SUPERTUX_UTIL_UID_HPP
 
 #include <assert.h>
-#include <stdint.h>
 #include <functional>
 #include <iosfwd>
+#include <stdint.h>
 
 class UID;
 

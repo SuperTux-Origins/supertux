@@ -20,8 +20,8 @@
 #include "audio/fwd.hpp"
 #include "badguy/badguy.hpp"
 #include "object/path_object.hpp"
-#include "squirrel/exposed_object.hpp"
 #include "scripting/willowisp.hpp"
+#include "squirrel/exposed_object.hpp"
 
 class WillOWisp final :
   public BadGuy,

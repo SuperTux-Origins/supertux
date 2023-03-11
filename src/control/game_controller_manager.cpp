@@ -20,9 +20,9 @@
 
 #include "control/input_manager.hpp"
 #include "object/player.hpp"
+#include "supertux/game_session.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
-#include "supertux/game_session.hpp"
 #include "supertux/savegame.hpp"
 #include "supertux/sector.hpp"
 #include "util/log.hpp"

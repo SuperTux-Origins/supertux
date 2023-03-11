@@ -19,14 +19,14 @@
 
 #include <memory>
 
-#include "squirrel/exposed_object.hpp"
 #include "scripting/text_array.hpp"
+#include "squirrel/exposed_object.hpp"
 
 #include "supertux/game_object.hpp"
 #include "supertux/timer.hpp"
 
-#include "object/text_object.hpp"
 #include "object/text_array_item.hpp"
+#include "object/text_object.hpp"
 
 typedef size_t ta_index;
 

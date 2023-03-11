@@ -22,7 +22,6 @@
 #include <fmt/format.h>
 #include <prio/reader_error.hpp>
 
-#include "util/writer.hpp"
 #include "collision/collision.hpp"
 #include "gui/menu_manager.hpp"
 #include "math/aatriangle.hpp"
@@ -40,6 +39,7 @@
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
+#include "util/writer.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 #include "video/surface_batch.hpp"

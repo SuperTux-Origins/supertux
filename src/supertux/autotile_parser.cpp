@@ -18,9 +18,9 @@
 
 #include "supertux/autotile_parser.hpp"
 
-#include <sstream>
-#include <sexp/value.hpp>
 #include <sexp/io.hpp>
+#include <sexp/value.hpp>
+#include <sstream>
 
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"

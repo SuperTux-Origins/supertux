@@ -17,8 +17,8 @@
 #ifndef HEADER_SUPERTUX_BADGUY_DART_HPP
 #define HEADER_SUPERTUX_BADGUY_DART_HPP
 
-#include "badguy/badguy.hpp"
 #include "audio/fwd.hpp"
+#include "badguy/badguy.hpp"
 
 /** Badguy "Dart" - Your average poison dart */
 class Dart final : public BadGuy

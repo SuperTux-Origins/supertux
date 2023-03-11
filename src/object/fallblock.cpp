@@ -16,13 +16,13 @@
 #include "object/fallblock.hpp"
 
 #include "audio/sound_manager.hpp"
+#include "math/random.hpp"
 #include "object/bumper.hpp"
-#include "object/player.hpp"
 #include "object/camera.hpp"
+#include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 #include "supertux/tile.hpp"
-#include "math/random.hpp"
 #include "util/reader_mapping.hpp"
 
 FallBlock::FallBlock(ReaderMapping const& reader) :

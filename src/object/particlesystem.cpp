@@ -18,12 +18,12 @@
 
 #include <math.h>
 
+#include "object/camera.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
-#include "object/camera.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 #include "video/surface_batch.hpp"

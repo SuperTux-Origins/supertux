@@ -22,8 +22,8 @@
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
-#include "util/reader_mapping.hpp"
 #include "util/file_system.hpp"
+#include "util/reader_mapping.hpp"
 
 static const int SHAKE_RANGE_X = 40;
 static const float SHAKE_TIME = .8f;
