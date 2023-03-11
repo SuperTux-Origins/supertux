@@ -1,6 +1,6 @@
 (supertux-text
   (background "images/background/arctis.jpg")
-  (text (_ "-Congratulations!
+  (text "-Congratulations!
 
 #You successfully made it through
 #Bonus Island II
@@ -26,5 +26,5 @@
 #Milestone 3 a little easier. :-)
 
 
- The end of the ice age is near..."))
+ The end of the ice age is near...")
 )

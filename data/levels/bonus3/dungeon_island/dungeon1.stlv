@@ -1,6 +1,6 @@
 (supertux-level
   (version 4)
-  (name (_ "Circles"))
+  (name "Circles")
   (author "Torfi Gunnarsson")
   (sectors
     (sector
