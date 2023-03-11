@@ -72,8 +72,6 @@ public:
   virtual void draw(DrawingContext& context) = 0;
 
   /** This function saves the object. Editor will use that. */
-  virtual std::string get_class_name() const { return "game-object"; }
-  virtual std::string get_display_name() const { return _("Unknown object"); }
 
   /** If true only a single object of this type is allowed in a
       given GameObjectManager */

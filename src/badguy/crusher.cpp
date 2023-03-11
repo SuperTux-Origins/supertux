@@ -204,7 +204,7 @@ Crusher::update(float dt_sec)
 
     if (brickbox.contains(brick.get_bbox()))
     {
-      if (brick.get_class_name() != "heavy-brick")
+      if (dynamic_cast<HeavyBrick*>(&brick))
       {
         brick.break_for_crusher(this);
       }

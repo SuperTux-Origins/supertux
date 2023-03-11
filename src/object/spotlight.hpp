@@ -45,10 +45,6 @@ public:
 
   HitResponse collision(GameObject& other, CollisionHit const& hit_) override;
 
-  static std::string class_name() { return "spotlight"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Spotlight"); }
-  std::string get_display_name() const override { return display_name(); }
 
   int get_layer() const override { return m_layer; }
 

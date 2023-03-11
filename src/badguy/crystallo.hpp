@@ -25,10 +25,6 @@ class Crystallo final : public WalkingBadguy
 public:
   Crystallo(ReaderMapping const& reader);
 
-  static std::string class_name() { return "crystallo"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Crystallo"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void active_update(float dt_sec) override;
   bool is_flammable() const override;

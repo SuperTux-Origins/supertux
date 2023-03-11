@@ -29,10 +29,6 @@ public:
   void update(float dt_sec) override;
 
   bool is_flammable() const override;
-  static std::string class_name() { return "yeti_stalactite"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Yeti's Stalactite"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void start_shaking();
   bool is_hanging() const;

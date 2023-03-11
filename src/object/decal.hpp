@@ -34,10 +34,6 @@ public:
 
   HitResponse collision(GameObject& , CollisionHit const& ) override { return FORCE_MOVE; }
 
-  static std::string class_name() { return "decal"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Decal"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void draw(DrawingContext& context) override;
   void update(float dt_sec) override;

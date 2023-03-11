@@ -40,10 +40,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
 
-  static std::string class_name() { return "path"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Path"); }
-  std::string get_display_name() const override { return display_name(); }
 
   const std::string get_icon_path() const override {
     return "images/engine/editor/path.png";

@@ -34,10 +34,6 @@ public:
 
   void kill_fall() override;
 
-  static std::string class_name() { return "walking_candle"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Walking Candle"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   Color lightcolor;

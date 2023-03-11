@@ -41,10 +41,6 @@ public:
   void event(Player& player, EventType type) override;
   void update(float dt_sec) override;
 
-  static std::string class_name() { return "text-area"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Text Area"); }
-  std::string get_display_name() const override { return display_name(); }
   bool has_variable_size() const override { return true; }
 
 private:

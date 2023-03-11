@@ -37,10 +37,6 @@ public:
   void draw(DrawingContext& context) override;
   void update(float dt_sec) override;
 
-  static std::string class_name() { return "textscroller"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Text Scroller"); }
-  std::string get_display_name() const override { return display_name(); }
   const std::string get_icon_path() const override { return "images/engine/editor/textscroller.png"; }
 
   void set_default_speed(float default_speed);

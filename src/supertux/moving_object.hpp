@@ -92,8 +92,6 @@ public:
     return &m_col;
   }
 
-  static std::string class_name() { return "moving-object"; }
-  std::string get_class_name() const override { return class_name(); }
 
   void on_flip(float height) override;
 

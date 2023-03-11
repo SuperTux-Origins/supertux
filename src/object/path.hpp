@@ -67,7 +67,6 @@ public:
       easing()
     {}
 
-    static std::string display_name() { return _("Path Node"); }
   };
 
 public:

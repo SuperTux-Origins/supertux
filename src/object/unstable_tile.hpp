@@ -34,10 +34,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
   void on_flip(float height) override;
-  static std::string class_name() { return "unstable_tile"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Unstable Tile"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   enum State {

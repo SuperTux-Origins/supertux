@@ -33,10 +33,6 @@ public:
   void kill_fall() override;
 
   bool is_flammable() const override;
-  static std::string class_name() { return "yeti"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Yeti"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void kill_squished(GameObject& object);
 

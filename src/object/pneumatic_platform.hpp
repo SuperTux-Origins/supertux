@@ -60,10 +60,6 @@ public:
   void update(float dt_sec) override;
   void on_flip(float height) override;
 
-  static std::string class_name() { return "pneumatic-platform"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Pneumatic Platform"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   Vector m_pos;

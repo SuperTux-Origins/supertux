@@ -42,10 +42,6 @@ public:
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override { return FORCE_MOVE; }
 
-  static std::string class_name() { return "spawnpoint"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Spawnpoint"); }
-  std::string get_display_name() const override { return display_name(); }
 
   int get_layer() const override { return LAYER_FOREGROUND1; }
 

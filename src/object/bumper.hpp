@@ -29,10 +29,6 @@ public:
   void update(float dt_sec) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  static std::string class_name() { return "bumper"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Bumper"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void on_flip(float height) override;
 

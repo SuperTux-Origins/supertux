@@ -33,10 +33,6 @@ public:
   bool is_flammable() const override;
 
   void kill_fall() override;
-  static std::string class_name() { return "livefire"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Walking Flame"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   std::string death_sound;
@@ -66,10 +62,6 @@ public:
   void draw(DrawingContext& context) override;
 
   void initialize() override;
-  static std::string class_name() { return "livefire_asleep"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Sleeping Flame"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   LiveFireAsleep(LiveFireAsleep const&) = delete;
@@ -84,10 +76,6 @@ public:
   void draw(DrawingContext& context) override;
 
   void initialize() override;
-  static std::string class_name() { return "livefire_dormant"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Dormant Flame"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   LiveFireDormant(LiveFireDormant const&) = delete;

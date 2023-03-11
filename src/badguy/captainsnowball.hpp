@@ -27,10 +27,6 @@ public:
   void active_update(float dt_sec) override;
   void collision_solid(CollisionHit const& hit) override;
 
-  static std::string class_name() { return "captainsnowball"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Captain Snowball"); }
-  std::string get_display_name() const override { return display_name(); }
 
   bool might_climb(int width, int height) const;
 

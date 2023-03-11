@@ -28,10 +28,6 @@ public:
 
   void initialize() override;
   void collision_solid(CollisionHit const& hit) override;
-  static std::string class_name() { return "kamikazesnowball"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Snowshot"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   bool collision_squished(GameObject& object) override;
@@ -56,10 +52,6 @@ public:
   void kill_collision() override;
 
   std::string get_overlay_size() const override { return "2x1"; }
-  static std::string class_name() { return "leafshot"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Leafshot"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   bool collision_squished(GameObject& object) override;

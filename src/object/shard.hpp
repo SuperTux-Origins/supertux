@@ -30,10 +30,6 @@ public:
   void update(float dt_sec) override;
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  static std::string class_name() { return "shard"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Shard"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   Physic m_physic;

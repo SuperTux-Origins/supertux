@@ -26,10 +26,6 @@ class Ghoul final : public BadGuy,
 {
 public:
   Ghoul(ReaderMapping const& reader);
-  static std::string class_name() { return "ghoul"; }
-  static std::string display_name() { return _("Ghoul"); }
-  std::string get_class_name() const override { return class_name(); }
-  std::string get_display_name() const override { return display_name(); }
   bool is_freezable() const override;
   bool is_flammable() const override;
 

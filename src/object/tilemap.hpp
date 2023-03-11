@@ -52,11 +52,7 @@ public:
 
   void finish_construction() override;
 
-  static std::string class_name() { return "tilemap"; }
-  std::string get_class_name() const override { return class_name(); }
   const std::string get_icon_path() const override { return "images/engine/editor/tilemap.png"; }
-  static std::string display_name() { return _("Tilemap"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;

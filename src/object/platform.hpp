@@ -39,10 +39,6 @@ public:
 
   void move_to(Vector const& pos) override;
 
-  static std::string class_name() { return "platform"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Platform"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void on_flip(float height) override;
 

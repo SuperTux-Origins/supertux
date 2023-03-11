@@ -43,10 +43,6 @@ public:
 
   void kill_fall() override;
   void ignite() override;
-  static std::string class_name() { return "goldbomb"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Gold Bomb"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void stop_looping_sounds() override;
   void play_looping_sounds() override;

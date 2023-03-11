@@ -40,10 +40,6 @@ public:
   void ignite() override;
 
   std::string get_overlay_size() const override { return "2x2"; }
-  static std::string class_name() { return "owl"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Owl"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   bool is_above_player() const;

@@ -28,10 +28,6 @@ public:
   SequenceTrigger(ReaderMapping const& reader);
   SequenceTrigger(Vector const& pos, std::string const& sequence_name);
 
-  static std::string class_name() { return "sequencetrigger"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Sequence Trigger"); }
-  std::string get_display_name() const override { return display_name(); }
   bool has_variable_size() const override { return true; }
 
   void event(Player& player, EventType type) override;

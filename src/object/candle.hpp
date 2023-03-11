@@ -32,10 +32,6 @@ public:
   void draw(DrawingContext& context) override;
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  static std::string class_name() { return "candle"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Candle"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void on_flip(float height) override;
 

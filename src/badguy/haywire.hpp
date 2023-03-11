@@ -40,10 +40,6 @@ public:
 
   HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
 
-  static std::string class_name() { return "haywire"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Haywire"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   bool collision_squished(GameObject& object) override;

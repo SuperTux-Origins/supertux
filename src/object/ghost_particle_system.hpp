@@ -30,10 +30,6 @@ public:
   void init();
   void update(float dt_sec) override;
 
-  static std::string class_name() { return "particles-ghosts"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Ghost Particles"); }
-  std::string get_display_name() const override { return display_name(); }
 
   const std::string get_icon_path() const override {
     return "images/engine/editor/ghostparticles.png";

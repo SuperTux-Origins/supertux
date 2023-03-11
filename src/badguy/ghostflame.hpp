@@ -26,10 +26,6 @@ public:
 
   bool is_flammable() const override;
   bool is_freezable() const override;
-  static std::string class_name() { return "ghostflame"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Ghost Flame"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   Ghostflame(Ghostflame const&) = delete;

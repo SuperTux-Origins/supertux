@@ -32,10 +32,6 @@ public:
 
   bool is_singleton() const override { return true; }
 
-  static std::string class_name() { return "ambient-light"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Ambient Light"); }
-  std::string get_display_name() const override { return display_name(); }
   const std::string get_icon_path() const override { return "images/engine/editor/ambient_light.png"; }
 
   void set_ambient_light(Color const& ambient_light);

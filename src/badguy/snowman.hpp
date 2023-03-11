@@ -24,10 +24,6 @@ class Snowman final : public WalkingBadguy
 public:
   Snowman(ReaderMapping const& reader);
 
-  static std::string class_name() { return "snowman"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Snowman"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   void loose_head();

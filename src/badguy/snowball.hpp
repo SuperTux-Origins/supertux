@@ -25,10 +25,6 @@ public:
   SnowBall(ReaderMapping const& reader);
   SnowBall(Vector const& pos, Direction d, std::string const& script);
 
-  static std::string class_name() { return "snowball"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Snowball"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   bool collision_squished(GameObject& object) override;

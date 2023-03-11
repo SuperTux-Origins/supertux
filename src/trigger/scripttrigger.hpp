@@ -27,10 +27,6 @@ public:
   ScriptTrigger(ReaderMapping const& reader);
   ScriptTrigger(Vector const& pos, std::string const& script);
 
-  static std::string class_name() { return "scripttrigger"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Script Trigger"); }
-  std::string get_display_name() const override { return display_name(); }
   bool has_variable_size() const override { return true; }
 
   void event(Player& player, EventType type) override;

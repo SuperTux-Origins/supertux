@@ -36,10 +36,6 @@ public:
   void init();
   void update(float dt_sec) override;
 
-  static std::string class_name() { return "particles-rain"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Rain Particles"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void fade_speed(float new_speed, float fade_time);
   void fade_angle(float new_angle, float fade_time, easing ease_func);

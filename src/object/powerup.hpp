@@ -32,10 +32,6 @@ public:
   void on_flip(float height) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  static std::string class_name() { return "powerup"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Powerup"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   /** Initialize power up sprites and other defaults */

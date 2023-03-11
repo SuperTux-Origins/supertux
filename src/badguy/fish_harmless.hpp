@@ -27,10 +27,6 @@ public:
 
   HitResponse collision_player(Player& player, CollisionHit const& hit) override;
 
-  static std::string class_name() { return "fish-harmless"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Harmless Fish"); }
-  std::string get_display_name() const override { return display_name(); }
   std::string get_overlay_size() const override { return "1x1"; }
 
 private:

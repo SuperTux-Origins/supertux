@@ -33,10 +33,6 @@ public:
   void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   void ungrab(MovingObject& object, Direction dir) override;
 
-  static std::string class_name() { return "lantern"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Lantern"); }
-  std::string get_display_name() const override { return display_name(); }
 
   /** returns true if lamp is currently open */
   bool is_open() const;

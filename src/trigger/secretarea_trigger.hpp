@@ -31,10 +31,6 @@ public:
   SecretAreaTrigger(ReaderMapping const& reader);
   SecretAreaTrigger(Rectf const& area, std::string const& fade_tilemap = "");
 
-  static std::string class_name() { return "secretarea"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Secret Area"); }
-  std::string get_display_name() const override { return display_name(); }
   bool has_variable_size() const override { return true; }
 
   void event(Player& player, EventType type) override;

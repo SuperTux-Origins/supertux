@@ -29,10 +29,6 @@ public:
   HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
   void active_update(float dt_sec) override;
   void ignite() override;
-  static std::string class_name() { return "plant"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Plant"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   enum PlantState {

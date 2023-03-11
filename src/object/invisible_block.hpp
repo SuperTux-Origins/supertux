@@ -25,10 +25,6 @@ public:
   InvisibleBlock(Vector const& pos);
   InvisibleBlock(ReaderMapping const& mapping);
 
-  static std::string class_name() { return "invisible_block"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Invisible Block"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void draw(DrawingContext& context) override;
   bool collides(GameObject& other, CollisionHit const& hit) const override;

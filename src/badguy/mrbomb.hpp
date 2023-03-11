@@ -35,10 +35,6 @@ public:
   bool is_portable() const override;
 
   bool is_freezable() const override;
-  static std::string class_name() { return "mrbomb"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Bomb"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   bool collision_squished(GameObject& object) override;

@@ -29,10 +29,6 @@ public:
 
   void update(float dt_sec) override;
 
-  static std::string class_name() { return "particles-snow"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Snow Particles"); }
-  std::string get_display_name() const override { return display_name(); }
 
   const std::string get_icon_path() const override {
     return "images/engine/editor/snow.png";

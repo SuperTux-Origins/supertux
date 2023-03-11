@@ -28,10 +28,6 @@ public:
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  static std::string class_name() { return "brick"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Brick"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void try_break(Player* player);
   void break_for_crusher(Crusher* icecrusher);
@@ -55,10 +51,6 @@ public:
   HeavyBrick(ReaderMapping const& mapping);
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  static std::string class_name() { return "heavy-brick"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Heavy Brick"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   void ricochet(GameObject* collider);

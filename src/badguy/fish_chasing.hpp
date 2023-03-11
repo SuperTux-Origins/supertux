@@ -27,10 +27,6 @@ public:
 
   void active_update(float dt_sec) override;
 
-  static std::string class_name() { return "fish-chasing"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Chasing Fish"); }
-  std::string get_display_name() const override { return display_name(); }
   std::string get_overlay_size() const override { return "2x2"; }
 
 private:

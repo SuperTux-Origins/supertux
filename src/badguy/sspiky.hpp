@@ -32,10 +32,6 @@ public:
   void freeze() override;
   bool is_freezable() const override;
   bool is_flammable() const override;
-  static std::string class_name() { return "sspiky"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Sleeping Spiky"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   enum SSpikyState {

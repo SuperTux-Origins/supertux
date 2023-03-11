@@ -37,10 +37,6 @@ public:
   bool is_freezable() const override;
 
   std::string get_overlay_size() const override { return "2x2"; }
-  static std::string class_name() { return "skydive"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Skydive"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   HitResponse collision_player(Player& player, CollisionHit const& hit) override;

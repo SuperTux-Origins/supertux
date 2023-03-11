@@ -30,10 +30,6 @@ public:
   void active_update(float dt_sec) override;
 
   HitResponse collision_player(Player& player, CollisionHit const& hit) override;
-  static std::string class_name() { return "darttrap"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Dart Trap"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void on_flip(float height) override;
 

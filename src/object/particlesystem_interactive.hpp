@@ -44,9 +44,6 @@ public:
   ~ParticleSystem_Interactive() override;
 
   void draw(DrawingContext& context) override;
-  std::string get_display_name() const override {
-    return _("Interactive particle system");
-  }
 
 protected:
   virtual int collision(Particle* particle, Vector const& movement);

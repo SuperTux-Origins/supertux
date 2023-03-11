@@ -257,7 +257,6 @@ GameObjectFactory::init_factories()
   add_factory<LitObject>("lit-object");
   add_factory<MagicBlock>("magicblock");
   add_factory<MusicObject>("music");
-  add_display_name("#node", Path::Node::display_name());
   add_factory<ParticleZone>("particle-zone");
   add_factory<Platform>("platform");
   add_factory<PneumaticPlatform>("pneumatic-platform");
@@ -293,10 +292,10 @@ GameObjectFactory::init_factories()
   // editor stuff
   add_factory<SpawnPointMarker>("spawnpoint");
 
-  add_factory("tilemap", TileMap::display_name(), [](ReaderMapping const& reader) {
-      auto tileset = TileManager::current()->get_tileset(Level::current()->get_tileset());
-      return std::make_unique<TileMap>(tileset, reader);
-    });
+  add_factory("tilemap", [](ReaderMapping const& reader) {
+    auto tileset = TileManager::current()->get_tileset(Level::current()->get_tileset());
+    return std::make_unique<TileMap>(tileset, reader);
+  });
 }
 
 std::unique_ptr<GameObject>

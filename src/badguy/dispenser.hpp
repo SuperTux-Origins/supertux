@@ -50,10 +50,6 @@ public:
   bool is_flammable() const override;
   bool is_portable() const override;
 
-  static std::string class_name() { return "dispenser"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Dispenser"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void on_flip(float height) override;
 

@@ -28,10 +28,6 @@ public:
   void active_update(float) override;
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
-  static std::string class_name() { return "bouncingsnowball"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Bouncing Snowball"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   bool collision_squished(GameObject& object) override;

@@ -34,10 +34,6 @@ public:
   bool is_flammable() const override;
 
   std::string get_overlay_size() const override { return "3x3"; }
-  static std::string class_name() { return "angrystone"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Angry Stone"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   enum AngryStoneState {

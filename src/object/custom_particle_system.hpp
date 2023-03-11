@@ -41,10 +41,6 @@ public:
   void reinit_textures();
   void update(float dt_sec) override;
 
-  static std::string class_name() { return "particles-custom"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Custom Particles"); }
-  std::string get_display_name() const override { return display_name(); }
 
   const std::string get_icon_path() const override {
     return "images/engine/editor/sparkle.png";

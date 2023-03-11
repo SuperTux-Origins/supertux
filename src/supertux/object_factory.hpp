@@ -39,7 +39,6 @@ private:
   std::vector<std::string> m_badguys_names;
   std::vector<uint8_t> m_badguys_params;
   std::vector<std::string> m_objects_names;
-  std::vector<std::string> m_objects_display_names;
   std::vector<uint8_t> m_objects_params;
   std::map<std::string, std::string> m_other_display_names; // Stores display names for non-factory objects.
 
@@ -65,13 +64,7 @@ public:
 protected:
   ObjectFactory();
 
-  void add_display_name(char const* class_name, std::string const& display_name)
-  {
-    assert(m_other_display_names.find(class_name) == m_other_display_names.end());
-    m_other_display_names[class_name] = display_name;
-  }
-
-  void add_factory(char const* name, std::string const& display_name, FactoryFunction const& func, uint8_t obj_params = 0)
+  void add_factory(char const* name, FactoryFunction const& func, uint8_t obj_params = 0)
   {
     assert(factories.find(name) == factories.end());
     if (m_adding_badguys)
@@ -80,7 +73,6 @@ protected:
       m_badguys_params.push_back(obj_params);
     }
     m_objects_names.push_back(name);
-    m_objects_display_names.push_back(display_name);
     m_objects_params.push_back(obj_params);
     factories[name] = func;
   }
@@ -88,7 +80,7 @@ protected:
   template<class C>
   void add_factory(char const* class_name, uint8_t obj_params = 0, std::string const& display_name = "")
   {
-    add_factory(class_name, (display_name == "") ? C::display_name() : display_name,
+    add_factory(class_name,
                 [](ReaderMapping const& reader) {
                   return std::make_unique<C>(reader);
                 }, obj_params);

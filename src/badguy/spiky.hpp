@@ -26,10 +26,6 @@ public:
 
   bool is_freezable() const override;
   bool is_flammable() const override;
-  static std::string class_name() { return "spiky"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Spiky"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   Spiky(Spiky const&) = delete;

@@ -25,10 +25,6 @@ public:
   RCrystallo(ReaderMapping const& reader);
 
   void initialize() override;
-  static std::string class_name() { return "rcrystallo"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Roof Crystallo"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void active_update(float dt_sec) override;
   void draw(DrawingContext& context) override;

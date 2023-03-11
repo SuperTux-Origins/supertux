@@ -35,10 +35,6 @@ public:
 
   void draw(DrawingContext& context) override;
   
-  static std::string class_name() { return "fallblock"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Falling Platform"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void on_flip(float height) override;
   

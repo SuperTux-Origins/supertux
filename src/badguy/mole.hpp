@@ -33,10 +33,6 @@ public:
 
   void ignite() override;
 
-  static std::string class_name() { return "mole"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Mole"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void on_flip(float height) override;
 

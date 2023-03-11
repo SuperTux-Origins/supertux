@@ -32,10 +32,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
 
-  static std::string class_name() { return "infoblock"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Info Block"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void show_message();
   void hide_message();

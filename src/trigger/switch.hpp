@@ -28,10 +28,6 @@ public:
   Switch(ReaderMapping const& reader);
   ~Switch() override;
 
-  static std::string class_name() { return "switch"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Switch"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;

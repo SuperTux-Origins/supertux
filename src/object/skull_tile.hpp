@@ -28,10 +28,6 @@ class SkullTile final : public MovingSprite
 public:
   SkullTile(ReaderMapping const& mapping);
 
-  static std::string class_name() { return "skull_tile"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Skull Tile"); }
-  std::string get_display_name() const override { return display_name(); }
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void update(float dt_sec) override;

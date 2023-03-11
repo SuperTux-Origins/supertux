@@ -30,8 +30,6 @@ public:
   Explosion(Vector const& pos, float push_strength, int num_particles=100);
   Explosion(ReaderMapping const& reader);
 
-  static std::string display_name() { return _("Explosion"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;

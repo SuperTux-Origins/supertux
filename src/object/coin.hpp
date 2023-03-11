@@ -39,10 +39,6 @@ public:
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   void update(float dt_sec) override;
-  static std::string class_name() { return "coin"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Coin"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void move_to(Vector const& pos) override;
 
@@ -73,10 +69,6 @@ public:
   void update(float dt_sec) override;
   void collision_solid(CollisionHit const& hit) override;
 
-  static std::string class_name() { return "heavycoin"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Heavy Coin"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void on_flip(float height) override;
 

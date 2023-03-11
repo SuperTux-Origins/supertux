@@ -31,10 +31,6 @@ public:
 
   void grab(MovingObject&, Vector const& pos, Direction) override;
   bool is_portable() const override;
-  static std::string class_name() { return "trampoline"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Trampoline"); }
-  std::string get_display_name() const override { return display_name(); }
 
 private:
   bool portable;

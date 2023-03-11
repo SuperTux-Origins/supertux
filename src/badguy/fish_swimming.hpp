@@ -34,10 +34,6 @@ public:
   void freeze() override;
   void unfreeze(bool melt = true) override;
   bool is_freezable() const override;
-  static std::string class_name() { return "fish-swimming"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Swimming Fish"); }
-  std::string get_display_name() const override { return display_name(); }
   std::string get_overlay_size() const override { return "2x1"; }
 
   void turn_around();

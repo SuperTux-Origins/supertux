@@ -36,10 +36,6 @@ public:
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   bool has_variable_size() const override { return true; }
-  static std::string class_name() { return "wind"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Wind"); }
-  std::string get_display_name() const override { return display_name(); }
 
   int get_layer() const override { return LAYER_OBJECTS; }
 

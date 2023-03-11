@@ -25,10 +25,6 @@ public:
   SCrystallo(ReaderMapping const& reader);
 
   void initialize() override;
-  static std::string class_name() { return "scrystallo"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Sleeping Crystallo"); }
-  std::string get_display_name() const override { return display_name(); }
 
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;

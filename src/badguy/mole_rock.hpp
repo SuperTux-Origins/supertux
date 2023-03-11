@@ -39,10 +39,6 @@ public:
 
   bool is_flammable() const override;
   bool is_hurtable() const override { return false; }
-  static std::string class_name() { return "mole_rock"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Mole's rock"); }
-  std::string get_display_name() const override { return display_name(); }
 
 protected:
   BadGuy const* parent; /**< collisions with this BadGuy will be ignored */
