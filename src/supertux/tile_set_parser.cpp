@@ -23,7 +23,6 @@
 
 #include <prio/sexpr_reader_impl.hpp>
 
-#include "supertux/autotile_parser.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/tile_set.hpp"
@@ -81,28 +80,6 @@ TileSetParser::parse()
         reader.read("name", tilegroup.name);
         reader.read("tiles", tilegroup.tiles);
         m_tileset.add_tilegroup(tilegroup);
-      }
-    }
-  }
-
-  ReaderCollection autotilesets_collection;
-  if (mapping.read("autotilesets", autotilesets_collection))
-  {
-    for (auto const& autotileset_obj : autotilesets_collection.get_objects())
-    {
-      if (autotileset_obj.get_name() == "autotileset") {
-        ReaderMapping reader = autotileset_obj.get_mapping();
-        std::string autotile_filename;
-        if (!reader.read("source", autotile_filename))
-        {
-          log_warning("No source path for autotiles in file '{}'", m_filename);
-        }
-        else
-        {
-          AutotileParser* parser = new AutotileParser(m_tileset.m_autotilesets,
-                                                      FileSystem::normalize(m_tiles_path + autotile_filename));
-          parser->parse();
-        }
       }
     }
   }
