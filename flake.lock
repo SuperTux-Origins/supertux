@@ -359,11 +359,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1678566306,
-        "narHash": "sha256-EaewBTWFT3t8h7lG+D0pjGrTxhi5DdAbnj0jzXWWyfc=",
+        "lastModified": 1678581275,
+        "narHash": "sha256-McJ9A0vNJu8kC6zNuYs1V/NcnG73xoIQJcqvu6CpksI=",
         "owner": "logmich",
         "repo": "logmich",
-        "rev": "2d15c4deba8997f4ca3ea84d8fe0b4ef7950cc27",
+        "rev": "1455401334513df2800453b24b7138702e096767",
         "type": "github"
       },
       "original": {
@@ -435,11 +435,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1678426640,
-        "narHash": "sha256-3Q4KN0XAXQT7YE3A8n3LzLtRNUCo0U++W3gl+5NhKHs=",
+        "lastModified": 1678500271,
+        "narHash": "sha256-tRBLElf6f02HJGG0ZR7znMNFv/Uf7b2fFInpTHiHaSE=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "824f886682fc893e6dbf27114e5001ebf2770ea1",
+        "rev": "5eb98948b66de29f899c7fe27ae112a47964baf8",
         "type": "github"
       },
       "original": {
@@ -631,11 +631,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1678054704,
-        "narHash": "sha256-ZOhE2sUGlh6nHWW9HXJIg1sS2DEw7Klg0e+S7M8gVQE=",
+        "lastModified": 1678659196,
+        "narHash": "sha256-DoHZ+mxuIeb/OPxfX4xdLM+J264wywSYmUo8albqMpE=",
         "owner": "grumbel",
         "repo": "priocpp",
-        "rev": "dbf8809fa87470e5fdfdc4253dd5aaa72545eda5",
+        "rev": "e99db7a1e41557abedf5e6e280c06b85b94dd4ec",
         "type": "github"
       },
       "original": {
@@ -679,11 +679,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1660503231,
-        "narHash": "sha256-Bm+FIzO3iyK0NtZOeRVyhuFdPHon3VQUyrOjy3EHpCI=",
+        "lastModified": 1678658797,
+        "narHash": "sha256-dg8re1QpkhHJLf/W54qZg7Y9ElNi7XJLneKokHKghxQ=",
         "owner": "lispparser",
         "repo": "sexp-cpp",
-        "rev": "ade5eb3193500031dab0c2b180e4fd4fcb7bda26",
+        "rev": "812da1e3533e5afe609370c02cd4918fb77efc89",
         "type": "github"
       },
       "original": {
@@ -743,11 +743,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1660505409,
-        "narHash": "sha256-4juFaDnOhUKhIo8bNLeKEFeXQ+bw+iDQ0G22Qr9w7K0=",
+        "lastModified": 1678657187,
+        "narHash": "sha256-klUlu2sPhF3kXzd/C8+EQai5mEeNCPafWRPEsgIKGWo=",
         "owner": "grumbel",
         "repo": "strutcpp",
-        "rev": "4b00d49250db4e42e46068d5b4e42a2f8c5ccf51",
+        "rev": "ceac97daf54aea25779efb1f8d1d2b8dbf453528",
         "type": "github"
       },
       "original": {
@@ -821,11 +821,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1662037475,
-        "narHash": "sha256-FAHaUq8XMEvB1t6Z3BY1dCzcGTPWuKZQDEVVmlUGR7w=",
+        "lastModified": 1678658502,
+        "narHash": "sha256-XwAv+rVeu337wx7802LZRFPZDkvXGTEXDdw8SsL+0z8=",
         "owner": "WindstilleTeam",
         "repo": "wstsound",
-        "rev": "fe9a337cdf22625a6f1cf3b82c73a10cb1bdb17c",
+        "rev": "86f2226349d0ddda445156cdb0e7a82b6c6bfb93",
         "type": "github"
       },
       "original": {
@@ -844,11 +844,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1658512131,
-        "narHash": "sha256-F4D3HyaJ5djL8YzLl1tzIuum6HYirxERIsNYchBcxdU=",
+        "lastModified": 1678658196,
+        "narHash": "sha256-yQMiT2TGJyqinOgxPmHR1kI2VGuhpPisr6sbstG6jfU=",
         "owner": "grumbel",
         "repo": "xdgcpp",
-        "rev": "569bf5b6df6092e92ce60bebb125b75b301185e4",
+        "rev": "7218bdab7d353f4850d74f34b96b48246adad3e9",
         "type": "github"
       },
       "original": {

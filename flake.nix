@@ -109,6 +109,8 @@
           supertux-origins = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
 
+            stdenv = pkgs.gcc12Stdenv;
+
             SDL2_ttf = if pkgs.targetPlatform.isWindows
                        then SDL2_ttf-win32.packages.${pkgs.system}.default
                        else pkgs.SDL2_ttf;
