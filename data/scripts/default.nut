@@ -7,7 +7,6 @@
 Level <- {
   finish=Level_finish,
   spawn=Level_spawn,
-  flip_vertically=Level_flip_vertically,
   toggle_pause=Level_toggle_pause,
   edit=Level_edit
 };
@@ -29,18 +28,10 @@ function exit_worldmap()
   exit_screen();
 }
 
-function levelflip()
-{
-  Effect.fade_out(1);
-  wait(1);
-  Level.flip_vertically();
-  Effect.fade_in(1);
-}
-
 function println(val)
 {
-	print(val);
-	print("\n");
+  print(val);
+  print("\n");
 }
 
 if(! ("state" in this))
