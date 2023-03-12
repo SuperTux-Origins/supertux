@@ -17,6 +17,8 @@
 #ifndef HEADER_SUPERTUX_UTIL_READER_MAPPING_HPP
 #define HEADER_SUPERTUX_UTIL_READER_MAPPING_HPP
 
+#include <algorithm>
+
 #include <prio/reader_mapping.hpp>
 
 #include "video/color.hpp"
