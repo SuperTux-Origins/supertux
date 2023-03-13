@@ -138,57 +138,21 @@ GLVideoSystem::create_gl_context()
 #if defined(USE_OPENGLES2)
   // nothing to do
 #else
-#  ifdef USE_GLBINDING
-  glbinding::Binding::initialize();
-
-#    ifdef USE_GLBINDING_DEBUG_OUTPUT
-  glbinding::setCallbackMask(glbinding::CallbackMask::After | glbinding::CallbackMask::ParametersAndReturnValue);
-
-  glbinding::setAfterCallback([](glbinding::FunctionCall const& call) {
-      std::cout << call.function.name() << "(";
-
-      for (unsigned i = 0; i < call.parameters.size(); ++i)
-      {
-        std::cout << call.parameters[i]->asString();
-        if (i < call.parameters.size() - 1)
-          std::cout << ", ";
-      }
-
-      std::cout << ")";
-
-      if (call.returnValue)
-      {
-        std::cout << " -> " << call.returnValue->asString();
-      }
-
-      std::cout << std::endl;
-    });
-#    endif
-  static auto extensions = glbinding::ContextInfo::extensions();
-  log_info("Using glbinding");
-  log_info("ARB_texture_non_power_of_two: {}", static_cast<int>(extensions.find(GLextension::GL_ARB_texture_non_power_of_two) != extensions.end()));
-#  else
   GLenum err = glewInit();
-#    ifdef GLEW_ERROR_NO_GLX_DISPLAY
+
   // Glew can't open glx display when it's running on wayland session
   // and thus returns an error. But glXGetProcAddress is fully usable
   // on wayland, so we can just ignore the "no glx display" error.
-  //
-  // Note that GLEW_ERROR_NO_GLX_DISPLAY needs glew >= 2.1. Older
-  // versions assume that glx display is always available and will
-  // just crash.
-  if (GLEW_ERROR_NO_GLX_DISPLAY == err)
+  if (err == GLEW_ERROR_NO_GLX_DISPLAY)
   {
     log_info("GLEW couldn't open GLX display");
   }
-  else
-#    endif
-    if (GLEW_OK != err)
-    {
-      std::ostringstream out;
-      out << "GLVideoSystem: GlewError: " << glewGetErrorString(err);
-      throw std::runtime_error(out.str());
-    }
+  else if (err != GLEW_OK)
+  {
+    std::ostringstream out;
+    out << "GLVideoSystem: GlewError: " << glewGetErrorString(err);
+    throw std::runtime_error(out.str());
+  }
 
   // older GLEW throws 'invalid enum' error in OpenGL3.3Core, thus we eat up the error code here
   glGetError();
@@ -197,7 +161,6 @@ GLVideoSystem::create_gl_context()
   log_info("OpenGL: {}", glGetString(GL_VERSION));
   log_info("Using GLEW {}", glewGetString(GLEW_VERSION));
   log_info("GLEW_ARB_texture_non_power_of_two: {}", static_cast<int>(GLEW_ARB_texture_non_power_of_two));
-#  endif
 #endif
 
   assert_gl();
