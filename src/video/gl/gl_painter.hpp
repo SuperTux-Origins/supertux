@@ -38,7 +38,6 @@ public:
   void draw_triangle(TriangleRequest const& request) override;
 
   void clear(Color const& color) override;
-  void get_pixel(GetPixelRequest const& request) const override;
 
   void set_clip_rect(Rect const& rect) override;
   void clear_clip_rect() override;

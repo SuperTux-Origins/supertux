@@ -26,6 +26,7 @@
 #include "sprite/sprite.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/sector.hpp"
+#include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
@@ -154,7 +155,8 @@ void
 MagicBlock::draw(DrawingContext& context)
 {
   // Ask for update about lightmap at center of this block
-  context.light().get_pixel(m_center, m_light);
+  // context.light().get_pixel(m_center, m_light);
+  log_warning("FIXME: get_pixel() no longer supported, implement this differently");
 
   MovingSprite::draw(context);
   context.color().draw_filled_rect(m_col.m_bbox, m_color, m_layer);

@@ -82,9 +82,6 @@ public:
   void draw_line(Vector const& pos1, Vector const& pos2, Color const& color, int layer);
   void draw_triangle(Vector const& pos1, Vector const& pos2, Vector const& pos3, Color const& color, int layer);
 
-  /** on next update, set color to lightmap's color at position */
-  void get_pixel(Vector const& position, std::shared_ptr<Color> const& color_out);
-
   void clear();
   void render(Renderer& renderer, Filter filter);
 

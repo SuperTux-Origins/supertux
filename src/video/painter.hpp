@@ -47,7 +47,6 @@ public:
   virtual void draw_triangle(TriangleRequest const& request) = 0;
 
   virtual void clear(Color const& color) = 0;
-  virtual void get_pixel(GetPixelRequest const& request) const = 0;
 
   virtual void set_clip_rect(Rect const& rect) = 0;
   virtual void clear_clip_rect() = 0;

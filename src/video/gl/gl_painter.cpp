@@ -472,31 +472,6 @@ GLPainter::clear(Color const& color)
 }
 
 void
-GLPainter::get_pixel(GetPixelRequest const& request) const
-{
-  assert_gl();
-
-  Rect const& rect = m_renderer.get_rect();
-  Size const& logical_size = m_renderer.get_logical_size();
-
-  float x = request.pos.x * static_cast<float>(rect.get_width()) / static_cast<float>(logical_size.width);
-  float y = request.pos.y * static_cast<float>(rect.get_height()) / static_cast<float>(logical_size.height);
-
-  x += static_cast<float>(rect.left);
-  y += static_cast<float>(rect.top);
-
-  float pixels[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-  // OpenGLES2 does not have PBOs, only GLES3 has
-  glReadPixels(static_cast<GLint>(x), static_cast<GLint>(y),
-               1, 1, GL_RGB, GL_FLOAT, pixels);
-
-  *(request.color_ptr) = Color(pixels[0], pixels[1], pixels[2]);
-
-  assert_gl();
-}
-
-void
 GLPainter::set_clip_rect(Rect const& clip_rect)
 {
   assert_gl();
