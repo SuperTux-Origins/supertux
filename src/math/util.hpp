@@ -21,23 +21,6 @@
 
 namespace math {
 
-template<class T>
-T const& clamp(T const& val, T const& min, T const& max)
-{
-  if (val < min)
-  {
-    return min;
-  }
-  else if (val > max)
-  {
-    return max;
-  }
-  else
-  {
-    return val;
-  }
-}
-
 template <class T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }

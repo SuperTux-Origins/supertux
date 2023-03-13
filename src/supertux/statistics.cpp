@@ -454,9 +454,9 @@ Statistics::update(Statistics const& other)
   m_total_badguys = other.m_total_badguys;
   m_total_secrets = other.m_total_secrets;
 
-  m_coins = math::clamp(m_coins, 0, m_total_coins);
-  m_badguys = math::clamp(m_badguys, 0, m_total_badguys);
-  m_secrets = math::clamp(m_secrets, 0, m_total_secrets);
+  m_coins = std::clamp(m_coins, 0, m_total_coins);
+  m_badguys = std::clamp(m_badguys, 0, m_total_badguys);
+  m_secrets = std::clamp(m_secrets, 0, m_total_secrets);
   m_status = FINAL;
 }
 

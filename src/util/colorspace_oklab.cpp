@@ -79,8 +79,8 @@ Color linear_srgb_to_srgb(ColorRGB const& c)
   // The clamping here is only for safety against numerical precision errors.
   // r, g and b should already be in [0,1] (at least approximately)
   // since they were clipped in the OKLab colourspace.
-  return Color(math::clamp(r, 0.0f, 1.0f), math::clamp(g, 0.0f, 1.0f),
-    math::clamp(b, 0.0f, 1.0f));
+  return Color(std::clamp(r, 0.0f, 1.0f), std::clamp(g, 0.0f, 1.0f),
+    std::clamp(b, 0.0f, 1.0f));
 }
 
 ColorOKLab linear_srgb_to_oklab(ColorRGB const& c)
@@ -363,8 +363,8 @@ ColorOKLCh::clip_chroma()
   if (-1.67462f < h && h < -1.67460f)
     h = -1.67462f;
 
-  L = math::clamp(L, 0.0f, 1.0f);
-  C = math::clamp(C, 0.0f, get_maximum_chroma());
+  L = std::clamp(L, 0.0f, 1.0f);
+  C = std::clamp(C, 0.0f, get_maximum_chroma());
 }
 
 void
@@ -374,7 +374,7 @@ ColorOKLCh::clip_lightness()
   if (-1.67462f < h && h < -1.67460f)
     h = -1.67462f;
 
-  L = math::clamp(L, 0.0f, 1.0f);
+  L = std::clamp(L, 0.0f, 1.0f);
   ColorOKLab lab = lch_to_lab(*this);
   ColorRGB rgb = oklab_to_linear_srgb(lab);
   if (rgb.is_valid())

@@ -343,8 +343,8 @@ Camera::keep_in_bounds(Vector& translation_)
   float height = d_sector->get_height();
 
   // don't scroll before the start or after the level's end
-  translation_.x = math::clamp(translation_.x, 0.0f, width - static_cast<float>(m_screen_size.width));
-  translation_.y = math::clamp(translation_.y, 0.0f, height - static_cast<float>(m_screen_size.height));
+  translation_.x = std::clamp(translation_.x, 0.0f, width - static_cast<float>(m_screen_size.width));
+  translation_.y = std::clamp(translation_.y, 0.0f, height - static_cast<float>(m_screen_size.height));
 
   if (height < static_cast<float>(m_screen_size.height))
     translation_.y = height / 2.0f - static_cast<float>(m_screen_size.height) / 2.0f;
@@ -406,7 +406,7 @@ Camera::update_scroll_normal(float dt_sec)
     // limit the camera speed when jumping upwards
     if (player.m_fall_mode != Player::FALLING
        && player.m_fall_mode != Player::TRAMPOLINE_JUMP) {
-      speed_y = math::clamp(speed_y, -config_.max_speed_y, config_.max_speed_y);
+      speed_y = std::clamp(speed_y, -config_.max_speed_y, config_.max_speed_y);
     }
 
     // scroll with calculated speed
@@ -414,7 +414,7 @@ Camera::update_scroll_normal(float dt_sec)
   }
   if (ymode == 3) {
     float halfsize = config_.kirby_rectsize_y * 0.5f;
-    m_cached_translation.y = math::clamp(m_cached_translation.y,
+    m_cached_translation.y = std::clamp(m_cached_translation.y,
                                  player_pos.y - static_cast<float>(m_screen_size.height) * (0.5f + halfsize),
                                  player_pos.y - static_cast<float>(m_screen_size.height) * (0.5f - halfsize));
   }
@@ -479,10 +479,10 @@ Camera::update_scroll_normal(float dt_sec)
     m_translation.y -= m_peek_pos.y;
 
     if (config_.clamp_y > 0.0f) {
-      m_translation.y = math::clamp(m_translation.y,
+      m_translation.y = std::clamp(m_translation.y,
                             player_pos.y - static_cast<float>(m_screen_size.height) * (1.0f - config_.clamp_y),
                             player_pos.y - static_cast<float>(m_screen_size.height) * config_.clamp_y);
-      m_cached_translation.y = math::clamp(m_cached_translation.y,
+      m_cached_translation.y = std::clamp(m_cached_translation.y,
                                    player_pos.y - static_cast<float>(m_screen_size.height) * (1.0f - config_.clamp_y),
                                    player_pos.y - static_cast<float>(m_screen_size.height) * config_.clamp_y);
     }
@@ -578,14 +578,14 @@ Camera::update_scroll_normal(float dt_sec)
     // limit our speed
     float player_speed_x = player_delta.x / dt_sec;
     float maxv = config_.max_speed_x + (fabsf(player_speed_x * config_.dynamic_max_speed_x));
-    speed_x = math::clamp(speed_x, -maxv, maxv);
+    speed_x = std::clamp(speed_x, -maxv, maxv);
 
     // apply scrolling
     m_cached_translation.x -= speed_x * dt_sec;
   }
   if (xmode == 3) {
     float halfsize = config_.kirby_rectsize_x * 0.5f;
-    m_cached_translation.x = math::clamp(m_cached_translation.x,
+    m_cached_translation.x = std::clamp(m_cached_translation.x,
                                  player_pos.x - static_cast<float>(m_screen_size.width) * (0.5f + halfsize),
                                  player_pos.x - static_cast<float>(m_screen_size.width) * (0.5f - halfsize));
   }
@@ -657,11 +657,11 @@ Camera::update_scroll_normal(float dt_sec)
     m_translation.x -= m_peek_pos.x;
 
     if (config_.clamp_x > 0.0f) {
-      m_translation.x = math::clamp(m_translation.x,
+      m_translation.x = std::clamp(m_translation.x,
                             player_pos.x - static_cast<float>(m_screen_size.width) * (1-config_.clamp_x),
                             player_pos.x - static_cast<float>(m_screen_size.width) * config_.clamp_x);
 
-      m_cached_translation.x = math::clamp(m_cached_translation.x,
+      m_cached_translation.x = std::clamp(m_cached_translation.x,
                                    player_pos.x - static_cast<float>(m_screen_size.width) * (1-config_.clamp_x),
                                    player_pos.x - static_cast<float>(m_screen_size.width) * config_.clamp_x);
     }
@@ -723,7 +723,7 @@ Camera::update_scroll_normal_multiplayer(float dt_sec)
 
   // Capping at `m_scale` allows fixing a minor bug where the camera would
   // sometimes be slightly off-sector if scaling goes faster than moving.
-  scale = math::clamp(scale, max_scale, m_scale);
+  scale = std::clamp(scale, max_scale, m_scale);
 
   // Can't use m_screen_size because it varies depending on the scale
   auto rect = Rectf::from_center(Vector((cover.get_left() + cover.get_right()) / 2.f, (cover.get_top() + cover.get_bottom()) / 2.f),
