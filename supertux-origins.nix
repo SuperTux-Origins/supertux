@@ -28,6 +28,8 @@
 , priocpp
 , xdgcpp
 , gtest
+
+, useGLES2 ? false
 }:
 
 stdenv.mkDerivation rec {
@@ -59,7 +61,8 @@ EOF
     "-DINSTALL_SUBDIR_BIN=bin"
     "-DUSE_SYSTEM_SDL2_TTF=ON"
     "-DBUILD_TESTS=ON"
-  ];
+  ] ++
+  lib.optional useGLES2 "-DENABLE_OPENGLES2=ON";
 
   postFixup =
     (lib.optionalString stdenv.targetPlatform.isLinux ''
