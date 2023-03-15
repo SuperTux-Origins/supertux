@@ -22,8 +22,8 @@
 #if defined(USE_OPENGLES2)
 #  include <SDL_opengles2.h>
 #else
-#    include <GL/glew.h>
-#    define GL_NONE_BIT 0
+#  include <GL/glew.h>
+#  define GL_NONE_BIT 0
 #endif
 
 #ifdef USE_OPENGLES2
