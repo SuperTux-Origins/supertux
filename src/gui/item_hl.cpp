@@ -18,7 +18,6 @@
 
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
-#include "video/drawing_context.hpp"
 
 ItemHorizontalLine::ItemHorizontalLine() :
   MenuItem("")

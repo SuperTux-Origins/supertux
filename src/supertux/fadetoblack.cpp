@@ -16,7 +16,6 @@
 
 #include "supertux/fadetoblack.hpp"
 
-#include "supertux/globals.hpp"
 #include "video/drawing_context.hpp"
 
 FadeToBlack::FadeToBlack(Direction direction, float fade_time, Color color) :

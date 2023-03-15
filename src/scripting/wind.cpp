@@ -15,7 +15,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/wind.hpp"
-#include "scripting/wind.hpp"
 
 namespace scripting {
 

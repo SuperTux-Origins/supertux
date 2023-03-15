@@ -18,9 +18,7 @@
 
 #include "supertux/colorscheme.hpp"
 #include "supertux/resources.hpp"
-#include "supertux/textscroller_screen.hpp"
 #include "video/drawing_context.hpp"
-#include "video/font.hpp"
 #include "video/surface.hpp"
 
 static const float ITEMS_SPACE = 4;

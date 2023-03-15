@@ -17,7 +17,6 @@
 #include "video/sdl_surface.hpp"
 
 #include <sstream>
-#include <stdexcept>
 
 #include <SDL_image.h>
 #include <savepng.h>

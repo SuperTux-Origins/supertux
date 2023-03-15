@@ -16,7 +16,6 @@
 
 #include "object/floating_text.hpp"
 
-#include <stdio.h>
 
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"

@@ -17,7 +17,6 @@
 #include "badguy/spidermite.hpp"
 
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 
 static const float FLYTIME = 1.2f;
 static const float MOVE_SPEED = -100.0f;

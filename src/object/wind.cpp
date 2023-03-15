@@ -23,11 +23,8 @@
 #include "object/player.hpp"
 #include "object/rock.hpp"
 #include "object/sprite_particle.hpp"
-#include "sprite/sprite.hpp"
-#include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "video/drawing_context.hpp"
 
 Wind::Wind(ReaderMapping const& reader) :
   MovingObject(reader),

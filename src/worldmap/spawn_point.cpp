@@ -16,7 +16,6 @@
 
 #include "worldmap/spawn_point.hpp"
 
-#include <stdexcept>
 
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"

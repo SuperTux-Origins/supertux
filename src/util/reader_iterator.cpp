@@ -16,13 +16,10 @@
 
 #include "util/reader_iterator.hpp"
 
-#include <sexp/io.hpp>
-#include <sstream>
 
 #include <prio/sexpr_reader_impl.hpp>
 
 #include "util/reader_document.hpp"
-#include "util/reader_error.hpp"
 #include "util/reader_mapping.hpp"
 
 ReaderIterator::ReaderIterator(ReaderMapping const& mapping) :

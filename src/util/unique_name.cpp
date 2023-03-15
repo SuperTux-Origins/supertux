@@ -17,8 +17,6 @@
 #include "util/unique_name.hpp"
 
 #include <sstream>
-#include <stdint.h>
-#include <time.h>
 
 std::string make_unique_name(std::string const& prefix, void* ptr)
 {

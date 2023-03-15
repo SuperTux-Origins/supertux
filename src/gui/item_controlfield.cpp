@@ -20,7 +20,6 @@
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "video/drawing_context.hpp"
 
 ItemControlField::ItemControlField(std::string const& text, std::string const& input_, int id) :
   MenuItem(text, id),

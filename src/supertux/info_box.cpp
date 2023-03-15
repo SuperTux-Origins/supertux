@@ -16,7 +16,6 @@
 
 #include "supertux/info_box.hpp"
 
-#include "supertux/globals.hpp"
 #include "supertux/info_box_line.hpp"
 #include "util/log.hpp"
 #include "video/drawing_context.hpp"

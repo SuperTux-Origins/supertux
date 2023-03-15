@@ -19,7 +19,6 @@
 #include <assert.h>
 #include <physfs.h>
 #include <sstream>
-#include <stdexcept>
 
 IFileStreambuf::IFileStreambuf(std::string const& filename) :
   file(),

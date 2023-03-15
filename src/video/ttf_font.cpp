@@ -17,15 +17,12 @@
 
 #include "video/ttf_font.hpp"
 
-#include <iostream>
 #include <numeric>
-#include <sstream>
 
 #include "physfs/physfs_sdl.hpp"
 #include "util/line_iterator.hpp"
 #include "util/log.hpp"
 #include "video/canvas.hpp"
-#include "video/surface.hpp"
 #include "video/ttf_surface_manager.hpp"
 
 TTFFont::TTFFont(std::string const& filename, int font_size, float line_spacing, int shadow_size, int border) :

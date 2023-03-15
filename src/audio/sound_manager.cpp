@@ -16,12 +16,9 @@
 
 #include "audio/sound_manager.hpp"
 
-#include <unordered_map>
 
-#include <wstsound/sound_file.hpp>
 
 #include "audio/sound_source.hpp"
-#include "physfs/ifile_stream.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/reader_document.hpp"

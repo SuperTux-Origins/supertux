@@ -23,10 +23,8 @@
 #include "object/magicblock.hpp"
 
 #include "object/camera.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/sector.hpp"
-#include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"

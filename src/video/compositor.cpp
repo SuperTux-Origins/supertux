@@ -17,7 +17,6 @@
 
 #include "video/compositor.hpp"
 
-#include "math/rect.hpp"
 #include "video/drawing_request.hpp"
 #include "video/painter.hpp"
 #include "video/renderer.hpp"

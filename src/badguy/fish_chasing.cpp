@@ -18,7 +18,6 @@
 
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
 #include "util/reader_mapping.hpp"
 
 static const float TRACK_DISTANCE = 200.0f;

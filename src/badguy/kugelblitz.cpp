@@ -16,13 +16,11 @@
 
 #include "badguy/kugelblitz.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "math/random.hpp"
 #include "object/electrifier.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 

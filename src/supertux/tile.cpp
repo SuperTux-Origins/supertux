@@ -21,9 +21,7 @@
 #include "math/aatriangle.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/globals.hpp"
-#include "util/log.hpp"
 #include "video/drawing_context.hpp"
-#include "video/surface.hpp"
 
 bool Tile::draw_editor_images = false;
 

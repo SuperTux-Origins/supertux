@@ -17,7 +17,6 @@
 #include "gui/item_inactive.hpp"
 
 #include "supertux/colorscheme.hpp"
-#include "video/color.hpp"
 
 ItemInactive::ItemInactive(std::string const& text_, bool default_color) :
   MenuItem(text_),

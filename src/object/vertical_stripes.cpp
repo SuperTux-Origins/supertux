@@ -16,11 +16,8 @@
 
 #include "object/vertical_stripes.hpp"
 
-#include "math/rect.hpp"
-#include "math/rectf.hpp"
 #include "supertux/sector.hpp"
 #include "video/drawing_context.hpp"
-#include "video/surface.hpp"
 
 VerticalStripes::VerticalStripes() :
   m_visible(false),

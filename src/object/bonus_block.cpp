@@ -26,7 +26,6 @@
 #include "object/growup.hpp"
 #include "object/oneup.hpp"
 #include "object/player.hpp"
-#include "object/portable.hpp"
 #include "object/powerup.hpp"
 #include "object/specialriser.hpp"
 #include "object/star.hpp"
@@ -39,8 +38,6 @@
 #include "util/reader_collection.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/reader_object.hpp"
-#include "util/writer.hpp"
-#include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
 namespace {

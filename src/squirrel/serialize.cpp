@@ -16,9 +16,6 @@
 
 #include "squirrel/serialize.hpp"
 
-#include <iostream>
-#include <sexp/util.hpp>
-#include <sexp/value.hpp>
 
 #include <prio/reader_document.hpp>
 #include <prio/sexpr_reader_impl.hpp>

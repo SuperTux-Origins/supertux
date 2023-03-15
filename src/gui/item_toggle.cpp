@@ -16,11 +16,9 @@
 
 #include "gui/item_toggle.hpp"
 
-#include "supertux/colorscheme.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
 ItemToggle::ItemToggle(std::string const& text_, bool* toggled, int id_, bool center_text) :

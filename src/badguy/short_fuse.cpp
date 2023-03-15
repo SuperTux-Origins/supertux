@@ -18,7 +18,6 @@
 #include "badguy/short_fuse.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "object/bullet.hpp"
 #include "object/explosion.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite_manager.hpp"

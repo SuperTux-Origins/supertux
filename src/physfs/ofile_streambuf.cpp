@@ -18,7 +18,6 @@
 
 #include <physfs.h>
 #include <sstream>
-#include <stdexcept>
 
 OFileStreambuf::OFileStreambuf(std::string const& filename) :
   file()

@@ -16,18 +16,14 @@
 
 #include "control/joystick_manager.hpp"
 
-#include <algorithm>
 
 #include "control/input_manager.hpp"
-#include "control/joystick_config.hpp"
 #include "gui/menu_manager.hpp"
 #include "object/player.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/gameconfig.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/savegame.hpp"
 #include "supertux/sector.hpp"
-#include "util/log.hpp"
 
 JoystickManager::JoystickManager(InputManager* parent_,
                                  JoystickConfig& joystick_config) :

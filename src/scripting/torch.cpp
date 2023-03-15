@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/torch.hpp"
-#include "scripting/torch.hpp"
 
 namespace scripting {
 

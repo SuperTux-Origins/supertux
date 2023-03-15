@@ -15,7 +15,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/level_time.hpp"
-#include "scripting/level_time.hpp"
 
 namespace scripting {
 

@@ -20,9 +20,7 @@
 #include "math/random.hpp"
 #include "object/bullet.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
-#include "util/file_system.hpp"
 #include "util/reader_mapping.hpp"
 
 static const int SHAKE_RANGE_X = 40;

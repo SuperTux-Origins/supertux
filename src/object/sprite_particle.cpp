@@ -21,8 +21,6 @@
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
-#include "video/video_system.hpp"
-#include "video/viewport.hpp"
 
 SpriteParticle::SpriteParticle(std::string const& sprite_name, std::string const& action,
                                Vector const& position_, AnchorPoint anchor, Vector const& velocity_, Vector const& acceleration_,

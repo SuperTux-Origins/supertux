@@ -17,14 +17,12 @@
 #include "supertux/world.hpp"
 
 #include <physfs.h>
-#include <sstream>
 
 #include "physfs/util.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
-#include "util/reader.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"

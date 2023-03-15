@@ -18,8 +18,6 @@
 #include "supertux/tile_set_parser.hpp"
 
 #include <sexp/io.hpp>
-#include <sexp/value.hpp>
-#include <sstream>
 
 #include <prio/sexpr_reader_impl.hpp>
 

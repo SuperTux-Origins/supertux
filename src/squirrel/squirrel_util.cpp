@@ -16,18 +16,8 @@
 
 #include "squirrel/squirrel_util.hpp"
 
-#include <config.h>
 
-#include <sqstdaux.h>
-#include <sqstdblob.h>
-#include <sqstdmath.h>
-#include <sqstdstring.h>
-#include <stdarg.h>
-#include <stdio.h>
 
-#include "squirrel/script_interface.hpp"
-#include "supertux/game_object.hpp"
-#include "util/log.hpp"
 
 std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
 {

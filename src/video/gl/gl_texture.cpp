@@ -16,10 +16,8 @@
 
 #include "video/gl/gl_texture.hpp"
 
-#include <assert.h>
 
 #include "video/glutil.hpp"
-#include "video/sampler.hpp"
 #include "video/sdl_surface.hpp"
 
 GLTexture::GLTexture(int width, int height, std::optional<Color> fill_color) :

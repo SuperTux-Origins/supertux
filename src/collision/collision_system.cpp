@@ -17,16 +17,10 @@
 
 #include "collision/collision_system.hpp"
 
-#include "collision/collision.hpp"
 #include "collision/collision_movement_manager.hpp"
 #include "math/aatriangle.hpp"
-#include "math/rect.hpp"
-#include "object/player.hpp"
-#include "object/tilemap.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
-#include "video/color.hpp"
 #include "video/drawing_context.hpp"
 
 namespace {

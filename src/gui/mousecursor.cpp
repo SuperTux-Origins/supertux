@@ -16,15 +16,11 @@
 
 #include "gui/mousecursor.hpp"
 
-#include <SDL.h>
 
 #include "sprite/sprite.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
-#include "video/drawing_context.hpp"
-#include "video/renderer.hpp"
 #include "video/surface.hpp"
-#include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
 MouseCursor* MouseCursor::current_ = nullptr;

@@ -28,10 +28,7 @@
 #include "util/colorspace_oklab.hpp"
 
 #include <algorithm>
-#include <cfloat>
-#include <cmath>
 
-#include "math/util.hpp"
 #include "util/log.hpp"
 #include "video/color.hpp"
 

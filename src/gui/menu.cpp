@@ -16,9 +16,7 @@
 
 #include "gui/menu.hpp"
 
-#include <stdexcept>
 
-#include "control/input_manager.hpp"
 #include "gui/item_action.hpp"
 #include "gui/item_back.hpp"
 #include "gui/item_controlfield.hpp"
@@ -28,22 +26,17 @@
 #include "gui/item_label.hpp"
 #include "gui/item_stringselect.hpp"
 #include "gui/item_toggle.hpp"
-#include "gui/menu_item.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/mousecursor.hpp"
 #include "math/util.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "video/drawing_context.hpp"
-#include "video/renderer.hpp"
-#include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
 static const float MENU_REPEAT_INITIAL = 0.4f;
 static const float MENU_REPEAT_RATE    = 0.1f;
 
-#include "supertux/error_handler.hpp"
 
 Menu::Menu() :
   m_pos(Vector(static_cast<float>(SCREEN_WIDTH) / 2.0f,

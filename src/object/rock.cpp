@@ -25,7 +25,6 @@
 #include "object/player.hpp"
 #include "object/pushbutton.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
 #include "util/reader_mapping.hpp"
 
 namespace {

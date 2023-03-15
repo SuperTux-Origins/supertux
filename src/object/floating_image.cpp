@@ -18,7 +18,6 @@
 
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/globals.hpp"
 
 FloatingImage::FloatingImage(std::string const& spritefile) :
   sprite(SpriteManager::current()->create(spritefile)),

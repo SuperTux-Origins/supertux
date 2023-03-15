@@ -21,7 +21,6 @@
 #include "object/text_object.hpp"
 #include "supertux/levelintro.hpp"
 #include "supertux/player_status_hud.hpp"
-#include "supertux/textscroller_screen.hpp"
 #include "trigger/climbable.hpp"
 #include "trigger/secretarea_trigger.hpp"
 #include "worldmap/worldmap.hpp"

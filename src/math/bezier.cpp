@@ -16,7 +16,6 @@
 
 #include "math/bezier.hpp"
 #include "util/log.hpp"
-#include "video/color.hpp"
 #include "video/drawing_context.hpp"
 
 Vector

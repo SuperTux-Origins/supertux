@@ -17,7 +17,6 @@
 
 #include "worldmap/tux.hpp"
 
-#include <sstream>
 
 #include "control/input_manager.hpp"
 #include "sprite/sprite.hpp"

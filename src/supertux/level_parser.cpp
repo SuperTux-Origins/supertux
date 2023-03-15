@@ -16,18 +16,14 @@
 
 #include "supertux/level_parser.hpp"
 
-#include <fmt/format.h>
 #include <physfs.h>
-#include <sstream>
 
 #include "supertux/level.hpp"
 #include "supertux/sector.hpp"
 #include "supertux/sector_parser.hpp"
 #include "util/log.hpp"
-#include "util/reader.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
-#include "util/reader_mapping.hpp"
 
 std::string
 LevelParser::get_level_name(std::string const& filename)

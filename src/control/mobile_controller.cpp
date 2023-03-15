@@ -17,15 +17,10 @@
 #include "control/mobile_controller.hpp"
 
 
-#include <string>
 
-#include "SDL.h"
 
-#include "control/controller.hpp"
-#include "math/vector.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
-#include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
 MobileController::MobileController() :

@@ -16,9 +16,7 @@
 
 #include "object/particle_zone.hpp"
 
-#include "supertux/resources.hpp"
 #include "util/reader_mapping.hpp"
-#include "video/drawing_context.hpp"
 
 
 ParticleZone::ParticleZone(ReaderMapping const& reader) :

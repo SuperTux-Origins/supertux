@@ -16,7 +16,6 @@
 
 #include "badguy/treewillowisp.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
@@ -25,7 +24,6 @@
 #include "math/util.hpp"
 #include "object/lantern.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 
 static const std::string TREEWILLOSOUND = "sounds/willowisp.wav";
 

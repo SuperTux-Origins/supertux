@@ -17,16 +17,9 @@
 
 #include "video/gl/gl_texture_renderer.hpp"
 
-#include "supertux/globals.hpp"
-#include "util/log.hpp"
-#include "video/drawing_request.hpp"
-#include "video/gl.hpp"
 #include "video/gl/gl_context.hpp"
 #include "video/gl/gl_framebuffer.hpp"
-#include "video/gl/gl_painter.hpp"
-#include "video/gl/gl_program.hpp"
 #include "video/gl/gl_texture.hpp"
-#include "video/gl/gl_vertex_arrays.hpp"
 #include "video/gl/gl_video_system.hpp"
 #include "video/glutil.hpp"
 

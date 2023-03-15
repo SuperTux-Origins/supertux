@@ -19,12 +19,9 @@
 
 #include "audio/sound_manager.hpp"
 #include "object/player.hpp"
-#include "object/portable.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/game_object_factory.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 namespace {
 

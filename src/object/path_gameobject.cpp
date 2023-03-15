@@ -16,10 +16,8 @@
 
 #include "object/path_gameobject.hpp"
 
-#include <optional>
 
 #include "gui/menu_manager.hpp"
-#include "object/path.hpp"
 #include "object/path_object.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
@@ -28,8 +26,6 @@
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/unique_name.hpp"
-#include "video/color.hpp"
-#include "video/drawing_context.hpp"
 
 namespace {
 

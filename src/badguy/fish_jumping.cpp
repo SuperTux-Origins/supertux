@@ -16,10 +16,7 @@
 
 #include "badguy/fish_jumping.hpp"
 
-#include "object/explosion.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
 
 static const float FISH_JUMP_POWER = -600.f;
 static const float FISH_WAIT_TIME = 1.f;

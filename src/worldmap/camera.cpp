@@ -17,11 +17,9 @@
 #include "worldmap/camera.hpp"
 
 #include "math/util.hpp"
-#include "supertux/globals.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
 #include "worldmap/tux.hpp"
-#include "worldmap/worldmap.hpp"
 
 namespace {
 

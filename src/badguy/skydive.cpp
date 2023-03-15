@@ -19,11 +19,8 @@
 #include "audio/sound_manager.hpp"
 #include "object/explosion.hpp"
 #include "object/player.hpp"
-#include "object/portable.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
 
 SkyDive::SkyDive(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/skydive/skydive.sprite")

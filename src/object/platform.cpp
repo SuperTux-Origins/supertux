@@ -19,7 +19,6 @@
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 Platform::Platform(ReaderMapping const& reader) :
   Platform(reader, "images/objects/flying_platform/flying_platform.sprite")

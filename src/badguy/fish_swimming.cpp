@@ -17,10 +17,7 @@
 
 #include "badguy/fish_swimming.hpp"
 
-#include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
 #include "util/reader_mapping.hpp"
 
 static const float FISH_BEACH_TIME = 5.f;

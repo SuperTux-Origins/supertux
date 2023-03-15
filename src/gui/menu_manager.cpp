@@ -25,7 +25,6 @@
 #include "supertux/globals.hpp"
 #include "supertux/menu/menu_storage.hpp"
 #include "util/log.hpp"
-#include "video/drawing_context.hpp"
 
 MenuManager* MenuManager::s_instance = nullptr;
 

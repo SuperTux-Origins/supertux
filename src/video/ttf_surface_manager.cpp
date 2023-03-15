@@ -16,17 +16,10 @@
 
 #include "video/ttf_surface_manager.hpp"
 
-#include <SDL_ttf.h>
-#include <iostream>
 #include <numeric>
-#include <sstream>
 
 #include "supertux/globals.hpp"
-#include "video/sdl_surface_ptr.hpp"
-#include "video/surface.hpp"
 #include "video/ttf_font.hpp"
-#include "video/ttf_surface.hpp"
-#include "video/video_system.hpp"
 
 TTFSurfaceManager::CacheEntry::CacheEntry(TTFSurfacePtr const& s) :
   ttf_surface(s),

@@ -16,12 +16,7 @@
 
 #include "badguy/viciousivy.hpp"
 
-#include <math.h>
 
-#include "math/random.hpp"
-#include "object/sprite_particle.hpp"
-#include "sprite/sprite.hpp"
-#include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 
 ViciousIvy::ViciousIvy(ReaderMapping const& reader)

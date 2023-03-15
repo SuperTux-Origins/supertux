@@ -21,7 +21,6 @@
 #include "badguy/walking_badguy.hpp"
 #include "control/controller.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "util/reader_mapping.hpp"
 
 /* Trampoline will accelerate Tux to to VY_BOUNCE, if

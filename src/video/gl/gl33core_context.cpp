@@ -17,7 +17,6 @@
 #include "video/gl/gl33core_context.hpp"
 
 #include "supertux/globals.hpp"
-#include "video/color.hpp"
 #include "video/gl/gl_program.hpp"
 #include "video/gl/gl_texture.hpp"
 #include "video/gl/gl_texture_renderer.hpp"

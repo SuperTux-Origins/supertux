@@ -16,12 +16,9 @@
 
 #include "badguy/mriceblock.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "object/player.hpp"
-#include "object/portable.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
 namespace {

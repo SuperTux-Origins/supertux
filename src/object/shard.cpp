@@ -20,8 +20,6 @@
 #include "badguy/badguy.hpp"
 #include "math/util.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
-#include "util/reader_mapping.hpp"
 
 Shard::Shard(ReaderMapping const& reader) :
   MovingSprite(reader, "images/creatures/crystallo/shard.sprite", LAYER_TILES - 2, COLGROUP_MOVING),

@@ -17,14 +17,12 @@
 
 #include "badguy/yeti.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "badguy/yeti_stalactite.hpp"
 #include "math/random.hpp"
 #include "object/camera.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/surface.hpp"

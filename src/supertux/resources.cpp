@@ -21,10 +21,7 @@
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/debug.hpp"
-#include "supertux/gameconfig.hpp"
-#include "supertux/globals.hpp"
 #include "video/bitmap_font.hpp"
-#include "video/font.hpp"
 #include "video/surface.hpp"
 #include "video/ttf_font.hpp"
 

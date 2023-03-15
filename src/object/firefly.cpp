@@ -16,14 +16,12 @@
 
 #include "object/firefly.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "math/random.hpp"
 #include "math/util.hpp"
 #include "object/player.hpp"
 #include "object/sprite_particle.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/sector.hpp"

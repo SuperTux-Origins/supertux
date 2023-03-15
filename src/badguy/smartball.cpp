@@ -16,7 +16,6 @@
 
 #include "badguy/smartball.hpp"
 
-#include "sprite/sprite.hpp"
 
 SmartBall::SmartBall(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/snowball/smart-snowball.sprite", "left", "right")

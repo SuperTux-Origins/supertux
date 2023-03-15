@@ -17,20 +17,16 @@
 
 #include "supertux/savegame.hpp"
 
-#include <algorithm>
 #include <physfs.h>
 
 #include "control/input_manager.hpp"
 #include "physfs/util.hpp"
 #include "squirrel/serialize.hpp"
-#include "squirrel/squirrel_util.hpp"
-#include "squirrel/squirrel_virtual_machine.hpp"
 #include "supertux/player_status.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 #include "worldmap/worldmap.hpp"
 
 namespace {

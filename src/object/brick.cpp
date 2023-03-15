@@ -18,13 +18,10 @@
 
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
-#include "badguy/crusher.hpp"
 #include "object/bouncy_coin.hpp"
 #include "object/camera.hpp"
 #include "object/explosion.hpp"
 #include "object/player.hpp"
-#include "object/portable.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/sector.hpp"

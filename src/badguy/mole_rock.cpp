@@ -16,11 +16,9 @@
 
 #include "badguy/mole_rock.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "math/random.hpp"
-#include "sprite/sprite.hpp"
 
 MoleRock::MoleRock(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/mole/mole_rock.sprite", LAYER_TILES - 2),

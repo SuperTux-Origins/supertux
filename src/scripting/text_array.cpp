@@ -15,9 +15,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/text_array_object.hpp"
-#include "scripting/text_array.hpp"
 
-#include "object/text_object.hpp"
 
 namespace scripting {
 

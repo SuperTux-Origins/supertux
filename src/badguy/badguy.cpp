@@ -22,16 +22,11 @@
 #include "object/bullet.hpp"
 #include "object/camera.hpp"
 #include "object/player.hpp"
-#include "object/portable.hpp"
 #include "object/sprite_particle.hpp"
-#include "object/water_drop.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/level.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 static const float SQUISH_TIME = 2;
 static const float GEAR_TIME = 2;

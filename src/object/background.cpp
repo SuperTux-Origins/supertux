@@ -17,15 +17,10 @@
 #include "object/background.hpp"
 
 #include <physfs.h>
-#include <utility>
 
 #include "supertux/d_scope.hpp"
-#include "supertux/gameconfig.hpp"
-#include "supertux/globals.hpp"
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
-#include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
 Background::Background() :

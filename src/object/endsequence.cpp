@@ -16,8 +16,6 @@
 
 #include "object/endsequence.hpp"
 
-#include "object/player.hpp"
-#include "supertux/sector.hpp"
 
 EndSequence::EndSequence() :
   m_is_running(false),

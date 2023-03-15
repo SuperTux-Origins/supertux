@@ -16,7 +16,6 @@
 
 #include "scripting/badguy.hpp"
 
-#include <physfs.h>
 
 #include "badguy/badguy.hpp"
 

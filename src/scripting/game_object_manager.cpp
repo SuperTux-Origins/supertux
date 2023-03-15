@@ -20,7 +20,6 @@
 #include "object/ambient_light.hpp"
 #include "object/music_object.hpp"
 #include "supertux/game_object_manager.hpp"
-#include "video/color.hpp"
 
 namespace scripting {
 

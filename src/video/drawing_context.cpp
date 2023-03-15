@@ -16,13 +16,7 @@
 
 #include "video/drawing_context.hpp"
 
-#include <algorithm>
 
-#include "supertux/globals.hpp"
-#include "util/obstackpp.hpp"
-#include "video/drawing_request.hpp"
-#include "video/renderer.hpp"
-#include "video/surface.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
 

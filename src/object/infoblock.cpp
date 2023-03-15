@@ -16,14 +16,12 @@
 
 #include "object/infoblock.hpp"
 
-#include <algorithm>
 
 #include "object/camera.hpp"
 #include "object/player.hpp"
 #include "supertux/info_box_line.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "video/drawing_context.hpp"
 
 InfoBlock::InfoBlock(ReaderMapping const& mapping) :
   Block(mapping, "images/objects/bonus_block/infoblock.sprite"),

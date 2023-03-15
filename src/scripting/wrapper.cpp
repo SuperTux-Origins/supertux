@@ -6,9 +6,6 @@
 
 #include "scripting/wrapper.hpp"
 
-#include <assert.h>
-#include <limits>
-#include <squirrel.h>
 #include <sstream>
 
 #include "scripting/wrapper.interface.hpp"

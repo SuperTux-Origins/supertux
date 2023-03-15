@@ -16,15 +16,12 @@
 
 #include "video/sdlbase_video_system.hpp"
 
-#include <sstream>
 
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "util/log.hpp"
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
 #endif
 
 SDLBaseVideoSystem::SDLBaseVideoSystem() :

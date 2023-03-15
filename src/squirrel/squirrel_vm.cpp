@@ -17,9 +17,7 @@
 
 #include "squirrel/squirrel_vm.hpp"
 
-#include <stdexcept>
 
-#include "squirrel/squirrel_error.hpp"
 #include "squirrel/squirrel_util.hpp"
 
 SquirrelVM::SquirrelVM() :

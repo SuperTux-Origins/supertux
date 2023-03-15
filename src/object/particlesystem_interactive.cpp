@@ -21,7 +21,6 @@
 #include "object/tilemap.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface_batch.hpp"
 #include "video/video_system.hpp"

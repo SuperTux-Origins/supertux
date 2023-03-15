@@ -18,7 +18,6 @@
 
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
-#include "sprite/sprite.hpp"
 
 namespace {
 const float DART_SPEED = 200;

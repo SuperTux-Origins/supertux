@@ -19,7 +19,6 @@
 #include "object/player.hpp"
 #include "supertux/debug.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 #include "video/drawing_context.hpp"
 
 SequenceTrigger::SequenceTrigger(ReaderMapping const& reader) :

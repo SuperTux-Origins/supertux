@@ -17,7 +17,6 @@
 
 #include "math/util.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 CirclePlatform::CirclePlatform(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/platforms/icebridge1.png", LAYER_OBJECTS, COLGROUP_STATIC),

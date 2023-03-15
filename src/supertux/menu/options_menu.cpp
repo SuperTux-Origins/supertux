@@ -17,27 +17,19 @@
 
 #include "supertux/menu/options_menu.hpp"
 
-#include <iostream>
-#include <sstream>
 
 #include "audio/sound_manager.hpp"
-#include "gui/dialog.hpp"
 #include "gui/item_goto.hpp"
 #include "gui/item_stringselect.hpp"
 #include "gui/item_toggle.hpp"
-#include "gui/menu_item.hpp"
 #include "gui/menu_manager.hpp"
-#include "supertux/game_session.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/menu/menu_storage.hpp"
 #include "util/gettext.hpp"
 #include "util/log.hpp"
-#include "video/renderer.hpp"
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
 #endif
 
 namespace {

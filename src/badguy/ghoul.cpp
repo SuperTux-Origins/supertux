@@ -16,11 +16,8 @@
 #include "badguy/ghoul.hpp"
 
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
-#include "supertux/game_session.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 static const float FLYSPEED = 80.0f; /**< speed in px per second */
 static const float TRACK_RANGE = 2500.0f; /**< at what distance to start tracking the player */

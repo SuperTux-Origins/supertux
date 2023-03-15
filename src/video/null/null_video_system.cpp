@@ -21,7 +21,6 @@
 #include "util/log.hpp"
 #include "video/null/null_renderer.hpp"
 #include "video/null/null_texture.hpp"
-#include "video/sdl_surface_ptr.hpp"
 #include "video/texture_manager.hpp"
 
 NullVideoSystem::NullVideoSystem() :

@@ -16,17 +16,13 @@
 
 #include "squirrel/squirrel_virtual_machine.hpp"
 
-#include <cstring>
 #include <sqstdaux.h>
 #include <sqstdblob.h>
 #include <sqstdmath.h>
 #include <sqstdstring.h>
 #include <stdarg.h>
-#include <stdio.h>
 
 #include "physfs/ifile_stream.hpp"
-#include "scripting/wrapper.hpp"
-#include "squirrel/squirrel_error.hpp"
 #include "squirrel/squirrel_scheduler.hpp"
 #include "squirrel/squirrel_thread_queue.hpp"
 #include "squirrel_util.hpp"

@@ -16,7 +16,6 @@
 
 #include "object/level_time.hpp"
 
-#include <algorithm>
 
 #include "object/player.hpp"
 #include "supertux/game_session.hpp"

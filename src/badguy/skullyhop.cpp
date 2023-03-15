@@ -17,7 +17,6 @@
 #include "badguy/skullyhop.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "sprite/sprite.hpp"
 
 namespace {
 static const std::string SKULLYHOP_SOUND = "sounds/hop.ogg";

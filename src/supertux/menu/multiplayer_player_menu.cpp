@@ -16,9 +16,7 @@
 
 #include "supertux/menu/multiplayer_player_menu.hpp"
 
-#include <fmt/format.h>
 
-#include "SDL.h"
 
 #include "control/game_controller_manager.hpp"
 #include "control/input_manager.hpp"
@@ -26,12 +24,8 @@
 #include "gui/dialog.hpp"
 #include "object/player.hpp"
 #include "supertux/game_session.hpp"
-#include "supertux/gameconfig.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/savegame.hpp"
 #include "supertux/sector.hpp"
-#include "util/gettext.hpp"
-#include "util/log.hpp"
 
 MultiplayerPlayerMenu::MultiplayerPlayerMenu(int player_id)
 {

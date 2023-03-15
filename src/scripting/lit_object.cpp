@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/lit_object.hpp"
-#include "scripting/lit_object.hpp"
 
 namespace scripting {
 

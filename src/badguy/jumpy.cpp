@@ -16,10 +16,8 @@
 
 #include "badguy/jumpy.hpp"
 
-#include <algorithm>
 
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 
 static const float JUMPYSPEED=-600;
 static const float JUMPY_MID_TOLERANCE=4;

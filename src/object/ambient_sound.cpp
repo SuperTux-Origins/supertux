@@ -16,14 +16,12 @@
 
 #include "object/ambient_sound.hpp"
 
-#include <limits>
 
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
 #include "object/camera.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "video/drawing_context.hpp"
 
 AmbientSound::AmbientSound(ReaderMapping const& mapping) :
   MovingObject(mapping),

@@ -16,31 +16,20 @@
 
 #include "supertux/sector_parser.hpp"
 
-#include <iostream>
-#include <physfs.h>
-#include <sexp/value.hpp>
 
 #include "badguy/fish_jumping.hpp"
 #include "badguy/jumpy.hpp"
-#include "object/ambient_light.hpp"
 #include "object/background.hpp"
 #include "object/camera.hpp"
-#include "object/cloud_particle_system.hpp"
-#include "object/custom_particle_system.hpp"
 #include "object/gradient.hpp"
 #include "object/music_object.hpp"
-#include "object/rain_particle_system.hpp"
-#include "object/snow_particle_system.hpp"
 #include "object/spawnpoint.hpp"
 #include "object/tilemap.hpp"
 #include "supertux/game_object_factory.hpp"
 #include "supertux/level.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
 #include "supertux/tile_manager.hpp"
 #include "util/reader_collection.hpp"
-#include "util/reader_iterator.hpp"
-#include "util/reader_mapping.hpp"
 #include "util/reader_object.hpp"
 
 static const std::string DEFAULT_BG = "images/background/antarctic/arctis2.png";

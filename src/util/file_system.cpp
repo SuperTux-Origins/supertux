@@ -17,25 +17,20 @@
 #include "util/file_system.hpp"
 
 #include <filesystem>
-#include <sstream>
-#include <stdexcept>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <vector>
 #if defined(_WIN32)
-  #include <windows.h>
-  #include <shellapi.h>
+#  include <windows.h>
+#  include <shellapi.h>
 #else
-  #include <cstdlib>
+#  include <cstdlib>
 #endif
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
+#  include <emscripten.h>
+#  include <emscripten/html5.h>
 #endif
 
 #include <SDL.h>
 
-#include "gui/dialog.hpp"
 #include "util/log.hpp"
 
 namespace fs = std::filesystem;

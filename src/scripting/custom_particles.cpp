@@ -15,7 +15,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/custom_particle_system.hpp"
-#include "scripting/custom_particles.hpp"
 
 namespace scripting {
 

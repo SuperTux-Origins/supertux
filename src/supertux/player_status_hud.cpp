@@ -16,10 +16,8 @@
 
 #include "supertux/player_status_hud.hpp"
 
-#include <sstream>
 
 #include "control/input_manager.hpp"
-#include "supertux/game_object.hpp"
 #include "supertux/player_status.hpp"
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"

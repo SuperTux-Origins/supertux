@@ -20,7 +20,6 @@
 #include "audio/sound_manager.hpp"
 #include "object/player.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 MusicObject::MusicObject() :
   m_currentmusic(LEVEL_MUSIC),

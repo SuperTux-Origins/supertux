@@ -17,11 +17,9 @@
 #include "gui/item_stringselect.hpp"
 
 #include "gui/menu_manager.hpp"
-#include "supertux/colorscheme.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
 ItemStringSelect::ItemStringSelect(std::string const& text, std::vector<std::string> items, int* selected, int id) :

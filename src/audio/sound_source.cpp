@@ -16,7 +16,6 @@
 
 #include "audio/sound_source.hpp"
 
-#include <wstsound/sound_source.hpp>
 
 #include "math/vector.hpp"
 

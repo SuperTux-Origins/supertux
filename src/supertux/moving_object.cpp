@@ -16,9 +16,7 @@
 
 #include "supertux/moving_object.hpp"
 
-#include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 MovingObject::MovingObject() :
   m_col(COLGROUP_MOVING, *this)

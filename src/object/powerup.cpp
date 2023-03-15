@@ -20,8 +20,6 @@
 #include "math/random.hpp"
 #include "object/player.hpp"
 #include "object/sprite_particle.hpp"
-#include "scripting/level.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"

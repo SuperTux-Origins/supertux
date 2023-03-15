@@ -16,7 +16,6 @@
 
 #include "badguy/walkingleaf.hpp"
 
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
 WalkingLeaf::WalkingLeaf(ReaderMapping const& reader) :

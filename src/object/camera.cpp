@@ -16,7 +16,6 @@
 
 #include "object/camera.hpp"
 
-#include <math.h>
 #include <physfs.h>
 
 #include "math/util.hpp"
@@ -25,7 +24,6 @@
 #include "supertux/sector.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 #include "video/drawing_context.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"

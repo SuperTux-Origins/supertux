@@ -17,16 +17,12 @@
 
 #include "worldmap/worldmap_state.hpp"
 
-#include "math/vector.hpp"
 #include "object/tilemap.hpp"
-#include "squirrel/squirrel_util.hpp"
 #include "supertux/savegame.hpp"
 #include "supertux/tile.hpp"
-#include "util/log.hpp"
 #include "worldmap/level_tile.hpp"
 #include "worldmap/sprite_change.hpp"
 #include "worldmap/tux.hpp"
-#include "worldmap/worldmap.hpp"
 
 namespace worldmap {
 

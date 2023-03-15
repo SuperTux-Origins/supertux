@@ -16,9 +16,7 @@
 
 #include "badguy/walking_badguy.hpp"
 
-#include <math.h>
 
-#include "sprite/sprite.hpp"
 
 WalkingBadguy::WalkingBadguy(Vector const& pos,
                              std::string const& sprite_name_,

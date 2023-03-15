@@ -16,12 +16,9 @@
 
 #include "supertux/game_session.hpp"
 
-#include <cfloat>
 
 #include "audio/sound_manager.hpp"
-#include "control/input_manager.hpp"
 #include "gui/menu_manager.hpp"
-#include "math/vector.hpp"
 #include "object/camera.hpp"
 #include "object/endsequence_fireworks.hpp"
 #include "object/endsequence_walk.hpp"
@@ -40,7 +37,6 @@
 #include "supertux/sector.hpp"
 #include "util/file_system.hpp"
 #include "video/compositor.hpp"
-#include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 #include "worldmap/worldmap.hpp"
 

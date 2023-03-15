@@ -16,8 +16,6 @@
 
 #include "video/gl/gl_shader.hpp"
 
-#include <fstream>
-#include <sstream>
 
 #include "physfs/ifile_stream.hpp"
 #include "video/glutil.hpp"

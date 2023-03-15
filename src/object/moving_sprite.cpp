@@ -16,7 +16,6 @@
 
 #include "object/moving_sprite.hpp"
 
-#include <math.h>
 #include <physfs.h>
 
 #include "math/random.hpp"
@@ -26,7 +25,6 @@
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 MovingSprite::MovingSprite(Vector const& pos, std::string const& sprite_name_,
                            int layer_, CollisionGroup collision_group) :

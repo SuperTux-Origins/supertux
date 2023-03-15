@@ -19,7 +19,6 @@
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "util/reader_mapping.hpp"
-#include "video/drawing_context.hpp"
 
 namespace worldmap {
 

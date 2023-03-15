@@ -20,10 +20,7 @@
 #include "object/bumper.hpp"
 #include "object/camera.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
-#include "util/reader_mapping.hpp"
 
 FallBlock::FallBlock(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/fallblock/cave-4x4.sprite", LAYER_OBJECTS, COLGROUP_STATIC),

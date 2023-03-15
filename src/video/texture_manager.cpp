@@ -16,21 +16,12 @@
 
 #include "video/texture_manager.hpp"
 
-#include <SDL_image.h>
-#include <assert.h>
-#include <sstream>
 
-#include "math/rect.hpp"
-#include "physfs/physfs_sdl.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "video/color.hpp"
-#include "video/gl.hpp"
-#include "video/sampler.hpp"
 #include "video/sdl_surface.hpp"
-#include "video/texture.hpp"
 #include "video/video_system.hpp"
 
 namespace {

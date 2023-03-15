@@ -16,15 +16,11 @@
 
 #include "object/rain_particle_system.hpp"
 
-#include <assert.h>
-#include <math.h>
 
-#include "math/easing.hpp"
 #include "math/random.hpp"
 #include "object/camera.hpp"
 #include "object/rainsplash.hpp"
 #include "supertux/sector.hpp"
-#include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"

@@ -16,7 +16,6 @@
 
 #include "badguy/yeti_stalactite.hpp"
 
-#include "sprite/sprite.hpp"
 
 static const float YT_SHAKE_TIME = .8f;
 

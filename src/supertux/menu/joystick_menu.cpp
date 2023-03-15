@@ -17,7 +17,6 @@
 
 #include "supertux/menu/joystick_menu.hpp"
 
-#include <sstream>
 
 #include "control/joystick_manager.hpp"
 #include "gui/item_controlfield.hpp"

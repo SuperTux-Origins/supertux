@@ -16,18 +16,13 @@
 
 #include "gui/dialog.hpp"
 
-#include <algorithm>
 
-#include "control/controller.hpp"
 #include "gui/mousecursor.hpp"
 #include "math/util.hpp"
 #include "supertux/colorscheme.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "video/drawing_context.hpp"
-#include "video/renderer.hpp"
-#include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
 Dialog::Dialog(bool passive, bool auto_clear_dialogs) :

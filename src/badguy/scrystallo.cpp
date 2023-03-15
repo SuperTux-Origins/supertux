@@ -18,7 +18,6 @@
 
 #include "audio/sound_manager.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 

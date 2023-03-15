@@ -16,7 +16,6 @@
 
 #include "control/joystick_config.hpp"
 
-#include <iostream>
 
 #include "util/gettext.hpp"
 #include "util/log.hpp"

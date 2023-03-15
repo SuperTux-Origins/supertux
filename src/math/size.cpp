@@ -16,7 +16,6 @@
 
 #include "math/size.hpp"
 
-#include <ostream>
 
 #include "math/sizef.hpp"
 

@@ -15,7 +15,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/cloud_particle_system.hpp"
-#include "scripting/clouds.hpp"
 
 namespace scripting {
 

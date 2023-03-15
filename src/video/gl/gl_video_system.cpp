@@ -16,18 +16,13 @@
 
 #include "video/gl/gl_video_system.hpp"
 
-#include "math/rect.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "util/log.hpp"
 #include "video/gl/gl33core_context.hpp"
-#include "video/gl/gl_context.hpp"
-#include "video/gl/gl_program.hpp"
 #include "video/gl/gl_screen_renderer.hpp"
 #include "video/gl/gl_texture.hpp"
 #include "video/gl/gl_texture_renderer.hpp"
-#include "video/gl/gl_texture_renderer.hpp"
-#include "video/gl/gl_vertex_arrays.hpp"
 #include "video/glutil.hpp"
 #include "video/sdl_surface.hpp"
 #include "video/texture_manager.hpp"

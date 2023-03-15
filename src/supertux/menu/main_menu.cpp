@@ -21,19 +21,14 @@
 #include "audio/sound_manager.hpp"
 #include "gui/dialog.hpp"
 #include "gui/menu_item.hpp"
-#include "gui/menu_manager.hpp"
 #include "physfs/util.hpp"
 #include "supertux/fadetoblack.hpp"
 #include "supertux/game_manager.hpp"
 #include "supertux/globals.hpp"
-#include "supertux/level.hpp"
-#include "supertux/level_parser.hpp"
 #include "supertux/levelset.hpp"
 #include "supertux/menu/menu_storage.hpp"
 #include "supertux/menu/sorted_contrib_menu.hpp"
 #include "supertux/screen_manager.hpp"
-#include "supertux/textscroller_screen.hpp"
-#include "supertux/world.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "video/video_system.hpp"
@@ -47,8 +42,6 @@
 #endif
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
 #endif
 
 MainMenu::MainMenu()

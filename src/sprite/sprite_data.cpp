@@ -16,17 +16,12 @@
 
 #include "sprite/sprite_data.hpp"
 
-#include <algorithm>
-#include <sstream>
-#include <stdexcept>
 
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
-#include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/reader_object.hpp"
 #include "video/surface.hpp"
 
 SpriteData::Action::Action() :

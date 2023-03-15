@@ -19,7 +19,6 @@
 
 #include "collision/collision_listener.hpp"
 #include "collision/collision_movement_manager.hpp"
-#include "supertux/game_object.hpp"
 
 CollisionObject::CollisionObject(CollisionGroup group, CollisionListener& listener) :
   m_listener(listener),

@@ -16,10 +16,7 @@
 
 #include "object/camera.hpp"
 
-#include "scripting/camera.hpp"
 #include "supertux/sector.hpp"
-#include "util/dynamic_scoped_ref.hpp"
-#include "util/log.hpp"
 
 namespace scripting {
 

@@ -16,13 +16,9 @@
 
 #include "squirrel/squirrel_environment.hpp"
 
-#include <algorithm>
 
 #include "squirrel/script_interface.hpp"
-#include "squirrel/squirrel_error.hpp"
 #include "squirrel/squirrel_scheduler.hpp"
-#include "squirrel/squirrel_util.hpp"
-#include "squirrel/squirrel_virtual_machine.hpp"
 #include "supertux/game_object.hpp"
 #include "supertux/globals.hpp"
 #include "util/log.hpp"

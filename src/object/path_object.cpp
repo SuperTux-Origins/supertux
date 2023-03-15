@@ -16,14 +16,9 @@
 
 #include "object/path_object.hpp"
 
-#include <optional>
 
-#include "object/path_gameobject.hpp"
-#include "supertux/d_scope.hpp"
 #include "supertux/sector.hpp"
-#include "util/log.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 PathObject::PathObject() :
   m_path_handle(),

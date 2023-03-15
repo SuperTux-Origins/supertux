@@ -17,17 +17,13 @@
 
 #include "object/weak_block.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
 #include "math/random.hpp"
 #include "object/bullet.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/sector.hpp"
-#include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 
 WeakBlock::WeakBlock(ReaderMapping const& mapping) :

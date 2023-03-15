@@ -16,7 +16,6 @@
 
 #include "badguy/root.hpp"
 
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 
 static const float SPEED_GROW = 256;

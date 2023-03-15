@@ -19,12 +19,9 @@
 #include <assert.h>
 #include <physfs.h>
 #include <sstream>
-#include <stdexcept>
-#include <stdio.h>
 
 #include "util/log.hpp"
 
-#include <iostream>
 
 namespace {
 

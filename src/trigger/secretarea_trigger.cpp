@@ -18,15 +18,11 @@
 
 #include "audio/sound_manager.hpp"
 #include "object/tilemap.hpp"
-#include "supertux/debug.hpp"
 #include "supertux/level.hpp"
 #include "supertux/resources.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
-#include "video/font.hpp"
-#include "video/video_system.hpp"
-#include "video/viewport.hpp"
 
 static const float MESSAGE_TIME=3.5;
 

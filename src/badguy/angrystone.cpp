@@ -17,7 +17,6 @@
 #include "badguy/angrystone.hpp"
 
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 
 static const float CHARGE_SPEED = 240;
 

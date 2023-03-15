@@ -15,7 +15,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/tilemap.hpp"
-#include "scripting/tilemap.hpp"
 
 namespace scripting {
 

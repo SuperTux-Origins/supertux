@@ -16,10 +16,8 @@
 
 #include "collision/collision.hpp"
 
-#include <algorithm>
 
 #include "math/aatriangle.hpp"
-#include "math/rectf.hpp"
 
 namespace collision {
 

@@ -16,32 +16,21 @@
 
 #include "object/custom_particle_system.hpp"
 
-#include <assert.h>
-#include <math.h>
 
-#include <fmt/format.h>
 #include <prio/reader_error.hpp>
 
 #include "collision/collision.hpp"
-#include "gui/menu_manager.hpp"
 #include "math/aatriangle.hpp"
-#include "math/easing.hpp"
 #include "math/random.hpp"
 #include "math/util.hpp"
 #include "object/camera.hpp"
 #include "object/tilemap.hpp"
-#include "supertux/fadetoblack.hpp"
 #include "supertux/game_session.hpp"
-#include "supertux/screen_manager.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
-#include "util/reader.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 #include "video/drawing_context.hpp"
-#include "video/surface.hpp"
 #include "video/surface_batch.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"

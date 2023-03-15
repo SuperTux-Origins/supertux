@@ -16,7 +16,6 @@
 
 #include "badguy/mrtree.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "badguy/stumpy.hpp"
@@ -25,8 +24,6 @@
 #include "math/util.hpp"
 #include "object/player.hpp"
 #include "object/sprite_particle.hpp"
-#include "sprite/sprite.hpp"
-#include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 
 static const float TREE_SPEED = 100;

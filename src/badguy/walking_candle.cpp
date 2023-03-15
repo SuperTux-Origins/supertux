@@ -17,7 +17,6 @@
 #include "badguy/walking_candle.hpp"
 
 #include "object/lantern.hpp"
-#include "sprite/sprite.hpp"
 #include "util/reader_mapping.hpp"
 
 WalkingCandle::WalkingCandle(ReaderMapping const& reader)

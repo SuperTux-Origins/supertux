@@ -16,13 +16,8 @@
 
 #include "supertux/main.hpp"
 
-#include <config.h>
-#include <filesystem>
-#include <fstream>
 
-#include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <fmt/format.h>
 #include <physfs.h>
 
 #ifdef __ANDROID__
@@ -35,44 +30,18 @@
 
 #include <version.h>
 
-#include "audio/sound_manager.hpp"
-#include "gui/dialog.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/notification.hpp"
 #include "math/random.hpp"
 #include "object/player.hpp"
 #include "object/spawnpoint.hpp"
-#include "physfs/physfs_sdl.hpp"
-#include "port/emscripten.hpp"
-#include "sprite/sprite_data.hpp"
-#include "sprite/sprite_manager.hpp"
-#include "supertux/command_line_arguments.hpp"
-#include "supertux/console.hpp"
 #include "supertux/error_handler.hpp"
-#include "supertux/game_manager.hpp"
 #include "supertux/game_session.hpp"
-#include "supertux/gameconfig.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/level.hpp"
-#include "supertux/level_parser.hpp"
-#include "supertux/player_status.hpp"
-#include "supertux/resources.hpp"
-#include "supertux/savegame.hpp"
 #include "supertux/screen_fade.hpp"
-#include "supertux/screen_manager.hpp"
 #include "supertux/sector.hpp"
-#include "supertux/tile.hpp"
-#include "supertux/tile_manager.hpp"
 #include "supertux/title_screen.hpp"
-#include "supertux/world.hpp"
 #include "util/file_system.hpp"
-#include "util/gettext.hpp"
-#include "util/reader_document.hpp"
-#include "util/reader_mapping.hpp"
 #include "util/timelog.hpp"
 #include "video/sdl_surface.hpp"
-#include "video/sdl_surface_ptr.hpp"
-#include "video/ttf_surface_manager.hpp"
 #include "worldmap/worldmap.hpp"
 #include "worldmap/worldmap_screen.hpp"
 

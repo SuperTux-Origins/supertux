@@ -17,9 +17,6 @@
 
 #include "badguy/crusher.hpp"
 
-#include <algorithm>
-#include <math.h>
-#include <string>
 
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
@@ -28,10 +25,7 @@
 #include "object/coin.hpp"
 #include "object/particles.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
-#include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
-#include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 
 namespace {

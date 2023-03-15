@@ -16,13 +16,8 @@
 
 #include "viewport.hpp"
 
-#include <algorithm>
 
-#include "config.h"
 
-#include "math/rect.hpp"
-#include "math/size.hpp"
-#include "math/vector.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 

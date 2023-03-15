@@ -16,15 +16,12 @@
 
 #include "video/ttf_surface.hpp"
 
-#include <SDL_ttf.h>
 
-#include <sstream>
 
 #include "util/log.hpp"
 #include "video/sdl_surface.hpp"
 #include "video/surface.hpp"
 #include "video/ttf_font.hpp"
-#include "video/ttf_surface_manager.hpp"
 #include "video/video_system.hpp"
 
 TTFSurfacePtr

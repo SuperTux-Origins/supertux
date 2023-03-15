@@ -17,11 +17,9 @@
 
 #include "object/ispy.hpp"
 
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 Ispy::Ispy(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/ispy/ispy.sprite", LAYER_TILES + 5, COLGROUP_DISABLED),

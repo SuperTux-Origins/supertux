@@ -18,7 +18,6 @@
 
 #include "math/random.hpp"
 #include "object/camera.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"

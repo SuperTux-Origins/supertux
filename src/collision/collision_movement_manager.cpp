@@ -15,7 +15,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "collision/collision_movement_manager.hpp"
-#include "object/player.hpp"
 
 void
 CollisionGroundMovementManager::register_movement(

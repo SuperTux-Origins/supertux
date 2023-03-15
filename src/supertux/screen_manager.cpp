@@ -19,34 +19,24 @@
 #include "supertux/screen_manager.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "gui/dialog.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/mousecursor.hpp"
 #include "object/player.hpp"
-#include "squirrel/squirrel_virtual_machine.hpp"
 #include "supertux/console.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/controller_hud.hpp"
 #include "supertux/debug.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/gameconfig.hpp"
-#include "supertux/globals.hpp"
 #include "supertux/level.hpp"
 #include "supertux/menu/menu_storage.hpp"
 #include "supertux/resources.hpp"
 #include "supertux/screen_fade.hpp"
 #include "supertux/sector.hpp"
-#include "util/log.hpp"
 #include "video/compositor.hpp"
-#include "video/drawing_context.hpp"
 
-#include <chrono>
-#include <iostream>
-#include <stdio.h>
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
 #endif
 
 struct ScreenManager::FPS_Stats

@@ -16,9 +16,7 @@
 
 #include "supertux/gameconfig.hpp"
 
-#include <ctime>
 
-#include "config.h"
 
 #include "supertux/colorscheme.hpp"
 #include "util/log.hpp"
@@ -26,12 +24,8 @@
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
-#include "video/video_system.hpp"
-#include "video/viewport.hpp"
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
 #endif
 
 Config::Config() :

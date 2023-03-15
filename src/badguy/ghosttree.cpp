@@ -16,8 +16,6 @@
 
 #include "badguy/ghosttree.hpp"
 
-#include <algorithm>
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "badguy/root.hpp"
@@ -25,7 +23,6 @@
 #include "math/random.hpp"
 #include "object/lantern.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 

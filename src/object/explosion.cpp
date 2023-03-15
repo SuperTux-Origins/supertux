@@ -17,7 +17,6 @@
 #include "object/explosion.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/badguy.hpp"
 #include "badguy/walking_badguy.hpp"
 #include "math/random.hpp"
 #include "object/bonus_block.hpp"
@@ -25,9 +24,7 @@
 #include "object/particles.hpp"
 #include "object/player.hpp"
 #include "object/weak_block.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/sector.hpp"
 #include "supertux/sector.hpp"
 
 Explosion::Explosion(Vector const& pos, float p_push_strength,

@@ -19,15 +19,10 @@
 #include "badguy/goldbomb.hpp"
 #include "object/bonus_block.hpp"
 #include "object/coin.hpp"
-#include "physfs/util.hpp"
 #include "supertux/sector.hpp"
 #include "trigger/secretarea_trigger.hpp"
-#include "util/file_system.hpp"
-#include "util/log.hpp"
-#include "util/writer.hpp"
 
 #include <numeric>
-#include <physfs.h>
 
 Level* Level::s_current = nullptr;
 

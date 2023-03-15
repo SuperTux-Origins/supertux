@@ -16,18 +16,12 @@
 
 #include "gui/notification.hpp"
 
-#include "control/controller.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/mousecursor.hpp"
-#include "supertux/colorscheme.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "util/gettext.hpp"
 #include "util/log.hpp"
-#include "video/color.hpp"
-#include "video/renderer.hpp"
-#include "video/video_system.hpp"
 #include "video/viewport.hpp"
 
 Notification::Notification(std::string id, bool no_auto_hide, bool no_auto_disable) :

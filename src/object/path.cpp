@@ -18,8 +18,6 @@
 
 #include "object/path.hpp"
 
-#include "math/easing.hpp"
-#include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"

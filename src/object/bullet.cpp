@@ -20,7 +20,6 @@
 #include "object/camera.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
-#include "supertux/direction.hpp"
 #include "supertux/sector.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"

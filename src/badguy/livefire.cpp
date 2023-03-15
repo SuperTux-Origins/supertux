@@ -19,7 +19,6 @@
 #include "audio/sound_manager.hpp"
 #include "object/player.hpp"
 #include "object/sprite_particle.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
 LiveFire::LiveFire(ReaderMapping const& reader) :

@@ -16,10 +16,8 @@
 
 #include "badguy/bouncing_snowball.hpp"
 
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
-#include <algorithm>
 
 static const float JUMPSPEED = -450;
 static const float BSNOWBALL_WALKSPEED = 80;

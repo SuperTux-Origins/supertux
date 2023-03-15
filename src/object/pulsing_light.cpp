@@ -16,8 +16,6 @@
 
 #include "object/pulsing_light.hpp"
 
-#include <assert.h>
-#include <math.h>
 
 #include "math/random.hpp"
 #include "math/util.hpp"

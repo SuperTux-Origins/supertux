@@ -16,7 +16,6 @@
 
 #include "control/keyboard_config.hpp"
 
-#include <optional>
 
 #include "util/log.hpp"
 #include "util/reader_collection.hpp"

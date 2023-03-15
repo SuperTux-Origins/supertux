@@ -18,8 +18,6 @@
 
 #include "object/floating_image.hpp"
 #include "scripting/floating_image.hpp"
-#include "supertux/sector.hpp"
-#include "worldmap/worldmap.hpp"
 
 namespace scripting {
 

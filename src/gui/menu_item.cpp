@@ -21,7 +21,6 @@
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "video/drawing_context.hpp"
 
 //static const float FLICK_CURSOR_TIME = 0.5f;
 

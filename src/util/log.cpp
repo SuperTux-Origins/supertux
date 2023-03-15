@@ -17,7 +17,6 @@
 
 #include "util/log.hpp"
 
-#include <iostream>
 
 std::ostream& get_logging_instance(bool use_console_buffer)
 {

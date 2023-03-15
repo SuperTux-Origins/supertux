@@ -17,13 +17,9 @@
 
 #include "trigger/text_area.hpp"
 
-#include "math/anchor_point.hpp"
-#include "object/player.hpp"
 #include "object/text_object.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "video/drawing_context.hpp"
-#include "video/layer.hpp"
 
 TextArea::TextArea(ReaderMapping const& mapping) :
   TriggerBase(mapping),

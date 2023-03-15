@@ -17,7 +17,6 @@
 
 #include "supertux/game_object_manager.hpp"
 
-#include <algorithm>
 
 #include "object/tilemap.hpp"
 

@@ -16,7 +16,6 @@
 
 #include "math/easing.hpp"
 #include "object/rain_particle_system.hpp"
-#include "scripting/rain.hpp"
 
 namespace scripting {
 

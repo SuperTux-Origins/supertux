@@ -17,15 +17,12 @@
 
 #include "supertux/player_status.hpp"
 
-#include <sstream>
 
 #include "audio/sound_manager.hpp"
 #include "supertux/game_session.hpp"
-#include "supertux/globals.hpp"
 #include "util/log.hpp"
 #include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 static const int START_COINS = 100;
 static const int MAX_COINS = 9999;

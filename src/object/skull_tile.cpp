@@ -18,7 +18,6 @@
 
 #include "math/random.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
 static const float CRACKTIME = 0.3f;

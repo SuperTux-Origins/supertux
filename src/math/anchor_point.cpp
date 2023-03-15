@@ -16,10 +16,7 @@
 
 #include "math/anchor_point.hpp"
 
-#include <config.h>
 
-#include <sstream>
-#include <stdexcept>
 
 #include "math/rectf.hpp"
 #include "util/gettext.hpp"

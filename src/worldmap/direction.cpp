@@ -16,7 +16,6 @@
 
 #include "worldmap/direction.hpp"
 
-#include "util/gettext.hpp"
 #include "util/log.hpp"
 
 namespace worldmap {

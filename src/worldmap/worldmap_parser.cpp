@@ -17,35 +17,24 @@
 #include "worldmap/worldmap_parser.hpp"
 
 #include <physfs.h>
-#include <stdexcept>
-#include <string>
 
-#include <fmt/format.h>
 
 #include "object/ambient_light.hpp"
 #include "object/background.hpp"
 #include "object/decal.hpp"
 #include "object/music_object.hpp"
-#include "object/path_gameobject.hpp"
 #include "object/tilemap.hpp"
 #include "physfs/util.hpp"
 #include "supertux/tile_manager.hpp"
 #include "util/file_system.hpp"
-#include "util/log.hpp"
-#include "util/reader.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/reader_object.hpp"
 #include "worldmap/level_tile.hpp"
-#include "worldmap/spawn_point.hpp"
 #include "worldmap/special_tile.hpp"
 #include "worldmap/sprite_change.hpp"
 #include "worldmap/teleporter.hpp"
-#include "worldmap/tux.hpp"
 #include "worldmap/worldmap.hpp"
-#include "worldmap/worldmap_parser.hpp"
-#include "worldmap/worldmap_screen.hpp"
 
 namespace worldmap {
 

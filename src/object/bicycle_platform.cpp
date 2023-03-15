@@ -16,15 +16,12 @@
 
 #include "object/bicycle_platform.hpp"
 
-#include <algorithm>
-#include <math.h>
 
 #include "math/util.hpp"
 #include "object/player.hpp"
 #include "object/portable.hpp"
 #include "supertux/debug.hpp"
 #include "supertux/sector.hpp"
-#include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 
 BicyclePlatformChild::BicyclePlatformChild(ReaderMapping const& reader, float angle_offset, BicyclePlatform& parent) :

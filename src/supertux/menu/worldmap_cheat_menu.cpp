@@ -20,12 +20,9 @@
 #include "gui/menu_manager.hpp"
 #include "supertux/menu/menu_storage.hpp"
 #include "supertux/menu/worldmap_cheat_apply_menu.hpp"
-#include "supertux/player_status.hpp"
 #include "supertux/savegame.hpp"
-#include "util/log.hpp"
 #include "worldmap/level_tile.hpp"
 #include "worldmap/tux.hpp"
-#include "worldmap/worldmap.hpp"
 
 WorldmapCheatMenu::WorldmapCheatMenu()
 {

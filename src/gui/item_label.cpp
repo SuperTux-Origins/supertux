@@ -16,11 +16,9 @@
 
 #include "gui/item_label.hpp"
 
-#include "supertux/colorscheme.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "video/drawing_context.hpp"
 
 ItemLabel::ItemLabel(std::string const& text_) :
   MenuItem(text_)

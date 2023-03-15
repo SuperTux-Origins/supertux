@@ -16,9 +16,9 @@
 
 #include "supertux/levelintro.hpp"
 
-#include "control/input_manager.hpp"
+#include <fmt/format.h>
+
 #include "math/random.hpp"
-#include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/fadetoblack.hpp"
@@ -28,12 +28,8 @@
 #include "supertux/resources.hpp"
 #include "supertux/screen_manager.hpp"
 #include "supertux/sector.hpp"
-#include "util/gettext.hpp"
 #include "util/log.hpp"
 #include "video/compositor.hpp"
-
-#include <fmt/format.h>
-
 
 // TODO: Display all players on the intro scene
 LevelIntro::LevelIntro(Level const& level, Statistics const* best_level_statistics, PlayerStatus const& player_status) :

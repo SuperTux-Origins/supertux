@@ -17,11 +17,9 @@
 #include "gui/item_back.hpp"
 
 #include "gui/menu_manager.hpp"
-#include "supertux/colorscheme.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/resources.hpp"
-#include "video/drawing_context.hpp"
 #include "video/surface.hpp"
 
 ItemBack::ItemBack(std::string const& text, int id) :

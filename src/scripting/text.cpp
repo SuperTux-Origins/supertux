@@ -17,8 +17,6 @@
 #include "scripting/text.hpp"
 
 #include "object/text_object.hpp"
-#include "supertux/sector.hpp"
-#include "worldmap/worldmap.hpp"
 
 namespace scripting {
 

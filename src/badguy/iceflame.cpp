@@ -16,13 +16,10 @@
 
 #include "badguy/iceflame.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
-#include "audio/sound_source.hpp"
 #include "math/util.hpp"
 #include "object/sprite_particle.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
 Iceflame::Iceflame(ReaderMapping const& reader) :

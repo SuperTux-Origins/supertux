@@ -17,7 +17,6 @@
 
 #include "supertux/tile_manager.hpp"
 
-#include "supertux/tile.hpp"
 #include "supertux/tile_set.hpp"
 
 TileManager::TileManager() :

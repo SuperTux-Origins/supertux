@@ -16,18 +16,13 @@
 
 #include "video/video_system.hpp"
 
-#include <assert.h>
-#include <config.h>
-#include <iomanip>
 #include <optional>
 #include <physfs.h>
-#include <sstream>
 
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "video/null/null_video_system.hpp"
 #include "video/sdl_surface.hpp"
-#include "video/sdl_surface_ptr.hpp"
 
 #include "video/gl/gl_video_system.hpp"
 

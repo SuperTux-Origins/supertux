@@ -16,16 +16,12 @@
 
 #include "video/canvas.hpp"
 
-#include <algorithm>
 
-#include "supertux/globals.hpp"
-#include "util/log.hpp"
 #include "util/obstackpp.hpp"
 #include "video/drawing_request.hpp"
 #include "video/painter.hpp"
 #include "video/renderer.hpp"
 #include "video/surface.hpp"
-#include "video/video_system.hpp"
 
 Canvas::Canvas(DrawingContext& context, obstack& obst) :
   m_context(context),

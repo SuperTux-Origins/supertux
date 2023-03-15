@@ -19,19 +19,16 @@
 #include "object/block.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/badguy.hpp"
 #include "badguy/bomb.hpp"
 #include "math/random.hpp"
 #include "object/coin.hpp"
 #include "object/growup.hpp"
 #include "object/player.hpp"
 #include "object/sprite_particle.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 static const float BOUNCY_BRICK_MAX_OFFSET = 8;
 static const float BOUNCY_BRICK_SPEED = 90;

@@ -20,7 +20,6 @@
 #include "math/random.hpp"
 #include "object/bullet.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/game_object_factory.hpp"
 #include "supertux/sector.hpp"
 #include "util/file_system.hpp"

@@ -15,7 +15,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "object/platform.hpp"
-#include "scripting/platform.hpp"
 
 namespace scripting {
 

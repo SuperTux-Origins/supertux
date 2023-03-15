@@ -17,7 +17,6 @@
 #include "object/invisible_wall.hpp"
 
 #include "util/reader_mapping.hpp"
-#include "video/drawing_context.hpp"
 
 InvisibleWall::InvisibleWall(ReaderMapping const& mapping):
   MovingObject(mapping),

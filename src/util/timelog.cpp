@@ -17,7 +17,6 @@
 
 #include "util/timelog.hpp"
 
-#include <iostream>
 
 #include "util/log.hpp"
 

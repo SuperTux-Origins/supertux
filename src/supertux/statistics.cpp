@@ -18,17 +18,12 @@
 
 #include "supertux/statistics.hpp"
 
-#include <algorithm>
-#include <iomanip>
-#include <limits>
 
 #include "audio/sound_manager.hpp"
-#include "math/util.hpp"
 #include "squirrel/squirrel_util.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/level.hpp"
 #include "supertux/resources.hpp"
-#include "util/gettext.hpp"
 #include "util/log.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"

@@ -19,14 +19,10 @@
 #include "object/gradient.hpp"
 
 #include "object/camera.hpp"
-#include "supertux/gameconfig.hpp"
 #include "supertux/level.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
-#include "video/video_system.hpp"
-#include "video/viewport.hpp"
 
 Gradient::Gradient() :
   ExposedObject<Gradient, scripting::Gradient>(this),

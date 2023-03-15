@@ -16,12 +16,10 @@
 
 #include "object/growup.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "math/util.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 
 GrowUp::GrowUp(Vector const& pos, Direction direction) :

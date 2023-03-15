@@ -16,13 +16,10 @@
 
 #include "video/surface.hpp"
 
-#include <sstream>
 
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
-#include "video/texture.hpp"
 #include "video/texture_manager.hpp"
-#include "video/video_system.hpp"
 
 SurfacePtr
 Surface::from_reader(ReaderMapping const& mapping, std::optional<Rect> const& rect, std::string const& filename)

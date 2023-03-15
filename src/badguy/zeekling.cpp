@@ -17,11 +17,9 @@
 
 #include "badguy/zeekling.hpp"
 
-#include <math.h>
 
 #include "math/random.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 
 Zeekling::Zeekling(ReaderMapping const& reader) :
   BadGuy(reader, "images/creatures/zeekling/zeekling.sprite"),

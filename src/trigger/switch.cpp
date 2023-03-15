@@ -16,13 +16,11 @@
 
 #include "trigger/switch.hpp"
 
-#include <sstream>
 
 #include "audio/sound_manager.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
-#include "util/log.hpp"
 #include "util/reader_mapping.hpp"
 
 namespace {

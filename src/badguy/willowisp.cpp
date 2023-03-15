@@ -21,11 +21,9 @@
 #include "badguy/dispenser.hpp"
 #include "object/lantern.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/game_session.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 
 static const float FLYSPEED = 64.0f; /**< speed in px per second */
 static const float TRACK_RANGE = 384.0f; /**< at what distance to start tracking the player */

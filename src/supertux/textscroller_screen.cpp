@@ -17,24 +17,16 @@
 
 #include "supertux/textscroller_screen.hpp"
 
-#include <sstream>
 
 #include "audio/sound_manager.hpp"
-#include "control/input_manager.hpp"
 #include "object/textscroller.hpp"
 #include "supertux/fadetoblack.hpp"
-#include "supertux/globals.hpp"
-#include "supertux/info_box_line.hpp"
 #include "supertux/screen_manager.hpp"
-#include "util/log.hpp"
-#include "util/reader.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/compositor.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
-#include "video/video_system.hpp"
-#include "video/viewport.hpp"
 
 namespace {
 

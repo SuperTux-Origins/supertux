@@ -17,7 +17,6 @@
 #include "badguy/sspiky.hpp"
 
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 
 SSpiky::SSpiky(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/spiky/sleepingspiky.sprite", "left", "right"), state(SSPIKY_SLEEPING)

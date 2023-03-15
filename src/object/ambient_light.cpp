@@ -16,12 +16,9 @@
 
 #include "object/ambient_light.hpp"
 
-#include <sexp/io.hpp>
-#include <sexp/value.hpp>
 
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
-#include "util/writer.hpp"
 #include "video/drawing_context.hpp"
 
 AmbientLight::AmbientLight(Color const& color) :

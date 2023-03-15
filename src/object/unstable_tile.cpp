@@ -21,7 +21,6 @@
 
 #include "object/explosion.hpp"
 #include "object/player.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/sector.hpp"
 

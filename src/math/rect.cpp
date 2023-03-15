@@ -16,7 +16,6 @@
 
 #include "math/rect.hpp"
 
-#include <ostream>
 
 #include "math/rectf.hpp"
 

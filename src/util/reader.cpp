@@ -22,9 +22,7 @@
 
 #include "util/reader.hpp"
 
-#include <physfs.h>
 
-#include "util/gettext.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 

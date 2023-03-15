@@ -16,13 +16,11 @@
 
 #include "badguy/mole.hpp"
 
-#include <math.h>
 
 #include "audio/sound_manager.hpp"
 #include "badguy/mole_rock.hpp"
 #include "math/random.hpp"
 #include "math/util.hpp"
-#include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
 static const float MOLE_WAIT_TIME = 0.2f; /**< time to wait before and after throwing */

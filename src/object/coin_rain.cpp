@@ -18,7 +18,6 @@
 
 #include "math/random.hpp"
 #include "object/coin.hpp"
-#include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 
