@@ -8,13 +8,6 @@
 #define INSTALL_SUBDIR_BIN "${INSTALL_SUBDIR_BIN}"
 #define INSTALL_SUBDIR_SHARE "${INSTALL_SUBDIR_SHARE}"
 
-#cmakedefine HAVE_ICONV_CONST
-#ifdef HAVE_ICONV_CONST
-#define ICONV_CONST const
-#else
-#define ICONV_CONST
-#endif
-
 #cmakedefine HAVE_OPENGL
 
 #cmakedefine HAVE_LIBCURL
