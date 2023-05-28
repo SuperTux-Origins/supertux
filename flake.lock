@@ -149,28 +149,15 @@
         "type": "github"
       }
     },
-    "flake-utils_2": {
-      "locked": {
-        "lastModified": 1659877975,
-        "narHash": "sha256-zllb8aq3YO3h8B/U0/J1WBgAL8EX5yWf5pMj3G0NAmc=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "c0e246b9b83f637f4681389ecabcb2681b4f3af0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
     "freetype-win32": {
       "inputs": {
         "freetype_src": "freetype_src",
         "nixpkgs": [
           "nixpkgs"
         ],
-        "tinycmmc": "tinycmmc"
+        "tinycmmc": [
+          "tinycmmc"
+        ]
       },
       "locked": {
         "lastModified": 1660996667,
@@ -377,19 +364,19 @@
     },
     "miniswig": {
       "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
         "nixpkgs": [
           "nixpkgs"
+        ],
+        "tinycmmc": [
+          "tinycmmc"
         ]
       },
       "locked": {
-        "lastModified": 1682455433,
-        "narHash": "sha256-iEZarZ/VsgSi9NK512Vl0c93I+ojGRYXbyGZYFmzo+A=",
+        "lastModified": 1685305305,
+        "narHash": "sha256-ZBnX2xDCd7q/3PonBlMTRIxsf5Q1DQi5i/Zx/eKzTeg=",
         "owner": "WindstilleTeam",
         "repo": "miniswig",
-        "rev": "643a056e5b52a72ed5bd2d4d98e6e65c76aebba1",
+        "rev": "63bcca2a7a8dddd1c3e84cf7c551b859619dd742",
         "type": "github"
       },
       "original": {
@@ -664,7 +651,7 @@
         "sexpcpp": "sexpcpp",
         "squirrel": "squirrel",
         "strutcpp": "strutcpp",
-        "tinycmmc": "tinycmmc_2",
+        "tinycmmc": "tinycmmc",
         "wstsound": "wstsound",
         "xdgcpp": "xdgcpp"
       }
@@ -775,28 +762,6 @@
       }
     },
     "tinycmmc": {
-      "inputs": {
-        "flake-utils": "flake-utils_2",
-        "nixpkgs": [
-          "freetype-win32",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1660915337,
-        "narHash": "sha256-RUvBcVlsF0jleNeDGP2TtTYVozsx+7lJeOlQJ9vuYrk=",
-        "owner": "grumbel",
-        "repo": "tinycmmc",
-        "rev": "25af158259bc772a5393c6200c4ebfd0ec4e28d0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "grumbel",
-        "repo": "tinycmmc",
-        "type": "github"
-      }
-    },
-    "tinycmmc_2": {
       "inputs": {
         "flake-utils": [
           "flake-utils"

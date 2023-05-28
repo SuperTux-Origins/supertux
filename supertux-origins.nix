@@ -89,6 +89,8 @@ EOF
   nativeBuildInputs = [
     cmake
     pkgconfig
+
+    miniswig
   ]
   ++ (lib.optional stdenv.targetPlatform.isLinux makeWrapper);
 
@@ -107,10 +109,8 @@ EOF
     squirrel
     tinycmmc
     strutcpp
-    miniswig
     wstsound
     priocpp
-
     # checkInputs
     gtest
   ]

@@ -24,7 +24,7 @@
 #  include <unistd.h>
 #endif
 
-#if !defined(WIN32) || !defined(EMSCRIPTEN)
+#if !defined(WIN32) && !defined(EMSCRIPTEN)
 #  include <xdgcpp/xdg.h>
 #endif
 

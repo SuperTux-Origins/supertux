@@ -58,6 +58,7 @@
 
     freetype-win32.url = "github:grumnix/freetype-win32";
     freetype-win32.inputs.nixpkgs.follows = "nixpkgs";
+    freetype-win32.inputs.tinycmmc.follows = "tinycmmc";
 
     SDL2_ttf-win32.url = "github:grumnix/SDL2_ttf-win32";
     SDL2_ttf-win32.inputs.nixpkgs.follows = "nixpkgs";
@@ -69,7 +70,7 @@
 
     miniswig.url = "github:WindstilleTeam/miniswig";
     miniswig.inputs.nixpkgs.follows = "nixpkgs";
-    miniswig.inputs.flake-utils.follows = "flake-utils";
+    miniswig.inputs.tinycmmc.follows = "tinycmmc";
 
     xdgcpp.url = "github:grumbel/xdgcpp";
     xdgcpp.inputs.nixpkgs.follows = "nixpkgs";
