@@ -132,12 +132,15 @@
       }
     },
     "flake-utils": {
+      "inputs": {
+        "systems": "systems"
+      },
       "locked": {
-        "lastModified": 1676283394,
-        "narHash": "sha256-XX2f9c3iySLCw54rJ/CZs+ZK6IQy7GXNY4nSOyu2QG4=",
+        "lastModified": 1681202837,
+        "narHash": "sha256-H+Rh19JDwRtpVPAWp64F+rlEtxUWBAQW28eAi3SRSzg=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "3db36a8b464d0c4532ba1c7dda728f4576d6d073",
+        "rev": "cfacdce06f30d2b68473a46042957675eebb3401",
         "type": "github"
       },
       "original": {
@@ -359,11 +362,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1678581275,
-        "narHash": "sha256-McJ9A0vNJu8kC6zNuYs1V/NcnG73xoIQJcqvu6CpksI=",
+        "lastModified": 1684870196,
+        "narHash": "sha256-5Y5FfBXM53OBSJzO6q+7M3Fj1KsusJcFg3cAfnFAWcA=",
         "owner": "logmich",
         "repo": "logmich",
-        "rev": "1455401334513df2800453b24b7138702e096767",
+        "rev": "5924b2beabd2169a077ae57401bdd3cd8ebfba7d",
         "type": "github"
       },
       "original": {
@@ -382,11 +385,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1677457209,
-        "narHash": "sha256-07tRf1rvcPhQcL7ofWTs2OnpQuEdXEs7dXkRMzne+pM=",
+        "lastModified": 1682455433,
+        "narHash": "sha256-iEZarZ/VsgSi9NK512Vl0c93I+ojGRYXbyGZYFmzo+A=",
         "owner": "WindstilleTeam",
         "repo": "miniswig",
-        "rev": "dea919a9066682e6ffa6de2f2e322b6c421f1b29",
+        "rev": "643a056e5b52a72ed5bd2d4d98e6e65c76aebba1",
         "type": "github"
       },
       "original": {
@@ -435,16 +438,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1678500271,
-        "narHash": "sha256-tRBLElf6f02HJGG0ZR7znMNFv/Uf7b2fFInpTHiHaSE=",
+        "lastModified": 1685094109,
+        "narHash": "sha256-u+awry81RAVV+fJBCZt+GKWsISSLJKUNbVwKccHeaPU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "5eb98948b66de29f899c7fe27ae112a47964baf8",
+        "rev": "551a52bfdd02e7b75be5faf9b42f864112d88654",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "nixos-22.11",
+        "ref": "nixos-23.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -703,11 +706,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1662035355,
-        "narHash": "sha256-rKsS5Ce+4QvzUmU8cf5474znNyXleUJtIppihz5P2ng=",
+        "lastModified": 1684866146,
+        "narHash": "sha256-Ewa98VUzbyUPUbeQezlUYsZPqKRzWu45B2XfmsuTf2w=",
         "owner": "grumnix",
         "repo": "squirrel",
-        "rev": "f96d65623b8a250a6da975884a4a2d1f59ea5388",
+        "rev": "87bcbc8d6778b53fa05d50d4a0c45cc73ea3c2a2",
         "type": "github"
       },
       "original": {
@@ -756,6 +759,21 @@
         "type": "github"
       }
     },
+    "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
     "tinycmmc": {
       "inputs": {
         "flake-utils": "flake-utils_2",
@@ -788,11 +806,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1660915337,
-        "narHash": "sha256-RUvBcVlsF0jleNeDGP2TtTYVozsx+7lJeOlQJ9vuYrk=",
+        "lastModified": 1684952066,
+        "narHash": "sha256-yS8/+TOL2OA7f/RQs1Zr20mmlPFIVvFOgWShLAQvH8w=",
         "owner": "grumbel",
         "repo": "tinycmmc",
-        "rev": "25af158259bc772a5393c6200c4ebfd0ec4e28d0",
+        "rev": "01fe277570a290837726de6eb3c16d617bfda28c",
         "type": "github"
       },
       "original": {
@@ -821,11 +839,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1678658502,
-        "narHash": "sha256-XwAv+rVeu337wx7802LZRFPZDkvXGTEXDdw8SsL+0z8=",
+        "lastModified": 1684951755,
+        "narHash": "sha256-j7+CF3IkffPTz07Vkyw4lZ2622BDq3W1ZLxjWNr2fQU=",
         "owner": "WindstilleTeam",
         "repo": "wstsound",
-        "rev": "86f2226349d0ddda445156cdb0e7a82b6c6bfb93",
+        "rev": "02175efb729fd95a8e8fa4432e186c37171b5c75",
         "type": "github"
       },
       "original": {
@@ -844,11 +862,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1678658196,
-        "narHash": "sha256-yQMiT2TGJyqinOgxPmHR1kI2VGuhpPisr6sbstG6jfU=",
+        "lastModified": 1685020673,
+        "narHash": "sha256-bH8Xu2KZxASEJKLysuoYu77xVWXVRVWFAIA0KNEwjjE=",
         "owner": "grumbel",
         "repo": "xdgcpp",
-        "rev": "7218bdab7d353f4850d74f34b96b48246adad3e9",
+        "rev": "7776bc77ad59a8e9b3ea7a30e87bcc7fa7efc31e",
         "type": "github"
       },
       "original": {
