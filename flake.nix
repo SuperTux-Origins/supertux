@@ -122,7 +122,7 @@
             strutcpp = strutcpp.packages.${pkgs.system}.default;
             miniswig = miniswig.packages.${pkgs.system}.default;
             wstsound = wstsound.packages.${pkgs.system}.default;
-            priocpp = priocpp.packages.${pkgs.system}.default;
+            priocpp = priocpp.packages.${pkgs.system}.priocpp-sexp;
             logmich = logmich.packages.${pkgs.system}.default;
 
             physfs = if pkgs.targetPlatform.isWindows
