@@ -64,8 +64,6 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/README.md ${CMAKE_CURRENT_SOURCE_DIR}/
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/credits.stxt DESTINATION ${INSTALL_SUBDIR_SHARE})
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/supertux-origins.appdata.xml DESTINATION "share/metainfo" )
-
 install(DIRECTORY
   ${CMAKE_CURRENT_SOURCE_DIR}/data/images
   ${CMAKE_CURRENT_SOURCE_DIR}/data/fonts
