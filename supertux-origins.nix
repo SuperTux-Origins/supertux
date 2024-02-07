@@ -3,7 +3,7 @@
 , lib
 
 , cmake
-, pkgconfig
+, pkg-config
 , makeWrapper
 
 , SDL2
@@ -88,7 +88,7 @@ EOF
 
   nativeBuildInputs = [
     cmake
-    pkgconfig
+    pkg-config
 
     miniswig
   ]
