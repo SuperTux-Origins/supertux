@@ -24,7 +24,7 @@
   description = "A 2D platform game featuring Tux the penguin";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-24.05";
     flake-utils.url = "github:numtide/flake-utils";
 
     tinycmmc.url = "github:grumbel/tinycmmc";
@@ -109,8 +109,6 @@
 
           supertux-origins = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
-
-            stdenv = pkgs.gcc12Stdenv;
 
             SDL2_ttf = if pkgs.targetPlatform.isWindows
                        then SDL2_ttf-win32.packages.${pkgs.system}.default
