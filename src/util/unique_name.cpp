@@ -16,6 +16,7 @@
 
 #include "util/unique_name.hpp"
 
+#include <cstdint>
 #include <sstream>
 
 std::string make_unique_name(std::string const& prefix, void* ptr)
