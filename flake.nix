@@ -24,7 +24,7 @@
   description = "A 2D platform game featuring Tux the penguin";
 
   inputs = rec {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
 
     tinycmmc.url = "github:grumbel/tinycmmc";
     tinycmmc.inputs.nixpkgs.follows = "nixpkgs";
@@ -64,7 +64,7 @@
               pkgs.buildPackages.autoreconfHook
               pkgs.buildPackages.pkg-config
             ]
-            ++ (nixpkgs.lib.optional pkgs.targetPlatform.isLinux pkgs.makeWrapper);
+            ++ (nixpkgs.lib.optional pkgs.stdenv.targetPlatform.isLinux pkgs.makeWrapper);
 
             postFixup = ""
               + (nixpkgs.lib.optionalString pkgs.stdenv.targetPlatform.isWindows ''
