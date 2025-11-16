@@ -67,11 +67,6 @@
             ++ (nixpkgs.lib.optional pkgs.targetPlatform.isLinux pkgs.makeWrapper);
 
             postFixup = ""
-              + (nixpkgs.lib.optionalString pkgs.targetPlatform.isLinux ''
-                   wrapProgram $out/bin/supertux-milestone1 \
-                     --prefix LIBGL_DRIVERS_PATH ":" "${pkgs.mesa.drivers}/lib/dri" \
-                     --prefix LD_LIBRARY_PATH ":" "${pkgs.mesa.drivers}/lib"
-                 '')
               + (nixpkgs.lib.optionalString pkgs.stdenv.targetPlatform.isWindows ''
                    mkdir -p $out/bin/
                    find ${pkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
