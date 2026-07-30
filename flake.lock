@@ -81,11 +81,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1716834232,
-        "narHash": "sha256-3Ci6yxY+Yr7yr7ePdDtkDkAcgvr/SdYMHZ1AgxFtcpI=",
+        "lastModified": 1764251921,
+        "narHash": "sha256-1sq2RfV7L1r90NAf7GzNDpCtkjUfVmYPwUM2LJdEq5U=",
         "owner": "grumnix",
         "repo": "SDL_mixer-win32",
-        "rev": "9041c274062f82e652cf92b8bf0cd94794c45d76",
+        "rev": "13b1be9ace72742e72adb2be83d922f54eb0caae",
         "type": "github"
       },
       "original": {
@@ -97,14 +97,18 @@
     "SDL_mixer_src": {
       "flake": false,
       "locked": {
-        "lastModified": 1326664828,
-        "narHash": "sha256-3e1DCX0S5VmVFs0eMcbN0O0zKbi3VJJ/7LGvEpQhgGc=",
-        "type": "tarball",
-        "url": "https://github.com/libsdl-org/SDL_mixer/archive/refs/tags/release-1.2.12.tar.gz"
+        "lastModified": 1757525120,
+        "narHash": "sha256-Gpuzzkxtfilvd2gqRxqZMIZHJgsRPd5AP61Cn8yHTe8=",
+        "owner": "libsdl-org",
+        "repo": "SDL_mixer",
+        "rev": "cc4724049377d82f4f1645df15e30e641f277358",
+        "type": "github"
       },
       "original": {
-        "type": "tarball",
-        "url": "https://github.com/libsdl-org/SDL_mixer/archive/refs/tags/release-1.2.12.tar.gz"
+        "owner": "libsdl-org",
+        "ref": "SDL-1.2",
+        "repo": "SDL_mixer",
+        "type": "github"
       }
     },
     "SDL_src": {
@@ -150,11 +154,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1712097214,
-        "narHash": "sha256-b48gR4s1nHCJYAiP1MgSJ7V8yNfk7ZrLVkay9QqYcAg=",
+        "lastModified": 1763584929,
+        "narHash": "sha256-K8GpBConQA6wfnfuzU+0B3fbjp3uVZE0WzADQNOTr7A=",
         "owner": "grumnix",
         "repo": "libmikmod-win32",
-        "rev": "8baa2217a7f1c48a19e72f519be5842a8a132582",
+        "rev": "ffe78a03e9a0afff54903c155608c6f352d9c487",
         "type": "github"
       },
       "original": {
@@ -176,11 +180,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1712097214,
-        "narHash": "sha256-HulmNbgQfUNZ2t9O4cOFoV6F2+32/yu1bVUTOGnS8KI=",
+        "lastModified": 1764251829,
+        "narHash": "sha256-CUq+HLy257tgKo9URjnjgCS1HyIQpPetU06gFr/1fQA=",
         "owner": "grumnix",
         "repo": "libogg-win32",
-        "rev": "e70c934408e1ab5807319d7c4b01c53cd125cc52",
+        "rev": "a05787b0ad8f878cd44008fd0c4c99cb149c0066",
         "type": "github"
       },
       "original": {
@@ -192,7 +196,7 @@
     "libogg_src": {
       "flake": false,
       "locked": {
-        "lastModified": 1622776889,
+        "lastModified": 1622776890,
         "narHash": "sha256-L8hFWoCh2VTdlsOq+cbP1eYAnciH70xlk1eSwr8YP5c=",
         "type": "tarball",
         "url": "https://downloads.xiph.org/releases/ogg/libogg-1.3.5.tar.gz"
@@ -219,11 +223,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1712097405,
-        "narHash": "sha256-TZdtYh2HUHaczKRkbfq4EOaGLTG7fOk7JOy7K1vZqMo=",
+        "lastModified": 1764251884,
+        "narHash": "sha256-3jO1DR02WbHEtv6r809E/UvUFou2uXkT/8hkqmhK2Y4=",
         "owner": "grumnix",
         "repo": "libvorbis-win32",
-        "rev": "44265a9a7cf3dd811b826eede62653ed211b69de",
+        "rev": "d698e14ec3fce00f85c111f74ad783bbda813a72",
         "type": "github"
       },
       "original": {
@@ -247,11 +251,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1762977756,
-        "narHash": "sha256-4PqRErxfe+2toFJFgcRKZ0UI9NSIOJa+7RXVtBhy4KE=",
+        "lastModified": 1785318670,
+        "narHash": "sha256-dN6Ou5x/+23FZLEpYP3IffO+NyJFzUlGumt1uu3MMaY=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
+        "rev": "0954f7ee2f6bb3dc7d4e3d0d8bcb8fd4bde4cfc5",
         "type": "github"
       },
       "original": {
@@ -293,11 +297,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1763256011,
-        "narHash": "sha256-CpQWAHdeLUYd28cT9heG05p6RX9WF7QslqNHoBi931E=",
+        "lastModified": 1783197069,
+        "narHash": "sha256-NI2pxYz9w+4yZrwOVr8g0a4B8iFAmrWCsrjlHZEfskE=",
         "owner": "grumbel",
         "repo": "tinycmmc",
-        "rev": "2e007ba059a4991c011a7193c9d7df28826c9adc",
+        "rev": "d7549879e3232909e124f25d33a33ce7dff153b6",
         "type": "github"
       },
       "original": {
