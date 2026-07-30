@@ -259,7 +259,8 @@ GameSession::process_events()
                     break;
                   }
               }
-          
+              break;
+
             case SDL_JOYBUTTONDOWN:
               if (event.jbutton.button == joystick_keymap.start_button)
                 on_escape_press();
@@ -282,8 +283,8 @@ GameSession::process_events()
 	      if(!Menu::current())
 	      st_pause_ticks_stop();
 
-            /* Tell Tux that the keys are all down, otherwise
-               it could have nasty bugs, like going allways to the right
+            /* Tell Tux that the keys are all up, otherwise
+               it could have nasty bugs, like going always to the right
                or whatever that key does */
             Player& tux = *world->get_tux();
             tux.key_event((SDLKey)keymap.jump, UP);
@@ -302,6 +303,21 @@ GameSession::process_events()
                 case SDL_QUIT:        /* Quit event - quit: */
                   st_abort("Received window close", "");
                   break;
+
+#ifdef USE_SDL2
+                case SDL_WINDOWEVENT:
+                  /* Focus loss leaves keys stuck DOWN without matching KEYUP. */
+                  if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST
+                      || event.window.event == SDL_WINDOWEVENT_MINIMIZED)
+                    {
+                      tux.key_event((SDLKey)keymap.jump, UP);
+                      tux.key_event((SDLKey)keymap.duck, UP);
+                      tux.key_event((SDLKey)keymap.left, UP);
+                      tux.key_event((SDLKey)keymap.right, UP);
+                      tux.key_event((SDLKey)keymap.fire, UP);
+                    }
+                  break;
+#endif
 
                 case SDL_KEYDOWN:     /* A keypress! */
                   {

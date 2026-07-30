@@ -43,7 +43,7 @@ When unsure, prefer the smallest change that stops a crash or unblocks SDL2 play
 | Platforms of historical interest | Desktop Linux/Windows, experimental GP2X, 320×240 test build |
 | SDL2 port | **Compiles** via platform layer + `platform_config.h`; playtest still open |
 
-Version string in Autotools is `0.1.4` (`configure.ac`); `defines.h` falls back to `"0.1.1"` if `VERSION` is unset. CMake defines `VERSION` consistently.
+Version string is `0.1.4` in CMake, Autotools (`configure.ac`), and the `defines.h` fallback when `VERSION` is unset at compile time.
 
 ## Architecture sketch
 

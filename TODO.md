@@ -89,8 +89,8 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] Smoke-compile ENABLE_SDL2=ON — links and installs (nix build .#supertux-milestone1-sdl2  # or .#default / .#supertux-milestone1)
 - [x] Event helpers: `st_key_ascii`, `st_event_wheel_up/down`, `st_event_mouse_xy`
 - [x] menu.cpp / button.cpp use event helpers (no keysym.unicode / button 4–5)
-- [ ] Remaining event edge cases (text input composition, joy hat)
-- [~] Playtest SDL2 binary — SEGV in TileManager::load_tileset during title demo; hardened loader + IMG_Init
+- [x] Remaining event edge cases: joy hat bits; SDL2 focus-loss releases player keys; menu TEXTINPUT
+- [~] Playtest SDL2 binary — needs `data/`; prior TileManager SEGV hardened (loader + nested merge + IMG_Init)
 
 ---
 
@@ -130,8 +130,10 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 
 - [ ] Remove or gate dead GP2X-only branches **only if** they obstruct the platform layer or SDL2 build
 - [ ] Drop Autotools from “supported” docs once CMake+SDL1 is verified
-- [ ] Align `VERSION` everywhere (defines, desktop file, CMake project version)
+- [x] Align `VERSION` fallback in `defines.h` with CMake/Autotools (`0.1.4`)
 - [ ] Optional: CI compile job (SDL1 and SDL2)
+- [x] Gameloop: missing `break` after menu-mode KEYDOWN (fell through to joy start)
+- [x] Gameloop: release movement keys on SDL2 focus loss / minimize
 
 ---
 
@@ -172,3 +174,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-31 | Fix pause ticks; nested tileset merge; tile get null; CMake GL link; SDL2 backbuffer |
 | 2026-07-31 | SDL2 text input, Mix_Init, joy-hat bits, menu backspace, TSCONTROL mouse y |
 | 2026-07-31 | SDL2 fullscreen fallbacks, letterbox present, GL viewport, safe video re-init |
+| 2026-07-31 | Fix KEYDOWN fallthrough; SDL2 focus-loss key release; VERSION 0.1.4 |
