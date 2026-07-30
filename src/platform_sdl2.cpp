@@ -140,12 +140,44 @@ try_gl_window(const char* label, int major, int minor, int profile,
 static bool
 create_opengl_window(bool fullscreen)
 {
-  /* Ensure the GL library is loaded before window creation (helps on NixOS). */
+  fprintf(stderr,
+          "  constants: WINDOW_OPENGL=0x%x SHOWN=0x%x FULLSCREEN=0x%x size=%dx%d\n",
+          (unsigned)SDL_WINDOW_OPENGL, (unsigned)SDL_WINDOW_SHOWN,
+          (unsigned)SDL_WINDOW_FULLSCREEN, ST_SCREEN_W, ST_SCREEN_H);
+
+  /* --- Attempt 0: absolute minimum (no attrs, no LoadLibrary) --- */
+  {
+    Uint32 flags = SDL_WINDOW_OPENGL;
+    if (fullscreen)
+      flags |= SDL_WINDOW_FULLSCREEN;
+    fprintf(stderr, "  GL try [bare OPENGL]: flags=0x%x\n", (unsigned)flags);
+    SDL_ClearError();
+    st_window = SDL_CreateWindow("supertux",
+                                 SDL_WINDOWPOS_UNDEFINED,
+                                 SDL_WINDOWPOS_UNDEFINED,
+                                 ST_SCREEN_W, ST_SCREEN_H,
+                                 flags);
+    fprintf(stderr, "    ptr=%p err=[%s]\n",
+            (void*)st_window, SDL_GetError());
+    if (st_window)
+      {
+        SDL_ClearError();
+        st_gl_context = SDL_GL_CreateContext(st_window);
+        fprintf(stderr, "    context=%p err=[%s]\n",
+                (void*)st_gl_context, SDL_GetError());
+        if (st_gl_context)
+          goto gl_ok;
+        SDL_DestroyWindow(st_window);
+        st_window = 0;
+      }
+  }
+
+  /* Ensure GL lib is loaded for subsequent attempts. */
+  SDL_ClearError();
   if (SDL_GL_LoadLibrary(NULL) != 0)
-    {
-      fprintf(stderr, "  SDL_GL_LoadLibrary failed: %s\n", SDL_GetError());
-      /* continue — CreateWindow may still succeed */
-    }
+    fprintf(stderr, "  SDL_GL_LoadLibrary: %s\n", SDL_GetError());
+  else
+    fprintf(stderr, "  SDL_GL_LoadLibrary: ok\n");
 
   /* Ordered from most appropriate for this codebase to more lenient. */
   const struct {
@@ -213,6 +245,7 @@ gl_ok:
   glLoadIdentity();
   return true;
 }
+
 #endif
 
 bool platform_video_init(bool fullscreen, bool opengl)

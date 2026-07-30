@@ -79,6 +79,9 @@
             postFixup = ""
               + (nixpkgs.lib.optionalString (pkgs.stdenv.targetPlatform.isLinux && useSDL2) ''
                    addDriverRunpath $out/bin/supertux-milestone1
+                   # Host GPU driver + libGL (NixOS OpenGL is impure outside the sandbox).
+                   wrapProgram $out/bin/supertux-milestone1 \
+                     --prefix LD_LIBRARY_PATH : "/run/opengl-driver/lib:/run/opengl-driver-32/lib"
                  '')
               + (nixpkgs.lib.optionalString pkgs.stdenv.targetPlatform.isWindows ''
                    mkdir -p $out/bin/
