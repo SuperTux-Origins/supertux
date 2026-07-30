@@ -108,7 +108,17 @@ void TileManager::load_tileset(std::string filename)
               tile->anim_speed = 25;
 
               LispReader reader(lisp_cdr(element));
-              assert(reader.read_int("id",  &tile->id));
+              if (!reader.read_int("id", &tile->id) || tile->id < 0)
+                {
+                  delete tile;
+                  fprintf(stderr,
+                          "\nError: tileset entry is missing a valid (id N) field.\n"
+                          "  File: %s\n"
+                          "  Each (tile ...) form must include a non-negative integer id.\n"
+                          "  Example: (tile (id 10) (images \"block.png\") (solid #t))\n\n",
+                          filename.c_str());
+                  st_abort("Invalid tile definition (missing or bad id)", filename);
+                }
               reader.read_bool("solid",     &tile->solid);
               reader.read_bool("brick",     &tile->brick);
               reader.read_bool("ice",       &tile->ice);
@@ -120,7 +130,7 @@ void TileManager::load_tileset(std::string filename)
               reader.read_int("anim-speed", &tile->anim_speed);
               reader.read_int("next-tile",  &tile->next_tile);
               reader.read_string_vector("images",  &tile->filenames);
-	      reader.read_string_vector("editor-images", &tile->editor_filenames);
+              reader.read_string_vector("editor-images", &tile->editor_filenames);
 
               for(std::vector<std::string>::iterator it = tile->
                   filenames.begin();
@@ -138,12 +148,6 @@ void TileManager::load_tileset(std::string filename)
                   tile->editor_images.push_back(new Surface(
                                datadir + "/images/tilesets/" + (*it),
                                USE_ALPHA));
-                }
-
-              if (tile->id < 0)
-                {
-                  delete tile;
-                  st_abort("Tile missing id in tileset", filename);
                 }
 
               if (tile->id + tileset_id >= int(tiles.size()))
