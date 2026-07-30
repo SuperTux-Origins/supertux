@@ -83,7 +83,7 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] `st_set_color_key` helper for colour-key flag differences
 - [x] `platform_set_icon` on both backends
 - [x] Ensure full game still links on SDL1 (nix build); runtime playtest still manual
-- [x] Smoke-compile ENABLE_SDL2=ON — links and installs (nix build .#supertux-milestone1-sdl2)
+- [x] Smoke-compile ENABLE_SDL2=ON — links and installs (nix build .#supertux-milestone1-sdl2  # or .#default / .#supertux-milestone1)
 - [x] Event helpers: `st_key_ascii`, `st_event_wheel_up/down`, `st_event_mouse_xy`
 - [x] menu.cpp / button.cpp use event helpers (no keysym.unicode / button 4–5)
 - [ ] Remaining event edge cases (text input composition, joy hat)

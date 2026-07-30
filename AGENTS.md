@@ -67,9 +67,9 @@ Binary name: `supertux-milestone1`.
 
 ```bash
 nix build .#supertux-milestone1       # or .#sdl1 / default — SDL 1.2
-nix build .#supertux-milestone1-sdl2  # or .#sdl2 — SDL2
+nix build .#supertux-milestone1-sdl2  # or .#default / .#supertux-milestone1  # or .#sdl2 — SDL2
 nix develop                           # SDL1 dev shell
-nix develop .#sdl2                    # SDL2 dev shell
+nix develop .#sdl2  # or default                    # SDL2 dev shell
 ```
 
 Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL1-oriented via existing win32 SDL inputs.
@@ -95,7 +95,7 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 
 **SDL2 path (target):** SDL2, SDL2_image, SDL2_mixer — wired through a compatibility/backend layer, not by rewriting every call site at once.
 
-**Nix:** both `nix build .#supertux-milestone1` (SDL1) and `.#supertux-milestone1-sdl2` have linked successfully. Runtime playtest of the SDL2 binary is still open.
+**Nix:** both `nix build .#supertux-milestone1-sdl1` (SDL1) and `.#supertux-milestone1-sdl2` have linked successfully. Runtime playtest of the SDL2 binary is still open.
 
 ## Coding guidelines for agents
 

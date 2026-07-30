@@ -47,8 +47,10 @@
   outputs = { self, nixpkgs, tinycmmc, SDL-win32, SDL_mixer-win32, SDL_image-win32 }:
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       let
-        # Shared CMake-based builder. useSDL2 selects the platform backend.
-        mkSuperTux = { useSDL2 ? false, pname ? "supertux-milestone1" }:
+        # Shared CMake builder. Binary is always named supertux-milestone1;
+        # pname differs per backend package. meta.mainProgram must match the
+        # on-disk binary for `nix run`.
+        mkSuperTux = { useSDL2 ? true, pname ? "supertux-milestone1" }:
           pkgs.stdenv.mkDerivation rec {
             inherit pname;
             version = "0.1.4";
@@ -112,39 +114,45 @@
 
             meta = with nixpkgs.lib; {
               description = "SuperTux Milestone 1 (${if useSDL2 then "SDL2" else "SDL 1.2"} backend)";
+              longDescription = ''
+                Classic SuperTux Milestone 1 engine with a CMake build and a
+                dual SDL1/SDL2 platform layer. Default builds use SDL2.
+              '';
               license = licenses.gpl2Plus;
               platforms = platforms.linux ++ platforms.windows;
+              # CMake always installs bin/supertux-milestone1 regardless of pname.
+              mainProgram = "supertux-milestone1";
             };
           };
+
+        pkgSdl2 = mkSuperTux {
+          useSDL2 = true;
+          pname = "supertux-milestone1-sdl2";
+        };
+
+        pkgSdl1 = mkSuperTux {
+          useSDL2 = false;
+          pname = "supertux-milestone1-sdl1";
+        };
       in
       {
         packages = rec {
+          # Default package = SDL2 backend
           default = supertux-milestone1;
+          supertux-milestone1 = supertux-milestone1-sdl2;
 
-          # SDL 1.2 backend (default, historical)
-          supertux-milestone1 = mkSuperTux {
-            useSDL2 = false;
-            pname = "supertux-milestone1";
-          };
-
-          # SDL2 backend (platform layer; still maturing — see TODO.md)
-          supertux-milestone1-sdl2 = mkSuperTux {
-            useSDL2 = true;
-            pname = "supertux-milestone1-sdl2";
-          };
-
-          # Aliases
-          sdl1 = supertux-milestone1;
-          sdl2 = supertux-milestone1-sdl2;
+          supertux-milestone1-sdl2 = pkgSdl2;
+          supertux-milestone1-sdl1 = pkgSdl1;
 
           supertux-milestone1-win32 = pkgs.runCommand "supertux-milestone1-win32" {} ''
             mkdir -p $out
             mkdir -p $out/data/
 
-            cp -vr ${supertux-milestone1}/bin/supertux-milestone1.exe $out/
-            cp -vLr ${supertux-milestone1}/bin/*.dll $out/ 2>/dev/null || true
-            if [ -d ${supertux-milestone1}/share/supertux-milestone1 ]; then
-              cp -vr ${supertux-milestone1}/share/supertux-milestone1/. $out/data/
+            cp -vr ${supertux-milestone1-sdl1}/bin/supertux-milestone1.exe $out/ 2>/dev/null || \
+              cp -vr ${supertux-milestone1-sdl1}/bin/supertux-milestone1 $out/
+            cp -vLr ${supertux-milestone1-sdl1}/bin/*.dll $out/ 2>/dev/null || true
+            if [ -d ${supertux-milestone1-sdl1}/share/supertux-milestone1 ]; then
+              cp -vr ${supertux-milestone1-sdl1}/share/supertux-milestone1/. $out/data/
             fi
           '';
 
@@ -158,23 +166,57 @@
             cd "$WORKDIR"
             ${nixpkgs.legacyPackages.x86_64-linux.zip}/bin/zip \
               -r \
-              $out/supertux-milestone1-${supertux-milestone1.version}-${pkgs.system}.zip \
+              $out/supertux-milestone1-${pkgSdl1.version}-${pkgs.system}.zip \
               .
           '';
         };
 
-        # Dev shells for each backend
+        # `nix run .#…` entry points (program path must be the real binary name)
+        apps = {
+          default = {
+            type = "app";
+            program = "${pkgSdl2}/bin/supertux-milestone1";
+            meta = {
+              description = "SuperTux Milestone 1 (SDL2 backend, default)";
+            };
+          };
+          supertux-milestone1 = {
+            type = "app";
+            program = "${pkgSdl2}/bin/supertux-milestone1";
+            meta = {
+              description = "SuperTux Milestone 1 (SDL2 backend, default)";
+            };
+          };
+          supertux-milestone1-sdl2 = {
+            type = "app";
+            program = "${pkgSdl2}/bin/supertux-milestone1";
+            meta = {
+              description = "SuperTux Milestone 1 with the SDL2 platform backend";
+            };
+          };
+          supertux-milestone1-sdl1 = {
+            type = "app";
+            program = "${pkgSdl1}/bin/supertux-milestone1";
+            meta = {
+              description = "SuperTux Milestone 1 with the legacy SDL 1.2 backend";
+            };
+          };
+        };
+
+        # Dev shells for each backend (default = SDL2)
         devShells = {
           default = pkgs.mkShell {
-            name = "supertux-m1-sdl1";
+            name = "supertux-m1-sdl2";
             packages = [
               pkgs.cmake
               pkgs.pkg-config
-              pkgs.SDL
-              pkgs.SDL_image
-              pkgs.SDL_mixer
+              pkgs.SDL2
+              pkgs.SDL2_image
+              pkgs.SDL2_mixer
               pkgs.libGL
               pkgs.zlib
+              pkgs.libpng
+              pkgs.libjpeg
             ];
           };
           sdl2 = pkgs.mkShell {
@@ -187,6 +229,22 @@
               pkgs.SDL2_mixer
               pkgs.libGL
               pkgs.zlib
+              pkgs.libpng
+              pkgs.libjpeg
+            ];
+          };
+          sdl1 = pkgs.mkShell {
+            name = "supertux-m1-sdl1";
+            packages = [
+              pkgs.cmake
+              pkgs.pkg-config
+              pkgs.SDL
+              pkgs.SDL_image
+              pkgs.SDL_mixer
+              pkgs.libGL
+              pkgs.zlib
+              pkgs.libpng
+              pkgs.libjpeg
             ];
           };
         };
