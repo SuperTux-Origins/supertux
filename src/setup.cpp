@@ -647,9 +647,12 @@ void st_general_setup(void)
   seticon();
 #endif
 
-  /* Unicode needed for input handling: */
-
+  /* Unicode / text input for menu text fields: */
   SDL_EnableUNICODE(1);
+#ifdef USE_SDL2
+  /* SDL2 delivers printable characters via SDL_TEXTINPUT. */
+  SDL_StartTextInput();
+#endif
 
   /* Load global images: */
 

@@ -629,13 +629,13 @@ WorldMap::get_input()
               break;
 
 	    case SDL_JOYHATMOTION:
-	      if (event.jhat.value == SDL_HAT_UP)
+	      if (event.jhat.value & SDL_HAT_UP)
                     input_direction = D_NORTH;
-	      if (event.jhat.value == SDL_HAT_DOWN)
+	      if (event.jhat.value & SDL_HAT_DOWN)
                     input_direction = D_SOUTH;
-	      if (event.jhat.value == SDL_HAT_LEFT)
+	      if (event.jhat.value & SDL_HAT_LEFT)
                     input_direction = D_WEST;
-	      if (event.jhat.value == SDL_HAT_RIGHT)
+	      if (event.jhat.value & SDL_HAT_RIGHT)
                     input_direction = D_EAST;
 	      break;
 

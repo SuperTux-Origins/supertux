@@ -74,7 +74,7 @@ GameSession::GameSession(const std::string& subset_, int levelnb_, int mode)
   restart_level();
 
 #ifdef TSCONTROL
-  old_mouse_y = screen->w;
+  old_mouse_y = screen->h;
 #endif
 }
 

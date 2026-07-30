@@ -445,11 +445,13 @@ Menu::action()
         {
           int i = strlen(item[active_item].input);
 
-          while(delete_character > 0)	/* remove charactes */
+          while(delete_character > 0 && i > 0)	/* remove characters */
           {
             item[active_item].input[i-1] = '\0';
+            i--;
             delete_character--;
           }
+          delete_character = 0;
         }
       }
       break;
@@ -767,7 +769,7 @@ Menu::event(SDL_Event& event)
     keymod = SDL_GetModState();
     int x,y;
 
-    /* ASCII character for text fields (SDL1 unicode / SDL2 keycode approx). */
+    /* ASCII character for text fields (SDL1 unicode / SDL2 keycode fallback). */
     ch[0] = st_key_ascii(event);
     ch[1] = '\0';
 
@@ -792,19 +794,25 @@ Menu::event(SDL_Event& event)
     case SDLK_DOWN:		/* Menu Down */
       menuaction = MENU_ACTION_DOWN;
       break;
-    case SDLK_LEFT:		/* Menu Up */
+    case SDLK_LEFT:		/* Menu Left */
       menuaction = MENU_ACTION_LEFT;
       break;
-    case SDLK_RIGHT:		/* Menu Down */
+    case SDLK_RIGHT:		/* Menu Right */
       menuaction = MENU_ACTION_RIGHT;
       break;
     case SDLK_SPACE:
       if(item[active_item].kind == MN_TEXTFIELD)
       {
+#ifdef USE_SDL2
+        /* Space arrives as SDL_TEXTINPUT under SDL2; avoid double insert. */
+        break;
+#else
         menuaction = MENU_ACTION_INPUT;
         mn_input_char = ' ';
         break;
+#endif
       }
+      /* fall through — space activates non-text items */
     case SDLK_RETURN: /* Menu Hit */
       menuaction = MENU_ACTION_HIT;
       break;
@@ -817,6 +825,11 @@ Menu::event(SDL_Event& event)
       Menu::pop_current();
       break;
     default:
+#ifdef USE_SDL2
+      /* Under SDL2, printable characters arrive as SDL_TEXTINPUT to avoid
+         double-insert when both keydown and text events fire. */
+      mn_input_char = '\0';
+#else
       if( (key >= SDLK_0 && key <= SDLK_9) || (key >= SDLK_a && key <= SDLK_z) || (key >= SDLK_SPACE && key <= SDLK_SLASH))
       {
         menuaction = MENU_ACTION_INPUT;
@@ -826,15 +839,35 @@ Menu::event(SDL_Event& event)
       {
         mn_input_char = '\0';
       }
+#endif
       break;
     }
     break;
-    
+
+#ifdef USE_SDL2
+  case SDL_TEXTINPUT:
+    {
+      char tc = 0;
+      if (st_event_text_input(event, &tc)
+          && (item[active_item].kind == MN_TEXTFIELD
+              || item[active_item].kind == MN_NUMFIELD))
+        {
+          menuaction = MENU_ACTION_INPUT;
+          mn_input_char = tc;
+        }
+    }
+    break;
+#endif
+
   case  SDL_JOYHATMOTION:
-      if(event.jhat.value == SDL_HAT_UP)
+      if(event.jhat.value & SDL_HAT_UP)
            menuaction = MENU_ACTION_UP;
-      if(event.jhat.value == SDL_HAT_DOWN)
+      if(event.jhat.value & SDL_HAT_DOWN)
            menuaction = MENU_ACTION_DOWN;
+      if(event.jhat.value & SDL_HAT_LEFT)
+           menuaction = MENU_ACTION_LEFT;
+      if(event.jhat.value & SDL_HAT_RIGHT)
+           menuaction = MENU_ACTION_RIGHT;
        break;
        
   case  SDL_JOYAXISMOTION:

@@ -73,6 +73,19 @@ int open_audio (int frequency, Uint16 format, int channels, int chunksize)
 {
 //  close_audio();
 #ifndef GP2X
+#ifdef USE_SDL2
+  /* SDL2_mixer needs Mix_Init for OGG/MOD (and others) before OpenAudio loads them. */
+  {
+    int mix_flags = MIX_INIT_OGG;
+#ifdef MIX_INIT_MOD
+    mix_flags |= MIX_INIT_MOD;
+#endif
+    int got = Mix_Init(mix_flags);
+    if ((got & MIX_INIT_OGG) == 0)
+      fprintf(stderr, "Warning: Mix_Init OGG: %s\n", Mix_GetError());
+  }
+#endif
+
   if (Mix_OpenAudio( frequency, format, channels, chunksize ) < 0)
     return -1;
 
@@ -143,6 +156,9 @@ void close_audio( void )
     Mix_UnregisterAllEffects( SOUND_LEFT_SPEAKER );
     Mix_UnregisterAllEffects( SOUND_RIGHT_SPEAKER );
     Mix_CloseAudio();
+#ifdef USE_SDL2
+    Mix_Quit();
+#endif
   }
 #else
   int i;

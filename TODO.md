@@ -99,9 +99,9 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] Initial `platform_sdl2.cpp` (window + GetWindowSurface / GL context — strategy A)
 - [x] Compat layer so most engine files compile against SDL2 headers (shims)
 - [x] **Software backbuffer:** own stable `st_backbuffer`; blit to window surface on present
-- [ ] SDL2_image / SDL2_mixer: confirm `IMG_Init` / mixer open at runtime with real assets
-- [ ] Menu / slot text input under SDL2 (`SDL_EnableUNICODE` is a no-op; `st_key_ascii` is approximate) — enough to type without crash; full IME not required
-- [ ] Event edge cases that can break control: joy hat, window focus (only if they cause stuck keys or unusable menus)
+- [x] SDL2_image / SDL2_mixer: `IMG_Init` in platform_sdl2; `Mix_Init` (OGG/MOD) + `Mix_Quit` on close
+- [x] Menu / slot text input under SDL2: `SDL_StartTextInput`, `SDL_TEXTINPUT` in menu, `st_key_ascii` shift fallback
+- [x] Joy hat: menu + worldmap use `SDL_HAT_*` bit flags; menu hat left/right
 - [ ] OpenGL-on-SDL2: keep working if `ENABLE_OPENGL=ON`; no need for FBO redesign unless it crashes
 - [ ] Fullscreen / present regressions that prevent playing (vsync/HiDPI only if they hard-fail)
 - [ ] Smoke playtest with `data/`: title demo, one level, worldmap, pause menu, options, quit — SDL1 and SDL2
@@ -121,7 +121,8 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 - [x] **Nested tileset load** (`TileManager::load_tileset`): `replace` flag; nested forms merge without wiping parent tiles
 - [x] **`TileManager::get` fallback**: missing ids return null; null-checks in world brick/box and fish water tile
 - [x] **CMake OpenGL/GLU link block**: explicit nesting; GLU only for SDL1
-- [ ] **TSCONTROL only (low priority):** `gameloop.cpp` sets `old_mouse_y = screen->w` — likely meant `screen->h`. Skip unless that build is used.
+- [x] **TSCONTROL:** `old_mouse_y = screen->h` (was `screen->w`)
+- [x] **Menu backspace:** do not write before start of empty text field (`delete_character` / `i > 0`)
 
 ---
 
@@ -169,3 +170,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-30 | Harden TileManager/IMG_Init after SDL2 runtime SEGV |
 | 2026-07-31 | Scope: SDL2 + crash fixes only; filed Phase 3b issues; AGENTS goals section |
 | 2026-07-31 | Fix pause ticks; nested tileset merge; tile get null; CMake GL link; SDL2 backbuffer |
+| 2026-07-31 | SDL2 text input, Mix_Init, joy-hat bits, menu backspace, TSCONTROL mouse y |

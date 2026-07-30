@@ -204,15 +204,41 @@ inline char st_key_ascii(const SDL_Event& event)
     return 0;
 #ifdef USE_SDL2
   {
+    /* Prefer SDL_TEXTINPUT in menus; this is a fallback for keycode mapping. */
     SDL_Keycode k = event.key.keysym.sym;
-    /* Prefer shifted symbol when available via mod state for letters is complex;
-       SDL2 text input is better long-term; approximate with keycode. */
+    SDL_Keymod mod = SDL_GetModState();
+    bool shift = (mod & (KMOD_LSHIFT | KMOD_RSHIFT)) != 0;
+    bool caps  = (mod & KMOD_CAPS) != 0;
+
     if (k >= SDLK_a && k <= SDLK_z)
-      return (char)k;
+      {
+        char c = (char)k;
+        if (shift ^ caps)
+          c = (char)(c - 'a' + 'A');
+        return c;
+      }
     if (k >= SDLK_0 && k <= SDLK_9)
-      return (char)k;
+      {
+        if (!shift)
+          return (char)k;
+        /* US layout shifted digits — good enough for slot names. */
+        static const char shifted[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(' };
+        return shifted[k - SDLK_0];
+      }
     if (k == SDLK_SPACE)
       return ' ';
+    if (k == SDLK_MINUS)
+      return shift ? '_' : '-';
+    if (k == SDLK_EQUALS)
+      return shift ? '+' : '=';
+    if (k == SDLK_PERIOD)
+      return shift ? '>' : '.';
+    if (k == SDLK_COMMA)
+      return shift ? '<' : ',';
+    if (k == SDLK_SLASH)
+      return shift ? '?' : '/';
+    if (k == SDLK_SEMICOLON)
+      return shift ? ':' : ';';
     if (k >= SDLK_SPACE && k <= SDLK_AT)
       return (char)k;
     return 0;
@@ -221,6 +247,28 @@ inline char st_key_ascii(const SDL_Event& event)
   if ((event.key.keysym.unicode & 0xFF80) == 0)
     return (char)(event.key.keysym.unicode & 0x7F);
   return 0;
+#endif
+}
+
+/** True if event is SDL2 text input with a printable first byte. */
+inline bool st_event_text_input(const SDL_Event& event, char* out_char)
+{
+#ifdef USE_SDL2
+  if (event.type != SDL_TEXTINPUT)
+    return false;
+  if (!event.text.text[0])
+    return false;
+  /* Take first UTF-8 byte only if it is ASCII printable. */
+  unsigned char c = (unsigned char)event.text.text[0];
+  if (c < 32 || c >= 127)
+    return false;
+  if (out_char)
+    *out_char = (char)c;
+  return true;
+#else
+  (void)event;
+  (void)out_char;
+  return false;
 #endif
 }
 
