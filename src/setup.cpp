@@ -35,6 +35,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <limits.h>
 #ifndef WIN32
 #include <libgen.h>
 #endif
@@ -168,6 +169,33 @@ FILE * opendata(const char * rel_filename, const char * mode)
   return(fi);
 }
 
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
+
+/* Join path components into dest; returns false if the result would truncate. */
+static bool
+path_join2(char* dest, size_t dest_sz, const char* a, const char* b)
+{
+  int n = snprintf(dest, dest_sz, "%s/%s", a, b);
+  return n >= 0 && (size_t)n < dest_sz;
+}
+
+static bool
+path_join3(char* dest, size_t dest_sz, const char* a, const char* b, const char* c)
+{
+  int n = snprintf(dest, dest_sz, "%s/%s/%s", a, b, c);
+  return n >= 0 && (size_t)n < dest_sz;
+}
+
+static bool
+path_join4(char* dest, size_t dest_sz,
+           const char* a, const char* b, const char* c, const char* d)
+{
+  int n = snprintf(dest, dest_sz, "%s/%s/%s/%s", a, b, c, d);
+  return n >= 0 && (size_t)n < dest_sz;
+}
+
 /* Get all names of sub-directories in a certain directory. */
 /* Returns the number of sub-directories found. */
 /* Note: The user has to free the allocated space. */
@@ -176,25 +204,30 @@ string_list_type dsubdirs(const char *rel_path,const  char* expected_file)
   DIR *dirStructP;
   struct dirent *direntp;
   string_list_type sdirs;
-  char filename[1024];
-  char path[1024];
+  char filename[PATH_MAX];
+  char path[PATH_MAX];
 
   string_list_init(&sdirs);
-  snprintf(path, sizeof(path), "%s/%s", st_dir, rel_path);
+  if (!path_join2(path, sizeof(path), st_dir, rel_path))
+    return sdirs;
   if((dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
         {
-          char absolute_filename[1024];
+          char absolute_filename[PATH_MAX];
           struct stat buf;
 
-          snprintf(absolute_filename, sizeof(absolute_filename), "%s/%s", path, direntp->d_name);
+          if (!path_join2(absolute_filename, sizeof(absolute_filename),
+                          path, direntp->d_name))
+            continue;
 
           if (stat(absolute_filename, &buf) == 0 && S_ISDIR(buf.st_mode))
             {
               if(expected_file != NULL)
                 {
-                  snprintf(filename, sizeof(filename), "%s/%s/%s", path, direntp->d_name, expected_file);
+                  if (!path_join3(filename, sizeof(filename),
+                                  path, direntp->d_name, expected_file))
+                    continue;
                   if(!faccessible(filename))
                     continue;
                 }
@@ -205,28 +238,35 @@ string_list_type dsubdirs(const char *rel_path,const  char* expected_file)
       closedir(dirStructP);
     }
 
-  snprintf(path, sizeof(path), "%s/%s", datadir.c_str(), rel_path);
+  if (!path_join2(path, sizeof(path), datadir.c_str(), rel_path))
+    return sdirs;
   if((dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
         {
-          char absolute_filename[1024];
+          char absolute_filename[PATH_MAX];
           struct stat buf;
 
-          snprintf(absolute_filename, sizeof(absolute_filename), "%s/%s", path, direntp->d_name);
+          if (!path_join2(absolute_filename, sizeof(absolute_filename),
+                          path, direntp->d_name))
+            continue;
 
           if (stat(absolute_filename, &buf) == 0 && S_ISDIR(buf.st_mode))
             {
               if(expected_file != NULL)
                 {
-                  snprintf(filename, sizeof(filename), "%s/%s/%s", path, direntp->d_name, expected_file);
+                  if (!path_join3(filename, sizeof(filename),
+                                  path, direntp->d_name, expected_file))
+                    continue;
                   if(!faccessible(filename))
                     {
                       continue;
                     }
                   else
                     {
-                      snprintf(filename, sizeof(filename), "%s/%s/%s/%s", st_dir, rel_path, direntp->d_name, expected_file);
+                      if (!path_join4(filename, sizeof(filename),
+                                      st_dir, rel_path, direntp->d_name, expected_file))
+                        continue;
                       if(faccessible(filename))
                         continue;
                     }
@@ -246,18 +286,21 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
   DIR *dirStructP;
   struct dirent *direntp;
   string_list_type sdirs;
-  char path[1024];
+  char path[PATH_MAX];
 
   string_list_init(&sdirs);
-  snprintf(path, sizeof(path), "%s/%s", st_dir, rel_path);
+  if (!path_join2(path, sizeof(path), st_dir, rel_path))
+    return sdirs;
   if((dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
         {
-          char absolute_filename[1024];
+          char absolute_filename[PATH_MAX];
           struct stat buf;
 
-          snprintf(absolute_filename, sizeof(absolute_filename), "%s/%s", path, direntp->d_name);
+          if (!path_join2(absolute_filename, sizeof(absolute_filename),
+                          path, direntp->d_name))
+            continue;
 
           if (stat(absolute_filename, &buf) == 0 && S_ISREG(buf.st_mode))
             {
@@ -276,15 +319,18 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
       closedir(dirStructP);
     }
 
-  snprintf(path, sizeof(path), "%s/%s", datadir.c_str(), rel_path);
+  if (!path_join2(path, sizeof(path), datadir.c_str(), rel_path))
+    return sdirs;
   if((dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
         {
-          char absolute_filename[1024];
+          char absolute_filename[PATH_MAX];
           struct stat buf;
 
-          snprintf(absolute_filename, sizeof(absolute_filename), "%s/%s", path, direntp->d_name);
+          if (!path_join2(absolute_filename, sizeof(absolute_filename),
+                          path, direntp->d_name))
+            continue;
 
           if (stat(absolute_filename, &buf) == 0 && S_ISREG(buf.st_mode))
             {
