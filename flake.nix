@@ -106,6 +106,8 @@
                ]) ++
               [
                 pkgs.zlib
+                pkgs.libpng
+                pkgs.libjpeg
               ];
 
             meta = with nixpkgs.lib; {

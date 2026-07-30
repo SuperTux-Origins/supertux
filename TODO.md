@@ -29,8 +29,8 @@ Goal: replace Autotools as the supported way to build; default remains **SDL 1.2
 - [x] Find SDL, SDL_image; optional SDL_mixer; optional OpenGL
 - [x] Define `VERSION`, `DATA_PREFIX`, `NOOPENGL` / `NOSOUND` as appropriate
 - [x] Install rules for binary + desktop/icon files (data install optional / documented)
-- [ ] Smoke-compile on a machine with SDL1.2 dev packages
-  - Note (2026-07-30): this sandbox has **SDL2** runtime only; SDL 1.2 *dev* packages needed for local verify of default backend.
+- [x] Smoke-compile SDL1 via `nix build` (CMake + platform_sdl1, warnings only; install succeeded with data/)
+  - Note: a log labeled “sdl2” actually showed `-DENABLE_SDL2=OFF` / “Backend = SDL 1.2” — that was the SDL1 package succeeding.
 - [x] Document CMake options in `AGENTS.md` / this file
 - [x] Install rules + optional `data/` install when present
 - [x] `DATA_PREFIX` cache variable aligned with old `$datadir/supertux-milestone1` idea
@@ -82,7 +82,7 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] Route headers/sources through `platform_config.h` instead of raw `SDL.h`
 - [x] `st_set_color_key` helper for colour-key flag differences
 - [x] `platform_set_icon` on both backends
-- [ ] Ensure full game still links and runs on SDL1 with data present
+- [x] Ensure full game still links on SDL1 (nix build); runtime playtest still manual
 - [ ] Smoke-compile ENABLE_SDL2=ON against SDL2 dev packages
 - [x] Event helpers: `st_key_ascii`, `st_event_wheel_up/down`, `st_event_mouse_xy`
 - [x] menu.cpp / button.cpp use event helpers (no keysym.unicode / button 4–5)
@@ -134,3 +134,4 @@ Thin layer in `src/platform*.{h,cpp}`:
 | 2026-07-30 | flake.nix: CMake builds, `sdl1` + `sdl2` packages and devShells |
 | 2026-07-30 | SDL2 compat shims; headers use platform_config; color-key helper |
 | 2026-07-30 | Event helpers for text input + mouse wheel; video re-init safety |
+| 2026-07-30 | Confirmed SDL1 nix build success; libpng/jpeg in flake; texture return warnings |

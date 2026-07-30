@@ -87,6 +87,7 @@ SurfaceData::create_SurfaceSDL()
     return new SurfaceSDL(surface, use_alpha);
   }
   assert(0);
+  return 0;
 }
 
 SurfaceOpenGL*
@@ -104,6 +105,7 @@ SurfaceData::create_SurfaceOpenGL()
   }
 #endif
   assert(0);
+  return 0;
 }
 
 #ifndef NOOPENGL
