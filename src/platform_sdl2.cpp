@@ -184,3 +184,9 @@ const char* platform_name(void)
 {
   return "SDL2";
 }
+
+void platform_set_icon(SDL_Surface* icon)
+{
+  if (st_window && icon)
+    SDL_SetWindowIcon(st_window, icon);
+}

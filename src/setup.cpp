@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string>
-#include <SDL.h>
+#include "platform_config.h"
 #include <SDL_image.h>
 #ifndef NOOPENGL
 #include <SDL_opengl.h>

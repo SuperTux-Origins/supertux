@@ -23,7 +23,7 @@
 #ifndef SUPERTUX_BADGUY_H
 #define SUPERTUX_BADGUY_H
 
-#include "SDL.h"
+#include "platform_config.h"
 #include "defines.h"
 #include "type.h"
 #include "timer.h"

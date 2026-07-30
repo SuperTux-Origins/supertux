@@ -40,4 +40,7 @@ void platform_video_shutdown(void);
 /** Backend name for diagnostics ("SDL1" or "SDL2"). */
 const char* platform_name(void);
 
+/** Window icon (SDL1: WM icon; SDL2: SDL_SetWindowIcon). */
+void platform_set_icon(SDL_Surface* icon);
+
 #endif /* SUPERTUX_PLATFORM_H */

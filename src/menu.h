@@ -20,7 +20,7 @@
 #ifndef SUPERTUX_MENU_H
 #define SUPERTUX_MENU_H
 
-#include <SDL.h>
+#include "platform_config.h"
 #include <vector>
 #include "texture.h"
 #include "timer.h"

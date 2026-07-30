@@ -78,18 +78,23 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] SDL1 backend: `platform_sdl1.cpp` (SetVideoMode / Flip / GL swap)
 - [x] Route `st_video_setup` / `flipscreen` / `updatescreen` through platform
 - [x] CMake: `ENABLE_SDL2` selects `platform_sdl1.cpp` vs `platform_sdl2.cpp`
-- [ ] Replace remaining `SDL_GetKeyState` / `SDL_WM_*` / `SDL_Flip` call sites via platform or `ST_*` helpers
+- [x] SDL2 compatibility shims in `platform_config.h` (SDLKey, DisplayFormat*, SetAlpha, GetKeyState, Flip, UpdateRect, EnableKeyRepeat, WM icon)
+- [x] Route headers/sources through `platform_config.h` instead of raw `SDL.h`
+- [x] `st_set_color_key` helper for colour-key flag differences
+- [x] `platform_set_icon` on both backends
 - [ ] Ensure full game still links and runs on SDL1 with data present
-- [ ] Event translation layer if SDL2 event field differences bite
+- [ ] Smoke-compile ENABLE_SDL2=ON against SDL2 dev packages
+- [ ] Event translation layer if SDL2 event field differences bite (joy hat, etc.)
 
 ---
 
 ## Phase 3 — SDL2 backend
 
 - [x] Initial `platform_sdl2.cpp` (window + GetWindowSurface / GL context — strategy A)
+- [x] Compat layer so most engine files compile against SDL2 headers (shims)
 - [ ] Finish software path: drawing code assumptions vs window surface format
 - [ ] SDL2_image / SDL2_mixer compile + runtime check
-- [ ] Event mapping (key/joy/mouse/quit; `SDL_GetKeyboardState`)
+- [ ] Event mapping edge cases (joy hat, text input, window focus)
 - [ ] OpenGL-on-SDL2 polish (shadow surface vs real FBO)
 - [ ] Fix regressions (vsync, fullscreen, HiDPI)
 - [ ] Verify title demo, level play, worldmap, menus, leveleditor smoke paths
@@ -114,7 +119,7 @@ Thin layer in `src/platform*.{h,cpp}`:
 
 - **No `data/` in this tree** — cannot fully playtest without external assets.
 - Codebase is pre-C++11 style; platform layer should not force a style rewrite of the entire game.
-- SDL2 port is incomplete: many files still include `<SDL.h>` assuming 1.2 symbols (`SDL_WM_SetCaption`, `SDL_Flip`, …). Compile with `-DENABLE_SDL2=ON` will expose those; fix by routing through platform / `platform_config.h`.
+- SDL2 port: core video/present + header shims in place; needs a real compile/link against SDL2_image/mixer and runtime testing with `data/`.
 
 ---
 
@@ -125,3 +130,4 @@ Thin layer in `src/platform*.{h,cpp}`:
 | 2026-07-30 | AGENTS.md, TODO.md, initial CMakeLists.txt |
 | 2026-07-30 | Platform layer sketch; setup/screen use platform_present |
 | 2026-07-30 | flake.nix: CMake builds, `sdl1` + `sdl2` packages and devShells |
+| 2026-07-30 | SDL2 compat shims; headers use platform_config; color-key helper |

@@ -20,7 +20,7 @@
 #ifndef SUPERTUX_PLAYER_H
 #define SUPERTUX_PLAYER_H
 
-#include <SDL.h>
+#include "platform_config.h"
 #include "type.h"
 #include "timer.h"
 #include "texture.h"

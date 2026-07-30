@@ -21,7 +21,7 @@
 #include <assert.h>
 #include <iostream>
 #include <algorithm>
-#include "SDL.h"
+#include "platform_config.h"
 #include "SDL_image.h"
 #include "texture.h"
 #include "globals.h"
@@ -722,7 +722,7 @@ SurfaceSDL::draw(float x, float y, Uint8 alpha, bool update)
                                     0);
     int colorkey = SDL_MapRGB(sdl_surface_copy->format, 255, 0, 255);
     SDL_FillRect(sdl_surface_copy, NULL, colorkey);
-    SDL_SetColorKey(sdl_surface_copy, SDL_SRCCOLORKEY, colorkey);
+    st_set_color_key(sdl_surface_copy, SDL_SRCCOLORKEY, colorkey);
 
 
     SDL_BlitSurface(sdl_surface, NULL, sdl_surface_copy, NULL);
@@ -769,7 +769,7 @@ SurfaceSDL::draw_bg(Uint8 alpha, bool update)
                                     0);
     int colorkey = SDL_MapRGB(sdl_surface_copy->format, 255, 0, 255);
     SDL_FillRect(sdl_surface_copy, NULL, colorkey);
-    SDL_SetColorKey(sdl_surface_copy, SDL_SRCCOLORKEY, colorkey);
+    st_set_color_key(sdl_surface_copy, SDL_SRCCOLORKEY, colorkey);
 
 
     SDL_BlitSurface(sdl_surface, NULL, sdl_surface_copy, NULL);
@@ -821,7 +821,7 @@ SurfaceSDL::draw_part(float sx, float sy, float x, float y, float w, float h, Ui
                                     0);
     int colorkey = SDL_MapRGB(sdl_surface_copy->format, 255, 0, 255);
     SDL_FillRect(sdl_surface_copy, NULL, colorkey);
-    SDL_SetColorKey(sdl_surface_copy, SDL_SRCCOLORKEY, colorkey);
+    st_set_color_key(sdl_surface_copy, SDL_SRCCOLORKEY, colorkey);
 
 
     SDL_BlitSurface(sdl_surface, NULL, sdl_surface_copy, NULL);

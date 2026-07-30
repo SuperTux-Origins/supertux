@@ -25,7 +25,7 @@
 #include <math.h>
 #include <errno.h>
 #include <unistd.h>
-#include <SDL.h>
+#include "platform_config.h"
 #include <SDL_image.h>
 #include "leveleditor.h"
 

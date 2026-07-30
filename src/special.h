@@ -20,7 +20,7 @@
 #ifndef SUPERTUX_SPECIAL_H
 #define SUPERTUX_SPECIAL_H
 
-#include <SDL.h>
+#include "platform_config.h"
 #include "type.h"
 #include "texture.h"
 #include "collision.h"

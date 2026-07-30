@@ -23,7 +23,7 @@
 #define SUPERTUX_WORLD_H
 
 #include <vector>
-#include <SDL.h>
+#include "platform_config.h"
 #include "type.h"
 #include "scene.h"
 #include "special.h"

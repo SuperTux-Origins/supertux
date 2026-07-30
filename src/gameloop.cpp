@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
-#include <SDL.h>
+#include "platform_config.h"
 
 #ifndef WIN32
 #include <sys/types.h>
