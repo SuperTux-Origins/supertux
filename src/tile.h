@@ -104,7 +104,10 @@ class TileManager
   std::vector<Tile*> tiles;
   static TileManager* instance_ ;
   static std::set<TileGroup>* tilegroups_;
-  void load_tileset(std::string filename);
+  /** @param replace If true, free existing tiles first (top-level load).
+      Nested (tileset (file …)) forms call with replace=false so parent
+      tiles are not wiped mid-parse. */
+  void load_tileset(std::string filename, bool replace = true);
 
   std::string current_tileset;
   
@@ -113,14 +116,10 @@ class TileManager
   static void destroy_instance() { delete instance_; instance_ = 0; }
   
   static std::set<TileGroup>* tilegroups() { if(!instance_) { instance_ = new TileManager(); } return tilegroups_ ? tilegroups_ : tilegroups_ = new std::set<TileGroup>; }
+  /** Returns the tile for id, or 0 if missing. Callers must null-check. */
   Tile* get(unsigned int id) {
-    if (tiles.empty())
-      return 0;
-    if (id < tiles.size() && tiles[id])
+    if (id < tiles.size())
       return tiles[id];
-    /* Prefer tile 0 if present so callers need fewer NULL checks. */
-    if (tiles[0])
-      return tiles[0];
     return 0;
   }
 };

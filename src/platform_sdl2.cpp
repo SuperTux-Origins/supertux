@@ -10,8 +10,30 @@
 
 static SDL_Window* st_window = NULL;
 static SDL_GLContext st_gl_context = NULL;
+/* Owned software backbuffer — window surface from SDL_GetWindowSurface is
+   invalidated on resize/format changes; the engine treats `screen` as stable. */
+static SDL_Surface* st_backbuffer = NULL;
 
 #define VLOG(...) do { if (verbose_mode) fprintf(stderr, __VA_ARGS__); } while (0)
+
+static SDL_Surface*
+create_software_backbuffer(SDL_Surface* window_surface)
+{
+  if (!window_surface || !window_surface->format)
+    return NULL;
+
+  SDL_PixelFormat* fmt = window_surface->format;
+  SDL_Surface* bb = SDL_CreateRGBSurface(
+      0, ST_SCREEN_W, ST_SCREEN_H, fmt->BitsPerPixel,
+      fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+  if (!bb)
+    {
+      /* Fall back to a fixed 32-bit format if the window format is awkward. */
+      bb = SDL_CreateRGBSurface(0, ST_SCREEN_W, ST_SCREEN_H, 32,
+                                0x00FF0000, 0x0000FF00, 0x000000FF, 0);
+    }
+  return bb;
+}
 
 static void
 log_window(const char* where)
@@ -169,12 +191,27 @@ bool platform_video_init(bool fullscreen, bool opengl)
         return false;
       }
 
-    screen = SDL_GetWindowSurface(st_window);
-    if (!screen)
-      {
-        fprintf(stderr, "Error: SDL_GetWindowSurface failed: %s\n", SDL_GetError());
-        return false;
-      }
+    {
+      SDL_Surface* window_surface = SDL_GetWindowSurface(st_window);
+      if (!window_surface)
+        {
+          fprintf(stderr, "Error: SDL_GetWindowSurface failed: %s\n", SDL_GetError());
+          return false;
+        }
+
+      if (st_backbuffer)
+        {
+          SDL_FreeSurface(st_backbuffer);
+          st_backbuffer = NULL;
+        }
+      st_backbuffer = create_software_backbuffer(window_surface);
+      if (!st_backbuffer)
+        {
+          fprintf(stderr, "Error: software backbuffer: %s\n", SDL_GetError());
+          return false;
+        }
+      screen = st_backbuffer;
+    }
     log_window("software ready");
   }
 
@@ -196,8 +233,15 @@ void platform_present(bool /*full_update*/)
       return;
     }
 #endif
-  if (st_window)
-    SDL_UpdateWindowSurface(st_window);
+  if (st_window && st_backbuffer)
+    {
+      SDL_Surface* window_surface = SDL_GetWindowSurface(st_window);
+      if (window_surface)
+        {
+          SDL_BlitSurface(st_backbuffer, NULL, window_surface, NULL);
+          SDL_UpdateWindowSurface(st_window);
+        }
+    }
 }
 
 void platform_update_rect(int /*x*/, int /*y*/, int /*w*/, int /*h*/)
@@ -221,6 +265,14 @@ void platform_video_shutdown(void)
       screen = NULL;
     }
 #endif
+  if (st_backbuffer)
+    {
+      /* screen aliases st_backbuffer in software mode */
+      if (screen == st_backbuffer)
+        screen = NULL;
+      SDL_FreeSurface(st_backbuffer);
+      st_backbuffer = NULL;
+    }
   if (st_window)
     {
       SDL_DestroyWindow(st_window);

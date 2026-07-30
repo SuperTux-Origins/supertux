@@ -56,17 +56,19 @@ TileManager::~TileManager()
   }
 }
 
-void TileManager::load_tileset(std::string filename)
+void TileManager::load_tileset(std::string filename, bool replace)
 {
-  if(filename == current_tileset)
+  if(replace && filename == current_tileset)
     return;
-  
-  // free old tiles
-  for(std::vector<Tile*>::iterator i = tiles.begin(); i != tiles.end(); ++i) {
-    delete *i;
-  }
-  tiles.clear();
- 
+
+  if(replace)
+    {
+      for(std::vector<Tile*>::iterator i = tiles.begin(); i != tiles.end(); ++i) {
+        delete *i;
+      }
+      tiles.clear();
+    }
+
   lisp_object_t* root_obj = lisp_read_from_file(filename);
 
   if (!root_obj)
@@ -92,8 +94,6 @@ void TileManager::load_tileset(std::string filename)
 
           if (strcmp(lisp_symbol(lisp_car(element)), "tile") == 0)
             {
-	      
-	     
               Tile* tile = new Tile;
               tile->id      = -1;
               tile->solid   = false;
@@ -153,15 +153,21 @@ void TileManager::load_tileset(std::string filename)
               if (tile->id + tileset_id >= int(tiles.size()))
                 tiles.resize(tile->id + tileset_id + 1, 0);
 
+              /* Nested loads may overwrite the same id; free the previous tile. */
+              if (tiles[tile->id + tileset_id] != 0
+                  && tiles[tile->id + tileset_id] != tile)
+                delete tiles[tile->id + tileset_id];
+
               tiles[tile->id + tileset_id] = tile;
             }
           else if (strcmp(lisp_symbol(lisp_car(element)), "tileset") == 0)
             {
               LispReader reader(lisp_cdr(element));
-              std::string filename;
-              reader.read_string("file",  &filename);
-              filename = datadir + "/images/tilesets/" + filename;
-              load_tileset(filename);
+              std::string child_file;
+              reader.read_string("file",  &child_file);
+              child_file = datadir + "/images/tilesets/" + child_file;
+              /* Merge nested tileset without clearing tiles already parsed. */
+              load_tileset(child_file, false);
             }
           else if (strcmp(lisp_symbol(lisp_car(element)), "tilegroup") == 0)
             {
@@ -193,7 +199,8 @@ void TileManager::load_tileset(std::string filename)
     }
 
   lisp_free(root_obj);
-  current_tileset = filename;
+  if(replace)
+    current_tileset = filename;
 }
 
 void

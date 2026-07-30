@@ -98,7 +98,7 @@ Thin layer in `src/platform*.{h,cpp}`:
 
 - [x] Initial `platform_sdl2.cpp` (window + GetWindowSurface / GL context — strategy A)
 - [x] Compat layer so most engine files compile against SDL2 headers (shims)
-- [ ] **Software backbuffer:** do not treat `SDL_GetWindowSurface` as a long-lived draw target; own a stable surface (or equivalent) and blit/present on flip — window surface is invalidated on resize/format change
+- [x] **Software backbuffer:** own stable `st_backbuffer`; blit to window surface on present
 - [ ] SDL2_image / SDL2_mixer: confirm `IMG_Init` / mixer open at runtime with real assets
 - [ ] Menu / slot text input under SDL2 (`SDL_EnableUNICODE` is a no-op; `st_key_ascii` is approximate) — enough to type without crash; full IME not required
 - [ ] Event edge cases that can break control: joy hat, window focus (only if they cause stuck keys or unusable menus)
@@ -108,8 +108,8 @@ Thin layer in `src/platform*.{h,cpp}`:
 
 ### Rendering strategy
 
-- **A (chosen for first bring-up):** software `SDL_Surface` via `SDL_GetWindowSurface`, present with `SDL_UpdateWindowSurface`.
-- **B (later, only if A is unstable):** owned backbuffer and/or `SDL_Renderer`.
+- **A (updated):** owned software backbuffer + blit to window surface on present.
+- **B (later, only if A is unstable):** `SDL_Renderer` / textures.
 
 ---
 
@@ -117,10 +117,10 @@ Thin layer in `src/platform*.{h,cpp}`:
 
 These are engine bugs that can crash, corrupt timers, or hide bad data. Not gameplay features.
 
-- [ ] **`st_get_ticks` while paused** (`timer.cpp`): paused branch has `SDL_GetTicks()` commented out and returns nonsense unsigned math — breaks invincibility / menus / any timer using pause-aware ticks. Restore a correct “frozen time” formula.
-- [ ] **Nested tileset load** (`TileManager::load_tileset`): entry always `tiles.clear()` + delete; a nested `(tileset (file …))` re-enters and wipes tiles already parsed from the parent — crash or empty tileset risk. Load child without destroying parent state (or merge into a temp).
-- [ ] **`TileManager::get` fallback**: missing ids return `tiles[0]` instead of null/safe empty — masks bad data and can confuse collision/draw. Prefer returning null (or a dedicated empty tile) and keep null checks at draw/collision sites.
-- [ ] **CMake OpenGL/GLU link block**: nested `if(ENABLE_OPENGL)` / `if(NOT ENABLE_SDL2)` for GLU is fragile; make structure explicit so SDL2+GL builds link the right libs.
+- [x] **`st_get_ticks` while paused** (`timer.cpp`): frozen clock = `st_pause_count - st_pause_ticks` while paused
+- [x] **Nested tileset load** (`TileManager::load_tileset`): `replace` flag; nested forms merge without wiping parent tiles
+- [x] **`TileManager::get` fallback**: missing ids return null; null-checks in world brick/box and fish water tile
+- [x] **CMake OpenGL/GLU link block**: explicit nesting; GLU only for SDL1
 - [ ] **TSCONTROL only (low priority):** `gameloop.cpp` sets `old_mouse_y = screen->w` — likely meant `screen->h`. Skip unless that build is used.
 
 ---
@@ -168,3 +168,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-30 | SDL2 build success; silence format/fread warnings |
 | 2026-07-30 | Harden TileManager/IMG_Init after SDL2 runtime SEGV |
 | 2026-07-31 | Scope: SDL2 + crash fixes only; filed Phase 3b issues; AGENTS goals section |
+| 2026-07-31 | Fix pause ticks; nested tileset merge; tile get null; CMake GL link; SDL2 backbuffer |

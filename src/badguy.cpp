@@ -553,7 +553,8 @@ BadGuy::action_fish(double frame_ratio)
   static const int WAITTIME = 1000;
     
   // go in wait mode when back in water
-  if(dying == DYING_NOT && gettile(base.x, base.y+ base.height)->water
+  Tile* water_tile = gettile(base.x, base.y + base.height);
+  if(dying == DYING_NOT && water_tile && water_tile->water
         && physic.get_velocity_y() <= 0 && mode == NORMAL)
     {
       mode = FISH_WAIT;

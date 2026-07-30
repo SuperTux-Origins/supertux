@@ -26,8 +26,11 @@ unsigned int st_pause_ticks, st_pause_count;
 
 unsigned int st_get_ticks(void)
 {
+  /* st_pause_ticks accumulates time spent while paused.
+     st_pause_count is the wall-clock moment pause started (0 = not paused).
+     While paused, freeze the returned clock at the pause start. */
   if(st_pause_count != 0)
-    return /*SDL_GetTicks()*/ - st_pause_ticks /*- SDL_GetTicks()*/ + st_pause_count;
+    return st_pause_count - st_pause_ticks;
   else
     return SDL_GetTicks() - st_pause_ticks;
 }
@@ -46,8 +49,8 @@ void st_pause_ticks_start(void)
 
 void st_pause_ticks_stop(void)
 {
-if(st_pause_count == 0)
-return;
+  if(st_pause_count == 0)
+    return;
 
   st_pause_ticks += SDL_GetTicks() - st_pause_count;
   st_pause_count = 0;
@@ -55,10 +58,7 @@ return;
 
 bool st_pause_ticks_started(void)
 {
-if(st_pause_count == 0)
-return false;
-else
-return true;
+  return st_pause_count != 0;
 }
 
 Timer::Timer()

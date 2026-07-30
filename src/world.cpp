@@ -616,6 +616,9 @@ World::trybreakbrick(float x, float y, bool small, Direction col_side)
   Level* plevel = get_level();
   
   Tile* tile = gettile(x, y);
+  if (!tile)
+    return;
+
   if (tile->brick)
     {
       if (tile->data > 0)
@@ -681,7 +684,7 @@ void
 World::tryemptybox(float x, float y, Direction col_side)
 {
   Tile* tile = gettile(x,y);
-  if (!tile->fullbox)
+  if (!tile || !tile->fullbox)
     return;
 
   // according to the collision side, set the upgrade direction
