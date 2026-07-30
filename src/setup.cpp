@@ -745,11 +745,22 @@ void st_video_setup(void)
 {
   if (!platform_video_init(use_fullscreen, use_gl))
     {
+      /* Options toggles can request a mode the driver rejects; fall back
+         instead of aborting the whole process mid-menu. */
+      fprintf(stderr,
+              "Warning: video init failed (fullscreen=%d gl=%d), "
+              "trying windowed software\n",
+              (int)use_fullscreen, (int)use_gl);
+      use_fullscreen = false;
+      use_gl = false;
+      if (!platform_video_init(false, false))
+        {
 #ifdef GP2X_VERSION
-      chdir("/usr/gp2x");
-      execl("/usr/gp2x/gp2xmenu", "/usr/gp2x/gp2xmenu", NULL);
+          chdir("/usr/gp2x");
+          execl("/usr/gp2x/gp2xmenu", "/usr/gp2x/gp2xmenu", NULL);
 #endif
-      exit(1);
+          exit(1);
+        }
     }
 
   Surface::reload_all();

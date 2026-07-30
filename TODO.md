@@ -102,8 +102,8 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] SDL2_image / SDL2_mixer: `IMG_Init` in platform_sdl2; `Mix_Init` (OGG/MOD) + `Mix_Quit` on close
 - [x] Menu / slot text input under SDL2: `SDL_StartTextInput`, `SDL_TEXTINPUT` in menu, `st_key_ascii` shift fallback
 - [x] Joy hat: menu + worldmap use `SDL_HAT_*` bit flags; menu hat left/right
-- [ ] OpenGL-on-SDL2: keep working if `ENABLE_OPENGL=ON`; no need for FBO redesign unless it crashes
-- [ ] Fullscreen / present regressions that prevent playing (vsync/HiDPI only if they hard-fail)
+- [x] OpenGL-on-SDL2: GL attributes + compatibility profile; letterboxed viewport from drawable size
+- [x] Fullscreen / present: FULLSCREEN → FULLSCREEN_DESKTOP → windowed; software letterbox scale; video re-init falls back instead of exit
 - [ ] Smoke playtest with `data/`: title demo, one level, worldmap, pause menu, options, quit — SDL1 and SDL2
 
 ### Rendering strategy
@@ -171,3 +171,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-31 | Scope: SDL2 + crash fixes only; filed Phase 3b issues; AGENTS goals section |
 | 2026-07-31 | Fix pause ticks; nested tileset merge; tile get null; CMake GL link; SDL2 backbuffer |
 | 2026-07-31 | SDL2 text input, Mix_Init, joy-hat bits, menu backspace, TSCONTROL mouse y |
+| 2026-07-31 | SDL2 fullscreen fallbacks, letterbox present, GL viewport, safe video re-init |

@@ -35,6 +35,114 @@ create_software_backbuffer(SDL_Surface* window_surface)
   return bb;
 }
 
+/** Try exclusive fullscreen, then desktop fullscreen, then windowed. */
+static SDL_Window*
+create_game_window(const char* title, bool opengl, bool* fullscreen_inout)
+{
+  Uint32 base = opengl ? SDL_WINDOW_OPENGL : 0;
+  SDL_Window* win = NULL;
+
+  if (*fullscreen_inout)
+    {
+      win = SDL_CreateWindow(title,
+                             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                             ST_SCREEN_W, ST_SCREEN_H,
+                             base | SDL_WINDOW_FULLSCREEN);
+      if (!win)
+        {
+          VLOG("[video] FULLSCREEN failed (%s), trying FULLSCREEN_DESKTOP\n",
+               SDL_GetError());
+          win = SDL_CreateWindow(title,
+                                 SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                 ST_SCREEN_W, ST_SCREEN_H,
+                                 base | SDL_WINDOW_FULLSCREEN_DESKTOP);
+        }
+      if (!win)
+        {
+          fprintf(stderr, "Warning: fullscreen failed (%s), using windowed\n",
+                  SDL_GetError());
+          *fullscreen_inout = false;
+        }
+    }
+
+  if (!win)
+    {
+      win = SDL_CreateWindow(title,
+                             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                             ST_SCREEN_W, ST_SCREEN_H,
+                             base);
+    }
+
+  return win;
+}
+
+static void
+software_present(void)
+{
+  if (!st_window || !st_backbuffer)
+    return;
+
+  SDL_Surface* window_surface = SDL_GetWindowSurface(st_window);
+  if (!window_surface)
+    {
+      /* Surface can be lost after mode changes; try once to recover. */
+      VLOG("[video] GetWindowSurface failed (%s), recreating backbuffer path\n",
+           SDL_GetError());
+      return;
+    }
+
+  if (window_surface->w == ST_SCREEN_W && window_surface->h == ST_SCREEN_H)
+    {
+      SDL_BlitSurface(st_backbuffer, NULL, window_surface, NULL);
+    }
+  else
+    {
+      /* Letterbox scale into desktop-fullscreen or HiDPI window. */
+      float sx = (float)window_surface->w / (float)ST_SCREEN_W;
+      float sy = (float)window_surface->h / (float)ST_SCREEN_H;
+      float scale = (sx < sy) ? sx : sy;
+      int dw = (int)(ST_SCREEN_W * scale + 0.5f);
+      int dh = (int)(ST_SCREEN_H * scale + 0.5f);
+      if (dw < 1) dw = 1;
+      if (dh < 1) dh = 1;
+      SDL_Rect dst;
+      dst.x = (window_surface->w - dw) / 2;
+      dst.y = (window_surface->h - dh) / 2;
+      dst.w = dw;
+      dst.h = dh;
+      SDL_FillRect(window_surface, NULL, SDL_MapRGB(window_surface->format, 0, 0, 0));
+      SDL_BlitScaled(st_backbuffer, NULL, window_surface, &dst);
+    }
+
+  SDL_UpdateWindowSurface(st_window);
+}
+
+#ifndef NOOPENGL
+static void
+gl_setup_viewport(void)
+{
+  int ww = ST_SCREEN_W;
+  int wh = ST_SCREEN_H;
+  if (st_window)
+    SDL_GL_GetDrawableSize(st_window, &ww, &wh);
+
+  float sx = (float)ww / (float)ST_SCREEN_W;
+  float sy = (float)wh / (float)ST_SCREEN_H;
+  float scale = (sx < sy) ? sx : sy;
+  int dw = (int)(ST_SCREEN_W * scale + 0.5f);
+  int dh = (int)(ST_SCREEN_H * scale + 0.5f);
+  if (dw < 1) dw = 1;
+  if (dh < 1) dh = 1;
+
+  glViewport((ww - dw) / 2, (wh - dh) / 2, dw, dh);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+}
+#endif
+
 static void
 log_window(const char* where)
 {
@@ -86,34 +194,22 @@ bool platform_video_init(bool fullscreen, bool opengl)
 #ifndef NOOPENGL
   if (use_gl)
     {
-      Uint32 flags = SDL_WINDOW_OPENGL;
-      if (use_fullscreen)
-        flags |= SDL_WINDOW_FULLSCREEN;
+      /* Request a compatibility context for immediate-mode GL (glBegin, etc.). */
+      SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+      SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+      SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+      SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+#ifdef SDL_GL_CONTEXT_PROFILE_MASK
+      SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                          SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+#endif
 
-      VLOG("[video] CreateWindow OPENGL flags=0x%x %dx%d\n",
-           (unsigned)flags, ST_SCREEN_W, ST_SCREEN_H);
+      VLOG("[video] CreateWindow OPENGL fullscreen=%d %dx%d\n",
+           (int)use_fullscreen, ST_SCREEN_W, ST_SCREEN_H);
       SDL_ClearError();
-      st_window = SDL_CreateWindow("SuperTux " VERSION,
-                                   SDL_WINDOWPOS_CENTERED,
-                                   SDL_WINDOWPOS_CENTERED,
-                                   ST_SCREEN_W, ST_SCREEN_H,
-                                   flags);
+      st_window = create_game_window("SuperTux " VERSION, true, &use_fullscreen);
       VLOG("[video] CreateWindow -> %p err=[%s]\n",
            (void*)st_window, SDL_GetError());
-
-      if (!st_window && use_fullscreen)
-        {
-          fprintf(stderr, "Warning: fullscreen OpenGL failed (%s), trying windowed\n",
-                  SDL_GetError());
-          use_fullscreen = false;
-          st_window = SDL_CreateWindow("SuperTux " VERSION,
-                                       SDL_WINDOWPOS_CENTERED,
-                                       SDL_WINDOWPOS_CENTERED,
-                                       ST_SCREEN_W, ST_SCREEN_H,
-                                       SDL_WINDOW_OPENGL);
-          VLOG("[video] windowed CreateWindow -> %p err=[%s]\n",
-               (void*)st_window, SDL_GetError());
-        }
 
       if (st_window)
         {
@@ -134,12 +230,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
                 }
               glDisable(GL_DEPTH_TEST);
               glDisable(GL_CULL_FACE);
-              glViewport(0, 0, ST_SCREEN_W, ST_SCREEN_H);
-              glMatrixMode(GL_PROJECTION);
-              glLoadIdentity();
-              glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
-              glMatrixMode(GL_MODELVIEW);
-              glLoadIdentity();
+              gl_setup_viewport();
               log_window("GL ready");
               return true;
             }
@@ -160,31 +251,12 @@ bool platform_video_init(bool fullscreen, bool opengl)
 #endif
 
   {
-    Uint32 flags = 0;
-    if (use_fullscreen)
-      flags |= SDL_WINDOW_FULLSCREEN;
-
-    VLOG("[video] CreateWindow software flags=0x%x %dx%d\n",
-         (unsigned)flags, ST_SCREEN_W, ST_SCREEN_H);
-    st_window = SDL_CreateWindow("SuperTux " VERSION,
-                                 SDL_WINDOWPOS_CENTERED,
-                                 SDL_WINDOWPOS_CENTERED,
-                                 ST_SCREEN_W, ST_SCREEN_H,
-                                 flags);
+    VLOG("[video] CreateWindow software fullscreen=%d %dx%d\n",
+         (int)use_fullscreen, ST_SCREEN_W, ST_SCREEN_H);
+    st_window = create_game_window("SuperTux " VERSION, false, &use_fullscreen);
     VLOG("[video] CreateWindow -> %p err=[%s]\n",
          (void*)st_window, SDL_GetError());
 
-    if (!st_window && use_fullscreen)
-      {
-        fprintf(stderr, "Warning: fullscreen failed (%s), trying windowed\n",
-                SDL_GetError());
-        use_fullscreen = false;
-        st_window = SDL_CreateWindow("SuperTux " VERSION,
-                                     SDL_WINDOWPOS_CENTERED,
-                                     SDL_WINDOWPOS_CENTERED,
-                                     ST_SCREEN_W, ST_SCREEN_H,
-                                     0);
-      }
     if (!st_window)
       {
         fprintf(stderr, "Error: SDL_CreateWindow failed: %s\n", SDL_GetError());
@@ -229,19 +301,13 @@ void platform_present(bool /*full_update*/)
 #ifndef NOOPENGL
   if (use_gl && st_window)
     {
+      /* Re-apply viewport in case of desktop-fullscreen / drawable size change. */
+      gl_setup_viewport();
       SDL_GL_SwapWindow(st_window);
       return;
     }
 #endif
-  if (st_window && st_backbuffer)
-    {
-      SDL_Surface* window_surface = SDL_GetWindowSurface(st_window);
-      if (window_surface)
-        {
-          SDL_BlitSurface(st_backbuffer, NULL, window_surface, NULL);
-          SDL_UpdateWindowSurface(st_window);
-        }
-    }
+  software_present();
 }
 
 void platform_update_rect(int /*x*/, int /*y*/, int /*w*/, int /*h*/)
@@ -279,6 +345,7 @@ void platform_video_shutdown(void)
       st_window = NULL;
     }
   screen = NULL;
+  /* Do not IMG_Quit here — video may re-init while surfaces still exist. */
 }
 
 const char* platform_name(void)
