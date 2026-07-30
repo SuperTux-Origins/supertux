@@ -231,6 +231,10 @@ bool platform_video_init(bool fullscreen, bool opengl)
               glDisable(GL_DEPTH_TEST);
               glDisable(GL_CULL_FACE);
               gl_setup_viewport();
+              /* Black frame immediately so the window is not garbage. */
+              glClearColor(0.f, 0.f, 0.f, 1.f);
+              glClear(GL_COLOR_BUFFER_BIT);
+              SDL_GL_SwapWindow(st_window);
               log_window("GL ready");
               return true;
             }
@@ -283,6 +287,9 @@ bool platform_video_init(bool fullscreen, bool opengl)
           return false;
         }
       screen = st_backbuffer;
+      SDL_FillRect(st_backbuffer, NULL,
+                   SDL_MapRGB(st_backbuffer->format, 0, 0, 0));
+      software_present();
     }
     log_window("software ready");
   }

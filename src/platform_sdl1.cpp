@@ -54,6 +54,10 @@ bool platform_video_init(bool fullscreen, bool opengl)
           glOrtho(0, screen->w, screen->h, 0, -1.0, 1.0);
           glMatrixMode(GL_MODELVIEW);
           glLoadIdentity();
+          /* Black frame immediately so the window is not garbage. */
+          glClearColor(0.f, 0.f, 0.f, 1.f);
+          glClear(GL_COLOR_BUFFER_BIT);
+          SDL_GL_SwapBuffers();
           VLOG("[video] OpenGL ready %dx%d\n", screen->w, screen->h);
           return true;
         }
@@ -81,6 +85,8 @@ bool platform_video_init(bool fullscreen, bool opengl)
         fprintf(stderr, "Error: SDL_SetVideoMode failed: %s\n", SDL_GetError());
         return false;
       }
+    SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+    SDL_Flip(screen);
     VLOG("[video] software ready %dx%d\n", screen->w, screen->h);
   }
 
