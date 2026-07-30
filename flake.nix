@@ -54,6 +54,10 @@
             src = nixpkgs.lib.cleanSource ./.;
             enableParallelBuilding = true;
 
+            # Keep debug symbols (and optionally split them to $debug).
+            dontStrip = true;
+            separateDebugInfo = true;
+
             nativeBuildInputs = [
               pkgs.buildPackages.cmake
               pkgs.buildPackages.pkg-config
@@ -62,6 +66,7 @@
             ];
 
             cmakeFlags = [
+              "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
               "-DENABLE_SOUND=ON"
               "-DENABLE_OPENGL=ON"
               "-DENABLE_SDL2=${if useSDL2 then "ON" else "OFF"}"
