@@ -34,6 +34,7 @@ string_list_type dsubdirs(const char *rel_path, const char* expected_file);
 string_list_type dfiles(const char *rel_path, const char* glob, const char* exception_str);
 void free_strings(char **strings, int num);
 void st_directory_setup(void);
+void st_sdl_init(void);
 void st_general_setup(void);
 void st_general_free();
 void st_video_setup_sdl(void);

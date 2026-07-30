@@ -38,9 +38,12 @@ int main(int argc, char * argv[])
 {
   st_directory_setup();
   parseargs(argc, argv);
-  
-  st_audio_setup();
+
+  /* One SDL_Init for all subsystems before any window/audio work.
+     Video first matters for GLX on some drivers; matches working GL tests. */
+  st_sdl_init();
   st_video_setup();
+  st_audio_setup();
   st_joystick_setup();
   st_general_setup();
   st_menu();

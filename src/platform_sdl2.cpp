@@ -15,23 +15,26 @@ static bool video_was_inited = false;
 static void
 log_windows(const char* where)
 {
-  fprintf(stderr, "[video] %s: st_window=%p st_gl_context=%p screen=%p "
-          "use_gl=%d use_fullscreen=%d video_was_inited=%d\n",
+  const char* driver = SDL_WasInit(SDL_INIT_VIDEO)
+                       ? (SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)")
+                       : "(video not inited)";
+  fprintf(stderr,
+          "[video] %s: st_window=%p st_gl_context=%p screen=%p use_gl=%d fullscreen=%d\n",
           where, (void*)st_window, (void*)st_gl_context, (void*)screen,
-          (int)use_gl, (int)use_fullscreen, (int)video_was_inited);
+          (int)use_gl, (int)use_fullscreen);
   if (st_window)
     {
-      int x, y, w, h;
+      int x = 0, y = 0, w = 0, h = 0;
       Uint32 flags = SDL_GetWindowFlags(st_window);
       SDL_GetWindowPosition(st_window, &x, &y);
       SDL_GetWindowSize(st_window, &w, &h);
-      fprintf(stderr, "[video]   window id=%u flags=0x%x pos=%d,%d size=%dx%d title=\"%s\"\n",
+      fprintf(stderr,
+              "[video]   id=%u flags=0x%x pos=%d,%d size=%dx%d title=\"%s\"\n",
               (unsigned)SDL_GetWindowID(st_window), (unsigned)flags,
               x, y, w, h, SDL_GetWindowTitle(st_window));
     }
-  fprintf(stderr, "[video]   SDL_GetError=[%s] driver=%s\n",
-          SDL_GetError(),
-          SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)");
+  fprintf(stderr, "[video]   driver=%s\n", driver);
+  SDL_ClearError();
 }
 
 static void
@@ -93,17 +96,20 @@ create_software_window(bool fullscreen)
 static bool
 create_opengl_window(bool fullscreen)
 {
-  /* Same call pattern as the known-working /tmp/glwin test. */
-  Uint32 flags = SDL_WINDOW_OPENGL;
-  if (fullscreen)
-    flags |= SDL_WINDOW_FULLSCREEN;
+  fprintf(stderr, "[video] GL env: LD_LIBRARY_PATH=%s DISPLAY=%s\n",
+          getenv("LD_LIBRARY_PATH") ? getenv("LD_LIBRARY_PATH") : "(unset)",
+          getenv("DISPLAY") ? getenv("DISPLAY") : "(unset)");
 
-  fprintf(stderr, "[video] CreateWindow OPENGL flags=0x%x size=%dx%d "
-          "(SDL_WINDOW_OPENGL=0x%x)\n",
-          (unsigned)flags, ST_SCREEN_W, ST_SCREEN_H,
-          (unsigned)SDL_WINDOW_OPENGL);
-  fprintf(stderr, "[video]   existing windows before create: ");
-  log_windows("pre-GL-CreateWindow");
+  /*
+   * Match /tmp/glwin exactly: no SDL_GL_LoadLibrary, no SetAttribute,
+   * just CreateWindow with SDL_WINDOW_OPENGL then CreateContext.
+   */
+  Uint32 flags = (Uint32)SDL_WINDOW_OPENGL;
+  if (fullscreen)
+    flags |= (Uint32)SDL_WINDOW_FULLSCREEN;
+
+  fprintf(stderr, "[video] CreateWindow OPENGL flags=0x%x size=%dx%d\n",
+          (unsigned)flags, ST_SCREEN_W, ST_SCREEN_H);
 
   SDL_ClearError();
   st_window = SDL_CreateWindow("SuperTux " VERSION,
@@ -111,30 +117,14 @@ create_opengl_window(bool fullscreen)
                                SDL_WINDOWPOS_CENTERED,
                                ST_SCREEN_W, ST_SCREEN_H,
                                flags);
-  fprintf(stderr, "[video] CreateWindow returned %p, err=[%s]\n",
+  fprintf(stderr, "[video] CreateWindow -> %p err=[%s]\n",
           (void*)st_window, SDL_GetError());
-
-  if (!st_window && fullscreen)
-    {
-      fprintf(stderr, "[video] fullscreen GL failed, retry windowed\n");
-      use_fullscreen = false;
-      SDL_ClearError();
-      st_window = SDL_CreateWindow("SuperTux " VERSION,
-                                   SDL_WINDOWPOS_CENTERED,
-                                   SDL_WINDOWPOS_CENTERED,
-                                   ST_SCREEN_W, ST_SCREEN_H,
-                                   SDL_WINDOW_OPENGL);
-      fprintf(stderr, "[video] windowed CreateWindow returned %p, err=[%s]\n",
-              (void*)st_window, SDL_GetError());
-    }
 
   if (!st_window)
     {
-      /* Last resort: identical to the working minimal test. */
-      fprintf(stderr, "[video] retry exact minimal test pattern…\n");
       SDL_ClearError();
       st_window = SDL_CreateWindow("t", 0, 0, 640, 480, SDL_WINDOW_OPENGL);
-      fprintf(stderr, "[video] minimal CreateWindow returned %p, err=[%s]\n",
+      fprintf(stderr, "[video] minimal CreateWindow -> %p err=[%s]\n",
               (void*)st_window, SDL_GetError());
     }
 
@@ -149,7 +139,7 @@ create_opengl_window(bool fullscreen)
 
   SDL_ClearError();
   st_gl_context = SDL_GL_CreateContext(st_window);
-  fprintf(stderr, "[video] CreateContext returned %p, err=[%s]\n",
+  fprintf(stderr, "[video] CreateContext -> %p err=[%s]\n",
           (void*)st_gl_context, SDL_GetError());
   if (!st_gl_context)
     {
@@ -178,10 +168,9 @@ create_opengl_window(bool fullscreen)
   glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-
-  log_windows("GL ready");
   return true;
 }
+
 #endif
 
 bool platform_video_init(bool fullscreen, bool opengl)
@@ -193,15 +182,15 @@ bool platform_video_init(bool fullscreen, bool opengl)
   platform_video_shutdown();
   log_windows("after shutdown");
 
-  /* Use SDL_Init(VIDEO) like the working test, not only InitSubSystem. */
+  /* Core SDL already started in st_sdl_init(); ensure VIDEO is on. */
   SDL_ClearError();
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
+  if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
-      fprintf(stderr, "Error: SDL_Init(VIDEO): %s\n", SDL_GetError());
+      fprintf(stderr, "Error: SDL_InitSubSystem(VIDEO): %s\n", SDL_GetError());
       return false;
     }
   video_was_inited = true;
-  fprintf(stderr, "[video] SDL_Init(VIDEO) ok, driver=%s\n",
+  fprintf(stderr, "[video] VIDEO subsystem ready, driver=%s\n",
           SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "?");
 
   use_fullscreen = fullscreen;

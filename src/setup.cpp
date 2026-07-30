@@ -779,7 +779,7 @@ void st_joystick_setup(void)
 
   use_joystick = true;
 
-  if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
+  if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
       fprintf(stderr, "Warning: I could not initialize joystick!\n"
               "The Simple DirectMedia error that occured was:\n"
@@ -835,6 +835,27 @@ void st_joystick_setup(void)
     }
 }
 
+void st_sdl_init(void)
+{
+  /* VIDEO only first — same as a minimal GL test. Audio/joystick later. */
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
+    {
+      fprintf(stderr,
+              "\nError: SDL_Init failed:\n%s\n\n", SDL_GetError());
+      exit(1);
+    }
+#ifdef USE_SDL2
+  fprintf(stderr, "[video] SDL_Init ok, driver=%s\n",
+          SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)");
+#else
+  {
+    char driver[32] = "?";
+    SDL_VideoDriverName(driver, sizeof(driver));
+    fprintf(stderr, "[video] SDL_Init ok, driver=%s\n", driver);
+  }
+#endif
+}
+
 void st_audio_setup(void)
 {
 #ifndef NOSOUND
@@ -843,7 +864,7 @@ void st_audio_setup(void)
 
   if (audio_device)
     {
-      if (SDL_Init(SDL_INIT_AUDIO) < 0)
+      if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
         {
           /* only print out message if sound or music
              was not disabled at command-line
