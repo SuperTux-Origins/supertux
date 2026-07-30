@@ -740,6 +740,9 @@ void st_general_free(void)
 
 void st_video_setup(void)
 {
+  printf("Video backend: %s (%s)\n",
+         platform_name(),
+         use_gl ? "OpenGL" : "software/SDL");
   if (!platform_video_init(use_fullscreen, use_gl))
     {
 #ifdef GP2X_VERSION
