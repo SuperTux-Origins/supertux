@@ -120,6 +120,8 @@
                 pkgs.zlib
                 pkgs.libpng
                 pkgs.libjpeg
+                pkgs.libtiff
+                pkgs.libsndfile
               ];
 
             meta = with nixpkgs.lib; {
