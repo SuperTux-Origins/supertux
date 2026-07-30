@@ -42,6 +42,7 @@
 
 #include "defines.h"
 #include "globals.h"
+#include "platform.h"
 #include "setup.h"
 #include "screen.h"
 #include "texture.h"
@@ -739,134 +740,33 @@ void st_general_free(void)
 
 void st_video_setup(void)
 {
-  /* Init SDL Video: */
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
+  if (!platform_video_init(use_fullscreen, use_gl))
     {
-      fprintf(stderr,
-              "\nError: I could not initialize video!\n"
-              "The Simple DirectMedia error that occured was:\n"
-              "%s\n\n", SDL_GetError());
 #ifdef GP2X_VERSION
-    chdir("/usr/gp2x");
-    execl("/usr/gp2x/gp2xmenu", "/usr/gp2x/gp2xmenu", NULL);    
+      chdir("/usr/gp2x");
+      execl("/usr/gp2x/gp2xmenu", "/usr/gp2x/gp2xmenu", NULL);
 #endif
-
       exit(1);
     }
 
-  /* Open display: */
-  if(use_gl)
-    st_video_setup_gl();
-  else
-    st_video_setup_sdl();
-
   Surface::reload_all();
 
-  /* Set window manager stuff: */
 #ifndef GP2X_VERSION
-  SDL_WM_SetCaption("SuperTux " VERSION, "SuperTux");
+  platform_set_caption("SuperTux " VERSION, "SuperTux");
 #endif
 }
 
 void st_video_setup_sdl(void)
 {
-  if (use_fullscreen)
-    {
-#ifndef GP2X
-      screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 0, SDL_FULLSCREEN ) ; /* | SDL_HWSURFACE); */
-#else
-//      screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 16, SDL_HWSURFACE | SDL_DOUBLEBUF ) ; /* GP2X */
-      printf("screen width: %d, height: %d\n",SCREEN_W, SCREEN_H);
-      screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 16, SDL_SWSURFACE ) ; /* GP2X */
-#endif
-      if (screen == NULL)
-        {
-          fprintf(stderr,
-                  "\nWarning: I could not set up fullscreen video for "
-                  "640x480 mode.\n"
-                  "The Simple DirectMedia error that occured was:\n"
-                  "%s\n\n", SDL_GetError());
-          use_fullscreen = false;
-        }
-    }
-  else
-    {
-#ifndef GP2X
-      screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 0, SDL_HWSURFACE | SDL_DOUBLEBUF );
-
-#else
-//      screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 16, SDL_HWSURFACE | SDL_DOUBLEBUF ) ; /* GP2X */
-      screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 16, SDL_SWSURFACE ) ; /* GP2X */
-#endif
-      if (screen == NULL)
-        {
-          fprintf(stderr,
-                  "\nError: I could not set up video for 640x480 mode.\n"
-                  "The Simple DirectMedia error that occured was:\n"
-                  "%s\n\n", SDL_GetError());
-#ifdef GP2X_VERSION
-    chdir("/usr/gp2x");
-    execl("/usr/gp2x/gp2xmenu", "/usr/gp2x/gp2xmenu", NULL);    
-#endif
-          exit(1);
-        }
-    }
+  /* Kept for menu toggles that re-init software mode */
+  if (!platform_video_init(use_fullscreen, false))
+    exit(1);
 }
 
 void st_video_setup_gl(void)
 {
-#ifndef NOOPENGL
-
-  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
-  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-  if (use_fullscreen)
-    {
-      screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 0, SDL_FULLSCREEN | SDL_OPENGL) ; /* | SDL_HWSURFACE); */
-      if (screen == NULL)
-        {
-          fprintf(stderr,
-                  "\nWarning: I could not set up fullscreen video for "
-                  "640x480 mode.\n"
-                  "The Simple DirectMedia error that occured was:\n"
-                  "%s\n\n", SDL_GetError());
-          use_fullscreen = false;
-        }
-    }
-  else
-    {
-      screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 0, SDL_OPENGL);
-
-      if (screen == NULL)
-        {
-          fprintf(stderr,
-                  "\nError: I could not set up video for 640x480 mode.\n"
-                  "The Simple DirectMedia error that occured was:\n"
-                  "%s\n\n", SDL_GetError());
-          exit(1);
-        }
-    }
-
-  /*
-   * Set up OpenGL for 2D rendering.
-   */
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-
-  glViewport(0, 0, screen->w, screen->h);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(0, screen->w, screen->h, 0, -1.0, 1.0);
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glTranslatef(0.0f, 0.0f, 0.0f);
-
-#endif
-
+  if (!platform_video_init(use_fullscreen, true))
+    exit(1);
 }
 
 void st_joystick_setup(void)
@@ -1005,6 +905,7 @@ void st_shutdown(void)
 #ifndef NOSOUND
   close_audio();
 #endif
+  platform_video_shutdown();
   SDL_Quit();
   saveconfig();
 #ifdef GP2X

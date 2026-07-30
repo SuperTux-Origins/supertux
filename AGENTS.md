@@ -57,11 +57,26 @@ cmake --build build
 # optional:
 #   -DENABLE_OPENGL=ON|OFF
 #   -DENABLE_SOUND=ON|OFF
-#   -DENABLE_SDL2=OFF   # default until SDL2 backend is ready
+#   -DENABLE_SDL2=ON|OFF   # OFF = SDL 1.2 (default); ON = SDL2 platform backend
 #   -DDATA_PREFIX=/path/to/data-parent   # install/runtime data root
 ```
 
 Binary name: `supertux-milestone1`.
+
+### Nix flake
+
+```bash
+nix build .#supertux-milestone1       # or .#sdl1 / default — SDL 1.2
+nix build .#supertux-milestone1-sdl2  # or .#sdl2 — SDL2
+nix develop                           # SDL1 dev shell
+nix develop .#sdl2                    # SDL2 dev shell
+```
+
+Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL1-oriented via existing win32 SDL inputs.
+
+### Platform layer
+
+Video init/present goes through `src/platform.h` (`platform_sdl1.cpp` or `platform_sdl2.cpp`). SDL2 uses strategy A (window surface + `SDL_UpdateWindowSurface`). See `TODO.md` Phase 2–3 for remaining API migration (`SDL_Flip`, `SDL_WM_*`, key state, …).
 
 Runtime still expects assets under `DATA_PREFIX` / discovered `datadir` (see `st_directory_setup()`). Without `data/`, the binary will not be playable.
 
@@ -102,6 +117,7 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 |------|------|
 | `src/supertux.cpp` | `main` |
 | `src/setup.cpp` | paths, video/audio/joystick init, CLI |
+| `src/platform.h` / `platform_sdl1.cpp` / `platform_sdl2.cpp` | SDL version backends |
 | `src/screen.cpp` / `texture.cpp` | drawing backends |
 | `src/gameloop.cpp` | level session |
 | `src/world.cpp` / `player.cpp` / `badguy.cpp` | gameplay |

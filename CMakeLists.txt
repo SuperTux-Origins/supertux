@@ -13,44 +13,49 @@ set(CMAKE_CXX_EXTENSIONS ON)
 # ---------------------------------------------------------------------------
 # Options
 # ---------------------------------------------------------------------------
-option(ENABLE_SOUND   "Build with SDL_mixer audio support" ON)
+option(ENABLE_SOUND   "Build with audio support (SDL_mixer / SDL2_mixer)" ON)
 option(ENABLE_OPENGL  "Build with OpenGL rendering path"   ON)
-option(ENABLE_SDL2    "Use SDL2 backend (experimental; default is SDL 1.2)" OFF)
+option(ENABLE_SDL2    "Use SDL2 backend instead of SDL 1.2" OFF)
 option(ENABLE_DEBUG   "Enable DEBUG define and softer optimisations" OFF)
 
 set(DATA_PREFIX "${CMAKE_INSTALL_PREFIX}/share/supertux-milestone1"
     CACHE PATH "Runtime data directory (levels, images, music, …)")
 
-if(ENABLE_SDL2)
-  message(FATAL_ERROR
-    "ENABLE_SDL2 is not implemented yet. "
-    "See TODO.md Phase 2–3 (platform abstraction). "
-    "Build with -DENABLE_SDL2=OFF (default) for SDL 1.2.")
-endif()
-
 # ---------------------------------------------------------------------------
-# Dependencies — SDL 1.2 path
+# Dependencies
 # ---------------------------------------------------------------------------
-# Prefer CMake config packages; fall back to pkg-config / Find modules.
-
 find_package(PkgConfig QUIET)
+find_package(ZLIB REQUIRED)
 
-# SDL 1.2
-if(PkgConfig_FOUND)
-  pkg_check_modules(SDL REQUIRED sdl>=1.2.4)
-  pkg_check_modules(SDL_IMAGE REQUIRED SDL_image)
-  if(ENABLE_SOUND)
-    pkg_check_modules(SDL_MIXER REQUIRED SDL_mixer)
+if(ENABLE_SDL2)
+  if(PkgConfig_FOUND)
+    pkg_check_modules(SDL REQUIRED sdl2)
+    pkg_check_modules(SDL_IMAGE REQUIRED SDL2_image)
+    if(ENABLE_SOUND)
+      pkg_check_modules(SDL_MIXER REQUIRED SDL2_mixer)
+    endif()
+  else()
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2_image REQUIRED)
+    if(ENABLE_SOUND)
+      find_package(SDL2_mixer REQUIRED)
+    endif()
   endif()
 else()
-  find_package(SDL REQUIRED)
-  find_package(SDL_image REQUIRED)
-  if(ENABLE_SOUND)
-    find_package(SDL_mixer REQUIRED)
+  if(PkgConfig_FOUND)
+    pkg_check_modules(SDL REQUIRED sdl>=1.2.4)
+    pkg_check_modules(SDL_IMAGE REQUIRED SDL_image)
+    if(ENABLE_SOUND)
+      pkg_check_modules(SDL_MIXER REQUIRED SDL_mixer)
+    endif()
+  else()
+    find_package(SDL REQUIRED)
+    find_package(SDL_image REQUIRED)
+    if(ENABLE_SOUND)
+      find_package(SDL_mixer REQUIRED)
+    endif()
   endif()
 endif()
-
-find_package(ZLIB REQUIRED)
 
 if(ENABLE_OPENGL)
   find_package(OpenGL)
@@ -105,6 +110,12 @@ set(SUPERTUX_SOUND_SOURCES
   src/sound.cpp
 )
 
+if(ENABLE_SDL2)
+  list(APPEND SUPERTUX_CORE_SOURCES src/platform_sdl2.cpp)
+else()
+  list(APPEND SUPERTUX_CORE_SOURCES src/platform_sdl1.cpp)
+endif()
+
 add_executable(supertux-milestone1 ${SUPERTUX_CORE_SOURCES})
 
 if(ENABLE_SOUND)
@@ -118,6 +129,10 @@ target_compile_definitions(supertux-milestone1 PRIVATE
   VERSION="${PROJECT_VERSION}"
   DATA_PREFIX="${DATA_PREFIX}"
 )
+
+if(ENABLE_SDL2)
+  target_compile_definitions(supertux-milestone1 PRIVATE USE_SDL2)
+endif()
 
 if(NOT ENABLE_SOUND)
   target_compile_definitions(supertux-milestone1 PRIVATE NOSOUND)
@@ -137,31 +152,29 @@ target_include_directories(supertux-milestone1 PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# pkg-config imported dirs / libs
-if(SDL_FOUND OR SDL_INCLUDE_DIRS)
-  target_include_directories(supertux-milestone1 PRIVATE
-    ${SDL_INCLUDE_DIRS}
-    ${SDL_IMAGE_INCLUDE_DIRS}
-  )
-  target_link_libraries(supertux-milestone1 PRIVATE
-    ${SDL_LIBRARIES}
-    ${SDL_IMAGE_LIBRARIES}
-  )
-  # Some setups need link directories
-  if(SDL_LIBRARY_DIRS)
-    target_link_directories(supertux-milestone1 PRIVATE ${SDL_LIBRARY_DIRS})
+foreach(_pc SDL SDL_IMAGE SDL_MIXER)
+  if(${_pc}_INCLUDE_DIRS)
+    target_include_directories(supertux-milestone1 PRIVATE ${${_pc}_INCLUDE_DIRS})
   endif()
-  if(SDL_IMAGE_LIBRARY_DIRS)
-    target_link_directories(supertux-milestone1 PRIVATE ${SDL_IMAGE_LIBRARY_DIRS})
+  if(${_pc}_LIBRARY_DIRS)
+    target_link_directories(supertux-milestone1 PRIVATE ${${_pc}_LIBRARY_DIRS})
   endif()
-endif()
+  if(${_pc}_LIBRARIES)
+    target_link_libraries(supertux-milestone1 PRIVATE ${${_pc}_LIBRARIES})
+  endif()
+endforeach()
 
-# Legacy FindSDL variables
 if(SDL_INCLUDE_DIR)
   target_include_directories(supertux-milestone1 PRIVATE ${SDL_INCLUDE_DIR})
 endif()
 if(SDL_LIBRARY)
   target_link_libraries(supertux-milestone1 PRIVATE ${SDL_LIBRARY})
+endif()
+if(SDL2_INCLUDE_DIRS)
+  target_include_directories(supertux-milestone1 PRIVATE ${SDL2_INCLUDE_DIRS})
+endif()
+if(SDL2_LIBRARIES)
+  target_link_libraries(supertux-milestone1 PRIVATE ${SDL2_LIBRARIES})
 endif()
 if(SDL_IMAGE_INCLUDE_DIR)
   target_include_directories(supertux-milestone1 PRIVATE ${SDL_IMAGE_INCLUDE_DIR})
@@ -169,19 +182,11 @@ endif()
 if(SDL_IMAGE_LIBRARY)
   target_link_libraries(supertux-milestone1 PRIVATE ${SDL_IMAGE_LIBRARY})
 endif()
-
-if(ENABLE_SOUND)
-  target_include_directories(supertux-milestone1 PRIVATE ${SDL_MIXER_INCLUDE_DIRS})
-  target_link_libraries(supertux-milestone1 PRIVATE ${SDL_MIXER_LIBRARIES})
-  if(SDL_MIXER_LIBRARY_DIRS)
-    target_link_directories(supertux-milestone1 PRIVATE ${SDL_MIXER_LIBRARY_DIRS})
-  endif()
-  if(SDL_MIXER_INCLUDE_DIR)
-    target_include_directories(supertux-milestone1 PRIVATE ${SDL_MIXER_INCLUDE_DIR})
-  endif()
-  if(SDL_MIXER_LIBRARY)
-    target_link_libraries(supertux-milestone1 PRIVATE ${SDL_MIXER_LIBRARY})
-  endif()
+if(SDL_MIXER_INCLUDE_DIR)
+  target_include_directories(supertux-milestone1 PRIVATE ${SDL_MIXER_INCLUDE_DIR})
+endif()
+if(SDL_MIXER_LIBRARY)
+  target_link_libraries(supertux-milestone1 PRIVATE ${SDL_MIXER_LIBRARY})
 endif()
 
 target_link_libraries(supertux-milestone1 PRIVATE ZLIB::ZLIB)
@@ -190,7 +195,6 @@ if(ENABLE_OPENGL AND OpenGL_FOUND)
   target_link_libraries(supertux-milestone1 PRIVATE OpenGL::GL)
 endif()
 
-# Math library on Unix
 if(UNIX AND NOT APPLE)
   target_link_libraries(supertux-milestone1 PRIVATE m)
 endif()
@@ -223,7 +227,6 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
 )
 
-# Data tree is optional in this source snapshot.
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/data")
   install(DIRECTORY data/
     DESTINATION ${CMAKE_INSTALL_DATADIR}/supertux-milestone1
@@ -238,9 +241,13 @@ endif()
 # ---------------------------------------------------------------------------
 message(STATUS "")
 message(STATUS "SuperTux Milestone 1 ${PROJECT_VERSION}")
+if(ENABLE_SDL2)
+  message(STATUS "  Backend        = SDL2")
+else()
+  message(STATUS "  Backend        = SDL 1.2")
+endif()
 message(STATUS "  ENABLE_SOUND   = ${ENABLE_SOUND}")
 message(STATUS "  ENABLE_OPENGL  = ${ENABLE_OPENGL}")
-message(STATUS "  ENABLE_SDL2    = ${ENABLE_SDL2}")
 message(STATUS "  ENABLE_DEBUG   = ${ENABLE_DEBUG}")
 message(STATUS "  DATA_PREFIX    = ${DATA_PREFIX}")
 message(STATUS "")

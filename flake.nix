@@ -21,7 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 {
-  description = "A 2D platform game featuring Tux the penguin";
+  description = "A 2D platform game featuring Tux the penguin (Milestone 1)";
 
   inputs = rec {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
@@ -46,12 +46,11 @@
 
   outputs = { self, nixpkgs, tinycmmc, SDL-win32, SDL_mixer-win32, SDL_image-win32 }:
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
-      {
-        packages = rec {
-          default = supertux-milestone1;
-
-          supertux-milestone1 = pkgs.stdenv.mkDerivation rec {
-            pname = "supertux-milestone1";
+      let
+        # Shared CMake-based builder. useSDL2 selects the platform backend.
+        mkSuperTux = { useSDL2 ? false, pname ? "supertux-milestone1" }:
+          pkgs.stdenv.mkDerivation rec {
+            inherit pname;
             version = "0.1.4";
 
             src = nixpkgs.lib.cleanSource ./.;
@@ -59,29 +58,44 @@
             enableParallelBuilding = true;
 
             nativeBuildInputs = [
-              pkgs.buildPackages.autoconf
-              pkgs.buildPackages.automake
-              pkgs.buildPackages.autoreconfHook
+              pkgs.buildPackages.cmake
               pkgs.buildPackages.pkg-config
             ]
             ++ (nixpkgs.lib.optional pkgs.stdenv.targetPlatform.isLinux pkgs.makeWrapper);
+
+            cmakeFlags = [
+              "-DENABLE_SOUND=ON"
+              "-DENABLE_OPENGL=ON"
+              "-DENABLE_SDL2=${if useSDL2 then "ON" else "OFF"}"
+              "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
+            ];
 
             postFixup = ""
               + (nixpkgs.lib.optionalString pkgs.stdenv.targetPlatform.isWindows ''
                    mkdir -p $out/bin/
                    find ${pkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
                    find ${pkgs.stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
+                   ${if useSDL2 then "" else ''
                    ln -sfv ${SDL-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
                    ln -sfv ${SDL_image-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
                    ln -sfv ${SDL_mixer-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
+                   ''}
                  '');
 
             buildInputs =
-              (if pkgs.stdenv.targetPlatform.isWindows
+              (if pkgs.stdenv.targetPlatform.isWindows && !useSDL2
                then [
                  SDL-win32.packages.${pkgs.system}.default
                  SDL_image-win32.packages.${pkgs.system}.default
                  SDL_mixer-win32.packages.${pkgs.system}.default
+               ]
+               else if useSDL2
+               then [
+                 pkgs.SDL2
+                 pkgs.SDL2_image
+                 pkgs.SDL2_mixer
+                 pkgs.libGL
+                 pkgs.libGLU
                ]
                else [
                  pkgs.SDL
@@ -93,15 +107,43 @@
               [
                 pkgs.zlib
               ];
+
+            meta = with nixpkgs.lib; {
+              description = "SuperTux Milestone 1 (${if useSDL2 then "SDL2" else "SDL 1.2"} backend)";
+              license = licenses.gpl2Plus;
+              platforms = platforms.linux ++ platforms.windows;
+            };
           };
+      in
+      {
+        packages = rec {
+          default = supertux-milestone1;
+
+          # SDL 1.2 backend (default, historical)
+          supertux-milestone1 = mkSuperTux {
+            useSDL2 = false;
+            pname = "supertux-milestone1";
+          };
+
+          # SDL2 backend (platform layer; still maturing — see TODO.md)
+          supertux-milestone1-sdl2 = mkSuperTux {
+            useSDL2 = true;
+            pname = "supertux-milestone1-sdl2";
+          };
+
+          # Aliases
+          sdl1 = supertux-milestone1;
+          sdl2 = supertux-milestone1-sdl2;
 
           supertux-milestone1-win32 = pkgs.runCommand "supertux-milestone1-win32" {} ''
             mkdir -p $out
             mkdir -p $out/data/
 
             cp -vr ${supertux-milestone1}/bin/supertux-milestone1.exe $out/
-            cp -vLr ${supertux-milestone1}/bin/*.dll $out/
-            cp -vr ${supertux-milestone1}/share/supertux-milestone1/. $out/data/
+            cp -vLr ${supertux-milestone1}/bin/*.dll $out/ 2>/dev/null || true
+            if [ -d ${supertux-milestone1}/share/supertux-milestone1 ]; then
+              cp -vr ${supertux-milestone1}/share/supertux-milestone1/. $out/data/
+            fi
           '';
 
           supertux-milestone1-win32-zip = pkgs.runCommand "supertux-milestone1-win32-zip" {} ''
@@ -117,6 +159,34 @@
               $out/supertux-milestone1-${supertux-milestone1.version}-${pkgs.system}.zip \
               .
           '';
+        };
+
+        # Dev shells for each backend
+        devShells = {
+          default = pkgs.mkShell {
+            name = "supertux-m1-sdl1";
+            packages = [
+              pkgs.cmake
+              pkgs.pkg-config
+              pkgs.SDL
+              pkgs.SDL_image
+              pkgs.SDL_mixer
+              pkgs.libGL
+              pkgs.zlib
+            ];
+          };
+          sdl2 = pkgs.mkShell {
+            name = "supertux-m1-sdl2";
+            packages = [
+              pkgs.cmake
+              pkgs.pkg-config
+              pkgs.SDL2
+              pkgs.SDL2_image
+              pkgs.SDL2_mixer
+              pkgs.libGL
+              pkgs.zlib
+            ];
+          };
         };
       }
     );

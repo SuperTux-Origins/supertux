@@ -33,6 +33,7 @@
 
 #include "defines.h"
 #include "globals.h"
+#include "platform.h"
 #include "screen.h"
 #include "setup.h"
 #include "type.h"
@@ -361,18 +362,12 @@ if(h < 0)
 
 void updatescreen(void)
 {
-  if(use_gl)  /*clearscreen(0,0,0);*/
-    SDL_GL_SwapBuffers();
-  else
-    SDL_UpdateRect(screen, 0, 0, screen->w, screen->h);
+  platform_present(false);
 }
 
 void flipscreen(void)
 {
-  if(use_gl)
-    SDL_GL_SwapBuffers();
-  else
-    SDL_Flip(screen);
+  platform_present(true);
 }
 
 void fadeout()
