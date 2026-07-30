@@ -24,7 +24,7 @@
   description = "A 2D platform game featuring Tux the penguin (Milestone 1)";
 
   inputs = rec {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-26.05";
 
     tinycmmc.url = "github:grumbel/tinycmmc";
     tinycmmc.inputs.nixpkgs.follows = "nixpkgs";
@@ -42,15 +42,57 @@
     SDL_image-win32.inputs.nixpkgs.follows = "nixpkgs";
     SDL_image-win32.inputs.tinycmmc.follows = "tinycmmc";
     SDL_image-win32.inputs.SDL-win32.follows = "SDL-win32";
+
+    # SDL2 source for Android ndk-build (same pattern as helloworld-fireos).
+    sdl2-src = {
+      url = "https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz";
+      flake = false;
+    };
+    sdl2-image-src = {
+      url = "https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.2/SDL2_image-2.8.2.tar.gz";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, tinycmmc, SDL-win32, SDL_mixer-win32, SDL_image-win32 }:
+  outputs = { self, nixpkgs, tinycmmc, SDL-win32, SDL_mixer-win32, SDL_image-win32
+            , sdl2-src, sdl2-image-src }:
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       let
         lib = nixpkgs.lib;
         versionBase = lib.strings.removeSuffix "\n" (builtins.readFile ./VERSION);
         gitRev = "${self.shortRev or self.dirtyShortRev or "dirty"}";
         version = "${versionBase}+g${gitRev}";
+
+        # Android SDK is unfree + needs license accept; use a dedicated pkgs.
+        androidPkgs = import nixpkgs {
+          system = pkgs.system;
+          config.allowUnfree = true;
+          config.android_sdk.accept_license = true;
+        };
+        buildToolsVersion = "30.0.3";
+        packagePlatform = "22";
+        compilePlatform = "33";
+        ndkVersion = "23.1.7779620";
+        targetAbis = [ "armeabi-v7a" "arm64-v8a" ];
+        androidSdk = (androidPkgs.androidenv.composeAndroidPackages {
+          platformVersions = [ packagePlatform compilePlatform ];
+          buildToolsVersions = [ buildToolsVersion ];
+          includeNDK = true;
+          inherit ndkVersion;
+          includeEmulator = false;
+          includeSources = false;
+        }).androidsdk;
+        android = import ./nix/android.nix {
+          pkgs = androidPkgs;
+          sdlSrc = sdl2-src;
+          sdlVersion = "2.30.3";
+          inherit androidSdk buildToolsVersion packagePlatform compilePlatform targetAbis;
+        };
+        gitDate =
+          if self ? lastModifiedDate then builtins.substring 0 8 self.lastModifiedDate
+          else "00000000";
+        androidApkName = "supertux-milestone1-${gitDate}-${gitRev}.apk";
+        hasGameData = builtins.pathExists ./data;
 
         mkSuperTux = { useSDL2 ? true, pname ? "supertux-milestone1" }:
           pkgs.stdenv.mkDerivation rec {
@@ -141,6 +183,18 @@
               cp -vr ${pkgSdl1}/share/supertux-milestone1/. $out/data/
             fi
           '';
+
+          # Android APK (Fire OS 5 / API 22 baseline). Requires Linux + SDK.
+          android-sdl-libs = android.sdlAndroidLibs;
+          supertux-milestone1-android = android.mkApk {
+            appName = "supertux-milestone1";
+            appDir = ./android;
+            outApkName = androidApkName;
+            keystore = ./keystore/debug.keystore;
+            gameSrcDir = ./src;
+            sdl2ImageSrc = sdl2-image-src;
+            gameDataDir = if hasGameData then ./data else null;
+          };
         };
 
         apps = {
@@ -163,6 +217,19 @@
             type = "app";
             program = "${pkgSdl1}/bin/supertux-milestone1";
             meta.description = "SuperTux Milestone 1 (SDL 1.2)";
+          };
+          install-android-supertux-milestone1 = android.mkInstallApp {
+            pkg = android.mkApk {
+              appName = "supertux-milestone1";
+              appDir = ./android;
+              outApkName = androidApkName;
+              keystore = ./keystore/debug.keystore;
+              gameSrcDir = ./src;
+              sdl2ImageSrc = sdl2-image-src;
+              gameDataDir = if hasGameData then ./data else null;
+            };
+            apkFileName = androidApkName;
+            description = "Install SuperTux Milestone 1 APK via adb";
           };
         };
 

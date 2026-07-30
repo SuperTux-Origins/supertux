@@ -177,3 +177,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-31 | Fix KEYDOWN fallthrough; SDL2 focus-loss key release; VERSION 0.1.4 |
 | 2026-07-31 | VERSION file as sole source; CMake/flake/SUPERTUX_MILESTONE1_VERSION |
 | 2026-07-31 | Silence -Wformat-truncation in dsubdirs/dfiles (PATH_MAX + path_join) |
+| 2026-07-31 | Android APK target: nix/android.nix, android/, SDL2+image stb, NOSOUND/NOOPENGL |

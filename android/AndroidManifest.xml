@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.supertux.milestone1"
+    android:versionCode="1"
+    android:versionName="0.1.5">
+
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="22" />
+
+    <!-- Software renderer by default; GLES not required. -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application
+        android:label="SuperTux Milestone 1"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:hasCode="true"
+        android:extractNativeLibs="true">
+        <activity
+            android:name="org.libsdl.app.SDLActivity"
+            android:label="SuperTux Milestone 1"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="landscape"
+            android:launchMode="singleTask"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

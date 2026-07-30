@@ -144,6 +144,23 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 | `src/menu.cpp` / `title.cpp` | UI |
 | `src/sound.cpp` / `music_manager.cpp` | audio |
 | `src/lispreader.cpp` | data parsing |
+| `android/` | Android packaging (manifest, jni/Android.mk, icons) |
+| `nix/android.nix` + `nix/scripts/build-android-*.sh` | APK pipeline (helloworld-fireos pattern) |
+
+### Android APK
+
+```bash
+nix build .#supertux-milestone1-android
+# -> result/supertux-milestone1-<date>-<rev>.apk
+nix run .#install-android-supertux-milestone1   # adb install -r
+```
+
+- SDL2 is built once as `android-sdl-libs` (ndk-build); the game links it as a prebuilt.
+- SDL2_image is compiled into `libmain.so` with the stb backend (no system libpng).
+- Sound is currently **off** (`NOSOUND`) on Android until SDL2_mixer is wired the same way.
+- OpenGL immediate-mode path is **off** (`NOOPENGL`); software SDL surface renderer only.
+- Place a Milestone 1 `data/` tree at the repo root to package assets into the APK; without it the APK still builds but needs external data at runtime.
+- Target baseline matches Fire OS 5 / API 22 (`armeabi-v7a` + `arm64-v8a`).
 
 ## License
 
