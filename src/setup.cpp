@@ -740,9 +740,6 @@ void st_general_free(void)
 
 void st_video_setup(void)
 {
-  printf("Video backend: %s (%s)\n",
-         platform_name(),
-         use_gl ? "OpenGL" : "software/SDL");
   if (!platform_video_init(use_fullscreen, use_gl))
     {
 #ifdef GP2X_VERSION
@@ -837,23 +834,11 @@ void st_joystick_setup(void)
 
 void st_sdl_init(void)
 {
-  /* VIDEO only first — same as a minimal GL test. Audio/joystick later. */
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
     {
-      fprintf(stderr,
-              "\nError: SDL_Init failed:\n%s\n\n", SDL_GetError());
+      fprintf(stderr, "\nError: SDL_Init failed:\n%s\n\n", SDL_GetError());
       exit(1);
     }
-#ifdef USE_SDL2
-  fprintf(stderr, "[video] SDL_Init ok, driver=%s\n",
-          SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)");
-#else
-  {
-    char driver[32] = "?";
-    SDL_VideoDriverName(driver, sizeof(driver));
-    fprintf(stderr, "[video] SDL_Init ok, driver=%s\n", driver);
-  }
-#endif
 }
 
 void st_audio_setup(void)
