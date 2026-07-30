@@ -361,33 +361,59 @@ void free_strings(char **strings, int num)
 
 /* --- SETUP --- */
 /* Set SuperTux configuration and save directories */
+/* Optional overrides from --datadir and --userdir (parsed before setup). */
+static std::string userdir_override;
+
+void parse_path_args(int argc, char* argv[])
+{
+  for (int i = 1; i < argc; i++)
+    {
+      if (strcmp(argv[i], "--datadir") == 0 && i + 1 < argc)
+        {
+          datadir = argv[++i];
+        }
+      else if (strcmp(argv[i], "--userdir") == 0 && i + 1 < argc)
+        {
+          userdir_override = argv[++i];
+        }
+    }
+}
+
 void st_directory_setup(void)
 {
-  std::string config_home(".");
+  if (!userdir_override.empty())
+    {
+      st_dir = (char *) malloc(userdir_override.size() + 1);
+      strcpy(st_dir, userdir_override.c_str());
+    }
+  else
+    {
+      std::string config_home(".");
 
 #ifndef WIN32
-  std::string home = ".";
-  const char* home_c = getenv("HOME");
-  if (home_c)
-  {
-    home = home_c;
-  }
+      std::string home = ".";
+      const char* home_c = getenv("HOME");
+      if (home_c)
+        {
+          home = home_c;
+        }
 
-  const char* config_home_c = getenv("XDG_CONFIG_HOME");
-  if (config_home_c)
-  {
-    config_home = config_home_c;
-  }
-  else
-  {
-    config_home = home + "/.config";
-  }
+      const char* config_home_c = getenv("XDG_CONFIG_HOME");
+      if (config_home_c)
+        {
+          config_home = config_home_c;
+        }
+      else
+        {
+          config_home = home + "/.config";
+        }
 #endif
 
-  st_dir = (char *) malloc(sizeof(char) * (config_home.size() +
-                                           strlen("/supertux-milestone1") + 1));
-  strcpy(st_dir, config_home.c_str());
-  strcat(st_dir, "/supertux-milestone1");
+      st_dir = (char *) malloc(sizeof(char) * (config_home.size() +
+                                               strlen("/supertux-milestone1") + 1));
+      strcpy(st_dir, config_home.c_str());
+      strcat(st_dir, "/supertux-milestone1");
+    }
 
   st_save_dir = (char *) malloc(sizeof(char) * (strlen(st_dir) + strlen("/save") + 1));
 
@@ -1096,11 +1122,25 @@ void parseargs(int argc, char * argv[])
         {
           launch_leveleditor_mode = true;
         }
-      else if (strcmp(argv[i], "--datadir") == 0 
-               || strcmp(argv[i], "-d") == 0 )
+      else if (strcmp(argv[i], "--datadir") == 0)
         {
-          assert(i+1 < argc);
+          /* Also handled in parse_path_args() before directory setup. */
+          if (i + 1 >= argc)
+            {
+              fprintf(stderr, "Error: --datadir requires a directory argument\n");
+              usage(argv[0], 1);
+            }
           datadir = argv[++i];
+        }
+      else if (strcmp(argv[i], "--userdir") == 0)
+        {
+          /* Handled in parse_path_args() before directory setup; skip value. */
+          if (i + 1 >= argc)
+            {
+              fprintf(stderr, "Error: --userdir requires a directory argument\n");
+              usage(argv[0], 1);
+            }
+          ++i;
         }
       else if (strcmp(argv[i], "--show-fps") == 0)
         {
@@ -1182,7 +1222,8 @@ void parseargs(int argc, char * argv[])
                "  --joymap XAXIS:YAXIS:A:B:START\n"
                "  --leveleditor       Opens the leveleditor in a file. (Only works when a file is provided.)\n"
                "                      Define how joystick buttons and axis should be mapped\n"
-               "  -d, --datadir DIR   Load Game data from DIR (default: automatic)\n"
+               "  --datadir DIR       Load game datafiles from DIR (default: automatic)\n"
+               "  --userdir DIR       Load config files and store savegames in DIR\n"
                "  --debug-mode        Enables the debug-mode, which is useful for developers.\n"
                "  --help              Display a help message summarizing command-line\n"
                "                      options, license and game controls.\n"

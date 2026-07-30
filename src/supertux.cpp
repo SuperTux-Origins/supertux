@@ -36,6 +36,8 @@
 
 int main(int argc, char * argv[])
 {
+  /* Path options must be applied before directory/config setup. */
+  parse_path_args(argc, argv);
   st_directory_setup();
   parseargs(argc, argv);
 

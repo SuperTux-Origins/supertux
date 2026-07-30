@@ -51,6 +51,7 @@ void process_options_menu(void);
 bool process_load_game_menu();
 
 void update_load_save_game_menu(Menu* pmenu);
+void parse_path_args(int argc, char * argv[]);
 void parseargs(int argc, char * argv[]);
 
 #endif /*SUPERTUX_SETUP_H*/
