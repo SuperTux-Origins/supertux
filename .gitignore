@@ -1,6 +1,5 @@
 *~
 *.o
-/.sconsign.dblite
 /Makefile
 /Makefile.in
 /aclocal.m4
