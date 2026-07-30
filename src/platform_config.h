@@ -62,6 +62,14 @@ inline const Uint8* SDL_GetKeyState(int* numkeys)
   return SDL_GetKeyboardState(numkeys);
 }
 
+/* SDL2 keyboard state is indexed by scancode, not keycode. */
+inline bool st_key_held(const Uint8* keystate, SDL_Keycode key)
+{
+  if (!keystate)
+    return false;
+  return keystate[SDL_GetScancodeFromKey(key)] != 0;
+}
+
 /* Key-repeat / UNICODE: approximate no-ops under SDL2. */
 #ifndef SDL_DEFAULT_REPEAT_DELAY
 #define SDL_DEFAULT_REPEAT_DELAY 500
@@ -155,6 +163,13 @@ inline void SDL_GL_SwapBuffers(void)
 inline Uint8* ST_GetKeyState(int* numkeys)
 {
   return SDL_GetKeyState(numkeys);
+}
+
+inline bool st_key_held(const Uint8* keystate, SDLKey key)
+{
+  if (!keystate)
+    return false;
+  return keystate[(unsigned)key] != 0;
 }
 
 inline int st_set_color_key(SDL_Surface* surface, Uint32 flag, Uint32 key)

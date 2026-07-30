@@ -672,14 +672,14 @@ WorldMap::get_input()
   if (!Menu::current())
     {
       const Uint8 *keystate = SDL_GetKeyState(NULL);
-  
-      if (keystate[SDLK_LEFT])
+
+      if (st_key_held(keystate, SDLK_LEFT))
         input_direction = D_WEST;
-      else if (keystate[SDLK_RIGHT])
+      else if (st_key_held(keystate, SDLK_RIGHT))
         input_direction = D_EAST;
-      else if (keystate[SDLK_UP])
+      else if (st_key_held(keystate, SDLK_UP))
         input_direction = D_NORTH;
-      else if (keystate[SDLK_DOWN])
+      else if (st_key_held(keystate, SDLK_DOWN))
         input_direction = D_SOUTH;
     }
 }
