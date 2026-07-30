@@ -63,7 +63,11 @@
               pkgs.buildPackages.cmake
               pkgs.buildPackages.pkg-config
             ]
-            ++ (nixpkgs.lib.optional pkgs.stdenv.targetPlatform.isLinux pkgs.makeWrapper);
+            ++ (nixpkgs.lib.optionals pkgs.stdenv.targetPlatform.isLinux [
+              pkgs.makeWrapper
+              # So the binary can dlopen the host OpenGL driver (NixOS).
+              pkgs.addDriverRunpath
+            ]);
 
             cmakeFlags = [
               "-DENABLE_SOUND=ON"
@@ -73,6 +77,9 @@
             ];
 
             postFixup = ""
+              + (nixpkgs.lib.optionalString (pkgs.stdenv.targetPlatform.isLinux && useSDL2) ''
+                   addDriverRunpath $out/bin/supertux-milestone1
+                 '')
               + (nixpkgs.lib.optionalString pkgs.stdenv.targetPlatform.isWindows ''
                    mkdir -p $out/bin/
                    find ${pkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;

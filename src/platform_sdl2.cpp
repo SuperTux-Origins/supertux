@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "platform.h"
 #include "globals.h"
@@ -23,13 +24,26 @@ init_image_subsystem(void)
     fprintf(stderr, "Warning: IMG_Init incomplete: %s\n", IMG_GetError());
 }
 
+static void
+log_video_env(void)
+{
+  const char* vd = SDL_GetCurrentVideoDriver();
+  fprintf(stderr, "  SDL video driver: %s\n", vd ? vd : "(null)");
+  fprintf(stderr, "  DISPLAY=%s\n", getenv("DISPLAY") ? getenv("DISPLAY") : "(unset)");
+  fprintf(stderr, "  WAYLAND_DISPLAY=%s\n",
+          getenv("WAYLAND_DISPLAY") ? getenv("WAYLAND_DISPLAY") : "(unset)");
+  fprintf(stderr, "  SDL_VIDEODRIVER=%s\n",
+          getenv("SDL_VIDEODRIVER") ? getenv("SDL_VIDEODRIVER") : "(unset)");
+}
+
 static bool
 create_software_window(bool fullscreen)
 {
-  Uint32 window_flags = 0;
+  Uint32 window_flags = SDL_WINDOW_SHOWN;
   if (fullscreen)
     window_flags |= SDL_WINDOW_FULLSCREEN;
 
+  SDL_ClearError();
   st_window = SDL_CreateWindow("SuperTux " VERSION,
                                SDL_WINDOWPOS_CENTERED,
                                SDL_WINDOWPOS_CENTERED,
@@ -44,13 +58,14 @@ create_software_window(bool fullscreen)
                                    SDL_WINDOWPOS_CENTERED,
                                    SDL_WINDOWPOS_CENTERED,
                                    ST_SCREEN_W, ST_SCREEN_H,
-                                   0);
+                                   SDL_WINDOW_SHOWN);
     }
 
   if (!st_window)
     {
       fprintf(stderr, "\nError: SDL_CreateWindow failed:\n%s\n\n",
               SDL_GetError());
+      log_video_env();
       return false;
     }
 
@@ -66,25 +81,35 @@ create_software_window(bool fullscreen)
 }
 
 #ifndef NOOPENGL
+/* Try one combination of GL attributes + window flags. */
 static bool
-create_opengl_window(bool fullscreen)
+try_gl_window(const char* label, int major, int minor, int profile,
+              int r, int g, int b, int a, int depth, bool fullscreen)
 {
-  /* Immediate-mode GL (glBegin/glOrtho) needs a compatibility context.
-     8-bit channels are widely supported; the old 5/5/5 attrs often fail. */
-  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-  SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+  SDL_GL_ResetAttributes();
+  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, r);
+  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, g);
+  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, b);
+  SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, a);
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, depth);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                      SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
-  Uint32 window_flags = SDL_WINDOW_OPENGL;
+  if (major > 0)
+    {
+      SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
+      SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
+      if (profile != 0)
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, profile);
+    }
+
+  Uint32 window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
   if (fullscreen)
     window_flags |= SDL_WINDOW_FULLSCREEN;
+
+  fprintf(stderr,
+          "  GL try [%s]: %d.%d profile=0x%x rgba=%d%d%d%d depth=%d flags=0x%x\n",
+          label, major, minor, profile, r, g, b, a, depth,
+          (unsigned)window_flags);
 
   SDL_ClearError();
   st_window = SDL_CreateWindow("SuperTux " VERSION,
@@ -92,44 +117,83 @@ create_opengl_window(bool fullscreen)
                                SDL_WINDOWPOS_CENTERED,
                                ST_SCREEN_W, ST_SCREEN_H,
                                window_flags);
-  if (!st_window && fullscreen)
-    {
-      fprintf(stderr, "\nWarning: fullscreen OpenGL window failed:\n%s\n",
-              SDL_GetError());
-      use_fullscreen = false;
-      window_flags &= ~SDL_WINDOW_FULLSCREEN;
-      SDL_ClearError();
-      st_window = SDL_CreateWindow("SuperTux " VERSION,
-                                   SDL_WINDOWPOS_CENTERED,
-                                   SDL_WINDOWPOS_CENTERED,
-                                   ST_SCREEN_W, ST_SCREEN_H,
-                                   window_flags);
-    }
-
   if (!st_window)
     {
-      fprintf(stderr,
-              "\nWarning: SDL_CreateWindow (OpenGL) failed: %s\n"
-              "Falling back to software renderer.\n\n",
-              SDL_GetError());
+      fprintf(stderr, "    CreateWindow failed: %s\n", SDL_GetError());
       return false;
     }
 
+  SDL_ClearError();
   st_gl_context = SDL_GL_CreateContext(st_window);
   if (!st_gl_context)
     {
-      fprintf(stderr,
-              "\nWarning: SDL_GL_CreateContext failed: %s\n"
-              "Falling back to software renderer.\n\n",
-              SDL_GetError());
+      fprintf(stderr, "    CreateContext failed: %s\n", SDL_GetError());
       SDL_DestroyWindow(st_window);
       st_window = 0;
       return false;
     }
 
+  fprintf(stderr, "    OK\n");
+  return true;
+}
+
+static bool
+create_opengl_window(bool fullscreen)
+{
+  /* Ensure the GL library is loaded before window creation (helps on NixOS). */
+  if (SDL_GL_LoadLibrary(NULL) != 0)
+    {
+      fprintf(stderr, "  SDL_GL_LoadLibrary failed: %s\n", SDL_GetError());
+      /* continue — CreateWindow may still succeed */
+    }
+
+  /* Ordered from most appropriate for this codebase to more lenient. */
+  const struct {
+    const char* label;
+    int major, minor, profile;
+    int r, g, b, a, depth;
+  } attempts[] = {
+    { "compat 2.1 8888", 2, 1, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY,
+      8, 8, 8, 8, 16 },
+    { "compat 2.1 5550", 2, 1, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY,
+      5, 5, 5, 0, 16 },
+    { "default attrs",   0, 0, 0, 8, 8, 8, 8, 16 },
+    { "legacy minimal",  0, 0, 0, 5, 5, 5, 0, 0 },
+  };
+
+  for (unsigned i = 0; i < sizeof(attempts) / sizeof(attempts[0]); ++i)
+    {
+      if (try_gl_window(attempts[i].label,
+                        attempts[i].major, attempts[i].minor,
+                        attempts[i].profile,
+                        attempts[i].r, attempts[i].g, attempts[i].b,
+                        attempts[i].a, attempts[i].depth,
+                        fullscreen))
+        goto gl_ok;
+
+      if (fullscreen)
+        {
+          fprintf(stderr, "    retry windowed…\n");
+          if (try_gl_window(attempts[i].label,
+                            attempts[i].major, attempts[i].minor,
+                            attempts[i].profile,
+                            attempts[i].r, attempts[i].g, attempts[i].b,
+                            attempts[i].a, attempts[i].depth,
+                            false))
+            {
+              use_fullscreen = false;
+              goto gl_ok;
+            }
+        }
+    }
+
+  fprintf(stderr, "  All OpenGL window attempts failed.\n");
+  log_video_env();
+  return false;
+
+gl_ok:
   SDL_GL_SetSwapInterval(1);
 
-  /* Placeholder surface so legacy code can read screen->w / screen->h. */
   screen = SDL_CreateRGBSurface(0, ST_SCREEN_W, ST_SCREEN_H, 32,
                                 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
   if (!screen)
@@ -153,7 +217,6 @@ create_opengl_window(bool fullscreen)
 
 bool platform_video_init(bool fullscreen, bool opengl)
 {
-  /* Re-init (e.g. options menu toggles fullscreen/GL): drop previous window. */
   platform_video_shutdown();
 
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
@@ -173,10 +236,11 @@ bool platform_video_init(bool fullscreen, bool opengl)
 #ifndef NOOPENGL
   if (use_gl)
     {
+      fprintf(stderr, "OpenGL: probing window/context configurations…\n");
       if (create_opengl_window(use_fullscreen))
         return true;
 
-      /* OpenGL unavailable — clear GL request state and use software. */
+      fprintf(stderr, "Falling back to software renderer.\n\n");
       use_gl = false;
       platform_video_shutdown();
       if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
@@ -213,7 +277,6 @@ void platform_present(bool /*full_update*/)
 
 void platform_update_rect(int /*x*/, int /*y*/, int /*w*/, int /*h*/)
 {
-  /* Window-surface path: partial updates are not always available; present. */
   platform_present(true);
 }
 
@@ -236,7 +299,6 @@ void platform_video_shutdown(void)
       SDL_DestroyWindow(st_window);
       st_window = 0;
     }
-  /* Software path: window surface is owned by the window; do not free. */
   screen = 0;
 }
 
