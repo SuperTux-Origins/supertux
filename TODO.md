@@ -87,7 +87,7 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] Event helpers: `st_key_ascii`, `st_event_wheel_up/down`, `st_event_mouse_xy`
 - [x] menu.cpp / button.cpp use event helpers (no keysym.unicode / button 4–5)
 - [ ] Remaining event edge cases (text input composition, joy hat)
-- [ ] Playtest SDL2 binary (title, worldmap, one level, options menu)
+- [~] Playtest SDL2 binary — SEGV in TileManager::load_tileset during title demo; hardened loader + IMG_Init
 
 ---
 
@@ -138,3 +138,4 @@ Thin layer in `src/platform*.{h,cpp}`:
 | 2026-07-30 | Confirmed SDL1 nix build success; libpng/jpeg in flake; texture return warnings |
 | 2026-07-30 | Fix SDL2: CaptureScreen, format->alpha, const keystate |
 | 2026-07-30 | SDL2 build success; silence format/fread warnings |
+| 2026-07-30 | Harden TileManager/IMG_Init after SDL2 runtime SEGV |

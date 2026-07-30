@@ -72,6 +72,9 @@ void TileManager::load_tileset(std::string filename)
   if (!root_obj)
     st_abort("Couldn't load file", filename);
 
+  if (!lisp_cons_p(root_obj) || !lisp_symbol_p(lisp_car(root_obj)))
+    st_abort("Tileset root is not a list starting with a symbol", filename);
+
   if (strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-tiles") == 0)
     {
       lisp_object_t* cur = lisp_cdr(root_obj);
@@ -80,6 +83,12 @@ void TileManager::load_tileset(std::string filename)
       while(!lisp_nil_p(cur))
         {
           lisp_object_t* element = lisp_car(cur);
+
+          if (!lisp_cons_p(element) || !lisp_symbol_p(lisp_car(element)))
+            {
+              cur = lisp_cdr(cur);
+              continue;
+            }
 
           if (strcmp(lisp_symbol(lisp_car(element)), "tile") == 0)
             {
@@ -118,26 +127,27 @@ void TileManager::load_tileset(std::string filename)
                   it != tile->filenames.end();
                   ++it)
                 {
-                  Surface* cur_image;
-                  tile->images.push_back(cur_image);
-                  tile->images[tile->images.size()-1] = new Surface(
+                  tile->images.push_back(new Surface(
                                datadir +  "/images/tilesets/" + (*it),
-                               USE_ALPHA);
+                               USE_ALPHA));
                 }
               for(std::vector<std::string>::iterator it = tile->editor_filenames.begin();
                   it != tile->editor_filenames.end();
                   ++it)
                 {
-                  Surface* cur_image;
-                  tile->editor_images.push_back(cur_image);
-                  tile->editor_images[tile->editor_images.size()-1] = new Surface(
+                  tile->editor_images.push_back(new Surface(
                                datadir + "/images/tilesets/" + (*it),
-                               USE_ALPHA);
+                               USE_ALPHA));
                 }
-		
-              if (tile->id + tileset_id >= int(tiles.size())
-                 )
-                tiles.resize(tile->id + tileset_id+1);
+
+              if (tile->id < 0)
+                {
+                  delete tile;
+                  st_abort("Tile missing id in tileset", filename);
+                }
+
+              if (tile->id + tileset_id >= int(tiles.size()))
+                tiles.resize(tile->id + tileset_id + 1, 0);
 
               tiles[tile->id + tileset_id] = tile;
             }

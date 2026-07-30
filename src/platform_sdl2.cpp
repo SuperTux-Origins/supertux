@@ -10,6 +10,7 @@
 #include "platform.h"
 #include "globals.h"
 #include "defines.h"
+#include <SDL_image.h>
 
 static SDL_Window* st_window = 0;
 static SDL_GLContext st_gl_context = 0;
@@ -27,6 +28,13 @@ bool platform_video_init(bool fullscreen, bool opengl)
               "%s\n\n", SDL_GetError());
       return false;
     }
+
+  /* SDL2_image: explicit init so PNG/JPG loaders are available. */
+  {
+    int img_flags = IMG_INIT_PNG | IMG_INIT_JPG;
+    if ((IMG_Init(img_flags) & img_flags) != img_flags)
+      fprintf(stderr, "Warning: IMG_Init incomplete: %s\n", IMG_GetError());
+  }
 
   use_fullscreen = fullscreen;
   use_gl = opengl;

@@ -114,17 +114,14 @@ class TileManager
   
   static std::set<TileGroup>* tilegroups() { if(!instance_) { instance_ = new TileManager(); } return tilegroups_ ? tilegroups_ : tilegroups_ = new std::set<TileGroup>; }
   Tile* get(unsigned int id) {
-    if(id < tiles.size())
-      {
-        return tiles[id]; 
-      }
-    else
-      {
-        // Never return 0, but return the 0th tile instead so that
-        // user code doesn't have to check for NULL pointers all over
-        // the place
-        return tiles[0]; 
-      } 
+    if (tiles.empty())
+      return 0;
+    if (id < tiles.size() && tiles[id])
+      return tiles[id];
+    /* Prefer tile 0 if present so callers need fewer NULL checks. */
+    if (tiles[0])
+      return tiles[0];
+    return 0;
   }
 };
 

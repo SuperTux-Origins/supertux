@@ -27,6 +27,7 @@
 #include "gameobjs.h"
 #include "special.h"
 #include "resources.h"
+#include "tile.h"
 #include "sprite_manager.h"
 #include "setup.h"
 
@@ -49,6 +50,9 @@ SpriteManager* sprite_manager = 0;
 void loadshared()
 {
   int i;
+
+  /* Load tileset early so missing data fails before gameplay. */
+  TileManager::instance();
 
   sprite_manager = new SpriteManager(datadir + "/supertux.strf");
 #ifndef NOSOUND
