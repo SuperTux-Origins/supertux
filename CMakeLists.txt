@@ -1,10 +1,20 @@
 cmake_minimum_required(VERSION 3.16)
 
+# Source of truth: top-level VERSION file (e.g. "0.1.5-dev"), or
+# -DPROJECT_VERSION_FULL=... from packaging (Nix flake appends +g<rev>).
+if(NOT DEFINED PROJECT_VERSION_FULL)
+  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL LIMIT_COUNT 1)
+endif()
+# CMake project() VERSION wants a numeric X.Y.Z; strip -dev / +g* suffixes.
+string(REGEX REPLACE "^([0-9]+\\.[0-9]+\\.[0-9]+).*" "\\1" _PROJECT_VERSION_BASE "${PROJECT_VERSION_FULL}")
+
 project(SuperTux-Milestone1
-  VERSION 0.1.4
+  VERSION ${_PROJECT_VERSION_BASE}
   DESCRIPTION "SuperTux Milestone 1"
   LANGUAGES CXX
 )
+
+set(PROJECT_VERSION_FULL "${PROJECT_VERSION_FULL}" CACHE STRING "Full version string from VERSION file or packager" FORCE)
 
 set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
@@ -99,7 +109,7 @@ target_include_directories(supertux-milestone1 PRIVATE
 )
 
 target_compile_definitions(supertux-milestone1 PRIVATE
-  VERSION="${PROJECT_VERSION}"
+  SUPERTUX_MILESTONE1_VERSION="${PROJECT_VERSION_FULL}"
   DATA_PREFIX="${DATA_PREFIX}"
 )
 
@@ -150,7 +160,7 @@ else()
 endif()
 
 message(STATUS "")
-message(STATUS "SuperTux Milestone 1 ${PROJECT_VERSION}")
+message(STATUS "SuperTux Milestone 1 ${PROJECT_VERSION_FULL}")
 if(ENABLE_SDL2)
   message(STATUS "  Backend       = SDL2")
 else()

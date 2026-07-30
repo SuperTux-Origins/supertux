@@ -12,7 +12,8 @@ dnl ===========================================================================
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.54])
-AC_INIT(SuperTux-Milestone1, 0.1.4)
+dnl Version from top-level VERSION file (source of truth; CMake path is preferred).
+AC_INIT([SuperTux-Milestone1], [m4_esyscmd_s([tr -d '\n' < VERSION])])
 AC_CONFIG_SRCDIR([src/supertux.cpp])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(dist-bzip2)

@@ -43,7 +43,7 @@ When unsure, prefer the smallest change that stops a crash or unblocks SDL2 play
 | Platforms of historical interest | Desktop Linux/Windows, experimental GP2X, 320×240 test build |
 | SDL2 port | **Compiles** via platform layer + `platform_config.h`; playtest still open |
 
-Version string is `0.1.4` in CMake, Autotools (`configure.ac`), and the `defines.h` fallback when `VERSION` is unset at compile time.
+**Version:** the only source of truth is the top-level `VERSION` file (e.g. `0.1.5-dev`). CMake reads it into `PROJECT_VERSION_FULL` and defines `SUPERTUX_MILESTONE1_VERSION` for the sources. Nix appends `+g<shortRev>` when packaging. Use `--version` to print it. For a release, drop the `-dev` suffix, commit, and tag `vX.Y.Z`.
 
 ## Architecture sketch
 

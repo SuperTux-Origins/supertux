@@ -47,10 +47,15 @@
   outputs = { self, nixpkgs, tinycmmc, SDL-win32, SDL_mixer-win32, SDL_image-win32 }:
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       let
+        lib = nixpkgs.lib;
+        versionBase = lib.strings.removeSuffix "\n" (builtins.readFile ./VERSION);
+        gitRev = "${self.shortRev or self.dirtyShortRev or "dirty"}";
+        version = "${versionBase}+g${gitRev}";
+
         mkSuperTux = { useSDL2 ? true, pname ? "supertux-milestone1" }:
           pkgs.stdenv.mkDerivation rec {
             inherit pname;
-            version = "0.1.4";
+            inherit version;
             src = nixpkgs.lib.cleanSource ./.;
             enableParallelBuilding = true;
 
@@ -71,6 +76,7 @@
               "-DENABLE_OPENGL=ON"
               "-DENABLE_SDL2=${if useSDL2 then "ON" else "OFF"}"
               "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
+              "-DPROJECT_VERSION_FULL=${version}"
             ];
 
             buildInputs =

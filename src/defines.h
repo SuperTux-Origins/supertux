@@ -24,8 +24,14 @@
 #define SUPERTUX_DEFINES_H
 /* Version: */
 
+/* Version comes from the build system (CMake reads top-level VERSION file).
+   SUPERTUX_MILESTONE1_VERSION is the full string, e.g. 0.1.5-dev or 0.1.5-dev+gabc123.
+   VERSION is kept as an alias for existing call sites. */
+#ifndef SUPERTUX_MILESTONE1_VERSION
+#  error "SUPERTUX_MILESTONE1_VERSION must be defined by the build system (see CMakeLists.txt / VERSION file)"
+#endif
 #ifndef VERSION
-	#define VERSION "0.1.4"
+#  define VERSION SUPERTUX_MILESTONE1_VERSION
 #endif
 
 /* Frames per second: */

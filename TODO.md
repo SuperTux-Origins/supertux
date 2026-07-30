@@ -130,7 +130,7 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 
 - [ ] Remove or gate dead GP2X-only branches **only if** they obstruct the platform layer or SDL2 build
 - [ ] Drop Autotools from “supported” docs once CMake+SDL1 is verified
-- [x] Align `VERSION` fallback in `defines.h` with CMake/Autotools (`0.1.4`)
+- [x] Single-source `VERSION` file → CMake `PROJECT_VERSION_FULL` / `SUPERTUX_MILESTONE1_VERSION`; flake appends `+g<rev>`
 - [ ] Optional: CI compile job (SDL1 and SDL2)
 - [x] Gameloop: missing `break` after menu-mode KEYDOWN (fell through to joy start)
 - [x] Gameloop: release movement keys on SDL2 focus loss / minimize
@@ -175,3 +175,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-31 | SDL2 text input, Mix_Init, joy-hat bits, menu backspace, TSCONTROL mouse y |
 | 2026-07-31 | SDL2 fullscreen fallbacks, letterbox present, GL viewport, safe video re-init |
 | 2026-07-31 | Fix KEYDOWN fallthrough; SDL2 focus-loss key release; VERSION 0.1.4 |
+| 2026-07-31 | VERSION file as sole source; CMake/flake/SUPERTUX_MILESTONE1_VERSION |
