@@ -148,9 +148,14 @@ Timer::fread(FILE* fi)
   unsigned int diff_ticks;
   int tick_mode;
 
-  ::fread(&period,sizeof(unsigned int),1,fi);
-  ::fread(&diff_ticks,sizeof(unsigned int),1,fi);
-  ::fread(&tick_mode,sizeof(unsigned int),1,fi);
+  if (::fread(&period,sizeof(unsigned int),1,fi) != 1 ||
+      ::fread(&diff_ticks,sizeof(unsigned int),1,fi) != 1 ||
+      ::fread(&tick_mode,sizeof(unsigned int),1,fi) != 1)
+    {
+      period = 0;
+      diff_ticks = 0;
+      tick_mode = 0;
+    }
 
   if (tick_mode)
     get_ticks = st_get_ticks;

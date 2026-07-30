@@ -180,7 +180,7 @@ string_list_type dsubdirs(const char *rel_path,const  char* expected_file)
   char path[1024];
 
   string_list_init(&sdirs);
-  sprintf(path,"%s/%s",st_dir,rel_path);
+  snprintf(path, sizeof(path), "%s/%s", st_dir, rel_path);
   if((dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
@@ -188,13 +188,13 @@ string_list_type dsubdirs(const char *rel_path,const  char* expected_file)
           char absolute_filename[1024];
           struct stat buf;
 
-          sprintf(absolute_filename, "%s/%s", path, direntp->d_name);
+          snprintf(absolute_filename, sizeof(absolute_filename), "%s/%s", path, direntp->d_name);
 
           if (stat(absolute_filename, &buf) == 0 && S_ISDIR(buf.st_mode))
             {
               if(expected_file != NULL)
                 {
-                  sprintf(filename,"%s/%s/%s",path,direntp->d_name,expected_file);
+                  snprintf(filename, sizeof(filename), "%s/%s/%s", path, direntp->d_name, expected_file);
                   if(!faccessible(filename))
                     continue;
                 }
@@ -205,7 +205,7 @@ string_list_type dsubdirs(const char *rel_path,const  char* expected_file)
       closedir(dirStructP);
     }
 
-  sprintf(path,"%s/%s",datadir.c_str(),rel_path);
+  snprintf(path, sizeof(path), "%s/%s", datadir.c_str(), rel_path);
   if((dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
@@ -213,20 +213,20 @@ string_list_type dsubdirs(const char *rel_path,const  char* expected_file)
           char absolute_filename[1024];
           struct stat buf;
 
-          sprintf(absolute_filename, "%s/%s", path, direntp->d_name);
+          snprintf(absolute_filename, sizeof(absolute_filename), "%s/%s", path, direntp->d_name);
 
           if (stat(absolute_filename, &buf) == 0 && S_ISDIR(buf.st_mode))
             {
               if(expected_file != NULL)
                 {
-                  sprintf(filename,"%s/%s/%s",path,direntp->d_name,expected_file);
+                  snprintf(filename, sizeof(filename), "%s/%s/%s", path, direntp->d_name, expected_file);
                   if(!faccessible(filename))
                     {
                       continue;
                     }
                   else
                     {
-                      sprintf(filename,"%s/%s/%s/%s",st_dir,rel_path,direntp->d_name,expected_file);
+                      snprintf(filename, sizeof(filename), "%s/%s/%s/%s", st_dir, rel_path, direntp->d_name, expected_file);
                       if(faccessible(filename))
                         continue;
                     }
@@ -249,7 +249,7 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
   char path[1024];
 
   string_list_init(&sdirs);
-  sprintf(path,"%s/%s",st_dir,rel_path);
+  snprintf(path, sizeof(path), "%s/%s", st_dir, rel_path);
   if((dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
@@ -257,7 +257,7 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
           char absolute_filename[1024];
           struct stat buf;
 
-          sprintf(absolute_filename, "%s/%s", path, direntp->d_name);
+          snprintf(absolute_filename, sizeof(absolute_filename), "%s/%s", path, direntp->d_name);
 
           if (stat(absolute_filename, &buf) == 0 && S_ISREG(buf.st_mode))
             {
@@ -276,7 +276,7 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
       closedir(dirStructP);
     }
 
-  sprintf(path,"%s/%s",datadir.c_str(),rel_path);
+  snprintf(path, sizeof(path), "%s/%s", datadir.c_str(), rel_path);
   if((dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
@@ -284,7 +284,7 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
           char absolute_filename[1024];
           struct stat buf;
 
-          sprintf(absolute_filename, "%s/%s", path, direntp->d_name);
+          snprintf(absolute_filename, sizeof(absolute_filename), "%s/%s", path, direntp->d_name);
 
           if (stat(absolute_filename, &buf) == 0 && S_ISREG(buf.st_mode))
             {
@@ -353,7 +353,7 @@ void st_directory_setup(void)
   mkdir(st_save_dir, 0755);
 
   char str[1024];
-  sprintf(str, "%s/levels", st_dir);
+  snprintf(str, sizeof(str), "%s/levels", st_dir);
   mkdir(str, 0755);
 
   // User has not that a datadir, so we try some magic

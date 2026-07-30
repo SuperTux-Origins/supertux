@@ -137,7 +137,7 @@ void LevelSubset::load(char *subset)
       lisp_free(root_obj);
       fclose(fi);
 
-      snprintf(str, 1024, "%s.png", filename);
+      snprintf(str, sizeof(str), "%.1019s.png", filename);
       if(faccessible(str))
         {
           delete image;

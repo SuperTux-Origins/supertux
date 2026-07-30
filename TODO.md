@@ -83,10 +83,11 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] `st_set_color_key` helper for colour-key flag differences
 - [x] `platform_set_icon` on both backends
 - [x] Ensure full game still links on SDL1 (nix build); runtime playtest still manual
-- [~] Smoke-compile ENABLE_SDL2=ON — first nix build failed on texture/worldmap; fixes applied
+- [x] Smoke-compile ENABLE_SDL2=ON — links and installs (nix build .#supertux-milestone1-sdl2)
 - [x] Event helpers: `st_key_ascii`, `st_event_wheel_up/down`, `st_event_mouse_xy`
 - [x] menu.cpp / button.cpp use event helpers (no keysym.unicode / button 4–5)
 - [ ] Remaining event edge cases (text input composition, joy hat)
+- [ ] Playtest SDL2 binary (title, worldmap, one level, options menu)
 
 ---
 
@@ -136,3 +137,4 @@ Thin layer in `src/platform*.{h,cpp}`:
 | 2026-07-30 | Event helpers for text input + mouse wheel; video re-init safety |
 | 2026-07-30 | Confirmed SDL1 nix build success; libpng/jpeg in flake; texture return warnings |
 | 2026-07-30 | Fix SDL2: CaptureScreen, format->alpha, const keystate |
+| 2026-07-30 | SDL2 build success; silence format/fread warnings |

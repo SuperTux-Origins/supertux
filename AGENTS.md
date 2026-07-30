@@ -19,11 +19,11 @@ src/        engine sources
 | Area | Status |
 |------|--------|
 | Original Autotools build | Present (`configure.ac`, `Makefile.am`, `autogen.sh`) |
-| **CMake build** | **In progress / primary target** — see root `CMakeLists.txt` |
+| **CMake build** | **Done** — root `CMakeLists.txt`; Autotools retained for reference |
 | Graphics / input | SDL 1.2 + optional OpenGL; software path via `SurfaceSDL` |
 | Audio | SDL_mixer 1.x (optional `-DNOSOUND`); GP2X uses a separate path |
 | Platforms of historical interest | Desktop Linux/Windows, experimental GP2X, 320×240 test build |
-| SDL2 port | Planned; must keep SDL1 workable via a **backend layer**, not mass `#ifdef`s |
+| SDL2 port | **Compiles** via platform layer + `platform_config.h`; playtest still open |
 
 Version string in Autotools is `0.1.4` (`configure.ac`); `defines.h` falls back to `"0.1.1"` if `VERSION` is unset. CMake defines `VERSION` consistently.
 
@@ -76,7 +76,7 @@ Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL
 
 ### Platform layer
 
-Video init/present goes through `src/platform.h` (`platform_sdl1.cpp` or `platform_sdl2.cpp`). SDL2 uses strategy A (window surface + `SDL_UpdateWindowSurface`). See `TODO.md` Phase 2–3 for remaining API migration (`SDL_Flip`, `SDL_WM_*`, key state, …).
+Video init/present goes through `src/platform.h` (`platform_sdl1.cpp` or `platform_sdl2.cpp`). SDL2 uses strategy A (window surface + `SDL_UpdateWindowSurface`). Compatibility helpers live in `platform_config.h` (keys, alpha, DisplayFormat, Flip→present, wheel/text helpers).
 
 Runtime still expects assets under `DATA_PREFIX` / discovered `datadir` (see `st_directory_setup()`). Without `data/`, the binary will not be playable.
 
@@ -95,7 +95,7 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 
 **SDL2 path (target):** SDL2, SDL2_image, SDL2_mixer — wired through a compatibility/backend layer, not by rewriting every call site at once.
 
-**This sandbox:** only SDL2 runtime was observed installed; SDL 1.2 *development* packages are required to verify the default CMake build until Phase 3 lands.
+**Nix:** both `nix build .#supertux-milestone1` (SDL1) and `.#supertux-milestone1-sdl2` have linked successfully. Runtime playtest of the SDL2 binary is still open.
 
 ## Coding guidelines for agents
 
