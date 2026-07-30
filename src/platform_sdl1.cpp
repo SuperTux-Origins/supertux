@@ -7,6 +7,17 @@
 #include "globals.h"
 #include "defines.h"
 
+static SDL_Surface*
+try_set_video_mode(int bpp, Uint32 flags)
+{
+  SDL_Surface* s = SDL_SetVideoMode(ST_SCREEN_W, ST_SCREEN_H, bpp, flags);
+  if (!s)
+    fprintf(stderr,
+            "  SetVideoMode(%dx%d, bpp=%d, flags=0x%x) failed: %s\n",
+            ST_SCREEN_W, ST_SCREEN_H, bpp, (unsigned)flags, SDL_GetError());
+  return s;
+}
+
 bool platform_video_init(bool fullscreen, bool opengl)
 {
   /* Video mode changes call this again; SDL1 SetVideoMode replaces the surface. */
@@ -35,53 +46,72 @@ bool platform_video_init(bool fullscreen, bool opengl)
       if (use_fullscreen)
         flags |= SDL_FULLSCREEN;
 
-      screen = SDL_SetVideoMode(ST_SCREEN_W, ST_SCREEN_H, 0, flags);
+      screen = try_set_video_mode(0, flags);
       if (screen == NULL && use_fullscreen)
         {
           fprintf(stderr,
-                  "\nWarning: I could not set up fullscreen OpenGL video.\n"
-                  "%s\n\n", SDL_GetError());
+                  "\nWarning: fullscreen OpenGL failed, trying windowed.\n");
           use_fullscreen = false;
-          screen = SDL_SetVideoMode(ST_SCREEN_W, ST_SCREEN_H, 0, SDL_OPENGL);
+          screen = try_set_video_mode(0, SDL_OPENGL);
         }
 
       if (screen == NULL)
         {
           fprintf(stderr,
                   "\nError: I could not set up OpenGL video for %dx%d.\n"
-                  "%s\n\n", ST_SCREEN_W, ST_SCREEN_H, SDL_GetError());
-          return false;
+                  "Falling back to software renderer.\n\n",
+                  ST_SCREEN_W, ST_SCREEN_H);
+          use_gl = false;
+          /* fall through to software path */
         }
-
-      glDisable(GL_DEPTH_TEST);
-      glDisable(GL_CULL_FACE);
-      glViewport(0, 0, screen->w, screen->h);
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      glOrtho(0, screen->w, screen->h, 0, -1.0, 1.0);
-      glMatrixMode(GL_MODELVIEW);
-      glLoadIdentity();
-      glTranslatef(0.0f, 0.0f, 0.0f);
-      return true;
+      else
+        {
+          glDisable(GL_DEPTH_TEST);
+          glDisable(GL_CULL_FACE);
+          glViewport(0, 0, screen->w, screen->h);
+          glMatrixMode(GL_PROJECTION);
+          glLoadIdentity();
+          glOrtho(0, screen->w, screen->h, 0, -1.0, 1.0);
+          glMatrixMode(GL_MODELVIEW);
+          glLoadIdentity();
+          glTranslatef(0.0f, 0.0f, 0.0f);
+          return true;
+        }
     }
 #endif
 
-  /* Software / SDL surface path */
+  /*
+   * Software path. Prefer SWSURFACE: HWSURFACE|DOUBLEBUF often fails on
+   * modern X11 with a misleading "Couldn't find matching GLX visual"
+   * even when SDL_OPENGL was never requested.
+   */
   {
-    Uint32 flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
-    if (use_fullscreen)
-      flags = SDL_FULLSCREEN;
+    const Uint32 fs = use_fullscreen ? SDL_FULLSCREEN : 0;
+    const int depths[] = { 32, 24, 16, 0 };
+    const Uint32 mode_flags[] = {
+      (Uint32)(SDL_SWSURFACE | fs),
+      (Uint32)(SDL_HWSURFACE | SDL_DOUBLEBUF | fs),
+      (Uint32)(SDL_HWSURFACE | fs),
+      (Uint32)(SDL_ANYFORMAT | fs),
+      (Uint32)fs
+    };
 
-    screen = SDL_SetVideoMode(ST_SCREEN_W, ST_SCREEN_H, 0, flags);
+    screen = NULL;
+    for (unsigned d = 0; d < sizeof(depths) / sizeof(depths[0]) && !screen; ++d)
+      for (unsigned m = 0; m < sizeof(mode_flags) / sizeof(mode_flags[0]) && !screen; ++m)
+        screen = try_set_video_mode(depths[d], mode_flags[m]);
+
     if (screen == NULL && use_fullscreen)
       {
         fprintf(stderr,
-                "\nWarning: I could not set up fullscreen video for "
-                "%dx%d mode.\n%s\n\n",
-                ST_SCREEN_W, ST_SCREEN_H, SDL_GetError());
+                "\nWarning: fullscreen software mode failed, trying windowed.\n");
         use_fullscreen = false;
-        screen = SDL_SetVideoMode(ST_SCREEN_W, ST_SCREEN_H, 0,
-                                  SDL_HWSURFACE | SDL_DOUBLEBUF);
+        for (unsigned d = 0; d < sizeof(depths) / sizeof(depths[0]) && !screen; ++d)
+          {
+            screen = try_set_video_mode(depths[d], SDL_SWSURFACE);
+            if (!screen)
+              screen = try_set_video_mode(depths[d], SDL_HWSURFACE | SDL_DOUBLEBUF);
+          }
       }
 
     if (screen == NULL)
