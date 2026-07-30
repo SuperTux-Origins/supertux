@@ -165,6 +165,22 @@ inline int st_set_color_key(SDL_Surface* surface, Uint32 flag, Uint32 key)
 #endif /* USE_SDL2 */
 
 
+
+inline Uint8 st_surface_alpha(SDL_Surface* surface)
+{
+  if (!surface)
+    return 255;
+#ifdef USE_SDL2
+  {
+    Uint8 a = 255;
+    SDL_GetSurfaceAlphaMod(surface, &a);
+    return a;
+  }
+#else
+  return surface->format->alpha;
+#endif
+}
+
 /* --- Event helpers (same call sites for SDL1 and SDL2) --- */
 
 inline char st_key_ascii(const SDL_Event& event)

@@ -274,11 +274,13 @@ Surface::resize(int w_, int h_)
 
 Surface* Surface::CaptureScreen()
 {
-  Surface *cap_screen;
+  Surface *cap_screen = 0;
 
-  if (!(screen->flags & SDL_OPENGL))
+  /* Software path: copy the current display surface. */
+  if (!use_gl)
   {
-    cap_screen = new Surface(SDL_GetVideoSurface(),false);
+    cap_screen = new Surface(screen, false);
+    return cap_screen;
   }
 
 #ifndef NOOPENGL
@@ -408,7 +410,7 @@ sdl_surface_from_sdl_surface(SDL_Surface* sdl_surf, int use_alpha)
 
   /* Save the alpha blending attributes */
   saved_flags = sdl_surf->flags&(SDL_SRCALPHA|SDL_RLEACCELOK);
-  saved_alpha = sdl_surf->format->alpha;
+  saved_alpha = st_surface_alpha(sdl_surf);
   if ( (saved_flags & SDL_SRCALPHA)
        == SDL_SRCALPHA )
   {
@@ -519,7 +521,7 @@ SurfaceOpenGL::create_gl(SDL_Surface * surf, GLuint * tex)
 
   /* Save the alpha blending attributes */
   saved_flags = surf->flags&(SDL_SRCALPHA|SDL_RLEACCELOK);
-  saved_alpha = surf->format->alpha;
+  saved_alpha = st_surface_alpha(surf);
   if ( (saved_flags & SDL_SRCALPHA)
        == SDL_SRCALPHA )
   {
