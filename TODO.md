@@ -2,6 +2,9 @@
 
 Progress tracker for CMake migration and SDL2 port. Update this file as work lands.
 
+**Scope:** make the engine build and run on SDL2; fix crashes and hard failures.  
+**Not in scope:** gameplay balance, level-design features, UI redesign, or legacy handheld polish. See `AGENTS.md` → Project goals.
+
 ## Legend
 
 - `[ ]` pending
@@ -95,23 +98,36 @@ Thin layer in `src/platform*.{h,cpp}`:
 
 - [x] Initial `platform_sdl2.cpp` (window + GetWindowSurface / GL context — strategy A)
 - [x] Compat layer so most engine files compile against SDL2 headers (shims)
-- [ ] Finish software path: drawing code assumptions vs window surface format
-- [ ] SDL2_image / SDL2_mixer compile + runtime check
-- [ ] Event mapping edge cases (joy hat, text input, window focus)
-- [ ] OpenGL-on-SDL2 polish (shadow surface vs real FBO)
-- [ ] Fix regressions (vsync, fullscreen, HiDPI)
-- [ ] Verify title demo, level play, worldmap, menus, leveleditor smoke paths
+- [ ] **Software backbuffer:** do not treat `SDL_GetWindowSurface` as a long-lived draw target; own a stable surface (or equivalent) and blit/present on flip — window surface is invalidated on resize/format change
+- [ ] SDL2_image / SDL2_mixer: confirm `IMG_Init` / mixer open at runtime with real assets
+- [ ] Menu / slot text input under SDL2 (`SDL_EnableUNICODE` is a no-op; `st_key_ascii` is approximate) — enough to type without crash; full IME not required
+- [ ] Event edge cases that can break control: joy hat, window focus (only if they cause stuck keys or unusable menus)
+- [ ] OpenGL-on-SDL2: keep working if `ENABLE_OPENGL=ON`; no need for FBO redesign unless it crashes
+- [ ] Fullscreen / present regressions that prevent playing (vsync/HiDPI only if they hard-fail)
+- [ ] Smoke playtest with `data/`: title demo, one level, worldmap, pause menu, options, quit — SDL1 and SDL2
 
 ### Rendering strategy
 
 - **A (chosen for first bring-up):** software `SDL_Surface` via `SDL_GetWindowSurface`, present with `SDL_UpdateWindowSurface`.
-- **B (later):** `SDL_Renderer` / textures.
+- **B (later, only if A is unstable):** owned backbuffer and/or `SDL_Renderer`.
+
+---
+
+## Phase 3b — Crash / correctness fixes (worth doing)
+
+These are engine bugs that can crash, corrupt timers, or hide bad data. Not gameplay features.
+
+- [ ] **`st_get_ticks` while paused** (`timer.cpp`): paused branch has `SDL_GetTicks()` commented out and returns nonsense unsigned math — breaks invincibility / menus / any timer using pause-aware ticks. Restore a correct “frozen time” formula.
+- [ ] **Nested tileset load** (`TileManager::load_tileset`): entry always `tiles.clear()` + delete; a nested `(tileset (file …))` re-enters and wipes tiles already parsed from the parent — crash or empty tileset risk. Load child without destroying parent state (or merge into a temp).
+- [ ] **`TileManager::get` fallback**: missing ids return `tiles[0]` instead of null/safe empty — masks bad data and can confuse collision/draw. Prefer returning null (or a dedicated empty tile) and keep null checks at draw/collision sites.
+- [ ] **CMake OpenGL/GLU link block**: nested `if(ENABLE_OPENGL)` / `if(NOT ENABLE_SDL2)` for GLU is fragile; make structure explicit so SDL2+GL builds link the right libs.
+- [ ] **TSCONTROL only (low priority):** `gameloop.cpp` sets `old_mouse_y = screen->w` — likely meant `screen->h`. Skip unless that build is used.
 
 ---
 
 ## Phase 4 — Cleanup
 
-- [ ] Remove or gate dead GP2X-only branches if they obstruct the platform layer
+- [ ] Remove or gate dead GP2X-only branches **only if** they obstruct the platform layer or SDL2 build
 - [ ] Drop Autotools from “supported” docs once CMake+SDL1 is verified
 - [ ] Align `VERSION` everywhere (defines, desktop file, CMake project version)
 - [ ] Optional: CI compile job (SDL1 and SDL2)
@@ -122,7 +138,19 @@ Thin layer in `src/platform*.{h,cpp}`:
 
 - **No `data/` in this tree** — cannot fully playtest without external assets.
 - Codebase is pre-C++11 style; platform layer should not force a style rewrite of the entire game.
-- SDL2 port: core video/present + header shims in place; needs a real compile/link against SDL2_image/mixer and runtime testing with `data/`.
+- SDL2 port: core video/present + header shims in place; needs runtime testing with `data/`.
+- Fixed 15-row level height and other Milestone 1 limits are **by design** — do not expand for content reasons.
+- Music may leak across transitions (`music_manager` / SDL_mixer lifetime); fix only if it causes crashes or severe resource exhaustion during normal play.
+
+---
+
+## Explicitly out of scope (do not put on this list)
+
+- New gameplay mechanics, enemy behavior changes, scoring tweaks
+- Level or worldmap design / new tiles for design reasons
+- Camera “feel”, back-scroll polish, UI/UX redesign
+- Rewriting the engine in modern C++, or Renderer migration without a crash/SDL2 need
+- Supporting or enhancing GP2X / 320×240 / touchscreen unless requested
 
 ---
 
@@ -139,3 +167,4 @@ Thin layer in `src/platform*.{h,cpp}`:
 | 2026-07-30 | Fix SDL2: CaptureScreen, format->alpha, const keystate |
 | 2026-07-30 | SDL2 build success; silence format/fread warnings |
 | 2026-07-30 | Harden TileManager/IMG_Init after SDL2 runtime SEGV |
+| 2026-07-31 | Scope: SDL2 + crash fixes only; filed Phase 3b issues; AGENTS goals section |

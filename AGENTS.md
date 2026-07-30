@@ -14,6 +14,24 @@ data/
 src/        engine sources
 ```
 
+## Project goals (read this first)
+
+This is a **historical** codebase. The point of work here is **not** to modernize gameplay, redesign levels, add features, or “improve” the 2004 game design.
+
+**In scope**
+
+- Get the game **running reliably on SDL2** (and keep SDL 1.2 building until that is proven).
+- Fix **crashes**, null dereferences, and other hard failures (especially in loaders, video/surface lifetime, and timers).
+- Keep the platform layer thin so gameplay files stay free of SDL-version spaghetti.
+
+**Out of scope**
+
+- Gameplay balance, new enemies, level-design features, camera “feel”, UI redesign.
+- Investing in legacy targets (`GP2X`, `RES320X240`, `TSCONTROL`) unless explicitly requested.
+- Large refactors or C++ modernization for their own sake.
+
+When unsure, prefer the smallest change that stops a crash or unblocks SDL2 playtest. Track concrete work in `TODO.md`.
+
 ## Project state (high level)
 
 | Area | Status |
@@ -109,7 +127,8 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 4. Do not require `data/` to *compile*; do document that it is required to *run*.
 5. Prefer clear, minimal diffs. This is a historical codebase — match local style (tabs/spaces as in neighboring files) unless reforming a whole module.
 6. GP2X / 320×240 paths are legacy; do not invest in them unless explicitly requested. CMake may omit those options initially.
-7. **Commit message in chat:** After any larger change (new subsystem, multi-file refactor, completed TODO phase, etc.), end the reply with a proposed **git commit message** (subject + optional body). Use imperative mood, explain *why* when non-obvious, and keep the subject ~50–72 characters when practical. Do not run `git commit` unless the user asks.
+7. **Do not change gameplay or level design** unless fixing a crash or an SDL2 blocker. No balance tweaks, new mechanics, or content work.
+8. **Commit message in chat:** After any larger change (new subsystem, multi-file refactor, completed TODO phase, etc.), end the reply with a proposed **git commit message** (subject + optional body). Use imperative mood, explain *why* when non-obvious, and keep the subject ~50–72 characters when practical. Do not run `git commit` unless the user asks.
 
 ## Key source map
 
