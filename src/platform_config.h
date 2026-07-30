@@ -164,4 +164,76 @@ inline int st_set_color_key(SDL_Surface* surface, Uint32 flag, Uint32 key)
 
 #endif /* USE_SDL2 */
 
+
+/* --- Event helpers (same call sites for SDL1 and SDL2) --- */
+
+inline char st_key_ascii(const SDL_Event& event)
+{
+  if (event.type != SDL_KEYDOWN && event.type != SDL_KEYUP)
+    return 0;
+#ifdef USE_SDL2
+  {
+    SDL_Keycode k = event.key.keysym.sym;
+    /* Prefer shifted symbol when available via mod state for letters is complex;
+       SDL2 text input is better long-term; approximate with keycode. */
+    if (k >= SDLK_a && k <= SDLK_z)
+      return (char)k;
+    if (k >= SDLK_0 && k <= SDLK_9)
+      return (char)k;
+    if (k == SDLK_SPACE)
+      return ' ';
+    if (k >= SDLK_SPACE && k <= SDLK_AT)
+      return (char)k;
+    return 0;
+  }
+#else
+  if ((event.key.keysym.unicode & 0xFF80) == 0)
+    return (char)(event.key.keysym.unicode & 0x7F);
+  return 0;
+#endif
+}
+
+inline bool st_event_wheel_up(const SDL_Event& event)
+{
+#ifdef USE_SDL2
+  return event.type == SDL_MOUSEWHEEL && event.wheel.y > 0;
+#else
+  return event.type == SDL_MOUSEBUTTONUP && event.button.button == 4;
+#endif
+}
+
+inline bool st_event_wheel_down(const SDL_Event& event)
+{
+#ifdef USE_SDL2
+  return event.type == SDL_MOUSEWHEEL && event.wheel.y < 0;
+#else
+  return event.type == SDL_MOUSEBUTTONUP && event.button.button == 5;
+#endif
+}
+
+inline void st_event_mouse_xy(const SDL_Event& event, int* x, int* y)
+{
+#ifdef USE_SDL2
+  if (event.type == SDL_MOUSEWHEEL)
+    {
+      SDL_GetMouseState(x, y);
+      return;
+    }
+#endif
+  if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
+    {
+      *x = event.button.x;
+      *y = event.button.y;
+      return;
+    }
+  if (event.type == SDL_MOUSEMOTION)
+    {
+      *x = event.motion.x;
+      *y = event.motion.y;
+      return;
+    }
+  SDL_GetMouseState(x, y);
+}
+
+
 #endif /* SUPERTUX_PLATFORM_CONFIG_H */

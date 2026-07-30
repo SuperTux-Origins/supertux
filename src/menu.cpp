@@ -29,6 +29,7 @@
 #include <assert.h>
 
 #include "defines.h"
+#include "platform_config.h"
 #include "globals.h"
 #include "menu.h"
 #include "screen.h"
@@ -766,17 +767,9 @@ Menu::event(SDL_Event& event)
     keymod = SDL_GetModState();
     int x,y;
 
-    /* If the current unicode character is an ASCII character,
-       assign it to ch. */
-    if ( (event.key.keysym.unicode & 0xFF80) == 0 )
-    {
-      ch[0] = event.key.keysym.unicode & 0x7F;
-      ch[1] = '\0';
-    }
-    else
-    {
-      /* An International Character. */
-    }
+    /* ASCII character for text fields (SDL1 unicode / SDL2 keycode approx). */
+    ch[0] = st_key_ascii(event);
+    ch[1] = '\0';
 
     if(item[active_item].kind == MN_CONTROLFIELD)
     {

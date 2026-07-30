@@ -84,7 +84,9 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] `platform_set_icon` on both backends
 - [ ] Ensure full game still links and runs on SDL1 with data present
 - [ ] Smoke-compile ENABLE_SDL2=ON against SDL2 dev packages
-- [ ] Event translation layer if SDL2 event field differences bite (joy hat, etc.)
+- [x] Event helpers: `st_key_ascii`, `st_event_wheel_up/down`, `st_event_mouse_xy`
+- [x] menu.cpp / button.cpp use event helpers (no keysym.unicode / button 4–5)
+- [ ] Remaining event edge cases (text input composition, joy hat)
 
 ---
 
@@ -131,3 +133,4 @@ Thin layer in `src/platform*.{h,cpp}`:
 | 2026-07-30 | Platform layer sketch; setup/screen use platform_present |
 | 2026-07-30 | flake.nix: CMake builds, `sdl1` + `sdl2` packages and devShells |
 | 2026-07-30 | SDL2 compat shims; headers use platform_config; color-key helper |
+| 2026-07-30 | Event helpers for text input + mouse wheel; video re-init safety |

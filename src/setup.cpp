@@ -956,7 +956,7 @@ void seticon(void)
 
   /* Set icon: */
 
-  SDL_WM_SetIcon(icon, NULL);//mask);
+  platform_set_icon(icon);
 
 
   /* Free icon surface & mask: */

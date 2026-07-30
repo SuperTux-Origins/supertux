@@ -16,6 +16,9 @@ static SDL_GLContext st_gl_context = 0;
 
 bool platform_video_init(bool fullscreen, bool opengl)
 {
+  /* Re-init (e.g. options menu toggles fullscreen/GL): drop previous window. */
+  platform_video_shutdown();
+
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
       fprintf(stderr,

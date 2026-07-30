@@ -9,6 +9,7 @@
 
 bool platform_video_init(bool fullscreen, bool opengl)
 {
+  /* Video mode changes call this again; SDL1 SetVideoMode replaces the surface. */
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
       fprintf(stderr,

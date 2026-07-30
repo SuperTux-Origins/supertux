@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "platform_config.h"
 #include "globals.h"
 #include "defines.h"
 #include "screen.h"

@@ -123,6 +123,17 @@ void Button::event(SDL_Event &event)
 
   SDLKey key = event.key.keysym.sym;
 
+  if (st_event_wheel_up(event) || st_event_wheel_down(event))
+  {
+    int mx, my;
+    st_event_mouse_xy(event, &mx, &my);
+    if(mx < rect.x || mx >= rect.x + rect.w ||
+       my < rect.y || my >= rect.y + rect.h)
+      return;
+    state = st_event_wheel_up(event) ? BUTTON_WHEELUP : BUTTON_WHEELDOWN;
+    return;
+  }
+
   if(event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
   {
     if(event.button.x < rect.x || event.button.x >= rect.x + rect.w ||
@@ -132,16 +143,6 @@ void Button::event(SDL_Event &event)
     if(event.button.button == SDL_BUTTON_RIGHT)
     {
       show_info = true;
-      return;
-    }
-    else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == 4) /* Mouse wheel up. */
-    {
-      state = BUTTON_WHEELUP;
-      return;
-    }
-    else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == 5) /* Mouse wheel down. */
-    {
-      state = BUTTON_WHEELDOWN;
       return;
     }
 
