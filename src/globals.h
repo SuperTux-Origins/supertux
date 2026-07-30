@@ -100,6 +100,7 @@ extern bool use_gl;
 extern bool use_joystick;
 extern bool use_fullscreen;
 extern bool debug_mode;
+extern bool verbose_mode;
 extern bool show_fps;
 extern bool show_mouse;
 

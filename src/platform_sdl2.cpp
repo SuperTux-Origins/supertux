@@ -11,8 +11,35 @@
 static SDL_Window* st_window = NULL;
 static SDL_GLContext st_gl_context = NULL;
 
+#define VLOG(...) do { if (verbose_mode) fprintf(stderr, __VA_ARGS__); } while (0)
+
+static void
+log_window(const char* where)
+{
+  if (!verbose_mode)
+    return;
+  fprintf(stderr, "[video] %s: window=%p glctx=%p screen=%p use_gl=%d fullscreen=%d\n",
+          where, (void*)st_window, (void*)st_gl_context, (void*)screen,
+          (int)use_gl, (int)use_fullscreen);
+  if (st_window)
+    {
+      int x = 0, y = 0, w = 0, h = 0;
+      Uint32 flags = SDL_GetWindowFlags(st_window);
+      SDL_GetWindowPosition(st_window, &x, &y);
+      SDL_GetWindowSize(st_window, &w, &h);
+      fprintf(stderr, "[video]   id=%u flags=0x%x pos=%d,%d size=%dx%d title=\"%s\"\n",
+              (unsigned)SDL_GetWindowID(st_window), (unsigned)flags,
+              x, y, w, h, SDL_GetWindowTitle(st_window));
+    }
+  fprintf(stderr, "[video]   driver=%s\n",
+          SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)");
+}
+
 bool platform_video_init(bool fullscreen, bool opengl)
 {
+  VLOG("[video] platform_video_init(fullscreen=%d, opengl=%d)\n",
+       (int)fullscreen, (int)opengl);
+
   platform_video_shutdown();
 
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
@@ -30,6 +57,10 @@ bool platform_video_init(bool fullscreen, bool opengl)
   use_fullscreen = fullscreen;
   use_gl = opengl;
 
+  VLOG("[video] driver=%s DISPLAY=%s\n",
+       SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)",
+       getenv("DISPLAY") ? getenv("DISPLAY") : "(unset)");
+
 #ifndef NOOPENGL
   if (use_gl)
     {
@@ -37,24 +68,37 @@ bool platform_video_init(bool fullscreen, bool opengl)
       if (use_fullscreen)
         flags |= SDL_WINDOW_FULLSCREEN;
 
+      VLOG("[video] CreateWindow OPENGL flags=0x%x %dx%d\n",
+           (unsigned)flags, ST_SCREEN_W, ST_SCREEN_H);
+      SDL_ClearError();
       st_window = SDL_CreateWindow("SuperTux " VERSION,
                                    SDL_WINDOWPOS_CENTERED,
                                    SDL_WINDOWPOS_CENTERED,
                                    ST_SCREEN_W, ST_SCREEN_H,
                                    flags);
+      VLOG("[video] CreateWindow -> %p err=[%s]\n",
+           (void*)st_window, SDL_GetError());
+
       if (!st_window && use_fullscreen)
         {
+          fprintf(stderr, "Warning: fullscreen OpenGL failed (%s), trying windowed\n",
+                  SDL_GetError());
           use_fullscreen = false;
           st_window = SDL_CreateWindow("SuperTux " VERSION,
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
                                        ST_SCREEN_W, ST_SCREEN_H,
                                        SDL_WINDOW_OPENGL);
+          VLOG("[video] windowed CreateWindow -> %p err=[%s]\n",
+               (void*)st_window, SDL_GetError());
         }
 
       if (st_window)
         {
+          SDL_ClearError();
           st_gl_context = SDL_GL_CreateContext(st_window);
+          VLOG("[video] CreateContext -> %p err=[%s]\n",
+               (void*)st_gl_context, SDL_GetError());
           if (st_gl_context)
             {
               SDL_GL_SetSwapInterval(1);
@@ -74,6 +118,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
               glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
               glMatrixMode(GL_MODELVIEW);
               glLoadIdentity();
+              log_window("GL ready");
               return true;
             }
           fprintf(stderr, "Warning: SDL_GL_CreateContext failed: %s\n",
@@ -87,7 +132,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
                   SDL_GetError());
         }
 
-      /* Fall back to software */
+      fprintf(stderr, "OpenGL unavailable — falling back to software.\n");
       use_gl = false;
     }
 #endif
@@ -97,13 +142,20 @@ bool platform_video_init(bool fullscreen, bool opengl)
     if (use_fullscreen)
       flags |= SDL_WINDOW_FULLSCREEN;
 
+    VLOG("[video] CreateWindow software flags=0x%x %dx%d\n",
+         (unsigned)flags, ST_SCREEN_W, ST_SCREEN_H);
     st_window = SDL_CreateWindow("SuperTux " VERSION,
                                  SDL_WINDOWPOS_CENTERED,
                                  SDL_WINDOWPOS_CENTERED,
                                  ST_SCREEN_W, ST_SCREEN_H,
                                  flags);
+    VLOG("[video] CreateWindow -> %p err=[%s]\n",
+         (void*)st_window, SDL_GetError());
+
     if (!st_window && use_fullscreen)
       {
+        fprintf(stderr, "Warning: fullscreen failed (%s), trying windowed\n",
+                SDL_GetError());
         use_fullscreen = false;
         st_window = SDL_CreateWindow("SuperTux " VERSION,
                                      SDL_WINDOWPOS_CENTERED,
@@ -123,6 +175,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
         fprintf(stderr, "Error: SDL_GetWindowSurface failed: %s\n", SDL_GetError());
         return false;
       }
+    log_window("software ready");
   }
 
   return true;
@@ -154,6 +207,8 @@ void platform_update_rect(int /*x*/, int /*y*/, int /*w*/, int /*h*/)
 
 void platform_video_shutdown(void)
 {
+  VLOG("[video] shutdown window=%p glctx=%p\n",
+       (void*)st_window, (void*)st_gl_context);
 #ifndef NOOPENGL
   if (st_gl_context)
     {

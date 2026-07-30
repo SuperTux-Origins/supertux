@@ -1061,6 +1061,11 @@ void parseargs(int argc, char * argv[])
           {
             use_gl = false;
           }
+            else if (strcmp(argv[i], "--verbose") == 0
+               || strcmp(argv[i], "-v") == 0)
+        {
+          verbose_mode = true;
+        }
       else if (strcmp(argv[i], "--usage") == 0)
         {
           /* Show usage: */
@@ -1105,6 +1110,7 @@ void parseargs(int argc, char * argv[])
                "  -gl, --opengl       If opengl support was compiled in, this will enable\n"
                "                      the OpenGL mode.\n"
                "  --sdl               Use non-opengl renderer\n"
+               "  -v, --verbose       Log video/window setup details\n"
                "\n"
                "Sound Options:\n"
                "  --disable-sound     If sound support was compiled in,  this will\n"

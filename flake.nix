@@ -83,6 +83,7 @@
                 pkgs.SDL_image
                 pkgs.SDL_mixer
                 pkgs.libGL
+                pkgs.libGLU
               ]) ++ [
                 pkgs.zlib
                 pkgs.libpng

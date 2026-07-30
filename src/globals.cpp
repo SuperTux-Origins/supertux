@@ -67,6 +67,7 @@ bool use_gl;
 bool use_joystick;
 bool use_fullscreen;
 bool debug_mode;
+bool verbose_mode;
 bool show_fps;
 bool show_mouse;
 float game_speed = 1.0f;
