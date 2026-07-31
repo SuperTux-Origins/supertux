@@ -79,6 +79,10 @@ void loadconfig(void)
 #ifndef NOSOUND
   reader.read_bool("sound",      &use_sound);
   reader.read_bool("music",      &use_music);
+  if (verbose_mode)
+    st_vlog("[config] sound=%s music=%s (from config file)\n",
+            use_sound ? "#t" : "#f",
+            use_music ? "#t" : "#f");
 #endif
   reader.read_bool("show_fps",   &show_fps);
 

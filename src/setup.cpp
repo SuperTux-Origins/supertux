@@ -1339,7 +1339,11 @@ void st_audio_setup(void)
   return;
 #else
 
-  /* Init SDL Audio silently even if --disable-sound : */
+  /* Init SDL Audio silently even if --disable-sound.
+     On device failure only clear audio_device — never clear use_sound /
+     use_music. Those are user preferences written by saveconfig(); wiping
+     them on a transient OpenSL failure permanently mutes the next launch
+     even when Mix_OpenAudio would succeed (common Android device split). */
 
   if (!audio_device)
     {
@@ -1349,12 +1353,11 @@ void st_audio_setup(void)
   else if (audio_device)
     {
       if (verbose_mode)
-        st_vlog("[audio] SDL_InitSubSystem(AUDIO)...\n");
+        st_vlog("[audio] SDL_InitSubSystem(AUDIO)... (pref SFX %s music %s)\n",
+                use_sound ? "on" : "off",
+                use_music ? "on" : "off");
       if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
         {
-          /* only print out message if sound or music
-             was not disabled at command-line
-           */
           if (use_sound || use_music)
             {
               fprintf(stderr,
@@ -1362,13 +1365,11 @@ void st_audio_setup(void)
                       "The Simple DirectMedia error that occured was:\n"
                       "%s\n\n", SDL_GetError());
             }
-          /* keep the programming logic the same :-)
-             because in this case, use_sound & use_music' values are ignored
-             when there's no available audio device
-          */
-          use_sound = false;
-          use_music = false;
           audio_device = false;
+          if (verbose_mode)
+            st_vlog("[audio] subsystem failed — prefs unchanged (SFX %s music %s)\n",
+                    use_sound ? "on" : "off",
+                    use_music ? "on" : "off");
         }
       else if (verbose_mode)
         {
@@ -1383,7 +1384,7 @@ void st_audio_setup(void)
     audio_device = true;
 #endif
     
-  /* Open sound silently regarless the value of "use_sound": */
+  /* Open sound silently regardless of "use_sound" (device probe). */
 
   if (audio_device)
     {
@@ -1393,9 +1394,6 @@ void st_audio_setup(void)
       if (open_audio(44100, AUDIO_S16, 1, 1024) < 0)
 #endif      
         {
-          /* only print out message if sound or music
-             was not disabled at command-line
-           */
           if (use_sound || use_music)
             {
               fprintf(stderr,
@@ -1404,13 +1402,17 @@ void st_audio_setup(void)
                       "The Simple DirectMedia error that occured was:\n"
                       "%s\n\n", SDL_GetError());
             }
-          use_sound = false;
-          use_music = false;
           audio_device = false;
+          if (verbose_mode)
+            st_vlog("[audio] Mix_OpenAudio failed — prefs unchanged\n");
         }
       else if (verbose_mode)
         {
-          st_vlog("[audio] Mix_OpenAudio ok (44100 Hz)\n");
+          st_vlog("[audio] Mix_OpenAudio ok (44100 Hz) playback SFX %s music %s\n",
+                  use_sound ? "on" : "off",
+                  use_music ? "on" : "off");
+          if (!use_sound && !use_music)
+            st_vlog("[audio] both prefs off — enable in Options or clear config\n");
         }
     }
 
