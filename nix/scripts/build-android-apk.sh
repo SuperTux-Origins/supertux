@@ -31,6 +31,15 @@ cp -r "$GAME_SRC_DIR"/. src/jni/src/
 # Minimal IMG_* shim (always compiled into libmain).
 cp "$APP_DIR/jni/img_stb_min.c" src/jni/src/img_stb_min.c
 cp "$APP_DIR/jni/SDL_image.h" src/jni/src/SDL_image.h
+if [ -n "${STB_IMAGE_H:-}" ] && [ -f "$STB_IMAGE_H" ]; then
+  cp "$STB_IMAGE_H" src/jni/src/stb_image.h
+elif [ -f "$APP_DIR/jni/stb_image.h" ]; then
+  cp "$APP_DIR/jni/stb_image.h" src/jni/src/stb_image.h
+else
+  echo "error: need STB_IMAGE_H or android/jni/stb_image.h (upstream stb)" >&2
+  exit 1
+fi
+
 
 # Drop the SDL1 backend — Android is SDL2-only.
 rm -f src/jni/src/platform_sdl1.cpp

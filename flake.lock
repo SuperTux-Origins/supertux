@@ -271,35 +271,7 @@
         "SDL_image-win32": "SDL_image-win32",
         "SDL_mixer-win32": "SDL_mixer-win32",
         "nixpkgs": "nixpkgs",
-        "sdl2-image-src": "sdl2-image-src",
-        "sdl2-src": "sdl2-src",
         "tinycmmc": "tinycmmc"
-      }
-    },
-    "sdl2-image-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1704144931,
-        "narHash": "sha256-zEE5Uk77xD0dYAJIPuhmidH51huxtmr+OmlrCcXoYRg=",
-        "type": "tarball",
-        "url": "https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.2/SDL2_image-2.8.2.tar.gz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.2/SDL2_image-2.8.2.tar.gz"
-      }
-    },
-    "sdl2-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1714580206,
-        "narHash": "sha256-49TNuKx5ec+rEK49rKjqrKStQzuhk8zdu8mRe/amUBk=",
-        "type": "tarball",
-        "url": "https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz"
       }
     },
     "systems": {

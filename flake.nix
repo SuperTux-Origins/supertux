@@ -94,6 +94,13 @@
         androidApkName = "supertux-milestone1-${gitDate}-${gitRev}.apk";
         hasGameData = builtins.pathExists ./data;
 
+        # Upstream stb_image.h (plain). Fetched at eval/build time; hash pinned.
+        stbImageH = androidPkgs.fetchurl {
+          url = "https://raw.githubusercontent.com/nothings/stb/f0569113c93ad095470c54bf34a802ac5bd90f23/stb_image.h";
+          # First build may fail with hash mismatch — paste the hash Nix prints.
+          sha256 = "sha256-5tlOnEeS6wGQTuCWBbYiOxeknWRLBR60OgWlCI78umQ=";
+        };
+
         mkSuperTux = { useSDL2 ? true, pname ? "supertux-milestone1" }:
           pkgs.stdenv.mkDerivation rec {
             inherit pname;
@@ -192,8 +199,8 @@
             outApkName = androidApkName;
             keystore = ./keystore/debug.keystore;
             gameSrcDir = ./src;
-            sdl2ImageSrc = sdl2-image-src;
             gameDataDir = if hasGameData then ./data else null;
+            stbImageH = stbImageH;
           };
         };
 
@@ -225,8 +232,8 @@
               outApkName = androidApkName;
               keystore = ./keystore/debug.keystore;
               gameSrcDir = ./src;
-              sdl2ImageSrc = sdl2-image-src;
               gameDataDir = if hasGameData then ./data else null;
+              stbImageH = stbImageH;
             };
             apkFileName = androidApkName;
             description = "Install SuperTux Milestone 1 APK via adb";

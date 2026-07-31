@@ -118,6 +118,7 @@ let
     sdl2ImageSrc ? null,
     # Optional game data directory packaged as APK assets.
     gameDataDir ? null,
+    stbImageH ? null,
   }:
     pkgs.stdenvNoCC.mkDerivation {
       pname = appName;
@@ -142,6 +143,8 @@ let
         SDL2_IMAGE_SRC = "${sdl2ImageSrc}";
       } // pkgs.lib.optionalAttrs (gameDataDir != null) {
         GAME_DATA_DIR = "${gameDataDir}";
+      } // pkgs.lib.optionalAttrs (stbImageH != null) {
+        STB_IMAGE_H = "${stbImageH}";
       };
 
       buildPhase = ''

@@ -4,12 +4,10 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := main
 
-# Prebuilt SDL2 headers live in ../SDL/include (sibling under jni/).
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../SDL/include \
 	$(LOCAL_PATH)
 
-# Game sources are copied next to this Android.mk by the Nix build script.
 LOCAL_SRC_FILES := \
 	badguy.cpp \
 	button.cpp \
@@ -47,16 +45,9 @@ LOCAL_SRC_FILES := \
 	worldmap.cpp \
 	img_stb_min.c
 
-# stb_image.h from SDL2_image source tree (copied by the build script).
-ifneq ($(wildcard $(LOCAL_PATH)/SDL2_image/src/stb_image.h),)
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/SDL2_image/src
-endif
-# Prefer real SDL_image.h when present; otherwise our minimal one next to sources.
-ifneq ($(wildcard $(LOCAL_PATH)/SDL2_image/include/SDL_image.h),)
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/SDL2_image/include
-endif
+# Unmodified stb_image.h is placed next to sources by the build script (STB_IMAGE_H).
+LOCAL_C_INCLUDES += $(LOCAL_PATH)
 
-# Sound optional
 ifeq ($(SUPER_TUX_ENABLE_SOUND),1)
 LOCAL_SRC_FILES += \
 	music_manager.cpp \
@@ -68,7 +59,6 @@ LOCAL_CPPFLAGS += -DNOSOUND
 endif
 
 LOCAL_SHARED_LIBRARIES := SDL2
-
 LOCAL_LDLIBS := -llog -landroid -lz
 
 LOCAL_CFLAGS += -DUSE_SDL2 -DNOOPENGL
