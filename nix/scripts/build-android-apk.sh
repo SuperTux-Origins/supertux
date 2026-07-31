@@ -6,7 +6,7 @@
 #   GAME_SRC_DIR               - path to C++ sources (repo src/)
 #   APPLICATION_MK, TOP_ANDROID_MK, SDL_PREBUILT_MK, SDL_ANDROID_LIBS
 #   KEYSTORE
-#   SDL2_IMAGE_SRC             - optional extracted SDL2_image source tree
+#   STB_IMAGE_H                - upstream stb_image.h
 #   GAME_DATA_DIR              - optional data/ tree packaged as assets
 set -euo pipefail
 
@@ -26,9 +26,12 @@ cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
 cp "$APP_DIR/AndroidManifest.xml" src/AndroidManifest.xml
 cp -r "$APP_DIR/res" src/res
 
-# Game C++ sources (and headers) next to the module Android.mk.
+# Game C++ sources next to the module Android.mk.
 cp -r "$GAME_SRC_DIR"/. src/jni/src/
-# Minimal IMG_* shim (always compiled into libmain).
+# Drop the SDL1 backend — Android is SDL2-only.
+rm -f src/jni/src/platform_sdl1.cpp
+
+# IMG_* shim + headers (always writable copies in the build dir).
 cp "$APP_DIR/jni/img_stb_min.c" src/jni/src/img_stb_min.c
 cp "$APP_DIR/jni/SDL_image.h" src/jni/src/SDL_image.h
 if [ -n "${STB_IMAGE_H:-}" ] && [ -f "$STB_IMAGE_H" ]; then
@@ -40,60 +43,16 @@ else
   exit 1
 fi
 
-
-# Drop the SDL1 backend — Android is SDL2-only.
-rm -f src/jni/src/platform_sdl1.cpp
-
 cp "$SDL_PREBUILT_MK" src/jni/SDL/Android.mk
 cp -r "$SDL_ANDROID_LIBS/include" src/jni/SDL/include
 
-# Optional: vendor SDL2_image sources (stb backend) into the app module.
-if [ -n "${SDL2_IMAGE_SRC:-}" ] && [ -d "$SDL2_IMAGE_SRC" ]; then
-  mkdir -p src/jni/src/SDL2_image
-  cp -r "$SDL2_IMAGE_SRC"/. src/jni/src/SDL2_image/
-  # Prefer the public headers that ship with the tarball.
-  if [ -d src/jni/src/SDL2_image/include ]; then
-    true
-  elif [ -f src/jni/src/SDL2_image/SDL_image.h ]; then
-    mkdir -p src/jni/src/SDL2_image/include
-    cp src/jni/src/SDL2_image/SDL_image.h src/jni/src/SDL2_image/include/
-  fi
-  # Ensure stb_image.h is reachable; SDL2_image 2.8 ships it under src/.
-  if [ ! -f src/jni/src/SDL2_image/src/stb_image.h ]; then
-    echo "error: SDL2_image tree lacks src/stb_image.h" >&2
-    exit 1
-  fi
-fi
-
-# Minimal SDL_image.h if the tarball header is awkward for our shim.
-if [ ! -f src/jni/src/SDL2_image/include/SDL_image.h ]; then
-  mkdir -p src/jni/src
-  cat > src/jni/src/SDL_image.h << 'EOF'
-#ifndef SDL_IMAGE_H_
-#define SDL_IMAGE_H_
-#include "SDL.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
-#define IMG_INIT_JPG 0x00000001
-#define IMG_INIT_PNG 0x00000002
-int IMG_Init(int flags);
-void IMG_Quit(void);
-SDL_Surface *IMG_Load(const char *file);
-const char *IMG_GetError(void);
-#ifdef __cplusplus
-}
-#endif
-#endif
-EOF
-fi
-
-# Optional game data → APK assets (extracted to internal storage at runtime).
+# Optional game data → APK assets.
 if [ -n "${GAME_DATA_DIR:-}" ] && [ -d "$GAME_DATA_DIR" ]; then
   mkdir -p src/assets
   cp -r "$GAME_DATA_DIR"/. src/assets/
 fi
 
+# Nix store copies are often 0444; make the tree writable before any edits.
 chmod -R u+w src
 cp "$KEYSTORE" debug.keystore
 

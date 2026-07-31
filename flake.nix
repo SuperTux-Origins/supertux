@@ -24,7 +24,7 @@
   description = "A 2D platform game featuring Tux the penguin (Milestone 1)";
 
   inputs = rec {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-26.05";
 
     tinycmmc.url = "github:grumbel/tinycmmc";
     tinycmmc.inputs.nixpkgs.follows = "nixpkgs";
@@ -96,9 +96,8 @@
 
         # Upstream stb_image.h (plain). Fetched at eval/build time; hash pinned.
         stbImageH = androidPkgs.fetchurl {
-          url = "https://raw.githubusercontent.com/nothings/stb/f0569113c93ad095470c54bf34a802ac5bd90f23/stb_image.h";
-          # First build may fail with hash mismatch — paste the hash Nix prints.
-          sha256 = "sha256-5tlOnEeS6wGQTuCWBbYiOxeknWRLBR60OgWlCI78umQ=";
+          url = "https://raw.githubusercontent.com/nothings/stb/refs/heads/master/stb_image.h";
+          sha256 = "sha256-WUwv411JSItDgtv67I+YNm3vyoGdkWrJW+zz519CALM=";
         };
 
         mkSuperTux = { useSDL2 ? true, pname ? "supertux-milestone1" }:
