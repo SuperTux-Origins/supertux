@@ -329,6 +329,13 @@ tc_press(int id, TcFingerId finger)
 {
   if (id < 0 || id >= TC_COUNT)
     return;
+  /* Synthetic mouse uses finger id -1. Never let it steal a button that
+     a real finger already owns — that leaves held stuck when FINGERUP
+     arrives for the original id and mouse-up never matches. */
+  if (finger == (TcFingerId)-1
+      && tc_btn[id].has_finger
+      && tc_btn[id].finger != (TcFingerId)-1)
+    return;
   tc_btn[id].held = true;
   tc_btn[id].has_finger = true;
   tc_btn[id].finger = finger;
@@ -341,6 +348,8 @@ tc_release_button(int i)
     return;
   tc_btn[i].held = false;
   tc_btn[i].has_finger = false;
+  if (i >= TC_LEFT && i <= TC_DOWN && tc_sticky_dpad == i)
+    tc_sticky_dpad = -1;
   if (!tc_player)
     return;
   switch (i)
@@ -400,6 +409,11 @@ tc_move_finger(TcFingerId finger, int x, int y)
      of Action checks TC_BOTH.held and skips the fire UP). */
   if (hit >= 0)
     tc_press(hit, finger);
+  else if (tc_sticky_dpad >= 0)
+    {
+      /* Off every pad cell: drop sticky so a later press starts clean. */
+      tc_sticky_dpad = -1;
+    }
   for (int i = 0; i < TC_COUNT; ++i)
     {
       if (!(tc_btn[i].has_finger && tc_btn[i].finger == finger && i != hit))
@@ -470,6 +484,12 @@ bool touch_controls_event(const SDL_Event& event)
       }
       break;
     case SDL_MOUSEBUTTONDOWN:
+#ifdef __ANDROID__
+      /* Android synthesizes mouse events from each touch. Handling both
+         FINGER* and MOUSE* double-owns buttons under different ids and
+         leaves the d-pad stuck when FINGERUP and mouse-up disagree. */
+      break;
+#else
       if (event.button.button == SDL_BUTTON_LEFT)
         {
           /* Raw window coords — do not map to logical. */
@@ -482,11 +502,19 @@ bool touch_controls_event(const SDL_Event& event)
             }
         }
       break;
+#endif
     case SDL_MOUSEBUTTONUP:
+#ifdef __ANDROID__
+      break;
+#else
       if (event.button.button == SDL_BUTTON_LEFT)
         tc_release_finger((TcFingerId)-1);
       break;
+#endif
     case SDL_MOUSEMOTION:
+#ifdef __ANDROID__
+      break;
+#else
       if (event.motion.state & SDL_BUTTON_LMASK)
         {
           int x = event.motion.x, y = event.motion.y;
@@ -501,6 +529,7 @@ bool touch_controls_event(const SDL_Event& event)
             }
         }
       break;
+#endif
     default:
       break;
     }

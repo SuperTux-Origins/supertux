@@ -187,6 +187,19 @@ path_join4(char* dest, size_t dest_sz,
 
 #ifdef __ANDROID__
 static void android_list_asset_dir(const char* asset_dir, string_list_type* out);
+
+/* AssetManager paths are relative to assets/ with no leading slash. */
+static void
+android_asset_dir_normalize(const char* rel_path, char* out, size_t out_sz)
+{
+  const char* p = rel_path ? rel_path : "";
+  while (*p == '/' || *p == '\\')
+    ++p;
+  snprintf(out, out_sz, "%s", p);
+  size_t n = strlen(out);
+  while (n > 0 && (out[n - 1] == '/' || out[n - 1] == '\\'))
+    out[--n] = '\0';
+}
 #endif
 
 /* Get all names of sub-directories in a certain directory. */
@@ -276,12 +289,16 @@ string_list_type dsubdirs(const char *rel_path,const  char* expected_file)
   {
     string_list_type asset_names;
     string_list_init(&asset_names);
-    android_list_asset_dir(rel_path, &asset_names);
+    char asset_dir[PATH_MAX];
+    android_asset_dir_normalize(rel_path, asset_dir, sizeof(asset_dir));
+    android_list_asset_dir(asset_dir, &asset_names);
+    st_vlog("[data] dsubdirs assets '%s' → %d name(s)\n",
+            asset_dir, asset_names.num_items);
     for (int i = 0; i < asset_names.num_items; ++i)
       {
         char child_path[PATH_MAX];
         char probe[PATH_MAX];
-        if (!path_join2(child_path, sizeof(child_path), rel_path, asset_names.item[i]))
+        if (!path_join2(child_path, sizeof(child_path), asset_dir, asset_names.item[i]))
           continue;
         if (expected_file != NULL)
           {
@@ -376,6 +393,34 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
       closedir(dirStructP);
     }
 
+#ifdef __ANDROID__
+  /* APK assets: same listing path as dsubdirs (opendir cannot see assets/). */
+  {
+    string_list_type asset_names;
+    string_list_init(&asset_names);
+    char asset_dir[PATH_MAX];
+    android_asset_dir_normalize(rel_path, asset_dir, sizeof(asset_dir));
+    android_list_asset_dir(asset_dir, &asset_names);
+    st_vlog("[data] dfiles assets '%s' → %d name(s) (glob=%s)\n",
+            asset_dir, asset_names.num_items, glob ? glob : "(any)");
+    for (int i = 0; i < asset_names.num_items; ++i)
+      {
+        const char* name = asset_names.item[i];
+        if (exception_str != NULL && strstr(name, exception_str) != NULL)
+          continue;
+        if (glob != NULL && strstr(name, glob) == NULL)
+          continue;
+        int dup = 0;
+        for (int j = 0; j < sdirs.num_items; ++j)
+          if (strcmp(sdirs.item[j], name) == 0)
+            { dup = 1; break; }
+        if (!dup)
+          string_list_add_item(&sdirs, name);
+      }
+    string_list_free(&asset_names);
+  }
+#endif
+
   return sdirs;
 }
 
@@ -417,7 +462,9 @@ android_list_asset_dir(const char* asset_dir, string_list_type* out)
       return;
     }
 
-  jstring jpath = env->NewStringUTF(asset_dir ? asset_dir : "");
+  char norm[PATH_MAX];
+  android_asset_dir_normalize(asset_dir, norm, sizeof(norm));
+  jstring jpath = env->NewStringUTF(norm);
   jobjectArray listing = (jobjectArray)env->CallObjectMethod(java_am, list_mid, jpath);
   env->DeleteLocalRef(jpath);
   if (listing && !env->ExceptionCheck())
