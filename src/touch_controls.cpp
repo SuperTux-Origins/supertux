@@ -54,8 +54,8 @@ static int tc_layout_wh = 0;
 /* Sticky Both: once a finger swipes Action→Both, stay on Both until the
    finger moves well into the lower Action zone (hysteresis / Fitts). */
 static bool tc_sticky_both = false;
-/* Sticky d-pad direction (TC_LEFT..TC_DOWN, or -1). Moving further past
-   the outer edge of a direction keeps that direction held. */
+/* Sticky d-pad direction (TC_LEFT..TC_DOWN, or -1). Outer-edge slack only;
+   the cross centre gap clears sticky so the player can stop without lift. */
 static int tc_sticky_dpad = -1;
 
 /* Default content margins when the pad is enabled (fractions of window). */
@@ -248,8 +248,10 @@ tc_hit(int x, int y)
 
   int hit = tc_hit_raw(x, y);
 
-  /* D-pad: once a direction is pressed, expand its hit zone outward so
-     sliding further left/right/up/down does not release the button. */
+  /* D-pad: once a direction is pressed, expand its hit zone *outward*
+     only so sliding further past the outer edge keeps the direction.
+     Do not claim the cross centre gap — that must remain a release
+     zone (finger back to centre = stop). */
   if (hit >= TC_LEFT && hit <= TC_DOWN)
     {
       tc_sticky_dpad = hit;
@@ -259,38 +261,35 @@ tc_hit(int x, int y)
   if (tc_sticky_dpad >= TC_LEFT && tc_sticky_dpad <= TC_DOWN)
     {
       const TcButton& b = tc_btn[tc_sticky_dpad];
-      int expand = b.w; /* full cell of outward slack */
-      if (expand < 48) expand = 48;
+      int expand = b.w / 2; /* modest outward slack */
+      if (expand < 24) expand = 24;
+      if (expand > 64) expand = 64;
+      int cross = expand / 3; /* slight cross-axis fat-finger room */
       int L = b.x, R = b.x + b.w, T = b.y, B = b.y + b.h;
-      /* Grow away from the cross centre; also widen the cross-axis a bit. */
       if (tc_sticky_dpad == TC_LEFT)
         {
-          L -= expand * 2;
-          T -= expand / 2;
-          B += expand / 2;
-          /* Stay left of the inner edge of the opposite (RIGHT) cell. */
-          R = tc_btn[TC_RIGHT].x;
+          L -= expand;
+          T -= cross;
+          B += cross;
+          /* R stays at original inner edge — centre gap is free */
         }
       else if (tc_sticky_dpad == TC_RIGHT)
         {
-          R += expand * 2;
-          T -= expand / 2;
-          B += expand / 2;
-          L = tc_btn[TC_LEFT].x + tc_btn[TC_LEFT].w;
+          R += expand;
+          T -= cross;
+          B += cross;
         }
       else if (tc_sticky_dpad == TC_UP)
         {
-          T -= expand * 2;
-          L -= expand / 2;
-          R += expand / 2;
-          B = tc_btn[TC_DOWN].y;
+          T -= expand;
+          L -= cross;
+          R += cross;
         }
       else /* TC_DOWN */
         {
-          B += expand * 2;
-          L -= expand / 2;
-          R += expand / 2;
-          T = tc_btn[TC_UP].y + tc_btn[TC_UP].h;
+          B += expand;
+          L -= cross;
+          R += cross;
         }
 
       if (x >= L && x < R && y >= T && y < B)
