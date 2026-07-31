@@ -65,7 +65,7 @@
 
         # Android SDK is unfree + needs license accept; use a dedicated pkgs.
         androidPkgs = import nixpkgs {
-          system = pkgs.system;
+          system = pkgs.stdenv.hostPlatform.system;
           config.allowUnfree = true;
           config.android_sdk.accept_license = true;
         };
@@ -132,9 +132,9 @@
 
             buildInputs =
               (if pkgs.stdenv.hostPlatform.isWindows && !effectiveSDL2 then [
-                SDL-win32.packages.${pkgs.system}.default
-                SDL_image-win32.packages.${pkgs.system}.default
-                SDL_mixer-win32.packages.${pkgs.system}.default
+                SDL-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
+                SDL_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
+                SDL_mixer-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
               ] else if effectiveSDL2 then [
                 pkgs.SDL2
                 pkgs.SDL2_image
@@ -164,9 +164,9 @@
               find ${pkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
               find ${pkgs.stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
               ${if effectiveSDL2 then "" else ''
-              ln -sfv ${SDL-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
-              ln -sfv ${SDL_image-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
-              ln -sfv ${SDL_mixer-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
+              ln -sfv ${SDL-win32.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/*.dll $out/bin/
+              ln -sfv ${SDL_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/*.dll $out/bin/
+              ln -sfv ${SDL_mixer-win32.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/*.dll $out/bin/
               ''}
             '';
 
