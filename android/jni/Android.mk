@@ -44,25 +44,19 @@ LOCAL_SRC_FILES := \
 	title.cpp \
 	type.cpp \
 	world.cpp \
-	worldmap.cpp
+	worldmap.cpp \
+	img_stb_min.c
 
-# SDL2_image: stb-only backend for PNG/JPG/BMP/GIF/TGA (no libpng/jpeg/webp).
-# Compile only IMG.c + IMG_stb.c and force every optional codec off so IMG.c
-# does not reference IMG_LoadAVIF_RW / IMG_LoadJXL_RW / etc.
-ifneq ($(wildcard $(LOCAL_PATH)/SDL2_image/src/IMG.c),)
+# stb_image.h from SDL2_image source tree (copied by the build script).
+ifneq ($(wildcard $(LOCAL_PATH)/SDL2_image/src/stb_image.h),)
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/SDL2_image/src
+endif
+# Prefer real SDL_image.h when present; otherwise our minimal one next to sources.
+ifneq ($(wildcard $(LOCAL_PATH)/SDL2_image/include/SDL_image.h),)
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/SDL2_image/include
-LOCAL_SRC_FILES += \
-	SDL2_image/src/IMG.c \
-	SDL2_image/src/IMG_stb.c
-LOCAL_CFLAGS += \
-	-DUSE_STBIMAGE \
-	-DLOAD_BMP=1 -DLOAD_GIF=1 -DLOAD_JPG=1 -DLOAD_PNG=1 -DLOAD_TGA=1 \
-	-DLOAD_AVIF=0 -DLOAD_JXL=0 -DLOAD_LBM=0 -DLOAD_PCX=0 -DLOAD_PNM=0 \
-	-DLOAD_QOI=0 -DLOAD_SVG=0 -DLOAD_TIF=0 -DLOAD_WEBP=0 \
-	-DLOAD_XCF=0 -DLOAD_XPM=0 -DLOAD_XV=0 -DLOAD_XXX=0
 endif
 
-# Sound optional — need SDL_mixer.h from a full SDL2_mixer install.
+# Sound optional
 ifeq ($(SUPER_TUX_ENABLE_SOUND),1)
 LOCAL_SRC_FILES += \
 	music_manager.cpp \

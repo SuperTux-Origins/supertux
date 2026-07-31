@@ -28,6 +28,10 @@ cp -r "$APP_DIR/res" src/res
 
 # Game C++ sources (and headers) next to the module Android.mk.
 cp -r "$GAME_SRC_DIR"/. src/jni/src/
+# Minimal IMG_* shim (always compiled into libmain).
+cp "$APP_DIR/jni/img_stb_min.c" src/jni/src/img_stb_min.c
+cp "$APP_DIR/jni/SDL_image.h" src/jni/src/SDL_image.h
+
 # Drop the SDL1 backend — Android is SDL2-only.
 rm -f src/jni/src/platform_sdl1.cpp
 
@@ -45,6 +49,34 @@ if [ -n "${SDL2_IMAGE_SRC:-}" ] && [ -d "$SDL2_IMAGE_SRC" ]; then
     mkdir -p src/jni/src/SDL2_image/include
     cp src/jni/src/SDL2_image/SDL_image.h src/jni/src/SDL2_image/include/
   fi
+  # Ensure stb_image.h is reachable; SDL2_image 2.8 ships it under src/.
+  if [ ! -f src/jni/src/SDL2_image/src/stb_image.h ]; then
+    echo "error: SDL2_image tree lacks src/stb_image.h" >&2
+    exit 1
+  fi
+fi
+
+# Minimal SDL_image.h if the tarball header is awkward for our shim.
+if [ ! -f src/jni/src/SDL2_image/include/SDL_image.h ]; then
+  mkdir -p src/jni/src
+  cat > src/jni/src/SDL_image.h << 'EOF'
+#ifndef SDL_IMAGE_H_
+#define SDL_IMAGE_H_
+#include "SDL.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+#define IMG_INIT_JPG 0x00000001
+#define IMG_INIT_PNG 0x00000002
+int IMG_Init(int flags);
+void IMG_Quit(void);
+SDL_Surface *IMG_Load(const char *file);
+const char *IMG_GetError(void);
+#ifdef __cplusplus
+}
+#endif
+#endif
+EOF
 fi
 
 # Optional game data → APK assets (extracted to internal storage at runtime).
