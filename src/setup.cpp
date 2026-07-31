@@ -1407,39 +1407,24 @@ void st_abort(const std::string& reason, const std::string& details)
 void seticon(void)
 {
 #ifndef GP2X
-//  int masklen;
-//  Uint8 * mask;
-  SDL_Surface * icon;
+  SDL_Surface * icon = 0;
+  std::string icon_path = datadir + "/images/icon.png";
 
-
-  /* Load icon into a surface: */
-
-  icon = IMG_Load((datadir + "/images/icon.png").c_str());
+  /* open_game_file so Android can read the icon from APK assets. */
+  {
+    SDL_RWops* rw = open_game_file(icon_path);
+    if (rw)
+      icon = IMG_Load_RW(rw, 1);
+  }
   if (icon == NULL)
     {
-      fprintf(stderr,
-              "\nError: I could not load the icon image: %s%s\n"
-              "The Simple DirectMedia error that occured was:\n"
-              "%s\n\n", datadir.c_str(), "/images/icon.png", SDL_GetError());
-      exit(1);
+      /* Window icon is optional — do not kill the process. */
+      SDL_Log("Warning: could not load icon %s: %s",
+              icon_path.c_str(), IMG_GetError());
+      return;
     }
 
-
-  /* Create mask: */
-/*
-  masklen = (((icon -> w) + 7) / 8) * (icon -> h);
-  mask = (Uint8*) malloc(masklen * sizeof(Uint8));
-  memset(mask, 0xFF, masklen);
-*/
-
-  /* Set icon: */
-
   platform_set_icon(icon);
-
-
-  /* Free icon surface & mask: */
-
-//  free(mask);
   SDL_FreeSurface(icon);
 #endif
 }
