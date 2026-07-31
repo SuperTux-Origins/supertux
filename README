@@ -48,7 +48,7 @@ DOCUMENTATION
     AUTHORS     - Credits for people that contributed to the creation
                   of SuperTux.
     NEWS        - Changes since the previous versions of "SuperTux"
-    COPYING     - The GNU Public License, which "SuperTux" is liscensed
+    COPYING     - The GNU General Public License v3 or later (GPL-3.0-or-later)
                   under.
     INSTALL     - Instructions on requirements, compiling and installing.
     README      - (This file.)  Game story, usage, rules and controls.

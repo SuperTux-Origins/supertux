@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2003-2006 SuperTux Development Team
+// SPDX-FileCopyrightText: 2024-2026 SuperTux Milestone 1 port contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Unified OpenGL / OpenGL ES 2 header selection for SuperTux Milestone 1.
 // Desktop immediate-mode path uses SDL_opengl.h; GLES2 uses Khronos GLES2.
 // Isolate includes here so gameplay files do not grow version ifdefs.

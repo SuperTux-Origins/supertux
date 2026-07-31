@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2003-2006 SuperTux Development Team
+// SPDX-FileCopyrightText: 2024-2026 SuperTux Milestone 1 port contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /* Thin game-data I/O: desktop filesystem or Android APK assets via SDL_RWops. */
 #ifndef SUPERTUX_GAME_FILE_H
 #define SUPERTUX_GAME_FILE_H

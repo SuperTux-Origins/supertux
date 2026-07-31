@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2003-2006 SuperTux Development Team
+// SPDX-FileCopyrightText: 2024-2026 SuperTux Milestone 1 port contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // SDL 2 platform backend
 
 #include <stdio.h>

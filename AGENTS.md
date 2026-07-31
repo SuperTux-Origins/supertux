@@ -2,7 +2,7 @@
 
 ## What this is
 
-This tree is **SuperTux Milestone 1** (classic 0.1.x-era codebase), a Super Mario–inspired 2D platformer starring Tux. Upstream history is from the early 2000s (SourceForge era). The game is GPL-2.0.
+This tree is **SuperTux Milestone 1** (classic 0.1.x-era codebase), a Super Mario–inspired 2D platformer starring Tux. Upstream history is from the early 2000s (SourceForge era). The game is GPL-3.0-or-later (REUSE SPDX headers in source files).
 
 This working copy is **source-only for the engine**. The large `data/` tree (levels, images, music, sounds, tilesets) is **not** shipped in this archive because of size. You need a matching Milestone 1 `data/` directory at runtime (or point `DATA_PREFIX` / `datadir` at one).
 
@@ -175,4 +175,4 @@ nix run .#install-android-supertux-milestone1   # adb install -r
 
 ## License
 
-GNU GPL v2 (see `COPYING`). Preserve license headers on source files.
+GNU GPL v3 or later (see `COPYING`). Source files use REUSE SPDX headers (`SPDX-FileCopyrightText` / `SPDX-License-Identifier: GPL-3.0-or-later`).

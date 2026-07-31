@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2003-2006 SuperTux Development Team
+// SPDX-FileCopyrightText: 2024-2026 SuperTux Milestone 1 port contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // SDL version selection and compatibility helpers.
 // Under USE_SDL2, SDL 1.2-shaped APIs used by this codebase are shimmed here
 // so gameplay files stay free of scattered version ifdefs.

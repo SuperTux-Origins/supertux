@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2003-2006 SuperTux Development Team
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #ifndef SDL_IMAGE_H_
 #define SDL_IMAGE_H_
 

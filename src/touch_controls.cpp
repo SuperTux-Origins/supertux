@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2003-2006 SuperTux Development Team
+// SPDX-FileCopyrightText: 2024-2026 SuperTux Milestone 1 port contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // On-screen virtual gamepad for touch devices.
 // Buttons live in window pixel space (letterbox margins); game stays logical 640×480.
 
