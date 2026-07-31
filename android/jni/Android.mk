@@ -50,17 +50,20 @@ LOCAL_SRC_FILES := \
 # Unmodified stb_image.h is placed next to sources by the build script (STB_IMAGE_H).
 LOCAL_C_INCLUDES += $(LOCAL_PATH)
 
+# Audio on by default (SDL2_mixer prebuilt with the SDL layer).
+# Pass SUPER_TUX_ENABLE_SOUND=0 to force NOSOUND.
+SUPER_TUX_ENABLE_SOUND ?= 1
 ifeq ($(SUPER_TUX_ENABLE_SOUND),1)
 LOCAL_SRC_FILES += \
 	music_manager.cpp \
 	musicref.cpp \
 	sound.cpp
+LOCAL_SHARED_LIBRARIES := SDL2 SDL2_mixer
 else
 LOCAL_CFLAGS += -DNOSOUND
 LOCAL_CPPFLAGS += -DNOSOUND
-endif
-
 LOCAL_SHARED_LIBRARIES := SDL2
+endif
 
 # GLES2 is the default accelerated path on Android. ES 2.0 has been required
 # by the Android CDD for many years; API 22 / Fire OS 5 devices all expose it.

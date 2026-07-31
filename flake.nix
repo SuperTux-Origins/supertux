@@ -52,10 +52,15 @@
       url = "https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.2/SDL2_image-2.8.2.tar.gz";
       flake = false;
     };
+    # SDL2_mixer for Android audio (OGG via stb_vorbis in-tree; no system libogg).
+    sdl2-mixer-src = {
+      url = "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.0/SDL2_mixer-2.8.0.tar.gz";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, tinycmmc, SDL-win32, SDL_mixer-win32, SDL_image-win32
-            , sdl2-src, sdl2-image-src }:
+            , sdl2-src, sdl2-image-src, sdl2-mixer-src }:
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       let
         lib = nixpkgs.lib;
@@ -86,6 +91,8 @@
           pkgs = androidPkgs;
           sdlSrc = sdl2-src;
           sdlVersion = "2.30.3";
+          sdlMixerSrc = sdl2-mixer-src;
+          sdlMixerVersion = "2.8.0";
           inherit androidSdk buildToolsVersion packagePlatform compilePlatform targetAbis;
         };
         gitDate =

@@ -18,6 +18,8 @@
 { pkgs
 , sdlSrc
 , sdlVersion
+, sdlMixerSrc ? null
+, sdlMixerVersion ? "2.8.0"
 , androidSdk
 , buildToolsVersion
 , packagePlatform
@@ -45,17 +47,12 @@ let
   };
 
   # ---------------------------------------------------------------
-  # SDL2 itself, built exactly once (per Nix store, cached across every
-  # app built with this module, and across repeated app rebuilds): the
-  # native libSDL2.so per ABI, its headers, and the compiled SDLActivity
-  # Java glue (identical for every SDL2-based app — nothing app-specific
-  # here). This is the expensive part of the whole pipeline (~150 C
-  # source files x N ABIs), so pulling it out of mkApk means editing a
-  # single app's main.cpp never triggers a full SDL2 recompile again.
+  # SDL2 (+ optional SDL2_mixer) native libs and SDLActivity Java glue.
+  # Built once and reused across app rebuilds.
   # ---------------------------------------------------------------
   sdlAndroidLibs = pkgs.stdenvNoCC.mkDerivation {
     pname = "sdl2-android-libs";
-    version = sdlVersion;
+    version = if sdlMixerSrc != null then "${sdlVersion}+mixer-${sdlMixerVersion}" else sdlVersion;
 
     dontUnpack = true;
     nativeBuildInputs = [ androidSdk pkgs.jdk17 pkgs.gnumake ];
@@ -67,6 +64,8 @@ let
       SDL_SRC = "${sdlSrc}";
       APPLICATION_MK = applicationMk;
       TOP_ANDROID_MK = topAndroidMk;
+    } // pkgs.lib.optionalAttrs (sdlMixerSrc != null) {
+      SDL_MIXER_SRC = "${sdlMixerSrc}";
     };
 
     buildPhase = ''
@@ -84,11 +83,7 @@ let
     '';
   };
 
-  # A drop-in replacement for the real SDL2 source dir, as far as an
-  # app's own jni/Android.mk is concerned: same "SDL2" module name, same
-  # ../SDL/include path — just backed by sdlAndroidLibs' prebuilt .so
-  # instead of full source, via ndk-build's PREBUILT_SHARED_LIBRARY. No
-  # changes needed in an app's own jni/Android.mk for this.
+  # Prebuilt SDL2 + SDL2_mixer for the app's ndk-build tree.
   sdlPrebuiltAndroidMk = pkgs.writeTextFile {
     name = "SDL2-prebuilt-Android.mk";
     text = ''
@@ -96,6 +91,11 @@ let
       include $(CLEAR_VARS)
       LOCAL_MODULE := SDL2
       LOCAL_SRC_FILES := ${sdlAndroidLibs}/lib/$(TARGET_ARCH_ABI)/libSDL2.so
+      include $(PREBUILT_SHARED_LIBRARY)
+
+      include $(CLEAR_VARS)
+      LOCAL_MODULE := SDL2_mixer
+      LOCAL_SRC_FILES := ${sdlAndroidLibs}/lib/$(TARGET_ARCH_ABI)/libSDL2_mixer.so
       include $(PREBUILT_SHARED_LIBRARY)
     '';
   };
