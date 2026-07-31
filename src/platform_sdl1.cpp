@@ -176,4 +176,8 @@ void platform_overlay_fillrect(int x, int y, int w, int h,
 {
   (void)x; (void)y; (void)w; (void)h; (void)r; (void)g; (void)b; (void)a;
 }
+void platform_overlay_surface(Surface* surf, int x, int y, int w, int h)
+{
+  (void)surf; (void)x; (void)y; (void)w; (void)h;
+}
 void platform_overlay_end(void) {}

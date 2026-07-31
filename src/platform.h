@@ -72,6 +72,8 @@ void platform_get_letterbox(int* ox, int* oy, int* dw, int* dh);
 void platform_overlay_begin(void);
 void platform_overlay_fillrect(int x, int y, int w, int h,
                                int r, int g, int b, int a);
+/** Stretched blit of a Surface in window coordinates (active overlay pass). */
+void platform_overlay_surface(class Surface* surf, int x, int y, int w, int h);
 void platform_overlay_end(void);
 
 #endif /* SUPERTUX_PLATFORM_H */

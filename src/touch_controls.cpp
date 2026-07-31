@@ -8,8 +8,11 @@
 #include "screen.h"
 #include "player.h"
 #include "text.h"
+#include "texture.h"
+#include "setup.h"
 
 #include <string.h>
+#include <string>
 
 enum {
   TC_LEFT = 0,
@@ -360,6 +363,46 @@ bool touch_controls_event(const SDL_Event& event)
   return false;
 }
 
+/* tv-bezel.png (1920×1080): transparent 4:3 hole at this rect. */
+static const int BEZEL_IW = 1920, BEZEL_IH = 1080;
+static const int BEZEL_HX = 320, BEZEL_HY = 60, BEZEL_HW = 1280, BEZEL_HH = 960;
+
+static Surface* tc_bezel = 0;
+static bool tc_bezel_tried = false;
+
+static void
+tc_draw_bezel(void)
+{
+  if (!tc_bezel_tried)
+    {
+      tc_bezel_tried = true;
+      std::string path = datadir + "/images/status/tv-bezel.png";
+      FILE* fp = fopen(path.c_str(), "rb");
+      if (fp)
+        {
+          fclose(fp);
+          tc_bezel = new Surface(path, USE_ALPHA);
+          st_vlog("[video] loaded arctic TV bezel (%dx%d)\n",
+                  tc_bezel ? tc_bezel->w : 0, tc_bezel ? tc_bezel->h : 0);
+        }
+      else
+        st_vlog("[video] no tv-bezel.png — plain letterbox margins\n");
+    }
+  if (!tc_bezel)
+    return;
+
+  int lx = 0, ly = 0, lw = ST_SCREEN_W, lh = ST_SCREEN_H;
+  platform_get_letterbox(&lx, &ly, &lw, &lh);
+  /* Map image hole → letterbox; frame scales with it (may stretch slightly). */
+  float sx = (float)lw / (float)BEZEL_HW;
+  float sy = (float)lh / (float)BEZEL_HH;
+  int dw = (int)(BEZEL_IW * sx + 0.5f);
+  int dh = (int)(BEZEL_IH * sy + 0.5f);
+  int dx = lx - (int)(BEZEL_HX * sx + 0.5f);
+  int dy = ly - (int)(BEZEL_HY * sy + 0.5f);
+  platform_overlay_surface(tc_bezel, dx, dy, dw, dh);
+}
+
 void touch_controls_draw(void)
 {
   if (!tc_enabled)
@@ -367,7 +410,14 @@ void touch_controls_draw(void)
 
   tc_ensure_layout();
 
+  int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
+  platform_get_window_size(&ww, &wh);
+
   platform_overlay_begin();
+  /* Arctic fill under the bezel so gaps outside the frame aren't pure black. */
+  platform_overlay_fillrect(0, 0, ww, wh, 25, 45, 70, 255);
+  tc_draw_bezel();
+
   for (int i = 0; i < TC_COUNT; ++i)
     {
       int alpha = tc_btn[i].held ? 160 : 90;

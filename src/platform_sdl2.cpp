@@ -7,6 +7,7 @@
 #include "globals.h"
 #include "defines.h"
 #include "touch_controls.h"
+#include "texture.h"
 #include <SDL_image.h>
 #ifndef NOOPENGL
 #include "gl_compat.h"
@@ -344,6 +345,14 @@ void platform_overlay_fillrect(int x, int y, int w, int h,
   /* Approximate alpha by solid fill (software path rarely used on Android). */
   SDL_FillRect(ws, &dst, SDL_MapRGB(ws->format, (Uint8)r, (Uint8)g, (Uint8)b));
   (void)a;
+}
+
+void platform_overlay_surface(Surface* surf, int x, int y, int w, int h)
+{
+  if (!st_overlay_active || !surf || w < 1 || h < 1)
+    return;
+  /* draw_stretched uses the current GL viewport/MVP (overlay ortho). */
+  surf->draw_stretched((float)x, (float)y, w, h, 255, NO_UPDATE);
 }
 
 void platform_overlay_end(void)
