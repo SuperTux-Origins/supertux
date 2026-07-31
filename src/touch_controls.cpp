@@ -11,10 +11,10 @@
 #include "texture.h"
 #include "setup.h"
 
+#include "SDL_image.h"
+
 #include <string.h>
 #include <string>
-#include <stdio.h>
-#include <unistd.h>
 
 enum {
   TC_LEFT = 0,
@@ -379,20 +379,19 @@ tc_draw_bezel(void)
     {
       tc_bezel_tried = true;
       std::string path = datadir + "/images/status/tv-bezel.png";
-      /* Prefer access() over fopen so we don't leave a FILE* dance; on
-         Android the data tree is extracted to internal storage so this
-         matches how other assets are probed. */
-      if (access(path.c_str(), R_OK) == 0)
+      /* Optional chrome — IMG_Load failure must not abort the game. */
+      SDL_Surface* raw = IMG_Load(path.c_str());
+      if (!raw)
         {
-          tc_bezel = new Surface(path, USE_ALPHA);
-          st_vlog("[video] loaded arctic TV bezel %s (%dx%d)\n",
-                  path.c_str(),
-                  tc_bezel ? tc_bezel->w : 0, tc_bezel ? tc_bezel->h : 0);
+          st_vlog("[video] TV bezel IMG_Load(%s) failed: %s\n",
+                  path.c_str(), IMG_GetError());
         }
       else
         {
-          st_vlog("[video] no tv-bezel.png at %s — plain letterbox margins\n",
-                  path.c_str());
+          tc_bezel = new Surface(raw, USE_ALPHA);
+          SDL_FreeSurface(raw);
+          st_vlog("[video] loaded arctic TV bezel (%dx%d)\n",
+                  tc_bezel ? tc_bezel->w : 0, tc_bezel ? tc_bezel->h : 0);
         }
     }
   if (!tc_bezel)
