@@ -553,8 +553,9 @@ WorldMap::get_input()
           else if (touch_controls_held(1)) input_direction = D_EAST;
           else if (touch_controls_held(2)) input_direction = D_NORTH;
           else if (touch_controls_held(3)) input_direction = D_SOUTH;
-          if (touch_controls_held(4) || touch_controls_held(5)
-              || touch_controls_held(6))
+          /* Edge only — held state after Abort would re-enter immediately. */
+          if (touch_controls_just_pressed(4) || touch_controls_just_pressed(5)
+              || touch_controls_just_pressed(6))
             enter_level = true;
           continue;
         }
@@ -700,8 +701,8 @@ WorldMap::get_input()
       else if (st_key_held(keystate, SDLK_DOWN) || touch_controls_held(3))
         input_direction = D_SOUTH;
 
-      if (touch_controls_held(4) || touch_controls_held(5)
-          || touch_controls_held(6))
+      if (touch_controls_just_pressed(4) || touch_controls_just_pressed(5)
+          || touch_controls_just_pressed(6))
         enter_level = true;
     }
 }
@@ -854,13 +855,8 @@ WorldMap::update(float delta)
 
                   break;
                 case GameSession::ES_LEVEL_ABORT:
-                  // Reseting the player_status might be a worthy
-                  // consideration, but I don't think we need it
-                  // 'cause only the bad players will use it to
-                  // 'cheat' a few items and that isn't necesarry a
-                  // bad thing (ie. better they continue that way,
-                  // then stop playing the game all together since it
-                  // is to hard)
+                  /* Drop any held pad buttons so Abort does not re-enter. */
+                  touch_controls_reset();
                   break;
                 case GameSession::ES_GAME_OVER:
                   quit = true;
@@ -875,6 +871,7 @@ WorldMap::update(float delta)
               music_manager->play_music(song);
 #endif
               Menu::set_current(0);
+              touch_controls_reset();
               if (!savegame_file.empty())
                 savegame(savegame_file);
               return;

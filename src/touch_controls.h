@@ -40,6 +40,9 @@ void touch_controls_set_player(Player* p);
  *  0=left 1=right 2=up 3=down 4=jump 5=action 6=both(run+jump) */
 bool touch_controls_held(int dir);
 
+/** Edge-triggered: true once when dir becomes held. Updates prev_held. */
+bool touch_controls_just_pressed(int dir);
+
 /**
  * One-shot menu navigation from the pad (edge-triggered).
  * Returns true and fills *action if a press occurred this poll.

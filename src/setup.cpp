@@ -1243,6 +1243,12 @@ void st_sdl_init(void)
 #ifdef SDL_HINT_OPENGL_ES_DRIVER
   SDL_SetHint(SDL_HINT_OPENGL_ES_DRIVER, "1");
 #endif
+#ifdef __ANDROID__
+  /* Deliver KEYCODE_BACK as SDLK_AC_BACK instead of finishing the Activity. */
+#ifdef SDL_HINT_ANDROID_TRAP_BACK_BUTTON
+  SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
+#endif
+#endif
   if (verbose_mode)
     st_vlog("[init] GLES2: set X11_FORCE_EGL and OPENGL_ES_DRIVER hints\n");
 #endif

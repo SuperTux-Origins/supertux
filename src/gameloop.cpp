@@ -754,6 +754,7 @@ GameSession::process_menu()
               break;
             case MNID_ABORTLEVEL:
               st_pause_ticks_stop();
+              touch_controls_reset();
               exit_status = ES_LEVEL_ABORT;
               break;
             }

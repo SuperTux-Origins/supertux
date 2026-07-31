@@ -51,6 +51,9 @@ static TcButton tc_btn[TC_COUNT];
 static bool tc_inited_layout = false;
 static int tc_layout_ww = 0;
 static int tc_layout_wh = 0;
+/* Sticky Both: once a finger swipes Action→Both, stay on Both until the
+   finger moves well into the lower Action zone (hysteresis / Fitts). */
+static bool tc_sticky_both = false;
 
 /* Default content margins when the pad is enabled (fractions of window). */
 static const float TC_MARGIN_L = 0.11f;
@@ -102,35 +105,35 @@ tc_layout(void)
    * Finger motion already retargets held buttons, so sliding Action→Both
    * keeps run and adds jump without a second finger.
    */
-  int jump_s = bs + bs / 4;
-  int act_s  = bs;
-  int both_s = bs;
+  /* Action and Jump are the same size; Both is a tall column above Action. */
+  int face_s = bs;
   int face_gap = gap / 2;
   if (face_gap < 6) face_gap = 6;
 
-  tc_btn[TC_JUMP].w = jump_s;
-  tc_btn[TC_JUMP].h = jump_s;
-  tc_btn[TC_JUMP].x = ww - pad - jump_s;
-  tc_btn[TC_JUMP].y = wh - pad - jump_s;
+  tc_btn[TC_JUMP].w = face_s;
+  tc_btn[TC_JUMP].h = face_s;
+  tc_btn[TC_JUMP].x = ww - pad - face_s;
+  tc_btn[TC_JUMP].y = wh - pad - face_s;
 
-  tc_btn[TC_ACTION].w = act_s;
-  tc_btn[TC_ACTION].h = act_s;
-  tc_btn[TC_ACTION].x = ww - pad - jump_s - face_gap - act_s;
-  tc_btn[TC_ACTION].y = wh - pad - act_s;
+  tc_btn[TC_ACTION].w = face_s;
+  tc_btn[TC_ACTION].h = face_s;
+  tc_btn[TC_ACTION].x = ww - pad - face_s - face_gap - face_s;
+  tc_btn[TC_ACTION].y = wh - pad - face_s;
 
-  /* Both sits directly above Action so a vertical swipe reaches it. */
-  tc_btn[TC_BOTH].w = both_s;
-  tc_btn[TC_BOTH].h = both_s;
-  tc_btn[TC_BOTH].x = tc_btn[TC_ACTION].x + (act_s - both_s) / 2;
-  tc_btn[TC_BOTH].y = tc_btn[TC_ACTION].y - face_gap - both_s;
+  /* Tall Both: swipe up from Action. Height ~2.5× face so the target is easy
+     (Fitts). Drawn as a tall pill above Action; hit testing adds hysteresis. */
+  int both_h = face_s * 5 / 2;
+  if (both_h < face_s + face_gap) both_h = face_s + face_gap;
+  tc_btn[TC_BOTH].w = face_s;
+  tc_btn[TC_BOTH].h = both_h;
+  tc_btn[TC_BOTH].x = tc_btn[TC_ACTION].x;
+  tc_btn[TC_BOTH].y = tc_btn[TC_ACTION].y - face_gap - both_h;
 
-  /* Menu — top-left corner. */
-  int menu_s = bs * 2 / 3;
-  if (menu_s < 40) menu_s = 40;
+  /* Menu — top-left, same size as the face buttons. */
   tc_btn[TC_MENU].x = pad;
   tc_btn[TC_MENU].y = pad;
-  tc_btn[TC_MENU].w = menu_s;
-  tc_btn[TC_MENU].h = menu_s;
+  tc_btn[TC_MENU].w = face_s;
+  tc_btn[TC_MENU].h = face_s;
 
   if (!tc_inited_layout)
     {
@@ -185,10 +188,11 @@ void touch_controls_reset(void)
       tc_btn[i].prev_held = false;
       tc_btn[i].has_finger = false;
     }
+  tc_sticky_both = false;
 }
 
 static int
-tc_hit(int x, int y)
+tc_hit_raw(int x, int y)
 {
   for (int i = 0; i < TC_COUNT; ++i)
     {
@@ -197,6 +201,47 @@ tc_hit(int x, int y)
         return i;
     }
   return -1;
+}
+
+/* Hit-test with Action/Both hysteresis: once sticky, stay on Both until the
+   finger is clearly in the lower 2/3 of Action (or leaves the column). */
+static int
+tc_hit(int x, int y)
+{
+  const TcButton& act = tc_btn[TC_ACTION];
+  const TcButton& both = tc_btn[TC_BOTH];
+  bool in_col = (x >= act.x && x < act.x + act.w
+                 && y >= both.y && y < act.y + act.h);
+
+  if (in_col)
+    {
+      /* Boundary between Both and Action with hysteresis band. */
+      int enter_both_y = act.y;                 /* y < this → Both when not sticky */
+      int leave_both_y = act.y + (act.h * 2) / 3; /* y >= this → leave Both when sticky */
+
+      if (tc_sticky_both)
+        {
+          if (y >= leave_both_y)
+            tc_sticky_both = false;
+        }
+      else
+        {
+          if (y < enter_both_y)
+            tc_sticky_both = true;
+        }
+
+      if (tc_sticky_both || y < enter_both_y)
+        return TC_BOTH;
+      return TC_ACTION;
+    }
+
+  /* Outside the column: clear sticky so a new press starts fresh. */
+  if (!(x >= act.x && x < act.x + act.w))
+    tc_sticky_both = false;
+
+  int hit = tc_hit_raw(x, y);
+  /* Prefer Jump over Both if raw hit is Jump (non-overlapping). */
+  return hit;
 }
 
 /* Finger/window position in window pixels (not logical). */
@@ -271,11 +316,18 @@ tc_release_button(int i)
 static void
 tc_release_finger(TcFingerId finger)
 {
+  bool owned_face = false;
   for (int i = 0; i < TC_COUNT; ++i)
     {
       if (tc_btn[i].has_finger && tc_btn[i].finger == finger)
-        tc_release_button(i);
+        {
+          if (i == TC_ACTION || i == TC_BOTH)
+            owned_face = true;
+          tc_release_button(i);
+        }
     }
+  if (owned_face)
+    tc_sticky_both = false;
 }
 
 static void
@@ -565,6 +617,15 @@ bool touch_controls_held(int dir)
   if (!tc_enabled || dir < 0 || dir >= TC_COUNT)
     return false;
   return tc_btn[dir].held;
+}
+
+bool touch_controls_just_pressed(int dir)
+{
+  if (!tc_enabled || dir < 0 || dir >= TC_COUNT)
+    return false;
+  bool pressed = tc_btn[dir].held && !tc_btn[dir].prev_held;
+  tc_btn[dir].prev_held = tc_btn[dir].held;
+  return pressed;
 }
 
 bool touch_controls_menu_nav(int* action)
