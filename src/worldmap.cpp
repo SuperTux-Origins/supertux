@@ -651,18 +651,12 @@ WorldMap::get_input()
             on_escape_press();
           break;
         case SDL_JOYBUTTONUP:
+          /* Non-GP2X: directions come from axes only (see JOYAXISMOTION).
+             JoystickKeymap has no up/down/left/right_button outside GP2X. */
           if (event.jbutton.button == joystick_keymap.a_button)
             enter_level = true;
           else if (event.jbutton.button == joystick_keymap.start_button)
             on_escape_press();
-          else if (event.jbutton.button == joystick_keymap.up_button)
-            input_direction = D_NORTH;
-          else if (event.jbutton.button == joystick_keymap.down_button)
-            input_direction = D_SOUTH;
-          else if (event.jbutton.button == joystick_keymap.right_button)
-            input_direction = D_EAST;
-          else if (event.jbutton.button == joystick_keymap.left_button)
-            input_direction = D_WEST;
           break;
 #endif
 #endif
