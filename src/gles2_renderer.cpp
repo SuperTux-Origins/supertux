@@ -45,14 +45,18 @@ static GLuint compile_shader(GLenum type, const char* src)
     {
       char log[512];
       glGetShaderInfoLog(s, sizeof(log), NULL, log);
-      fprintf(stderr, "GLES2 shader compile error: %s\n", log);
+      fprintf(stderr, "GLES2 shader compile error (%s): %s\n",
+              type == GL_VERTEX_SHADER ? "vertex" : "fragment", log);
       glDeleteShader(s);
       return 0;
     }
   return s;
 }
 
-static const char* kVS =
+/* GLSL ES 1.00 (#version 100) — required by many GLES2 compilers; without
+   it Mesa reports "syntax error, unexpected NEW_IDENTIFIER" on attribute. */
+static const char* kVS_ES =
+  "#version 100\n"
   "attribute vec2 a_pos;\n"
   "attribute vec2 a_uv;\n"
   "attribute vec4 a_color;\n"
@@ -65,7 +69,8 @@ static const char* kVS =
   "  v_color = a_color;\n"
   "}\n";
 
-static const char* kFS =
+static const char* kFS_ES =
+  "#version 100\n"
   "precision mediump float;\n"
   "varying vec2 v_uv;\n"
   "varying vec4 v_color;\n"
@@ -75,6 +80,77 @@ static const char* kFS =
   "  vec4 t = texture2D(u_tex, v_uv);\n"
   "  gl_FragColor = mix(v_color, t * v_color, u_use_tex);\n"
   "}\n";
+
+/* Desktop GLSL 1.20 fallback if the context is not actually ES (some
+   drivers ignore PROFILE_ES and hand back a compatibility context). */
+static const char* kVS_GL =
+  "#version 120\n"
+  "attribute vec2 a_pos;\n"
+  "attribute vec2 a_uv;\n"
+  "attribute vec4 a_color;\n"
+  "uniform mat4 u_mvp;\n"
+  "varying vec2 v_uv;\n"
+  "varying vec4 v_color;\n"
+  "void main() {\n"
+  "  gl_Position = u_mvp * vec4(a_pos, 0.0, 1.0);\n"
+  "  v_uv = a_uv;\n"
+  "  v_color = a_color;\n"
+  "}\n";
+
+static const char* kFS_GL =
+  "#version 120\n"
+  "varying vec2 v_uv;\n"
+  "varying vec4 v_color;\n"
+  "uniform sampler2D u_tex;\n"
+  "uniform float u_use_tex;\n"
+  "void main() {\n"
+  "  vec4 t = texture2D(u_tex, v_uv);\n"
+  "  gl_FragColor = mix(v_color, t * v_color, u_use_tex);\n"
+  "}\n";
+
+static bool context_looks_like_gles(void)
+{
+  const char* ver = (const char*)glGetString(GL_VERSION);
+  if (!ver)
+    return false;
+  /* Typical strings: "OpenGL ES 2.0 ...", "OpenGL ES 3.1 ..." */
+  return strstr(ver, "OpenGL ES") != NULL || strstr(ver, "OpenGL-ES") != NULL;
+}
+
+static bool link_program(const char* vs_src, const char* fs_src)
+{
+  GLuint vs = compile_shader(GL_VERTEX_SHADER, vs_src);
+  GLuint fs = compile_shader(GL_FRAGMENT_SHADER, fs_src);
+  if (!vs || !fs)
+    {
+      if (vs) glDeleteShader(vs);
+      if (fs) glDeleteShader(fs);
+      return false;
+    }
+
+  g_program = glCreateProgram();
+  glAttachShader(g_program, vs);
+  glAttachShader(g_program, fs);
+  glBindAttribLocation(g_program, 0, "a_pos");
+  glBindAttribLocation(g_program, 1, "a_uv");
+  glBindAttribLocation(g_program, 2, "a_color");
+  glLinkProgram(g_program);
+  glDeleteShader(vs);
+  glDeleteShader(fs);
+
+  GLint linked = 0;
+  glGetProgramiv(g_program, GL_LINK_STATUS, &linked);
+  if (!linked)
+    {
+      char log[512];
+      glGetProgramInfoLog(g_program, sizeof(log), NULL, log);
+      fprintf(stderr, "GLES2 program link error: %s\n", log);
+      glDeleteProgram(g_program);
+      g_program = 0;
+      return false;
+    }
+  return true;
+}
 
 struct Vertex {
   float x, y;
@@ -130,34 +206,40 @@ bool gles2_renderer_init(void)
 {
   gles2_renderer_shutdown();
 
-  GLuint vs = compile_shader(GL_VERTEX_SHADER, kVS);
-  GLuint fs = compile_shader(GL_FRAGMENT_SHADER, kFS);
-  if (!vs || !fs)
+  const char* gl_ver = (const char*)glGetString(GL_VERSION);
+  const char* gl_ren = (const char*)glGetString(GL_RENDERER);
+  const bool is_es = context_looks_like_gles();
+
+  if (verbose_mode)
     {
-      if (vs) glDeleteShader(vs);
-      if (fs) glDeleteShader(fs);
-      return false;
+      fprintf(stderr, "[video] GL context for shaders: ES=%s\n", is_es ? "yes" : "no");
+      fprintf(stderr, "[video]   GL_VERSION=%s\n", gl_ver ? gl_ver : "(null)");
+      fprintf(stderr, "[video]   GL_RENDERER=%s\n", gl_ren ? gl_ren : "(null)");
     }
 
-  g_program = glCreateProgram();
-  glAttachShader(g_program, vs);
-  glAttachShader(g_program, fs);
-  glBindAttribLocation(g_program, 0, "a_pos");
-  glBindAttribLocation(g_program, 1, "a_uv");
-  glBindAttribLocation(g_program, 2, "a_color");
-  glLinkProgram(g_program);
-  glDeleteShader(vs);
-  glDeleteShader(fs);
-
-  GLint linked = 0;
-  glGetProgramiv(g_program, GL_LINK_STATUS, &linked);
-  if (!linked)
+  /* Prefer ES 1.00 sources on an ES context; fall back to GLSL 1.20 if the
+     driver handed us a desktop compatibility context despite PROFILE_ES. */
+  bool ok = false;
+  if (is_es)
     {
-      char log[512];
-      glGetProgramInfoLog(g_program, sizeof(log), NULL, log);
-      fprintf(stderr, "GLES2 program link error: %s\n", log);
-      glDeleteProgram(g_program);
-      g_program = 0;
+      ok = link_program(kVS_ES, kFS_ES);
+      if (!ok)
+        fprintf(stderr, "Warning: GLSL ES 1.00 shaders failed; trying GLSL 1.20\n");
+    }
+  if (!ok)
+    ok = link_program(kVS_GL, kFS_GL);
+  if (!ok && !is_es)
+    {
+      /* Last resort: ES sources on a non-ES context (some EGL stacks). */
+      ok = link_program(kVS_ES, kFS_ES);
+    }
+  if (!ok)
+    {
+      fprintf(stderr,
+              "Error: could not compile/link shader program for GLES2 path\n"
+              "  GL_VERSION=%s\n  GL_RENDERER=%s\n",
+              gl_ver ? gl_ver : "(null)",
+              gl_ren ? gl_ren : "(null)");
       return false;
     }
 

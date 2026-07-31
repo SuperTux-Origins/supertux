@@ -208,6 +208,18 @@ bool platform_video_init(bool fullscreen, bool opengl)
 
   platform_video_shutdown();
 
+#ifdef USE_GLES2
+  /* X11's default GLX path often cannot create a real ES context; force EGL
+     so PROFILE_ES is honored (Mesa). Harmless on Wayland/Android. */
+#ifdef SDL_HINT_VIDEO_X11_FORCE_EGL
+  SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
+#endif
+#ifdef SDL_HINT_OPENGL_ES_DRIVER
+  /* Prefer a native GLES library when SDL has a choice. */
+  SDL_SetHint(SDL_HINT_OPENGL_ES_DRIVER, "1");
+#endif
+#endif
+
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
       fprintf(stderr, "Error: SDL_InitSubSystem(VIDEO): %s\n", SDL_GetError());

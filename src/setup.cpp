@@ -1289,6 +1289,19 @@ void st_joystick_setup(void)
 
 void st_sdl_init(void)
 {
+#ifdef USE_GLES2
+  /* Must be set before the first video init: X11/GLX cannot create ES
+     contexts; EGL can. Also prefer a native GLES driver when available. */
+#ifdef SDL_HINT_VIDEO_X11_FORCE_EGL
+  SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
+#endif
+#ifdef SDL_HINT_OPENGL_ES_DRIVER
+  SDL_SetHint(SDL_HINT_OPENGL_ES_DRIVER, "1");
+#endif
+  if (verbose_mode)
+    fprintf(stderr, "[init] GLES2: set X11_FORCE_EGL and OPENGL_ES_DRIVER hints\n");
+#endif
+
   if (verbose_mode)
     fprintf(stderr, "[init] SDL_Init(VIDEO|TIMER)...\n");
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
