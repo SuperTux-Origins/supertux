@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <iostream>
 #include <algorithm>
+#include <string.h>
 #include "platform_config.h"
 #include "SDL_image.h"
 #include "texture.h"
@@ -542,6 +543,39 @@ SurfaceOpenGL::create_gl(SDL_Surface * surf, GLuint * tex)
     SDL_SetAlpha(surf, saved_flags, saved_alpha);
   }
 
+  /*
+   * POT textures are larger than the image: the gutter is left cleared
+   * (transparent black). With GL_LINEAR, UVs at the image edge (u=w/pw)
+   * bilinear-sample into that gutter and pick up a dark fringe. That shows
+   * up as a 1px seam when the same image is drawn edge-to-edge (parallax
+   * background). Tiles rarely do that, so they looked fine.
+   *
+   * Replicate the edge texels into the padding so LINEAR bleeds into the
+   * same colour instead of black. Not a texture atlas issue and not the
+   * old +0.375 hack — just filter support for clamped sub-rect UVs.
+   */
+  if (conv->format->BytesPerPixel == 4)
+    {
+      const int sw = surf->w;
+      const int sh = surf->h;
+      const int bpp = 4;
+      Uint8* pixels = (Uint8*)conv->pixels;
+
+      for (int y = 0; y < sh; ++y)
+        {
+          Uint8* row = pixels + y * conv->pitch;
+          Uint8* edge = row + (sw - 1) * bpp;
+          for (int x = sw; x < w; ++x)
+            memcpy(row + x * bpp, edge, bpp);
+        }
+      if (sh > 0 && h > sh)
+        {
+          Uint8* last = pixels + (sh - 1) * conv->pitch;
+          for (int y = sh; y < h; ++y)
+            memcpy(pixels + y * conv->pitch, last, (size_t)w * bpp);
+        }
+    }
+
   glGenTextures(1, tex);
   glBindTexture(GL_TEXTURE_2D, *tex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -567,9 +601,12 @@ SurfaceOpenGL::draw(float x, float y, Uint8 alpha, bool update)
 {
   float pw = (float)power_of_two(w);
   float ph = (float)power_of_two(h);
+  /* Snap to integer pixels so adjacent tiles share an exact edge. */
+  int ix = (int)x;
+  int iy = (int)y;
 
 #ifdef USE_GLES2
-  gles2_draw_textured_quad(gl_texture, x, y, (float)w, (float)h,
+  gles2_draw_textured_quad(gl_texture, (float)ix, (float)iy, (float)w, (float)h,
                            0.0f, 0.0f, (float)w / pw, (float)h / ph,
                            alpha, alpha, alpha, alpha);
 #else
@@ -583,12 +620,13 @@ SurfaceOpenGL::draw(float x, float y, Uint8 alpha, bool update)
 
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0);
-  glVertex2f(x, y);
+  glVertex2i(ix, iy);
   glTexCoord2f((float)w / pw, 0);
-  glVertex2f((float)w+x, y);
-  glTexCoord2f((float)w / pw, (float)h / ph);  glVertex2f((float)w+x, (float)h+y);
+  glVertex2i(ix + w, iy);
+  glTexCoord2f((float)w / pw, (float)h / ph);
+  glVertex2i(ix + w, iy + h);
   glTexCoord2f(0, (float)h / ph);
-  glVertex2f(x, (float)h+y);
+  glVertex2i(ix, iy + h);
   glEnd();
 
   glDisable(GL_TEXTURE_2D);
@@ -640,10 +678,21 @@ SurfaceOpenGL::draw_part(float sx, float sy, float x, float y, float w, float h,
 {
   float pw = (float)power_of_two(int(this->w));
   float ph = (float)power_of_two(int(this->h));
+  /* Integer geometry + UV: (float)(sx+w) vs (float)sx+(float)w can differ. */
+  int isx = (int)sx;
+  int isy = (int)sy;
+  int ix  = (int)x;
+  int iy  = (int)y;
+  int iw  = (int)w;
+  int ih  = (int)h;
+  float u0 = (float)isx / pw;
+  float v0 = (float)isy / ph;
+  float u1 = (float)(isx + iw) / pw;
+  float v1 = (float)(isy + ih) / ph;
 
 #ifdef USE_GLES2
-  gles2_draw_textured_quad(gl_texture, x, y, w, h,
-                           sx / pw, sy / ph, (sx + w) / pw, (sy + h) / ph,
+  gles2_draw_textured_quad(gl_texture, (float)ix, (float)iy, (float)iw, (float)ih,
+                           u0, v0, u1, v1,
                            alpha, alpha, alpha, alpha);
 #else
   glBindTexture(GL_TEXTURE_2D, gl_texture);
@@ -655,16 +704,15 @@ SurfaceOpenGL::draw_part(float sx, float sy, float x, float y, float w, float h,
 
   glEnable(GL_TEXTURE_2D);
 
-
   glBegin(GL_QUADS);
-  glTexCoord2f(sx / pw, sy / ph);
-  glVertex2f(x, y);
-  glTexCoord2f((float)(sx + w) / pw, sy / ph);
-  glVertex2f(w+x, y);
-  glTexCoord2f((sx+w) / pw, (sy+h) / ph);
-  glVertex2f(w +x, h+y);
-  glTexCoord2f(sx / pw, (float)(sy+h) / ph);
-  glVertex2f(x, h+y);
+  glTexCoord2f(u0, v0);
+  glVertex2i(ix, iy);
+  glTexCoord2f(u1, v0);
+  glVertex2i(ix + iw, iy);
+  glTexCoord2f(u1, v1);
+  glVertex2i(ix + iw, iy + ih);
+  glTexCoord2f(u0, v1);
+  glVertex2i(ix, iy + ih);
   glEnd();
 
   glDisable(GL_TEXTURE_2D);

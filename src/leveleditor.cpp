@@ -909,17 +909,24 @@ void le_drawinterface()
 
 void le_drawlevel()
 {
-  unsigned int y,x,s;
+  unsigned int y,x;
   Uint8 a;
 
-  /* Draw the real background */
+  /* Full background at integer offsets (same as World::draw). */
   if(le_world->get_level()->bkgd_image[0] != '\0')
   {
-    s = (int)((float)pos_x * ((float)le_world->get_level()->bkgd_speed/100.0f)) % screen->w;
-    le_world->get_level()->img_bkgd->draw_part(s,0,0,0,
-        le_world->get_level()->img_bkgd->w - s - 32, le_world->get_level()->img_bkgd->h);
-    le_world->get_level()->img_bkgd->draw_part(0,0,screen->w - s - 32 ,0,s,
-        le_world->get_level()->img_bkgd->h);
+    int bw = le_world->get_level()->img_bkgd->w;
+    if (bw < 1)
+      bw = screen->w;
+    int speed = le_world->get_level()->bkgd_speed;
+    int s = speed ? ((int)(pos_x * speed / 100) % bw) : 0;
+    if (s < 0)
+      s += bw;
+    int x0 = -s;
+    int x1 = x0 + bw;
+    le_world->get_level()->img_bkgd->draw((float)x0, 0);
+    if (s != 0)
+      le_world->get_level()->img_bkgd->draw((float)x1, 0);
   }
   else
   {

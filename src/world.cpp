@@ -183,12 +183,26 @@ World::draw()
 {
   int y,x;
 
-  /* Draw the real background */
+  /* Draw the real background — full image(s) at integer offsets so the
+     shared edge is exact (no float x+w drift). */
   if(level->img_bkgd)
     {
-      int s = (int)((float)scroll_x * ((float)level->bkgd_speed/100.0f)) % screen->w;
-      level->img_bkgd->draw_part(s, 0,0,0,level->img_bkgd->w - s, level->img_bkgd->h);
-      level->img_bkgd->draw_part(0, 0,screen->w - s ,0,s,level->img_bkgd->h);
+      int bw = level->img_bkgd->w;
+      if (bw < 1)
+        bw = screen->w;
+      int s = 0;
+      if (level->bkgd_speed)
+        {
+          /* Integer parallax; avoid float cast chain for the modulo. */
+          s = (int)(scroll_x * level->bkgd_speed / 100) % bw;
+        }
+      if (s < 0)
+        s += bw;
+      int x0 = -s;
+      int x1 = x0 + bw;
+      level->img_bkgd->draw((float)x0, 0);
+      if (s != 0)
+        level->img_bkgd->draw((float)x1, 0);
     }
   else
     {
