@@ -58,7 +58,8 @@ bool platform_video_init(bool fullscreen, bool opengl)
           glClearColor(0.f, 0.f, 0.f, 1.f);
           glClear(GL_COLOR_BUFFER_BIT);
           SDL_GL_SwapBuffers();
-          VLOG("[video] OpenGL ready %dx%d\n", screen->w, screen->h);
+          VLOG("[video] OpenGL ready %dx%d — render path: OpenGL (desktop)\n",
+               screen->w, screen->h);
           return true;
         }
 
@@ -87,7 +88,8 @@ bool platform_video_init(bool fullscreen, bool opengl)
       }
     SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
     SDL_Flip(screen);
-    VLOG("[video] software ready %dx%d\n", screen->w, screen->h);
+    VLOG("[video] software ready %dx%d — render path: software SDL surface\n",
+         screen->w, screen->h);
   }
 
   return true;

@@ -4,6 +4,7 @@
 
 #include "gles2_renderer.h"
 #include "platform.h"
+#include "globals.h"
 #include <cstdio>
 #include <cstring>
 #include <cmath>
@@ -169,7 +170,8 @@ bool gles2_renderer_init(void)
 
   mat4_ortho(g_mvp, 0.0f, (float)ST_SCREEN_W, (float)ST_SCREEN_H, 0.0f);
   g_ready = true;
-  fprintf(stderr, "[video] GLES2 renderer ready\n");
+  if (verbose_mode)
+    fprintf(stderr, "[video] GLES2 renderer ready (shader textured/solid quads)\n");
   return true;
 }
 

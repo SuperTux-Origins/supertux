@@ -35,7 +35,7 @@
 #include <android/log.h>
 #endif
 #ifndef NOOPENGL
-#include <SDL_opengl.h>
+#include "gl_compat.h"
 #endif
 
 #include <sys/stat.h>
@@ -1053,6 +1053,141 @@ void st_video_setup(void)
 #endif
 }
 
+void st_print_init_status(void)
+{
+  if (!verbose_mode)
+    return;
+
+  fprintf(stderr, "\n");
+  fprintf(stderr, "========== SuperTux Milestone 1 init status ==========\n");
+  fprintf(stderr, "  version      %s\n", VERSION);
+  fprintf(stderr, "  platform     %s\n", platform_name());
+  fprintf(stderr, "  datadir      %s\n", datadir.c_str());
+  fprintf(stderr, "  config dir   %s\n", st_dir ? st_dir : "(null)");
+  fprintf(stderr, "  save dir     %s\n", st_save_dir ? st_save_dir : "(null)");
+  fprintf(stderr, "------------------------------------------------------\n");
+
+  /* --- Render path (the important one) --- */
+  fprintf(stderr, "  RENDER PATH  ");
+  if (use_gl)
+    {
+#ifdef USE_GLES2
+      fprintf(stderr, "OpenGL ES 2.0 (shader quads)\n");
+#elif defined(NOOPENGL)
+      fprintf(stderr, "software (compiled without OpenGL, use_gl was set?)\n");
+#else
+      fprintf(stderr, "OpenGL (desktop immediate-mode)\n");
+#endif
+#ifndef NOOPENGL
+      {
+        const char* gl_ver = (const char*)glGetString(GL_VERSION);
+        const char* gl_ren = (const char*)glGetString(GL_RENDERER);
+        const char* gl_ven = (const char*)glGetString(GL_VENDOR);
+        fprintf(stderr, "    GL_VERSION  %s\n", gl_ver ? gl_ver : "(null)");
+        fprintf(stderr, "    GL_RENDERER %s\n", gl_ren ? gl_ren : "(null)");
+        fprintf(stderr, "    GL_VENDOR   %s\n", gl_ven ? gl_ven : "(null)");
+      }
+#endif
+    }
+  else
+    {
+#ifdef NOOPENGL
+      fprintf(stderr, "software SDL surface (OpenGL not compiled in)\n");
+#else
+#ifdef USE_GLES2
+      fprintf(stderr, "software SDL surface (GLES2 requested but not active)\n");
+#else
+      fprintf(stderr, "software SDL surface\n");
+#endif
+#endif
+    }
+
+  fprintf(stderr, "    display    %dx%d  fullscreen=%s\n",
+          screen ? screen->w : 0, screen ? screen->h : 0,
+          use_fullscreen ? "yes" : "no");
+  fprintf(stderr, "    SDL video  %s\n",
+          SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)");
+
+  /* Compile-time feature flags */
+  fprintf(stderr, "------------------------------------------------------\n");
+  fprintf(stderr, "  features (compile-time)\n");
+#ifdef USE_SDL2
+  fprintf(stderr, "    SDL2            built-in\n");
+#else
+  fprintf(stderr, "    SDL 1.2         built-in\n");
+#endif
+#ifdef NOOPENGL
+  fprintf(stderr, "    OpenGL          not compiled (NOOPENGL)\n");
+#else
+#ifdef USE_GLES2
+  fprintf(stderr, "    OpenGL ES 2.0   built-in (USE_GLES2)\n");
+#else
+  fprintf(stderr, "    OpenGL desktop  built-in (immediate-mode)\n");
+#endif
+#endif
+#ifdef NOSOUND
+  fprintf(stderr, "    audio           not compiled (NOSOUND)\n");
+#else
+  fprintf(stderr, "    audio           built-in (SDL_mixer)\n");
+#endif
+#ifdef DEBUG
+  fprintf(stderr, "    DEBUG           on\n");
+#else
+  fprintf(stderr, "    DEBUG           off\n");
+#endif
+
+  /* Runtime subsystems */
+  fprintf(stderr, "------------------------------------------------------\n");
+  fprintf(stderr, "  subsystems (runtime)\n");
+
+#ifdef NOSOUND
+  fprintf(stderr, "    audio device    skipped (NOSOUND)\n");
+  fprintf(stderr, "    sound effects   skipped (NOSOUND)\n");
+  fprintf(stderr, "    music           skipped (NOSOUND)\n");
+#else
+  if (!audio_device)
+    fprintf(stderr, "    audio device    skipped (unavailable or open failed)\n");
+  else
+    fprintf(stderr, "    audio device    initialized\n");
+
+  if (!audio_device)
+    {
+      fprintf(stderr, "    sound effects   skipped (no audio device)\n");
+      fprintf(stderr, "    music           skipped (no audio device)\n");
+    }
+  else
+    {
+      fprintf(stderr, "    sound effects   %s\n",
+              use_sound ? "enabled" : "disabled (--disable-sound or menu)");
+      fprintf(stderr, "    music           %s\n",
+              use_music ? "enabled" : "disabled (--disable-music or menu)");
+    }
+#endif
+
+  if (use_joystick)
+    {
+      const char* name = NULL;
+#ifndef USE_SDL2
+      name = SDL_JoystickName(joystick_num);
+#else
+      if (js)
+        name = SDL_JoystickName(js);
+#endif
+      fprintf(stderr, "    joystick        initialized (index %d%s%s%s)\n",
+              joystick_num,
+              name ? ", \"" : "",
+              name ? name : "",
+              name ? "\"" : "");
+    }
+  else
+    {
+      fprintf(stderr, "    joystick        skipped (none available or open failed)\n");
+    }
+
+  fprintf(stderr, "    keyboard        active\n");
+  fprintf(stderr, "======================================================\n\n");
+}
+
 void st_video_setup_sdl(void)
 {
   /* Kept for menu toggles that re-init software mode */
@@ -1092,7 +1227,10 @@ void st_joystick_setup(void)
       /* Open joystick: */
       if (SDL_NumJoysticks() <= 0)
         {
-          fprintf(stderr, "Warning: No joysticks are available.\n");
+          if (verbose_mode)
+            fprintf(stderr, "[joy] no joysticks available — skipping\n");
+          else
+            fprintf(stderr, "Warning: No joysticks are available.\n");
 
           use_joystick = false;
         }
@@ -1128,6 +1266,20 @@ void st_joystick_setup(void)
 
                       use_joystick = false;
                     }
+                  else if (verbose_mode)
+                    {
+#ifdef USE_SDL2
+                      const char* jname = SDL_JoystickName(js);
+#else
+                      const char* jname = SDL_JoystickName(joystick_num);
+#endif
+                      fprintf(stderr,
+                              "[joy] opened index %d \"%s\" (%d axes, %d buttons)\n",
+                              joystick_num,
+                              jname ? jname : "(unnamed)",
+                              SDL_JoystickNumAxes(js),
+                              SDL_JoystickNumButtons(js));
+                    }
                 }
             }
 #endif
@@ -1137,22 +1289,52 @@ void st_joystick_setup(void)
 
 void st_sdl_init(void)
 {
+  if (verbose_mode)
+    fprintf(stderr, "[init] SDL_Init(VIDEO|TIMER)...\n");
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
     {
       SDL_Log("FATAL: SDL_Init failed: %s", SDL_GetError());
       fprintf(stderr, "\nError: SDL_Init failed:\n%s\n\n", SDL_GetError());
       exit(1);
     }
+  if (verbose_mode)
+    {
+#ifdef USE_SDL2
+      SDL_version linked;
+      SDL_GetVersion(&linked);
+      fprintf(stderr,
+              "[init] SDL_Init ok (headers %d.%d.%d, linked %d.%d.%d)\n",
+              SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL,
+              linked.major, linked.minor, linked.patch);
+#else
+      const SDL_version* linked = SDL_Linked_Version();
+      fprintf(stderr,
+              "[init] SDL_Init ok (headers %d.%d.%d, linked %d.%d.%d)\n",
+              SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL,
+              linked->major, linked->minor, linked->patch);
+#endif
+    }
 }
 
 void st_audio_setup(void)
 {
-#ifndef NOSOUND
+#ifdef NOSOUND
+  if (verbose_mode)
+    fprintf(stderr, "[audio] skipped (compiled with NOSOUND)\n");
+  return;
+#else
 
   /* Init SDL Audio silently even if --disable-sound : */
 
-  if (audio_device)
+  if (!audio_device)
     {
+      if (verbose_mode)
+        fprintf(stderr, "[audio] device open skipped (--disable-sound or prior failure)\n");
+    }
+  else if (audio_device)
+    {
+      if (verbose_mode)
+        fprintf(stderr, "[audio] SDL_InitSubSystem(AUDIO)...\n");
       if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
         {
           /* only print out message if sound or music
@@ -1172,6 +1354,12 @@ void st_audio_setup(void)
           use_sound = false;
           use_music = false;
           audio_device = false;
+        }
+      else if (verbose_mode)
+        {
+          fprintf(stderr, "[audio] subsystem ready (SFX %s, music %s)\n",
+                  use_sound ? "on" : "off",
+                  use_music ? "on" : "off");
         }
     }
 
@@ -1204,6 +1392,10 @@ void st_audio_setup(void)
           use_sound = false;
           use_music = false;
           audio_device = false;
+        }
+      else if (verbose_mode)
+        {
+          fprintf(stderr, "[audio] Mix_OpenAudio ok (44100 Hz)\n");
         }
     }
 
@@ -1384,6 +1576,8 @@ void parseargs(int argc, char * argv[])
                || strcmp(argv[i], "-v") == 0)
         {
           verbose_mode = true;
+          fprintf(stderr,
+                  "[verbose] enabled — will report render path and subsystem status\n");
         }
       else if (strcmp(argv[i], "--usage") == 0)
         {
@@ -1429,7 +1623,8 @@ void parseargs(int argc, char * argv[])
                "  -gl, --opengl       If opengl support was compiled in, this will enable\n"
                "                      the OpenGL mode.\n"
                "  --sdl               Use non-opengl renderer\n"
-               "  -v, --verbose       Log video/window setup details\n"
+               "  -v, --verbose       Log render path, video setup, and which\n"
+               "                      subsystems were initialized or skipped\n"
                "\n"
                "Sound Options:\n"
                "  --disable-sound     If sound support was compiled in,  this will\n"

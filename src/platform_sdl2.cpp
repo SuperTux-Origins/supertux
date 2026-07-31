@@ -158,21 +158,47 @@ log_window(const char* where)
 {
   if (!verbose_mode)
     return;
-  fprintf(stderr, "[video] %s: window=%p glctx=%p screen=%p use_gl=%d fullscreen=%d\n",
-          where, (void*)st_window, (void*)st_gl_context, (void*)screen,
-          (int)use_gl, (int)use_fullscreen);
+
+  const char* path = "software";
+  if (use_gl)
+    {
+#ifdef USE_GLES2
+      path = "OpenGL ES 2.0";
+#else
+      path = "OpenGL (desktop)";
+#endif
+    }
+
+  fprintf(stderr, "[video] %s — render path: %s\n", where, path);
+  fprintf(stderr, "[video]   window=%p glctx=%p screen=%p fullscreen=%s\n",
+          (void*)st_window, (void*)st_gl_context, (void*)screen,
+          use_fullscreen ? "yes" : "no");
   if (st_window)
     {
       int x = 0, y = 0, w = 0, h = 0;
+      int dw = 0, dh = 0;
       Uint32 flags = SDL_GetWindowFlags(st_window);
       SDL_GetWindowPosition(st_window, &x, &y);
       SDL_GetWindowSize(st_window, &w, &h);
-      fprintf(stderr, "[video]   id=%u flags=0x%x pos=%d,%d size=%dx%d title=\"%s\"\n",
+      SDL_GL_GetDrawableSize(st_window, &dw, &dh);
+      fprintf(stderr, "[video]   id=%u flags=0x%x pos=%d,%d size=%dx%d",
               (unsigned)SDL_GetWindowID(st_window), (unsigned)flags,
-              x, y, w, h, SDL_GetWindowTitle(st_window));
+              x, y, w, h);
+      if (dw > 0 && dh > 0 && (dw != w || dh != h))
+        fprintf(stderr, " drawable=%dx%d", dw, dh);
+      fprintf(stderr, " title=\"%s\"\n", SDL_GetWindowTitle(st_window));
     }
   fprintf(stderr, "[video]   driver=%s\n",
           SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)");
+#ifndef NOOPENGL
+  if (use_gl && st_gl_context)
+    {
+      const char* gl_ver = (const char*)glGetString(GL_VERSION);
+      const char* gl_ren = (const char*)glGetString(GL_RENDERER);
+      fprintf(stderr, "[video]   GL_VERSION=%s\n", gl_ver ? gl_ver : "(null)");
+      fprintf(stderr, "[video]   GL_RENDERER=%s\n", gl_ren ? gl_ren : "(null)");
+    }
+#endif
 }
 
 bool platform_video_init(bool fullscreen, bool opengl)

@@ -45,6 +45,8 @@ void st_joystick_setup(void);
 void st_shutdown(void);
 void st_menu(void);
 void st_abort(const std::string& reason, const std::string& details);
+/** When --verbose: print render path and subsystem init/skip summary to stderr. */
+void st_print_init_status(void);
 void process_options_menu(void);
 
 /** Return true if the gameloop() was entered, false otherwise */

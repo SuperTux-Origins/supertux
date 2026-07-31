@@ -50,6 +50,7 @@ int main(int argc, char * argv[])
   st_audio_setup();
   st_joystick_setup();
   st_general_setup();
+  st_print_init_status();
   st_menu();
   loadshared();
 
