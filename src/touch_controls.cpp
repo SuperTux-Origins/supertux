@@ -57,41 +57,47 @@ tc_layout(void)
   tc_layout_ww = ww;
   tc_layout_wh = wh;
 
-  /* Button size scales with the shorter window side. */
-  int unit = wh < ww ? wh / 12 : ww / 12;
-  if (unit < 36) unit = 36;
-  if (unit > 96) unit = 96;
-  int gap = unit / 8;
+  /*
+   * Comfortable cross layout near the corners — not packed into a tight
+   * cluster. Sizes scale with the window; spacing stays proportional so
+   * the pad feels like the old on-screen layout.
+   */
+  int bs = wh < ww ? wh / 9 : ww / 10;   /* face-button size */
+  if (bs < 48) bs = 48;
+  if (bs > 88) bs = 88;
+  int gap = bs / 3;                       /* open space between arms */
+  int pad = bs / 4;                       /* inset from screen edge */
+  if (pad < 12) pad = 12;
 
-  /* D-pad in bottom-left margin (window space). */
-  int dpad_cx = unit + gap;
-  int dpad_cy = wh - unit - gap;
-  tc_btn[TC_LEFT].x  = dpad_cx - unit - gap; tc_btn[TC_LEFT].y  = dpad_cy - unit / 2;
-  tc_btn[TC_LEFT].w  = unit;                 tc_btn[TC_LEFT].h  = unit;
-  tc_btn[TC_RIGHT].x = dpad_cx + gap;        tc_btn[TC_RIGHT].y = dpad_cy - unit / 2;
-  tc_btn[TC_RIGHT].w = unit;                 tc_btn[TC_RIGHT].h = unit;
-  tc_btn[TC_UP].x    = dpad_cx - unit / 2;   tc_btn[TC_UP].y    = dpad_cy - unit - gap;
-  tc_btn[TC_UP].w    = unit;                 tc_btn[TC_UP].h    = unit;
-  tc_btn[TC_DOWN].x  = dpad_cx - unit / 2;   tc_btn[TC_DOWN].y  = dpad_cy + gap;
-  tc_btn[TC_DOWN].w  = unit;                 tc_btn[TC_DOWN].h  = unit;
+  /* D-pad: bottom-left corner, classic + shape with room between keys. */
+  int dpad_cx = pad + bs + gap / 2 + bs / 2;
+  int dpad_cy = wh - pad - bs - gap / 2 - bs / 2;
+  tc_btn[TC_LEFT].x  = dpad_cx - bs - gap;  tc_btn[TC_LEFT].y  = dpad_cy - bs / 2;
+  tc_btn[TC_LEFT].w  = bs;                  tc_btn[TC_LEFT].h  = bs;
+  tc_btn[TC_RIGHT].x = dpad_cx + gap;       tc_btn[TC_RIGHT].y = dpad_cy - bs / 2;
+  tc_btn[TC_RIGHT].w = bs;                  tc_btn[TC_RIGHT].h = bs;
+  tc_btn[TC_UP].x    = dpad_cx - bs / 2;    tc_btn[TC_UP].y    = dpad_cy - bs - gap;
+  tc_btn[TC_UP].w    = bs;                  tc_btn[TC_UP].h    = bs;
+  tc_btn[TC_DOWN].x  = dpad_cx - bs / 2;    tc_btn[TC_DOWN].y  = dpad_cy + gap;
+  tc_btn[TC_DOWN].w  = bs;                  tc_btn[TC_DOWN].h  = bs;
 
-  /* Jump / Action in bottom-right margin. */
-  int jump_s = unit + unit / 4;
-  int act_s  = unit;
-  tc_btn[TC_JUMP].x   = ww - jump_s - gap * 2;
-  tc_btn[TC_JUMP].y   = wh - jump_s - gap * 2;
+  /* Jump (larger) and Action — bottom-right, separated, not stacked tight. */
+  int jump_s = bs + bs / 5;
+  int act_s  = bs;
+  tc_btn[TC_JUMP].x   = ww - pad - jump_s;
+  tc_btn[TC_JUMP].y   = wh - pad - jump_s;
   tc_btn[TC_JUMP].w   = jump_s;
   tc_btn[TC_JUMP].h   = jump_s;
-  tc_btn[TC_ACTION].x = ww - jump_s - act_s - gap * 4;
-  tc_btn[TC_ACTION].y = wh - act_s - gap * 2;
+  tc_btn[TC_ACTION].x = ww - pad - jump_s - gap - act_s;
+  tc_btn[TC_ACTION].y = wh - pad - act_s - gap;
   tc_btn[TC_ACTION].w = act_s;
   tc_btn[TC_ACTION].h = act_s;
 
-  /* Menu — top-left corner of the window. */
-  int menu_s = unit * 3 / 4;
+  /* Menu — top-left corner. */
+  int menu_s = bs * 2 / 3;
   if (menu_s < 40) menu_s = 40;
-  tc_btn[TC_MENU].x = gap;
-  tc_btn[TC_MENU].y = gap;
+  tc_btn[TC_MENU].x = pad;
+  tc_btn[TC_MENU].y = pad;
   tc_btn[TC_MENU].w = menu_s;
   tc_btn[TC_MENU].h = menu_s;
 

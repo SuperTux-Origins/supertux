@@ -259,11 +259,16 @@ gl_setup_viewport(void)
 
   st_update_letterbox(ww, wh);
 
+  /* st_lb_oy is top-down (SDL); glViewport Y is bottom-up. With asymmetric
+     touch margins the two differ — using top-down Y parks the game too low. */
+  int gl_oy = wh - st_lb_oy - st_lb_dh;
+  if (gl_oy < 0)
+    gl_oy = 0;
+
 #ifdef USE_GLES2
-  /* Single source of truth: platform letterbox (includes touch margins). */
-  gles2_renderer_set_viewport_rect(st_lb_ox, st_lb_oy, st_lb_dw, st_lb_dh);
+  gles2_renderer_set_viewport_rect(st_lb_ox, gl_oy, st_lb_dw, st_lb_dh);
 #else
-  glViewport(st_lb_ox, st_lb_oy, st_lb_dw, st_lb_dh);
+  glViewport(st_lb_ox, gl_oy, st_lb_dw, st_lb_dh);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
