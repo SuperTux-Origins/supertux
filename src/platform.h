@@ -52,4 +52,7 @@ void platform_window_to_logical(int* x, int* y);
 /** SDL_GetMouseState then map into logical coordinates. */
 Uint32 platform_get_mouse_state(int* x, int* y);
 
+/** Current window size in pixels (for finger→logical mapping). */
+void platform_get_window_size(int* w, int* h);
+
 #endif /* SUPERTUX_PLATFORM_H */

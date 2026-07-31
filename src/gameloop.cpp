@@ -43,6 +43,7 @@
 #include "setup.h"
 #include "high_scores.h"
 #include "menu.h"
+#include "touch_controls.h"
 #include "badguy.h"
 #include "world.h"
 #include "special.h"
@@ -249,15 +250,8 @@ GameSession::process_events()
             case SDL_KEYDOWN:     /* A keypress! */
               {
                 SDLKey key = event.key.keysym.sym;
-           
-                switch(key)
-                  {
-                  case SDLK_ESCAPE:    /* Escape: Open/Close the menu: */
-                    on_escape_press();
-                    break;
-                  default:
-                    break;
-                  }
+                if (st_is_escape_key(key))
+                  on_escape_press();
               }
               break;
 
@@ -276,10 +270,28 @@ GameSession::process_events()
       SDL_Event event;
       while (SDL_PollEvent(&event))
         {
+          if (touch_controls_event(event))
+            continue;
+
           /* Check for menu-events, if the menu is shown */
           if (Menu::current())
             {
               Menu::current()->event(event);
+              {
+                int tact = 0;
+                if (touch_controls_menu_nav(&tact))
+                  {
+                    SDL_Event syn;
+                    memset(&syn, 0, sizeof(syn));
+                    syn.type = SDL_KEYDOWN;
+                    if (tact == 0) syn.key.keysym.sym = SDLK_UP;
+                    else if (tact == 1) syn.key.keysym.sym = SDLK_DOWN;
+                    else if (tact == 2) syn.key.keysym.sym = SDLK_LEFT;
+                    else if (tact == 3) syn.key.keysym.sym = SDLK_RIGHT;
+                    else syn.key.keysym.sym = SDLK_RETURN;
+                    Menu::current()->event(syn);
+                  }
+              }
 	      if(!Menu::current())
 	      st_pause_ticks_stop();
 
@@ -292,6 +304,7 @@ GameSession::process_events()
             tux.key_event((SDLKey)keymap.left, UP);
             tux.key_event((SDLKey)keymap.right, UP);
             tux.key_event((SDLKey)keymap.fire, UP);
+            touch_controls_reset();
             }
           else
             {
@@ -315,6 +328,7 @@ GameSession::process_events()
                       tux.key_event((SDLKey)keymap.left, UP);
                       tux.key_event((SDLKey)keymap.right, UP);
                       tux.key_event((SDLKey)keymap.fire, UP);
+                      touch_controls_reset();
                     }
                   break;
 #endif
@@ -326,12 +340,9 @@ GameSession::process_events()
                     if(tux.key_event(key,DOWN))
                       break;
 
-                    switch(key)
+                    if (st_is_escape_key(key))
                       {
-                      case SDLK_ESCAPE:    /* Escape: Open/Close the menu: */
                         on_escape_press();
-                        break;
-                      default:
                         break;
                       }
                   }
@@ -645,6 +656,8 @@ GameSession::action(double frame_ratio)
 {
   if (exit_status == ES_NONE)
     {
+      if (!Menu::current() && !game_pause && world)
+        touch_controls_apply_player(*world->get_tux());
       // Update Tux and the World
       world->action(frame_ratio);
     }
@@ -671,6 +684,10 @@ GameSession::draw()
     {
       Menu::current()->draw();
       mouse_cursor->draw();
+    }
+  else if (!game_pause)
+    {
+      touch_controls_draw();
     }
   
 #ifdef TSCONTROL

@@ -310,6 +310,9 @@ void display_text_file(const std::string& file, Surface* surface, float scroll_s
                   scroll += SCROLL;
                 break;
               case SDLK_ESCAPE:
+#ifdef SDLK_AC_BACK
+              case SDLK_AC_BACK:
+#endif
                 done = 1;
                 break;
               default:

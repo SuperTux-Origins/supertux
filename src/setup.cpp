@@ -51,6 +51,7 @@
 #include "globals.h"
 #include "platform.h"
 #include "setup.h"
+#include "touch_controls.h"
 #include "screen.h"
 #include "texture.h"
 #include "menu.h"
@@ -1698,12 +1699,14 @@ void parseargs(int argc, char * argv[])
 
 #ifdef __ANDROID__
   /* Phone/tablet: fullscreen; GLES2 is the default accelerated path.
-     Verbose stays on so render path / subsystem status shows in logcat. */
+     Verbose stays on so render path / subsystem status shows in logcat.
+     On-screen virtual gamepad for play without a controller. */
   use_fullscreen = true;
   verbose_mode = true;
 #ifdef USE_GLES2
   use_gl = true;
 #endif
+  touch_controls_set_enabled(true);
 #endif
 }
 

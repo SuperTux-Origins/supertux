@@ -41,6 +41,7 @@ LOCAL_SRC_FILES := \
 	tile.cpp \
 	timer.cpp \
 	title.cpp \
+	touch_controls.cpp \
 	type.cpp \
 	world.cpp \
 	worldmap.cpp \

@@ -68,6 +68,15 @@ Uint32 platform_get_mouse_state(int* x, int* y)
   return buttons;
 }
 
+void platform_get_window_size(int* w, int* h)
+{
+  int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
+  if (st_window)
+    SDL_GetWindowSize(st_window, &ww, &wh);
+  if (w) *w = ww;
+  if (h) *h = wh;
+}
+
 static SDL_Surface*
 create_software_backbuffer(SDL_Surface* window_surface)
 {

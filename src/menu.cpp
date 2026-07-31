@@ -842,7 +842,7 @@ Menu::event(SDL_Event& event)
 
     if(item[active_item].kind == MN_CONTROLFIELD)
     {
-      if(key == SDLK_ESCAPE)
+      if(st_is_escape_key(key))
       {
         Menu::pop_current();
         return;
@@ -889,6 +889,9 @@ Menu::event(SDL_Event& event)
       delete_character++;
       break;
     case SDLK_ESCAPE:
+#ifdef SDLK_AC_BACK
+    case SDLK_AC_BACK:
+#endif
       Menu::pop_current();
       break;
     default:

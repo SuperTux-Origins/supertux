@@ -70,6 +70,18 @@ inline bool st_key_held(const Uint8* keystate, SDL_Keycode key)
   return keystate[SDL_GetScancodeFromKey(key)] != 0;
 }
 
+/** Escape or Android Back (SDLK_AC_BACK). */
+inline bool st_is_escape_key(SDL_Keycode key)
+{
+  if (key == SDLK_ESCAPE)
+    return true;
+#ifdef SDLK_AC_BACK
+  if (key == SDLK_AC_BACK)
+    return true;
+#endif
+  return false;
+}
+
 /* Key-repeat / UNICODE: approximate no-ops under SDL2. */
 #ifndef SDL_DEFAULT_REPEAT_DELAY
 #define SDL_DEFAULT_REPEAT_DELAY 500
@@ -170,6 +182,11 @@ inline bool st_key_held(const Uint8* keystate, SDLKey key)
   if (!keystate)
     return false;
   return keystate[(unsigned)key] != 0;
+}
+
+inline bool st_is_escape_key(SDLKey key)
+{
+  return key == SDLK_ESCAPE;
 }
 
 inline int st_set_color_key(SDL_Surface* surface, Uint32 flag, Uint32 key)

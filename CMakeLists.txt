@@ -107,6 +107,7 @@ set(SUPERTUX_SOURCES
   src/gameobjs.cpp
   src/sprite.cpp
   src/sprite_manager.cpp
+  src/touch_controls.cpp
 )
 
 if(ENABLE_SDL2)

@@ -150,3 +150,9 @@ Uint32 platform_get_mouse_state(int* x, int* y)
 {
   return SDL_GetMouseState(x, y);
 }
+
+void platform_get_window_size(int* w, int* h)
+{
+  if (w) *w = screen ? screen->w : ST_SCREEN_W;
+  if (h) *h = screen ? screen->h : ST_SCREEN_H;
+}

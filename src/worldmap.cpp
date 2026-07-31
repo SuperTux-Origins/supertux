@@ -22,6 +22,7 @@
 #include <vector>
 #include <assert.h>
 #include <unistd.h>
+#include <string.h>
 #include "globals.h"
 #include "texture.h"
 #include "screen.h"
@@ -30,6 +31,8 @@
 #include "setup.h"
 #include "worldmap.h"
 #include "resources.h"
+#include "touch_controls.h"
+#include "platform_config.h"
 
 #define DISPLAY_MAP_MESSAGE_TIME 2800
 
@@ -563,9 +566,33 @@ WorldMap::get_input()
   SDL_Event event;
   while (SDL_PollEvent(&event))
     {
+      if (touch_controls_event(event))
+        {
+          if (touch_controls_held(0)) input_direction = D_WEST;
+          else if (touch_controls_held(1)) input_direction = D_EAST;
+          else if (touch_controls_held(2)) input_direction = D_NORTH;
+          else if (touch_controls_held(3)) input_direction = D_SOUTH;
+          if (touch_controls_held(4) || touch_controls_held(5))
+            enter_level = true;
+          continue;
+        }
+
       if (Menu::current())
         {
           Menu::current()->event(event);
+          int tact = 0;
+          if (touch_controls_menu_nav(&tact))
+            {
+              SDL_Event syn;
+              memset(&syn, 0, sizeof(syn));
+              syn.type = SDL_KEYDOWN;
+              if (tact == 0) syn.key.keysym.sym = SDLK_UP;
+              else if (tact == 1) syn.key.keysym.sym = SDLK_DOWN;
+              else if (tact == 2) syn.key.keysym.sym = SDLK_LEFT;
+              else if (tact == 3) syn.key.keysym.sym = SDLK_RIGHT;
+              else syn.key.keysym.sym = SDLK_RETURN;
+              Menu::current()->event(syn);
+            }
         }
       else
         {
@@ -576,11 +603,13 @@ WorldMap::get_input()
               break;
           
             case SDL_KEYDOWN:
-              switch(event.key.keysym.sym)
+              if (st_is_escape_key(event.key.keysym.sym))
                 {
-                case SDLK_ESCAPE:
                   on_escape_press();
                   break;
+                }
+              switch(event.key.keysym.sym)
+                {
                 case SDLK_LCTRL:
                 case SDLK_RETURN:
                   enter_level = true;
@@ -679,14 +708,17 @@ WorldMap::get_input()
     {
       const Uint8 *keystate = SDL_GetKeyState(NULL);
 
-      if (st_key_held(keystate, SDLK_LEFT))
+      if (st_key_held(keystate, SDLK_LEFT) || touch_controls_held(0))
         input_direction = D_WEST;
-      else if (st_key_held(keystate, SDLK_RIGHT))
+      else if (st_key_held(keystate, SDLK_RIGHT) || touch_controls_held(1))
         input_direction = D_EAST;
-      else if (st_key_held(keystate, SDLK_UP))
+      else if (st_key_held(keystate, SDLK_UP) || touch_controls_held(2))
         input_direction = D_NORTH;
-      else if (st_key_held(keystate, SDLK_DOWN))
+      else if (st_key_held(keystate, SDLK_DOWN) || touch_controls_held(3))
         input_direction = D_SOUTH;
+
+      if (touch_controls_held(4) || touch_controls_held(5))
+        enter_level = true;
     }
 }
 
@@ -1110,12 +1142,16 @@ WorldMap::display()
           Menu::current()->draw();
           mouse_cursor->draw();
         }
+      else
+        touch_controls_draw();
 #else
       if(Menu::current())
         {
           Menu::current()->draw();
         }
         if (show_mouse) mouse_cursor->draw();
+      else
+        touch_controls_draw();
 #endif
       flipscreen();
 
