@@ -1672,8 +1672,10 @@ void parseargs(int argc, char * argv[])
     }
 
 #ifdef __ANDROID__
-  /* Phone/tablet: fullscreen; GLES2 is the default accelerated path. */
+  /* Phone/tablet: fullscreen; GLES2 is the default accelerated path.
+     Verbose stays on so render path / subsystem status shows in logcat. */
   use_fullscreen = true;
+  verbose_mode = true;
 #ifdef USE_GLES2
   use_gl = true;
 #endif

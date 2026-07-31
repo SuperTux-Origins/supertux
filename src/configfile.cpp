@@ -35,7 +35,12 @@ static void defaults ()
 {
   /* Set defaults: */
   debug_mode = false;
+#ifdef __ANDROID__
+  /* Default on for logcat debugging; desktop stays quiet unless -v. */
+  verbose_mode = true;
+#else
   verbose_mode = false;
+#endif
 
   use_fullscreen = false;
   show_fps = false;
