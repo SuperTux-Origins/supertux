@@ -46,11 +46,12 @@ nix build .#supertux-milestone1-sdl2
 nix build .#supertux-milestone1-sdl1
 
 # Desktop — SDL2 + OpenGL ES 2.0
-nix build .#supertux-milestone1-gles2
+nix build .#supertux-milestone1-sdl2-gles2
 
-# Dev shell
-nix develop          # SDL1
-nix develop .#sdl2   # SDL2
+# Dev shells (same names as packages)
+nix develop                                  # SDL2
+nix develop .#supertux-milestone1-sdl1
+nix develop .#supertux-milestone1-sdl2-gles2
 ```
 
 The binary is `result/bin/supertux-milestone1`.

@@ -197,15 +197,17 @@
 
         pkgSdl2 = mkSuperTux { useSDL2 = true;  pname = "supertux-milestone1-sdl2"; };
         pkgSdl1 = mkSuperTux { useSDL2 = false; pname = "supertux-milestone1-sdl1"; };
-        pkgGles2 = mkSuperTux { useSDL2 = true; useGLES2 = true; pname = "supertux-milestone1-gles2"; };
-      in {
-        packages = rec {
-          default = supertux-milestone1-sdl2;
-          supertux-milestone1 = supertux-milestone1-sdl2;
+        pkgSdl2Gles2 = mkSuperTux {
+          useSDL2 = true;
+          useGLES2 = true;
+          pname = "supertux-milestone1-sdl2-gles2";
+        };
+      in rec {
+        packages = {
+          default = pkgSdl2;
           supertux-milestone1-sdl2 = pkgSdl2;
           supertux-milestone1-sdl1 = pkgSdl1;
-          supertux-milestone1-gles2 = pkgGles2;
-          gles2 = pkgGles2;
+          supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
 
           supertux-milestone1-win32 = pkgs.runCommand "supertux-milestone1-win32" {} ''
             mkdir -p $out/data
@@ -230,13 +232,19 @@
           };
         };
 
+        # `nix flake check` builds every derivation listed here.
+        checks = {
+          inherit (packages)
+            supertux-milestone1-sdl1
+            supertux-milestone1-sdl2
+            supertux-milestone1-sdl2-gles2
+            supertux-milestone1-win32
+            android-sdl-libs
+            supertux-milestone1-android;
+        };
+
         apps = {
           default = {
-            type = "app";
-            program = "${pkgSdl2}/bin/supertux-milestone1";
-            meta.description = "SuperTux Milestone 1 (SDL2)";
-          };
-          supertux-milestone1 = {
             type = "app";
             program = "${pkgSdl2}/bin/supertux-milestone1";
             meta.description = "SuperTux Milestone 1 (SDL2)";
@@ -250,6 +258,11 @@
             type = "app";
             program = "${pkgSdl1}/bin/supertux-milestone1";
             meta.description = "SuperTux Milestone 1 (SDL 1.2)";
+          };
+          supertux-milestone1-sdl2-gles2 = {
+            type = "app";
+            program = "${pkgSdl2Gles2}/bin/supertux-milestone1";
+            meta.description = "SuperTux Milestone 1 (SDL2 + OpenGL ES 2.0)";
           };
           install-android-supertux-milestone1 = android.mkInstallApp {
             pkg = android.mkApk {
@@ -266,6 +279,7 @@
           };
         };
 
+        # Shell names match package attribute names.
         devShells = {
           default = pkgs.mkShell {
             packages = [
@@ -274,18 +288,25 @@
               pkgs.libGL pkgs.zlib pkgs.libpng pkgs.libjpeg
             ];
           };
-          sdl2 = pkgs.mkShell {
+          supertux-milestone1-sdl2 = pkgs.mkShell {
             packages = [
               pkgs.cmake pkgs.pkg-config
               pkgs.SDL2 pkgs.SDL2_image pkgs.SDL2_mixer
               pkgs.libGL pkgs.zlib pkgs.libpng pkgs.libjpeg
             ];
           };
-          sdl1 = pkgs.mkShell {
+          supertux-milestone1-sdl1 = pkgs.mkShell {
             packages = [
               pkgs.cmake pkgs.pkg-config
               pkgs.SDL pkgs.SDL_image pkgs.SDL_mixer
               pkgs.libGL pkgs.zlib pkgs.libpng pkgs.libjpeg
+            ];
+          };
+          supertux-milestone1-sdl2-gles2 = pkgs.mkShell {
+            packages = [
+              pkgs.cmake pkgs.pkg-config
+              pkgs.SDL2 pkgs.SDL2_image pkgs.SDL2_mixer
+              pkgs.libGL pkgs.libGLU pkgs.zlib pkgs.libpng pkgs.libjpeg
             ];
           };
         };

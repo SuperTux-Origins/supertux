@@ -53,11 +53,10 @@ Goal: replace Autotools as the supported way to build; default remains **SDL 1.2
 
 | Attribute | Backend |
 |-----------|---------|
-| `supertux-milestone1` / `sdl1` / `default` | SDL 1.2 |
-| `supertux-milestone1-sdl2` / `sdl2` | SDL2 |
-| `supertux-milestone1-gles2` / `gles2` | SDL2 + OpenGL ES 2.0 |
-| `devShells.default` | SDL1 tools |
-| `devShells.sdl2` | SDL2 tools |
+| `supertux-milestone1-sdl2` / `default` | SDL2 |
+| `supertux-milestone1-sdl1` | SDL 1.2 |
+| `supertux-milestone1-sdl2-gles2` | SDL2 + OpenGL ES 2.0 |
+| `devShells.*` | same attribute names as packages |
 
 Out of scope for initial CMake: GP2X, RES320X240, TSCONTROL, gprof, forced static link.
 

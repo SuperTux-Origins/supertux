@@ -85,11 +85,12 @@ Binary name: `supertux-milestone1`.
 ### Nix flake
 
 ```bash
-nix build .#supertux-milestone1       # or .#sdl1 / default — SDL 1.2
-nix build .#supertux-milestone1-sdl2  # or .#default / .#supertux-milestone1  # or .#sdl2 — SDL2
-nix build .#supertux-milestone1-gles2 # or .#gles2 — SDL2 + OpenGL ES 2.0
-nix develop                           # SDL1 dev shell
-nix develop .#sdl2  # or default                    # SDL2 dev shell
+nix build .#supertux-milestone1-sdl2        # or .#default — SDL2
+nix build .#supertux-milestone1-sdl1        # SDL 1.2
+nix build .#supertux-milestone1-sdl2-gles2  # SDL2 + OpenGL ES 2.0
+nix develop                                 # SDL2 (matches default package)
+nix develop .#supertux-milestone1-sdl1
+nix develop .#supertux-milestone1-sdl2-gles2
 ```
 
 Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL1-oriented via existing win32 SDL inputs.
@@ -117,7 +118,7 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 
 **GLES2 path (optional / Android prep):** with `-DENABLE_GLES2=ON` (implies SDL2 + OpenGL), video requests an ES 2.0 context and drawing goes through `src/gles2_renderer.cpp` (textured/solid quads via GLSL ES 1.00). Desktop immediate-mode GL remains the default when GLES2 is off. Link against `GLESv2`.
 
-**Nix:** both `nix build .#supertux-milestone1-sdl1` (SDL1) and `.#supertux-milestone1-sdl2` have linked successfully. Runtime playtest of the SDL2 binary is still open. GLES2 package: `.#supertux-milestone1-gles2`.
+**Nix:** `.#supertux-milestone1-sdl1`, `.#supertux-milestone1-sdl2` (default), and `.#supertux-milestone1-sdl2-gles2` are the desktop packages. Dev shells use the same attribute names.
 
 ## Coding guidelines for agents
 
