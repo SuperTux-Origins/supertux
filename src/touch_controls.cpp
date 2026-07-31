@@ -88,26 +88,35 @@ tc_layout(void)
   tc_btn[TC_DOWN].w  = bs;                  tc_btn[TC_DOWN].h  = bs;
 
   /*
-   * Right cluster (bottom-right corner), left → right:
-   *   Action (run/shoot) | Both (run+jump) | Jump
-   * "Both" is for carrying an item while running and still being able to jump
-   * without needing two fingers on the face buttons.
+   * Right face cluster (bottom-right), designed for one-thumb play:
+   *
+   *     [BOTH]          ← swipe up from Action = run+jump
+   *   [ACTION] [JUMP]   ← side by side
+   *
+   * Finger motion already retargets held buttons, so sliding Action→Both
+   * keeps run and adds jump without a second finger.
    */
-  int jump_s = bs + bs / 5;
+  int jump_s = bs + bs / 4;
   int act_s  = bs;
   int both_s = bs;
-  tc_btn[TC_JUMP].x   = ww - pad - jump_s;
-  tc_btn[TC_JUMP].y   = wh - pad - jump_s;
-  tc_btn[TC_JUMP].w   = jump_s;
-  tc_btn[TC_JUMP].h   = jump_s;
-  tc_btn[TC_BOTH].x   = ww - pad - jump_s - gap - both_s;
-  tc_btn[TC_BOTH].y   = wh - pad - both_s - gap / 2;
-  tc_btn[TC_BOTH].w   = both_s;
-  tc_btn[TC_BOTH].h   = both_s;
-  tc_btn[TC_ACTION].x = ww - pad - jump_s - gap - both_s - gap - act_s;
-  tc_btn[TC_ACTION].y = wh - pad - act_s - gap;
+  int face_gap = gap / 2;
+  if (face_gap < 6) face_gap = 6;
+
+  tc_btn[TC_JUMP].w = jump_s;
+  tc_btn[TC_JUMP].h = jump_s;
+  tc_btn[TC_JUMP].x = ww - pad - jump_s;
+  tc_btn[TC_JUMP].y = wh - pad - jump_s;
+
   tc_btn[TC_ACTION].w = act_s;
   tc_btn[TC_ACTION].h = act_s;
+  tc_btn[TC_ACTION].x = ww - pad - jump_s - face_gap - act_s;
+  tc_btn[TC_ACTION].y = wh - pad - act_s;
+
+  /* Both sits directly above Action so a vertical swipe reaches it. */
+  tc_btn[TC_BOTH].w = both_s;
+  tc_btn[TC_BOTH].h = both_s;
+  tc_btn[TC_BOTH].x = tc_btn[TC_ACTION].x + (act_s - both_s) / 2;
+  tc_btn[TC_BOTH].y = tc_btn[TC_ACTION].y - face_gap - both_s;
 
   /* Menu — top-left corner. */
   int menu_s = bs * 2 / 3;
@@ -267,13 +276,15 @@ static void
 tc_move_finger(TcFingerId finger, int x, int y)
 {
   int hit = tc_hit(x, y);
+  /* Press the new target first so Action→Both keeps fire held (release
+     of Action checks TC_BOTH.held and skips the fire UP). */
+  if (hit >= 0)
+    tc_press(hit, finger);
   for (int i = 0; i < TC_COUNT; ++i)
     {
       if (tc_btn[i].has_finger && tc_btn[i].finger == finger && i != hit)
         tc_release_button(i);
     }
-  if (hit >= 0)
-    tc_press(hit, finger);
 }
 
 bool touch_controls_event(const SDL_Event& event)
@@ -365,12 +376,43 @@ bool touch_controls_event(const SDL_Event& event)
   return false;
 }
 
-/* tv-bezel.png (1920×1080): transparent 4:3 hole at this rect. */
-static const int BEZEL_IW = 1920, BEZEL_IH = 1080;
-static const int BEZEL_HX = 320, BEZEL_HY = 60, BEZEL_HW = 1280, BEZEL_HH = 960;
+/*
+ * tv-bezel.png defaults (image pixel space). Overridden by
+ * images/status/tv-bezel.hole when present:
+ *   hx hy hw hh [iw ih]
+ * e.g. "524 51 876 606 1920 1125"
+ */
+static int bezel_hx = 524, bezel_hy = 51, bezel_hw = 876, bezel_hh = 606;
+static int bezel_iw = 1920, bezel_ih = 1125;
 
 static Surface* tc_bezel = 0;
 static bool tc_bezel_tried = false;
+
+static void
+tc_load_bezel_hole(void)
+{
+  std::string hole_path = datadir + "/images/status/tv-bezel.hole";
+  FILE* fp = fopen(hole_path.c_str(), "r");
+  if (!fp)
+    return;
+  int hx = 0, hy = 0, hw = 0, hh = 0, iw = 0, ih = 0;
+  int n = fscanf(fp, "%d %d %d %d %d %d", &hx, &hy, &hw, &hh, &iw, &ih);
+  fclose(fp);
+  if (n >= 4 && hw > 0 && hh > 0)
+    {
+      bezel_hx = hx;
+      bezel_hy = hy;
+      bezel_hw = hw;
+      bezel_hh = hh;
+      if (n >= 6 && iw > 0 && ih > 0)
+        {
+          bezel_iw = iw;
+          bezel_ih = ih;
+        }
+      st_vlog("[video] TV bezel hole from .hole: %d %d %dx%d (img %dx%d)\n",
+              bezel_hx, bezel_hy, bezel_hw, bezel_hh, bezel_iw, bezel_ih);
+    }
+}
 
 static void
 tc_draw_bezel(void)
@@ -378,6 +420,7 @@ tc_draw_bezel(void)
   if (!tc_bezel_tried)
     {
       tc_bezel_tried = true;
+      tc_load_bezel_hole();
       std::string path = datadir + "/images/status/tv-bezel.png";
       /* Optional chrome — IMG_Load failure must not abort the game. */
       SDL_Surface* raw = IMG_Load(path.c_str());
@@ -390,8 +433,14 @@ tc_draw_bezel(void)
         {
           tc_bezel = new Surface(raw, USE_ALPHA);
           SDL_FreeSurface(raw);
-          st_vlog("[video] loaded arctic TV bezel (%dx%d)\n",
-                  tc_bezel ? tc_bezel->w : 0, tc_bezel ? tc_bezel->h : 0);
+          /* Prefer real decoded size over design defaults / .hole iw/ih. */
+          if (tc_bezel && tc_bezel->w > 0 && tc_bezel->h > 0)
+            {
+              bezel_iw = tc_bezel->w;
+              bezel_ih = tc_bezel->h;
+            }
+          st_vlog("[video] loaded arctic TV bezel (%dx%d) hole=(%d,%d %dx%d)\n",
+                  bezel_iw, bezel_ih, bezel_hx, bezel_hy, bezel_hw, bezel_hh);
         }
     }
   if (!tc_bezel)
@@ -400,23 +449,23 @@ tc_draw_bezel(void)
   int lx = 0, ly = 0, lw = ST_SCREEN_W, lh = ST_SCREEN_H;
   platform_get_letterbox(&lx, &ly, &lw, &lh);
 
-  /* Map the image's transparent 4:3 hole exactly onto the letterbox.
-     Letterbox is always 4:3 so sx≈sy; independent axes stay correct if
-     a pixel of rounding drifts. Use the real surface size if the asset
-     is not the design 1920×1080. */
-  int iw = tc_bezel->w > 0 ? tc_bezel->w : BEZEL_IW;
-  int ih = tc_bezel->h > 0 ? tc_bezel->h : BEZEL_IH;
-  float hx = (float)BEZEL_HX * (float)iw / (float)BEZEL_IW;
-  float hy = (float)BEZEL_HY * (float)ih / (float)BEZEL_IH;
-  float hw = (float)BEZEL_HW * (float)iw / (float)BEZEL_IW;
-  float hh = (float)BEZEL_HH * (float)ih / (float)BEZEL_IH;
+  /*
+   * Map the transparent hole rectangle exactly onto the letterboxed
+   * playfield. Independent sx/sy: the hole need not be 4:3 (current
+   * asset is ~876×606). Frame may stretch slightly; the game fills the
+   * cutout with no black bars inside the TV.
+   */
+  float hx = (float)bezel_hx;
+  float hy = (float)bezel_hy;
+  float hw = (float)bezel_hw;
+  float hh = (float)bezel_hh;
   if (hw < 1.0f) hw = 1.0f;
   if (hh < 1.0f) hh = 1.0f;
 
   float sx = (float)lw / hw;
   float sy = (float)lh / hh;
-  int dw = (int)((float)iw * sx + 0.5f);
-  int dh = (int)((float)ih * sy + 0.5f);
+  int dw = (int)((float)bezel_iw * sx + 0.5f);
+  int dh = (int)((float)bezel_ih * sy + 0.5f);
   int dx = lx - (int)(hx * sx + 0.5f);
   int dy = ly - (int)(hy * sy + 0.5f);
 
@@ -424,8 +473,8 @@ tc_draw_bezel(void)
   if (!logged_rect)
     {
       logged_rect = true;
-      st_vlog("[video] TV bezel draw: dst=(%d,%d %dx%d) hole→letterbox=(%d,%d %dx%d)\n",
-              dx, dy, dw, dh, lx, ly, lw, lh);
+      st_vlog("[video] TV bezel draw: dst=(%d,%d %dx%d) hole→lb=(%d,%d %dx%d) scale=(%.3f,%.3f)\n",
+              dx, dy, dw, dh, lx, ly, lw, lh, sx, sy);
     }
 
   platform_overlay_surface(tc_bezel, dx, dy, dw, dh);
@@ -465,12 +514,15 @@ void touch_controls_draw(void)
 
   for (int i = 0; i < TC_COUNT; ++i)
     {
-      int alpha = tc_btn[i].held ? 160 : 90;
-      int r = 50, g = 50, b = 50;
-      if (i == TC_JUMP)   { r = 40;  g = 140; b = 40; }
-      if (i == TC_ACTION) { r = 140; g = 40;  b = 40; }
-      if (i == TC_BOTH)   { r = 140; g = 120; b = 40; } /* run+jump */
-      if (i == TC_MENU)   { r = 40;  g = 40;  b = 120; }
+      /* Idle ~70% opaque; held almost solid — was 90/160 and too faint. */
+      int alpha = tc_btn[i].held ? 230 : 180;
+      int r = 70, g = 70, b = 80;
+      if (i == TC_JUMP)   { r = 50;  g = 180; b = 60; }
+      if (i == TC_ACTION) { r = 200; g = 50;  b = 50; }
+      if (i == TC_BOTH)   { r = 200; g = 160; b = 40; } /* run+jump */
+      if (i == TC_MENU)   { r = 60;  g = 60;  b = 180; }
+      if (i == TC_LEFT || i == TC_RIGHT || i == TC_UP || i == TC_DOWN)
+        { r = 90; g = 100; b = 120; }
       platform_overlay_fillrect(tc_btn[i].x, tc_btn[i].y,
                                 tc_btn[i].w, tc_btn[i].h,
                                 r, g, b, alpha);
