@@ -7,6 +7,12 @@
 #include "globals.h"
 #include "defines.h"
 #include <SDL_image.h>
+#ifndef NOOPENGL
+#include "gl_compat.h"
+#ifdef USE_GLES2
+#include "gles2_renderer.h"
+#endif
+#endif
 
 static SDL_Window* st_window = NULL;
 static SDL_GLContext st_gl_context = NULL;
@@ -126,6 +132,9 @@ gl_setup_viewport(void)
   if (st_window)
     SDL_GL_GetDrawableSize(st_window, &ww, &wh);
 
+#ifdef USE_GLES2
+  gles2_renderer_set_viewport(ww, wh);
+#else
   float sx = (float)ww / (float)ST_SCREEN_W;
   float sy = (float)wh / (float)ST_SCREEN_H;
   float scale = (sx < sy) ? sx : sy;
@@ -140,6 +149,7 @@ gl_setup_viewport(void)
   glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
+#endif
 }
 #endif
 
@@ -195,17 +205,31 @@ bool platform_video_init(bool fullscreen, bool opengl)
 #ifndef NOOPENGL
   if (use_gl)
     {
-      /* Request a compatibility context for immediate-mode GL (glBegin, etc.). */
       SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
       SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
       SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
       SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+#ifdef USE_GLES2
+      /* OpenGL ES 2.0 — required on Android; optional on desktop Linux. */
+#ifdef SDL_GL_CONTEXT_PROFILE_MASK
+      SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#endif
+      SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+      SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#else
+      /* Desktop compatibility context for immediate-mode GL (glBegin, etc.). */
 #ifdef SDL_GL_CONTEXT_PROFILE_MASK
       SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
                           SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 #endif
+#endif
 
-      VLOG("[video] CreateWindow OPENGL fullscreen=%d %dx%d\n",
+      VLOG("[video] CreateWindow OPENGL%s fullscreen=%d %dx%d\n",
+#ifdef USE_GLES2
+           " ES2",
+#else
+           "",
+#endif
            (int)use_fullscreen, ST_SCREEN_W, ST_SCREEN_H);
       SDL_ClearError();
       st_window = create_game_window("SuperTux " VERSION, true, &use_fullscreen);
@@ -232,18 +256,40 @@ bool platform_video_init(bool fullscreen, bool opengl)
                 }
               glDisable(GL_DEPTH_TEST);
               glDisable(GL_CULL_FACE);
-              gl_setup_viewport();
-              /* Black frame immediately so the window is not garbage. */
-              glClearColor(0.f, 0.f, 0.f, 1.f);
-              glClear(GL_COLOR_BUFFER_BIT);
-              SDL_GL_SwapWindow(st_window);
-              log_window("GL ready");
-              return true;
+#ifdef USE_GLES2
+              if (!gles2_renderer_init())
+                {
+                  fprintf(stderr, "Warning: GLES2 renderer init failed\n");
+                  SDL_GL_DeleteContext(st_gl_context);
+                  st_gl_context = NULL;
+                  SDL_FreeSurface(screen);
+                  screen = NULL;
+                  SDL_DestroyWindow(st_window);
+                  st_window = NULL;
+                }
+              else
+#endif
+                {
+                  gl_setup_viewport();
+                  /* Black frame immediately so the window is not garbage. */
+                  glClearColor(0.f, 0.f, 0.f, 1.f);
+                  glClear(GL_COLOR_BUFFER_BIT);
+                  SDL_GL_SwapWindow(st_window);
+#ifdef USE_GLES2
+                  log_window("GLES2 ready");
+#else
+                  log_window("GL ready");
+#endif
+                  return true;
+                }
             }
-          fprintf(stderr, "Warning: SDL_GL_CreateContext failed: %s\n",
-                  SDL_GetError());
-          SDL_DestroyWindow(st_window);
-          st_window = NULL;
+          if (st_window)
+            {
+              fprintf(stderr, "Warning: SDL_GL_CreateContext failed: %s\n",
+                      SDL_GetError());
+              SDL_DestroyWindow(st_window);
+              st_window = NULL;
+            }
         }
       else
         {
@@ -251,7 +297,11 @@ bool platform_video_init(bool fullscreen, bool opengl)
                   SDL_GetError());
         }
 
+#ifdef USE_GLES2
+      fprintf(stderr, "OpenGL ES 2 unavailable — falling back to software.\n");
+#else
       fprintf(stderr, "OpenGL unavailable — falling back to software.\n");
+#endif
       use_gl = false;
     }
 #endif
@@ -332,6 +382,9 @@ void platform_video_shutdown(void)
   VLOG("[video] shutdown window=%p glctx=%p\n",
        (void*)st_window, (void*)st_gl_context);
 #ifndef NOOPENGL
+#ifdef USE_GLES2
+  gles2_renderer_shutdown();
+#endif
   if (st_gl_context)
     {
       SDL_GL_DeleteContext(st_gl_context);

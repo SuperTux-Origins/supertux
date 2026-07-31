@@ -24,7 +24,7 @@
 #include "platform_config.h"
 #include <string>
 #ifndef NOOPENGL
-#include <SDL_opengl.h>
+#include "gl_compat.h"
 #endif
 
 #include <list>

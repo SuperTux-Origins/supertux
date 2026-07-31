@@ -37,6 +37,12 @@
 #include "screen.h"
 #include "setup.h"
 #include "type.h"
+#ifdef USE_GLES2
+#include "gles2_renderer.h"
+#endif
+#ifndef NOOPENGL
+#include "gl_compat.h"
+#endif
 
 /* Needed for line calculations */
 #define SGN(x) ((x)>0 ? 1 : ((x)==0 ? 0:(-1)))
@@ -70,6 +76,11 @@ void drawgradient(Color top_clr, Color bot_clr)
 #ifndef NOOPENGL
   if(use_gl)
     {
+#ifdef USE_GLES2
+      gles2_draw_gradient(0, 0, 640, 480,
+                          top_clr.red, top_clr.green, top_clr.blue,
+                          bot_clr.red, bot_clr.green, bot_clr.blue);
+#else
       glBegin(GL_QUADS);
       glColor3ub(top_clr.red, top_clr.green, top_clr.blue);
       glVertex2f(0, 0);
@@ -78,6 +89,7 @@ void drawgradient(Color top_clr, Color bot_clr)
       glVertex2f(640, 480);
       glVertex2f(0, 480);
       glEnd();
+#endif
     }
   else
   {
@@ -219,6 +231,11 @@ void drawline(int x1, int y1, int x2, int y2, int r, int g, int b, int a)
 #ifndef NOOPENGL
   if(use_gl)
     {
+#ifdef USE_GLES2
+      gles2_draw_line((float)x1, (float)y1, (float)x2, (float)y2,
+                      (unsigned char)r, (unsigned char)g,
+                      (unsigned char)b, (unsigned char)a);
+#else
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glColor4ub(r, g, b,a);
@@ -228,6 +245,7 @@ void drawline(int x1, int y1, int x2, int y2, int r, int g, int b, int a)
       glVertex2f(x2, y2);
       glEnd();
       glDisable(GL_BLEND);
+#endif
     }
   else
     {
@@ -303,6 +321,11 @@ if(h < 0)
 #ifndef NOOPENGL
   if(use_gl)
     {
+#ifdef USE_GLES2
+      gles2_draw_solid_quad(x, y, w, h,
+                            (unsigned char)r, (unsigned char)g,
+                            (unsigned char)b, (unsigned char)a);
+#else
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glColor4ub(r, g, b,a);
@@ -314,6 +337,7 @@ if(h < 0)
       glVertex2f(x, y+h);
       glEnd();
       glDisable(GL_BLEND);
+#endif
     }
   else
     {

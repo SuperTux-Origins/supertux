@@ -26,6 +26,9 @@
 #include "texture.h"
 #include "globals.h"
 #include "setup.h"
+#ifdef USE_GLES2
+#include "gles2_renderer.h"
+#endif
 
 Surface::Surfaces Surface::surfaces;
 
@@ -509,14 +512,16 @@ SurfaceOpenGL::create_gl(SDL_Surface * surf, GLuint * tex)
   SDL_Surface *conv;
 
   w = power_of_two(surf->w);
-  h = power_of_two(surf->h),
+  h = power_of_two(surf->h);
 
+  /* Always upload tightly packed RGBA8 — required for GLES2 (no
+     GL_UNPACK_ROW_LENGTH) and portable on desktop GL. */
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-      conv = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surf->format->BitsPerPixel,
-                                  0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+  conv = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
+                              0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 #else
-      conv = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surf->format->BitsPerPixel,
-                                  0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+  conv = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
+                              0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 #endif
 
   /* Save the alpha blending attributes */
@@ -537,15 +542,22 @@ SurfaceOpenGL::create_gl(SDL_Surface * surf, GLuint * tex)
     SDL_SetAlpha(surf, saved_flags, saved_alpha);
   }
 
-  glGenTextures(1, &*tex);
-  glBindTexture(GL_TEXTURE_2D , *tex);
+  glGenTextures(1, tex);
+  glBindTexture(GL_TEXTURE_2D, *tex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+#ifndef USE_GLES2
+  /* Desktop path may use ROW_LENGTH; GLES2 requires tight packing (ensured above). */
   glPixelStorei(GL_UNPACK_ROW_LENGTH, conv->pitch / conv->format->BytesPerPixel);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, conv->pixels);
+#endif
+  /* Internal format: GL_RGBA is valid on both desktop GL and GLES2.
+     (Legacy code used GL_RGB10_A2 which is not available in ES 2.0.) */
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, conv->pixels);
+#ifndef USE_GLES2
   glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
 
   SDL_FreeSurface(conv);
 }
@@ -553,9 +565,14 @@ SurfaceOpenGL::create_gl(SDL_Surface * surf, GLuint * tex)
 int
 SurfaceOpenGL::draw(float x, float y, Uint8 alpha, bool update)
 {
-  float pw = power_of_two(w);
-  float ph = power_of_two(h);
+  float pw = (float)power_of_two(w);
+  float ph = (float)power_of_two(h);
 
+#ifdef USE_GLES2
+  gles2_draw_textured_quad(gl_texture, x, y, (float)w, (float)h,
+                           0.0f, 0.0f, (float)w / pw, (float)h / ph,
+                           alpha, alpha, alpha, alpha);
+#else
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -576,6 +593,7 @@ SurfaceOpenGL::draw(float x, float y, Uint8 alpha, bool update)
 
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
+#endif
 
   (void) update; // avoid compiler warning
 
@@ -585,9 +603,14 @@ SurfaceOpenGL::draw(float x, float y, Uint8 alpha, bool update)
 int
 SurfaceOpenGL::draw_bg(Uint8 alpha, bool update)
 {
-  float pw = power_of_two(w);
-  float ph = power_of_two(h);
+  float pw = (float)power_of_two(w);
+  float ph = (float)power_of_two(h);
 
+#ifdef USE_GLES2
+  gles2_draw_textured_quad(gl_texture, 0, 0, (float)screen->w, (float)screen->h,
+                           0.0f, 0.0f, (float)w / pw, (float)h / ph,
+                           alpha, alpha, alpha, alpha);
+#else
   glColor3ub(alpha, alpha, alpha);
 
   glEnable(GL_TEXTURE_2D);
@@ -605,6 +628,7 @@ SurfaceOpenGL::draw_bg(Uint8 alpha, bool update)
   glEnd();
 
   glDisable(GL_TEXTURE_2D);
+#endif
 
   (void) update; // avoid compiler warning
 
@@ -614,9 +638,14 @@ SurfaceOpenGL::draw_bg(Uint8 alpha, bool update)
 int
 SurfaceOpenGL::draw_part(float sx, float sy, float x, float y, float w, float h, Uint8 alpha, bool update)
 {
-  float pw = power_of_two(int(this->w));
-  float ph = power_of_two(int(this->h));
+  float pw = (float)power_of_two(int(this->w));
+  float ph = (float)power_of_two(int(this->h));
 
+#ifdef USE_GLES2
+  gles2_draw_textured_quad(gl_texture, x, y, w, h,
+                           sx / pw, sy / ph, (sx + w) / pw, (sy + h) / ph,
+                           alpha, alpha, alpha, alpha);
+#else
   glBindTexture(GL_TEXTURE_2D, gl_texture);
 
   glEnable(GL_BLEND);
@@ -640,6 +669,7 @@ SurfaceOpenGL::draw_part(float sx, float sy, float x, float y, float w, float h,
 
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
+#endif
 
   (void) update; // avoid warnings
   return 0;
@@ -648,9 +678,14 @@ SurfaceOpenGL::draw_part(float sx, float sy, float x, float y, float w, float h,
 int
 SurfaceOpenGL::draw_stretched(float x, float y, int sw, int sh, Uint8 alpha, bool update)
 {
-  float pw = power_of_two(int(this->w));
-  float ph = power_of_two(int(this->h));
+  float pw = (float)power_of_two(int(this->w));
+  float ph = (float)power_of_two(int(this->h));
 
+#ifdef USE_GLES2
+  gles2_draw_textured_quad(gl_texture, x, y, (float)sw, (float)sh,
+                           0.0f, 0.0f, (float)w / pw, (float)h / ph,
+                           alpha, alpha, alpha, alpha);
+#else
   glBindTexture(GL_TEXTURE_2D, gl_texture);
 
   glEnable(GL_BLEND);
@@ -674,6 +709,7 @@ SurfaceOpenGL::draw_stretched(float x, float y, int sw, int sh, Uint8 alpha, boo
 
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
+#endif
 
   (void) update; // avoid warnings
   return 0;

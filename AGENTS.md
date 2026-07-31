@@ -38,7 +38,7 @@ When unsure, prefer the smallest change that stops a crash or unblocks SDL2 play
 |------|--------|
 | Original Autotools build | Present (`configure.ac`, `Makefile.am`, `autogen.sh`) |
 | **CMake build** | **Done** — root `CMakeLists.txt`; Autotools retained for reference |
-| Graphics / input | SDL 1.2 + optional OpenGL; software path via `SurfaceSDL` |
+| Graphics / input | SDL 1.2 + optional OpenGL (immediate) or GLES2 (shaders); software via `SurfaceSDL` |
 | Audio | SDL_mixer 1.x (optional `-DNOSOUND`); GP2X uses a separate path |
 | Platforms of historical interest | Desktop Linux/Windows, experimental GP2X, 320×240 test build |
 | SDL2 port | **Compiles** via platform layer + `platform_config.h`; playtest still open |
@@ -74,6 +74,7 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 # optional:
 #   -DENABLE_OPENGL=ON|OFF
+#   -DENABLE_GLES2=ON|OFF  # ES 2.0 shader path (implies OpenGL+SDL2)
 #   -DENABLE_SOUND=ON|OFF
 #   -DENABLE_SDL2=ON|OFF   # OFF = SDL 1.2 (default); ON = SDL2 platform backend
 #   -DDATA_PREFIX=/path/to/data-parent   # install/runtime data root
@@ -86,6 +87,7 @@ Binary name: `supertux-milestone1`.
 ```bash
 nix build .#supertux-milestone1       # or .#sdl1 / default — SDL 1.2
 nix build .#supertux-milestone1-sdl2  # or .#default / .#supertux-milestone1  # or .#sdl2 — SDL2
+nix build .#supertux-milestone1-gles2 # or .#gles2 — SDL2 + OpenGL ES 2.0
 nix develop                           # SDL1 dev shell
 nix develop .#sdl2  # or default                    # SDL2 dev shell
 ```
@@ -113,7 +115,9 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 
 **SDL2 path (target):** SDL2, SDL2_image, SDL2_mixer — wired through a compatibility/backend layer, not by rewriting every call site at once.
 
-**Nix:** both `nix build .#supertux-milestone1-sdl1` (SDL1) and `.#supertux-milestone1-sdl2` have linked successfully. Runtime playtest of the SDL2 binary is still open.
+**GLES2 path (optional / Android prep):** with `-DENABLE_GLES2=ON` (implies SDL2 + OpenGL), video requests an ES 2.0 context and drawing goes through `src/gles2_renderer.cpp` (textured/solid quads via GLSL ES 1.00). Desktop immediate-mode GL remains the default when GLES2 is off. Link against `GLESv2`.
+
+**Nix:** both `nix build .#supertux-milestone1-sdl1` (SDL1) and `.#supertux-milestone1-sdl2` have linked successfully. Runtime playtest of the SDL2 binary is still open. GLES2 package: `.#supertux-milestone1-gles2`.
 
 ## Coding guidelines for agents
 
@@ -137,6 +141,8 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 | `src/supertux.cpp` | `main` |
 | `src/setup.cpp` | paths, video/audio/joystick init, CLI |
 | `src/platform.h` / `platform_sdl1.cpp` / `platform_sdl2.cpp` | SDL version backends |
+| `src/gl_compat.h` | OpenGL vs GLES2 includes |
+| `src/gles2_renderer.cpp` | ES 2.0 shader quads (when `USE_GLES2`) |
 | `src/screen.cpp` / `texture.cpp` | drawing backends |
 | `src/gameloop.cpp` | level session |
 | `src/world.cpp` / `player.cpp` / `badguy.cpp` | gameplay |

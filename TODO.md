@@ -45,6 +45,7 @@ Goal: replace Autotools as the supported way to build; default remains **SDL 1.2
 |--------|---------|---------|
 | `ENABLE_SOUND` | ON | Link mixer; else `-DNOSOUND` |
 | `ENABLE_OPENGL` | ON | Allow GL path; else `-DNOOPENGL` |
+| `ENABLE_GLES2` | OFF | OpenGL ES 2.0 shader path (`USE_GLES2`); forces OpenGL+SDL2 |
 | `ENABLE_SDL2` | OFF | Compile `platform_sdl2.cpp` + `USE_SDL2` |
 | `DATA_PREFIX` | `${CMAKE_INSTALL_PREFIX}/share/supertux-milestone1` | Compile-time data root |
 
@@ -54,6 +55,7 @@ Goal: replace Autotools as the supported way to build; default remains **SDL 1.2
 |-----------|---------|
 | `supertux-milestone1` / `sdl1` / `default` | SDL 1.2 |
 | `supertux-milestone1-sdl2` / `sdl2` | SDL2 |
+| `supertux-milestone1-gles2` / `gles2` | SDL2 + OpenGL ES 2.0 |
 | `devShells.default` | SDL1 tools |
 | `devShells.sdl2` | SDL2 tools |
 
@@ -104,12 +106,15 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] Joy hat: menu + worldmap use `SDL_HAT_*` bit flags; menu hat left/right
 - [x] OpenGL-on-SDL2: GL attributes + compatibility profile; letterboxed viewport from drawable size
 - [x] Fullscreen / present: FULLSCREEN → FULLSCREEN_DESKTOP → windowed; software letterbox scale; video re-init falls back instead of exit
-- [ ] Smoke playtest with `data/`: title demo, one level, worldmap, pause menu, options, quit — SDL1 and SDL2
+- [x] **GLES2 optional path** (`ENABLE_GLES2`): ES 2.0 context, `gles2_renderer` shader quads, texture upload without `GL_UNPACK_ROW_LENGTH` / `GL_RGB10_A2`; desktop immediate-mode GL retained when GLES2 is off
+- [ ] Smoke playtest with `data/`: title demo, one level, worldmap, pause menu, options, quit — SDL1, SDL2, and GLES2
+- [ ] Wire Android APK to GLES2 renderer (currently `NOOPENGL` / software only)
 
 ### Rendering strategy
 
 - **A (updated):** owned software backbuffer + blit to window surface on present.
 - **B (later, only if A is unstable):** `SDL_Renderer` / textures.
+- **C (new):** GLES2 shader path for textured/solid quads — preparation for Android GL; optional on Linux via `-DENABLE_GLES2=ON`.
 
 ---
 
@@ -178,3 +183,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-31 | VERSION file as sole source; CMake/flake/SUPERTUX_MILESTONE1_VERSION |
 | 2026-07-31 | Silence -Wformat-truncation in dsubdirs/dfiles (PATH_MAX + path_join) |
 | 2026-07-31 | Android APK target: nix/android.nix, android/, SDL2+image stb, NOSOUND/NOOPENGL |
+| 2026-07-31 | GLES2 renderer: ENABLE_GLES2, gles2_renderer, gl_compat.h; flake gles2 package |

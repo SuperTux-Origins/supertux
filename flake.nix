@@ -98,7 +98,11 @@
           sha256 = "sha256-WUwv411JSItDgtv67I+YNm3vyoGdkWrJW+zz519CALM=";
         };
 
-        mkSuperTux = { useSDL2 ? true, pname ? "supertux-milestone1" }:
+        mkSuperTux = { useSDL2 ? true, useGLES2 ? false, pname ? "supertux-milestone1" }:
+          let
+            # GLES2 implies SDL2 + OpenGL path (shader renderer, no libGLU).
+            effectiveSDL2 = useSDL2 || useGLES2;
+          in
           pkgs.stdenv.mkDerivation rec {
             inherit pname;
             inherit version;
@@ -120,22 +124,27 @@
               "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
               "-DENABLE_SOUND=ON"
               "-DENABLE_OPENGL=ON"
-              "-DENABLE_SDL2=${if useSDL2 then "ON" else "OFF"}"
+              "-DENABLE_GLES2=${if useGLES2 then "ON" else "OFF"}"
+              "-DENABLE_SDL2=${if effectiveSDL2 then "ON" else "OFF"}"
               "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
               "-DPROJECT_VERSION_FULL=${version}"
             ];
 
             buildInputs =
-              (if pkgs.stdenv.hostPlatform.isWindows && !useSDL2 then [
+              (if pkgs.stdenv.hostPlatform.isWindows && !effectiveSDL2 then [
                 SDL-win32.packages.${pkgs.system}.default
                 SDL_image-win32.packages.${pkgs.system}.default
                 SDL_mixer-win32.packages.${pkgs.system}.default
-              ] else if useSDL2 then [
+              ] else if effectiveSDL2 then [
                 pkgs.SDL2
                 pkgs.SDL2_image
                 pkgs.SDL2_mixer
-                pkgs.libGL
+              ] ++ (if useGLES2 then [
+                pkgs.libGL          # EGL/GLX dispatch often needed by SDL2 ES
+                pkgs.libglvnd
               ] else [
+                pkgs.libGL
+              ]) else [
                 pkgs.SDL
                 pkgs.SDL_image
                 pkgs.SDL_mixer
@@ -154,7 +163,7 @@
               mkdir -p $out/bin/
               find ${pkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
               find ${pkgs.stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
-              ${if useSDL2 then "" else ''
+              ${if effectiveSDL2 then "" else ''
               ln -sfv ${SDL-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
               ln -sfv ${SDL_image-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
               ln -sfv ${SDL_mixer-win32.packages.${pkgs.system}.default}/bin/*.dll $out/bin/
@@ -162,7 +171,11 @@
             '';
 
             meta = with nixpkgs.lib; {
-              description = "SuperTux Milestone 1 (${if useSDL2 then "SDL2" else "SDL 1.2"})";
+              description = "SuperTux Milestone 1 (${
+                if useGLES2 then "SDL2 + GLES2"
+                else if effectiveSDL2 then "SDL2"
+                else "SDL 1.2"
+              })";
               license = licenses.gpl2Plus;
               platforms = platforms.linux ++ platforms.windows;
               mainProgram = "supertux-milestone1";
@@ -171,12 +184,15 @@
 
         pkgSdl2 = mkSuperTux { useSDL2 = true;  pname = "supertux-milestone1-sdl2"; };
         pkgSdl1 = mkSuperTux { useSDL2 = false; pname = "supertux-milestone1-sdl1"; };
+        pkgGles2 = mkSuperTux { useSDL2 = true; useGLES2 = true; pname = "supertux-milestone1-gles2"; };
       in {
         packages = rec {
           default = supertux-milestone1-sdl2;
           supertux-milestone1 = supertux-milestone1-sdl2;
           supertux-milestone1-sdl2 = pkgSdl2;
           supertux-milestone1-sdl1 = pkgSdl1;
+          supertux-milestone1-gles2 = pkgGles2;
+          gles2 = pkgGles2;
 
           supertux-milestone1-win32 = pkgs.runCommand "supertux-milestone1-win32" {} ''
             mkdir -p $out/data
