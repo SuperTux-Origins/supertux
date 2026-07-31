@@ -566,7 +566,10 @@ WorldMap::get_input()
   SDL_Event event;
   while (SDL_PollEvent(&event))
     {
-      if (touch_controls_event(event))
+      bool touch_ate = touch_controls_event(event);
+      if (touch_controls_escape_pressed())
+        on_escape_press();
+      if (touch_ate)
         {
           if (touch_controls_held(0)) input_direction = D_WEST;
           else if (touch_controls_held(1)) input_direction = D_EAST;
@@ -574,6 +577,12 @@ WorldMap::get_input()
           else if (touch_controls_held(3)) input_direction = D_SOUTH;
           if (touch_controls_held(4) || touch_controls_held(5))
             enter_level = true;
+          continue;
+        }
+
+      if (st_is_escape_event(event))
+        {
+          on_escape_press();
           continue;
         }
 
@@ -603,11 +612,6 @@ WorldMap::get_input()
               break;
           
             case SDL_KEYDOWN:
-              if (st_is_escape_key(event.key.keysym.sym))
-                {
-                  on_escape_press();
-                  break;
-                }
               switch(event.key.keysym.sym)
                 {
                 case SDLK_LCTRL:

@@ -42,4 +42,10 @@ bool touch_controls_held(int dir); /* 0=left 1=right 2=up 3=down 4=jump 5=action
  */
 bool touch_controls_menu_nav(int* action);
 
+/**
+ * Edge-triggered press of the top-left Menu button (same as Escape).
+ * Call once per event-poll loop; returns true on the frame of the press.
+ */
+bool touch_controls_escape_pressed(void);
+
 #endif /* SUPERTUX_TOUCH_CONTROLS_H */

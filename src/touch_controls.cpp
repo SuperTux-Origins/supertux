@@ -17,6 +17,7 @@ enum {
   TC_DOWN,
   TC_JUMP,
   TC_ACTION,
+  TC_MENU,
   TC_COUNT
 };
 
@@ -48,6 +49,8 @@ tc_layout(void)
   /* Action buttons right */
   tc_btn[TC_JUMP].x = 540;   tc_btn[TC_JUMP].y = 360;  tc_btn[TC_JUMP].w = 80; tc_btn[TC_JUMP].h = 80;
   tc_btn[TC_ACTION].x = 450; tc_btn[TC_ACTION].y = 400; tc_btn[TC_ACTION].w = 72; tc_btn[TC_ACTION].h = 72;
+  /* Menu / Escape — top-left, always available */
+  tc_btn[TC_MENU].x = 8;     tc_btn[TC_MENU].y = 8;    tc_btn[TC_MENU].w = 48; tc_btn[TC_MENU].h = 48;
 
   for (int i = 0; i < TC_COUNT; ++i)
     {
@@ -291,6 +294,7 @@ void touch_controls_draw(void)
       int r = 40, g = 40, b = 40;
       if (i == TC_JUMP) { r = 40; g = 120; b = 40; }
       if (i == TC_ACTION) { r = 120; g = 40; b = 40; }
+      if (i == TC_MENU) { r = 40; g = 40; b = 100; }
       fillrect(tc_btn[i].x, tc_btn[i].y, tc_btn[i].w, tc_btn[i].h,
                r, g, b, alpha);
     }
@@ -303,7 +307,19 @@ void touch_controls_draw(void)
       white_small_text->draw("D", tc_btn[TC_DOWN].x + 24, tc_btn[TC_DOWN].y + 24, 0);
       white_small_text->draw("J", tc_btn[TC_JUMP].x + 32, tc_btn[TC_JUMP].y + 32, 0);
       white_small_text->draw("A", tc_btn[TC_ACTION].x + 28, tc_btn[TC_ACTION].y + 28, 0);
+      white_small_text->draw("M", tc_btn[TC_MENU].x + 16, tc_btn[TC_MENU].y + 16, 0);
     }
+}
+
+bool touch_controls_escape_pressed(void)
+{
+  if (!tc_enabled)
+    return false;
+  if (!tc_inited_layout)
+    tc_layout();
+  bool pressed = tc_btn[TC_MENU].held && !tc_btn[TC_MENU].prev_held;
+  tc_btn[TC_MENU].prev_held = tc_btn[TC_MENU].held;
+  return pressed;
 }
 
 void touch_controls_apply_player(Player& tux)
@@ -354,8 +370,9 @@ bool touch_controls_menu_nav(int* action)
         }
     }
 
-  for (int i = 0; i < TC_COUNT; ++i)
-    tc_btn[i].prev_held = tc_btn[i].held;
+  /* Only advance prev for nav buttons — TC_MENU uses escape_pressed(). */
+  for (int i = 0; i < 6; ++i)
+    tc_btn[order[i]].prev_held = tc_btn[order[i]].held;
 
   return found;
 }

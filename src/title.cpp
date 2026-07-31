@@ -312,16 +312,20 @@ void title(void)
                   else syn.key.keysym.sym = SDLK_RETURN;
                   Menu::current()->event(syn);
                 }
+              if (touch_controls_escape_pressed() && Menu::current()
+                  && Menu::current() != main_menu)
+                {
+                  SDL_Event syn;
+                  memset(&syn, 0, sizeof(syn));
+                  syn.type = SDL_KEYDOWN;
+                  syn.key.keysym.sym = SDLK_ESCAPE;
+                  Menu::current()->event(syn);
+                }
               continue;
             }
           if (Menu::current())
             {
               Menu::current()->event(event);
-              if (event.type == SDL_KEYDOWN && st_is_escape_key(event.key.keysym.sym)
-                  && Menu::current() == main_menu)
-                {
-                  /* Back on root menu exits (handled by menu quit item too). */
-                }
             }
          // FIXME: QUIT signal should be handled more generic, not locally
           if (event.type == SDL_QUIT)

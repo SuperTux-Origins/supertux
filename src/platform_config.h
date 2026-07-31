@@ -70,13 +70,26 @@ inline bool st_key_held(const Uint8* keystate, SDL_Keycode key)
   return keystate[SDL_GetScancodeFromKey(key)] != 0;
 }
 
-/** Escape or Android Back (SDLK_AC_BACK). */
+/** Escape or Android Back (SDLK_AC_BACK / scancode). */
 inline bool st_is_escape_key(SDL_Keycode key)
 {
   if (key == SDLK_ESCAPE)
     return true;
 #ifdef SDLK_AC_BACK
   if (key == SDLK_AC_BACK)
+    return true;
+#endif
+  return false;
+}
+
+inline bool st_is_escape_event(const SDL_Event& event)
+{
+  if (event.type != SDL_KEYDOWN)
+    return false;
+  if (st_is_escape_key(event.key.keysym.sym))
+    return true;
+#ifdef SDL_SCANCODE_AC_BACK
+  if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK)
     return true;
 #endif
   return false;
@@ -187,6 +200,11 @@ inline bool st_key_held(const Uint8* keystate, SDLKey key)
 inline bool st_is_escape_key(SDLKey key)
 {
   return key == SDLK_ESCAPE;
+}
+
+inline bool st_is_escape_event(const SDL_Event& event)
+{
+  return event.type == SDL_KEYDOWN && st_is_escape_key(event.key.keysym.sym);
 }
 
 inline int st_set_color_key(SDL_Surface* surface, Uint32 flag, Uint32 key)

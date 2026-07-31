@@ -270,28 +270,40 @@ GameSession::process_events()
       SDL_Event event;
       while (SDL_PollEvent(&event))
         {
-          if (touch_controls_event(event))
+          bool touch_ate = touch_controls_event(event);
+          if (touch_controls_escape_pressed())
+            on_escape_press();
+
+          if (Menu::current())
+            {
+              int tact = 0;
+              if (touch_controls_menu_nav(&tact))
+                {
+                  SDL_Event syn;
+                  memset(&syn, 0, sizeof(syn));
+                  syn.type = SDL_KEYDOWN;
+                  if (tact == 0) syn.key.keysym.sym = SDLK_UP;
+                  else if (tact == 1) syn.key.keysym.sym = SDLK_DOWN;
+                  else if (tact == 2) syn.key.keysym.sym = SDLK_LEFT;
+                  else if (tact == 3) syn.key.keysym.sym = SDLK_RIGHT;
+                  else syn.key.keysym.sym = SDLK_RETURN;
+                  Menu::current()->event(syn);
+                }
+            }
+
+          if (touch_ate)
             continue;
+
+          if (st_is_escape_event(event))
+            {
+              on_escape_press();
+              continue;
+            }
 
           /* Check for menu-events, if the menu is shown */
           if (Menu::current())
             {
               Menu::current()->event(event);
-              {
-                int tact = 0;
-                if (touch_controls_menu_nav(&tact))
-                  {
-                    SDL_Event syn;
-                    memset(&syn, 0, sizeof(syn));
-                    syn.type = SDL_KEYDOWN;
-                    if (tact == 0) syn.key.keysym.sym = SDLK_UP;
-                    else if (tact == 1) syn.key.keysym.sym = SDLK_DOWN;
-                    else if (tact == 2) syn.key.keysym.sym = SDLK_LEFT;
-                    else if (tact == 3) syn.key.keysym.sym = SDLK_RIGHT;
-                    else syn.key.keysym.sym = SDLK_RETURN;
-                    Menu::current()->event(syn);
-                  }
-              }
 	      if(!Menu::current())
 	      st_pause_ticks_stop();
 
@@ -304,7 +316,6 @@ GameSession::process_events()
             tux.key_event((SDLKey)keymap.left, UP);
             tux.key_event((SDLKey)keymap.right, UP);
             tux.key_event((SDLKey)keymap.fire, UP);
-            touch_controls_reset();
             }
           else
             {
@@ -339,12 +350,6 @@ GameSession::process_events()
             
                     if(tux.key_event(key,DOWN))
                       break;
-
-                    if (st_is_escape_key(key))
-                      {
-                        on_escape_press();
-                        break;
-                      }
                   }
                   break;
                 case SDL_KEYUP:      /* A keyrelease! */
@@ -685,10 +690,9 @@ GameSession::draw()
       Menu::current()->draw();
       mouse_cursor->draw();
     }
-  else if (!game_pause)
-    {
-      touch_controls_draw();
-    }
+  /* Overlay: full pad while playing; menu button alone is always useful. */
+  if (!game_pause)
+    touch_controls_draw();
   
 #ifdef TSCONTROL
   if (show_mouse) MouseCursor::current()->draw();
