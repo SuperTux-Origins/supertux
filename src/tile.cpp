@@ -177,7 +177,7 @@ void TileManager::load_tileset(std::string filename, bool replace)
               reader.read_int_vector("tiles", &new_.tiles);	      
               if(!tilegroups_)
                 tilegroups_ = new std::set<TileGroup>;
-              tilegroups_->insert(new_).first;
+              tilegroups_->insert(new_);
             }
           else if (strcmp(lisp_symbol(lisp_car(element)), "properties") == 0)
             {
