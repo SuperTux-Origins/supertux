@@ -640,6 +640,11 @@ void platform_present(bool /*full_update*/)
     {
       /* Re-apply viewport in case of desktop-fullscreen / drawable size change. */
       gl_setup_viewport();
+      /* Overlay (bezel, touch pad) is in window pixel space and must be
+         drawn after the letterboxed game viewport, before the swap.
+         Callers may also draw it; a second pass is harmless. */
+      if (touch_controls_is_enabled())
+        touch_controls_draw();
       SDL_GL_SwapWindow(st_window);
       return;
     }

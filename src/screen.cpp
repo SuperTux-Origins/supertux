@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include "platform_config.h"
+#include "touch_controls.h"
 #include <SDL_image.h>
 
 #ifndef WIN32
@@ -398,6 +399,10 @@ void fadeout()
 {
   clearscreen(0, 0, 0);
   white_text->draw_align("Loading...", screen->w/2, screen->h/2, A_HMIDDLE, A_TOP);
+  /* Bezel/margins live in the window overlay; GLES present does not paint
+     them unless asked — same as the in-game loop. */
+  if (touch_controls_is_enabled())
+    touch_controls_draw();
   flipscreen();
 }
 
