@@ -74,22 +74,28 @@ inline bool st_key_held(const Uint8* keystate, SDL_Keycode key)
   return keystate[SDL_GetScancodeFromKey(key)] != 0;
 }
 
-/** Escape or Android Back keycode. */
+/**
+ * Escape or Android Back keycode.
+ *
+ * Do NOT gate on #ifdef SDLK_AC_BACK: in SDL2 that name is an anonymous
+ * enum member, not a #define, so the preprocessor never sees it and the
+ * AC_BACK branch was compiled out — Back reached Menu::event (sym=
+ * 1073742094) but matched no case and did nothing.
+ */
 inline bool st_is_escape_key(SDL_Keycode key)
 {
   if (key == SDLK_ESCAPE)
     return true;
-#ifdef SDLK_AC_BACK
-  if (key == SDLK_AC_BACK)
+  /* SDL_SCANCODE_AC_BACK = 270; keycode = scancode | (1<<30). */
+  if (key == (SDL_Keycode)SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_BACK))
     return true;
-#endif
   return false;
 }
 
 /**
  * Escape / Android Back — KEYDOWN only (one edge per physical press).
- * Android Back arrives as SDLK_AC_BACK (1073742094) / SDL_SCANCODE_AC_BACK
- * when SDL_HINT_ANDROID_TRAP_BACK_BUTTON is set before SDL_Init.
+ * Android Back arrives as SDLK_AC_BACK / SDL_SCANCODE_AC_BACK when
+ * SDL_HINT_ANDROID_TRAP_BACK_BUTTON is set before SDL_Init.
  * Matching KEYUP as well would toggle menus twice (KEYDOWN closes,
  * KEYUP opens again — looks like "Back does nothing").
  */
@@ -97,14 +103,10 @@ inline bool st_is_escape_event(const SDL_Event& event)
 {
   if (event.type != SDL_KEYDOWN)
     return false;
-#ifdef USE_SDL2
   if (event.key.repeat)
     return false;
-#endif
-#ifdef SDL_SCANCODE_AC_BACK
   if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK)
     return true;
-#endif
   return st_is_escape_key(event.key.keysym.sym);
 }
 

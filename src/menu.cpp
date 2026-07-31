@@ -872,13 +872,14 @@ Menu::event(SDL_Event& event)
       menuaction = MENU_ACTION_REMOVE;
       delete_character++;
       break;
-    case SDLK_ESCAPE:
-#ifdef SDLK_AC_BACK
-    case SDLK_AC_BACK:
-#endif
-      Menu::pop_current();
-      break;
     default:
+      /* Escape / Android Back: st_is_escape_key handles SDLK_AC_BACK
+         without a #ifdef (enum member is invisible to the preprocessor). */
+      if (st_is_escape_key(key))
+        {
+          Menu::pop_current();
+          break;
+        }
 #ifdef USE_SDL2
       /* Under SDL2, printable characters arrive as SDL_TEXTINPUT to avoid
          double-insert when both keydown and text events fire. */
