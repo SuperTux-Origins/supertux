@@ -27,6 +27,7 @@
 #include "texture.h"
 #include "globals.h"
 #include "setup.h"
+#include "game_file.h"
 #ifdef USE_GLES2
 #include "gles2_renderer.h"
 #endif
@@ -333,7 +334,10 @@ sdl_surface_part_from_file(const std::string& file, int x, int y, int w, int h, 
   SDL_Surface * temp;
   SDL_Surface * conv;
 
-  temp = IMG_Load(file.c_str());
+  {
+    SDL_RWops* rw = open_game_file(file);
+    temp = rw ? IMG_Load_RW(rw, 1) : 0;
+  }
 
   if (temp == NULL)
     st_abort("Can't load", file);
@@ -384,7 +388,10 @@ sdl_surface_from_file(const std::string& file, int use_alpha)
   SDL_Surface* sdl_surface;
   SDL_Surface* temp;
 
-  temp = IMG_Load(file.c_str());
+  {
+    SDL_RWops* rw = open_game_file(file);
+    temp = rw ? IMG_Load_RW(rw, 1) : 0;
+  }
 
   if (temp == NULL)
     st_abort("Can't load", file);

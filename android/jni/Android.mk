@@ -14,6 +14,7 @@ LOCAL_SRC_FILES := \
 	collision.cpp \
 	configfile.cpp \
 	gameloop.cpp \
+	game_file.cpp \
 	gameobjs.cpp \
 	globals.cpp \
 	gles2_renderer.cpp \

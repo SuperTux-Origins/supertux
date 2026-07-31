@@ -22,6 +22,7 @@
 #include "globals.h"
 #include "sound.h"
 #include "setup.h"
+#include "game_file.h"
 #ifdef GP2X
 #include <string.h>
 #endif
@@ -197,8 +198,13 @@ Mix_Chunk* load_sound(const std::string& file)
 {
   if(!audio_device)
     return 0;
-  
-  Mix_Chunk* snd = Mix_LoadWAV(file.c_str());
+
+  Mix_Chunk* snd = 0;
+  {
+    SDL_RWops* rw = open_game_file(file);
+    if (rw)
+      snd = Mix_LoadWAV_RW(rw, 1);
+  }
 
   if (snd == 0)
     st_abort("Can't load", file);

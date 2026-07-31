@@ -51,6 +51,7 @@
 #include "globals.h"
 #include "platform.h"
 #include "setup.h"
+#include "game_file.h"
 #include "touch_controls.h"
 #include "screen.h"
 #include "texture.h"
@@ -96,18 +97,15 @@ void usage(char * prog, int ret);
 /* Does the given file exist and is it accessible? */
 int faccessible(const char *filename)
 {
+  if (!filename || !filename[0])
+    return false;
+  /* Real filesystem (mods, installs) or APK assets via open_game_file. */
+  if (game_file_exists(filename))
+    return true;
   struct stat filestat;
   if (stat(filename, &filestat) == -1)
-    {
-      return false;
-    }
-  else
-    {
-      if(S_ISREG(filestat.st_mode))
-        return true;
-      else
-        return false;
-    }
+    return false;
+  return S_ISREG(filestat.st_mode) ? true : false;
 }
 
 /* Can we write to this location? */
@@ -203,6 +201,10 @@ path_join4(char* dest, size_t dest_sz,
   return n >= 0 && (size_t)n < dest_sz;
 }
 
+#ifdef __ANDROID__
+static void android_list_asset_dir(const char* asset_dir, string_list_type* out);
+#endif
+
 /* Get all names of sub-directories in a certain directory. */
 /* Returns the number of sub-directories found. */
 /* Note: The user has to free the allocated space. */
@@ -284,6 +286,40 @@ string_list_type dsubdirs(const char *rel_path,const  char* expected_file)
         }
       closedir(dirStructP);
     }
+
+#ifdef __ANDROID__
+  /* APK assets are not a real directory tree — list via AssetManager. */
+  {
+    string_list_type asset_names;
+    string_list_init(&asset_names);
+    android_list_asset_dir(rel_path, &asset_names);
+    for (int i = 0; i < asset_names.num_items; ++i)
+      {
+        char child_path[PATH_MAX];
+        char probe[PATH_MAX];
+        if (!path_join2(child_path, sizeof(child_path), rel_path, asset_names.item[i]))
+          continue;
+        if (expected_file != NULL)
+          {
+            if (!path_join2(probe, sizeof(probe), child_path, expected_file))
+              continue;
+            /* game path uses datadir prefix for open_game_file stripping */
+            char full[PATH_MAX];
+            snprintf(full, sizeof(full), "%s/%s", datadir.c_str(), probe);
+            if (!faccessible(full) && !faccessible(probe))
+              continue;
+          }
+        /* Skip if already listed from filesystem. */
+        int dup = 0;
+        for (int j = 0; j < sdirs.num_items; ++j)
+          if (strcmp(sdirs.item[j], asset_names.item[i]) == 0)
+            { dup = 1; break; }
+        if (!dup)
+          string_list_add_item(&sdirs, asset_names.item[i]);
+      }
+    string_list_free(&asset_names);
+  }
+#endif
 
   return sdirs;
 }
@@ -372,127 +408,59 @@ void free_strings(char **strings, int num)
 static std::string userdir_override;
 
 #ifdef __ANDROID__
-/* Recursive mkdir (creates all parent components). */
-static int
-android_mkpath(const char* path)
-{
-  char tmp[1024];
-  size_t len = strlen(path);
-  if (len == 0 || len >= sizeof(tmp))
-    return -1;
-  memcpy(tmp, path, len + 1);
-  for (char* p = tmp + 1; *p; ++p)
-    {
-      if (*p == '/')
-        {
-          *p = '\0';
-          mkdir(tmp, 0755);
-          *p = '/';
-        }
-    }
-  return mkdir(tmp, 0755);
-}
-
-static int
-android_write_asset(AAssetManager* mgr, const char* asset_path, const char* dest_path)
-{
-  AAsset* asset = AAssetManager_open(mgr, asset_path, AASSET_MODE_STREAMING);
-  if (!asset)
-    return -1;
-
-  char parent[1024];
-  snprintf(parent, sizeof(parent), "%s", dest_path);
-  char* slash = strrchr(parent, '/');
-  if (slash)
-    {
-      *slash = '\0';
-      android_mkpath(parent);
-    }
-
-  FILE* out = fopen(dest_path, "wb");
-  if (!out)
-    {
-      SDL_Log("Android: cannot write %s: %s", dest_path, strerror(errno));
-      AAsset_close(asset);
-      return -1;
-    }
-
-  char buf[8192];
-  int rd;
-  while ((rd = AAsset_read(asset, buf, sizeof(buf))) > 0)
-    {
-      if ((int)fwrite(buf, 1, (size_t)rd, out) != rd)
-        {
-          fclose(out);
-          AAsset_close(asset);
-          SDL_Log("Android: short write to %s", dest_path);
-          return -1;
-        }
-    }
-  fclose(out);
-  AAsset_close(asset);
-  return 0;
-}
-
-/* Use Java AssetManager.list() so subdirectories are visible. */
+/* List names under an APK assets/ subdirectory (AssetManager.list). */
 static void
-android_extract_tree(JNIEnv* env, jobject java_am, AAssetManager* mgr,
-                     jmethodID list_mid, const char* asset_dir, const char* dest_dir)
+android_list_asset_dir(const char* asset_dir, string_list_type* out)
 {
-  jstring jpath = env->NewStringUTF(asset_dir);
-  jobjectArray listing = (jobjectArray)env->CallObjectMethod(java_am, list_mid, jpath);
-  env->DeleteLocalRef(jpath);
-  if (!listing || env->ExceptionCheck())
+  JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+  jobject activity = (jobject)SDL_AndroidGetActivity();
+  if (!env || !activity)
+    return;
+
+  jclass act_class = env->GetObjectClass(activity);
+  jmethodID get_assets = env->GetMethodID(
+      act_class, "getAssets", "()Landroid/content/res/AssetManager;");
+  jobject java_am = env->CallObjectMethod(activity, get_assets);
+  jclass am_class = env->GetObjectClass(java_am);
+  jmethodID list_mid = env->GetMethodID(
+      am_class, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
+  if (!list_mid)
     {
-      if (env->ExceptionCheck())
-        env->ExceptionClear();
-      SDL_Log("Android: AssetManager.list(\"%s\") failed", asset_dir);
+      env->DeleteLocalRef(am_class);
+      env->DeleteLocalRef(java_am);
+      env->DeleteLocalRef(act_class);
+      env->DeleteLocalRef(activity);
       return;
     }
 
-  android_mkpath(dest_dir);
-
-  jsize n = env->GetArrayLength(listing);
-  int files = 0;
-  for (jsize i = 0; i < n; ++i)
+  jstring jpath = env->NewStringUTF(asset_dir ? asset_dir : "");
+  jobjectArray listing = (jobjectArray)env->CallObjectMethod(java_am, list_mid, jpath);
+  env->DeleteLocalRef(jpath);
+  if (listing && !env->ExceptionCheck())
     {
-      jstring jname = (jstring)env->GetObjectArrayElement(listing, i);
-      if (!jname)
-        continue;
-      const char* name = env->GetStringUTFChars(jname, NULL);
-      if (!name)
+      jsize n = env->GetArrayLength(listing);
+      for (jsize i = 0; i < n; ++i)
         {
+          jstring jname = (jstring)env->GetObjectArrayElement(listing, i);
+          if (!jname)
+            continue;
+          const char* name = env->GetStringUTFChars(jname, NULL);
+          if (name)
+            {
+              string_list_add_item(out, name);
+              env->ReleaseStringUTFChars(jname, name);
+            }
           env->DeleteLocalRef(jname);
-          continue;
         }
-
-      char asset_path[1024];
-      char dest_path[1024];
-      if (asset_dir[0])
-        snprintf(asset_path, sizeof(asset_path), "%s/%s", asset_dir, name);
-      else
-        snprintf(asset_path, sizeof(asset_path), "%s", name);
-      snprintf(dest_path, sizeof(dest_path), "%s/%s", dest_dir, name);
-
-      /* Directory entries cannot be opened as AAsset. */
-      AAsset* as_file = AAssetManager_open(mgr, asset_path, AASSET_MODE_STREAMING);
-      if (as_file)
-        {
-          AAsset_close(as_file);
-          if (android_write_asset(mgr, asset_path, dest_path) == 0)
-            ++files;
-        }
-      else
-        {
-          android_extract_tree(env, java_am, mgr, list_mid, asset_path, dest_path);
-        }
-
-      env->ReleaseStringUTFChars(jname, name);
-      env->DeleteLocalRef(jname);
+      env->DeleteLocalRef(listing);
     }
-  env->DeleteLocalRef(listing);
-  SDL_Log("Android: %s -> %s (%d files this level, %d entries)",
-          asset_dir[0] ? asset_dir : "(root)", dest_dir, files, (int)n);
+  else if (env->ExceptionCheck())
+    env->ExceptionClear();
+
+  env->DeleteLocalRef(am_class);
+  env->DeleteLocalRef(java_am);
+  env->DeleteLocalRef(act_class);
+  env->DeleteLocalRef(activity);
 }
 
 static void
@@ -512,127 +480,20 @@ android_prepare_paths(void)
       SDL_Log("Android: userdir = %s", userdir_override.c_str());
     }
 
-  std::string data_root = std::string(internal) + "/data";
-  std::string marker = data_root + "/.extracted";
   /*
-   * APK build writes assets/.data_stamp (content fingerprint of packaged
-   * data/). Marker stores VERSION + that stamp. Any asset change (bezel,
-   * levels, …) changes the stamp and forces re-extract. Code lives in
-   * libmain.so and always updates on adb install; data is sticky until
-   * the stamp mismatches.
+   * Read game data straight from APK assets via open_game_file() /
+   * SDL_RWFromFile — no extract-to-disk. datadir stays empty so path joins
+   * produce "/images/..." etc.; game_file_relative() strips the slash and
+   * SDL opens the asset.
    */
-  char apk_stamp[96];
-  apk_stamp[0] = '\0';
-
-  bool need_extract = true;
-  JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
-  jobject activity = (jobject)SDL_AndroidGetActivity();
-  jobject java_am = 0;
-  jclass act_class = 0;
-  jclass am_class = 0;
-  jmethodID list_mid = 0;
-  AAssetManager* mgr = 0;
-
-  if (env && activity)
-    {
-      act_class = env->GetObjectClass(activity);
-      jmethodID get_assets = env->GetMethodID(
-          act_class, "getAssets", "()Landroid/content/res/AssetManager;");
-      java_am = env->CallObjectMethod(activity, get_assets);
-      am_class = env->GetObjectClass(java_am);
-      list_mid = env->GetMethodID(
-          am_class, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
-      mgr = AAssetManager_fromJava(env, java_am);
-
-      /* Read stamp from the APK (not internal storage). */
-      AAsset* stamp_asset = mgr
-          ? AAssetManager_open(mgr, ".data_stamp", AASSET_MODE_BUFFER)
-          : 0;
-      if (stamp_asset)
-        {
-          int n = AAsset_read(stamp_asset, apk_stamp, sizeof(apk_stamp) - 1);
-          AAsset_close(stamp_asset);
-          if (n > 0)
-            {
-              apk_stamp[n] = '\0';
-              while (n > 0 && (apk_stamp[n - 1] == '\n' || apk_stamp[n - 1] == '\r'
-                               || apk_stamp[n - 1] == ' '))
-                apk_stamp[--n] = '\0';
-            }
-        }
-      if (apk_stamp[0])
-        SDL_Log("Android: APK data stamp = %s", apk_stamp);
-      else
-        SDL_Log("Android: no .data_stamp in APK — will extract");
-    }
-  else
-    {
-      SDL_Log("Android: no JNI env/activity");
-    }
-
-  if (apk_stamp[0])
-    {
-      FILE* mf = fopen(marker.c_str(), "r");
-      if (mf)
-        {
-          char ver[128], gen[96];
-          ver[0] = gen[0] = '\0';
-          if (fgets(ver, sizeof(ver), mf))
-            {
-              size_t n = strlen(ver);
-              while (n > 0 && (ver[n - 1] == '\n' || ver[n - 1] == '\r'))
-                ver[--n] = '\0';
-              if (fgets(gen, sizeof(gen), mf))
-                {
-                  n = strlen(gen);
-                  while (n > 0 && (gen[n - 1] == '\n' || gen[n - 1] == '\r'))
-                    gen[--n] = '\0';
-                  if (strcmp(ver, VERSION) == 0 && strcmp(gen, apk_stamp) == 0)
-                    need_extract = false;
-                }
-            }
-          fclose(mf);
-        }
-    }
-
-  if (need_extract)
-    {
-      SDL_Log("Android: extracting APK assets to %s (stamp %s)",
-              data_root.c_str(), apk_stamp[0] ? apk_stamp : "(none)");
-      if (mgr && list_mid)
-        android_extract_tree(env, java_am, mgr, list_mid, "", data_root.c_str());
-      else
-        SDL_Log("Android: AssetManager setup failed — cannot extract");
-
-      FILE* m = fopen(marker.c_str(), "w");
-      if (m)
-        {
-          fprintf(m, "%s\n%s\n", VERSION, apk_stamp[0] ? apk_stamp : "none");
-          fclose(m);
-        }
-    }
-  else
-    {
-      SDL_Log("Android: data already extracted at %s (stamp %s)",
-              data_root.c_str(), apk_stamp);
-    }
-
-  if (env)
-    {
-      if (am_class) env->DeleteLocalRef(am_class);
-      if (java_am) env->DeleteLocalRef(java_am);
-      if (act_class) env->DeleteLocalRef(act_class);
-      if (activity) env->DeleteLocalRef(activity);
-    }
-
   if (datadir.empty())
     {
-      datadir = data_root;
-      SDL_Log("Android: datadir = %s", datadir.c_str());
+      datadir = "";
+      SDL_Log("Android: datadir = (APK assets, no extract)");
     }
 
   std::string probe = datadir + "/images/status/letters-white.png";
-  if (access(probe.c_str(), F_OK) != 0)
+  if (!game_file_exists(probe))
     SDL_Log("Android: ERROR missing %s — rebuild APK with data/ in the repo root",
             probe.c_str());
   else

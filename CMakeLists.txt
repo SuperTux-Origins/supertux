@@ -80,6 +80,7 @@ set(SUPERTUX_SOURCES
   src/configfile.cpp
   src/intro.cpp
   src/gameloop.cpp
+  src/game_file.cpp
   src/globals.cpp
   src/high_scores.cpp
   src/level.cpp

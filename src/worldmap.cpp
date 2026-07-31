@@ -518,18 +518,14 @@ void WorldMap::get_level_title(Levels::pointer level)
   /** get level's title */
   level->title = "<no title>";
 
-  FILE * fi;
   lisp_object_t* root_obj = 0;
-  fi = fopen((datadir +  "/levels/" + level->name).c_str(), "r");
-  if (fi == NULL)
+  std::string levelfile = datadir + "/levels/" + level->name;
+  root_obj = lisp_read_from_file(levelfile);
+  if (!root_obj)
   {
-    perror((datadir +  "/levels/" + level->name).c_str());
+    perror(levelfile.c_str());
     return;
   }
-
-  lisp_stream_t stream;
-  lisp_stream_init_file (&stream, fi);
-  root_obj = lisp_read (&stream);
 
   if (root_obj->type == LISP_TYPE_EOF || root_obj->type == LISP_TYPE_PARSE_ERROR)
   {
@@ -543,8 +539,6 @@ void WorldMap::get_level_title(Levels::pointer level)
   }
 
   lisp_free(root_obj);
-
-  fclose(fi);
 }
 
 void

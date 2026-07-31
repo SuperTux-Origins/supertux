@@ -23,12 +23,14 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include "setup.h"
 #include "lispreader.h"
+#include "game_file.h"
 
 #define TOKEN_ERROR                   -1
 #define TOKEN_EOF                     0
@@ -1372,20 +1374,14 @@ lisp_object_t* lisp_read_from_file(const std::string& filename)
     {
       return lisp_read_from_gzfile(filename.c_str());
     }
-  else
-    {
-      lisp_object_t* obj = 0;
-      FILE* in = fopen(filename.c_str(), "r");
 
-      if (in)
-        {
-          lisp_stream_init_file(&stream, in);
-          obj = lisp_read(&stream);
-          fclose(in);
-        }
-
-      return obj;
-    }
+  /* Prefer RWops so Android can read levels/maps from APK assets. */
+  std::vector<char> buf;
+  if (!game_file_read(filename, buf))
+    return 0;
+  buf.push_back('\0');
+  lisp_stream_init_string(&stream, &buf[0]);
+  return lisp_read(&stream);
 }
 
 // EOF //

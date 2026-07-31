@@ -94,7 +94,6 @@ void LevelSubset::parse (lisp_object_t* cursor)
 
 void LevelSubset::load(char *subset)
 {
-  FILE* fi;
   char filename[1024];
   char str[1024];
   int i;
@@ -107,35 +106,27 @@ void LevelSubset::load(char *subset)
     snprintf(filename, 1024, "%s/levels/%s/info", datadir.c_str(), subset);
   if(faccessible(filename))
     {
-      fi = fopen(filename, "r");
-      if (fi == NULL)
-        {
-          perror(filename);
-        }
-      lisp_stream_t stream;
-      lisp_stream_init_file (&stream, fi);
-      root_obj = lisp_read (&stream);
+      root_obj = lisp_read_from_file(filename);
 
-      if (root_obj->type == LISP_TYPE_EOF || root_obj->type == LISP_TYPE_PARSE_ERROR)
+      if (!root_obj || root_obj->type == LISP_TYPE_EOF || root_obj->type == LISP_TYPE_PARSE_ERROR)
         {
           printf("World: Parse Error in file %s", filename);
         }
-
-      lisp_object_t* cur = lisp_car(root_obj);
-
-      if (!lisp_symbol_p (cur))
+      else
         {
-          printf("World: Read error in %s",filename);
+          lisp_object_t* cur = lisp_car(root_obj);
+
+          if (!lisp_symbol_p (cur))
+            {
+              printf("World: Read error in %s",filename);
+            }
+          else if (strcmp(lisp_symbol(cur), "supertux-level-subset") == 0)
+            {
+              parse(lisp_cdr(root_obj));
+            }
+
+          lisp_free(root_obj);
         }
-
-      if (strcmp(lisp_symbol(cur), "supertux-level-subset") == 0)
-        {
-          parse(lisp_cdr(root_obj));
-
-        }
-
-      lisp_free(root_obj);
-      fclose(fi);
 
       snprintf(str, sizeof(str), "%.1019s.png", filename);
       if(faccessible(str))

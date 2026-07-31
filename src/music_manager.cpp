@@ -22,6 +22,7 @@
 #include "musicref.h"
 #include "sound.h"
 #include "setup.h"
+#include "game_file.h"
 
 MusicManager::MusicManager()
   : current_music(0), music_enabled(true)
@@ -73,7 +74,20 @@ MusicManager::exists_music(const std::string& file)
   }
   
 #ifndef GP2X
-  Mix_Music* song = Mix_LoadMUS(file.c_str());
+  Mix_Music* song = 0;
+  {
+    SDL_RWops* rw = open_game_file(file);
+    if (rw)
+      {
+#ifdef USE_SDL2
+        song = Mix_LoadMUS_RW(rw, 1);
+#else
+        song = Mix_LoadMUS_RW(rw);
+        if (!song)
+          SDL_RWclose(rw);
+#endif
+      }
+  }
 #else
   char mfile[100];
   snprintf(mfile,sizeof(mfile),"%s",file.c_str());

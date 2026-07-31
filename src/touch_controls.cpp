@@ -10,11 +10,13 @@
 #include "text.h"
 #include "texture.h"
 #include "setup.h"
+#include "game_file.h"
 
 #include "SDL_image.h"
 
 #include <string.h>
 #include <string>
+#include <vector>
 
 enum {
   TC_LEFT = 0,
@@ -392,12 +394,12 @@ static void
 tc_load_bezel_hole(void)
 {
   std::string hole_path = datadir + "/images/status/tv-bezel.hole";
-  FILE* fp = fopen(hole_path.c_str(), "r");
-  if (!fp)
+  std::vector<char> buf;
+  if (!game_file_read(hole_path, buf) || buf.empty())
     return;
+  buf.push_back('\0');
   int hx = 0, hy = 0, hw = 0, hh = 0, iw = 0, ih = 0;
-  int n = fscanf(fp, "%d %d %d %d %d %d", &hx, &hy, &hw, &hh, &iw, &ih);
-  fclose(fp);
+  int n = sscanf(&buf[0], "%d %d %d %d %d %d", &hx, &hy, &hw, &hh, &iw, &ih);
   if (n >= 4 && hw > 0 && hh > 0)
     {
       bezel_hx = hx;
@@ -422,11 +424,16 @@ tc_draw_bezel(void)
       tc_bezel_tried = true;
       tc_load_bezel_hole();
       std::string path = datadir + "/images/status/tv-bezel.png";
-      /* Optional chrome — IMG_Load failure must not abort the game. */
-      SDL_Surface* raw = IMG_Load(path.c_str());
+      /* Optional chrome — load failure must not abort the game. */
+      SDL_Surface* raw = 0;
+      {
+        SDL_RWops* rw = open_game_file(path);
+        if (rw)
+          raw = IMG_Load_RW(rw, 1);
+      }
       if (!raw)
         {
-          st_vlog("[video] TV bezel IMG_Load(%s) failed: %s\n",
+          st_vlog("[video] TV bezel load(%s) failed: %s\n",
                   path.c_str(), IMG_GetError());
         }
       else
