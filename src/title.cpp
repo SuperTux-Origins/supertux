@@ -25,6 +25,7 @@
 #include "texture.h"
 #include "timer.h"
 #include "setup.h"
+#include "game_file.h"
 #include "level.h"
 #include "gameloop.h"
 #include "leveleditor.h"
@@ -242,17 +243,45 @@ void title(void)
   logo = new Surface(datadir + "/images/title/logo.png", USE_ALPHA);
   img_choose_subset = new Surface(datadir + "/images/status/choose-level-subset.png", USE_ALPHA);
 
-  /* Generating contrib maps by only using a string_list */
-  // Since there isn't any world dir or anything, add a hardcoded entry for Bonus Island
+  /* Contrib / bonus worldmaps: every .stwm under levels/worldmaps/ except the
+     main campaign map. On Android, directory listing may miss zip-injected
+     assets — probe known names that open_game_file can still read. */
   string_list_init(&worldmap_list);
 
-  string_list_type files = dfiles("levels/worldmaps/", ".stwm", "couldn't list worldmaps");
+  string_list_type files = dfiles("levels/worldmaps/", ".stwm", NULL);
   for(int i = 0; i < files.num_items; ++i) {
     if(strcmp(files.item[i], "world1.stwm") == 0)
       continue;
     string_list_add_item(&worldmap_list, files.item[i]);
   }
   string_list_free(&files);
+
+  /* Fallback probes when listing returned nothing (or missed a map). */
+  {
+    static const char* known_bonus_stwm[] = {
+      "bonusisland.stwm",
+      "bonus_island.stwm",
+      "bonus.stwm",
+      "world2.stwm",
+      0
+    };
+    for (int k = 0; known_bonus_stwm[k]; ++k)
+      {
+        int already = 0;
+        for (int i = 0; i < worldmap_list.num_items; ++i)
+          if (strcmp(worldmap_list.item[i], known_bonus_stwm[k]) == 0)
+            { already = 1; break; }
+        if (already)
+          continue;
+        std::string probe = datadir + "/levels/worldmaps/" + known_bonus_stwm[k];
+        if (game_file_exists(probe))
+          {
+            st_vlog("[data] worldmap probe hit: %s\n", known_bonus_stwm[k]);
+            string_list_add_item(&worldmap_list, known_bonus_stwm[k]);
+          }
+      }
+  }
+  st_vlog("[data] bonus worldmap_list count=%d\n", worldmap_list.num_items);
 
   /* --- Main title loop: --- */
   frame = 0;

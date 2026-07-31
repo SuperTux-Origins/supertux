@@ -200,6 +200,18 @@ android_asset_dir_normalize(const char* rel_path, char* out, size_t out_sz)
   while (n > 0 && (out[n - 1] == '/' || out[n - 1] == '\\'))
     out[--n] = '\0';
 }
+
+/* True if name is already in the string_list (must be before dfiles/dsubdirs). */
+static int
+string_list_contains(const string_list_type* list, const char* name)
+{
+  if (!list || !name)
+    return 0;
+  for (int i = 0; i < list->num_items; ++i)
+    if (strcmp(list->item[i], name) == 0)
+      return 1;
+  return 0;
+}
 #endif
 
 /* Get all names of sub-directories in a certain directory. */
@@ -333,9 +345,8 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
   char path[PATH_MAX];
 
   string_list_init(&sdirs);
-  if (!path_join2(path, sizeof(path), st_dir, rel_path))
-    return sdirs;
-  if((dirStructP = opendir(path)) != NULL)
+  if (path_join2(path, sizeof(path), st_dir, rel_path)
+      && (dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
         {
@@ -363,9 +374,8 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
       closedir(dirStructP);
     }
 
-  if (!path_join2(path, sizeof(path), datadir.c_str(), rel_path))
-    return sdirs;
-  if((dirStructP = opendir(path)) != NULL)
+  if (path_join2(path, sizeof(path), datadir.c_str(), rel_path)
+      && (dirStructP = opendir(path)) != NULL)
     {
       while((direntp = readdir(dirStructP)) != NULL)
         {
@@ -394,7 +404,7 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
     }
 
 #ifdef __ANDROID__
-  /* APK assets: same listing path as dsubdirs (opendir cannot see assets/). */
+  /* APK assets: always run (opendir cannot see assets/). */
   {
     string_list_type asset_names;
     string_list_init(&asset_names);
@@ -410,11 +420,7 @@ string_list_type dfiles(const char *rel_path, const  char* glob, const  char* ex
           continue;
         if (glob != NULL && strstr(name, glob) == NULL)
           continue;
-        int dup = 0;
-        for (int j = 0; j < sdirs.num_items; ++j)
-          if (strcmp(sdirs.item[j], name) == 0)
-            { dup = 1; break; }
-        if (!dup)
+        if (!string_list_contains(&sdirs, name))
           string_list_add_item(&sdirs, name);
       }
     string_list_free(&asset_names);
@@ -437,61 +443,116 @@ void free_strings(char **strings, int num)
 static std::string userdir_override;
 
 #ifdef __ANDROID__
-/* List names under an APK assets/ subdirectory (AssetManager.list). */
+/*
+ * List names under an APK assets/ subdirectory.
+ *
+ * Prefer NDK AAssetDir (files only) — works for assets injected via zip into
+ * the APK. Supplement with Java AssetManager.list() for subdirectory names
+ * (needed by dsubdirs). Zip-injected trees often make list() return empty
+ * while SDL_RWFromFile / AAsset still open files.
+ */
 static void
 android_list_asset_dir(const char* asset_dir, string_list_type* out)
 {
+  char norm[PATH_MAX];
+  android_asset_dir_normalize(asset_dir, norm, sizeof(norm));
+
   JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
   jobject activity = (jobject)SDL_AndroidGetActivity();
   if (!env || !activity)
-    return;
+    {
+      st_vlog("[data] android_list_asset_dir('%s'): no JNI env/activity\n", norm);
+      return;
+    }
 
   jclass act_class = env->GetObjectClass(activity);
   jmethodID get_assets = env->GetMethodID(
       act_class, "getAssets", "()Landroid/content/res/AssetManager;");
-  jobject java_am = env->CallObjectMethod(activity, get_assets);
-  jclass am_class = env->GetObjectClass(java_am);
-  jmethodID list_mid = env->GetMethodID(
-      am_class, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
-  if (!list_mid)
+  if (!get_assets)
     {
-      env->DeleteLocalRef(am_class);
-      env->DeleteLocalRef(java_am);
+      st_vlog("[data] android_list_asset_dir: getAssets missing\n");
+      env->DeleteLocalRef(act_class);
+      env->DeleteLocalRef(activity);
+      return;
+    }
+  jobject java_am = env->CallObjectMethod(activity, get_assets);
+  if (!java_am || env->ExceptionCheck())
+    {
+      if (env->ExceptionCheck())
+        env->ExceptionClear();
+      st_vlog("[data] android_list_asset_dir: getAssets() returned null\n");
       env->DeleteLocalRef(act_class);
       env->DeleteLocalRef(activity);
       return;
     }
 
-  char norm[PATH_MAX];
-  android_asset_dir_normalize(asset_dir, norm, sizeof(norm));
-  jstring jpath = env->NewStringUTF(norm);
-  jobjectArray listing = (jobjectArray)env->CallObjectMethod(java_am, list_mid, jpath);
-  env->DeleteLocalRef(jpath);
-  if (listing && !env->ExceptionCheck())
+  int n_ndk = 0;
+  AAssetManager* mgr = AAssetManager_fromJava(env, java_am);
+  if (mgr)
     {
-      jsize n = env->GetArrayLength(listing);
-      for (jsize i = 0; i < n; ++i)
+      AAssetDir* adir = AAssetManager_openDir(mgr, norm);
+      if (adir)
         {
-          jstring jname = (jstring)env->GetObjectArrayElement(listing, i);
-          if (!jname)
-            continue;
-          const char* name = env->GetStringUTFChars(jname, NULL);
-          if (name)
+          const char* fname;
+          while ((fname = AAssetDir_getNextFileName(adir)) != NULL)
             {
-              string_list_add_item(out, name);
-              env->ReleaseStringUTFChars(jname, name);
+              if (!string_list_contains(out, fname))
+                {
+                  string_list_add_item(out, fname);
+                  ++n_ndk;
+                }
             }
-          env->DeleteLocalRef(jname);
+          AAssetDir_close(adir);
         }
-      env->DeleteLocalRef(listing);
+      else
+        st_vlog("[data] AAssetManager_openDir('%s') failed\n", norm);
     }
-  else if (env->ExceptionCheck())
-    env->ExceptionClear();
+  else
+    st_vlog("[data] AAssetManager_fromJava failed\n");
 
+  /* Java list() — files + directory names (dsubdirs needs dirs). */
+  int n_java = 0;
+  jclass am_class = env->GetObjectClass(java_am);
+  jmethodID list_mid = env->GetMethodID(
+      am_class, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
+  if (list_mid)
+    {
+      jstring jpath = env->NewStringUTF(norm);
+      jobjectArray listing =
+          (jobjectArray)env->CallObjectMethod(java_am, list_mid, jpath);
+      env->DeleteLocalRef(jpath);
+      if (listing && !env->ExceptionCheck())
+        {
+          jsize n = env->GetArrayLength(listing);
+          for (jsize i = 0; i < n; ++i)
+            {
+              jstring jname = (jstring)env->GetObjectArrayElement(listing, i);
+              if (!jname)
+                continue;
+              const char* name = env->GetStringUTFChars(jname, NULL);
+              if (name)
+                {
+                  if (!string_list_contains(out, name))
+                    {
+                      string_list_add_item(out, name);
+                      ++n_java;
+                    }
+                  env->ReleaseStringUTFChars(jname, name);
+                }
+              env->DeleteLocalRef(jname);
+            }
+          env->DeleteLocalRef(listing);
+        }
+      else if (env->ExceptionCheck())
+        env->ExceptionClear();
+    }
   env->DeleteLocalRef(am_class);
   env->DeleteLocalRef(java_am);
   env->DeleteLocalRef(act_class);
   env->DeleteLocalRef(activity);
+
+  st_vlog("[data] android_list_asset_dir('%s') → %d total (ndk files +%d, java +%d)\n",
+          norm, out->num_items, n_ndk, n_java);
 }
 
 static void
