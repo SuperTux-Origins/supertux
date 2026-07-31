@@ -92,8 +92,6 @@
           if self ? lastModifiedDate then builtins.substring 0 8 self.lastModifiedDate
           else "00000000";
         androidApkName = "supertux-milestone1-${gitDate}-${gitRev}.apk";
-        hasGameData = builtins.pathExists ./data;
-
         # Upstream stb_image.h (plain). Fetched at eval/build time; hash pinned.
         stbImageH = androidPkgs.fetchurl {
           url = "https://raw.githubusercontent.com/nothings/stb/refs/heads/master/stb_image.h";
@@ -198,7 +196,7 @@
             outApkName = androidApkName;
             keystore = ./keystore/debug.keystore;
             gameSrcDir = ./src;
-            gameDataDir = if hasGameData then ./data else null;
+            gameDataDir = ./data;
             stbImageH = stbImageH;
           };
         };
@@ -231,7 +229,7 @@
               outApkName = androidApkName;
               keystore = ./keystore/debug.keystore;
               gameSrcDir = ./src;
-              gameDataDir = if hasGameData then ./data else null;
+              gameDataDir = ./data;
               stbImageH = stbImageH;
             };
             apkFileName = androidApkName;

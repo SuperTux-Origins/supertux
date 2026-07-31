@@ -4,10 +4,9 @@
 #   ANDROID_HOME, BUILD_TOOLS_VERSION, PACKAGE_PLATFORM, TARGET_ABIS
 #   APP_NAME, APP_DIR          - android/ packaging dir (manifest, res, jni/)
 #   GAME_SRC_DIR               - path to C++ sources (repo src/)
+#   GAME_DATA_DIR              - required data/ tree packaged as assets
 #   APPLICATION_MK, TOP_ANDROID_MK, SDL_PREBUILT_MK, SDL_ANDROID_LIBS
-#   KEYSTORE
-#   STB_IMAGE_H                - upstream stb_image.h
-#   GAME_DATA_DIR              - optional data/ tree packaged as assets
+#   KEYSTORE, STB_IMAGE_H
 set -euo pipefail
 
 NDK="$ANDROID_HOME/ndk-bundle"
@@ -16,6 +15,12 @@ PACKAGE_JAR="$ANDROID_HOME/platforms/android-$PACKAGE_PLATFORM/android.jar"
 
 if [ -z "${GAME_SRC_DIR:-}" ] || [ ! -d "$GAME_SRC_DIR" ]; then
   echo "error: GAME_SRC_DIR must point at the game C++ source tree" >&2
+  exit 1
+fi
+
+if [ -z "${GAME_DATA_DIR:-}" ] || [ ! -d "$GAME_DATA_DIR" ]; then
+  echo "error: GAME_DATA_DIR must point at the Milestone 1 data/ tree" >&2
+  echo "       (expected images/, levels/, etc. under that path)" >&2
   exit 1
 fi
 
@@ -28,10 +33,9 @@ cp -r "$APP_DIR/res" src/res
 
 # Game C++ sources next to the module Android.mk.
 cp -r "$GAME_SRC_DIR"/. src/jni/src/
-# Drop the SDL1 backend — Android is SDL2-only.
 rm -f src/jni/src/platform_sdl1.cpp
 
-# IMG_* shim + headers (always writable copies in the build dir).
+# IMG_* shim + headers.
 cp "$APP_DIR/jni/img_stb_min.c" src/jni/src/img_stb_min.c
 cp "$APP_DIR/jni/SDL_image.h" src/jni/src/SDL_image.h
 if [ -n "${STB_IMAGE_H:-}" ] && [ -f "$STB_IMAGE_H" ]; then
@@ -46,14 +50,27 @@ fi
 cp "$SDL_PREBUILT_MK" src/jni/SDL/Android.mk
 cp -r "$SDL_ANDROID_LIBS/include" src/jni/SDL/include
 
-# Optional game data → APK assets.
-if [ -n "${GAME_DATA_DIR:-}" ] && [ -d "$GAME_DATA_DIR" ]; then
-  mkdir -p src/assets
-  cp -r "$GAME_DATA_DIR"/. src/assets/
+# Game data → APK assets/ (AssetManager root).
+mkdir -p src/assets
+cp -a "$GAME_DATA_DIR"/. src/assets/
+# Nix store files are often 0444; aapt/zip need readable tree we can scan.
+chmod -R u+rwX src
+
+ASSET_COUNT=$(find src/assets -type f | wc -l)
+ASSET_SIZE=$(du -sh src/assets | awk '{print $1}')
+echo "Packaging $ASSET_COUNT asset files ($ASSET_SIZE) from $GAME_DATA_DIR"
+if [ "$ASSET_COUNT" -lt 10 ]; then
+  echo "error: asset tree looks empty (found $ASSET_COUNT files)" >&2
+  ls -la src/assets >&2 || true
+  exit 1
+fi
+# Probe a well-known path used by the game at startup.
+if [ ! -f src/assets/images/status/letters-white.png ]; then
+  echo "error: missing src/assets/images/status/letters-white.png" >&2
+  echo "       is GAME_DATA_DIR a full Milestone 1 data/ tree?" >&2
+  exit 1
 fi
 
-# Nix store copies are often 0444; make the tree writable before any edits.
-chmod -R u+w src
 cp "$KEYSTORE" debug.keystore
 
 "$NDK/ndk-build" \
@@ -63,15 +80,12 @@ cp "$KEYSTORE" debug.keystore
   -j"${NIX_BUILD_CORES:-$(nproc)}"
 
 mkdir -p out
-AAPT_ASSETS=()
-if [ -d src/assets ]; then
-  AAPT_ASSETS=(-A src/assets)
-fi
 
+# Package resources + manifest. Assets are added via zip below: old aapt's
+# -A path has been unreliable with large trees in this pipeline.
 "$BT/aapt" package -f \
   -M src/AndroidManifest.xml \
   -S src/res \
-  "${AAPT_ASSETS[@]}" \
   -I "$PACKAGE_JAR" \
   -F out/base.apk
 
@@ -84,10 +98,23 @@ done
 ( cd out && "$BT/aapt" add base.apk classes.dex )
 ( cd out && zip -r base.apk lib )
 
+# Inject assets/ into the APK (same layout AssetManager expects).
+# Run from src/ so paths inside the zip are assets/...
+( cd src && zip -r -9 ../out/base.apk assets )
+echo "APK contents (assets sample):"
+unzip -l out/base.apk | grep -E 'assets/(images|levels)/' | head -20
+ASSET_IN_APK=$(unzip -l out/base.apk | grep -c ' assets/' || true)
+echo "Asset entries in APK: $ASSET_IN_APK"
+if [ "${ASSET_IN_APK:-0}" -lt 10 ]; then
+  echo "error: APK still has almost no assets after zip inject" >&2
+  exit 1
+fi
+
 "$BT/zipalign" -f 4 out/base.apk out/aligned.apk
 
 "$BT/apksigner" sign \
   --ks debug.keystore --ks-pass pass:android --key-pass pass:android \
   --out "out/$APP_NAME.apk" out/aligned.apk
 
+echo "Final APK size: $(du -h "out/$APP_NAME.apk" | awk '{print $1}')"
 "$BT/aapt" dump badging "out/$APP_NAME.apk"

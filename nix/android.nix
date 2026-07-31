@@ -141,9 +141,13 @@ let
         GAME_SRC_DIR = "${gameSrcDir}";
       } // pkgs.lib.optionalAttrs (sdl2ImageSrc != null) {
         SDL2_IMAGE_SRC = "${sdl2ImageSrc}";
-      } // pkgs.lib.optionalAttrs (gameDataDir != null) {
-        GAME_DATA_DIR = "${gameDataDir}";
-      } // pkgs.lib.optionalAttrs (stbImageH != null) {
+      } // (
+        if gameDataDir == null then
+          throw "mkApk: gameDataDir is required for SuperTux Android APK"
+        else {
+          GAME_DATA_DIR = "${gameDataDir}";
+        }
+      ) // pkgs.lib.optionalAttrs (stbImageH != null) {
         STB_IMAGE_H = "${stbImageH}";
       };
 
