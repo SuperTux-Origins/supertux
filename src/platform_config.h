@@ -290,12 +290,16 @@ inline bool st_event_wheel_down(const SDL_Event& event)
 #endif
 }
 
+/* Implemented in platform_sdl1.cpp / platform_sdl2.cpp (letterbox-aware). */
+void platform_window_to_logical(int* x, int* y);
+Uint32 platform_get_mouse_state(int* x, int* y);
+
 inline void st_event_mouse_xy(const SDL_Event& event, int* x, int* y)
 {
 #ifdef USE_SDL2
   if (event.type == SDL_MOUSEWHEEL)
     {
-      SDL_GetMouseState(x, y);
+      platform_get_mouse_state(x, y);
       return;
     }
 #endif
@@ -303,15 +307,17 @@ inline void st_event_mouse_xy(const SDL_Event& event, int* x, int* y)
     {
       *x = event.button.x;
       *y = event.button.y;
+      platform_window_to_logical(x, y);
       return;
     }
   if (event.type == SDL_MOUSEMOTION)
     {
       *x = event.motion.x;
       *y = event.motion.y;
+      platform_window_to_logical(x, y);
       return;
     }
-  SDL_GetMouseState(x, y);
+  platform_get_mouse_state(x, y);
 }
 
 

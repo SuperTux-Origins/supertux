@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "screen.h"
+#include "platform.h"
 #include "mousecursor.h"
 
 MouseCursor* MouseCursor::current_ = 0;
@@ -62,7 +63,8 @@ void MouseCursor::set_mid(int x, int y)
 void MouseCursor::draw()
 {
   int x,y,w,h;
-  Uint8 ispressed = SDL_GetMouseState(&x,&y);
+  /* Window/touch coords → logical ST_SCREEN (letterbox-aware on SDL2). */
+  Uint8 ispressed = (Uint8)platform_get_mouse_state(&x, &y);
   w = cursor->w / tot_frames;
   h = cursor->h / MC_STATES_NB;
   if(ispressed &SDL_BUTTON(1) || ispressed &SDL_BUTTON(2))

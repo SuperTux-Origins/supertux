@@ -138,3 +138,15 @@ void platform_set_icon(SDL_Surface* icon)
   if (icon)
     SDL_WM_SetIcon(icon, NULL);
 }
+
+void platform_window_to_logical(int* x, int* y)
+{
+  (void)x;
+  (void)y;
+  /* SDL1 SetVideoMode is already ST_SCREEN_W×ST_SCREEN_H. */
+}
+
+Uint32 platform_get_mouse_state(int* x, int* y)
+{
+  return SDL_GetMouseState(x, y);
+}

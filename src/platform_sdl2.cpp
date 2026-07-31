@@ -20,7 +20,53 @@ static SDL_GLContext st_gl_context = NULL;
    invalidated on resize/format changes; the engine treats `screen` as stable. */
 static SDL_Surface* st_backbuffer = NULL;
 
+/* Letterbox used by software present / GL viewport — keep in sync so
+   touch/mouse window coords can be mapped back to logical ST_SCREEN. */
+static int st_lb_ox = 0;
+static int st_lb_oy = 0;
+static float st_lb_scale = 1.0f;
+
 #define VLOG(...) st_vlog(__VA_ARGS__)
+
+static void
+st_update_letterbox(int window_w, int window_h)
+{
+  if (window_w <= 0 || window_h <= 0
+      || (window_w == ST_SCREEN_W && window_h == ST_SCREEN_H))
+    {
+      st_lb_ox = 0;
+      st_lb_oy = 0;
+      st_lb_scale = 1.0f;
+      return;
+    }
+  float sx = (float)window_w / (float)ST_SCREEN_W;
+  float sy = (float)window_h / (float)ST_SCREEN_H;
+  float scale = (sx < sy) ? sx : sy;
+  int dw = (int)(ST_SCREEN_W * scale + 0.5f);
+  int dh = (int)(ST_SCREEN_H * scale + 0.5f);
+  if (dw < 1) dw = 1;
+  if (dh < 1) dh = 1;
+  st_lb_ox = (window_w - dw) / 2;
+  st_lb_oy = (window_h - dh) / 2;
+  st_lb_scale = scale;
+}
+
+void platform_window_to_logical(int* x, int* y)
+{
+  if (!x || !y)
+    return;
+  if (st_lb_scale <= 0.0f)
+    return;
+  *x = (int)(((float)(*x - st_lb_ox) / st_lb_scale) + 0.5f);
+  *y = (int)(((float)(*y - st_lb_oy) / st_lb_scale) + 0.5f);
+}
+
+Uint32 platform_get_mouse_state(int* x, int* y)
+{
+  Uint32 buttons = SDL_GetMouseState(x, y);
+  platform_window_to_logical(x, y);
+  return buttons;
+}
 
 static SDL_Surface*
 create_software_backbuffer(SDL_Surface* window_surface)
@@ -97,6 +143,8 @@ software_present(void)
       return;
     }
 
+  st_update_letterbox(window_surface->w, window_surface->h);
+
   if (window_surface->w == ST_SCREEN_W && window_surface->h == ST_SCREEN_H)
     {
       SDL_BlitSurface(st_backbuffer, NULL, window_surface, NULL);
@@ -104,18 +152,13 @@ software_present(void)
   else
     {
       /* Letterbox scale into desktop-fullscreen or HiDPI window. */
-      float sx = (float)window_surface->w / (float)ST_SCREEN_W;
-      float sy = (float)window_surface->h / (float)ST_SCREEN_H;
-      float scale = (sx < sy) ? sx : sy;
-      int dw = (int)(ST_SCREEN_W * scale + 0.5f);
-      int dh = (int)(ST_SCREEN_H * scale + 0.5f);
-      if (dw < 1) dw = 1;
-      if (dh < 1) dh = 1;
       SDL_Rect dst;
-      dst.x = (window_surface->w - dw) / 2;
-      dst.y = (window_surface->h - dh) / 2;
-      dst.w = dw;
-      dst.h = dh;
+      dst.x = st_lb_ox;
+      dst.y = st_lb_oy;
+      dst.w = (int)(ST_SCREEN_W * st_lb_scale + 0.5f);
+      dst.h = (int)(ST_SCREEN_H * st_lb_scale + 0.5f);
+      if (dst.w < 1) dst.w = 1;
+      if (dst.h < 1) dst.h = 1;
       SDL_FillRect(window_surface, NULL, SDL_MapRGB(window_surface->format, 0, 0, 0));
       SDL_BlitScaled(st_backbuffer, NULL, window_surface, &dst);
     }
@@ -132,18 +175,17 @@ gl_setup_viewport(void)
   if (st_window)
     SDL_GL_GetDrawableSize(st_window, &ww, &wh);
 
+  st_update_letterbox(ww, wh);
+
 #ifdef USE_GLES2
   gles2_renderer_set_viewport(ww, wh);
 #else
-  float sx = (float)ww / (float)ST_SCREEN_W;
-  float sy = (float)wh / (float)ST_SCREEN_H;
-  float scale = (sx < sy) ? sx : sy;
-  int dw = (int)(ST_SCREEN_W * scale + 0.5f);
-  int dh = (int)(ST_SCREEN_H * scale + 0.5f);
+  int dw = (int)(ST_SCREEN_W * st_lb_scale + 0.5f);
+  int dh = (int)(ST_SCREEN_H * st_lb_scale + 0.5f);
   if (dw < 1) dw = 1;
   if (dh < 1) dh = 1;
 
-  glViewport((ww - dw) / 2, (wh - dh) / 2, dw, dh);
+  glViewport(st_lb_ox, st_lb_oy, dw, dh);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);

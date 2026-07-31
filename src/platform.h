@@ -43,4 +43,13 @@ const char* platform_name(void);
 /** Window icon (SDL1: WM icon; SDL2: SDL_SetWindowIcon). */
 void platform_set_icon(SDL_Surface* icon);
 
+/** Map window/client coordinates (touch, mouse events) into logical
+ *  ST_SCREEN_W×ST_SCREEN_H space used by gameplay and the software
+ *  backbuffer. No-op when the window matches logical size (SDL1, or
+ *  SDL2 without letterbox). Safe to call with NULL. */
+void platform_window_to_logical(int* x, int* y);
+
+/** SDL_GetMouseState then map into logical coordinates. */
+Uint32 platform_get_mouse_state(int* x, int* y);
+
 #endif /* SUPERTUX_PLATFORM_H */

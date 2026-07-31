@@ -930,12 +930,10 @@ void st_general_setup(void)
   seticon();
 #endif
 
-  /* Unicode / text input for menu text fields: */
+  /* Unicode for menu text fields (SDL1). On SDL2, call SDL_StartTextInput
+     only while a text/num field is active — starting it at launch shows the
+     Android soft keyboard and system bars. */
   SDL_EnableUNICODE(1);
-#ifdef USE_SDL2
-  /* SDL2 delivers printable characters via SDL_TEXTINPUT. */
-  SDL_StartTextInput();
-#endif
 
   /* Load global images: */
 

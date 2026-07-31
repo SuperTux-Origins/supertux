@@ -20,6 +20,7 @@
         <activity
             android:name="org.libsdl.app.SDLActivity"
             android:label="SuperTux Milestone 1"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
             android:launchMode="singleTask">

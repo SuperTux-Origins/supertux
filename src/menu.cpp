@@ -121,6 +121,34 @@ bool confirm_dialog(std::string text)
 
 }
 
+/** SDL2: show soft keyboard only while a text/num field is selected. */
+static void
+menu_sync_text_input(Menu* menu)
+{
+#ifdef USE_SDL2
+  bool want = false;
+  if (menu && !menu->item.empty()
+      && menu->active_item >= 0
+      && menu->active_item < (int)menu->item.size())
+    {
+      int k = menu->item[menu->active_item].kind;
+      want = (k == MN_TEXTFIELD || k == MN_NUMFIELD);
+    }
+  if (want)
+    {
+      if (!SDL_IsTextInputActive())
+        SDL_StartTextInput();
+    }
+  else
+    {
+      if (SDL_IsTextInputActive())
+        SDL_StopTextInput();
+    }
+#else
+  (void)menu;
+#endif
+}
+
 void
 Menu::push_current(Menu* pmenu)
 {
@@ -129,6 +157,7 @@ Menu::push_current(Menu* pmenu)
 
   current_ = pmenu;
   current_->effect.start(500);
+  menu_sync_text_input(current_);
 }
 
 void
@@ -145,6 +174,7 @@ Menu::pop_current()
   {
     current_ = 0;
   }
+  menu_sync_text_input(current_);
 }
 
 void
@@ -156,6 +186,7 @@ Menu::set_current(Menu* menu)
     menu->effect.start(500);
 
   current_ = menu;
+  menu_sync_text_input(current_);
 }
 
 /* Return a pointer to a new menu item */
@@ -519,6 +550,7 @@ Menu::action()
   }
 
   menuaction = MENU_ACTION_NONE;
+  menu_sync_text_input(this);
 }
 
 int
@@ -1017,8 +1049,9 @@ Menu::event(SDL_Event& event)
   case SDL_MOUSEBUTTONDOWN:
     x = event.button.x;
     y = event.button.y;
+    platform_window_to_logical(&x, &y);
     if (verbose_mode)
-      st_vlog("[menu] MOUSEBUTTONDOWN btn=%d x=%d y=%d\n",
+      st_vlog("[menu] MOUSEBUTTONDOWN btn=%d x=%d y=%d (logical)\n",
               (int)event.button.button, x, y);
     if(x > pos_x - get_width()/2 &&
         x < pos_x + get_width()/2 &&
@@ -1031,6 +1064,7 @@ Menu::event(SDL_Event& event)
   case SDL_MOUSEMOTION:
     x = event.motion.x;
     y = event.motion.y;
+    platform_window_to_logical(&x, &y);
     if(x > pos_x - get_width()/2 &&
         x < pos_x + get_width()/2 &&
         y > pos_y - get_height()/2 &&
@@ -1042,6 +1076,7 @@ Menu::event(SDL_Event& event)
                 x, y, active_item, new_active, pos_y, get_height());
       active_item = new_active;
       mouse_cursor->set_state(MC_LINK);
+      menu_sync_text_input(this);
     }
     else
     {
