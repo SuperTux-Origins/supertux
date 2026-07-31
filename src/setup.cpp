@@ -28,6 +28,12 @@
 #include <string>
 #include "platform_config.h"
 #include <SDL_image.h>
+#ifdef __ANDROID__
+#include <jni.h>
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
+#include <android/log.h>
+#endif
 #ifndef NOOPENGL
 #include <SDL_opengl.h>
 #endif
@@ -361,9 +367,210 @@ void free_strings(char **strings, int num)
 
 /* --- SETUP --- */
 /* Set SuperTux configuration and save directories */
-/* Optional overrides from --datadir and --userdir (parsed before setup). */
+
 static std::string userdir_override;
 
+#ifdef __ANDROID__
+/* Recursive mkdir (creates all parent components). */
+static int
+android_mkpath(const char* path)
+{
+  char tmp[1024];
+  size_t len = strlen(path);
+  if (len == 0 || len >= sizeof(tmp))
+    return -1;
+  memcpy(tmp, path, len + 1);
+  for (char* p = tmp + 1; *p; ++p)
+    {
+      if (*p == '/')
+        {
+          *p = '\0';
+          mkdir(tmp, 0755);
+          *p = '/';
+        }
+    }
+  return mkdir(tmp, 0755);
+}
+
+static int
+android_write_asset(AAssetManager* mgr, const char* asset_path, const char* dest_path)
+{
+  AAsset* asset = AAssetManager_open(mgr, asset_path, AASSET_MODE_STREAMING);
+  if (!asset)
+    return -1;
+
+  char parent[1024];
+  snprintf(parent, sizeof(parent), "%s", dest_path);
+  char* slash = strrchr(parent, '/');
+  if (slash)
+    {
+      *slash = '\0';
+      android_mkpath(parent);
+    }
+
+  FILE* out = fopen(dest_path, "wb");
+  if (!out)
+    {
+      SDL_Log("Android: cannot write %s: %s", dest_path, strerror(errno));
+      AAsset_close(asset);
+      return -1;
+    }
+
+  char buf[8192];
+  int rd;
+  while ((rd = AAsset_read(asset, buf, sizeof(buf))) > 0)
+    {
+      if ((int)fwrite(buf, 1, (size_t)rd, out) != rd)
+        {
+          fclose(out);
+          AAsset_close(asset);
+          SDL_Log("Android: short write to %s", dest_path);
+          return -1;
+        }
+    }
+  fclose(out);
+  AAsset_close(asset);
+  return 0;
+}
+
+/* Use Java AssetManager.list() so subdirectories are visible. */
+static void
+android_extract_tree(JNIEnv* env, jobject java_am, AAssetManager* mgr,
+                     jmethodID list_mid, const char* asset_dir, const char* dest_dir)
+{
+  jstring jpath = env->NewStringUTF(asset_dir);
+  jobjectArray listing = (jobjectArray)env->CallObjectMethod(java_am, list_mid, jpath);
+  env->DeleteLocalRef(jpath);
+  if (!listing || env->ExceptionCheck())
+    {
+      if (env->ExceptionCheck())
+        env->ExceptionClear();
+      SDL_Log("Android: AssetManager.list(\"%s\") failed", asset_dir);
+      return;
+    }
+
+  android_mkpath(dest_dir);
+
+  jsize n = env->GetArrayLength(listing);
+  int files = 0;
+  for (jsize i = 0; i < n; ++i)
+    {
+      jstring jname = (jstring)env->GetObjectArrayElement(listing, i);
+      if (!jname)
+        continue;
+      const char* name = env->GetStringUTFChars(jname, NULL);
+      if (!name)
+        {
+          env->DeleteLocalRef(jname);
+          continue;
+        }
+
+      char asset_path[1024];
+      char dest_path[1024];
+      if (asset_dir[0])
+        snprintf(asset_path, sizeof(asset_path), "%s/%s", asset_dir, name);
+      else
+        snprintf(asset_path, sizeof(asset_path), "%s", name);
+      snprintf(dest_path, sizeof(dest_path), "%s/%s", dest_dir, name);
+
+      /* Directory entries cannot be opened as AAsset. */
+      AAsset* as_file = AAssetManager_open(mgr, asset_path, AASSET_MODE_STREAMING);
+      if (as_file)
+        {
+          AAsset_close(as_file);
+          if (android_write_asset(mgr, asset_path, dest_path) == 0)
+            ++files;
+        }
+      else
+        {
+          android_extract_tree(env, java_am, mgr, list_mid, asset_path, dest_path);
+        }
+
+      env->ReleaseStringUTFChars(jname, name);
+      env->DeleteLocalRef(jname);
+    }
+  env->DeleteLocalRef(listing);
+  SDL_Log("Android: %s -> %s (%d files this level, %d entries)",
+          asset_dir[0] ? asset_dir : "(root)", dest_dir, files, (int)n);
+}
+
+static void
+android_prepare_paths(void)
+{
+  const char* internal = SDL_AndroidGetInternalStoragePath();
+  if (!internal)
+    {
+      SDL_Log("Android: SDL_AndroidGetInternalStoragePath failed: %s", SDL_GetError());
+      return;
+    }
+  SDL_Log("Android: internal storage = %s", internal);
+
+  if (userdir_override.empty())
+    {
+      userdir_override = std::string(internal) + "/config";
+      SDL_Log("Android: userdir = %s", userdir_override.c_str());
+    }
+
+  std::string data_root = std::string(internal) + "/data";
+  std::string marker = data_root + "/.extracted";
+
+  if (access(marker.c_str(), F_OK) != 0)
+    {
+      SDL_Log("Android: extracting APK assets to %s", data_root.c_str());
+      JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+      jobject activity = (jobject)SDL_AndroidGetActivity();
+      if (!env || !activity)
+        {
+          SDL_Log("Android: no JNI env/activity");
+        }
+      else
+        {
+          jclass act_class = env->GetObjectClass(activity);
+          jmethodID get_assets = env->GetMethodID(
+              act_class, "getAssets", "()Landroid/content/res/AssetManager;");
+          jobject java_am = env->CallObjectMethod(activity, get_assets);
+          jclass am_class = env->GetObjectClass(java_am);
+          jmethodID list_mid = env->GetMethodID(
+              am_class, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
+          AAssetManager* mgr = AAssetManager_fromJava(env, java_am);
+          if (mgr && list_mid)
+            android_extract_tree(env, java_am, mgr, list_mid, "", data_root.c_str());
+          else
+            SDL_Log("Android: AssetManager setup failed");
+
+          FILE* m = fopen(marker.c_str(), "w");
+          if (m)
+            {
+              fputs(VERSION "\n", m);
+              fclose(m);
+            }
+          env->DeleteLocalRef(am_class);
+          env->DeleteLocalRef(java_am);
+          env->DeleteLocalRef(act_class);
+          env->DeleteLocalRef(activity);
+        }
+    }
+  else
+    {
+      SDL_Log("Android: data already extracted at %s", data_root.c_str());
+    }
+
+  if (datadir.empty())
+    {
+      datadir = data_root;
+      SDL_Log("Android: datadir = %s", datadir.c_str());
+    }
+
+  std::string probe = datadir + "/images/status/letters-white.png";
+  if (access(probe.c_str(), F_OK) != 0)
+    SDL_Log("Android: ERROR missing %s — rebuild APK with data/ in the repo root",
+            probe.c_str());
+  else
+    SDL_Log("Android: data probe OK (%s)", probe.c_str());
+}
+#endif /* __ANDROID__ 
+
+/* Optional overrides from --datadir and --userdir (parsed before setup). */
 void parse_path_args(int argc, char* argv[])
 {
   for (int i = 1; i < argc; i++)
@@ -381,6 +588,10 @@ void parse_path_args(int argc, char* argv[])
 
 void st_directory_setup(void)
 {
+#ifdef __ANDROID__
+  android_prepare_paths();
+#endif
+
   if (!userdir_override.empty())
     {
       st_dir = (char *) malloc(userdir_override.size() + 1);
@@ -462,8 +673,8 @@ void st_directory_setup(void)
   datadir = DATA_PREFIX;
 #endif
     }
-  printf("Configdir: %s\n", st_dir);
-  printf("Datadir: %s\n", datadir.c_str());
+  SDL_Log("Configdir: %s", st_dir);
+  SDL_Log("Datadir: %s", datadir.c_str());
 }
 
 /* Create and setup menus. */
@@ -846,13 +1057,19 @@ void st_video_setup_sdl(void)
 {
   /* Kept for menu toggles that re-init software mode */
   if (!platform_video_init(use_fullscreen, false))
-    exit(1);
+    {
+      SDL_Log("FATAL: software video init failed: %s", SDL_GetError());
+      exit(1);
+    }
 }
 
 void st_video_setup_gl(void)
 {
   if (!platform_video_init(use_fullscreen, true))
-    exit(1);
+    {
+      SDL_Log("FATAL: GL video init failed: %s", SDL_GetError());
+      exit(1);
+    }
 }
 
 void st_joystick_setup(void)
@@ -922,6 +1139,7 @@ void st_sdl_init(void)
 {
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
     {
+      SDL_Log("FATAL: SDL_Init failed: %s", SDL_GetError());
       fprintf(stderr, "\nError: SDL_Init failed:\n%s\n\n", SDL_GetError());
       exit(1);
     }
@@ -1014,6 +1232,7 @@ void st_shutdown(void)
 
 void st_abort(const std::string& reason, const std::string& details)
 {
+  SDL_Log("FATAL: %s %s", reason.c_str(), details.c_str());
   fprintf(stderr, "\nError: %s\n%s\n\n", reason.c_str(), details.c_str());
   st_shutdown();
   abort();

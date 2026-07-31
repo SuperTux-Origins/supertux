@@ -175,6 +175,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
       fprintf(stderr, "Error: SDL_InitSubSystem(VIDEO): %s\n", SDL_GetError());
+      SDL_Log("platform_video_init failed: %s", SDL_GetError());
       return false;
     }
 
@@ -226,6 +227,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
               if (!screen)
                 {
                   fprintf(stderr, "Error: GL shadow surface: %s\n", SDL_GetError());
+                  SDL_Log("platform_video_init failed: %s", SDL_GetError());
                   return false;
                 }
               glDisable(GL_DEPTH_TEST);
@@ -264,6 +266,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
     if (!st_window)
       {
         fprintf(stderr, "Error: SDL_CreateWindow failed: %s\n", SDL_GetError());
+        SDL_Log("platform_video_init failed: %s", SDL_GetError());
         return false;
       }
 
@@ -272,6 +275,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
       if (!window_surface)
         {
           fprintf(stderr, "Error: SDL_GetWindowSurface failed: %s\n", SDL_GetError());
+          SDL_Log("platform_video_init failed: %s", SDL_GetError());
           return false;
         }
 
@@ -284,6 +288,7 @@ bool platform_video_init(bool fullscreen, bool opengl)
       if (!st_backbuffer)
         {
           fprintf(stderr, "Error: software backbuffer: %s\n", SDL_GetError());
+          SDL_Log("platform_video_init failed: %s", SDL_GetError());
           return false;
         }
       screen = st_backbuffer;

@@ -15,15 +15,13 @@
         android:label="SuperTux Milestone 1"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
-        android:hasCode="true"
-        android:extractNativeLibs="true">
+        android:hasCode="true">
         <activity
             android:name="org.libsdl.app.SDLActivity"
             android:label="SuperTux Milestone 1"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
-            android:launchMode="singleTask"
-            android:exported="true">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

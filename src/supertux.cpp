@@ -24,6 +24,7 @@
 #include "defines.h"
 #include "globals.h"
 #include "setup.h"
+#include "platform_config.h"
 #include "intro.h"
 #include "title.h"
 #include "gameloop.h"
@@ -36,6 +37,7 @@
 
 int main(int argc, char * argv[])
 {
+  SDL_Log("SuperTux Milestone 1 %s starting", VERSION);
   /* Path options must be applied before directory/config setup. */
   parse_path_args(argc, argv);
   st_directory_setup();
