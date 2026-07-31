@@ -342,6 +342,33 @@ tc_press(int id, TcFingerId finger)
   tc_btn[id].finger = finger;
 }
 
+/*
+ * Virtual pad drives Player::input directly with a fixed layout. It must
+ * not go through keymap / key_event — those are for the physical keyboard
+ * configurator, and routing the pad through them made the pad follow
+ * remaps and pollute MN_CONTROLFIELD captures.
+ *
+ * apply: only assert DOWN for held pad buttons (never force UP here, so a
+ * physical keyboard can still hold the same action).
+ * release: clear an axis only when no pad button still provides it.
+ */
+static void
+tc_apply_player_downs(void)
+{
+  if (!tc_player)
+    return;
+  if (tc_btn[TC_LEFT].held)
+    tc_player->input.left = DOWN;
+  if (tc_btn[TC_RIGHT].held)
+    tc_player->input.right = DOWN;
+  if (tc_btn[TC_DOWN].held)
+    tc_player->input.down = DOWN;
+  if (tc_btn[TC_UP].held || tc_btn[TC_JUMP].held || tc_btn[TC_BOTH].held)
+    tc_player->input.up = DOWN;
+  if (tc_btn[TC_ACTION].held || tc_btn[TC_BOTH].held)
+    tc_player->input.fire = DOWN;
+}
+
 static void
 tc_release_button(int i)
 {
@@ -355,28 +382,35 @@ tc_release_button(int i)
     return;
   switch (i)
     {
-    case TC_LEFT:   tc_player->key_event((SDLKey)keymap.left, UP); break;
-    case TC_RIGHT:  tc_player->key_event((SDLKey)keymap.right, UP); break;
+    case TC_LEFT:
+      if (!tc_btn[TC_LEFT].held)
+        tc_player->input.left = UP;
+      break;
+    case TC_RIGHT:
+      if (!tc_btn[TC_RIGHT].held)
+        tc_player->input.right = UP;
+      break;
+    case TC_DOWN:
+      if (!tc_btn[TC_DOWN].held)
+        tc_player->input.down = UP;
+      break;
     case TC_UP:
-      if (!tc_btn[TC_JUMP].held && !tc_btn[TC_BOTH].held)
-        tc_player->key_event((SDLKey)keymap.jump, UP);
-      break;
     case TC_JUMP:
-      if (!tc_btn[TC_UP].held && !tc_btn[TC_BOTH].held)
-        tc_player->key_event((SDLKey)keymap.jump, UP);
-      break;
     case TC_BOTH:
-      if (!tc_btn[TC_UP].held && !tc_btn[TC_JUMP].held)
-        tc_player->key_event((SDLKey)keymap.jump, UP);
-      if (!tc_btn[TC_ACTION].held)
-        tc_player->key_event((SDLKey)keymap.fire, UP);
+      if (!tc_btn[TC_UP].held && !tc_btn[TC_JUMP].held && !tc_btn[TC_BOTH].held)
+        tc_player->input.up = UP;
+      if (i == TC_BOTH || i == TC_ACTION)
+        {
+          if (!tc_btn[TC_ACTION].held && !tc_btn[TC_BOTH].held)
+            tc_player->input.fire = UP;
+        }
       break;
-    case TC_DOWN:   tc_player->key_event((SDLKey)keymap.duck, UP); break;
     case TC_ACTION:
-      if (!tc_btn[TC_BOTH].held)
-        tc_player->key_event((SDLKey)keymap.fire, UP);
+      if (!tc_btn[TC_ACTION].held && !tc_btn[TC_BOTH].held)
+        tc_player->input.fire = UP;
       break;
-    default: break;
+    default:
+      break;
     }
 }
 
@@ -705,17 +739,8 @@ void touch_controls_apply_player(Player& tux)
     return;
 
   tc_player = &tux;
-
-  if (tc_btn[TC_LEFT].held)
-    tux.key_event((SDLKey)keymap.left, DOWN);
-  if (tc_btn[TC_RIGHT].held)
-    tux.key_event((SDLKey)keymap.right, DOWN);
-  if (tc_btn[TC_UP].held || tc_btn[TC_JUMP].held || tc_btn[TC_BOTH].held)
-    tux.key_event((SDLKey)keymap.jump, DOWN);
-  if (tc_btn[TC_DOWN].held)
-    tux.key_event((SDLKey)keymap.duck, DOWN);
-  if (tc_btn[TC_ACTION].held || tc_btn[TC_BOTH].held)
-    tux.key_event((SDLKey)keymap.fire, DOWN);
+  /* Fixed layout — independent of keyboard configurator / keymap. */
+  tc_apply_player_downs();
 }
 
 bool touch_controls_held(int dir)
@@ -798,8 +823,15 @@ bool touch_controls_process_event(SDL_Event& event, bool* want_escape)
       else if (!ate)
         menu->event(event);
 
+      /* Do not inject pad nav as KEYDOWNs while binding a key — that would
+         capture SDLK_UP/RETURN etc. into the configurator. */
+      bool binding = false;
+      if (menu->active_item >= 0
+          && menu->active_item < (int)menu->item.size()
+          && menu->item[menu->active_item].kind == MN_CONTROLFIELD)
+        binding = true;
       int tact = 0;
-      if (touch_controls_menu_nav(&tact))
+      if (!binding && touch_controls_menu_nav(&tact))
         {
           SDLKey key = SDLK_RETURN;
           if (tact == 0) key = SDLK_UP;
