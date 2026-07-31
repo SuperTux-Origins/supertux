@@ -551,9 +551,10 @@ WorldMap::get_input()
   SDL_Event event;
   while (SDL_PollEvent(&event))
     {
-      bool touch_ate = touch_controls_event(event);
+      bool want_escape = false;
+      bool routed = touch_controls_process_event(event, &want_escape);
 
-      if (st_is_escape_event(event) || touch_controls_escape_pressed())
+      if (want_escape)
         {
           on_escape_press();
           continue;
@@ -561,27 +562,14 @@ WorldMap::get_input()
 
       if (Menu::current())
         {
-          if (!touch_ate)
+          /* Menu owned the event inside process_event (or keyboard below). */
+          if (!routed)
             Menu::current()->event(event);
-
-          int tact = 0;
-          if (touch_controls_menu_nav(&tact))
-            {
-              SDL_Event syn;
-              memset(&syn, 0, sizeof(syn));
-              syn.type = SDL_KEYDOWN;
-              if (tact == 0) syn.key.keysym.sym = SDLK_UP;
-              else if (tact == 1) syn.key.keysym.sym = SDLK_DOWN;
-              else if (tact == 2) syn.key.keysym.sym = SDLK_LEFT;
-              else if (tact == 3) syn.key.keysym.sym = SDLK_RIGHT;
-              else syn.key.keysym.sym = SDLK_RETURN;
-              Menu::current()->event(syn);
-            }
           continue;
         }
 
       /* --- map mode (no menu) --- */
-      if (touch_ate)
+      if (routed)
         {
           if (touch_controls_held(0)) input_direction = D_WEST;
           else if (touch_controls_held(1)) input_direction = D_EAST;

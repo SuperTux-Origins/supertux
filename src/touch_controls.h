@@ -56,4 +56,20 @@ bool touch_controls_menu_nav(int* action);
  */
 bool touch_controls_escape_pressed(void);
 
+/**
+ * Shared pad + menu routing for one polled SDL event.
+ *
+ * Always updates the virtual pad. When Menu::current() is set:
+ *   - feeds the event into the menu (unless the pad consumed it)
+ *   - injects edge-triggered pad navigation as synthetic KEYDOWNs
+ *   - Escape / Android Back / Menu button → synthetic ESCAPE to the menu
+ * and returns true so the caller skips game-specific handling.
+ *
+ * When no menu is open: sets *want_escape if Escape/Back/Menu was pressed,
+ * and returns true only if the pad consumed the event.
+ *
+ * Use this in every event loop instead of open-coding pad + menu branches.
+ */
+bool touch_controls_process_event(SDL_Event& event, bool* want_escape);
+
 #endif /* SUPERTUX_TOUCH_CONTROLS_H */

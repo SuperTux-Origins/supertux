@@ -309,36 +309,11 @@ void title(void)
       SDL_Event event;
       while (SDL_PollEvent(&event))
         {
-          if (touch_controls_event(event))
-            {
-              int tact = 0;
-              if (Menu::current() && touch_controls_menu_nav(&tact))
-                {
-                  SDL_Event syn;
-                  memset(&syn, 0, sizeof(syn));
-                  syn.type = SDL_KEYDOWN;
-                  if (tact == 0) syn.key.keysym.sym = SDLK_UP;
-                  else if (tact == 1) syn.key.keysym.sym = SDLK_DOWN;
-                  else if (tact == 2) syn.key.keysym.sym = SDLK_LEFT;
-                  else if (tact == 3) syn.key.keysym.sym = SDLK_RIGHT;
-                  else syn.key.keysym.sym = SDLK_RETURN;
-                  Menu::current()->event(syn);
-                }
-              if (touch_controls_escape_pressed() && Menu::current()
-                  && Menu::current() != main_menu)
-                {
-                  SDL_Event syn;
-                  memset(&syn, 0, sizeof(syn));
-                  syn.type = SDL_KEYDOWN;
-                  syn.key.keysym.sym = SDLK_ESCAPE;
-                  Menu::current()->event(syn);
-                }
-              continue;
-            }
-          if (Menu::current())
-            {
-              Menu::current()->event(event);
-            }
+          bool want_escape = false;
+          if (touch_controls_process_event(event, &want_escape))
+            continue;
+          /* Title always has a menu; want_escape while none is unused. */
+          (void)want_escape;
          // FIXME: QUIT signal should be handled more generic, not locally
           if (event.type == SDL_QUIT)
             Menu::set_current(0);

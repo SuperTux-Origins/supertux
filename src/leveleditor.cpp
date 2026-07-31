@@ -25,6 +25,7 @@
 #include "button.h"
 #include "tile.h"
 #include "resources.h"
+#include "touch_controls.h"
 #ifndef NOSOUND
 #include "music_manager.h"
 #endif
@@ -1011,6 +1012,14 @@ void le_change_object_properties(GameObject *pobj)
 
     while (SDL_PollEvent(&event))
     {
+      bool want_escape = false;
+      if (touch_controls_process_event(event, &want_escape))
+        continue;
+      if (want_escape)
+        {
+          Menu::set_current(0);
+          continue;
+        }
       object_properties_menu->event(event);
     }
 
@@ -1068,8 +1077,23 @@ void le_checkevents()
 
   while(SDL_PollEvent(&event))
   {
+    bool want_escape = false;
+    if (touch_controls_process_event(event, &want_escape))
+      {
+        /* Pad ate the event, or an open menu owned it (nav + Back). */
+        if (!le_world && !Menu::current())
+          Menu::set_current(leveleditor_menu);
+        continue;
+      }
+    if (want_escape)
+      {
+        Menu::set_current(leveleditor_menu);
+        continue;
+      }
+
     if (Menu::current())
     {
+      /* Non-touch path (keyboard/mouse) while a menu is open. */
       Menu::current()->event(event);
       if(!le_world && !Menu::current())
         Menu::set_current(leveleditor_menu);

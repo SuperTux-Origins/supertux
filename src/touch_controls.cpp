@@ -15,6 +15,7 @@
 #include "texture.h"
 #include "setup.h"
 #include "game_file.h"
+#include "menu.h"
 
 #include "SDL_image.h"
 
@@ -767,4 +768,51 @@ bool touch_controls_escape_pressed(void)
   bool pressed = tc_btn[TC_MENU].held && !tc_btn[TC_MENU].prev_held;
   tc_btn[TC_MENU].prev_held = tc_btn[TC_MENU].held;
   return pressed;
+}
+
+static void
+tc_inject_menu_key(Menu* menu, SDLKey key)
+{
+  if (!menu)
+    return;
+  SDL_Event syn;
+  memset(&syn, 0, sizeof(syn));
+  syn.type = SDL_KEYDOWN;
+  syn.key.keysym.sym = key;
+  menu->event(syn);
+}
+
+bool touch_controls_process_event(SDL_Event& event, bool* want_escape)
+{
+  if (want_escape)
+    *want_escape = false;
+
+  bool ate = touch_controls_event(event);
+  bool esc = st_is_escape_event(event) || touch_controls_escape_pressed();
+  Menu* menu = Menu::current();
+
+  if (menu)
+    {
+      if (esc)
+        tc_inject_menu_key(menu, SDLK_ESCAPE);
+      else if (!ate)
+        menu->event(event);
+
+      int tact = 0;
+      if (touch_controls_menu_nav(&tact))
+        {
+          SDLKey key = SDLK_RETURN;
+          if (tact == 0) key = SDLK_UP;
+          else if (tact == 1) key = SDLK_DOWN;
+          else if (tact == 2) key = SDLK_LEFT;
+          else if (tact == 3) key = SDLK_RIGHT;
+          tc_inject_menu_key(menu, key);
+        }
+      return true;
+    }
+
+  if (esc && want_escape)
+    *want_escape = true;
+
+  return ate;
 }
