@@ -54,6 +54,9 @@ static int tc_layout_wh = 0;
 /* Sticky Both: once a finger swipes Action→Both, stay on Both until the
    finger moves well into the lower Action zone (hysteresis / Fitts). */
 static bool tc_sticky_both = false;
+/* Sticky d-pad direction (TC_LEFT..TC_DOWN, or -1). Moving further past
+   the outer edge of a direction keeps that direction held. */
+static int tc_sticky_dpad = -1;
 
 /* Default content margins when the pad is enabled (fractions of window). */
 static const float TC_MARGIN_L = 0.11f;
@@ -105,8 +108,11 @@ tc_layout(void)
    * Finger motion already retargets held buttons, so sliding Action→Both
    * keeps run and adds jump without a second finger.
    */
-  /* Action and Jump are the same size; Both is a tall column above Action. */
-  int face_s = bs;
+  /* Action and Jump ~50% larger than the d-pad cells. Both is a tall
+     extension of Action with zero gap (swipe up = run+jump). */
+  int face_s = bs * 3 / 2;
+  if (face_s < 72) face_s = 72;
+  if (face_s > 132) face_s = 132;
   int face_gap = gap / 2;
   if (face_gap < 6) face_gap = 6;
 
@@ -120,14 +126,13 @@ tc_layout(void)
   tc_btn[TC_ACTION].x = ww - pad - face_s - face_gap - face_s;
   tc_btn[TC_ACTION].y = wh - pad - face_s;
 
-  /* Tall Both: swipe up from Action. Height ~2.5× face so the target is easy
-     (Fitts). Drawn as a tall pill above Action; hit testing adds hysteresis. */
+  /* Contiguous with Action: bottom of Both == top of Action (no free pixels). */
   int both_h = face_s * 5 / 2;
-  if (both_h < face_s + face_gap) both_h = face_s + face_gap;
+  if (both_h < face_s) both_h = face_s;
   tc_btn[TC_BOTH].w = face_s;
   tc_btn[TC_BOTH].h = both_h;
   tc_btn[TC_BOTH].x = tc_btn[TC_ACTION].x;
-  tc_btn[TC_BOTH].y = tc_btn[TC_ACTION].y - face_gap - both_h;
+  tc_btn[TC_BOTH].y = tc_btn[TC_ACTION].y - both_h;
 
   /* Menu — top-left, same size as the face buttons. */
   tc_btn[TC_MENU].x = pad;
@@ -189,6 +194,7 @@ void touch_controls_reset(void)
       tc_btn[i].has_finger = false;
     }
   tc_sticky_both = false;
+  tc_sticky_dpad = -1;
 }
 
 static int
@@ -215,19 +221,20 @@ tc_hit(int x, int y)
 
   if (in_col)
     {
-      /* Boundary between Both and Action with hysteresis band. */
-      int enter_both_y = act.y;                 /* y < this → Both when not sticky */
-      int leave_both_y = act.y + (act.h * 2) / 3; /* y >= this → leave Both when sticky */
+      /* Shared edge is act.y (Both bottom == Action top). Hysteresis:
+         enter Both as soon as y crosses above the edge; leave Both only
+         when deep in the lower part of Action — never a dead band. */
+      int enter_both_y = act.y;
+      int leave_both_y = act.y + (act.h * 3) / 4;
 
       if (tc_sticky_both)
         {
           if (y >= leave_both_y)
             tc_sticky_both = false;
         }
-      else
+      else if (y < enter_both_y)
         {
-          if (y < enter_both_y)
-            tc_sticky_both = true;
+          tc_sticky_both = true;
         }
 
       if (tc_sticky_both || y < enter_both_y)
@@ -240,7 +247,58 @@ tc_hit(int x, int y)
     tc_sticky_both = false;
 
   int hit = tc_hit_raw(x, y);
-  /* Prefer Jump over Both if raw hit is Jump (non-overlapping). */
+
+  /* D-pad: once a direction is pressed, expand its hit zone outward so
+     sliding further left/right/up/down does not release the button. */
+  if (hit >= TC_LEFT && hit <= TC_DOWN)
+    {
+      tc_sticky_dpad = hit;
+      return hit;
+    }
+
+  if (tc_sticky_dpad >= TC_LEFT && tc_sticky_dpad <= TC_DOWN)
+    {
+      const TcButton& b = tc_btn[tc_sticky_dpad];
+      int expand = b.w; /* full cell of outward slack */
+      if (expand < 48) expand = 48;
+      int L = b.x, R = b.x + b.w, T = b.y, B = b.y + b.h;
+      /* Grow away from the cross centre; also widen the cross-axis a bit. */
+      if (tc_sticky_dpad == TC_LEFT)
+        {
+          L -= expand * 2;
+          T -= expand / 2;
+          B += expand / 2;
+          /* Stay left of the inner edge of the opposite (RIGHT) cell. */
+          R = tc_btn[TC_RIGHT].x;
+        }
+      else if (tc_sticky_dpad == TC_RIGHT)
+        {
+          R += expand * 2;
+          T -= expand / 2;
+          B += expand / 2;
+          L = tc_btn[TC_LEFT].x + tc_btn[TC_LEFT].w;
+        }
+      else if (tc_sticky_dpad == TC_UP)
+        {
+          T -= expand * 2;
+          L -= expand / 2;
+          R += expand / 2;
+          B = tc_btn[TC_DOWN].y;
+        }
+      else /* TC_DOWN */
+        {
+          B += expand * 2;
+          L -= expand / 2;
+          R += expand / 2;
+          T = tc_btn[TC_UP].y + tc_btn[TC_UP].h;
+        }
+
+      if (x >= L && x < R && y >= T && y < B)
+        return tc_sticky_dpad;
+
+      tc_sticky_dpad = -1;
+    }
+
   return hit;
 }
 
@@ -317,17 +375,22 @@ static void
 tc_release_finger(TcFingerId finger)
 {
   bool owned_face = false;
+  bool owned_dpad = false;
   for (int i = 0; i < TC_COUNT; ++i)
     {
       if (tc_btn[i].has_finger && tc_btn[i].finger == finger)
         {
           if (i == TC_ACTION || i == TC_BOTH)
             owned_face = true;
+          if (i >= TC_LEFT && i <= TC_DOWN)
+            owned_dpad = true;
           tc_release_button(i);
         }
     }
   if (owned_face)
     tc_sticky_both = false;
+  if (owned_dpad)
+    tc_sticky_dpad = -1;
 }
 
 static void
@@ -340,8 +403,22 @@ tc_move_finger(TcFingerId finger, int x, int y)
     tc_press(hit, finger);
   for (int i = 0; i < TC_COUNT; ++i)
     {
-      if (tc_btn[i].has_finger && tc_btn[i].finger == finger && i != hit)
-        tc_release_button(i);
+      if (!(tc_btn[i].has_finger && tc_btn[i].finger == finger && i != hit))
+        continue;
+      /* While sticky Both, never release Action from this finger — fire
+         stays down for the whole contiguous strip. */
+      if (hit == TC_BOTH && i == TC_ACTION)
+        {
+          tc_btn[i].held = true; /* keep action asserted under both */
+          continue;
+        }
+      if (hit == TC_ACTION && i == TC_BOTH)
+        {
+          /* Moving back down into Action: drop Both (and jump) only. */
+          tc_release_button(i);
+          continue;
+        }
+      tc_release_button(i);
     }
 }
 

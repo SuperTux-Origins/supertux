@@ -540,27 +540,20 @@ WorldMap::get_input()
 {
   enter_level = false;
   input_direction = D_NONE;
-   
+
+  /*
+   * Input ownership:
+   *   1. Update the touch pad from the event (always).
+   *   2. Escape / Android Back / Menu button → toggle worldmap menu.
+   *   3. If a menu is open it owns all other input (keys + pad edges).
+   *   4. Otherwise the map owns pad held-state and keyboard/joystick.
+   */
   SDL_Event event;
   while (SDL_PollEvent(&event))
     {
       bool touch_ate = touch_controls_event(event);
-      if (touch_controls_escape_pressed())
-        on_escape_press();
-      if (touch_ate)
-        {
-          if (touch_controls_held(0)) input_direction = D_WEST;
-          else if (touch_controls_held(1)) input_direction = D_EAST;
-          else if (touch_controls_held(2)) input_direction = D_NORTH;
-          else if (touch_controls_held(3)) input_direction = D_SOUTH;
-          /* Edge only — held state after Abort would re-enter immediately. */
-          if (touch_controls_just_pressed(4) || touch_controls_just_pressed(5)
-              || touch_controls_just_pressed(6))
-            enter_level = true;
-          continue;
-        }
 
-      if (st_is_escape_event(event))
+      if (st_is_escape_event(event) || touch_controls_escape_pressed())
         {
           on_escape_press();
           continue;
@@ -568,7 +561,9 @@ WorldMap::get_input()
 
       if (Menu::current())
         {
-          Menu::current()->event(event);
+          if (!touch_ate)
+            Menu::current()->event(event);
+
           int tact = 0;
           if (touch_controls_menu_nav(&tact))
             {
@@ -582,112 +577,119 @@ WorldMap::get_input()
               else syn.key.keysym.sym = SDLK_RETURN;
               Menu::current()->event(syn);
             }
+          continue;
         }
-      else
+
+      /* --- map mode (no menu) --- */
+      if (touch_ate)
         {
-          switch(event.type)
+          if (touch_controls_held(0)) input_direction = D_WEST;
+          else if (touch_controls_held(1)) input_direction = D_EAST;
+          else if (touch_controls_held(2)) input_direction = D_NORTH;
+          else if (touch_controls_held(3)) input_direction = D_SOUTH;
+          if (touch_controls_just_pressed(4) || touch_controls_just_pressed(5)
+              || touch_controls_just_pressed(6))
+            enter_level = true;
+          continue;
+        }
+
+      switch(event.type)
+        {
+        case SDL_QUIT:
+          st_abort("Received window close", "");
+          break;
+
+        case SDL_KEYDOWN:
+          switch(event.key.keysym.sym)
             {
-            case SDL_QUIT:
-              st_abort("Received window close", "");
+            case SDLK_LCTRL:
+            case SDLK_RETURN:
+              enter_level = true;
               break;
-          
-            case SDL_KEYDOWN:
-              switch(event.key.keysym.sym)
-                {
-                case SDLK_LCTRL:
-                case SDLK_RETURN:
-                  enter_level = true;
-                  break;
-                default:
-                  break;
-                }
-              break;
-
-#ifdef TSCONTROL
-			case SDL_MOUSEBUTTONDOWN:
-			  if (event.motion.y < screen->h/4) {
-				input_direction = D_NORTH;
-			  }
-			  else if (event.motion.y > 3*screen->h/4) {
-			    input_direction = D_SOUTH;
-			  }
-			  else if (event.motion.x < screen->w/4) {
-			    input_direction = D_WEST;
-			  }
-			  else if (event.motion.x > 3*screen->w/4) {
-			    input_direction = D_EAST;
-			  }
-			  else {
-			    enter_level = true;
-			  }
-			break;
-#endif
-
-#ifndef GP2X      
-            case SDL_JOYAXISMOTION:
-              if (!use_joystick)
-                break;
-              if (event.jaxis.axis == joystick_keymap.x_axis)
-                {
-                  if (event.jaxis.value < -joystick_keymap.dead_zone)
-                    input_direction = D_WEST;
-                  else if (event.jaxis.value > joystick_keymap.dead_zone)
-                    input_direction = D_EAST;
-                }
-              else if (event.jaxis.axis == joystick_keymap.y_axis)
-                {
-                  if (event.jaxis.value > joystick_keymap.dead_zone)
-                    input_direction = D_SOUTH;
-                  else if (event.jaxis.value < -joystick_keymap.dead_zone)
-                    input_direction = D_NORTH;
-                }
-              break;
-
-	    case SDL_JOYHATMOTION:
-	      if (!use_joystick)
-	        break;
-	      if (event.jhat.value & SDL_HAT_UP)
-                    input_direction = D_NORTH;
-	      if (event.jhat.value & SDL_HAT_DOWN)
-                    input_direction = D_SOUTH;
-	      if (event.jhat.value & SDL_HAT_LEFT)
-                    input_direction = D_WEST;
-	      if (event.jhat.value & SDL_HAT_RIGHT)
-                    input_direction = D_EAST;
-	      break;
-
-#endif
-            case SDL_JOYBUTTONDOWN:
-#ifndef GP2X
-              if (!use_joystick)
-                break;
-              if (event.jbutton.button == joystick_keymap.b_button)
-                enter_level = true;
-              else if (event.jbutton.button == joystick_keymap.start_button)
-                on_escape_press();
-              break;
-#else
-              if (event.jbutton.button == joystick_keymap.a_button)
-                enter_level = true;
-              else if (event.jbutton.button == joystick_keymap.start_button)
-                on_escape_press();
-              else if (event.jbutton.button == joystick_keymap.up_button)
-                input_direction = D_NORTH;
-              else if (event.jbutton.button == joystick_keymap.down_button)
-                input_direction = D_SOUTH;
-              else if (event.jbutton.button == joystick_keymap.right_button)
-                input_direction = D_EAST;
-              else if (event.jbutton.button == joystick_keymap.left_button)
-                input_direction = D_WEST;
-              break;
-#endif
-
             default:
               break;
             }
+          break;
+
+#ifdef TSCONTROL
+        case SDL_MOUSEBUTTONDOWN:
+          if (event.motion.y < screen->h/4)
+            input_direction = D_NORTH;
+          else if (event.motion.y > 3*screen->h/4)
+            input_direction = D_SOUTH;
+          else if (event.motion.x < screen->w/4)
+            input_direction = D_WEST;
+          else if (event.motion.x > 3*screen->w/4)
+            input_direction = D_EAST;
+          else
+            enter_level = true;
+          break;
+#endif
+
+#ifndef NOSOUND
+#ifdef GP2X
+        case SDL_JOYBUTTONDOWN:
+          if (event.jbutton.button == joystick_keymap.b_button
+              || event.jbutton.button == joystick_keymap.a_button)
+            enter_level = true;
+          else if (event.jbutton.button == joystick_keymap.start_button)
+            on_escape_press();
+          else if (event.jbutton.button == joystick_keymap.up_button)
+            input_direction = D_NORTH;
+          else if (event.jbutton.button == joystick_keymap.down_button)
+            input_direction = D_SOUTH;
+          else if (event.jbutton.button == joystick_keymap.right_button)
+            input_direction = D_EAST;
+          else if (event.jbutton.button == joystick_keymap.left_button)
+            input_direction = D_WEST;
+          break;
+#else
+        case SDL_JOYBUTTONDOWN:
+          if (event.jbutton.button == joystick_keymap.b_button)
+            enter_level = true;
+          else if (event.jbutton.button == joystick_keymap.start_button)
+            on_escape_press();
+          break;
+        case SDL_JOYBUTTONUP:
+          if (event.jbutton.button == joystick_keymap.a_button)
+            enter_level = true;
+          else if (event.jbutton.button == joystick_keymap.start_button)
+            on_escape_press();
+          else if (event.jbutton.button == joystick_keymap.up_button)
+            input_direction = D_NORTH;
+          else if (event.jbutton.button == joystick_keymap.down_button)
+            input_direction = D_SOUTH;
+          else if (event.jbutton.button == joystick_keymap.right_button)
+            input_direction = D_EAST;
+          else if (event.jbutton.button == joystick_keymap.left_button)
+            input_direction = D_WEST;
+          break;
+#endif
+#endif
+
+        case SDL_JOYAXISMOTION:
+          if (event.jaxis.axis == joystick_keymap.x_axis)
+            {
+              if (event.jaxis.value < -joystick_keymap.dead_zone)
+                input_direction = D_WEST;
+              else if (event.jaxis.value > joystick_keymap.dead_zone)
+                input_direction = D_EAST;
+            }
+          else if (event.jaxis.axis == joystick_keymap.y_axis)
+            {
+              if (event.jaxis.value > joystick_keymap.dead_zone)
+                input_direction = D_SOUTH;
+              else if (event.jaxis.value < -joystick_keymap.dead_zone)
+                input_direction = D_NORTH;
+            }
+          break;
+
+        default:
+          break;
         }
     }
 
+  /* Continuous walk / enter from held keys + pad while no menu. */
   if (!Menu::current())
     {
       const Uint8 *keystate = SDL_GetKeyState(NULL);
@@ -706,6 +708,7 @@ WorldMap::get_input()
         enter_level = true;
     }
 }
+
 
 Point
 WorldMap::get_next_tile(Point pos, Direction direction)
