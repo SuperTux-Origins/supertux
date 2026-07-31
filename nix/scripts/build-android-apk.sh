@@ -62,6 +62,18 @@ cp -a "$GAME_DATA_DIR"/. src/assets/
 # Nix store files are often 0444; aapt/zip need readable tree we can scan.
 chmod -R u+rwX src
 
+# Fingerprint packaged data so the game re-extracts on asset changes
+# (code is in libmain.so and always updates; data lives in internal storage
+# and is otherwise sticky after the first extract).
+(
+  cd src/assets
+  find . -type f ! -name '.data_stamp' -printf '%p %s\n' 2>/dev/null \
+    | sort \
+    | sha256sum \
+    | awk '{print $1}'
+) > src/assets/.data_stamp
+echo "data stamp: $(cat src/assets/.data_stamp)"
+
 ASSET_COUNT=$(find src/assets -type f | wc -l)
 ASSET_SIZE=$(du -sh src/assets | awk '{print $1}')
 echo "Packaging $ASSET_COUNT asset files ($ASSET_SIZE) from $GAME_DATA_DIR"

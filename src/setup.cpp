@@ -515,80 +515,114 @@ android_prepare_paths(void)
   std::string data_root = std::string(internal) + "/data";
   std::string marker = data_root + "/.extracted";
   /*
-   * Bump ANDROID_DATA_EXTRACT_GEN whenever the packaged data/ tree gains or
-   * loses files (e.g. tv-bezel.png). Marker stores VERSION + gen; a mismatch
-   * forces a fresh extract so internal storage is not stuck on an older tree
-   * from a previous install ("data already extracted" with missing assets).
+   * APK build writes assets/.data_stamp (content fingerprint of packaged
+   * data/). Marker stores VERSION + that stamp. Any asset change (bezel,
+   * levels, …) changes the stamp and forces re-extract. Code lives in
+   * libmain.so and always updates on adb install; data is sticky until
+   * the stamp mismatches.
    */
-#define ANDROID_DATA_EXTRACT_GEN "2"
+  char apk_stamp[96];
+  apk_stamp[0] = '\0';
 
   bool need_extract = true;
-  {
-    FILE* mf = fopen(marker.c_str(), "r");
-    if (mf)
-      {
-        char ver[128], gen[64];
-        ver[0] = gen[0] = '\0';
-        if (fgets(ver, sizeof(ver), mf))
-          {
-            size_t n = strlen(ver);
-            while (n > 0 && (ver[n - 1] == '\n' || ver[n - 1] == '\r'))
-              ver[--n] = '\0';
-            if (fgets(gen, sizeof(gen), mf))
-              {
-                n = strlen(gen);
-                while (n > 0 && (gen[n - 1] == '\n' || gen[n - 1] == '\r'))
-                  gen[--n] = '\0';
-                if (strcmp(ver, VERSION) == 0
-                    && strcmp(gen, ANDROID_DATA_EXTRACT_GEN) == 0)
-                  need_extract = false;
-              }
-          }
-        fclose(mf);
-      }
-  }
+  JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+  jobject activity = (jobject)SDL_AndroidGetActivity();
+  jobject java_am = 0;
+  jclass act_class = 0;
+  jclass am_class = 0;
+  jmethodID list_mid = 0;
+  AAssetManager* mgr = 0;
+
+  if (env && activity)
+    {
+      act_class = env->GetObjectClass(activity);
+      jmethodID get_assets = env->GetMethodID(
+          act_class, "getAssets", "()Landroid/content/res/AssetManager;");
+      java_am = env->CallObjectMethod(activity, get_assets);
+      am_class = env->GetObjectClass(java_am);
+      list_mid = env->GetMethodID(
+          am_class, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
+      mgr = AAssetManager_fromJava(env, java_am);
+
+      /* Read stamp from the APK (not internal storage). */
+      AAsset* stamp_asset = mgr
+          ? AAssetManager_open(mgr, ".data_stamp", AASSET_MODE_BUFFER)
+          : 0;
+      if (stamp_asset)
+        {
+          int n = AAsset_read(stamp_asset, apk_stamp, sizeof(apk_stamp) - 1);
+          AAsset_close(stamp_asset);
+          if (n > 0)
+            {
+              apk_stamp[n] = '\0';
+              while (n > 0 && (apk_stamp[n - 1] == '\n' || apk_stamp[n - 1] == '\r'
+                               || apk_stamp[n - 1] == ' '))
+                apk_stamp[--n] = '\0';
+            }
+        }
+      if (apk_stamp[0])
+        SDL_Log("Android: APK data stamp = %s", apk_stamp);
+      else
+        SDL_Log("Android: no .data_stamp in APK — will extract");
+    }
+  else
+    {
+      SDL_Log("Android: no JNI env/activity");
+    }
+
+  if (apk_stamp[0])
+    {
+      FILE* mf = fopen(marker.c_str(), "r");
+      if (mf)
+        {
+          char ver[128], gen[96];
+          ver[0] = gen[0] = '\0';
+          if (fgets(ver, sizeof(ver), mf))
+            {
+              size_t n = strlen(ver);
+              while (n > 0 && (ver[n - 1] == '\n' || ver[n - 1] == '\r'))
+                ver[--n] = '\0';
+              if (fgets(gen, sizeof(gen), mf))
+                {
+                  n = strlen(gen);
+                  while (n > 0 && (gen[n - 1] == '\n' || gen[n - 1] == '\r'))
+                    gen[--n] = '\0';
+                  if (strcmp(ver, VERSION) == 0 && strcmp(gen, apk_stamp) == 0)
+                    need_extract = false;
+                }
+            }
+          fclose(mf);
+        }
+    }
 
   if (need_extract)
     {
-      SDL_Log("Android: extracting APK assets to %s (gen %s)",
-              data_root.c_str(), ANDROID_DATA_EXTRACT_GEN);
-      JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
-      jobject activity = (jobject)SDL_AndroidGetActivity();
-      if (!env || !activity)
-        {
-          SDL_Log("Android: no JNI env/activity");
-        }
+      SDL_Log("Android: extracting APK assets to %s (stamp %s)",
+              data_root.c_str(), apk_stamp[0] ? apk_stamp : "(none)");
+      if (mgr && list_mid)
+        android_extract_tree(env, java_am, mgr, list_mid, "", data_root.c_str());
       else
-        {
-          jclass act_class = env->GetObjectClass(activity);
-          jmethodID get_assets = env->GetMethodID(
-              act_class, "getAssets", "()Landroid/content/res/AssetManager;");
-          jobject java_am = env->CallObjectMethod(activity, get_assets);
-          jclass am_class = env->GetObjectClass(java_am);
-          jmethodID list_mid = env->GetMethodID(
-              am_class, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
-          AAssetManager* mgr = AAssetManager_fromJava(env, java_am);
-          if (mgr && list_mid)
-            android_extract_tree(env, java_am, mgr, list_mid, "", data_root.c_str());
-          else
-            SDL_Log("Android: AssetManager setup failed");
+        SDL_Log("Android: AssetManager setup failed — cannot extract");
 
-          FILE* m = fopen(marker.c_str(), "w");
-          if (m)
-            {
-              fprintf(m, "%s\n%s\n", VERSION, ANDROID_DATA_EXTRACT_GEN);
-              fclose(m);
-            }
-          env->DeleteLocalRef(am_class);
-          env->DeleteLocalRef(java_am);
-          env->DeleteLocalRef(act_class);
-          env->DeleteLocalRef(activity);
+      FILE* m = fopen(marker.c_str(), "w");
+      if (m)
+        {
+          fprintf(m, "%s\n%s\n", VERSION, apk_stamp[0] ? apk_stamp : "none");
+          fclose(m);
         }
     }
   else
     {
-      SDL_Log("Android: data already extracted at %s (gen %s)",
-              data_root.c_str(), ANDROID_DATA_EXTRACT_GEN);
+      SDL_Log("Android: data already extracted at %s (stamp %s)",
+              data_root.c_str(), apk_stamp);
+    }
+
+  if (env)
+    {
+      if (am_class) env->DeleteLocalRef(am_class);
+      if (java_am) env->DeleteLocalRef(java_am);
+      if (act_class) env->DeleteLocalRef(act_class);
+      if (activity) env->DeleteLocalRef(activity);
     }
 
   if (datadir.empty())
