@@ -25,6 +25,7 @@
 #include "defines.h"
 #include "screen.h"
 #include "text.h"
+#include "setup.h"
 #include "touch_controls.h"
 #ifndef NOSOUND
 #include "sound.h"
@@ -58,9 +59,13 @@ Text::Text(const std::string& file, int kind_, int w_, int h_)
     }
 
   chars = new Surface(file, USE_ALPHA);
+  if (!chars || !chars->impl || !chars->impl->get_sdl_surface())
+    st_abort("Can't load font surface", file);
 
   // Load shadow font.
   conv = SDL_DisplayFormatAlpha(chars->impl->get_sdl_surface());
+  if (!conv)
+    st_abort("Can't convert font surface", file);
   pixels = conv->w * conv->h;
   SDL_LockSurface(conv);
   for(i = 0; i < pixels; ++i)

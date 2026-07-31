@@ -18,7 +18,8 @@ game_file_relative(const std::string& path)
   while (!p.empty() && (p[0] == '/' || p[0] == '\\'))
     p.erase(0, 1);
 
-  if (p.size() >= 2 && p[0] == '.' && (p[1] == '/' || p[1] == '\\'))
+  /* Strip leading "./" segments. */
+  while (p.size() >= 2 && p[0] == '.' && (p[1] == '/' || p[1] == '\\'))
     p.erase(0, 2);
 
   return p;
@@ -30,16 +31,29 @@ open_game_file(const std::string& path)
   if (path.empty())
     return 0;
 
-  /* Prefer real filesystem (desktop install, user mods, writable paths). */
-  SDL_RWops* rw = SDL_RWFromFile(path.c_str(), "rb");
-  if (rw)
-    return rw;
-
-  /* Fall back to datadir-relative path — on Android SDL opens APK assets. */
   std::string rel = game_file_relative(path);
+
+#ifdef __ANDROID__
+  /* APK assets first: SDL_RWFromFile maps relative paths to AssetManager. */
+  if (!rel.empty())
+    {
+      SDL_RWops* rw = SDL_RWFromFile(rel.c_str(), "rb");
+      if (rw)
+        return rw;
+    }
+#endif
+
+  /* Real filesystem (desktop install, user mods, writable paths). */
+  {
+    SDL_RWops* rw = SDL_RWFromFile(path.c_str(), "rb");
+    if (rw)
+      return rw;
+  }
+
+  /* Desktop: also try datadir-relative if path was absolute under datadir. */
   if (!rel.empty() && rel != path)
     {
-      rw = SDL_RWFromFile(rel.c_str(), "rb");
+      SDL_RWops* rw = SDL_RWFromFile(rel.c_str(), "rb");
       if (rw)
         return rw;
     }
@@ -65,7 +79,6 @@ game_file_read(const std::string& path, std::vector<char>& out)
   if (!rw)
     return false;
 
-  /* Chunked read works on SDL1 and SDL2 (no SDL_RWsize required). */
   char buf[4096];
   size_t n;
   while ((n = SDL_RWread(rw, buf, 1, sizeof(buf))) > 0)

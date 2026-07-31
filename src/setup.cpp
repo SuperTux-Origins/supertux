@@ -482,15 +482,14 @@ android_prepare_paths(void)
 
   /*
    * Read game data straight from APK assets via open_game_file() /
-   * SDL_RWFromFile — no extract-to-disk. datadir stays empty so path joins
-   * produce "/images/..." etc.; game_file_relative() strips the slash and
-   * SDL opens the asset.
+   * SDL_RWFromFile — no extract-to-disk. Use a non-empty logical datadir so
+   * st_directory_setup does not fall through to the desktop path search
+   * (which would overwrite with DATA_PREFIX "."). Path joins become
+   * "./images/..."; game_file_relative() strips to "images/..." for assets.
    */
   if (datadir.empty())
-    {
-      datadir = "";
-      SDL_Log("Android: datadir = (APK assets, no extract)");
-    }
+    datadir = ".";
+  SDL_Log("Android: datadir = %s (APK assets via open_game_file)", datadir.c_str());
 
   std::string probe = datadir + "/images/status/letters-white.png";
   if (!game_file_exists(probe))
@@ -571,6 +570,8 @@ void st_directory_setup(void)
   mkdir(str, 0755);
 
   // User has not that a datadir, so we try some magic
+  // Android already set a logical datadir in android_prepare_paths().
+#ifndef __ANDROID__
   if (datadir.empty())
     {
       // Detect datadir
@@ -604,6 +605,7 @@ void st_directory_setup(void)
   datadir = DATA_PREFIX;
 #endif
     }
+#endif /* !__ANDROID__ */
   SDL_Log("Configdir: %s", st_dir);
   SDL_Log("Datadir: %s", datadir.c_str());
 }
