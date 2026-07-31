@@ -20,7 +20,7 @@ static SDL_GLContext st_gl_context = NULL;
    invalidated on resize/format changes; the engine treats `screen` as stable. */
 static SDL_Surface* st_backbuffer = NULL;
 
-#define VLOG(...) do { if (verbose_mode) fprintf(stderr, __VA_ARGS__); } while (0)
+#define VLOG(...) st_vlog(__VA_ARGS__)
 
 static SDL_Surface*
 create_software_backbuffer(SDL_Surface* window_surface)
@@ -169,8 +169,8 @@ log_window(const char* where)
 #endif
     }
 
-  fprintf(stderr, "[video] %s — render path: %s\n", where, path);
-  fprintf(stderr, "[video]   window=%p glctx=%p screen=%p fullscreen=%s\n",
+  st_vlog("[video] %s — render path: %s\n", where, path);
+  st_vlog("[video]   window=%p glctx=%p screen=%p fullscreen=%s\n",
           (void*)st_window, (void*)st_gl_context, (void*)screen,
           use_fullscreen ? "yes" : "no");
   if (st_window)
@@ -181,22 +181,22 @@ log_window(const char* where)
       SDL_GetWindowPosition(st_window, &x, &y);
       SDL_GetWindowSize(st_window, &w, &h);
       SDL_GL_GetDrawableSize(st_window, &dw, &dh);
-      fprintf(stderr, "[video]   id=%u flags=0x%x pos=%d,%d size=%dx%d",
+      st_vlog("[video]   id=%u flags=0x%x pos=%d,%d size=%dx%d",
               (unsigned)SDL_GetWindowID(st_window), (unsigned)flags,
               x, y, w, h);
       if (dw > 0 && dh > 0 && (dw != w || dh != h))
-        fprintf(stderr, " drawable=%dx%d", dw, dh);
-      fprintf(stderr, " title=\"%s\"\n", SDL_GetWindowTitle(st_window));
+        st_vlog(" drawable=%dx%d", dw, dh);
+      st_vlog(" title=\"%s\"\n", SDL_GetWindowTitle(st_window));
     }
-  fprintf(stderr, "[video]   driver=%s\n",
+  st_vlog("[video]   driver=%s\n",
           SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)");
 #ifndef NOOPENGL
   if (use_gl && st_gl_context)
     {
       const char* gl_ver = (const char*)glGetString(GL_VERSION);
       const char* gl_ren = (const char*)glGetString(GL_RENDERER);
-      fprintf(stderr, "[video]   GL_VERSION=%s\n", gl_ver ? gl_ver : "(null)");
-      fprintf(stderr, "[video]   GL_RENDERER=%s\n", gl_ren ? gl_ren : "(null)");
+      st_vlog("[video]   GL_VERSION=%s\n", gl_ver ? gl_ver : "(null)");
+      st_vlog("[video]   GL_RENDERER=%s\n", gl_ren ? gl_ren : "(null)");
     }
 #endif
 }

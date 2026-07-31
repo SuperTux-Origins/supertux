@@ -19,6 +19,9 @@
 //  02111-1307, USA.
 
 #include "globals.h"
+#include <cstdarg>
+#include <cstdio>
+#include <cstring>
 
 /** The datadir prefix prepended when loading game data file */
 std::string datadir;
@@ -68,6 +71,33 @@ bool use_joystick;
 bool use_fullscreen;
 bool debug_mode;
 bool verbose_mode;
+
+void st_vlog(const char* fmt, ...)
+{
+  if (!verbose_mode || !fmt)
+    return;
+
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
+
+#ifdef __ANDROID__
+  {
+    char buf[1024];
+    va_list ap2;
+    va_start(ap2, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, ap2);
+    va_end(ap2);
+    size_t n = strlen(buf);
+    while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r'))
+      buf[--n] = '\0';
+    if (n > 0)
+      SDL_Log("%s", buf);
+  }
+#endif
+}
+
 bool show_fps;
 bool show_mouse;
 float game_speed = 1.0f;

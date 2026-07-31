@@ -7,7 +7,7 @@
 #include "globals.h"
 #include "defines.h"
 
-#define VLOG(...) do { if (verbose_mode) fprintf(stderr, __VA_ARGS__); } while (0)
+#define VLOG(...) st_vlog(__VA_ARGS__)
 
 bool platform_video_init(bool fullscreen, bool opengl)
 {

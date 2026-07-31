@@ -212,9 +212,9 @@ bool gles2_renderer_init(void)
 
   if (verbose_mode)
     {
-      fprintf(stderr, "[video] GL context for shaders: ES=%s\n", is_es ? "yes" : "no");
-      fprintf(stderr, "[video]   GL_VERSION=%s\n", gl_ver ? gl_ver : "(null)");
-      fprintf(stderr, "[video]   GL_RENDERER=%s\n", gl_ren ? gl_ren : "(null)");
+      st_vlog("[video] GL context for shaders: ES=%s\n", is_es ? "yes" : "no");
+      st_vlog("[video]   GL_VERSION=%s\n", gl_ver ? gl_ver : "(null)");
+      st_vlog("[video]   GL_RENDERER=%s\n", gl_ren ? gl_ren : "(null)");
     }
 
   /* Prefer ES 1.00 sources on an ES context; fall back to GLSL 1.20 if the
@@ -253,7 +253,7 @@ bool gles2_renderer_init(void)
   mat4_ortho(g_mvp, 0.0f, (float)ST_SCREEN_W, (float)ST_SCREEN_H, 0.0f);
   g_ready = true;
   if (verbose_mode)
-    fprintf(stderr, "[video] GLES2 renderer ready (shader textured/solid quads)\n");
+    st_vlog("[video] GLES2 renderer ready (shader textured/solid quads)\n");
   return true;
 }
 

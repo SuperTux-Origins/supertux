@@ -104,6 +104,9 @@ extern bool verbose_mode;
 extern bool show_fps;
 extern bool show_mouse;
 
+/** Verbose diagnostics: always to stderr; on Android also SDL_Log (logcat). */
+void st_vlog(const char* fmt, ...);
+
 /** The number of the joystick that will be use in the game */
 extern int joystick_num;
 extern char* level_startup_file;
