@@ -13,6 +13,8 @@
 
 #include <string.h>
 #include <string>
+#include <stdio.h>
+#include <unistd.h>
 
 enum {
   TC_LEFT = 0,
@@ -377,29 +379,58 @@ tc_draw_bezel(void)
     {
       tc_bezel_tried = true;
       std::string path = datadir + "/images/status/tv-bezel.png";
-      FILE* fp = fopen(path.c_str(), "rb");
-      if (fp)
+      /* Prefer access() over fopen so we don't leave a FILE* dance; on
+         Android the data tree is extracted to internal storage so this
+         matches how other assets are probed. */
+      if (access(path.c_str(), R_OK) == 0)
         {
-          fclose(fp);
           tc_bezel = new Surface(path, USE_ALPHA);
-          st_vlog("[video] loaded arctic TV bezel (%dx%d)\n",
+          fprintf(stderr, "[video] loaded arctic TV bezel %s (%dx%d)\n",
+                  path.c_str(),
                   tc_bezel ? tc_bezel->w : 0, tc_bezel ? tc_bezel->h : 0);
         }
       else
-        st_vlog("[video] no tv-bezel.png — plain letterbox margins\n");
+        {
+          fprintf(stderr,
+                  "[video] no tv-bezel.png at %s — plain letterbox margins\n",
+                  path.c_str());
+        }
     }
   if (!tc_bezel)
     return;
 
   int lx = 0, ly = 0, lw = ST_SCREEN_W, lh = ST_SCREEN_H;
   platform_get_letterbox(&lx, &ly, &lw, &lh);
-  /* Map image hole → letterbox; frame scales with it (may stretch slightly). */
-  float sx = (float)lw / (float)BEZEL_HW;
-  float sy = (float)lh / (float)BEZEL_HH;
-  int dw = (int)(BEZEL_IW * sx + 0.5f);
-  int dh = (int)(BEZEL_IH * sy + 0.5f);
-  int dx = lx - (int)(BEZEL_HX * sx + 0.5f);
-  int dy = ly - (int)(BEZEL_HY * sy + 0.5f);
+
+  /* Map the image's transparent 4:3 hole exactly onto the letterbox.
+     Letterbox is always 4:3 so sx≈sy; independent axes stay correct if
+     a pixel of rounding drifts. Use the real surface size if the asset
+     is not the design 1920×1080. */
+  int iw = tc_bezel->w > 0 ? tc_bezel->w : BEZEL_IW;
+  int ih = tc_bezel->h > 0 ? tc_bezel->h : BEZEL_IH;
+  float hx = (float)BEZEL_HX * (float)iw / (float)BEZEL_IW;
+  float hy = (float)BEZEL_HY * (float)ih / (float)BEZEL_IH;
+  float hw = (float)BEZEL_HW * (float)iw / (float)BEZEL_IW;
+  float hh = (float)BEZEL_HH * (float)ih / (float)BEZEL_IH;
+  if (hw < 1.0f) hw = 1.0f;
+  if (hh < 1.0f) hh = 1.0f;
+
+  float sx = (float)lw / hw;
+  float sy = (float)lh / hh;
+  int dw = (int)((float)iw * sx + 0.5f);
+  int dh = (int)((float)ih * sy + 0.5f);
+  int dx = lx - (int)(hx * sx + 0.5f);
+  int dy = ly - (int)(hy * sy + 0.5f);
+
+  static bool logged_rect = false;
+  if (!logged_rect)
+    {
+      logged_rect = true;
+      fprintf(stderr,
+              "[video] TV bezel draw: dst=(%d,%d %dx%d) hole→letterbox=(%d,%d %dx%d)\n",
+              dx, dy, dw, dh, lx, ly, lw, lh);
+    }
+
   platform_overlay_surface(tc_bezel, dx, dy, dw, dh);
 }
 
@@ -413,9 +444,26 @@ void touch_controls_draw(void)
   int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
   platform_get_window_size(&ww, &wh);
 
+  int lx = 0, ly = 0, lw = ST_SCREEN_W, lh = ST_SCREEN_H;
+  platform_get_letterbox(&lx, &ly, &lw, &lh);
+
   platform_overlay_begin();
-  /* Arctic fill under the bezel so gaps outside the frame aren't pure black. */
-  platform_overlay_fillrect(0, 0, ww, wh, 25, 45, 70, 255);
+  /*
+   * Fill only the margin bands (never the letterboxed playfield).
+   * Use a near-black underlay so an arctic-coloured bezel frame is
+   * visible against it; a matching (25,45,70) fill made the frame
+   * disappear into the chrome.
+   */
+  const int ar = 8, ag = 12, ab = 20;
+  if (ly > 0)
+    platform_overlay_fillrect(0, 0, ww, ly, ar, ag, ab, 255);
+  if (ly + lh < wh)
+    platform_overlay_fillrect(0, ly + lh, ww, wh - (ly + lh), ar, ag, ab, 255);
+  if (lx > 0)
+    platform_overlay_fillrect(0, ly, lx, lh, ar, ag, ab, 255);
+  if (lx + lw < ww)
+    platform_overlay_fillrect(lx + lw, ly, ww - (lx + lw), lh, ar, ag, ab, 255);
+
   tc_draw_bezel();
 
   for (int i = 0; i < TC_COUNT; ++i)

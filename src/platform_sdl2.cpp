@@ -351,8 +351,32 @@ void platform_overlay_surface(Surface* surf, int x, int y, int w, int h)
 {
   if (!st_overlay_active || !surf || w < 1 || h < 1)
     return;
-  /* draw_stretched uses the current GL viewport/MVP (overlay ortho). */
-  surf->draw_stretched((float)x, (float)y, w, h, 255, NO_UPDATE);
+#ifndef NOOPENGL
+  if (use_gl)
+    {
+      /* GL path: draw_stretched uses the overlay ortho set in begin(). */
+      surf->draw_stretched((float)x, (float)y, w, h, 255, NO_UPDATE);
+      return;
+    }
+#endif
+  /*
+   * Software: SurfaceSDL::draw_stretched blits to the logical `screen`
+   * backbuffer (640×480). Overlay coords are window pixels, so that would
+   * either clip away or stamp garbage into the playfield. Blit onto the
+   * window surface instead (same target as overlay_fillrect).
+   */
+  if (!st_window || !surf->impl)
+    return;
+  SDL_Surface* src = surf->impl->get_sdl_surface();
+  SDL_Surface* ws = SDL_GetWindowSurface(st_window);
+  if (!src || !ws)
+    return;
+  SDL_Rect dst;
+  dst.x = x;
+  dst.y = y;
+  dst.w = w;
+  dst.h = h;
+  SDL_BlitScaled(src, NULL, ws, &dst);
 }
 
 void platform_overlay_end(void)
