@@ -4,9 +4,9 @@
 
 This tree is **SuperTux Milestone 1** (classic 0.1.x-era codebase), a Super Mario–inspired 2D platformer starring Tux. Upstream history is from the early 2000s (SourceForge era). The game is GPL-3.0-or-later (REUSE SPDX headers in source files).
 
-This working copy is **source-only for the engine**. The large `data/` tree (levels, images, music, sounds, tilesets) is **not** shipped in this archive because of size. You need a matching Milestone 1 `data/` directory at runtime (or point `DATA_PREFIX` / `datadir` at one).
+`data/` (levels, images, music, sounds, tilesets) is **part of the source tree**. Some agent uploads omit it only to save size; treat a missing `data/` in the working copy as incomplete packaging, not as an optional external dependency.
 
-Canonical layout once data is present:
+Canonical layout:
 
 ```text
 data/
@@ -98,7 +98,7 @@ Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL
 
 Video init/present goes through `src/platform.h` (`platform_sdl1.cpp` or `platform_sdl2.cpp`). SDL2 uses strategy A (window surface + `SDL_UpdateWindowSurface`). Compatibility helpers live in `platform_config.h` (keys, alpha, DisplayFormat, Flip→present, wheel/text helpers).
 
-Runtime still expects assets under `DATA_PREFIX` / discovered `datadir` (see `st_directory_setup()`). Without `data/`, the binary will not be playable.
+Runtime resolves assets under `DATA_PREFIX` / discovered `datadir` (see `st_directory_setup()`), normally the repo-root `data/` tree.
 
 Autotools remain in the tree for reference but are not the maintained path forward.
 
@@ -128,7 +128,7 @@ Autotools remain in the tree for reference but are not the maintained path forwa
    - surface/texture upload and blit
    - event translation
    - audio open/load/play
-4. Do not require `data/` to *compile*; do document that it is required to *run*.
+4. `data/` belongs in the tree. Do not invent alternate data-discovery schemes; runtime still uses `DATA_PREFIX` / `datadir` as today.
 5. Prefer clear, minimal diffs. This is a historical codebase — match local style (tabs/spaces as in neighboring files) unless reforming a whole module.
 6. GP2X / 320×240 paths are legacy; do not invest in them unless explicitly requested. CMake may omit those options initially.
 7. **Do not change gameplay or level design** unless fixing a crash or an SDL2 blocker. No balance tweaks, new mechanics, or content work.
@@ -170,7 +170,7 @@ nix run .#install-android-supertux-milestone1   # adb install -r
 - SDL2_image is compiled into `libmain.so` with the stb backend (no system libpng).
 - **SDL2_mixer** is built into `android-sdl-libs` (OGG via in-tree stb_vorbis) and linked from `libmain.so`. Force silence with `SUPER_TUX_ENABLE_SOUND=0` in `android/jni/Android.mk` if needed.
 - **GLES2 is the default renderer** on Android (`USE_GLES2`, linked `-lGLESv2`). ES 2.0 is required by the Android CDD and available on API 22 / Fire OS 5. Software fallback remains if context creation fails.
-- Place a Milestone 1 `data/` tree at the repo root to package assets into the APK; without it the APK still builds but needs external data at runtime.
+- The repo-root `data/` tree is packaged into the APK as assets.
 - Target baseline matches Fire OS 5 / API 22 (`armeabi-v7a` + `arm64-v8a`).
 
 ## License
