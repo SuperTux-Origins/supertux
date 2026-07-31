@@ -1,4 +1,5 @@
 // On-screen virtual gamepad for touch devices.
+// Buttons live in window pixel space (letterbox margins); game stays logical 640×480.
 
 #include "touch_controls.h"
 #include "platform.h"
@@ -36,39 +37,100 @@ struct TcButton {
 static bool tc_enabled = false;
 static TcButton tc_btn[TC_COUNT];
 static bool tc_inited_layout = false;
+static int tc_layout_ww = 0;
+static int tc_layout_wh = 0;
+
+/* Default content margins when the pad is enabled (fractions of window). */
+static const float TC_MARGIN_L = 0.11f;
+static const float TC_MARGIN_R = 0.11f;
+static const float TC_MARGIN_T = 0.05f;
+static const float TC_MARGIN_B = 0.20f;
 
 static void
 tc_layout(void)
 {
-  /* Logical 640×480 bottom corners. */
-  /* D-pad cluster left */
-  tc_btn[TC_LEFT].x = 12;   tc_btn[TC_LEFT].y = 368;  tc_btn[TC_LEFT].w = 64; tc_btn[TC_LEFT].h = 64;
-  tc_btn[TC_RIGHT].x = 140; tc_btn[TC_RIGHT].y = 368; tc_btn[TC_RIGHT].w = 64; tc_btn[TC_RIGHT].h = 64;
-  tc_btn[TC_UP].x = 76;     tc_btn[TC_UP].y = 304;    tc_btn[TC_UP].w = 64; tc_btn[TC_UP].h = 64;
-  tc_btn[TC_DOWN].x = 76;   tc_btn[TC_DOWN].y = 432;  tc_btn[TC_DOWN].w = 64; tc_btn[TC_DOWN].h = 64;
-  /* Action buttons right */
-  tc_btn[TC_JUMP].x = 540;   tc_btn[TC_JUMP].y = 360;  tc_btn[TC_JUMP].w = 80; tc_btn[TC_JUMP].h = 80;
-  tc_btn[TC_ACTION].x = 450; tc_btn[TC_ACTION].y = 400; tc_btn[TC_ACTION].w = 72; tc_btn[TC_ACTION].h = 72;
-  /* Menu / Escape — top-left, always available */
-  tc_btn[TC_MENU].x = 8;     tc_btn[TC_MENU].y = 8;    tc_btn[TC_MENU].w = 48; tc_btn[TC_MENU].h = 48;
+  int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
+  platform_get_window_size(&ww, &wh);
+  if (ww < 64) ww = ST_SCREEN_W;
+  if (wh < 64) wh = ST_SCREEN_H;
 
-  for (int i = 0; i < TC_COUNT; ++i)
+  tc_layout_ww = ww;
+  tc_layout_wh = wh;
+
+  /* Button size scales with the shorter window side. */
+  int unit = wh < ww ? wh / 12 : ww / 12;
+  if (unit < 36) unit = 36;
+  if (unit > 96) unit = 96;
+  int gap = unit / 8;
+
+  /* D-pad in bottom-left margin (window space). */
+  int dpad_cx = unit + gap;
+  int dpad_cy = wh - unit - gap;
+  tc_btn[TC_LEFT].x  = dpad_cx - unit - gap; tc_btn[TC_LEFT].y  = dpad_cy - unit / 2;
+  tc_btn[TC_LEFT].w  = unit;                 tc_btn[TC_LEFT].h  = unit;
+  tc_btn[TC_RIGHT].x = dpad_cx + gap;        tc_btn[TC_RIGHT].y = dpad_cy - unit / 2;
+  tc_btn[TC_RIGHT].w = unit;                 tc_btn[TC_RIGHT].h = unit;
+  tc_btn[TC_UP].x    = dpad_cx - unit / 2;   tc_btn[TC_UP].y    = dpad_cy - unit - gap;
+  tc_btn[TC_UP].w    = unit;                 tc_btn[TC_UP].h    = unit;
+  tc_btn[TC_DOWN].x  = dpad_cx - unit / 2;   tc_btn[TC_DOWN].y  = dpad_cy + gap;
+  tc_btn[TC_DOWN].w  = unit;                 tc_btn[TC_DOWN].h  = unit;
+
+  /* Jump / Action in bottom-right margin. */
+  int jump_s = unit + unit / 4;
+  int act_s  = unit;
+  tc_btn[TC_JUMP].x   = ww - jump_s - gap * 2;
+  tc_btn[TC_JUMP].y   = wh - jump_s - gap * 2;
+  tc_btn[TC_JUMP].w   = jump_s;
+  tc_btn[TC_JUMP].h   = jump_s;
+  tc_btn[TC_ACTION].x = ww - jump_s - act_s - gap * 4;
+  tc_btn[TC_ACTION].y = wh - act_s - gap * 2;
+  tc_btn[TC_ACTION].w = act_s;
+  tc_btn[TC_ACTION].h = act_s;
+
+  /* Menu — top-left corner of the window. */
+  int menu_s = unit * 3 / 4;
+  if (menu_s < 40) menu_s = 40;
+  tc_btn[TC_MENU].x = gap;
+  tc_btn[TC_MENU].y = gap;
+  tc_btn[TC_MENU].w = menu_s;
+  tc_btn[TC_MENU].h = menu_s;
+
+  if (!tc_inited_layout)
     {
-      tc_btn[i].held = false;
-      tc_btn[i].prev_held = false;
-      tc_btn[i].has_finger = false;
-      tc_btn[i].finger = 0;
+      for (int i = 0; i < TC_COUNT; ++i)
+        {
+          tc_btn[i].held = false;
+          tc_btn[i].prev_held = false;
+          tc_btn[i].has_finger = false;
+          tc_btn[i].finger = 0;
+        }
     }
   tc_inited_layout = true;
+}
+
+static void
+tc_ensure_layout(void)
+{
+  int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
+  platform_get_window_size(&ww, &wh);
+  if (!tc_inited_layout || ww != tc_layout_ww || wh != tc_layout_wh)
+    tc_layout();
 }
 
 void touch_controls_set_enabled(bool enabled)
 {
   tc_enabled = enabled;
-  if (!tc_inited_layout)
-    tc_layout();
-  if (!enabled)
-    touch_controls_reset();
+  if (enabled)
+    {
+      platform_set_content_margins(TC_MARGIN_L, TC_MARGIN_R,
+                                   TC_MARGIN_T, TC_MARGIN_B);
+      tc_layout();
+    }
+  else
+    {
+      platform_set_content_margins(0.0f, 0.0f, 0.0f, 0.0f);
+      touch_controls_reset();
+    }
 }
 
 bool touch_controls_is_enabled(void)
@@ -100,17 +162,14 @@ tc_hit(int x, int y)
   return -1;
 }
 
+/* Finger/window position in window pixels (not logical). */
 static void
-tc_finger_to_logical(float fx, float fy, int* lx, int* ly)
+tc_event_to_window(float fx, float fy, int* wx, int* wy)
 {
-  int ww = ST_SCREEN_W;
-  int wh = ST_SCREEN_H;
+  int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
   platform_get_window_size(&ww, &wh);
-  int x = (int)(fx * (float)ww + 0.5f);
-  int y = (int)(fy * (float)wh + 0.5f);
-  platform_window_to_logical(&x, &y);
-  *lx = x;
-  *ly = y;
+  *wx = (int)(fx * (float)ww + 0.5f);
+  *wy = (int)(fy * (float)wh + 0.5f);
 }
 
 #ifdef USE_SDL2
@@ -118,6 +177,13 @@ typedef SDL_FingerID TcFingerId;
 #else
 typedef int TcFingerId;
 #endif
+
+static Player* tc_player = 0;
+
+void touch_controls_set_player(Player* p)
+{
+  tc_player = p;
+}
 
 static void
 tc_press(int id, TcFingerId finger)
@@ -127,14 +193,6 @@ tc_press(int id, TcFingerId finger)
   tc_btn[id].held = true;
   tc_btn[id].has_finger = true;
   tc_btn[id].finger = finger;
-}
-
-/* Optional callback target for releases (set by gameloop). */
-static Player* tc_player = 0;
-
-void touch_controls_set_player(Player* p)
-{
-  tc_player = p;
 }
 
 static void
@@ -192,17 +250,16 @@ bool touch_controls_event(const SDL_Event& event)
   if (!tc_enabled)
     return false;
 
-  if (!tc_inited_layout)
-    tc_layout();
+  tc_ensure_layout();
 
 #ifdef USE_SDL2
   switch (event.type)
     {
     case SDL_FINGERDOWN:
       {
-        int lx, ly;
-        tc_finger_to_logical(event.tfinger.x, event.tfinger.y, &lx, &ly);
-        int hit = tc_hit(lx, ly);
+        int wx, wy;
+        tc_event_to_window(event.tfinger.x, event.tfinger.y, &wx, &wy);
+        int hit = tc_hit(wx, wy);
         if (hit >= 0)
           {
             tc_press(hit, event.tfinger.fingerId);
@@ -223,25 +280,24 @@ bool touch_controls_event(const SDL_Event& event)
       break;
     case SDL_FINGERMOTION:
       {
-        int lx, ly;
-        tc_finger_to_logical(event.tfinger.x, event.tfinger.y, &lx, &ly);
+        int wx, wy;
+        tc_event_to_window(event.tfinger.x, event.tfinger.y, &wx, &wy);
         bool owned = false;
         for (int i = 0; i < TC_COUNT; ++i)
           if (tc_btn[i].has_finger && tc_btn[i].finger == event.tfinger.fingerId)
             owned = true;
-        if (owned || tc_hit(lx, ly) >= 0)
+        if (owned || tc_hit(wx, wy) >= 0)
           {
-            tc_move_finger(event.tfinger.fingerId, lx, ly);
+            tc_move_finger(event.tfinger.fingerId, wx, wy);
             return true;
           }
       }
       break;
-    /* Mouse fallback (single touch synthesis) */
     case SDL_MOUSEBUTTONDOWN:
       if (event.button.button == SDL_BUTTON_LEFT)
         {
+          /* Raw window coords — do not map to logical. */
           int x = event.button.x, y = event.button.y;
-          platform_window_to_logical(&x, &y);
           int hit = tc_hit(x, y);
           if (hit >= 0)
             {
@@ -252,15 +308,12 @@ bool touch_controls_event(const SDL_Event& event)
       break;
     case SDL_MOUSEBUTTONUP:
       if (event.button.button == SDL_BUTTON_LEFT)
-        {
-          tc_release_finger((TcFingerId)-1);
-        }
+        tc_release_finger((TcFingerId)-1);
       break;
     case SDL_MOUSEMOTION:
       if (event.motion.state & SDL_BUTTON_LMASK)
         {
           int x = event.motion.x, y = event.motion.y;
-          platform_window_to_logical(&x, &y);
           bool owned = false;
           for (int i = 0; i < TC_COUNT; ++i)
             if (tc_btn[i].has_finger && tc_btn[i].finger == (TcFingerId)-1)
@@ -285,41 +338,22 @@ void touch_controls_draw(void)
 {
   if (!tc_enabled)
     return;
-  if (!tc_inited_layout)
-    tc_layout();
 
+  tc_ensure_layout();
+
+  platform_overlay_begin();
   for (int i = 0; i < TC_COUNT; ++i)
     {
-      int alpha = tc_btn[i].held ? 140 : 70;
-      int r = 40, g = 40, b = 40;
-      if (i == TC_JUMP) { r = 40; g = 120; b = 40; }
-      if (i == TC_ACTION) { r = 120; g = 40; b = 40; }
-      if (i == TC_MENU) { r = 40; g = 40; b = 100; }
-      fillrect(tc_btn[i].x, tc_btn[i].y, tc_btn[i].w, tc_btn[i].h,
-               r, g, b, alpha);
+      int alpha = tc_btn[i].held ? 160 : 90;
+      int r = 50, g = 50, b = 50;
+      if (i == TC_JUMP)   { r = 40;  g = 140; b = 40; }
+      if (i == TC_ACTION) { r = 140; g = 40;  b = 40; }
+      if (i == TC_MENU)   { r = 40;  g = 40;  b = 120; }
+      platform_overlay_fillrect(tc_btn[i].x, tc_btn[i].y,
+                                tc_btn[i].w, tc_btn[i].h,
+                                r, g, b, alpha);
     }
-
-  if (white_small_text)
-    {
-      white_small_text->draw("L", tc_btn[TC_LEFT].x + 24, tc_btn[TC_LEFT].y + 24, 0);
-      white_small_text->draw("R", tc_btn[TC_RIGHT].x + 24, tc_btn[TC_RIGHT].y + 24, 0);
-      white_small_text->draw("U", tc_btn[TC_UP].x + 24, tc_btn[TC_UP].y + 24, 0);
-      white_small_text->draw("D", tc_btn[TC_DOWN].x + 24, tc_btn[TC_DOWN].y + 24, 0);
-      white_small_text->draw("J", tc_btn[TC_JUMP].x + 32, tc_btn[TC_JUMP].y + 32, 0);
-      white_small_text->draw("A", tc_btn[TC_ACTION].x + 28, tc_btn[TC_ACTION].y + 28, 0);
-      white_small_text->draw("M", tc_btn[TC_MENU].x + 16, tc_btn[TC_MENU].y + 16, 0);
-    }
-}
-
-bool touch_controls_escape_pressed(void)
-{
-  if (!tc_enabled)
-    return false;
-  if (!tc_inited_layout)
-    tc_layout();
-  bool pressed = tc_btn[TC_MENU].held && !tc_btn[TC_MENU].prev_held;
-  tc_btn[TC_MENU].prev_held = tc_btn[TC_MENU].held;
-  return pressed;
+  platform_overlay_end();
 }
 
 void touch_controls_apply_player(Player& tux)
@@ -329,7 +363,6 @@ void touch_controls_apply_player(Player& tux)
 
   tc_player = &tux;
 
-  /* Drive held directions every frame; releases are applied in event path. */
   if (tc_btn[TC_LEFT].held)
     tux.key_event((SDLKey)keymap.left, DOWN);
   if (tc_btn[TC_RIGHT].held)
@@ -354,9 +387,8 @@ bool touch_controls_menu_nav(int* action)
   if (!tc_enabled || !action)
     return false;
 
-  /* Edge-trigger: press when held && !prev_held */
   static const int order[] = { TC_UP, TC_DOWN, TC_LEFT, TC_RIGHT, TC_JUMP, TC_ACTION };
-  static const int mapact[] = { 0, 1, 2, 3, 4, 4 }; /* jump/action both = hit */
+  static const int mapact[] = { 0, 1, 2, 3, 4, 4 };
 
   bool found = false;
   for (int i = 0; i < 6; ++i)
@@ -370,9 +402,18 @@ bool touch_controls_menu_nav(int* action)
         }
     }
 
-  /* Only advance prev for nav buttons — TC_MENU uses escape_pressed(). */
   for (int i = 0; i < 6; ++i)
     tc_btn[order[i]].prev_held = tc_btn[order[i]].held;
 
   return found;
+}
+
+bool touch_controls_escape_pressed(void)
+{
+  if (!tc_enabled)
+    return false;
+  tc_ensure_layout();
+  bool pressed = tc_btn[TC_MENU].held && !tc_btn[TC_MENU].prev_held;
+  tc_btn[TC_MENU].prev_held = tc_btn[TC_MENU].held;
+  return pressed;
 }

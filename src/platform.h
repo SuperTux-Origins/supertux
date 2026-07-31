@@ -55,4 +55,23 @@ Uint32 platform_get_mouse_state(int* x, int* y);
 /** Current window size in pixels (for finger→logical mapping). */
 void platform_get_window_size(int* w, int* h);
 
+/**
+ * Reserve fractions of the window (0–1) as margins around the game
+ * letterbox so touch controls can sit outside the playfield.
+ * L/R/T/B are left, right, top, bottom. Zero = full-window fit (old behaviour).
+ */
+void platform_set_content_margins(float left, float right, float top, float bottom);
+
+/** Current letterbox rect in window/drawable pixels (game content). */
+void platform_get_letterbox(int* ox, int* oy, int* dw, int* dh);
+
+/**
+ * Overlay pass in window pixel coordinates (full drawable).
+ * Use between game drawing and present to paint touch controls in margins.
+ */
+void platform_overlay_begin(void);
+void platform_overlay_fillrect(int x, int y, int w, int h,
+                               int r, int g, int b, int a);
+void platform_overlay_end(void);
+
 #endif /* SUPERTUX_PLATFORM_H */

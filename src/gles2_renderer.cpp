@@ -267,8 +267,17 @@ void gles2_renderer_shutdown(void)
   g_ready = false;
 }
 
+void gles2_renderer_set_viewport_rect(int ox, int oy, int dw, int dh)
+{
+  if (dw < 1) dw = 1;
+  if (dh < 1) dh = 1;
+  glViewport(ox, oy, dw, dh);
+  mat4_ortho(g_mvp, 0.0f, (float)ST_SCREEN_W, (float)ST_SCREEN_H, 0.0f);
+}
+
 void gles2_renderer_set_viewport(int drawable_w, int drawable_h)
 {
+  /* Fallback when platform margins are not applied: classic centered fit. */
   float sx = (float)drawable_w / (float)ST_SCREEN_W;
   float sy = (float)drawable_h / (float)ST_SCREEN_H;
   float scale = (sx < sy) ? sx : sy;
@@ -276,9 +285,16 @@ void gles2_renderer_set_viewport(int drawable_w, int drawable_h)
   int dh = (int)(ST_SCREEN_H * scale + 0.5f);
   if (dw < 1) dw = 1;
   if (dh < 1) dh = 1;
+  gles2_renderer_set_viewport_rect((drawable_w - dw) / 2,
+                                   (drawable_h - dh) / 2, dw, dh);
+}
 
-  glViewport((drawable_w - dw) / 2, (drawable_h - dh) / 2, dw, dh);
-  mat4_ortho(g_mvp, 0.0f, (float)ST_SCREEN_W, (float)ST_SCREEN_H, 0.0f);
+void gles2_renderer_set_overlay(int drawable_w, int drawable_h)
+{
+  if (drawable_w < 1) drawable_w = 1;
+  if (drawable_h < 1) drawable_h = 1;
+  glViewport(0, 0, drawable_w, drawable_h);
+  mat4_ortho(g_mvp, 0.0f, (float)drawable_w, (float)drawable_h, 0.0f);
 }
 
 void gles2_draw_textured_quad(GLuint tex,

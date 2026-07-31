@@ -156,3 +156,24 @@ void platform_get_window_size(int* w, int* h)
   if (w) *w = screen ? screen->w : ST_SCREEN_W;
   if (h) *h = screen ? screen->h : ST_SCREEN_H;
 }
+
+void platform_set_content_margins(float left, float right, float top, float bottom)
+{
+  (void)left; (void)right; (void)top; (void)bottom;
+}
+
+void platform_get_letterbox(int* ox, int* oy, int* dw, int* dh)
+{
+  if (ox) *ox = 0;
+  if (oy) *oy = 0;
+  if (dw) *dw = screen ? screen->w : ST_SCREEN_W;
+  if (dh) *dh = screen ? screen->h : ST_SCREEN_H;
+}
+
+void platform_overlay_begin(void) {}
+void platform_overlay_fillrect(int x, int y, int w, int h,
+                               int r, int g, int b, int a)
+{
+  (void)x; (void)y; (void)w; (void)h; (void)r; (void)g; (void)b; (void)a;
+}
+void platform_overlay_end(void) {}

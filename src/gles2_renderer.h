@@ -18,6 +18,12 @@ void gles2_renderer_shutdown(void);
 /** Recompute MVP for current drawable size / letterbox (call after resize). */
 void gles2_renderer_set_viewport(int drawable_w, int drawable_h);
 
+/** Apply an explicit letterbox rect (platform is source of truth for margins). */
+void gles2_renderer_set_viewport_rect(int ox, int oy, int dw, int dh);
+
+/** Full-drawable overlay pass in window pixels (Y-down). */
+void gles2_renderer_set_overlay(int drawable_w, int drawable_h);
+
 /** Textured axis-aligned quad in screen pixels; colour modulates texture (0–255). */
 void gles2_draw_textured_quad(GLuint tex,
                               float x, float y, float w, float h,

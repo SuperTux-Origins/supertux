@@ -6,6 +6,7 @@
 #include "platform.h"
 #include "globals.h"
 #include "defines.h"
+#include "touch_controls.h"
 #include <SDL_image.h>
 #ifndef NOOPENGL
 #include "gl_compat.h"
@@ -24,30 +25,57 @@ static SDL_Surface* st_backbuffer = NULL;
    touch/mouse window coords can be mapped back to logical ST_SCREEN. */
 static int st_lb_ox = 0;
 static int st_lb_oy = 0;
+static int st_lb_dw = ST_SCREEN_W;
+static int st_lb_dh = ST_SCREEN_H;
 static float st_lb_scale = 1.0f;
+/* Fractions of window reserved for touch chrome (outside the game fit). */
+static float st_margin_l = 0.0f;
+static float st_margin_r = 0.0f;
+static float st_margin_t = 0.0f;
+static float st_margin_b = 0.0f;
+static int st_overlay_active = 0;
 
 #define VLOG(...) st_vlog(__VA_ARGS__)
 
 static void
 st_update_letterbox(int window_w, int window_h)
 {
-  if (window_w <= 0 || window_h <= 0
-      || (window_w == ST_SCREEN_W && window_h == ST_SCREEN_H))
+  if (window_w <= 0 || window_h <= 0)
     {
       st_lb_ox = 0;
       st_lb_oy = 0;
+      st_lb_dw = ST_SCREEN_W;
+      st_lb_dh = ST_SCREEN_H;
       st_lb_scale = 1.0f;
       return;
     }
-  float sx = (float)window_w / (float)ST_SCREEN_W;
-  float sy = (float)window_h / (float)ST_SCREEN_H;
+
+  int ml = (int)(st_margin_l * (float)window_w + 0.5f);
+  int mr = (int)(st_margin_r * (float)window_w + 0.5f);
+  int mt = (int)(st_margin_t * (float)window_h + 0.5f);
+  int mb = (int)(st_margin_b * (float)window_h + 0.5f);
+  if (ml < 0) ml = 0;
+  if (mr < 0) mr = 0;
+  if (mt < 0) mt = 0;
+  if (mb < 0) mb = 0;
+
+  int content_w = window_w - ml - mr;
+  int content_h = window_h - mt - mb;
+  if (content_w < 16) content_w = 16;
+  if (content_h < 16) content_h = 16;
+
+  float sx = (float)content_w / (float)ST_SCREEN_W;
+  float sy = (float)content_h / (float)ST_SCREEN_H;
   float scale = (sx < sy) ? sx : sy;
   int dw = (int)(ST_SCREEN_W * scale + 0.5f);
   int dh = (int)(ST_SCREEN_H * scale + 0.5f);
   if (dw < 1) dw = 1;
   if (dh < 1) dh = 1;
-  st_lb_ox = (window_w - dw) / 2;
-  st_lb_oy = (window_h - dh) / 2;
+
+  st_lb_ox = ml + (content_w - dw) / 2;
+  st_lb_oy = mt + (content_h - dh) / 2;
+  st_lb_dw = dw;
+  st_lb_dh = dh;
   st_lb_scale = scale;
 }
 
@@ -72,9 +100,48 @@ void platform_get_window_size(int* w, int* h)
 {
   int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
   if (st_window)
-    SDL_GetWindowSize(st_window, &ww, &wh);
+    {
+#ifndef NOOPENGL
+      if (use_gl)
+        SDL_GL_GetDrawableSize(st_window, &ww, &wh);
+      else
+#endif
+        SDL_GetWindowSize(st_window, &ww, &wh);
+    }
   if (w) *w = ww;
   if (h) *h = wh;
+}
+
+void platform_set_content_margins(float left, float right, float top, float bottom)
+{
+  st_margin_l = left;
+  st_margin_r = right;
+  st_margin_t = top;
+  st_margin_b = bottom;
+  if (st_margin_l < 0.0f) st_margin_l = 0.0f;
+  if (st_margin_r < 0.0f) st_margin_r = 0.0f;
+  if (st_margin_t < 0.0f) st_margin_t = 0.0f;
+  if (st_margin_b < 0.0f) st_margin_b = 0.0f;
+  /* Recompute on next present / coordinate map. */
+  int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
+  if (st_window)
+    {
+#ifdef USE_GLES2
+      if (use_gl)
+        SDL_GL_GetDrawableSize(st_window, &ww, &wh);
+      else
+#endif
+        SDL_GetWindowSize(st_window, &ww, &wh);
+    }
+  st_update_letterbox(ww, wh);
+}
+
+void platform_get_letterbox(int* ox, int* oy, int* dw, int* dh)
+{
+  if (ox) *ox = st_lb_ox;
+  if (oy) *oy = st_lb_oy;
+  if (dw) *dw = st_lb_dw;
+  if (dh) *dh = st_lb_dh;
 }
 
 static SDL_Surface*
@@ -154,7 +221,9 @@ software_present(void)
 
   st_update_letterbox(window_surface->w, window_surface->h);
 
-  if (window_surface->w == ST_SCREEN_W && window_surface->h == ST_SCREEN_H)
+  if (window_surface->w == ST_SCREEN_W && window_surface->h == ST_SCREEN_H
+      && st_margin_l == 0.0f && st_margin_r == 0.0f
+      && st_margin_t == 0.0f && st_margin_b == 0.0f)
     {
       SDL_BlitSurface(st_backbuffer, NULL, window_surface, NULL);
     }
@@ -164,13 +233,17 @@ software_present(void)
       SDL_Rect dst;
       dst.x = st_lb_ox;
       dst.y = st_lb_oy;
-      dst.w = (int)(ST_SCREEN_W * st_lb_scale + 0.5f);
-      dst.h = (int)(ST_SCREEN_H * st_lb_scale + 0.5f);
+      dst.w = st_lb_dw;
+      dst.h = st_lb_dh;
       if (dst.w < 1) dst.w = 1;
       if (dst.h < 1) dst.h = 1;
       SDL_FillRect(window_surface, NULL, SDL_MapRGB(window_surface->format, 0, 0, 0));
       SDL_BlitScaled(st_backbuffer, NULL, window_surface, &dst);
     }
+
+  /* Touch overlay must be painted after the scaled blit (FillRect wipes it). */
+  if (touch_controls_is_enabled())
+    touch_controls_draw();
 
   SDL_UpdateWindowSurface(st_window);
 }
@@ -187,14 +260,10 @@ gl_setup_viewport(void)
   st_update_letterbox(ww, wh);
 
 #ifdef USE_GLES2
-  gles2_renderer_set_viewport(ww, wh);
+  /* Single source of truth: platform letterbox (includes touch margins). */
+  gles2_renderer_set_viewport_rect(st_lb_ox, st_lb_oy, st_lb_dw, st_lb_dh);
 #else
-  int dw = (int)(ST_SCREEN_W * st_lb_scale + 0.5f);
-  int dh = (int)(ST_SCREEN_H * st_lb_scale + 0.5f);
-  if (dw < 1) dw = 1;
-  if (dh < 1) dh = 1;
-
-  glViewport(st_lb_ox, st_lb_oy, dw, dh);
+  glViewport(st_lb_ox, st_lb_oy, st_lb_dw, st_lb_dh);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
@@ -203,6 +272,85 @@ gl_setup_viewport(void)
 #endif
 }
 #endif
+
+void platform_overlay_begin(void)
+{
+  int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
+#ifndef NOOPENGL
+  if (use_gl && st_window)
+    {
+      SDL_GL_GetDrawableSize(st_window, &ww, &wh);
+#ifdef USE_GLES2
+      gles2_renderer_set_overlay(ww, wh);
+#else
+      glViewport(0, 0, ww, wh);
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity();
+      glOrtho(0, ww, wh, 0, -1.0, 1.0);
+      glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
+#endif
+      st_overlay_active = 1;
+      return;
+    }
+#endif
+  if (st_window)
+    SDL_GetWindowSize(st_window, &ww, &wh);
+  st_overlay_active = 1;
+  (void)ww;
+  (void)wh;
+}
+
+void platform_overlay_fillrect(int x, int y, int w, int h,
+                               int r, int g, int b, int a)
+{
+  if (!st_overlay_active)
+    return;
+#ifndef NOOPENGL
+  if (use_gl)
+    {
+#ifdef USE_GLES2
+      gles2_draw_solid_quad((float)x, (float)y, (float)w, (float)h,
+                            (unsigned char)r, (unsigned char)g,
+                            (unsigned char)b, (unsigned char)a);
+#else
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glColor4ub((GLubyte)r, (GLubyte)g, (GLubyte)b, (GLubyte)a);
+      glBegin(GL_QUADS);
+      glVertex2i(x, y);
+      glVertex2i(x + w, y);
+      glVertex2i(x + w, y + h);
+      glVertex2i(x, y + h);
+      glEnd();
+      glDisable(GL_BLEND);
+#endif
+      return;
+    }
+#endif
+  /* Software: paint onto the window surface directly. */
+  if (!st_window)
+    return;
+  SDL_Surface* ws = SDL_GetWindowSurface(st_window);
+  if (!ws)
+    return;
+  SDL_Rect dst;
+  dst.x = x; dst.y = y; dst.w = w; dst.h = h;
+  /* Approximate alpha by solid fill (software path rarely used on Android). */
+  SDL_FillRect(ws, &dst, SDL_MapRGB(ws->format, (Uint8)r, (Uint8)g, (Uint8)b));
+  (void)a;
+}
+
+void platform_overlay_end(void)
+{
+  if (!st_overlay_active)
+    return;
+  st_overlay_active = 0;
+#ifndef NOOPENGL
+  if (use_gl)
+    gl_setup_viewport();
+#endif
+}
 
 static void
 log_window(const char* where)
