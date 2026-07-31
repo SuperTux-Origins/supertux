@@ -451,6 +451,8 @@ GameSession::process_events()
 		  break;
 #endif
 		case SDL_JOYHATMOTION:
+		  if (!use_joystick)
+		    break;
 		  if ((event.jhat.value == SDL_HAT_RIGHT) || 
 		      (event.jhat.value == SDL_HAT_RIGHTUP) ){
 			tux.input.left  = UP;
@@ -480,6 +482,8 @@ GameSession::process_events()
 
 
                 case SDL_JOYAXISMOTION:
+                  if (!use_joystick)
+                    break;
                   if (event.jaxis.axis == joystick_keymap.x_axis)
                     {
                       if (event.jaxis.value < -joystick_keymap.dead_zone)
@@ -511,6 +515,8 @@ GameSession::process_events()
 #endif            
                 case SDL_JOYBUTTONDOWN:
 #ifndef GP2X
+                  if (!use_joystick)
+                    break;
                   if (event.jbutton.button == joystick_keymap.a_button)
                     tux.input.up = DOWN;
                   else if (event.jbutton.button == joystick_keymap.b_button)
@@ -544,6 +550,8 @@ GameSession::process_events()
 
                 case SDL_JOYBUTTONUP:
 #ifndef GP2X
+                  if (!use_joystick)
+                    break;
                   if (event.jbutton.button == joystick_keymap.a_button)
                     tux.input.up = UP;
                   else if (event.jbutton.button == joystick_keymap.b_button)

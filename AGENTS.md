@@ -133,6 +133,11 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 6. GP2X / 320×240 paths are legacy; do not invest in them unless explicitly requested. CMake may omit those options initially.
 7. **Do not change gameplay or level design** unless fixing a crash or an SDL2 blocker. No balance tweaks, new mechanics, or content work.
 8. **Commit message in chat:** After any larger change (new subsystem, multi-file refactor, completed TODO phase, etc.), end the reply with a proposed **git commit message** (subject + optional body). Use imperative mood, explain *why* when non-obvious, and keep the subject ~50–72 characters when practical. Do not run `git commit` unless the user asks.
+9. **Diagnose before fixing — no speculative hacks.** If the root cause is not confirmed by logs, a reproducible test, or a clear code path, **do not** “fix” by papering over symptoms (extra guards, random hints, dead-zone tweaks, `#ifdef` workarounds). Instead:
+   - Add **targeted debug output** (`st_vlog` / `SDL_Log`) at the decision points that must fire for the bug to occur (input events, menu actions, init flags, open/close of devices).
+   - On Android, `verbose_mode` is forced on so `st_vlog` already goes to logcat; prefer that over inventing a parallel logging path.
+   - Re-run, collect logcat (or desktop stderr), and only then land a minimal fix tied to what the logs show.
+   - Harmless resource hygiene (e.g. closing a joystick you opened but rejected) is fine; theory-driven behavior changes without evidence are not.
 
 ## Key source map
 

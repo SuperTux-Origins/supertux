@@ -612,6 +612,8 @@ WorldMap::get_input()
 
 #ifndef GP2X      
             case SDL_JOYAXISMOTION:
+              if (!use_joystick)
+                break;
               if (event.jaxis.axis == joystick_keymap.x_axis)
                 {
                   if (event.jaxis.value < -joystick_keymap.dead_zone)
@@ -629,6 +631,8 @@ WorldMap::get_input()
               break;
 
 	    case SDL_JOYHATMOTION:
+	      if (!use_joystick)
+	        break;
 	      if (event.jhat.value & SDL_HAT_UP)
                     input_direction = D_NORTH;
 	      if (event.jhat.value & SDL_HAT_DOWN)
@@ -642,6 +646,8 @@ WorldMap::get_input()
 #endif
             case SDL_JOYBUTTONDOWN:
 #ifndef GP2X
+              if (!use_joystick)
+                break;
               if (event.jbutton.button == joystick_keymap.b_button)
                 enter_level = true;
               else if (event.jbutton.button == joystick_keymap.start_button)

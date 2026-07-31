@@ -364,6 +364,25 @@ Menu::action()
   hit_item = -1;
   if(item.size() != 0)
   {
+    int prev_active = active_item;
+    if (menuaction != MENU_ACTION_NONE && verbose_mode)
+      {
+        const char* aname = "?";
+        switch (menuaction)
+          {
+          case MENU_ACTION_UP:     aname = "UP"; break;
+          case MENU_ACTION_DOWN:   aname = "DOWN"; break;
+          case MENU_ACTION_LEFT:   aname = "LEFT"; break;
+          case MENU_ACTION_RIGHT:  aname = "RIGHT"; break;
+          case MENU_ACTION_HIT:    aname = "HIT"; break;
+          case MENU_ACTION_INPUT:  aname = "INPUT"; break;
+          case MENU_ACTION_REMOVE: aname = "REMOVE"; break;
+          case MENU_ACTION_NONE:   aname = "NONE"; break;
+          }
+        st_vlog("[menu] action %s active=%d/%d\n",
+                aname, active_item, (int)item.size());
+      }
+
     switch(menuaction)
     {
     case MENU_ACTION_UP:
@@ -371,6 +390,9 @@ Menu::action()
         --active_item;
       else
         active_item = int(item.size())-1;
+      if (verbose_mode && active_item != prev_active)
+        st_vlog("[menu] active_item %d -> %d (UP)\n",
+                prev_active, active_item);
       break;
 
     case MENU_ACTION_DOWN:
@@ -378,6 +400,9 @@ Menu::action()
         ++active_item;
       else
         active_item = 0;
+      if (verbose_mode && active_item != prev_active)
+        st_vlog("[menu] active_item %d -> %d (DOWN)\n",
+                prev_active, active_item);
       break;
 
     case MENU_ACTION_LEFT:
@@ -773,6 +798,16 @@ Menu::event(SDL_Event& event)
     ch[0] = st_key_ascii(event);
     ch[1] = '\0';
 
+    if (verbose_mode)
+      st_vlog("[menu] KEYDOWN sym=%d repeat=%d active=%d\n",
+              (int)key,
+#ifdef USE_SDL2
+              (int)event.key.repeat,
+#else
+              0,
+#endif
+              active_item);
+
     if(item[active_item].kind == MN_CONTROLFIELD)
     {
       if(key == SDLK_ESCAPE)
@@ -860,6 +895,11 @@ Menu::event(SDL_Event& event)
 #endif
 
   case  SDL_JOYHATMOTION:
+      if (verbose_mode)
+        st_vlog("[menu] JOYHAT value=0x%x use_joystick=%d\n",
+                (unsigned)event.jhat.value, (int)use_joystick);
+      if (!use_joystick)
+        break;
       if(event.jhat.value & SDL_HAT_UP)
            menuaction = MENU_ACTION_UP;
       if(event.jhat.value & SDL_HAT_DOWN)
@@ -871,11 +911,18 @@ Menu::event(SDL_Event& event)
        break;
        
   case  SDL_JOYAXISMOTION:
+    if (verbose_mode)
+      st_vlog("[menu] JOYAXIS which=%d axis=%d value=%d use_joystick=%d dead=%d\n",
+              (int)event.jaxis.which, (int)event.jaxis.axis,
+              (int)event.jaxis.value, (int)use_joystick,
+              joystick_keymap.dead_zone);
+    if (!use_joystick)
+      break;
     if(event.jaxis.axis == joystick_keymap.y_axis)
     {
-      if (event.jaxis.value > 1024)
+      if (event.jaxis.value > joystick_keymap.dead_zone)
         menuaction = MENU_ACTION_DOWN;
-      else if (event.jaxis.value < -1024)
+      else if (event.jaxis.value < -joystick_keymap.dead_zone)
         menuaction = MENU_ACTION_UP;
     }
     break;
@@ -883,7 +930,11 @@ Menu::event(SDL_Event& event)
 
   case  SDL_JOYBUTTONDOWN:
 #ifndef GP2X
-    menuaction = MENU_ACTION_HIT;
+    if (verbose_mode)
+      st_vlog("[menu] JOYBUTTONDOWN btn=%d use_joystick=%d\n",
+              (int)event.jbutton.button, (int)use_joystick);
+    if (use_joystick)
+      menuaction = MENU_ACTION_HIT;
     break;
 #else
 
@@ -964,8 +1015,11 @@ Menu::event(SDL_Event& event)
 
 #ifndef GP2X
   case SDL_MOUSEBUTTONDOWN:
-    x = event.motion.x;
-    y = event.motion.y;
+    x = event.button.x;
+    y = event.button.y;
+    if (verbose_mode)
+      st_vlog("[menu] MOUSEBUTTONDOWN btn=%d x=%d y=%d\n",
+              (int)event.button.button, x, y);
     if(x > pos_x - get_width()/2 &&
         x < pos_x + get_width()/2 &&
         y > pos_y - get_height()/2 &&
@@ -982,7 +1036,11 @@ Menu::event(SDL_Event& event)
         y > pos_y - get_height()/2 &&
         y < pos_y + get_height()/2)
     {
-      active_item = (y - (pos_y - get_height()/2)) / 24;
+      int new_active = (y - (pos_y - get_height()/2)) / 24;
+      if (verbose_mode && new_active != active_item)
+        st_vlog("[menu] MOUSEMOTION x=%d y=%d active %d -> %d (pos_y=%d h=%d)\n",
+                x, y, active_item, new_active, pos_y, get_height());
+      active_item = new_active;
       mouse_cursor->set_state(MC_LINK);
     }
     else

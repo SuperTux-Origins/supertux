@@ -185,3 +185,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-31 | Android APK target: nix/android.nix, android/, SDL2+image stb, NOSOUND/NOOPENGL |
 | 2026-07-31 | GLES2 renderer: ENABLE_GLES2, gles2_renderer, gl_compat.h; flake gles2 package |
 | 2026-07-31 | Android default renderer: GLES2 (Android.mk USE_GLES2, manifest glEsVersion 0x20000) |
+| 2026-07-31 | Android menu stuck-DOWN: open (not assumed joystick); menu/joy debug logs; AGENTS diagnose-first |

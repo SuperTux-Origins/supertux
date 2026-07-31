@@ -1213,6 +1213,7 @@ void st_joystick_setup(void)
   /* Init Joystick: */
 
   use_joystick = true;
+  js = NULL;
 
   if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
@@ -1221,11 +1222,29 @@ void st_joystick_setup(void)
               "%s\n\n", SDL_GetError());
 
       use_joystick = false;
+      if (verbose_mode)
+        st_vlog("[joy] SDL_InitSubSystem(JOYSTICK) failed: %s\n", SDL_GetError());
     }
   else
     {
+      int njoy = SDL_NumJoysticks();
+      if (verbose_mode)
+        {
+          st_vlog("[joy] SDL_NumJoysticks() = %d (want index %d)\n",
+                  njoy, joystick_num);
+          for (int i = 0; i < njoy; ++i)
+            {
+#ifdef USE_SDL2
+              const char* jname = SDL_JoystickNameForIndex(i);
+#else
+              const char* jname = SDL_JoystickName(i);
+#endif
+              st_vlog("[joy]   [%d] \"%s\"\n", i, jname ? jname : "(unnamed)");
+            }
+        }
+
       /* Open joystick: */
-      if (SDL_NumJoysticks() <= 0)
+      if (njoy <= 0)
         {
           if (verbose_mode)
             st_vlog("[joy] no joysticks available — skipping\n");
@@ -1245,45 +1264,57 @@ void st_joystick_setup(void)
                       "%s\n\n", joystick_num, SDL_GetError());
 
               use_joystick = false;
+              if (verbose_mode)
+                st_vlog("[joy] open index %d failed: %s\n",
+                        joystick_num, SDL_GetError());
             }
 #ifndef GP2X
           else
             {
-              if (SDL_JoystickNumAxes(js) < 2)
+              int naxes = SDL_JoystickNumAxes(js);
+              int nbuttons = SDL_JoystickNumButtons(js);
+#ifdef USE_SDL2
+              const char* jname = SDL_JoystickName(js);
+#else
+              const char* jname = SDL_JoystickName(joystick_num);
+#endif
+              if (verbose_mode)
+                st_vlog("[joy] opened index %d \"%s\" (%d axes, %d buttons)\n",
+                        joystick_num,
+                        jname ? jname : "(unnamed)",
+                        naxes, nbuttons);
+
+              if (naxes < 2)
                 {
                   fprintf(stderr,
                           "Warning: Joystick does not have enough axes!\n");
-
+                  SDL_JoystickClose(js);
+                  js = NULL;
                   use_joystick = false;
+                  if (verbose_mode)
+                    st_vlog("[joy] rejected: need >= 2 axes (have %d)\n", naxes);
                 }
-              else
+              else if (nbuttons < 2)
                 {
-                  if (SDL_JoystickNumButtons(js) < 2)
-                    {
-                      fprintf(stderr,
-                              "Warning: "
-                              "Joystick does not have enough buttons!\n");
-
-                      use_joystick = false;
-                    }
-                  else if (verbose_mode)
-                    {
-#ifdef USE_SDL2
-                      const char* jname = SDL_JoystickName(js);
-#else
-                      const char* jname = SDL_JoystickName(joystick_num);
-#endif
-                      st_vlog("[joy] opened index %d \"%s\" (%d axes, %d buttons)\n",
-                              joystick_num,
-                              jname ? jname : "(unnamed)",
-                              SDL_JoystickNumAxes(js),
-                              SDL_JoystickNumButtons(js));
-                    }
+                  fprintf(stderr,
+                          "Warning: "
+                          "Joystick does not have enough buttons!\n");
+                  /* Close rejected device so it cannot keep sending events. */
+                  SDL_JoystickClose(js);
+                  js = NULL;
+                  use_joystick = false;
+                  if (verbose_mode)
+                    st_vlog("[joy] rejected: need >= 2 buttons (have %d)\n",
+                            nbuttons);
                 }
             }
 #endif
         }
     }
+
+  if (verbose_mode)
+    st_vlog("[joy] use_joystick=%s js=%p\n",
+            use_joystick ? "true" : "false", (void*)js);
 }
 
 void st_sdl_init(void)
