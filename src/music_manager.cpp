@@ -40,7 +40,20 @@ MusicManager::load_music(const std::string& file)
     return MusicRef(0);
 
   if(!exists_music(file))
-    st_abort("Couldn't load musicfile ", file.c_str());
+    {
+      /* Missing/unsupported codec (e.g. MOD without libxmp) must not kill
+         the process — run silent and keep going. */
+      fprintf(stderr, "Warning: couldn't load music '%s'%s%s\n",
+              file.c_str(),
+#ifndef GP2X
+              Mix_GetError() ? ": " : "",
+              Mix_GetError() ? Mix_GetError() : ""
+#else
+              "", ""
+#endif
+              );
+      return MusicRef(0);
+    }
 
   std::map<std::string, MusicResource>::iterator i = musics.find(file);
   assert(i != musics.end());

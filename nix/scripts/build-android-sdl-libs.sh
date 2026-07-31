@@ -47,14 +47,55 @@ EOF
   cp -a "$SDL_MIXER_SRC"/. mixer-jni/SDL2_mixer/
   chmod -R u+w mixer-jni
 
-  # Prefer in-tree stb_vorbis OGG; avoid wavpack/gme/xmp (need extra deps).
+  # Milestone 1 ships .mod/.xm — need libxmp under external/libxmp.
+  MOD_XMP=false
+  if [ -n "${LIBXMP_SRC:-}" ] && [ -d "$LIBXMP_SRC" ]; then
+    echo "Vendoring libxmp into SDL2_mixer/external/libxmp"
+    mkdir -p mixer-jni/SDL2_mixer/external/libxmp
+    cp -a "$LIBXMP_SRC"/. mixer-jni/SDL2_mixer/external/libxmp/
+    chmod -R u+w mixer-jni/SDL2_mixer/external/libxmp
+    # CORE_PLAYER is enough for SuperTux .mod/.xm. Only compile the core
+    # player sources + the four core format loaders (MOD/S3M/XM/IT). A full
+    # loaders/*.c wildcard pulls in 669/MED/FAR/… which reference FX_* enums
+    # that LIBXMP_CORE_PLAYER deliberately omits → undeclared-identifier
+    # errors (e.g. FX_669_PORTA_UP in 669_load.c).
+    echo "Writing Android.mk for libxmp CORE_PLAYER (MOD/S3M/XM/IT)"
+    cat > mixer-jni/SDL2_mixer/external/libxmp/Android.mk <<'XMPMK'
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_MODULE := xmp
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include $(LOCAL_PATH)/src $(LOCAL_PATH)/src/loaders
+LOCAL_CFLAGS += -DLIBXMP_CORE_PLAYER -DLIBXMP_NO_PROWIZARD -DLIBXMP_NO_DEPACKERS -DHAVE_ROUND
+# Core player (src/*.c minus format-specific extras). Keep lfo.c — player,
+# effects, and read_event call libxmp_lfo_* even under CORE_PLAYER.
+XMP_SRC := $(wildcard $(LOCAL_PATH)/src/*.c)
+XMP_SRC := $(filter-out %/extras.c %/far_extras.c %/med_extras.c %/hmn_extras.c,$(XMP_SRC))
+# Core loaders only — matches libxmp's LIBXMP_CORE_PLAYER set.
+XMP_LOADERS := \
+  src/loaders/common.c \
+  src/loaders/iff.c \
+  src/loaders/it_load.c \
+  src/loaders/itsex.c \
+  src/loaders/mod_load.c \
+  src/loaders/s3m_load.c \
+  src/loaders/sample.c \
+  src/loaders/xm_load.c
+LOCAL_SRC_FILES := $(subst $(LOCAL_PATH)/,,$(XMP_SRC)) $(XMP_LOADERS)
+include $(BUILD_STATIC_LIBRARY)
+XMPMK
+    MOD_XMP=true
+  else
+    echo "warning: LIBXMP_SRC unset — MOD/XM music will not load" >&2
+  fi
+
+  # Prefer in-tree stb_vorbis OGG; disable codecs that need missing deps.
   "$NDK/ndk-build" \
     NDK_PROJECT_PATH="$PWD/mixer-jni" \
     APP_BUILD_SCRIPT="$PWD/mixer-jni/Android.mk" \
     NDK_APPLICATION_MK="$PWD/mixer-jni/Application.mk" \
     SUPPORT_WAVPACK=false \
     SUPPORT_GME=false \
-    SUPPORT_MOD_XMP=false \
+    SUPPORT_MOD_XMP=$MOD_XMP \
     SUPPORT_OGG_STB=true \
     SUPPORT_OGG=false \
     -j"$NIX_BUILD_CORES"

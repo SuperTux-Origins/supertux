@@ -20,6 +20,7 @@
 , sdlVersion
 , sdlMixerSrc ? null
 , sdlMixerVersion ? "2.8.0"
+, libxmpSrc ? null
 , androidSdk
 , buildToolsVersion
 , packagePlatform
@@ -66,6 +67,8 @@ let
       TOP_ANDROID_MK = topAndroidMk;
     } // pkgs.lib.optionalAttrs (sdlMixerSrc != null) {
       SDL_MIXER_SRC = "${sdlMixerSrc}";
+    } // pkgs.lib.optionalAttrs (libxmpSrc != null) {
+      LIBXMP_SRC = "${libxmpSrc}";
     };
 
     buildPhase = ''

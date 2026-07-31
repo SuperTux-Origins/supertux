@@ -57,10 +57,15 @@
       url = "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.0/SDL2_mixer-2.8.0.tar.gz";
       flake = false;
     };
+    # libxmp for MOD/XM music (salcon.mod, theme.mod, credits.xm, …).
+    libxmp-src = {
+      url = "https://github.com/libxmp/libxmp/releases/download/libxmp-4.6.0/libxmp-4.6.0.tar.gz";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, tinycmmc, SDL-win32, SDL_mixer-win32, SDL_image-win32
-            , sdl2-src, sdl2-image-src, sdl2-mixer-src }:
+            , sdl2-src, sdl2-image-src, sdl2-mixer-src, libxmp-src }:
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       let
         lib = nixpkgs.lib;
@@ -93,6 +98,7 @@
           sdlVersion = "2.30.3";
           sdlMixerSrc = sdl2-mixer-src;
           sdlMixerVersion = "2.8.0";
+          libxmpSrc = libxmp-src;
           inherit androidSdk buildToolsVersion packagePlatform compilePlatform targetAbis;
         };
         gitDate =
