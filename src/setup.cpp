@@ -1128,8 +1128,17 @@ void st_print_init_status(void)
   st_vlog("    display    %dx%d  fullscreen=%s\n",
           screen ? screen->w : 0, screen ? screen->h : 0,
           use_fullscreen ? "yes" : "no");
+#ifdef USE_SDL2
   st_vlog("    SDL video  %s\n",
           SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "(none)");
+#else
+  {
+    char driver_name[64];
+    st_vlog("    SDL video  %s\n",
+            SDL_VideoDriverName(driver_name, sizeof(driver_name))
+              ? driver_name : "(none)");
+  }
+#endif
 
   /* Compile-time feature flags */
   st_vlog("------------------------------------------------------\n");

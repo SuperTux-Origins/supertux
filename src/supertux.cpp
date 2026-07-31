@@ -20,7 +20,7 @@
 
 int main(int argc, char * argv[])
 {
-  SDL_Log("SuperTux Milestone 1 %s starting", VERSION);
+  st_log("SuperTux Milestone 1 %s starting", VERSION);
   /* Path options must be applied before directory/config setup. */
   parse_path_args(argc, argv);
   st_directory_setup();
