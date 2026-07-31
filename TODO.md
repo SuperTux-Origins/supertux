@@ -108,7 +108,7 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] Fullscreen / present: FULLSCREEN → FULLSCREEN_DESKTOP → windowed; software letterbox scale; video re-init falls back instead of exit
 - [x] **GLES2 optional path** (`ENABLE_GLES2`): ES 2.0 context, `gles2_renderer` shader quads, texture upload without `GL_UNPACK_ROW_LENGTH` / `GL_RGB10_A2`; desktop immediate-mode GL retained when GLES2 is off
 - [ ] Smoke playtest with `data/`: title demo, one level, worldmap, pause menu, options, quit — SDL1, SDL2, and GLES2
-- [ ] Wire Android APK to GLES2 renderer (currently `NOOPENGL` / software only)
+- [x] Wire Android APK to GLES2 renderer (default; `USE_GLES2` + `-lGLESv2`; software fallback)
 
 ### Rendering strategy
 
@@ -184,3 +184,4 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-31 | Silence -Wformat-truncation in dsubdirs/dfiles (PATH_MAX + path_join) |
 | 2026-07-31 | Android APK target: nix/android.nix, android/, SDL2+image stb, NOSOUND/NOOPENGL |
 | 2026-07-31 | GLES2 renderer: ENABLE_GLES2, gles2_renderer, gl_compat.h; flake gles2 package |
+| 2026-07-31 | Android default renderer: GLES2 (Android.mk USE_GLES2, manifest glEsVersion 0x20000) |

@@ -1670,6 +1670,14 @@ void parseargs(int argc, char * argv[])
           usage(argv[0], 1);
         }
     }
+
+#ifdef __ANDROID__
+  /* Phone/tablet: fullscreen; GLES2 is the default accelerated path. */
+  use_fullscreen = true;
+#ifdef USE_GLES2
+  use_gl = true;
+#endif
+#endif
 }
 
 

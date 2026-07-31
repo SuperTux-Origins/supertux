@@ -164,7 +164,7 @@ nix run .#install-android-supertux-milestone1   # adb install -r
 - SDL2 is built once as `android-sdl-libs` (ndk-build); the game links it as a prebuilt.
 - SDL2_image is compiled into `libmain.so` with the stb backend (no system libpng).
 - Sound is currently **off** (`NOSOUND`) on Android until SDL2_mixer is wired the same way.
-- OpenGL immediate-mode path is **off** (`NOOPENGL`); software SDL surface renderer only.
+- **GLES2 is the default renderer** on Android (`USE_GLES2`, linked `-lGLESv2`). ES 2.0 is required by the Android CDD and available on API 22 / Fire OS 5. Software fallback remains if context creation fails.
 - Place a Milestone 1 `data/` tree at the repo root to package assets into the APK; without it the APK still builds but needs external data at runtime.
 - Target baseline matches Fire OS 5 / API 22 (`armeabi-v7a` + `arm64-v8a`).
 

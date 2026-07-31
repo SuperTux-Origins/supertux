@@ -39,7 +39,12 @@ static void defaults ()
 
   use_fullscreen = false;
   show_fps = false;
+#ifdef USE_GLES2
+  /* GLES2 builds (Android + optional desktop): prefer the shader path. */
+  use_gl = true;
+#else
   use_gl = false;
+#endif
 
 #ifndef NOSOUND
   audio_device = true;

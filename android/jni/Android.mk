@@ -16,6 +16,7 @@ LOCAL_SRC_FILES := \
 	gameloop.cpp \
 	gameobjs.cpp \
 	globals.cpp \
+	gles2_renderer.cpp \
 	high_scores.cpp \
 	intro.cpp \
 	level.cpp \
@@ -59,10 +60,13 @@ LOCAL_CPPFLAGS += -DNOSOUND
 endif
 
 LOCAL_SHARED_LIBRARIES := SDL2
-LOCAL_LDLIBS := -llog -landroid -lz
 
-LOCAL_CFLAGS += -DUSE_SDL2 -DNOOPENGL
-LOCAL_CPPFLAGS += -DUSE_SDL2 -DNOOPENGL -std=c++98
+# GLES2 is the default accelerated path on Android. ES 2.0 has been required
+# by the Android CDD for many years; API 22 / Fire OS 5 devices all expose it.
+LOCAL_LDLIBS := -llog -landroid -lz -lGLESv2
+
+LOCAL_CFLAGS += -DUSE_SDL2 -DUSE_GLES2
+LOCAL_CPPFLAGS += -DUSE_SDL2 -DUSE_GLES2 -std=c++98
 LOCAL_CFLAGS += -DSUPERTUX_MILESTONE1_VERSION=\"0.1.5-dev\"
 LOCAL_CPPFLAGS += -DSUPERTUX_MILESTONE1_VERSION=\"0.1.5-dev\"
 LOCAL_CFLAGS += -DDATA_PREFIX=\".\"
