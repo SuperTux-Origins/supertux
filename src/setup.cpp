@@ -514,10 +514,44 @@ android_prepare_paths(void)
 
   std::string data_root = std::string(internal) + "/data";
   std::string marker = data_root + "/.extracted";
+  /*
+   * Bump ANDROID_DATA_EXTRACT_GEN whenever the packaged data/ tree gains or
+   * loses files (e.g. tv-bezel.png). Marker stores VERSION + gen; a mismatch
+   * forces a fresh extract so internal storage is not stuck on an older tree
+   * from a previous install ("data already extracted" with missing assets).
+   */
+#define ANDROID_DATA_EXTRACT_GEN "2"
 
-  if (access(marker.c_str(), F_OK) != 0)
+  bool need_extract = true;
+  {
+    FILE* mf = fopen(marker.c_str(), "r");
+    if (mf)
+      {
+        char ver[128], gen[64];
+        ver[0] = gen[0] = '\0';
+        if (fgets(ver, sizeof(ver), mf))
+          {
+            size_t n = strlen(ver);
+            while (n > 0 && (ver[n - 1] == '\n' || ver[n - 1] == '\r'))
+              ver[--n] = '\0';
+            if (fgets(gen, sizeof(gen), mf))
+              {
+                n = strlen(gen);
+                while (n > 0 && (gen[n - 1] == '\n' || gen[n - 1] == '\r'))
+                  gen[--n] = '\0';
+                if (strcmp(ver, VERSION) == 0
+                    && strcmp(gen, ANDROID_DATA_EXTRACT_GEN) == 0)
+                  need_extract = false;
+              }
+          }
+        fclose(mf);
+      }
+  }
+
+  if (need_extract)
     {
-      SDL_Log("Android: extracting APK assets to %s", data_root.c_str());
+      SDL_Log("Android: extracting APK assets to %s (gen %s)",
+              data_root.c_str(), ANDROID_DATA_EXTRACT_GEN);
       JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
       jobject activity = (jobject)SDL_AndroidGetActivity();
       if (!env || !activity)
@@ -542,7 +576,7 @@ android_prepare_paths(void)
           FILE* m = fopen(marker.c_str(), "w");
           if (m)
             {
-              fputs(VERSION "\n", m);
+              fprintf(m, "%s\n%s\n", VERSION, ANDROID_DATA_EXTRACT_GEN);
               fclose(m);
             }
           env->DeleteLocalRef(am_class);
@@ -553,7 +587,8 @@ android_prepare_paths(void)
     }
   else
     {
-      SDL_Log("Android: data already extracted at %s", data_root.c_str());
+      SDL_Log("Android: data already extracted at %s (gen %s)",
+              data_root.c_str(), ANDROID_DATA_EXTRACT_GEN);
     }
 
   if (datadir.empty())

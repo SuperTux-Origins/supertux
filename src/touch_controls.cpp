@@ -385,14 +385,13 @@ tc_draw_bezel(void)
       if (access(path.c_str(), R_OK) == 0)
         {
           tc_bezel = new Surface(path, USE_ALPHA);
-          fprintf(stderr, "[video] loaded arctic TV bezel %s (%dx%d)\n",
+          st_vlog("[video] loaded arctic TV bezel %s (%dx%d)\n",
                   path.c_str(),
                   tc_bezel ? tc_bezel->w : 0, tc_bezel ? tc_bezel->h : 0);
         }
       else
         {
-          fprintf(stderr,
-                  "[video] no tv-bezel.png at %s — plain letterbox margins\n",
+          st_vlog("[video] no tv-bezel.png at %s — plain letterbox margins\n",
                   path.c_str());
         }
     }
@@ -426,8 +425,7 @@ tc_draw_bezel(void)
   if (!logged_rect)
     {
       logged_rect = true;
-      fprintf(stderr,
-              "[video] TV bezel draw: dst=(%d,%d %dx%d) hole→letterbox=(%d,%d %dx%d)\n",
+      st_vlog("[video] TV bezel draw: dst=(%d,%d %dx%d) hole→letterbox=(%d,%d %dx%d)\n",
               dx, dy, dw, dh, lx, ly, lw, lh);
     }
 
