@@ -46,28 +46,20 @@ LOCAL_SRC_FILES := \
 	world.cpp \
 	worldmap.cpp
 
-# SDL2_image (stb backend) when the build script placed sources here.
+# SDL2_image: stb-only backend for PNG/JPG/BMP/GIF/TGA (no libpng/jpeg/webp).
+# Compile only IMG.c + IMG_stb.c and force every optional codec off so IMG.c
+# does not reference IMG_LoadAVIF_RW / IMG_LoadJXL_RW / etc.
 ifneq ($(wildcard $(LOCAL_PATH)/SDL2_image/src/IMG.c),)
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/SDL2_image/include
 LOCAL_SRC_FILES += \
 	SDL2_image/src/IMG.c \
-	SDL2_image/src/IMG_stb.c \
-	SDL2_image/src/IMG_bmp.c \
-	SDL2_image/src/IMG_gif.c \
-	SDL2_image/src/IMG_jpg.c \
-	SDL2_image/src/IMG_lbm.c \
-	SDL2_image/src/IMG_pcx.c \
-	SDL2_image/src/IMG_png.c \
-	SDL2_image/src/IMG_pnm.c \
-	SDL2_image/src/IMG_svg.c \
-	SDL2_image/src/IMG_tga.c \
-	SDL2_image/src/IMG_tif.c \
-	SDL2_image/src/IMG_webp.c \
-	SDL2_image/src/IMG_xcf.c \
-	SDL2_image/src/IMG_xpm.c \
-	SDL2_image/src/IMG_xv.c \
-	SDL2_image/src/IMG_qoi.c
-LOCAL_CFLAGS += -DUSE_STBIMAGE -DLOAD_BMP -DLOAD_PNG -DLOAD_JPG -DLOAD_GIF
+	SDL2_image/src/IMG_stb.c
+LOCAL_CFLAGS += \
+	-DUSE_STBIMAGE \
+	-DLOAD_BMP=1 -DLOAD_GIF=1 -DLOAD_JPG=1 -DLOAD_PNG=1 -DLOAD_TGA=1 \
+	-DLOAD_AVIF=0 -DLOAD_JXL=0 -DLOAD_LBM=0 -DLOAD_PCX=0 -DLOAD_PNM=0 \
+	-DLOAD_QOI=0 -DLOAD_SVG=0 -DLOAD_TIF=0 -DLOAD_WEBP=0 \
+	-DLOAD_XCF=0 -DLOAD_XPM=0 -DLOAD_XV=0 -DLOAD_XXX=0
 endif
 
 # Sound optional — need SDL_mixer.h from a full SDL2_mixer install.

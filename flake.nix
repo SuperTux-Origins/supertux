@@ -24,7 +24,7 @@
   description = "A 2D platform game featuring Tux the penguin (Milestone 1)";
 
   inputs = rec {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-26.05";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
 
     tinycmmc.url = "github:grumbel/tinycmmc";
     tinycmmc.inputs.nixpkgs.follows = "nixpkgs";
