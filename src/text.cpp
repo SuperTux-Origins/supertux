@@ -299,7 +299,8 @@ void display_text_file(const std::string& file, Surface* surface, float scroll_s
             {
               if (touch_controls_escape_pressed()
                   || touch_controls_held(4)  /* jump */
-                  || touch_controls_held(5)) /* action */
+                  || touch_controls_held(5)  /* action */
+                  || touch_controls_held(6)) /* both */
                 done = 1;
               continue;
             }

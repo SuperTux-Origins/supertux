@@ -18,6 +18,7 @@ enum {
   TC_DOWN,
   TC_JUMP,
   TC_ACTION,
+  TC_BOTH,   /* Run+Jump together (carry item while running/jumping) */
   TC_MENU,
   TC_COUNT
 };
@@ -81,14 +82,24 @@ tc_layout(void)
   tc_btn[TC_DOWN].x  = dpad_cx - bs / 2;    tc_btn[TC_DOWN].y  = dpad_cy + gap;
   tc_btn[TC_DOWN].w  = bs;                  tc_btn[TC_DOWN].h  = bs;
 
-  /* Jump (larger) and Action — bottom-right, separated, not stacked tight. */
+  /*
+   * Right cluster (bottom-right corner), left → right:
+   *   Action (run/shoot) | Both (run+jump) | Jump
+   * "Both" is for carrying an item while running and still being able to jump
+   * without needing two fingers on the face buttons.
+   */
   int jump_s = bs + bs / 5;
   int act_s  = bs;
+  int both_s = bs;
   tc_btn[TC_JUMP].x   = ww - pad - jump_s;
   tc_btn[TC_JUMP].y   = wh - pad - jump_s;
   tc_btn[TC_JUMP].w   = jump_s;
   tc_btn[TC_JUMP].h   = jump_s;
-  tc_btn[TC_ACTION].x = ww - pad - jump_s - gap - act_s;
+  tc_btn[TC_BOTH].x   = ww - pad - jump_s - gap - both_s;
+  tc_btn[TC_BOTH].y   = wh - pad - both_s - gap / 2;
+  tc_btn[TC_BOTH].w   = both_s;
+  tc_btn[TC_BOTH].h   = both_s;
+  tc_btn[TC_ACTION].x = ww - pad - jump_s - gap - both_s - gap - act_s;
   tc_btn[TC_ACTION].y = wh - pad - act_s - gap;
   tc_btn[TC_ACTION].w = act_s;
   tc_btn[TC_ACTION].h = act_s;
@@ -215,15 +226,24 @@ tc_release_button(int i)
     case TC_LEFT:   tc_player->key_event((SDLKey)keymap.left, UP); break;
     case TC_RIGHT:  tc_player->key_event((SDLKey)keymap.right, UP); break;
     case TC_UP:
-      if (!tc_btn[TC_JUMP].held)
+      if (!tc_btn[TC_JUMP].held && !tc_btn[TC_BOTH].held)
         tc_player->key_event((SDLKey)keymap.jump, UP);
       break;
     case TC_JUMP:
-      if (!tc_btn[TC_UP].held)
+      if (!tc_btn[TC_UP].held && !tc_btn[TC_BOTH].held)
         tc_player->key_event((SDLKey)keymap.jump, UP);
       break;
+    case TC_BOTH:
+      if (!tc_btn[TC_UP].held && !tc_btn[TC_JUMP].held)
+        tc_player->key_event((SDLKey)keymap.jump, UP);
+      if (!tc_btn[TC_ACTION].held)
+        tc_player->key_event((SDLKey)keymap.fire, UP);
+      break;
     case TC_DOWN:   tc_player->key_event((SDLKey)keymap.duck, UP); break;
-    case TC_ACTION: tc_player->key_event((SDLKey)keymap.fire, UP); break;
+    case TC_ACTION:
+      if (!tc_btn[TC_BOTH].held)
+        tc_player->key_event((SDLKey)keymap.fire, UP);
+      break;
     default: break;
     }
 }
@@ -354,6 +374,7 @@ void touch_controls_draw(void)
       int r = 50, g = 50, b = 50;
       if (i == TC_JUMP)   { r = 40;  g = 140; b = 40; }
       if (i == TC_ACTION) { r = 140; g = 40;  b = 40; }
+      if (i == TC_BOTH)   { r = 140; g = 120; b = 40; } /* run+jump */
       if (i == TC_MENU)   { r = 40;  g = 40;  b = 120; }
       platform_overlay_fillrect(tc_btn[i].x, tc_btn[i].y,
                                 tc_btn[i].w, tc_btn[i].h,
@@ -373,11 +394,11 @@ void touch_controls_apply_player(Player& tux)
     tux.key_event((SDLKey)keymap.left, DOWN);
   if (tc_btn[TC_RIGHT].held)
     tux.key_event((SDLKey)keymap.right, DOWN);
-  if (tc_btn[TC_UP].held || tc_btn[TC_JUMP].held)
+  if (tc_btn[TC_UP].held || tc_btn[TC_JUMP].held || tc_btn[TC_BOTH].held)
     tux.key_event((SDLKey)keymap.jump, DOWN);
   if (tc_btn[TC_DOWN].held)
     tux.key_event((SDLKey)keymap.duck, DOWN);
-  if (tc_btn[TC_ACTION].held)
+  if (tc_btn[TC_ACTION].held || tc_btn[TC_BOTH].held)
     tux.key_event((SDLKey)keymap.fire, DOWN);
 }
 
@@ -393,11 +414,11 @@ bool touch_controls_menu_nav(int* action)
   if (!tc_enabled || !action)
     return false;
 
-  static const int order[] = { TC_UP, TC_DOWN, TC_LEFT, TC_RIGHT, TC_JUMP, TC_ACTION };
-  static const int mapact[] = { 0, 1, 2, 3, 4, 4 };
+  static const int order[] = { TC_UP, TC_DOWN, TC_LEFT, TC_RIGHT, TC_JUMP, TC_ACTION, TC_BOTH };
+  static const int mapact[] = { 0, 1, 2, 3, 4, 4, 4 };
 
   bool found = false;
-  for (int i = 0; i < 6; ++i)
+  for (int i = 0; i < 7; ++i)
     {
       int b = order[i];
       if (tc_btn[b].held && !tc_btn[b].prev_held)
@@ -408,7 +429,7 @@ bool touch_controls_menu_nav(int* action)
         }
     }
 
-  for (int i = 0; i < 6; ++i)
+  for (int i = 0; i < 7; ++i)
     tc_btn[order[i]].prev_held = tc_btn[order[i]].held;
 
   return found;

@@ -32,8 +32,9 @@ void touch_controls_apply_player(Player& tux);
 /** Optional: bind player for immediate key-up on finger release. */
 void touch_controls_set_player(Player* p);
 
-/** Held state for worldmap / other consumers. */
-bool touch_controls_held(int dir); /* 0=left 1=right 2=up 3=down 4=jump 5=action */
+/** Held state for worldmap / other consumers.
+ *  0=left 1=right 2=up 3=down 4=jump 5=action 6=both(run+jump) */
+bool touch_controls_held(int dir);
 
 /**
  * One-shot menu navigation from the pad (edge-triggered).

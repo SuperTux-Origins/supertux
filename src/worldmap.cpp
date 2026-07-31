@@ -575,7 +575,8 @@ WorldMap::get_input()
           else if (touch_controls_held(1)) input_direction = D_EAST;
           else if (touch_controls_held(2)) input_direction = D_NORTH;
           else if (touch_controls_held(3)) input_direction = D_SOUTH;
-          if (touch_controls_held(4) || touch_controls_held(5))
+          if (touch_controls_held(4) || touch_controls_held(5)
+              || touch_controls_held(6))
             enter_level = true;
           continue;
         }
@@ -721,7 +722,8 @@ WorldMap::get_input()
       else if (st_key_held(keystate, SDLK_DOWN) || touch_controls_held(3))
         input_direction = D_SOUTH;
 
-      if (touch_controls_held(4) || touch_controls_held(5))
+      if (touch_controls_held(4) || touch_controls_held(5)
+          || touch_controls_held(6))
         enter_level = true;
     }
 }
