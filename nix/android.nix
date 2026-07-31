@@ -125,7 +125,7 @@ let
       version = "1.0.0";
 
       dontUnpack = true;
-      nativeBuildInputs = [ androidSdk pkgs.jdk17 pkgs.zip pkgs.gnumake ];
+      nativeBuildInputs = [ androidSdk pkgs.jdk17 pkgs.zip pkgs.gnumake pkgs.unzip ];
 
       env = {
         BUILD_TOOLS_VERSION = buildToolsVersion;
