@@ -55,30 +55,46 @@ bool use_fullscreen;
 bool debug_mode;
 bool verbose_mode;
 
+void st_log(const char* fmt, ...)
+{
+  if (!fmt)
+    return;
+
+  char buf[1024];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+
+#ifdef USE_SDL2
+  /* SDL_Log treats the message as a single line; drop trailing newlines. */
+  size_t n = strlen(buf);
+  while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r'))
+    buf[--n] = '\0';
+  if (n > 0)
+    SDL_Log("%s", buf);
+#else
+  fputs(buf, stderr);
+  if (buf[0] != '\0')
+    {
+      size_t n = strlen(buf);
+      if (buf[n - 1] != '\n')
+        fputc('\n', stderr);
+    }
+#endif
+}
+
 void st_vlog(const char* fmt, ...)
 {
   if (!verbose_mode || !fmt)
     return;
 
+  char buf[1024];
   va_list ap;
   va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
   va_end(ap);
-
-#ifdef __ANDROID__
-  {
-    char buf[1024];
-    va_list ap2;
-    va_start(ap2, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, ap2);
-    va_end(ap2);
-    size_t n = strlen(buf);
-    while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r'))
-      buf[--n] = '\0';
-    if (n > 0)
-      SDL_Log("%s", buf);
-  }
-#endif
+  st_log("%s", buf);
 }
 
 bool show_fps;

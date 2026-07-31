@@ -86,7 +86,10 @@ extern bool verbose_mode;
 extern bool show_fps;
 extern bool show_mouse;
 
-/** Verbose diagnostics: always to stderr; on Android also SDL_Log (logcat). */
+/** Always-on log: SDL_Log on SDL2 (logcat on Android), fprintf on SDL 1.2. */
+void st_log(const char* fmt, ...);
+
+/** Verbose diagnostics (no-op unless verbose_mode); routes through st_log. */
 void st_vlog(const char* fmt, ...);
 
 /** The number of the joystick that will be use in the game */

@@ -561,15 +561,15 @@ android_prepare_paths(void)
   const char* internal = SDL_AndroidGetInternalStoragePath();
   if (!internal)
     {
-      SDL_Log("Android: SDL_AndroidGetInternalStoragePath failed: %s", SDL_GetError());
+      st_log("Android: SDL_AndroidGetInternalStoragePath failed: %s", SDL_GetError());
       return;
     }
-  SDL_Log("Android: internal storage = %s", internal);
+  st_log("Android: internal storage = %s", internal);
 
   if (userdir_override.empty())
     {
       userdir_override = std::string(internal) + "/config";
-      SDL_Log("Android: userdir = %s", userdir_override.c_str());
+      st_log("Android: userdir = %s", userdir_override.c_str());
     }
 
   /*
@@ -581,14 +581,14 @@ android_prepare_paths(void)
    */
   if (datadir.empty())
     datadir = ".";
-  SDL_Log("Android: datadir = %s (APK assets via open_game_file)", datadir.c_str());
+  st_log("Android: datadir = %s (APK assets via open_game_file)", datadir.c_str());
 
   std::string probe = datadir + "/images/status/letters-white.png";
   if (!game_file_exists(probe))
-    SDL_Log("Android: ERROR missing %s — rebuild APK with data/ in the repo root",
-            probe.c_str());
+    st_log("Android: ERROR missing %s — rebuild APK with data/ in the repo root",
+           probe.c_str());
   else
-    SDL_Log("Android: data probe OK (%s)", probe.c_str());
+    st_log("Android: data probe OK (%s)", probe.c_str());
 }
 #endif /* __ANDROID__ */
 
@@ -698,8 +698,8 @@ void st_directory_setup(void)
 #endif
     }
 #endif /* !__ANDROID__ */
-  SDL_Log("Configdir: %s", st_dir);
-  SDL_Log("Datadir: %s", datadir.c_str());
+  st_log("Configdir: %s", st_dir ? st_dir : "(null)");
+  st_log("Datadir: %s", datadir.c_str());
 }
 
 /* Create and setup menus. */
@@ -1216,7 +1216,7 @@ void st_video_setup_sdl(void)
   /* Kept for menu toggles that re-init software mode */
   if (!platform_video_init(use_fullscreen, false))
     {
-      SDL_Log("FATAL: software video init failed: %s", SDL_GetError());
+      st_log("FATAL: software video init failed: %s", SDL_GetError());
       exit(1);
     }
 }
@@ -1225,7 +1225,7 @@ void st_video_setup_gl(void)
 {
   if (!platform_video_init(use_fullscreen, true))
     {
-      SDL_Log("FATAL: GL video init failed: %s", SDL_GetError());
+      st_log("FATAL: GL video init failed: %s", SDL_GetError());
       exit(1);
     }
 }
@@ -1371,8 +1371,7 @@ void st_sdl_init(void)
     st_vlog("[init] SDL_Init(VIDEO|TIMER)...\n");
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
     {
-      SDL_Log("FATAL: SDL_Init failed: %s", SDL_GetError());
-      fprintf(stderr, "\nError: SDL_Init failed:\n%s\n\n", SDL_GetError());
+      st_log("Error: SDL_Init failed: %s", SDL_GetError());
       exit(1);
     }
   if (verbose_mode)
@@ -1502,8 +1501,7 @@ void st_shutdown(void)
 
 void st_abort(const std::string& reason, const std::string& details)
 {
-  SDL_Log("FATAL: %s %s", reason.c_str(), details.c_str());
-  fprintf(stderr, "\nError: %s\n%s\n\n", reason.c_str(), details.c_str());
+  st_log("Error: %s %s", reason.c_str(), details.c_str());
   st_shutdown();
   abort();
 }
@@ -1525,8 +1523,8 @@ void seticon(void)
   if (icon == NULL)
     {
       /* Window icon is optional — do not kill the process. */
-      SDL_Log("Warning: could not load icon %s: %s",
-              icon_path.c_str(), IMG_GetError());
+      st_log("Warning: could not load icon %s: %s",
+             icon_path.c_str(), IMG_GetError());
       return;
     }
 
