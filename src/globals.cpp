@@ -147,13 +147,11 @@ int wait_for_event(SDL_Event& event,unsigned int min_delay, unsigned int max_del
               else if (event.type == SDL_KEYDOWN)
                 {
                   /* Keypress - skip intro: */
-
                   return 1;
                 }
               else if (event.type == SDL_JOYBUTTONDOWN)
                 {
                   /* Fire button - skip intro: */
-
                   return 1;
                 }
               else if (event.type == SDL_MOUSEBUTTONDOWN)
@@ -161,6 +159,13 @@ int wait_for_event(SDL_Event& event,unsigned int min_delay, unsigned int max_del
                   /* Mouse button - skip intro: */
                   return 1;
                 }
+#ifdef USE_SDL2
+              else if (event.type == SDL_FINGERDOWN)
+                {
+                  /* Touch - skip intro: */
+                  return 1;
+                }
+#endif
             }
         }
       SDL_Delay(10);

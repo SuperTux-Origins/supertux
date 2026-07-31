@@ -25,6 +25,7 @@
 #include "defines.h"
 #include "screen.h"
 #include "text.h"
+#include "touch_controls.h"
 #ifndef NOSOUND
 #include "sound.h"
 #endif
@@ -290,58 +291,75 @@ void display_text_file(const std::string& file, Surface* surface, float scroll_s
   Uint32 lastticks = SDL_GetTicks();
   while(done == 0)
     {
-      /* in case of input, exit */
+      /* Input: Escape / Back / touch Menu / tap skips the cutscene. */
       SDL_Event event;
       while(SDL_PollEvent(&event))
-        switch(event.type)
-          {
-          case SDL_KEYDOWN:
-            switch(event.key.keysym.sym)
-              {
-              case SDLK_UP:
-                speed -= SPEED_INC;
-                break;
-              case SDLK_DOWN:
-                speed += SPEED_INC;
-                break;
-              case SDLK_SPACE:
-              case SDLK_RETURN:
-                if(speed >= 0)
-                  scroll += SCROLL;
-                break;
-              case SDLK_ESCAPE:
-#ifdef SDLK_AC_BACK
-              case SDLK_AC_BACK:
-#endif
+        {
+          if (touch_controls_event(event))
+            {
+              if (touch_controls_escape_pressed()
+                  || touch_controls_held(4)  /* jump */
+                  || touch_controls_held(5)) /* action */
                 done = 1;
-                break;
-              default:
-                break;
-              }
-            break;
+              continue;
+            }
+          if (st_is_escape_event(event))
+            {
+              done = 1;
+              continue;
+            }
+          switch(event.type)
+            {
+            case SDL_KEYDOWN:
+              switch(event.key.keysym.sym)
+                {
+                case SDLK_UP:
+                  speed -= SPEED_INC;
+                  break;
+                case SDLK_DOWN:
+                  speed += SPEED_INC;
+                  break;
+                case SDLK_SPACE:
+                case SDLK_RETURN:
+                  if(speed >= 0)
+                    scroll += SCROLL;
+                  break;
+                default:
+                  break;
+                }
+              break;
 #ifdef GP2X
-	  case SDL_JOYBUTTONDOWN:
-	    if ( event.jbutton.button == joystick_keymap.down_button ) {
-            	    speed += SPEED_INC;
-	    }
-	    if ( event.jbutton.button == joystick_keymap.up_button ) {
-            	    speed -= SPEED_INC;
-	    }	    
-	    if ( event.jbutton.button == joystick_keymap.b_button ) {
-            	    done = 1;
-	    }	    
-	    if ( event.jbutton.button == joystick_keymap.a_button ) {
-            	    scroll += SCROLL;
-	    }
-	  break;
+            case SDL_JOYBUTTONDOWN:
+              if ( event.jbutton.button == joystick_keymap.down_button ) {
+                speed += SPEED_INC;
+              }
+              if ( event.jbutton.button == joystick_keymap.up_button ) {
+                speed -= SPEED_INC;
+              }
+              if ( event.jbutton.button == joystick_keymap.b_button ) {
+                done = 1;
+              }
+              if ( event.jbutton.button == joystick_keymap.a_button ) {
+                scroll += SCROLL;
+              }
+              break;
 #endif
-
-          case SDL_QUIT:
-            done = 1;
-            break;
-          default:
-            break;
-          }
+#ifdef USE_SDL2
+            case SDL_FINGERDOWN:
+              /* Any tap outside the pad also skips. */
+              done = 1;
+              break;
+#endif
+            case SDL_MOUSEBUTTONDOWN:
+              done = 1;
+              break;
+            case SDL_QUIT:
+              done = 1;
+              break;
+            default:
+              break;
+            }
+        }
 
       if(speed > MAX_VEL)
         speed = MAX_VEL;
@@ -393,6 +411,9 @@ void display_text_file(const std::string& file, Surface* surface, float scroll_s
             break;
           }
         }
+
+      /* Keep the virtual pad visible so players can skip (Menu / Jump / Action). */
+      touch_controls_draw();
 
       flipscreen();
 
