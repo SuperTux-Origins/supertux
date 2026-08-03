@@ -86,8 +86,15 @@ if(ENABLE_SDL2)
     if(ENABLE_SOUND AND EXISTS "${SDL2_ROOT}/lib/libSDL2_mixer.a")
       target_link_libraries(supertux_sdl2 INTERFACE
         "${SDL2_ROOT}/lib/libSDL2_mixer.a")
+      # Static libxmp for MOD/XM (wasm / offline builds).
+      if(EXISTS "${SDL2_ROOT}/lib/libxmp.a")
+        target_link_libraries(supertux_sdl2 INTERFACE
+          "${SDL2_ROOT}/lib/libxmp.a")
+      endif()
     elseif(ENABLE_SOUND AND NOT EMSCRIPTEN)
       message(FATAL_ERROR "ENABLE_SOUND=ON but no libSDL2_mixer.a under SDL2_ROOT")
+    elseif(ENABLE_SOUND AND EMSCRIPTEN)
+      message(WARNING "ENABLE_SOUND=ON but no libSDL2_mixer.a under SDL2_ROOT — build will fail at link")
     endif()
     # Fake imported targets so the rest of the file can stay uniform.
     add_library(PkgConfig::SDL ALIAS supertux_sdl2)

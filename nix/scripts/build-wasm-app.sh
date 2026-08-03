@@ -6,7 +6,7 @@
 #   SDL_WASM_LIBS    - prebuilt SDL2 (+ image) prefix (include/ + lib/)
 #   ZLIB_WASM_LIBS   - prebuilt static zlib prefix (libz.a + zlib.h)
 #   DATA_DIR         - optional path to data/ for --preload-file (may be absent)
-#   ENABLE_SOUND     - 0|1 (default 0 for first bring-up; mixer not in wasm libs yet)
+#   ENABLE_SOUND     - 0|1 (default 0; needs libSDL2_mixer.a + libxmp.a in SDL_WASM_LIBS)
 #   ENABLE_GLES2     - 0|1 (default 1 — WebGL via GLES2 path)
 #   CMAKE_VERBOSE    - if 1, pass --verbose to cmake --build
 set -euo pipefail

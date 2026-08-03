@@ -99,7 +99,7 @@ nix develop .#supertux-milestone1-sdl2-gles2
 
 Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL1-oriented via existing win32 SDL inputs.
 
-**WebAssembly:** `nix/wasm.nix` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL), `ENABLE_SOUND=OFF` on first bring-up. Offline static **zlib** is `wasm-zlib-libs` (`ZLIB_ROOT`). Runtime uses `app_loop` + `emscripten_set_main_loop` (TITLE / WORLDMAP / SESSION / CONFIRM / TEXT); `st_frame_delay()` no-ops under that pump. **ASYNCIFY** is **off** by default (`enableAsyncify = true` in `mkApp` / `ENABLE_ASYNCIFY=1` if a residual wait freezes the tab). Assets preload to `/data`; config/saves use **IDBFS** under `/home/web_user`. Level editor is hidden on wasm.
+**WebAssembly:** `nix/wasm.nix` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL); `ENABLE_SOUND` optional (mixer+libxmp in `wasm-sdl-libs`, default off until playtested). Offline static **zlib** is `wasm-zlib-libs` (`ZLIB_ROOT`). Runtime uses `app_loop` + `emscripten_set_main_loop` (TITLE / WORLDMAP / SESSION / CONFIRM / TEXT); `st_frame_delay()` no-ops under that pump. **ASYNCIFY** is **off** by default (`enableAsyncify = true` in `mkApp` / `ENABLE_ASYNCIFY=1` if a residual wait freezes the tab). Assets preload to `/data`; config/saves use **IDBFS** under `/home/web_user`. Level editor is hidden on wasm.
 
 ### Platform layer
 

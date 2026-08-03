@@ -1,36 +1,44 @@
 # Emscripten / WebAssembly pipeline for SuperTux Milestone 1.
 #
 # Pattern mirrors helloworld-fireos (apk/nix/wasm.nix):
-#   - Build SDL2 (+ SDL2_image) once as static wasm libs from flake inputs
-#     (no -sUSE_SDL=2 network port).
+#   - Build SDL2 (+ SDL2_image, optional SDL2_mixer + libxmp) once as static
+#     wasm libs from flake inputs (no -sUSE_SDL=2 network port).
 #   - emcmake the game CMake tree against that prefix.
 #   - Serve HTML over local HTTP (file:// cannot fetch .wasm).
 #
-# First bring-up uses ASYNCIFY so nested title/gameloop/worldmap loops keep
-# working; a real requestAnimationFrame main loop is tracked in TODO.md.
+# Main loop: app_loop + emscripten_set_main_loop (ASYNCIFY off by default).
+# Sound: optional; needs sdlMixerSrc (+ libxmpSrc for .mod/.xm music).
 #
 # Usage (from flake.nix):
 #   wasm = import ./nix/wasm.nix {
 #     inherit pkgs;
 #     sdlSrc = sdl2-src;
 #     sdlImageSrc = sdl2-image-src;
+#     sdlMixerSrc = sdl2-mixer-src;
+#     libxmpSrc = libxmp-src;
 #     sdlVersion = "2.30.3";
 #   };
 #   packages.supertux-milestone1-wasm = wasm.mkApp {
 #     appName = "supertux-milestone1";
 #     srcDir = ./.;
 #     dataDir = ./data;   # optional; empty tree → no preload
+#     enableSound = true; # requires mixer in sdlWasmLibs
 #   };
 { pkgs
 , sdlSrc
 , sdlVersion
 , sdlImageSrc ? null
+, sdlMixerSrc ? null
+, libxmpSrc ? null
 }:
 
 let
   sdlWasmLibs = pkgs.stdenv.mkDerivation {
     pname = "sdl2-wasm-libs";
-    version = if sdlImageSrc != null then "${sdlVersion}+image" else sdlVersion;
+    version =
+      if sdlMixerSrc != null then "${sdlVersion}+image+mixer"
+      else if sdlImageSrc != null then "${sdlVersion}+image"
+      else sdlVersion;
 
     dontUnpack = true;
     dontConfigure = true;
@@ -41,6 +49,10 @@ let
       SDL_SRC = "${sdlSrc}";
     } // pkgs.lib.optionalAttrs (sdlImageSrc != null) {
       SDL_IMAGE_SRC = "${sdlImageSrc}";
+    } // pkgs.lib.optionalAttrs (sdlMixerSrc != null) {
+      SDL_MIXER_SRC = "${sdlMixerSrc}";
+    } // pkgs.lib.optionalAttrs (libxmpSrc != null) {
+      LIBXMP_SRC = "${libxmpSrc}";
     };
 
     buildPhase = ''
@@ -59,8 +71,11 @@ let
         mkdir -p $out/lib $out/include
         find . -name 'libSDL2.a' -exec cp {} $out/lib/ \;
         find . -name 'libSDL2_image.a' -exec cp {} $out/lib/ \; || true
+        find . -name 'libSDL2_mixer.a' -exec cp {} $out/lib/ \; || true
+        find . -name 'libxmp.a' -exec cp {} $out/lib/ \; || true
         if [ -d SDL2-src/include ]; then cp -a SDL2-src/include/. $out/include/; fi
         find . -name 'SDL_image.h' -exec cp {} $out/include/ \; || true
+        find . -name 'SDL_mixer.h' -exec cp {} $out/include/ \; || true
       fi
       # Convenience: pkg-config stubs so CMake pkg_check_modules can work if used.
       mkdir -p $out/lib/pkgconfig
@@ -85,6 +100,33 @@ Description: SDL2_image (wasm static)
 Version: 2.8.2
 Requires: sdl2
 Libs: -L\''${libdir} -lSDL2_image
+Cflags: -I\''${includedir}
+EOF
+      fi
+      if [ -f $out/lib/libSDL2_mixer.a ]; then
+        xmp_libs=""
+        if [ -f $out/lib/libxmp.a ]; then xmp_libs=" -lxmp"; fi
+        cat > $out/lib/pkgconfig/SDL2_mixer.pc <<EOF
+prefix=$out
+libdir=\''${prefix}/lib
+includedir=\''${prefix}/include
+Name: SDL2_mixer
+Description: SDL2_mixer (wasm static)
+Version: 2.8.0
+Requires: sdl2
+Libs: -L\''${libdir} -lSDL2_mixer$xmp_libs
+Cflags: -I\''${includedir}
+EOF
+      fi
+      if [ -f $out/lib/libxmp.a ] && [ ! -f $out/lib/pkgconfig/libxmp.pc ]; then
+        cat > $out/lib/pkgconfig/libxmp.pc <<EOF
+prefix=$out
+libdir=\''${prefix}/lib
+includedir=\''${prefix}/include
+Name: libxmp
+Description: libxmp (wasm static)
+Version: 4.6.0
+Libs: -L\''${libdir} -lxmp
 Cflags: -I\''${includedir}
 EOF
       fi

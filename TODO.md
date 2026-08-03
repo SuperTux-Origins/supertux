@@ -243,7 +243,9 @@ blocking `while` + `SDL_Delay`. Browsers need either:
     - [x] Hide level editor on Emscripten; skip intro under app_loop
   - [x] Drop ASYNCIFY by default (`enableAsyncify = false`); re-enable if residual waits freeze
     - [x] `st_frame_delay()` no-op under `app_loop_active()`
-- [ ] Optional: SDL2_mixer + formats for wasm (or keep `ENABLE_SOUND=OFF`)
+- [x] Wire SDL2_mixer + libxmp into `build-wasm-sdl-libs.sh` / `wasm.nix` / flake
+  - [ ] Playtest with `enableSound = true` once `nix build .#wasm-sdl-libs` produces `libSDL2_mixer.a` + `libxmp.a`
+  - Default app still `enableSound = false` until playtested
 - [x] Document `nix build` / `nix run` wasm targets in `AGENTS.md` / README
 
 ### Flake attributes (Phase 5)
@@ -258,7 +260,7 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 
 - **No `data/` in thin trees** — preload skipped; runtime will miss assets.
 - **Main loops** — ASYNCIFY is a stopgap; stack size may need tuning.
-- **Audio** — first wasm target is `ENABLE_SOUND=OFF` until mixer is ported.
+- **Audio** — mixer+libxmp build path wired; default app still `ENABLE_SOUND=OFF` until playtested.
 - **C++98 + emscripten** — should work; watch for missing POSIX (`access`, paths).
 
 ---
@@ -281,3 +283,4 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 | 2026-08-03 | ASYNCIFY off by default (mkApp enableAsyncify=false) |
 | 2026-08-03 | Custom wasm HTML shell; non-blocking wait_for_event/fade under app_loop |
 | 2026-08-03 | IDBFS syncfs without Asyncify.handleSleep (ASYNCIFY-off safe) |
+| 2026-08-03 | Wasm SDL2_mixer + libxmp in build-wasm-sdl-libs; flake wires sources; CMake links libxmp |

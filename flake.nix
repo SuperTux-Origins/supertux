@@ -102,13 +102,15 @@
           inherit androidSdk buildToolsVersion packagePlatform compilePlatform targetAbis;
         };
 
-        # WebAssembly (Emscripten) — same SDL2 source inputs as Android.
-        # SDL2_image from flake input; sound off on first bring-up (no mixer
-        # in wasm-sdl-libs yet). See TODO.md Phase 5.
+        # WebAssembly (Emscripten) — same SDL2 / mixer / libxmp inputs as Android.
+        # Mixer is built into wasm-sdl-libs; app defaults enableSound=false until
+        # playtested. See TODO.md Phase 5.
         wasm = import ./nix/wasm.nix {
           inherit pkgs;
           sdlSrc = sdl2-src;
           sdlImageSrc = sdl2-image-src;
+          sdlMixerSrc = sdl2-mixer-src;
+          libxmpSrc = libxmp-src;
           sdlVersion = "2.30.3";
         };
         # data/ may be missing in thin agent trees; mkApp tolerates null.
