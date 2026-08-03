@@ -1878,12 +1878,12 @@ void parseargs(int argc, char * argv[])
     if (v & 1)
       {
         verbose_mode = true;
-        st_vlog("[verbose] enabled via URL query (?verbose=1 / ?debug=1)\n");
+        st_log("[verbose] enabled via URL query (?verbose=1 / ?debug=1)");
       }
     if (v & 2)
       {
         debug_mode = true;
-        st_vlog("[debug-mode] enabled via URL query (?debug-mode=1)\n");
+        st_log("[debug-mode] enabled via URL query (?debug-mode=1)");
       }
   }
 #endif

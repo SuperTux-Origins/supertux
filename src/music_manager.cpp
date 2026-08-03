@@ -64,7 +64,7 @@ MusicManager::exists_music(const std::string& file)
     SDL_RWops* rw = open_game_file(file);
     if (!rw)
       {
-        st_vlog("[music] open failed: %s\n", file.c_str());
+        st_log("[music] open failed: %s", file.c_str());
       }
     else
       {
@@ -77,7 +77,7 @@ MusicManager::exists_music(const std::string& file)
           SDL_RWclose(rw);
 #endif
         if (!song)
-          st_vlog("[music] Mix_LoadMUS failed: %s\n",
+          st_log("[music] Mix_LoadMUS failed: %s",
                   Mix_GetError() ? Mix_GetError() : "(no Mix_GetError)");
       }
   }
@@ -89,7 +89,7 @@ MusicManager::exists_music(const std::string& file)
         
   if(song == 0)
     {
-      st_vlog("[music] not available: %s\n", file.c_str());
+      st_log("[music] not available: %s", file.c_str());
       return false;
     }
   st_vlog("[music] loaded ok: %s\n", file.c_str());
@@ -122,7 +122,7 @@ MusicManager::play_music(const MusicRef& musicref, int loops)
 
   if(musicref.music == 0)
     {
-      st_vlog("[music] play skipped (null MusicRef - load failed earlier)\n");
+      st_log("[music] play skipped (null MusicRef - load failed earlier)");
       return;
     }
   if(current_music == musicref.music)
