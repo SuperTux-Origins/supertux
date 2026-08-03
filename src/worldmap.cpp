@@ -361,6 +361,7 @@ Tile::~Tile()
 
 WorldMap::WorldMap()
 {
+  display_last_update_time = display_update_time = 0;
   tile_manager = new TileManager();
 
   width  = (int)(20);
@@ -1057,77 +1058,82 @@ WorldMap::display()
   music_manager->play_music(song);
 #endif
 
-  unsigned int last_update_time;
-  unsigned int update_time;
+  display_last_update_time = display_update_time = st_get_ticks();
 
-  last_update_time = update_time = st_get_ticks();
+  while (frame())
+    { /* busy loop — frame() does one iteration */ }
+}
 
-  while(!quit)
+bool
+WorldMap::frame()
+{
+  if (quit)
+    return false;
+
+  float delta = ((float)(display_update_time - display_last_update_time))/100.0;
+
+  delta *= 1.3f;
+
+  if (delta > 10.0f)
+    delta = .3f;
+
+  display_last_update_time = display_update_time;
+  display_update_time      = st_get_ticks();
+
+  Point tux_pos = tux->get_pos();
+  if (1)
     {
-      float delta = ((float)(update_time-last_update_time))/100.0;
-
-      delta *= 1.3f;
-
-      if (delta > 10.0f)
-        delta = .3f;
-      
-      last_update_time = update_time;
-      update_time      = st_get_ticks();
-
-      Point tux_pos = tux->get_pos();
-      if (1)
-        {
 #ifndef GP2X
-          offset.x = -tux_pos.x + screen->w/2;
-          offset.y = -tux_pos.y + screen->h/2;
+      offset.x = -tux_pos.x + screen->w/2;
+      offset.y = -tux_pos.y + screen->h/2;
 
-          if (offset.x > 0) offset.x = 0;
-          if (offset.y > 0) offset.y = 0;
+      if (offset.x > 0) offset.x = 0;
+      if (offset.y > 0) offset.y = 0;
 
-          if (offset.x < screen->w - width*32) offset.x = screen->w - width*32;
-          if (offset.y < screen->h - height*32) offset.y = screen->h - height*32;
+      if (offset.x < screen->w - width*32) offset.x = screen->w - width*32;
+      if (offset.y < screen->h - height*32) offset.y = screen->h - height*32;
 #else
-          offset.x = -tux_pos.x + 640/2;
-          offset.y = -tux_pos.y + 480/2;
+      offset.x = -tux_pos.x + 640/2;
+      offset.y = -tux_pos.y + 480/2;
 
-          if (offset.x > 0) offset.x = 0;
-          if (offset.y > 0) offset.y = 0;
+      if (offset.x > 0) offset.x = 0;
+      if (offset.y > 0) offset.y = 0;
 
-          if (offset.x < 640 - width*32) offset.x = 640 - width*32;
-          if (offset.y < 480 - height*32) offset.y = 480 - height*32;
+      if (offset.x < 640 - width*32) offset.x = 640 - width*32;
+      if (offset.y < 480 - height*32) offset.y = 480 - height*32;
 #endif
-        } 
+    }
 
-      draw(offset);
-      get_input();
-      update(delta);
+  draw(offset);
+  get_input();
+  update(delta);
 
 #ifndef TSCONTROL
-      if(Menu::current())
-        {
-          Menu::current()->draw();
-          mouse_cursor->draw();
-        }
-      else
-        touch_controls_draw();
+  if(Menu::current())
+    {
+      Menu::current()->draw();
+      mouse_cursor->draw();
+    }
+  else
+    touch_controls_draw();
 #else
-      if(Menu::current())
-        {
-          Menu::current()->draw();
-        }
-        if (show_mouse) mouse_cursor->draw();
-      else
-        touch_controls_draw();
+  if(Menu::current())
+    {
+      Menu::current()->draw();
+    }
+  if (show_mouse) mouse_cursor->draw();
+  else
+    touch_controls_draw();
 #endif
-      flipscreen();
+  flipscreen();
 
 #ifndef NOSOUND
 #ifdef GP2X
-      updateSound();
+  updateSound();
 #endif
 #endif
-      SDL_Delay(20);
-    }
+  SDL_Delay(20);
+  return !quit;
 }
 
 void

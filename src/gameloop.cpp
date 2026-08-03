@@ -48,6 +48,7 @@ GameSession::GameSession(const std::string& subset_, int levelnb_, int mode)
   : world(0), st_gl_mode(mode), levelnb(levelnb_), end_sequence(NO_ENDSEQUENCE),
     subset(subset_)
 {
+  fps_cnt = 0;
   current_ = this;
   
   global_frame_counter = 0;
@@ -751,9 +752,8 @@ GameSession::run()
 {
   Menu::set_current(0);
   current_ = this;
-  
-  int fps_cnt = 0;
 
+  fps_cnt = 0;
   update_time = last_update_time = st_get_ticks();
 
   // Eat unneeded events
@@ -762,108 +762,114 @@ GameSession::run()
 
   draw();
 
-  while (exit_status == ES_NONE)
-    {
-#ifdef GP2X
-      SDL_Delay(10);
-#endif
-      /* Calculate the movement-factor */
-      double frame_ratio = ((double)(update_time-last_update_time))/((double)FRAME_RATE);
+  while (frame())
+    { /* busy loop — frame() does one iteration */ }
 
-      if(!frame_timer.check())
-        {
-          frame_timer.start(25);
-          ++global_frame_counter;
-        }
-
-      /* Handle events: */
-      world->get_tux()->input.old_fire = world->get_tux()->input.fire;
-
-      process_events();
-      process_menu();
-
-      // Update the world state and all objects in the world
-      // Do that with a constante time-delta so that the game will run
-      // determistic and not different on different machines
-      if(!game_pause && !Menu::current())
-        {
-          // Update the world
-          check_end_conditions();
-          if (end_sequence == ENDSEQUENCE_RUNNING)
-             action(frame_ratio/2);
-          else if(end_sequence == NO_ENDSEQUENCE)
-             action(frame_ratio);
-        }
-      else
-        {
-          ++pause_menu_frame;
-          SDL_Delay(50);
-        }
-
-      draw();
-
-      /* Time stops in pause mode */
-      if(game_pause || Menu::current())
-        {
-          continue;
-        }
-
-      /* Set the time of the last update and the time of the current update */
-      last_update_time = update_time;
-      update_time      = st_get_ticks();
-
-      /* Pause till next frame, if the machine running the game is too fast: */
-      /* FIXME: Works great for in OpenGl mode, where the CPU doesn't have to do that much. But
-         the results in SDL mode aren't perfect (thought the 100 FPS are reached), even on an AMD2500+. */
-      if(last_update_time >= update_time - 12) 
-        {
-          SDL_Delay(10);
-          update_time = st_get_ticks();
-        }
-
-      /* Handle time: */
-      if (!time_left.check() && world->get_tux()->dying == DYING_NOT
-              && !end_sequence)
-        world->get_tux()->kill(Player::KILL);
-
-#ifndef NOSOUND
-	  /* Handle music: */
-      if(world->get_tux()->invincible_timer.check() && !end_sequence)
-        {
-          world->play_music(HERRING_MUSIC);
-        }
-      /* are we low on time ? */
-      else if (time_left.get_left() < TIME_WARNING && !end_sequence)
-        {
-          world->play_music(HURRYUP_MUSIC);
-        }
-      /* or just normal music? */
-      else if(world->get_music_type() != LEVEL_MUSIC && !end_sequence)
-        {
-          world->play_music(LEVEL_MUSIC);
-        }
-
-#endif
-      /* Calculate frames per second */
-      if(show_fps)
-        {
-          ++fps_cnt;
-          fps_fps = (1000.0 / (float)fps_timer.get_gone()) * (float)fps_cnt;
-
-          if(!fps_timer.check())
-            {
-              fps_timer.start(1000);
-              fps_cnt = 0;
-            }
-        }
-#ifndef NOSOUND
-#ifdef GP2X
-	updateSound();
-#endif
-#endif
-    }
-  
   return exit_status;
+}
+
+bool
+GameSession::frame()
+{
+  if (exit_status != ES_NONE)
+    return false;
+
+#ifdef GP2X
+  SDL_Delay(10);
+#endif
+  /* Calculate the movement-factor */
+  double frame_ratio = ((double)(update_time-last_update_time))/((double)FRAME_RATE);
+
+  if(!frame_timer.check())
+    {
+      frame_timer.start(25);
+      ++global_frame_counter;
+    }
+
+  /* Handle events: */
+  world->get_tux()->input.old_fire = world->get_tux()->input.fire;
+
+  process_events();
+  process_menu();
+
+  // Update the world state and all objects in the world
+  // Do that with a constante time-delta so that the game will run
+  // determistic and not different on different machines
+  if(!game_pause && !Menu::current())
+    {
+      // Update the world
+      check_end_conditions();
+      if (end_sequence == ENDSEQUENCE_RUNNING)
+         action(frame_ratio/2);
+      else if(end_sequence == NO_ENDSEQUENCE)
+         action(frame_ratio);
+    }
+  else
+    {
+      ++pause_menu_frame;
+      SDL_Delay(50);
+    }
+
+  draw();
+
+  /* Time stops in pause mode */
+  if(game_pause || Menu::current())
+    return (exit_status == ES_NONE);
+
+  /* Set the time of the last update and the time of the current update */
+  last_update_time = update_time;
+  update_time      = st_get_ticks();
+
+  /* Pause till next frame, if the machine running the game is too fast: */
+  /* FIXME: Works great for in OpenGl mode, where the CPU doesn't have to do that much. But
+     the results in SDL mode aren't perfect (thought the 100 FPS are reached), even on an AMD2500+. */
+  if(last_update_time >= update_time - 12)
+    {
+      SDL_Delay(10);
+      update_time = st_get_ticks();
+    }
+
+  /* Handle time: */
+  if (!time_left.check() && world->get_tux()->dying == DYING_NOT
+          && !end_sequence)
+    world->get_tux()->kill(Player::KILL);
+
+#ifndef NOSOUND
+  /* Handle music: */
+  if(world->get_tux()->invincible_timer.check() && !end_sequence)
+    {
+      world->play_music(HERRING_MUSIC);
+    }
+  /* are we low on time ? */
+  else if (time_left.get_left() < TIME_WARNING && !end_sequence)
+    {
+      world->play_music(HURRYUP_MUSIC);
+    }
+  /* or just normal music? */
+  else if(world->get_music_type() != LEVEL_MUSIC && !end_sequence)
+    {
+      world->play_music(LEVEL_MUSIC);
+    }
+
+#endif
+  /* Calculate frames per second */
+  if(show_fps)
+    {
+      ++fps_cnt;
+      fps_fps = (1000.0 / (float)fps_timer.get_gone()) * (float)fps_cnt;
+
+      if(!fps_timer.check())
+        {
+          fps_timer.start(1000);
+          fps_cnt = 0;
+        }
+    }
+#ifndef NOSOUND
+#ifdef GP2X
+  updateSound();
+#endif
+#endif
+  return (exit_status == ES_NONE);
 }
 
 /* Bounce a brick: */

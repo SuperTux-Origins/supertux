@@ -98,7 +98,7 @@ nix develop .#supertux-milestone1-sdl2-gles2
 
 Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL1-oriented via existing win32 SDL inputs.
 
-**WebAssembly:** `nix/wasm.nix` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL), `ENABLE_SOUND=OFF` on first bring-up. Nested title/session/worldmap loops currently rely on **ASYNCIFY**; a real frame pump is tracked in `TODO.md` Phase 5. Assets preload from `data/` to `/data` when present.
+**WebAssembly:** `nix/wasm.nix` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL), `ENABLE_SOUND=OFF` on first bring-up. Offline static **zlib** is built into the app derivation. Nested title/session/worldmap loops currently rely on **ASYNCIFY**; `GameSession::frame()` and `WorldMap::frame()` are extracted as the first step toward a real frame pump (see `TODO.md` Phase 5). Assets preload from `data/` to `/data` when present. Config and savegames persist via **IDBFS** under `/home/web_user`.
 
 ### Platform layer
 

@@ -40,6 +40,7 @@ class GameSession
   unsigned int update_time;
   int pause_menu_frame;
   int debug_fps;
+  int fps_cnt;
 #ifdef TSCONTROL
   int old_mouse_y;
 #endif
@@ -70,8 +71,11 @@ class GameSession
   GameSession(const std::string& subset, int levelnb, int mode);
   ~GameSession();
 
-  /** Enter the busy loop */
+  /** Enter the busy loop (calls frame() until exit). */
   ExitStatus run();
+
+  /** One iteration of the game loop. Returns true while still running. */
+  bool frame();
 
   void draw();
   void action(double frame_ratio);

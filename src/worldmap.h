@@ -128,6 +128,8 @@ private:
   Tux* tux;
 
   bool quit;
+  unsigned int display_last_update_time;
+  unsigned int display_update_time;
 
   Surface* level_sprite;
   Surface* leveldot_green;
@@ -213,8 +215,11 @@ public:
 
   void set_map_file(std::string mapfile);
 
-  /** Busy loop */
+  /** Busy loop (calls frame() until quit). */
   void display();
+
+  /** One iteration of the worldmap loop. Returns true while still running. */
+  bool frame();
 
   void load_map();
   

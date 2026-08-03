@@ -229,7 +229,10 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 - [ ] First browser smoke: canvas paints (even without full `data/`)
 - [ ] With `data/`: title screen → start game → one level → quit
 - [x] IDBFS for config/saves under `/home/web_user` (survive reload)
-- [ ] Replace ASYNCIFY with real frame pump (title / session / worldmap)
+- [~] Replace ASYNCIFY with real frame pump (title / session / worldmap)
+  - [x] Extract `GameSession::frame()` / `WorldMap::frame()` (busy loops call them)
+  - [ ] Extract title-menu frame; top-level state machine
+  - [ ] `emscripten_set_main_loop` + drop ASYNCIFY
 - [ ] Optional: SDL2_mixer + formats for wasm (or keep `ENABLE_SOUND=OFF`)
 - [ ] Document `nix build` / `nix run` wasm targets in `AGENTS.md` / README
 
@@ -257,3 +260,4 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 | 2026-08-03 | Fix wasm SDL2_image: pass SDL2_LIBRARY/INCLUDE_DIR to PrivateSDL2 finder |
 | 2026-08-03 | First successful `nix build .#supertux-milestone1-wasm` (zlib via emconfigure; ASYNCIFY; data preload) |
 | 2026-08-03 | IDBFS mount + sync on startup / saveconfig / worldmap savegame |
+| 2026-08-03 | Extract GameSession::frame + WorldMap::frame (ASYNCIFY exit path) |
