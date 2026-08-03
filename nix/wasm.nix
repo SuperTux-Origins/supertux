@@ -115,6 +115,8 @@ EOF
         ENABLE_SOUND = if enableSound then "1" else "0";
         ENABLE_GLES2 = if enableGles2 then "1" else "0";
         PKG_CONFIG_PATH = "${sdlWasmLibs}/lib/pkgconfig";
+        # Offline zlib for wasm (lispreader); avoid Emscripten network port.
+        ZLIB_SRC = "${pkgs.zlib.src}";
       } // pkgs.lib.optionalAttrs (dataDir != null) {
         DATA_DIR = "${dataDir}";
       };

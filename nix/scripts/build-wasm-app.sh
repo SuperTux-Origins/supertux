@@ -13,6 +13,49 @@ set -euo pipefail
 export EM_CACHE="${TMPDIR:-/tmp}/emcache"
 mkdir -p "$EM_CACHE"
 
+# Static zlib for wasm (lispreader / .gz levels). Offline — no -sUSE_ZLIB port.
+ZLIB_PREFIX="$PWD/zlib-prefix"
+if [ -n "${ZLIB_SRC:-}" ]; then
+  echo "==> zlib static (wasm32) → $ZLIB_PREFIX"
+  rm -rf zlib-src build-zlib
+  # Nix zlib.src is often a .tar.gz path; unpack or copy tree.
+  if [ -d "$ZLIB_SRC" ]; then
+    cp -a "$ZLIB_SRC" zlib-src
+  else
+    mkdir -p zlib-src
+    tar -xf "$ZLIB_SRC" -C zlib-src --strip-components=1
+  fi
+  chmod -R u+w zlib-src
+  # Prefer classic configure: zlib's CMake still add_library(SHARED), which
+  # Emscripten rejects even with -DBUILD_SHARED_LIBS=OFF.
+  (
+    cd zlib-src
+    if [ -x ./configure ] || [ -f ./configure ]; then
+      emconfigure ./configure --static --prefix="$ZLIB_PREFIX"
+      emmake make -j"${NIX_BUILD_CORES:-$(nproc)}"
+      emmake make install
+    else
+      # Very old / odd tree: compile the few .c files by hand into libz.a
+      echo "zlib: no configure — compiling sources with emcc"
+      mkdir -p "$ZLIB_PREFIX/lib" "$ZLIB_PREFIX/include"
+      objs=()
+      for c in adler32 compress crc32 deflate gzclose gzlib gzread gzwrite \
+               infback inffast inflate inftrees trees uncompr zutil; do
+        if [ -f "${c}.c" ]; then
+          emcc -O2 -c "${c}.c" -o "${c}.o"
+          objs+=("${c}.o")
+        fi
+      done
+      emar rcs "$ZLIB_PREFIX/lib/libz.a" "${objs[@]}"
+      cp zlib.h zconf.h "$ZLIB_PREFIX/include/" 2>/dev/null || cp zlib.h "$ZLIB_PREFIX/include/"
+    fi
+  )
+  ls -la "$ZLIB_PREFIX/lib" "$ZLIB_PREFIX/include" || true
+else
+  echo "WARNING: ZLIB_SRC unset — configure may fail on zlib.h"
+  ZLIB_PREFIX=""
+fi
+
 APP_NAME="${APP_NAME:-supertux-milestone1}"
 ENABLE_SOUND="${ENABLE_SOUND:-0}"
 ENABLE_GLES2="${ENABLE_GLES2:-1}"
@@ -52,6 +95,9 @@ cmake_args=(
   -DSDL2_ROOT="$SDL_WASM_LIBS"
   -DEMSCRIPTEN_LINK_FLAGS="${LINK_FLAGS[*]} ${PRELOAD[*]}"
 )
+if [ -n "$ZLIB_PREFIX" ] && [ -d "$ZLIB_PREFIX" ]; then
+  cmake_args+=(-DZLIB_ROOT="$ZLIB_PREFIX")
+fi
 
 echo "==> emcmake configure ${APP_NAME}"
 emcmake cmake "${cmake_args[@]}"

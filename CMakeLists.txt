@@ -49,9 +49,23 @@ set(EMSCRIPTEN_LINK_FLAGS "" CACHE STRING "Extra link flags (Emscripten)")
 
 find_package(PkgConfig REQUIRED)
 
-# Emscripten ships zlib in the sysroot; desktop needs find_package.
+# Desktop: system zlib. Emscripten: optional ZLIB_ROOT (static wasm build).
+set(ZLIB_ROOT "" CACHE PATH "Prebuilt zlib prefix for Emscripten/static builds")
 if(EMSCRIPTEN)
-  set(ZLIB_FOUND TRUE)
+  if(ZLIB_ROOT)
+    message(STATUS "Using ZLIB_ROOT=${ZLIB_ROOT}")
+    add_library(ZLIB::ZLIB UNKNOWN IMPORTED)
+    set_target_properties(ZLIB::ZLIB PROPERTIES
+      IMPORTED_LOCATION "${ZLIB_ROOT}/lib/libz.a"
+      INTERFACE_INCLUDE_DIRECTORIES "${ZLIB_ROOT}/include")
+    set(ZLIB_FOUND TRUE)
+  else()
+    # Fall back to find_package (may work if sysroot has zlib).
+    find_package(ZLIB)
+    if(NOT ZLIB_FOUND)
+      message(FATAL_ERROR "Emscripten build needs -DZLIB_ROOT=… (static libz + zlib.h)")
+    endif()
+  endif()
 else()
   find_package(ZLIB REQUIRED)
 endif()
