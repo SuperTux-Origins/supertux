@@ -253,3 +253,4 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 |------|------|
 | 2026-08-03 | Phase 5 scaffold: wasm.nix, scripts, CMake EMSCRIPTEN/SDL2_ROOT, flake targets |
 | 2026-08-03 | Emscripten datadir/userdir + open_game_file /data; SDL wasm install prefix |
+| 2026-08-03 | Fix wasm SDL2_image: pass SDL2_LIBRARY/INCLUDE_DIR to PrivateSDL2 finder |
