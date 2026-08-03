@@ -103,8 +103,7 @@
         };
 
         # WebAssembly (Emscripten) — same SDL2 / mixer / libxmp inputs as Android.
-        # Mixer is built into wasm-sdl-libs; app defaults enableSound=false until
-        # playtested. See TODO.md Phase 5.
+        # Mixer+libxmp built into wasm-sdl-libs; enableSound on for wasm playtest.
         wasm = import ./nix/wasm.nix {
           inherit pkgs;
           sdlSrc = sdl2-src;

@@ -59,15 +59,37 @@ int open_audio (int frequency, Uint16 format, int channels, int chunksize)
 //  close_audio();
 #ifndef GP2X
 #ifdef USE_SDL2
-  /* SDL2_mixer needs Mix_Init for OGG/MOD (and others) before OpenAudio loads them. */
+  /* SDL2_mixer needs Mix_Init for OGG/MOD before load. Music is mostly .mod/.xm. */
   {
-    int mix_flags = MIX_INIT_OGG;
+    int mix_flags = 0;
+#ifdef MIX_INIT_OGG
+    mix_flags |= MIX_INIT_OGG;
+#endif
 #ifdef MIX_INIT_MOD
     mix_flags |= MIX_INIT_MOD;
 #endif
     int got = Mix_Init(mix_flags);
+#ifdef MIX_INIT_OGG
     if ((got & MIX_INIT_OGG) == 0)
-      fprintf(stderr, "Warning: Mix_Init OGG: %s\n", Mix_GetError());
+      fprintf(stderr, "Warning: Mix_Init OGG unavailable: %s\n", Mix_GetError());
+    else
+      st_vlog("[audio] Mix_Init: OGG ok\n");
+#endif
+#ifdef MIX_INIT_MOD
+    if ((got & MIX_INIT_MOD) == 0)
+      {
+        fprintf(stderr, "Warning: Mix_Init MOD unavailable: %s\n"
+                "  (music uses .mod/.xm — need SDL2_mixer built with libxmp)\n",
+                Mix_GetError());
+        st_vlog("[audio] Mix_Init: MOD FAILED — music may be silent (%s)\n",
+                Mix_GetError() ? Mix_GetError() : "no error string");
+      }
+    else
+      st_vlog("[audio] Mix_Init: MOD ok\n");
+#else
+    st_vlog("[audio] Mix_Init: MIX_INIT_MOD not defined in headers\n");
+#endif
+    st_vlog("[audio] Mix_Init flags requested=0x%x got=0x%x\n", mix_flags, got);
   }
 #endif
 

@@ -6,6 +6,7 @@
 #include "musicref.h"
 #include "sound.h"
 #include "setup.h"
+#include "globals.h"
 #include "game_file.h"
 
 MusicManager::MusicManager()
@@ -61,8 +62,13 @@ MusicManager::exists_music(const std::string& file)
   Mix_Music* song = 0;
   {
     SDL_RWops* rw = open_game_file(file);
-    if (rw)
+    if (!rw)
       {
+        st_vlog("[music] open failed: %s\n", file.c_str());
+      }
+    else
+      {
+        st_vlog("[music] loading: %s\n", file.c_str());
 #ifdef USE_SDL2
         song = Mix_LoadMUS_RW(rw, 1);
 #else
@@ -70,6 +76,9 @@ MusicManager::exists_music(const std::string& file)
         if (!song)
           SDL_RWclose(rw);
 #endif
+        if (!song)
+          st_vlog("[music] Mix_LoadMUS failed: %s\n",
+                  Mix_GetError() ? Mix_GetError() : "(no Mix_GetError)");
       }
   }
 #else
@@ -79,7 +88,11 @@ MusicManager::exists_music(const std::string& file)
 #endif
         
   if(song == 0)
-    return false;
+    {
+      st_vlog("[music] not available: %s\n", file.c_str());
+      return false;
+    }
+  st_vlog("[music] loaded ok: %s\n", file.c_str());
 
   // insert into music list
   std::pair<std::map<std::string, MusicResource>::iterator, bool> result = 
@@ -107,7 +120,12 @@ MusicManager::play_music(const MusicRef& musicref, int loops)
   if(!audio_device)
     return;
 
-  if(musicref.music == 0 || current_music == musicref.music)
+  if(musicref.music == 0)
+    {
+      st_vlog("[music] play skipped (null MusicRef - load failed earlier)\n");
+      return;
+    }
+  if(current_music == musicref.music)
     return;
 
   if(current_music)

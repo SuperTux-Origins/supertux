@@ -1756,7 +1756,8 @@ void parseargs(int argc, char * argv[])
             use_gl = false;
           }
             else if (strcmp(argv[i], "--verbose") == 0
-               || strcmp(argv[i], "-v") == 0)
+               || strcmp(argv[i], "-v") == 0
+               || strcmp(argv[i], "--debug") == 0)
         {
           verbose_mode = true;
           st_vlog("[verbose] enabled — will report render path and subsystem status\n");
@@ -1850,6 +1851,41 @@ void parseargs(int argc, char * argv[])
   use_gl = true;
 #endif
   touch_controls_set_enabled(true);
+#endif
+
+#ifdef __EMSCRIPTEN__
+  /* Browser: ?verbose=1 / ?debug=1 (or =true/yes) enable verbose_mode so
+     st_vlog goes to the JS console. ?debug-mode=1 also sets gameplay debug_mode.
+     Works with file:// and http:// without rebuilding argv. */
+  {
+    int v = EM_ASM_INT({
+      try {
+        var q = (typeof URLSearchParams !== 'undefined')
+          ? new URLSearchParams(window.location.search)
+          : null;
+        if (!q) return 0;
+        function on(name) {
+          if (!q.has(name)) return false;
+          var val = (q.get(name) || '1').toLowerCase();
+          return val !== '0' && val !== 'false' && val !== 'no' && val !== 'off';
+        }
+        var flags = 0;
+        if (on('verbose') || on('v') || on('debug')) flags |= 1;
+        if (on('debug-mode') || on('debug_mode')) flags |= 2;
+        return flags;
+      } catch (e) { return 0; }
+    });
+    if (v & 1)
+      {
+        verbose_mode = true;
+        st_vlog("[verbose] enabled via URL query (?verbose=1 / ?debug=1)\n");
+      }
+    if (v & 2)
+      {
+        debug_mode = true;
+        st_vlog("[debug-mode] enabled via URL query (?debug-mode=1)\n");
+      }
+  }
 #endif
 }
 
