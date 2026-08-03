@@ -40,14 +40,53 @@ endif()
 set(DATA_PREFIX "${CMAKE_INSTALL_PREFIX}/share/supertux-milestone1"
     CACHE PATH "Runtime data directory")
 
+# Optional prebuilt SDL2 tree (Emscripten / custom static builds).
+# When set: headers in ${SDL2_ROOT}/include, libs in ${SDL2_ROOT}/lib.
+set(SDL2_ROOT "" CACHE PATH "Prebuilt SDL2 (+ image/mixer) prefix for wasm/static")
+
+# Extra link flags for the final executable (Emscripten SHELL: options, preload).
+set(EMSCRIPTEN_LINK_FLAGS "" CACHE STRING "Extra link flags (Emscripten)")
+
 find_package(PkgConfig REQUIRED)
-find_package(ZLIB REQUIRED)
+
+# Emscripten ships zlib in the sysroot; desktop needs find_package.
+if(EMSCRIPTEN)
+  set(ZLIB_FOUND TRUE)
+else()
+  find_package(ZLIB REQUIRED)
+endif()
 
 if(ENABLE_SDL2)
-  pkg_check_modules(SDL REQUIRED IMPORTED_TARGET sdl2)
-  pkg_check_modules(SDL_IMAGE REQUIRED IMPORTED_TARGET SDL2_image)
-  if(ENABLE_SOUND)
-    pkg_check_modules(SDL_MIXER REQUIRED IMPORTED_TARGET SDL2_mixer)
+  if(SDL2_ROOT)
+    message(STATUS "Using SDL2_ROOT=${SDL2_ROOT}")
+    add_library(supertux_sdl2 INTERFACE)
+    target_include_directories(supertux_sdl2 INTERFACE
+      "${SDL2_ROOT}/include"
+      "${SDL2_ROOT}/include/SDL2")
+    target_link_libraries(supertux_sdl2 INTERFACE
+      "${SDL2_ROOT}/lib/libSDL2.a")
+    if(EXISTS "${SDL2_ROOT}/lib/libSDL2_image.a")
+      target_link_libraries(supertux_sdl2 INTERFACE
+        "${SDL2_ROOT}/lib/libSDL2_image.a")
+    endif()
+    if(ENABLE_SOUND AND EXISTS "${SDL2_ROOT}/lib/libSDL2_mixer.a")
+      target_link_libraries(supertux_sdl2 INTERFACE
+        "${SDL2_ROOT}/lib/libSDL2_mixer.a")
+    elseif(ENABLE_SOUND AND NOT EMSCRIPTEN)
+      message(FATAL_ERROR "ENABLE_SOUND=ON but no libSDL2_mixer.a under SDL2_ROOT")
+    endif()
+    # Fake imported targets so the rest of the file can stay uniform.
+    add_library(PkgConfig::SDL ALIAS supertux_sdl2)
+    add_library(PkgConfig::SDL_IMAGE ALIAS supertux_sdl2)
+    if(ENABLE_SOUND AND EXISTS "${SDL2_ROOT}/lib/libSDL2_mixer.a")
+      add_library(PkgConfig::SDL_MIXER ALIAS supertux_sdl2)
+    endif()
+  else()
+    pkg_check_modules(SDL REQUIRED IMPORTED_TARGET sdl2)
+    pkg_check_modules(SDL_IMAGE REQUIRED IMPORTED_TARGET SDL2_image)
+    if(ENABLE_SOUND)
+      pkg_check_modules(SDL_MIXER REQUIRED IMPORTED_TARGET SDL2_mixer)
+    endif()
   endif()
 else()
   pkg_check_modules(SDL REQUIRED IMPORTED_TARGET sdl>=1.2.4)
@@ -57,12 +96,13 @@ else()
   endif()
 endif()
 
-if(ENABLE_OPENGL AND NOT ENABLE_GLES2)
+if(ENABLE_OPENGL AND NOT ENABLE_GLES2 AND NOT EMSCRIPTEN)
   find_package(OpenGL REQUIRED)
 endif()
 
-if(ENABLE_GLES2)
+if(ENABLE_GLES2 AND NOT EMSCRIPTEN)
   # Prefer pkg-config glesv2; fall back to find_library.
+  # Emscripten provides WebGL via link flags (-sFULL_ES2); no system GLESv2.
   pkg_check_modules(GLES2 IMPORTED_TARGET glesv2)
   if(NOT GLES2_FOUND)
     find_library(GLES2_LIBRARY NAMES GLESv2)
@@ -160,27 +200,44 @@ endif()
 target_link_libraries(supertux-milestone1 PRIVATE
   PkgConfig::SDL
   PkgConfig::SDL_IMAGE
-  ZLIB::ZLIB
 )
-if(ENABLE_SOUND)
+if(TARGET ZLIB::ZLIB)
+  target_link_libraries(supertux-milestone1 PRIVATE ZLIB::ZLIB)
+elseif(EMSCRIPTEN)
+  # Emscripten sysroot provides compress; -lz is resolved by emcc.
+  target_link_libraries(supertux-milestone1 PRIVATE z)
+endif()
+if(ENABLE_SOUND AND TARGET PkgConfig::SDL_MIXER)
   target_link_libraries(supertux-milestone1 PRIVATE PkgConfig::SDL_MIXER)
 endif()
-if(ENABLE_GLES2)
+if(ENABLE_GLES2 AND NOT EMSCRIPTEN)
   if(TARGET PkgConfig::GLES2)
     target_link_libraries(supertux-milestone1 PRIVATE PkgConfig::GLES2)
   else()
     target_include_directories(supertux-milestone1 PRIVATE ${GLES2_INCLUDE_DIR})
     target_link_libraries(supertux-milestone1 PRIVATE ${GLES2_LIBRARY})
   endif()
-elseif(ENABLE_OPENGL)
+elseif(ENABLE_OPENGL AND NOT EMSCRIPTEN)
   target_link_libraries(supertux-milestone1 PRIVATE OpenGL::GL)
   # Legacy immediate-mode path uses GLU on SDL 1.2 builds only.
   if(NOT ENABLE_SDL2)
     target_link_libraries(supertux-milestone1 PRIVATE OpenGL::GLU)
   endif()
 endif()
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
   target_link_libraries(supertux-milestone1 PRIVATE m)
+endif()
+
+if(EMSCRIPTEN)
+  set(CMAKE_EXECUTABLE_SUFFIX ".html")
+  # USE_SDL2 already set; force USE_GLES2-friendly defines when GLES2 on.
+  target_compile_definitions(supertux-milestone1 PRIVATE __EMSCRIPTEN__)
+  if(EMSCRIPTEN_LINK_FLAGS)
+    # Space-separated SHELL: flags and optional --preload-file from the
+    # build-wasm-app.sh script.
+    separate_arguments(_em_link_flags NATIVE_COMMAND "${EMSCRIPTEN_LINK_FLAGS}")
+    target_link_options(supertux-milestone1 PRIVATE ${_em_link_flags})
+  endif()
 endif()
 
 include(GNUInstallDirs)

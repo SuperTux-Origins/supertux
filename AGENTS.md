@@ -88,12 +88,17 @@ Binary name: `supertux-milestone1`.
 nix build .#supertux-milestone1-sdl2        # or .#default — SDL2
 nix build .#supertux-milestone1-sdl1        # SDL 1.2
 nix build .#supertux-milestone1-sdl2-gles2  # SDL2 + OpenGL ES 2.0
+nix build .#wasm-sdl-libs                   # SDL2 (+ image) static for wasm32
+nix build .#supertux-milestone1-wasm        # Emscripten HTML/JS/Wasm
+nix run .#supertux-milestone1-wasm          # serve over HTTP + open browser
 nix develop                                 # SDL2 (matches default package)
 nix develop .#supertux-milestone1-sdl1
 nix develop .#supertux-milestone1-sdl2-gles2
 ```
 
 Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL1-oriented via existing win32 SDL inputs.
+
+**WebAssembly:** `nix/wasm.nix` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL), `ENABLE_SOUND=OFF` on first bring-up. Nested title/session/worldmap loops currently rely on **ASYNCIFY**; a real frame pump is tracked in `TODO.md` Phase 5. Assets preload from `data/` to `/data` when present.
 
 ### Platform layer
 
@@ -118,7 +123,7 @@ Autotools remain in the tree for reference but are not the maintained path forwa
 
 **GLES2 path (optional / Android prep):** with `-DENABLE_GLES2=ON` (implies SDL2 + OpenGL), video requests an ES 2.0 context and drawing goes through `src/gles2_renderer.cpp` (textured/solid quads via GLSL ES 1.00). Desktop immediate-mode GL remains the default when GLES2 is off. Link against `GLESv2`.
 
-**Nix:** `.#supertux-milestone1-sdl1`, `.#supertux-milestone1-sdl2` (default), and `.#supertux-milestone1-sdl2-gles2` are the desktop packages. Dev shells use the same attribute names.
+**Nix:** `.#supertux-milestone1-sdl1`, `.#supertux-milestone1-sdl2` (default), and `.#supertux-milestone1-sdl2-gles2` are the desktop packages. Dev shells use the same attribute names. Wasm: `.#wasm-sdl-libs`, `.#supertux-milestone1-wasm` (package + `nix run` app).
 
 ## Coding guidelines for agents
 

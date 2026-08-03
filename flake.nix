@@ -101,6 +101,20 @@
           libxmpSrc = libxmp-src;
           inherit androidSdk buildToolsVersion packagePlatform compilePlatform targetAbis;
         };
+
+        # WebAssembly (Emscripten) — same SDL2 source inputs as Android.
+        # SDL2_image from flake input; sound off on first bring-up (no mixer
+        # in wasm-sdl-libs yet). See TODO.md Phase 5.
+        wasm = import ./nix/wasm.nix {
+          inherit pkgs;
+          sdlSrc = sdl2-src;
+          sdlImageSrc = sdl2-image-src;
+          sdlVersion = "2.30.3";
+        };
+        # data/ may be missing in thin agent trees; mkApp tolerates null.
+        wasmDataDir =
+          if builtins.pathExists ./data then ./data else null;
+
         gitDate =
           if self ? lastModifiedDate then builtins.substring 0 8 self.lastModifiedDate
           else "00000000";
@@ -230,6 +244,16 @@
             gameDataDir = ./data;
             stbImageH = stbImageH;
           };
+
+          # WebAssembly (Emscripten + SDL2 + GLES2/WebGL).
+          wasm-sdl-libs = wasm.sdlWasmLibs;
+          supertux-milestone1-wasm = wasm.mkApp {
+            appName = "supertux-milestone1";
+            srcDir = ./.;
+            dataDir = wasmDataDir;
+            enableSound = false;
+            enableGles2 = true;
+          };
         };
 
         # `nix flake check` builds every derivation listed here.
@@ -276,6 +300,13 @@
             };
             apkFileName = androidApkName;
             description = "Install SuperTux Milestone 1 APK via adb";
+          };
+
+          # Serve wasm build over local HTTP (required for .wasm fetch).
+          supertux-milestone1-wasm = wasm.mkOpenBrowserApp {
+            pkg = packages.supertux-milestone1-wasm;
+            appName = "supertux-milestone1";
+            description = "Serve SuperTux Milestone 1 (wasm) over HTTP and open browser";
           };
         };
 

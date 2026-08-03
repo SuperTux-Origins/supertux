@@ -186,3 +186,69 @@ These are engine bugs that can crash, corrupt timers, or hide bad data. Not game
 | 2026-07-31 | Android default renderer: GLES2 (Android.mk USE_GLES2, manifest glEsVersion 0x20000) |
 | 2026-07-31 | Android menu stuck-DOWN: open (not assumed joystick); menu/joy debug logs; AGENTS diagnose-first |
 | 2026-07-31 | Touch→logical letterbox map; no StartTextInput at boot; Android fullscreen theme |
+
+---
+
+## Phase 5 — WebAssembly (Emscripten)
+
+Goal: ship a browser build patterned on the helloworld-fireos reference
+(`apk/` in the agent workspace): offline SDL2 static libs, `emcmake` of the
+existing CMake tree, `nix run .#supertux-milestone1-wasm` serves over HTTP.
+
+**In scope:** compile + present title/level with SDL2 + GLES2/WebGL; package
+`data/` via `--preload-file` when present.  
+**Out of scope:** gameplay changes; full mixer/MOD stack on day one; replacing
+ASYNCIFY with a perfect main-loop refactor before first paint.
+
+### Design (mirrors `apk/nix/wasm.nix`)
+
+| Piece | Role |
+|-------|------|
+| `nix/wasm.nix` | `sdlWasmLibs` + `mkApp` + `mkOpenBrowserApp` |
+| `nix/scripts/build-wasm-sdl-libs.sh` | emcmake SDL2 (+ SDL2_image) static |
+| `nix/scripts/build-wasm-app.sh` | emcmake game; ASYNCIFY + WebGL link flags |
+| CMake `SDL2_ROOT` / `EMSCRIPTEN` | skip pkg-config system GLES; `.html` suffix |
+| Flake | `wasm-sdl-libs`, `supertux-milestone1-wasm` package + app |
+
+Nested loops (`title()`, `GameSession::run()`, `WorldMap::display()`) use
+blocking `while` + `SDL_Delay`. Browsers need either:
+
+1. **ASYNCIFY** (temporary, current default in the wasm link line), or  
+2. A single frame callback (`emscripten_set_main_loop`) — preferred long-term.
+
+### Tasks
+
+- [x] Add `nix/wasm.nix` + `build-wasm-sdl-libs.sh` + `build-wasm-app.sh`
+- [x] CMake: `SDL2_ROOT`, Emscripten link options, no system GLESv2 on wasm
+- [x] Flake packages: `wasm-sdl-libs`, `supertux-milestone1-wasm`
+- [x] Flake app: `supertux-milestone1-wasm` (local HTTP server + open browser)
+- [ ] `nix build .#wasm-sdl-libs` — verify static `libSDL2.a` / `libSDL2_image.a`
+- [ ] `nix build .#supertux-milestone1-wasm` — first full link (may need iterate)
+- [ ] Runtime datadir on wasm: prefer `/data` preload; mirror Android
+      `open_game_file` / logical datadir path if `access()` fails in MEMFS
+- [ ] First browser smoke: canvas paints (even without full `data/`)
+- [ ] With `data/`: title screen → start game → one level → quit
+- [ ] Replace ASYNCIFY with real frame pump (title / session / worldmap)
+- [ ] Optional: SDL2_mixer + formats for wasm (or keep `ENABLE_SOUND=OFF`)
+- [ ] Document `nix build` / `nix run` wasm targets in `AGENTS.md` / README
+
+### Flake attributes (Phase 5)
+
+| Attribute | Meaning |
+|-----------|---------|
+| `wasm-sdl-libs` | Cached SDL2 (+ image) static wasm libs |
+| `supertux-milestone1-wasm` | package: `.html` / `.js` / `.wasm` (+ `.data` if preloaded) |
+| `apps.supertux-milestone1-wasm` | serve package over HTTP and open browser |
+
+### Known blockers
+
+- **No `data/` in thin trees** — preload skipped; runtime will miss assets.
+- **Main loops** — ASYNCIFY is a stopgap; stack size may need tuning.
+- **Audio** — first wasm target is `ENABLE_SOUND=OFF` until mixer is ported.
+- **C++98 + emscripten** — should work; watch for missing POSIX (`access`, paths).
+
+---
+
+| Date | Item |
+|------|------|
+| 2026-08-03 | Phase 5 scaffold: wasm.nix, scripts, CMake EMSCRIPTEN/SDL2_ROOT, flake targets |
