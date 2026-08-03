@@ -602,20 +602,25 @@ android_prepare_paths(void)
  * DATA_PREFIX is compiled as "/data". Config/saves live under a writable
  * path backed by IndexedDB (IDBFS) so progress survives page reloads.
  *
- * Requires ASYNCIFY (already on the wasm link line) so FS.syncfs can block
- * until IndexedDB finishes.
+ * FS.syncfs is asynchronous. We must not use Asyncify.handleSleep when
+ * ASYNCIFY is disabled (default). Fire-and-forget is enough: startup may
+ * race one frame before old saves appear; writes still flush to IDBFS.
  */
 void st_emscripten_fs_sync(int populate)
 {
   /* populate=1: IndexedDB → MEMFS (startup). populate=0: MEMFS → IndexedDB. */
   EM_ASM({
     var populate = $0;
-    Asyncify.handleSleep(function (wakeUp) {
+    try {
       FS.syncfs(!!populate, function (err) {
-        if (err) console.error("SuperTux IDBFS syncfs:", err);
-        wakeUp();
+        if (err)
+          console.error("SuperTux IDBFS syncfs:", err);
+        else if (populate)
+          console.log("SuperTux: IDBFS populate done");
       });
-    });
+    } catch (e) {
+      console.error("SuperTux IDBFS syncfs threw:", e);
+    }
   }, populate ? 1 : 0);
 }
 

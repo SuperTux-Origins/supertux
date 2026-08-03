@@ -109,6 +109,17 @@ delete sur;
 
 void fade(Surface *surface, int seconds, bool fade_out)
 {
+#ifdef __EMSCRIPTEN__
+  extern bool app_loop_active(void);
+  if (app_loop_active())
+    {
+      /* No busy-loop fade without ASYNCIFY — single present. */
+      surface->draw(0, 0, fade_out ? 255 : 0);
+      flipscreen();
+      return;
+    }
+#endif
+
 float alpha;
 if (fade_out)
   alpha = 0;

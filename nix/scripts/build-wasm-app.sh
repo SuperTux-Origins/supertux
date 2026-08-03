@@ -45,6 +45,11 @@ else
   echo "==> ASYNCIFY disabled (default; set enableAsyncify=true in mkApp if a path freezes)"
 fi
 
+if [ -n "${WASM_SHELL:-}" ] && [ -f "$WASM_SHELL" ]; then
+  LINK_FLAGS+=("--shell-file" "$WASM_SHELL")
+  echo "==> using HTML shell: $WASM_SHELL"
+fi
+
 PRELOAD=()
 if [ -n "${DATA_DIR:-}" ] && [ -d "$DATA_DIR" ]; then
   # Mount game assets at /data in the virtual FS; runtime datadir = "/data".

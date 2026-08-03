@@ -226,8 +226,8 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 - [x] `nix build .#supertux-milestone1-wasm` — full link OK (html/js/wasm + preloaded .data)
 - [x] Runtime datadir on wasm: `/data` preload + `emscripten_prepare_paths`;
       `open_game_file` tries `/data/<rel>` on MEMFS
-- [ ] First browser smoke: canvas paints (even without full `data/`)
-- [ ] With `data/`: title screen → start game → one level → quit
+- [x] First browser smoke: canvas paints (even without full `data/`)
+- [x] With `data/`: title screen → start game → one level → quit
 - [x] IDBFS for config/saves under `/home/web_user` (survive reload)
 - [x] Replace ASYNCIFY with real frame pump (title / session / worldmap / confirm / text)
   - [x] Extract `GameSession::frame()` / `WorldMap::frame()` (busy loops call them)
@@ -244,7 +244,7 @@ blocking `while` + `SDL_Delay`. Browsers need either:
   - [x] Drop ASYNCIFY by default (`enableAsyncify = false`); re-enable if residual waits freeze
     - [x] `st_frame_delay()` no-op under `app_loop_active()`
 - [ ] Optional: SDL2_mixer + formats for wasm (or keep `ENABLE_SOUND=OFF`)
-- [ ] Document `nix build` / `nix run` wasm targets in `AGENTS.md` / README
+- [x] Document `nix build` / `nix run` wasm targets in `AGENTS.md` / README
 
 ### Flake attributes (Phase 5)
 
@@ -279,3 +279,5 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 | 2026-08-03 | Emscripten: no level editor menu; skip intro; save_hs frames |
 | 2026-08-03 | st_frame_delay; optional ENABLE_ASYNCIFY=0 for wasm link |
 | 2026-08-03 | ASYNCIFY off by default (mkApp enableAsyncify=false) |
+| 2026-08-03 | Custom wasm HTML shell; non-blocking wait_for_event/fade under app_loop |
+| 2026-08-03 | IDBFS syncfs without Asyncify.handleSleep (ASYNCIFY-off safe) |

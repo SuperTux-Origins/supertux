@@ -89,3 +89,16 @@ This is a maintained port of the classic SuperTux Milestone 1 (0.1.x) game. The 
 ## License
 
 GNU **GPL-3.0-or-later**. See `COPYING` and the REUSE headers in the sources.
+
+## WebAssembly (browser)
+
+```bash
+nix build .#supertux-milestone1-wasm
+nix run .#supertux-milestone1-wasm    # local HTTP server + open browser
+```
+
+Also: `nix build .#wasm-sdl-libs` and `nix build .#wasm-zlib-libs` for the
+static dependency prefixes. The game uses SDL2 + GLES2/WebGL, preloads `data/`
+into MEMFS at `/data`, and stores config/saves in IDBFS under `/home/web_user`.
+Sound is off by default; the level editor is not offered in the web build.
+

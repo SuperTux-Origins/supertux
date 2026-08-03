@@ -66,21 +66,20 @@ void st_log(const char* fmt, ...)
   vsnprintf(buf, sizeof(buf), fmt, ap);
   va_end(ap);
 
-#ifdef USE_SDL2
-  /* SDL_Log treats the message as a single line; drop trailing newlines. */
   size_t n = strlen(buf);
   while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r'))
     buf[--n] = '\0';
-  if (n > 0)
-    SDL_Log("%s", buf);
+  if (n == 0)
+    return;
+
+#ifdef __EMSCRIPTEN__
+  /* stdout → Module.print / console.log. stderr+SDL_Log look like errors. */
+  printf("%s\n", buf);
+#elif defined(USE_SDL2)
+  SDL_Log("%s", buf);
 #else
   fputs(buf, stderr);
-  if (buf[0] != '\0')
-    {
-      size_t n = strlen(buf);
-      if (buf[n - 1] != '\n')
-        fputc('\n', stderr);
-    }
+  fputc('\n', stderr);
 #endif
 }
 
@@ -116,6 +115,30 @@ int wait_for_event(SDL_Event& event,unsigned int min_delay, unsigned int max_del
   int i;
   Timer maxdelay;
   Timer mindelay;
+
+#ifdef __EMSCRIPTEN__
+  /* Under app_loop, never busy-wait (no ASYNCIFY). Single poll. */
+  extern bool app_loop_active(void);
+  if (app_loop_active())
+    {
+      if (empty_events)
+        while (SDL_PollEvent(&event)) {}
+      if (SDL_PollEvent(&event))
+        {
+          if (event.type == SDL_QUIT)
+            return 2;
+          if (event.type == SDL_KEYDOWN
+              || event.type == SDL_JOYBUTTONDOWN
+              || event.type == SDL_MOUSEBUTTONDOWN
+#ifdef USE_SDL2
+              || event.type == SDL_FINGERDOWN
+#endif
+             )
+            return 1;
+        }
+      return 0;
+    }
+#endif
   
   maxdelay.init(false);
   mindelay.init(false);
