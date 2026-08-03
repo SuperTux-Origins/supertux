@@ -4,6 +4,8 @@
 #ifndef SUPERTUX_TIMER_H
 #define SUPERTUX_TIMER_H
 
+#include <cstdio>
+
 extern unsigned int st_pause_ticks, st_pause_count;
 
 unsigned int st_get_ticks(void);
