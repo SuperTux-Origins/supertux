@@ -25,6 +25,7 @@
 
   inputs = rec {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-26.05";
+    flake-utils.url = "github:numtide/flake-utils";
 
     tinycmmc.url = "github:grumbel/tinycmmc";
     tinycmmc.inputs.nixpkgs.follows = "nixpkgs";
@@ -76,11 +77,12 @@
     };
   };
 
-  outputs = { self, nixpkgs, tinycmmc, SDL2-win32, SDL2_image-win32
+  outputs = { self, nixpkgs, flake-utils, tinycmmc, SDL2-win32, SDL2_image-win32
             , sdl2-mixer-mingw-devel, SDL2_mixer-win32-x64, SDL2_mixer-win32-x86
             , sdl2-src, sdl2-image-src, sdl2-mixer-src, libxmp-src }:
-    tinycmmc.lib.eachSystemWithPkgs (pkgs:
+    flake-utils.lib.eachDefaultSystem (system:
       let
+        pkgs = nixpkgs.legacyPackages.${system};
         lib = nixpkgs.lib;
         isWin = pkgs.stdenv.hostPlatform.isWindows;
         versionBase = lib.strings.removeSuffix "\n" (builtins.readFile ./VERSION);
