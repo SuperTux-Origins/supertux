@@ -16,6 +16,7 @@
 #include "worldmap.h"
 #include "resources.h"
 #include "touch_controls.h"
+#include "app_loop.h"
 #include "platform_config.h"
 
 #define DISPLAY_MAP_MESSAGE_TIME 2800
@@ -770,6 +771,16 @@ WorldMap::update(float delta)
               level->y == tux->get_tile_pos().y)
             {
               std::cout << "Enter the current level: " << level->name << std::endl;;
+#ifdef __EMSCRIPTEN__
+              if (app_loop_active())
+                {
+                  enter_level = false;
+                  app_request_session(datadir + "/levels/" + level->name,
+                                      ST_GL_LOAD_LEVEL_FILE);
+                  return;
+                }
+#endif
+              {
               GameSession session(datadir +  "/levels/" + level->name,
                                   1, ST_GL_LOAD_LEVEL_FILE);
 
@@ -788,10 +799,8 @@ WorldMap::update(float delta)
                       player_status.bonus = PlayerStatus::NO_BONUS;
 
                     if (old_level_state != level->solved && level->auto_path)
-                      { // Try to detect the next direction to which we should walk
-                        // FIXME: Mostly a hack
+                      {
                         Direction dir = D_NONE;
-                    
                         Tile* tile = at(tux->get_tile_pos());
 
                         if (tile->north && tux->back_direction != D_NORTH)
@@ -806,31 +815,29 @@ WorldMap::update(float delta)
                         if (dir != D_NONE)
                           {
                             tux->set_direction(dir);
-                            //tux->update(delta);
                           }
 
                         std::cout << "Walk to dir: " << dir << std::endl;
                       }
 
                     if (!level->extro_filename.empty())
-                      { 
+                      {
 #ifndef NOSOUND
                         MusicRef theme =
                           music_manager->load_music(datadir + "/music/theme.mod");
 #ifdef GP2X
                         MusicRef credits = music_manager->load_music(datadir + "/music/credits.xm");
 #else
-						MusicRef credits = music_manager->load_music(datadir + "/music/credits.ogg");
+                                                MusicRef credits = music_manager->load_music(datadir + "/music/credits.ogg");
 #endif
                         music_manager->play_music(theme);
 #endif
-                        // Display final credits and go back to the main menu
                         display_text_file(level->extro_filename,
                                           "/images/background/extro.jpg", SCROLL_SPEED_MESSAGE);
 #ifndef NOSOUND
-			music_manager->play_music(credits,0);
+                        music_manager->play_music(credits,0);
 #endif
-			display_text_file("CREDITS",
+                        display_text_file("CREDITS",
                                           "/images/background/oiltux.jpg", SCROLL_SPEED_CREDITS);
 #ifndef NOSOUND
                         music_manager->play_music(theme);
@@ -841,7 +848,6 @@ WorldMap::update(float delta)
 
                   break;
                 case GameSession::ES_LEVEL_ABORT:
-                  /* Drop any held pad buttons so Abort does not re-enter. */
                   touch_controls_reset();
                   break;
                 case GameSession::ES_GAME_OVER:
@@ -849,7 +855,6 @@ WorldMap::update(float delta)
                   player_status.reset();
                   break;
                 case GameSession::ES_NONE:
-                  // Should never be reached 
                   break;
                 }
 
@@ -861,6 +866,8 @@ WorldMap::update(float delta)
               if (!savegame_file.empty())
                 savegame(savegame_file);
               return;
+              }
+
             }
         }
       else if (level && level->teleport_dest_x != -1 && level->teleport_dest_y != -1) {
@@ -1047,7 +1054,7 @@ WorldMap::draw_status()
 }
 
 void
-WorldMap::display()
+WorldMap::begin_display()
 {
   Menu::set_current(0);
 
@@ -1059,6 +1066,12 @@ WorldMap::display()
 #endif
 
   display_last_update_time = display_update_time = st_get_ticks();
+}
+
+void
+WorldMap::display()
+{
+  begin_display();
 
   while (frame())
     { /* busy loop — frame() does one iteration */ }

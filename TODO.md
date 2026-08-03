@@ -232,9 +232,10 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 - [~] Replace ASYNCIFY with real frame pump (title / session / worldmap)
   - [x] Extract `GameSession::frame()` / `WorldMap::frame()` (busy loops call them)
   - [x] Extract `title_frame()` (+ init/shutdown); `title()` calls the loop
-  - [ ] Top-level state machine (TITLE / SESSION / WORLDMAP) — no nested `run()`/`display()`
-  - [ ] Frame remaining dialogs (confirm, credits, high scores, editor)
-  - [ ] `emscripten_set_main_loop` + drop ASYNCIFY
+  - [x] Top-level `app_loop` state machine (TITLE / WORLDMAP / SESSION) + `emscripten_set_main_loop`
+  - [x] Hand-off from load-game + worldmap enter-level (no nested run/display when `app_loop_active`)
+  - [ ] Frame remaining dialogs (confirm, credits, high scores, editor, contrib subset)
+  - [ ] Drop ASYNCIFY once dialogs are non-blocking
 - [ ] Optional: SDL2_mixer + formats for wasm (or keep `ENABLE_SOUND=OFF`)
 - [ ] Document `nix build` / `nix run` wasm targets in `AGENTS.md` / README
 
@@ -264,3 +265,4 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 | 2026-08-03 | IDBFS mount + sync on startup / saveconfig / worldmap savegame |
 | 2026-08-03 | Extract GameSession::frame + WorldMap::frame (ASYNCIFY exit path) |
 | 2026-08-03 | Extract title_frame / title_init / title_shutdown |
+| 2026-08-03 | app_loop: Emscripten TITLE/WORLDMAP/SESSION state machine + main_loop |

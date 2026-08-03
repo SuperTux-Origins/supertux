@@ -74,8 +74,13 @@ class GameSession
   /** Enter the busy loop (calls frame() until exit). */
   ExitStatus run();
 
+  /** Setup before a frame() pump (used by app_loop / run). */
+  void begin_run();
+
   /** One iteration of the game loop. Returns true while still running. */
   bool frame();
+
+  ExitStatus get_exit_status() const { return exit_status; }
 
   void draw();
   void action(double frame_ratio);

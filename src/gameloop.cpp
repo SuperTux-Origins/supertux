@@ -747,13 +747,14 @@ GameSession::process_menu()
     }
 }
 
-GameSession::ExitStatus
-GameSession::run()
+void
+GameSession::begin_run()
 {
   Menu::set_current(0);
   current_ = this;
 
   fps_cnt = 0;
+  exit_status = ES_NONE;
   update_time = last_update_time = st_get_ticks();
 
   // Eat unneeded events
@@ -761,6 +762,12 @@ GameSession::run()
   while (SDL_PollEvent(&event)) {}
 
   draw();
+}
+
+GameSession::ExitStatus
+GameSession::run()
+{
+  begin_run();
 
   while (frame())
     { /* busy loop — frame() does one iteration */ }

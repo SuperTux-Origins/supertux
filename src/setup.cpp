@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <string>
 #include "platform_config.h"
+#include "app_loop.h"
 #include <SDL_image.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -964,6 +965,16 @@ bool process_load_game_menu()
         }
 
       fadeout();
+#ifdef __EMSCRIPTEN__
+      if (app_loop_active())
+        {
+          /* Non-blocking hand-off to the top-level frame pump. */
+          app_request_worldmap("world1.stwm", slotfile, false);
+          Menu::set_current(0);
+          return true;
+        }
+#endif
+      {
       WorldMapNS::WorldMap worldmap;
       
       //TODO: Define the circumstances under which BonusIsland is chosen
@@ -976,6 +987,7 @@ bool process_load_game_menu()
       worldmap.display();
       
       Menu::set_current(main_menu);
+      }
 
       st_pause_ticks_stop();
       return true;

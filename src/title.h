@@ -11,6 +11,8 @@ void title(void);
 /** One iteration of the title/menu loop. Returns true while a menu is active. */
 bool title_frame(void);
 
-#endif /* SUPERTUX_TITLE_H */
+/** Split init/shutdown for the Emscripten top-level app loop. */
+void title_init(void);
+void title_shutdown(void);
 
-// EOF //
+#endif /* SUPERTUX_TITLE_H */

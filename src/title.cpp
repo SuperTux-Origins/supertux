@@ -36,6 +36,7 @@
 #include "resources.h"
 #include "worldmap.h"
 #include "touch_controls.h"
+#include "app_loop.h"
 #ifndef NOSOUND
 #include "sound.h"
 #endif
@@ -115,9 +116,9 @@ void check_contrib_menu()
       LevelSubset& subset = * (contrib_subsets[index]);
 
       current_contrib_subset = subset.name;
- 
+
       contrib_subset_menu->clear();
- 
+
       contrib_subset_menu->additem(MN_LABEL, subset.title, 0,0);
       contrib_subset_menu->additem(MN_HL,"",0,0);
 
@@ -129,7 +130,7 @@ void check_contrib_menu()
         contrib_subset_menu->additem(MN_ACTION, level.name, 0,0,i+1);
         }
 
-      contrib_subset_menu->additem(MN_HL,"",0,0);      
+      contrib_subset_menu->additem(MN_HL,"",0,0);
       contrib_subset_menu->additem(MN_BACK, "Back", 0, 0);
       }
     else if(index < worldmap_list.num_items + (int)contrib_subsets.size())
@@ -137,6 +138,18 @@ void check_contrib_menu()
       // Loading fade
       fadeout();
 
+#ifdef __EMSCRIPTEN__
+      if (app_loop_active())
+        {
+          std::string mapfile = worldmap_list.item[index - contrib_subsets.size()];
+          std::string savegame = mapfile;
+          savegame = savegame.substr(0, savegame.size()-5);
+          savegame = std::string(st_save_dir) + "/" + savegame + ".stsg";
+          app_request_worldmap(mapfile, savegame, true);
+          Menu::set_current(0);
+          return;
+        }
+#endif
       WorldMapNS::WorldMap worldmap;
       worldmap.loadmap(worldmap_list.item[index - contrib_subsets.size()]);
 //      worldmap.set_levels_as_solved();
@@ -227,7 +240,7 @@ void draw_demo(GameSession* session, double frame_ratio)
 }
 
 /* --- TITLE SCREEN --- */
-static void
+void
 title_init(void)
 {
   random_timer.init(true);
@@ -299,7 +312,7 @@ title_init(void)
   Menu::set_current(main_menu);
 }
 
-static void
+void
 title_shutdown(void)
 {
   free_contrib_menu();

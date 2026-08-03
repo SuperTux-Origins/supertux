@@ -153,6 +153,7 @@ set(SUPERTUX_SOURCES
   src/texture.cpp
   src/timer.cpp
   src/title.cpp
+  src/app_loop.cpp
   src/type.cpp
   src/world.cpp
   src/worldmap.cpp

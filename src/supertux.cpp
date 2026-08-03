@@ -10,6 +10,7 @@
 #include "platform_config.h"
 #include "intro.h"
 #include "title.h"
+#include "app_loop.h"
 #include "gameloop.h"
 #include "leveleditor.h"
 #include "screen.h"
@@ -47,10 +48,17 @@ int main(int argc, char * argv[])
       session.run();
     }
   else
-    {  
+    {
+#ifdef __EMSCRIPTEN__
+      /* Single frame pump: title ↔ worldmap ↔ session (no nested busy loops). */
+      app_run();
+      /* app_run() uses emscripten_set_main_loop and does not return. */
+#else
       title();
+#endif
     }
-  
+
+#ifndef __EMSCRIPTEN__
   clearscreen(0, 0, 0);
   updatescreen();
 
@@ -61,6 +69,7 @@ int main(int argc, char * argv[])
   Surface::debug_check();
 #endif
   st_shutdown();
-  
+#endif
+
   return 0;
 }

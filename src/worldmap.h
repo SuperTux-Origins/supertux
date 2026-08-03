@@ -218,8 +218,13 @@ public:
   /** Busy loop (calls frame() until quit). */
   void display();
 
+  /** Setup before a frame() pump (music, timers, quit=false). */
+  void begin_display();
+
   /** One iteration of the worldmap loop. Returns true while still running. */
   bool frame();
+
+  const std::string& get_savegame_file() const { return savegame_file; }
 
   void load_map();
   
