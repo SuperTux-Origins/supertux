@@ -247,6 +247,7 @@
 
           # WebAssembly (Emscripten + SDL2 + GLES2/WebGL).
           wasm-sdl-libs = wasm.sdlWasmLibs;
+          wasm-zlib-libs = wasm.zlibWasmLibs;
           supertux-milestone1-wasm = wasm.mkApp {
             appName = "supertux-milestone1";
             srcDir = ./.;

@@ -4,6 +4,7 @@
 #   APP_NAME         - binary/html basename (e.g. supertux-milestone1)
 #   SRC_DIR          - repo root (contains CMakeLists.txt + src/)
 #   SDL_WASM_LIBS    - prebuilt SDL2 (+ image) prefix (include/ + lib/)
+#   ZLIB_WASM_LIBS   - prebuilt static zlib prefix (libz.a + zlib.h)
 #   DATA_DIR         - optional path to data/ for --preload-file (may be absent)
 #   ENABLE_SOUND     - 0|1 (default 0 for first bring-up; mixer not in wasm libs yet)
 #   ENABLE_GLES2     - 0|1 (default 1 — WebGL via GLES2 path)
@@ -13,46 +14,12 @@ set -euo pipefail
 export EM_CACHE="${TMPDIR:-/tmp}/emcache"
 mkdir -p "$EM_CACHE"
 
-# Static zlib for wasm (lispreader / .gz levels). Offline — no -sUSE_ZLIB port.
-ZLIB_PREFIX="$PWD/zlib-prefix"
-if [ -n "${ZLIB_SRC:-}" ]; then
-  echo "==> zlib static (wasm32) → $ZLIB_PREFIX"
-  rm -rf zlib-src build-zlib
-  # Nix zlib.src is often a .tar.gz path; unpack or copy tree.
-  if [ -d "$ZLIB_SRC" ]; then
-    cp -a "$ZLIB_SRC" zlib-src
-  else
-    mkdir -p zlib-src
-    tar -xf "$ZLIB_SRC" -C zlib-src --strip-components=1
-  fi
-  chmod -R u+w zlib-src
-  # Prefer classic configure: zlib's CMake still add_library(SHARED), which
-  # Emscripten rejects even with -DBUILD_SHARED_LIBS=OFF.
-  (
-    cd zlib-src
-    if [ -x ./configure ] || [ -f ./configure ]; then
-      emconfigure ./configure --static --prefix="$ZLIB_PREFIX"
-      emmake make -j"${NIX_BUILD_CORES:-$(nproc)}"
-      emmake make install
-    else
-      # Very old / odd tree: compile the few .c files by hand into libz.a
-      echo "zlib: no configure — compiling sources with emcc"
-      mkdir -p "$ZLIB_PREFIX/lib" "$ZLIB_PREFIX/include"
-      objs=()
-      for c in adler32 compress crc32 deflate gzclose gzlib gzread gzwrite \
-               infback inffast inflate inftrees trees uncompr zutil; do
-        if [ -f "${c}.c" ]; then
-          emcc -O2 -c "${c}.c" -o "${c}.o"
-          objs+=("${c}.o")
-        fi
-      done
-      emar rcs "$ZLIB_PREFIX/lib/libz.a" "${objs[@]}"
-      cp zlib.h zconf.h "$ZLIB_PREFIX/include/" 2>/dev/null || cp zlib.h "$ZLIB_PREFIX/include/"
-    fi
-  )
-  ls -la "$ZLIB_PREFIX/lib" "$ZLIB_PREFIX/include" || true
+# Static zlib comes from flake output wasm-zlib-libs (see nix/wasm.nix).
+ZLIB_PREFIX="${ZLIB_WASM_LIBS:-}"
+if [ -n "$ZLIB_PREFIX" ] && [ -f "$ZLIB_PREFIX/lib/libz.a" ]; then
+  echo "==> using prebuilt wasm zlib: $ZLIB_PREFIX"
 else
-  echo "WARNING: ZLIB_SRC unset — configure may fail on zlib.h"
+  echo "WARNING: ZLIB_WASM_LIBS unset or incomplete — configure may fail on zlib.h"
   ZLIB_PREFIX=""
 fi
 

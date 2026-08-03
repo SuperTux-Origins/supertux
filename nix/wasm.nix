@@ -92,6 +92,58 @@ EOF
     '';
   };
 
+
+  # Static zlib for wasm (lispreader / .gz levels). Offline — no -sUSE_ZLIB port.
+  zlibWasmLibs = pkgs.stdenv.mkDerivation {
+    pname = "zlib-wasm-libs";
+    version = pkgs.zlib.version;
+
+    dontUnpack = true;
+    dontConfigure = true;
+    nativeBuildInputs = [ pkgs.emscripten ];
+
+    env = {
+      ZLIB_SRC = "${pkgs.zlib.src}";
+    };
+
+    buildPhase = ''
+      runHook preBuild
+      bash ${./scripts/build-wasm-zlib.sh}
+      runHook postBuild
+    '';
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      if [ -d prefix ]; then
+        cp -a prefix/. $out/
+      else
+        echo "error: build-wasm-zlib.sh did not produce prefix/" >&2
+        exit 1
+      fi
+      # Optional pkg-config for completeness.
+      mkdir -p $out/lib/pkgconfig
+      cat > $out/lib/pkgconfig/zlib.pc <<EOF
+prefix=$out
+exec_prefix=\''${prefix}
+libdir=\''${prefix}/lib
+includedir=\''${prefix}/include
+Name: zlib
+Description: zlib (wasm static)
+Version: ${pkgs.zlib.version}
+Libs: -L\''${libdir} -lz
+Cflags: -I\''${includedir}
+EOF
+      runHook postInstall
+    '';
+
+    meta = with pkgs.lib; {
+      description = "Static zlib built for wasm32-emscripten";
+      license = licenses.zlib;
+      platforms = platforms.linux;
+    };
+  };
+
   mkApp = {
     appName
   , srcDir
@@ -115,8 +167,7 @@ EOF
         ENABLE_SOUND = if enableSound then "1" else "0";
         ENABLE_GLES2 = if enableGles2 then "1" else "0";
         PKG_CONFIG_PATH = "${sdlWasmLibs}/lib/pkgconfig";
-        # Offline zlib for wasm (lispreader); avoid Emscripten network port.
-        ZLIB_SRC = "${pkgs.zlib.src}";
+        ZLIB_WASM_LIBS = zlibWasmLibs;
       } // pkgs.lib.optionalAttrs (dataDir != null) {
         DATA_DIR = "${dataDir}";
       };
@@ -203,5 +254,5 @@ EOF
     meta.description = description;
   };
 in {
-  inherit sdlWasmLibs mkApp mkOpenBrowserApp;
+  inherit sdlWasmLibs zlibWasmLibs mkApp mkOpenBrowserApp;
 }

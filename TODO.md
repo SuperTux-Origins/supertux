@@ -266,3 +266,4 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 | 2026-08-03 | Extract GameSession::frame + WorldMap::frame (ASYNCIFY exit path) |
 | 2026-08-03 | Extract title_frame / title_init / title_shutdown |
 | 2026-08-03 | app_loop: Emscripten TITLE/WORLDMAP/SESSION state machine + main_loop |
+| 2026-08-03 | Split wasm zlib into flake output `wasm-zlib-libs` |
