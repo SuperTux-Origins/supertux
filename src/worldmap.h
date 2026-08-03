@@ -218,6 +218,9 @@ public:
   /** Busy loop (calls frame() until quit). */
   void display();
 
+  /** Signal the worldmap frame pump to exit (e.g. game over). */
+  void request_quit() { quit = true; }
+
   /** Setup before a frame() pump (music, timers, quit=false). */
   void begin_display();
 

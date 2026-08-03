@@ -135,7 +135,7 @@ app_finish_session(void)
         }
       else if (st == GameSession::ES_GAME_OVER)
         {
-          g_worldmap->quit = true;
+          g_worldmap->request_quit();
           player_status.reset();
         }
 

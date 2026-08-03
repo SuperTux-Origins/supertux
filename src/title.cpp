@@ -469,7 +469,7 @@ title_frame(void)
             update_time = st_get_ticks();
             Menu::set_current(main_menu);
             /* Consume so we do not re-trigger every frame. */
-            title_last_event.type = SDL_NOEVENT;
+            title_last_event.type = 0; /* clear; SDL2 has no SDL_NOEVENT */
             }
           else if (process_load_game_menu())
             {
