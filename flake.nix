@@ -39,6 +39,16 @@
     SDL2_image-win32.inputs.nixpkgs.follows = "nixpkgs";
     SDL2_image-win32.inputs.tinycmmc.follows = "tinycmmc";
 
+    SDL2_mixer-win32-x64 = {
+      url = "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-2.8.1-win32-x64.zip";
+      flake = false;
+    };
+
+    SDL2_mixer-win32-x86 = {
+      url = "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-2.8.1-win32-x86.zip";
+      flake = false;
+    };
+
     # Official MinGW devel archive (same shape as SDL2_image-win32).
     sdl2-mixer-mingw-devel = {
       url = "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-devel-2.8.1-mingw.tar.gz";
@@ -67,7 +77,7 @@
   };
 
   outputs = { self, nixpkgs, tinycmmc, SDL2-win32, SDL2_image-win32
-            , sdl2-mixer-mingw-devel
+            , sdl2-mixer-mingw-devel, SDL2_mixer-win32-x64, SDL2_mixer-win32-x86
             , sdl2-src, sdl2-image-src, sdl2-mixer-src, libxmp-src }:
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       let
@@ -155,11 +165,13 @@
             dontConfigure = true;
             dontBuild = true;
             installPhase = ''
-              mkdir -p $out
+              mkdir $out
+              find . -print
               cp -vr ${triplet}/. $out/
-              if [ -f $out/lib/pkgconfig/SDL2_mixer.pc ]; then
-                sed -i "s|^prefix=.*|prefix=$out|" $out/lib/pkgconfig/SDL2_mixer.pc
-              fi
+              substituteInPlace $out/lib/pkgconfig/SDL2_mixer.pc \
+                --replace "prefix=/tmp/tardir/SDL2_mixer-2.8.1/build-mingw/install-${triplet}" \
+                          "prefix=$out"
+               cp -v ${if winSystem == "x86_64-windows" then SDL2_mixer-win32-x64 else SDL2_mixer-win32-x86}/optional/libxmp.dll $out/
             '';
           };
 
@@ -221,12 +233,12 @@
         win64Package = if isWin then null else mkWinCross {
           crossPkgs = pkgs.pkgsCross.mingwW64;
           winSystem = "x86_64-windows";
-          pname = "supertux-milestone1-win64";
+          pname = "supertux-milestone1-win32-x86";
         };
         win32Package = if isWin then null else mkWinCross {
           crossPkgs = pkgs.pkgsCross.mingw32;
           winSystem = "i686-windows";
-          pname = "supertux-milestone1-win32";
+          pname = "supertux-milestone1-win32-x86";
         };
 
 
@@ -412,8 +424,8 @@
           # Native Linux + Windows cross under the *build* system (like android/wasm).
           supertux-milestone1-sdl1 = pkgSdl1;
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
-          supertux-milestone1-win64 = win64Package; # mingwW64 → x86_64 PE
-          supertux-milestone1-win32 = win32Package; # mingw32  → i686 PE
+          supertux-milestone1-win32-x64 = win64Package; # mingwW64 → x86_64 PE
+          supertux-milestone1-win32-x86 = win32Package; # mingw32  → i686 PE
         } // linuxExtras.packages;
 
         checks = {
@@ -427,8 +439,8 @@
         } // lib.optionalAttrs (!isWin) {
           supertux-milestone1-sdl1 = pkgSdl1;
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
-          supertux-milestone1-win64 = win64Package;
-          supertux-milestone1-win32 = win32Package;
+          supertux-milestone1-win32-x64 = win64Package;
+          supertux-milestone1-win32-x86 = win32Package;
 
           sanity-sdl1 = mkSanity "sdl1" pkgSdl1 ''
             test -x ${pkgSdl1}/bin/supertux-milestone1
@@ -496,11 +508,11 @@
             program = "${pkgSdl2Gles2}/bin/supertux-milestone1";
             meta.description = "SuperTux Milestone 1 (SDL2 + OpenGL ES 2.0)";
           };
-          supertux-milestone1-win64 = mkWineApp win64Package
-            "supertux-milestone1-win64-wine"
+          supertux-milestone1-win32-x64 = mkWineApp win64Package
+            "supertux-milestone1-win32-x64-wine"
             "SuperTux Milestone 1 (Win64 via Wine, temp WINEPREFIX)";
-          supertux-milestone1-win32 = mkWineApp win32Package
-            "supertux-milestone1-win32-wine"
+          supertux-milestone1-win32-x86 = mkWineApp win32Package
+            "supertux-milestone1-win32-x86-wine"
             "SuperTux Milestone 1 (Win32 via Wine, temp WINEPREFIX)";
         } // linuxExtras.apps;
       }

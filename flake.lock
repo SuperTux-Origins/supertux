@@ -61,6 +61,32 @@
         "url": "https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.8.8-mingw.tar.gz"
       }
     },
+    "SDL2_mixer-win32-x64": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1738958792,
+        "narHash": "sha256-4HZQQiepTwGXeS/QwW+0BayuxH5+08cCstEFXSoTjkE=",
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-2.8.1-win32-x64.zip"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-2.8.1-win32-x64.zip"
+      }
+    },
+    "SDL2_mixer-win32-x86": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1738958772,
+        "narHash": "sha256-D6W/pjPr9nED34xotJuRz+3pOzRhpwfC0xmk4vQNvpM=",
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-2.8.1-win32-x86.zip"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-2.8.1-win32-x86.zip"
+      }
+    },
     "SDL2_src": {
       "flake": false,
       "locked": {
@@ -125,6 +151,8 @@
       "inputs": {
         "SDL2-win32": "SDL2-win32",
         "SDL2_image-win32": "SDL2_image-win32",
+        "SDL2_mixer-win32-x64": "SDL2_mixer-win32-x64",
+        "SDL2_mixer-win32-x86": "SDL2_mixer-win32-x86",
         "libxmp-src": "libxmp-src",
         "nixpkgs": "nixpkgs",
         "sdl2-image-src": "sdl2-image-src",
