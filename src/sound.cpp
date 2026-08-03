@@ -59,36 +59,24 @@ int open_audio (int frequency, Uint16 format, int channels, int chunksize)
 //  close_audio();
 #ifndef GP2X
 #ifdef USE_SDL2
-  /* SDL2_mixer needs Mix_Init for OGG/MOD before load. Music is mostly .mod/.xm.
-     Always log results so wasm does not require ?debug to see MOD failure. */
+  /* SDL2_mixer: MIX_INIT_* are enum values (not #defines) — do not #ifdef them.
+     Request OGG + MOD; Milestone 1 music is mostly .mod/.xm via libxmp. */
   {
-    int mix_flags = 0;
-#ifdef MIX_INIT_OGG
-    mix_flags |= MIX_INIT_OGG;
-#endif
-#ifdef MIX_INIT_MOD
-    mix_flags |= MIX_INIT_MOD;
-#endif
+    int mix_flags = MIX_INIT_OGG | MIX_INIT_MOD;
     int got = Mix_Init(mix_flags);
-#ifdef MIX_INIT_OGG
     if ((got & MIX_INIT_OGG) == 0)
       st_log("[audio] Mix_Init: OGG unavailable: %s",
              Mix_GetError() ? Mix_GetError() : "(no error)");
     else
       st_log("[audio] Mix_Init: OGG ok");
-#endif
-#ifdef MIX_INIT_MOD
     if ((got & MIX_INIT_MOD) == 0)
       {
         st_log("[audio] Mix_Init: MOD FAILED: %s",
                Mix_GetError() ? Mix_GetError() : "(no error)");
-        st_log("[audio] music uses .mod/.xm — need SDL2_mixer built with libxmp");
+        st_log("[audio] music uses .mod/.xm — need SDL2_mixer + libxmp in wasm libs");
       }
     else
       st_log("[audio] Mix_Init: MOD ok");
-#else
-    st_log("[audio] Mix_Init: MIX_INIT_MOD not defined in headers");
-#endif
     st_log("[audio] Mix_Init flags requested=0x%x got=0x%x", mix_flags, got);
   }
 #endif

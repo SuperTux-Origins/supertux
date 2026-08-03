@@ -37,6 +37,9 @@ LINK_FLAGS=(
   "SHELL:-sMAX_WEBGL_VERSION=2"
   "SHELL:-sFORCE_FILESYSTEM=1"
   "SHELL:-sEXIT_RUNTIME=0"
+  # IDBFS JS library (FS.mount(IDBFS, …) for config/saves). Without this,
+  # runtime logs "IDBFS is not defined" and persistence is a no-op.
+  "SHELL:-lidbfs.js"
 )
 if [ "${ENABLE_ASYNCIFY:-0}" = 1 ]; then
   LINK_FLAGS+=("SHELL:-sASYNCIFY=1" "SHELL:-sASYNCIFY_STACK_SIZE=1048576")

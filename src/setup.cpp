@@ -636,14 +636,19 @@ emscripten_prepare_paths(void)
   st_log("Emscripten: datadir = %s (MEMFS preload)", datadir.c_str());
   st_log("Emscripten: userdir = %s (IDBFS)", userdir_override.c_str());
 
-  /* Mount IDBFS over /home/web_user so config + saves persist. */
+  /* Mount IDBFS over /home/web_user so config + saves persist.
+     Requires -lidbfs.js at link time (see build-wasm-app.sh). */
   EM_ASM({
     try {
       FS.mkdir("/home/web_user");
     } catch (e) {}
     try {
-      FS.mount(IDBFS, {}, "/home/web_user");
-      console.log("SuperTux: IDBFS mounted at /home/web_user");
+      if (typeof IDBFS === "undefined") {
+        console.error("SuperTux: IDBFS is not defined — rebuild with -lidbfs.js");
+      } else {
+        FS.mount(IDBFS, {}, "/home/web_user");
+        console.log("SuperTux: IDBFS mounted at /home/web_user");
+      }
     } catch (e) {
       /* Already mounted on soft restart — ignore. */
       console.log("SuperTux: IDBFS mount skipped:", e);
