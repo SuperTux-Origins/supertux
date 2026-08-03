@@ -47,14 +47,25 @@ open_game_file(const std::string& path)
     }
 #endif
 
-  /* Real filesystem (desktop install, user mods, writable paths). */
+#ifdef __EMSCRIPTEN__
+  /* MEMFS preload mounts assets at /data (see build-wasm-app.sh). */
+  if (!rel.empty())
+    {
+      std::string under_data = std::string("/data/") + rel;
+      SDL_RWops* rw = SDL_RWFromFile(under_data.c_str(), "rb");
+      if (rw)
+        return rw;
+    }
+#endif
+
+  /* Real filesystem (desktop install, user mods, writable paths, MEMFS). */
   {
     SDL_RWops* rw = SDL_RWFromFile(path.c_str(), "rb");
     if (rw)
       return rw;
   }
 
-  /* Desktop: also try datadir-relative if path was absolute under datadir. */
+  /* Also try datadir-relative if path was absolute under datadir. */
   if (!rel.empty() && rel != path)
     {
       SDL_RWops* rw = SDL_RWFromFile(rel.c_str(), "rb");

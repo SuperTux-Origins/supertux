@@ -222,10 +222,10 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 - [x] CMake: `SDL2_ROOT`, Emscripten link options, no system GLESv2 on wasm
 - [x] Flake packages: `wasm-sdl-libs`, `supertux-milestone1-wasm`
 - [x] Flake app: `supertux-milestone1-wasm` (local HTTP server + open browser)
-- [ ] `nix build .#wasm-sdl-libs` — verify static `libSDL2.a` / `libSDL2_image.a`
+- [ ] `nix build .#wasm-sdl-libs` — verify static `libSDL2.a` / `libSDL2_image.a` (script installs to prefix/)
 - [ ] `nix build .#supertux-milestone1-wasm` — first full link (may need iterate)
-- [ ] Runtime datadir on wasm: prefer `/data` preload; mirror Android
-      `open_game_file` / logical datadir path if `access()` fails in MEMFS
+- [x] Runtime datadir on wasm: `/data` preload + `emscripten_prepare_paths`;
+      `open_game_file` tries `/data/<rel>` on MEMFS
 - [ ] First browser smoke: canvas paints (even without full `data/`)
 - [ ] With `data/`: title screen → start game → one level → quit
 - [ ] Replace ASYNCIFY with real frame pump (title / session / worldmap)
@@ -252,3 +252,4 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 | Date | Item |
 |------|------|
 | 2026-08-03 | Phase 5 scaffold: wasm.nix, scripts, CMake EMSCRIPTEN/SDL2_ROOT, flake targets |
+| 2026-08-03 | Emscripten datadir/userdir + open_game_file /data; SDL wasm install prefix |

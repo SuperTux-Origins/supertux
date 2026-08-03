@@ -51,18 +51,16 @@ let
 
     installPhase = ''
       runHook preInstall
-      mkdir -p $out/lib $out/include
-      # SDL2
-      find build-sdl2 -name 'libSDL2.a' -exec cp {} $out/lib/ \;
-      cp -a SDL2-src/include/. $out/include/
-      # SDL2_image (optional)
-      if [ -d build-sdl2-image ]; then
-        find build-sdl2-image -name 'libSDL2_image.a' -exec cp {} $out/lib/ \;
-        if [ -d SDL2_image-src/include ]; then
-          cp -a SDL2_image-src/include/. $out/include/ || true
-        fi
-        # Some builds only install headers under the build tree.
-        find build-sdl2-image -name 'SDL_image.h' -exec cp {} $out/include/ \; || true
+      mkdir -p $out
+      # Prefer staged install prefix from build-wasm-sdl-libs.sh.
+      if [ -d prefix ]; then
+        cp -a prefix/. $out/
+      else
+        mkdir -p $out/lib $out/include
+        find . -name 'libSDL2.a' -exec cp {} $out/lib/ \;
+        find . -name 'libSDL2_image.a' -exec cp {} $out/lib/ \; || true
+        if [ -d SDL2-src/include ]; then cp -a SDL2-src/include/. $out/include/; fi
+        find . -name 'SDL_image.h' -exec cp {} $out/include/ \; || true
       fi
       # Convenience: pkg-config stubs so CMake pkg_check_modules can work if used.
       mkdir -p $out/lib/pkgconfig

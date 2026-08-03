@@ -592,6 +592,33 @@ android_prepare_paths(void)
 }
 #endif /* __ANDROID__ */
 
+#ifdef __EMSCRIPTEN__
+/*
+ * Wasm packages assets with --preload-file …@/data (see build-wasm-app.sh).
+ * DATA_PREFIX is compiled as "/data". Config/saves live under a writable
+ * MEMFS path (no HOME / XDG on the web).
+ */
+static void
+emscripten_prepare_paths(void)
+{
+  if (userdir_override.empty())
+    userdir_override = "/home/web_user/.config/supertux-milestone1";
+
+  if (datadir.empty())
+    datadir = DATA_PREFIX; /* typically "/data" */
+
+  st_log("Emscripten: datadir = %s (MEMFS preload)", datadir.c_str());
+  st_log("Emscripten: userdir = %s", userdir_override.c_str());
+
+  std::string probe = datadir + "/images/status/letters-white.png";
+  if (!game_file_exists(probe))
+    st_log("Emscripten: missing %s — rebuild with data/ or expect title failure",
+           probe.c_str());
+  else
+    st_log("Emscripten: data probe OK (%s)", probe.c_str());
+}
+#endif /* __EMSCRIPTEN__ */
+
 /* Optional overrides from --datadir and --userdir (parsed before setup). */
 void parse_path_args(int argc, char* argv[])
 {
@@ -612,6 +639,9 @@ void st_directory_setup(void)
 {
 #ifdef __ANDROID__
   android_prepare_paths();
+#endif
+#ifdef __EMSCRIPTEN__
+  emscripten_prepare_paths();
 #endif
 
   if (!userdir_override.empty())
@@ -653,8 +683,30 @@ void st_directory_setup(void)
   strcpy(st_save_dir,st_dir);
   strcat(st_save_dir,"/save");
 
-  /* Create them. In the case they exist they won't destroy anything. */
+  /* Create them. In the case they exist they won't destroy anything.
+     On Emscripten, create intermediate path components (MEMFS starts empty). */
+#ifdef __EMSCRIPTEN__
+  {
+    char tmp[1024];
+    size_t n = strlen(st_dir);
+    if (n >= sizeof(tmp))
+      n = sizeof(tmp) - 1;
+    memcpy(tmp, st_dir, n);
+    tmp[n] = '\0';
+    for (char* p = tmp + 1; *p; ++p)
+      {
+        if (*p == '/')
+          {
+            *p = '\0';
+            mkdir(tmp, 0755);
+            *p = '/';
+          }
+      }
+    mkdir(tmp, 0755);
+  }
+#else
   mkdir(st_dir, 0755);
+#endif
   mkdir(st_save_dir, 0755);
 
   char str[1024];
@@ -662,8 +714,8 @@ void st_directory_setup(void)
   mkdir(str, 0755);
 
   // User has not that a datadir, so we try some magic
-  // Android already set a logical datadir in android_prepare_paths().
-#ifndef __ANDROID__
+  // Android / Emscripten set datadir in their prepare_paths helpers.
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   if (datadir.empty())
     {
       // Detect datadir
@@ -697,7 +749,7 @@ void st_directory_setup(void)
   datadir = DATA_PREFIX;
 #endif
     }
-#endif /* !__ANDROID__ */
+#endif /* !__ANDROID__ && !__EMSCRIPTEN__ */
   st_log("Configdir: %s", st_dir ? st_dir : "(null)");
   st_log("Datadir: %s", datadir.c_str());
 }
