@@ -55,6 +55,8 @@ static std::vector<LevelSubset*> contrib_subsets;
 static std::string current_contrib_subset;
 
 static string_list_type worldmap_list;
+static GameSession* demo_session = 0;
+static SDL_Event title_last_event;
 
 void free_contrib_menu()
 {
@@ -225,7 +227,8 @@ void draw_demo(GameSession* session, double frame_ratio)
 }
 
 /* --- TITLE SCREEN --- */
-void title(void)
+static void
+title_init(void)
 {
   random_timer.init(true);
 
@@ -233,7 +236,8 @@ void title(void)
 
   st_pause_ticks_init();
 
-  GameSession session(datadir + "/levels/misc/menu.stl", 0, ST_GL_DEMO_GAME);
+  delete demo_session;
+  demo_session = new GameSession(datadir + "/levels/misc/menu.stl", 0, ST_GL_DEMO_GAME);
 
   clearscreen(0, 0, 0);
   updatescreen();
@@ -283,188 +287,217 @@ void title(void)
   }
   st_vlog("[data] bonus worldmap_list count=%d\n", worldmap_list.num_items);
 
-  /* --- Main title loop: --- */
   frame = 0;
 
   /* Draw the title background: */
   bkg_title->draw_bg();
 
-  update_time = st_get_ticks();
+  update_time = last_update_time = st_get_ticks();
   random_timer.start(rand() % 2000 + 2000);
 
+  memset(&title_last_event, 0, sizeof(title_last_event));
   Menu::set_current(main_menu);
-  while (Menu::current())
-    {
-      // if we spent to much time on a menu entry
-      if( (update_time - last_update_time) > 1000)
-        update_time = last_update_time = st_get_ticks();
+}
 
-      // Calculate the movement-factor
-      double frame_ratio = ((double)(update_time-last_update_time))/((double)FRAME_RATE);
-      if(frame_ratio > 1.5) /* Quick hack to correct the unprecise CPU clocks a little bit. */
-        frame_ratio = 1.5 + (frame_ratio - 1.5) * 0.85;
-      /* Lower the frame_ratio that Tux doesn't jump to hectically throught the demo. */
-      frame_ratio /= 2;
-
-      SDL_Event event;
-      while (SDL_PollEvent(&event))
-        {
-          bool want_escape = false;
-          if (touch_controls_process_event(event, &want_escape))
-            continue;
-          /* Title always has a menu; want_escape while none is unused. */
-          (void)want_escape;
-         // FIXME: QUIT signal should be handled more generic, not locally
-          if (event.type == SDL_QUIT)
-            Menu::set_current(0);
-        }
-
-      /* Draw the background: */
-      draw_demo(&session, frame_ratio);
-      
-      if (Menu::current() == main_menu)
-        logo->draw( 160, 30);
-
-	
-#ifndef RES320X240
-      white_small_text->draw(" SuperTux " VERSION "\n"
-                             "Copyright (c) 2003 SuperTux Devel Team\n"
-                             "This game comes with ABSOLUTELY NO WARRANTY. This is free software, and you\n"
-                             "are welcome to redistribute it under certain conditions; see the file COPYING\n"
-                             "for details.\n",
-                             0, 420, 0);
-#else
-      white_small_text->draw(" SuperTux " VERSION "\n"
-                             "Copyright (c) 2003 SuperTux Devel Team\n"
-                             "This game comes with ABSOLUTELY NO \n"
-			     "WARRANTY. This is free software, and\n"
-                             "you are welcome to redistribute it\n"
-			     "under certain conditions; see the file\n"
-			     "COPYING for details.\n",
-                             0, 360, 0);
-#endif
-#ifndef NOSOUND
-#ifdef GP2X
-	updateSound();
-#endif
-#endif
-
-      /* Don't draw menu, if quit is true */
-      Menu* menu = Menu::current();
-      if(menu)
-        {
-          menu->draw();
-          menu->action();
-        
-          if(menu == main_menu)
-            {
-#ifndef NOSOUND
-              MusicManager* music_manager;
-	      MusicRef menu_song;
-#endif
-              switch (main_menu->check())
-                {
-                case MNID_STARTGAME:
-                  // Start Game, ie. goto the slots menu
-                  update_load_save_game_menu(load_game_menu);
-                  break;
-                case MNID_CONTRIB:
-                  // Contrib Menu
-                  puts("Entering contrib menu");
-                  generate_contrib_menu();
-                  break;
-                case MNID_LEVELEDITOR:
-                  leveleditor();
-                  Menu::set_current(main_menu);
-                  break;
-                case MNID_CREDITS:
-#ifndef NOSOUND
-                  music_manager = new MusicManager();
-#ifdef GP2X
-                  menu_song  = music_manager->load_music(datadir + "/music/credits.xm");
-#else
-                  menu_song  = music_manager->load_music(datadir + "/music/credits.ogg");
-#endif
-                  music_manager->halt_music();
-                  music_manager->play_music(menu_song,0);
-#endif
-                  display_text_file("CREDITS", bkg_title, SCROLL_SPEED_CREDITS);
-#ifndef NOSOUND
-                  music_manager->halt_music();
-                  menu_song = music_manager->load_music(datadir + "/music/theme.mod");
-                  music_manager->play_music(menu_song);
-#endif
-                  Menu::set_current(main_menu);
-                  break;
-                case MNID_QUITMAINMENU:
-                  Menu::set_current(0);
-                  break;
-                }
-            }
-          else if(menu == options_menu)
-            {
-              process_options_menu();
-            }
-          else if(menu == load_game_menu)
-            {
-              if(event.key.keysym.sym == SDLK_DELETE)
-                {
-                int slot = menu->get_active_item_id();
-                char str[1024];
-                sprintf(str,"Are you sure you want to delete slot %d?", slot);
-                
-                draw_background();
-
-                if(confirm_dialog(str))
-                  {
-                  sprintf(str,"%s/slot%d.stsg", st_save_dir, slot);
-                  printf("Removing: %s\n",str);
-                  remove(str);
-                  }
-
-                update_load_save_game_menu(load_game_menu);
-                update_time = st_get_ticks();
-                Menu::set_current(main_menu);
-                }
-              else if (process_load_game_menu())
-                {
-                  // FIXME: shouldn't be needed if GameSession doesn't relay on global variables
-                  // reset tux
-                  scroll_x = 0;
-                  //titletux.level_begin();
-                  update_time = st_get_ticks();
-                }
-            }
-          else if(menu == contrib_menu)
-            {
-              check_contrib_menu();
-            }
-          else if (menu == contrib_subset_menu)
-            {
-              check_contrib_subset_menu();
-            }
-        }
-
-      mouse_cursor->draw();
-      touch_controls_draw();
-      
-      flipscreen();
-
-      /* Set the time of the last update and the time of the current update */
-      last_update_time = update_time;
-      update_time = st_get_ticks();
-
-      /* Pause: */
-      frame++;
-      SDL_Delay(25);
-    }
-  /* Free surfaces: */
-
+static void
+title_shutdown(void)
+{
   free_contrib_menu();
   string_list_free(&worldmap_list);
   delete bkg_title;
+  bkg_title = 0;
   delete logo;
+  logo = 0;
   delete img_choose_subset;
+  img_choose_subset = 0;
+  delete demo_session;
+  demo_session = 0;
+}
+
+bool
+title_frame(void)
+{
+  if (!Menu::current())
+    return false;
+
+  // if we spent to much time on a menu entry
+  if( (update_time - last_update_time) > 1000)
+    update_time = last_update_time = st_get_ticks();
+
+  // Calculate the movement-factor
+  double frame_ratio = ((double)(update_time-last_update_time))/((double)FRAME_RATE);
+  if(frame_ratio > 1.5) /* Quick hack to correct the unprecise CPU clocks a little bit. */
+    frame_ratio = 1.5 + (frame_ratio - 1.5) * 0.85;
+  /* Lower the frame_ratio that Tux doesn't jump to hectically throught the demo. */
+  frame_ratio /= 2;
+
+  SDL_Event event;
+  while (SDL_PollEvent(&event))
+    {
+      title_last_event = event;
+      bool want_escape = false;
+      if (touch_controls_process_event(event, &want_escape))
+        continue;
+      /* Title always has a menu; want_escape while none is unused. */
+      (void)want_escape;
+     // FIXME: QUIT signal should be handled more generic, not locally
+      if (event.type == SDL_QUIT)
+        Menu::set_current(0);
+    }
+
+  if (!Menu::current())
+    return false;
+
+  /* Draw the background: */
+  draw_demo(demo_session, frame_ratio);
+
+  if (Menu::current() == main_menu)
+    logo->draw( 160, 30);
+
+
+#ifndef RES320X240
+  white_small_text->draw(" SuperTux " VERSION "\n"
+                         "Copyright (c) 2003 SuperTux Devel Team\n"
+                         "This game comes with ABSOLUTELY NO WARRANTY. This is free software, and you\n"
+                         "are welcome to redistribute it under certain conditions; see the file COPYING\n"
+                         "for details.\n",
+                         0, 420, 0);
+#else
+  white_small_text->draw(" SuperTux " VERSION "\n"
+                         "Copyright (c) 2003 SuperTux Devel Team\n"
+                         "This game comes with ABSOLUTELY NO \n"
+                         "WARRANTY. This is free software, and\n"
+                         "you are welcome to redistribute it\n"
+                         "under certain conditions; see the file\n"
+                         "COPYING for details.\n",
+                         0, 360, 0);
+#endif
+#ifndef NOSOUND
+#ifdef GP2X
+  updateSound();
+#endif
+#endif
+
+  /* Don't draw menu, if quit is true */
+  Menu* menu = Menu::current();
+  if(menu)
+    {
+      menu->draw();
+      menu->action();
+
+      if(menu == main_menu)
+        {
+#ifndef NOSOUND
+          MusicManager* music_manager;
+          MusicRef menu_song;
+#endif
+          switch (main_menu->check())
+            {
+            case MNID_STARTGAME:
+              // Start Game, ie. goto the slots menu
+              update_load_save_game_menu(load_game_menu);
+              break;
+            case MNID_CONTRIB:
+              // Contrib Menu
+              puts("Entering contrib menu");
+              generate_contrib_menu();
+              break;
+            case MNID_LEVELEDITOR:
+              leveleditor();
+              Menu::set_current(main_menu);
+              break;
+            case MNID_CREDITS:
+#ifndef NOSOUND
+              music_manager = new MusicManager();
+#ifdef GP2X
+              menu_song  = music_manager->load_music(datadir + "/music/credits.xm");
+#else
+              menu_song  = music_manager->load_music(datadir + "/music/credits.ogg");
+#endif
+              music_manager->halt_music();
+              music_manager->play_music(menu_song,0);
+#endif
+              display_text_file("CREDITS", bkg_title, SCROLL_SPEED_CREDITS);
+#ifndef NOSOUND
+              music_manager->halt_music();
+              menu_song = music_manager->load_music(datadir + "/music/theme.mod");
+              music_manager->play_music(menu_song);
+#endif
+              Menu::set_current(main_menu);
+              break;
+            case MNID_QUITMAINMENU:
+              Menu::set_current(0);
+              break;
+            }
+        }
+      else if(menu == options_menu)
+        {
+          process_options_menu();
+        }
+      else if(menu == load_game_menu)
+        {
+          if(title_last_event.type == SDL_KEYDOWN
+             && title_last_event.key.keysym.sym == SDLK_DELETE)
+            {
+            int slot = menu->get_active_item_id();
+            char str[1024];
+            sprintf(str,"Are you sure you want to delete slot %d?", slot);
+
+            draw_background();
+
+            if(confirm_dialog(str))
+              {
+              sprintf(str,"%s/slot%d.stsg", st_save_dir, slot);
+              printf("Removing: %s\n",str);
+              remove(str);
+              }
+
+            update_load_save_game_menu(load_game_menu);
+            update_time = st_get_ticks();
+            Menu::set_current(main_menu);
+            /* Consume so we do not re-trigger every frame. */
+            title_last_event.type = SDL_NOEVENT;
+            }
+          else if (process_load_game_menu())
+            {
+              // FIXME: shouldn't be needed if GameSession doesn't relay on global variables
+              // reset tux
+              scroll_x = 0;
+              //titletux.level_begin();
+              update_time = st_get_ticks();
+            }
+        }
+      else if(menu == contrib_menu)
+        {
+          check_contrib_menu();
+        }
+      else if (menu == contrib_subset_menu)
+        {
+          check_contrib_subset_menu();
+        }
+    }
+
+  mouse_cursor->draw();
+  touch_controls_draw();
+
+  flipscreen();
+
+  /* Set the time of the last update and the time of the current update */
+  last_update_time = update_time;
+  update_time = st_get_ticks();
+
+  /* Pause: */
+  frame++;
+  SDL_Delay(25);
+  return Menu::current() != 0;
+}
+
+void title(void)
+{
+  title_init();
+  while (title_frame())
+    { /* busy loop — title_frame() does one iteration */ }
+  title_shutdown();
 }
 
 // EOF //
