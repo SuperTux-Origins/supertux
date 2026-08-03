@@ -128,6 +128,7 @@
         "libxmp-src": "libxmp-src",
         "nixpkgs": "nixpkgs",
         "sdl2-image-src": "sdl2-image-src",
+        "sdl2-mixer-mingw-devel": "sdl2-mixer-mingw-devel",
         "sdl2-mixer-src": "sdl2-mixer-src",
         "sdl2-src": "sdl2-src",
         "tinycmmc": "tinycmmc"
@@ -144,6 +145,19 @@
       "original": {
         "type": "tarball",
         "url": "https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.2/SDL2_image-2.8.2.tar.gz"
+      }
+    },
+    "sdl2-mixer-mingw-devel": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1738962281,
+        "narHash": "sha256-N4AS1iYQoMeJ1Hq5VlHqVNxpCIP7oSS2shgHOvXP3iA=",
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-devel-2.8.1-mingw.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-devel-2.8.1-mingw.tar.gz"
       }
     },
     "sdl2-mixer-src": {

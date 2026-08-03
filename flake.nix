@@ -39,6 +39,12 @@
     SDL2_image-win32.inputs.nixpkgs.follows = "nixpkgs";
     SDL2_image-win32.inputs.tinycmmc.follows = "tinycmmc";
 
+    # Official MinGW devel archive (same shape as SDL2_image-win32).
+    sdl2-mixer-mingw-devel = {
+      url = "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-devel-2.8.1-mingw.tar.gz";
+      flake = false;
+    };
+
     # SDL2 source for Android ndk-build (same pattern as helloworld-fireos).
     sdl2-src = {
       url = "https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz";
@@ -61,6 +67,7 @@
   };
 
   outputs = { self, nixpkgs, tinycmmc, SDL2-win32, SDL2_image-win32
+            , sdl2-mixer-mingw-devel
             , sdl2-src, sdl2-image-src, sdl2-mixer-src, libxmp-src }:
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       let
@@ -131,10 +138,36 @@
         # ---- Windows cross (from Linux only, same idea as android/wasm) ----
         # SDL2-win32 flakes expose packages under x86_64-windows / i686-windows.
         # Build with pkgsCross; stage .exe + DLLs + data/ into a flat output.
+        # Official SDL2_mixer mingw devel → $out (like SDL2_image-win32 template).
+        # winSystem: x86_64-windows | i686-windows → triplet for the archive layout.
+        mkSdl2MixerWin = winSystem:
+          let
+            triplet =
+              if winSystem == "x86_64-windows" then "x86_64-w64-mingw32"
+              else if winSystem == "i686-windows" then "i686-w64-mingw32"
+              else throw "mkSdl2MixerWin: unknown winSystem ${winSystem}";
+          in
+          pkgs.stdenvNoCC.mkDerivation {
+            pname = "SDL2_mixer";
+            version = "2.8.1";
+            src = sdl2-mixer-mingw-devel;
+            # Prebuilt tree; no compile.
+            dontConfigure = true;
+            dontBuild = true;
+            installPhase = ''
+              mkdir -p $out
+              cp -vr ${triplet}/. $out/
+              if [ -f $out/lib/pkgconfig/SDL2_mixer.pc ]; then
+                sed -i "s|^prefix=.*|prefix=$out|" $out/lib/pkgconfig/SDL2_mixer.pc
+              fi
+            '';
+          };
+
         mkWinCross = { crossPkgs, winSystem, pname }:
           let
             sdl2Win = SDL2-win32.packages.${winSystem}.default;
             sdl2ImageWin = SDL2_image-win32.packages.${winSystem}.default;
+            sdl2MixerWin = mkSdl2MixerWin winSystem;
             game = crossPkgs.stdenv.mkDerivation {
               inherit pname version;
               src = lib.cleanSource ./.;
@@ -147,20 +180,23 @@
               ];
               cmakeFlags = [
                 "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
-                "-DENABLE_SOUND=OFF"
+                "-DENABLE_SOUND=ON"
                 "-DENABLE_OPENGL=ON"
                 "-DENABLE_GLES2=OFF"
                 "-DENABLE_SDL2=ON"
                 "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
                 "-DPROJECT_VERSION_FULL=${version}"
               ];
-              buildInputs = [ sdl2Win sdl2ImageWin crossPkgs.zlib ];
+              buildInputs = [ sdl2Win sdl2ImageWin sdl2MixerWin crossPkgs.zlib ];
               postFixup = ''
                 mkdir -p $out/bin/
                 find ${crossPkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
                 find ${crossPkgs.stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
                 ln -sfv ${sdl2Win}/bin/*.dll $out/bin/
                 ln -sfv ${sdl2ImageWin}/bin/*.dll $out/bin/
+                ln -sfv ${sdl2MixerWin}/bin/*.dll $out/bin/ || true
+                # Optional codec DLLs shipped next to SDL2_mixer.dll in some archives.
+                find ${sdl2MixerWin} -iname "*.dll" -exec ln -sfv {} $out/bin/ \; || true
               '';
               meta = with lib; {
                 description = "SuperTux Milestone 1 (${pname})";
