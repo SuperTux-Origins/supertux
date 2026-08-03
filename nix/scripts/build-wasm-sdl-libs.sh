@@ -129,89 +129,100 @@ if [ -n "${SDL_IMAGE_SRC:-}" ]; then
   cd ..
 fi
 
-# --- libxmp (MOD/XM for Milestone 1 music) + SDL2_mixer ---
+# --- SDL2_mixer + libxmp (MOD/XM for Milestone 1 music) ---
+# Mirror Android: vendor libxmp into SDL2_mixer/external/libxmp and build with
+# SDL2MIXER_VENDORED + MOD_XMP so the static mixer actually decodes .mod/.xm.
+# A system-style find_package often silently drops MOD under emcmake.
 if [ -n "${SDL_MIXER_SRC:-}" ]; then
-  XMP_OK=0
-  if [ -n "${LIBXMP_SRC:-}" ]; then
-    echo "==> libxmp static (wasm32, CORE_PLAYER — MOD/S3M/XM/IT)"
-    cp -a "$LIBXMP_SRC" libxmp-src
-    chmod -R u+w libxmp-src
-    mkdir -p build-libxmp
+  if [ -z "${LIBXMP_SRC:-}" ]; then
+    echo "error: SDL_MIXER_SRC set but LIBXMP_SRC unset — MOD music will not work" >&2
+    exit 1
+  fi
+
+  echo "==> SDL2_mixer static (wasm32) with vendored libxmp"
+  cp -a "$SDL_MIXER_SRC" SDL2_mixer-src
+  chmod -R u+w SDL2_mixer-src
+
+  # Vendor libxmp where SDL2_mixer CMake expects it.
+  rm -rf SDL2_mixer-src/external/libxmp
+  mkdir -p SDL2_mixer-src/external
+  cp -a "$LIBXMP_SRC" SDL2_mixer-src/external/libxmp
+  chmod -R u+w SDL2_mixer-src/external/libxmp
+
+  # Also install a standalone libxmp.a into PREFIX for the game link line
+  # (some mixer builds only reference symbols, not merge the archive).
+  echo "==> libxmp static → $PREFIX (standalone + vendored)"
+  mkdir -p build-libxmp
+  (
     cd build-libxmp
-    # Prefer cmake when present; fall back to emconfigure.
-    if [ -f ../libxmp-src/CMakeLists.txt ]; then
-      set +e
-      emcmake cmake ../libxmp-src \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-        -DBUILD_SHARED=OFF \
-        -DBUILD_STATIC=ON \
-        -DLIBXMP_DISABLE_DEPACKERS=ON \
-        -DLIBXMP_DISABLE_PROWIZARD=ON \
-        -DCMAKE_C_FLAGS="-DLIBXMP_CORE_PLAYER -DLIBXMP_NO_PROWIZARD -DLIBXMP_NO_DEPACKERS -DHAVE_ROUND"
-      xmp_cfg=$?
-      set -e
-      if [ "$xmp_cfg" -eq 0 ]; then
+    set +e
+    emcmake cmake ../SDL2_mixer-src/external/libxmp \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+      -DBUILD_SHARED=OFF \
+      -DBUILD_STATIC=ON \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DLIBXMP_DISABLE_DEPACKERS=ON \
+      -DLIBXMP_DISABLE_PROWIZARD=ON \
+      -DCMAKE_C_FLAGS="-O2 -DHAVE_ROUND"
+    xmp_cfg=$?
+    set -e
+    if [ "$xmp_cfg" -eq 0 ]; then
+      emmake make -j"${NIX_BUILD_CORES:-$(nproc)}"
+      emmake make install || true
+    fi
+  )
+  if [ ! -f "$PREFIX/lib/libxmp.a" ]; then
+    find build-libxmp SDL2_mixer-src/external/libxmp -name 'libxmp*.a' 2>/dev/null | head -20
+    find . -name 'libxmp.a' -exec cp -v {} "$PREFIX/lib/libxmp.a" \; || true
+    find . -name 'libxmp_static.a' -exec cp -v {} "$PREFIX/lib/libxmp.a" \; || true
+  fi
+  if [ ! -f "$PREFIX/lib/libxmp.a" ]; then
+    # Autotools fallback
+    (
+      cd SDL2_mixer-src/external/libxmp
+      if [ -f configure ] || [ -f configure.ac ]; then
+        [ -f configure ] || autoreconf -fi || true
+        emconfigure ./configure \
+          --prefix="$PREFIX" \
+          --enable-static \
+          --disable-shared \
+          --disable-depackers \
+          --disable-prowizard \
+          CFLAGS="-O2 -DHAVE_ROUND"
         emmake make -j"${NIX_BUILD_CORES:-$(nproc)}"
         emmake make install || true
       fi
-    else
-      xmp_cfg=1
-    fi
-    if [ ! -f "$PREFIX/lib/libxmp.a" ] && [ ! -f "$PREFIX/lib/libxmp_static.a" ]; then
-      # emconfigure / classic autotools path
-      cd ../libxmp-src
-      set +e
-      emconfigure ./configure \
-        --prefix="$PREFIX" \
-        --enable-static \
-        --disable-shared \
-        --disable-depackers \
-        --disable-prowizard \
-        CFLAGS="-O2 -DLIBXMP_CORE_PLAYER -DLIBXMP_NO_PROWIZARD -DLIBXMP_NO_DEPACKERS -DHAVE_ROUND"
-      cfg=$?
-      set -e
-      if [ "$cfg" -eq 0 ]; then
-        emmake make -j"${NIX_BUILD_CORES:-$(nproc)}"
-        emmake make install || true
-      fi
-      cd ../build-libxmp
-    fi
-    # Normalize library name
-    if [ ! -f "$PREFIX/lib/libxmp.a" ]; then
-      find .. -name 'libxmp*.a' | head -5
-      find .. -name 'libxmp.a' -exec cp {} "$PREFIX/lib/libxmp.a" \; || true
-      find .. -name 'libxmp_static.a' -exec cp {} "$PREFIX/lib/libxmp.a" \; || true
-    fi
-    if [ -f "$PREFIX/lib/libxmp.a" ]; then
-      XMP_OK=1
-      echo "==> libxmp ready: $PREFIX/lib/libxmp.a"
-      # Minimal pkg-config for SDL2_mixer's finder
-      mkdir -p "$PREFIX/lib/pkgconfig"
-      cat > "$PREFIX/lib/pkgconfig/libxmp.pc" <<EOF
+    )
+  fi
+  if [ ! -f "$PREFIX/lib/libxmp.a" ]; then
+    echo "error: libxmp.a not produced — cannot enable MOD music" >&2
+    exit 1
+  fi
+  mkdir -p "$PREFIX/lib/pkgconfig" "$PREFIX/include"
+  # Ensure xmp.h is visible
+  if [ ! -f "$PREFIX/include/xmp.h" ]; then
+    find SDL2_mixer-src/external/libxmp -name 'xmp.h' -exec cp -v {} "$PREFIX/include/" \; || true
+  fi
+  cat > "$PREFIX/lib/pkgconfig/libxmp.pc" <<EOF
 prefix=$PREFIX
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
 Name: libxmp
-Description: libxmp (wasm static, CORE_PLAYER)
+Description: libxmp (wasm static)
 Version: 4.6.0
 Libs: -L\${libdir} -lxmp
 Cflags: -I\${includedir}
 EOF
-    else
-      echo "warning: libxmp build failed — MOD/XM music will not load" >&2
-    fi
-    cd ..
-  else
-    echo "warning: LIBXMP_SRC unset — MOD/XM music will not load" >&2
-  fi
+  # Alias some finders use
+  cp -f "$PREFIX/lib/pkgconfig/libxmp.pc" "$PREFIX/lib/pkgconfig/xmp.pc"
+  echo "==> libxmp ready: $(ls -la "$PREFIX/lib/libxmp.a")"
 
-  echo "==> SDL2_mixer static (wasm32)"
-  cp -a "$SDL_MIXER_SRC" SDL2_mixer-src
-  chmod -R u+w SDL2_mixer-src
   mkdir -p build-sdl2-mixer
   cd build-sdl2-mixer
+
+  export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 
   mixer_args=(
     -DCMAKE_BUILD_TYPE=Release
@@ -225,67 +236,46 @@ EOF
     -DBUILD_SHARED_LIBS=OFF
     -DSDL2MIXER_SAMPLES=OFF
     -DSDL2MIXER_CMD=OFF
+    -DSDL2MIXER_VENDORED=ON
     -DSDL2MIXER_FLAC=OFF
     -DSDL2MIXER_GME=OFF
     -DSDL2MIXER_MOD=ON
+    -DSDL2MIXER_MOD_XMP=ON
+    -DSDL2MIXER_MOD_MODPLUG=OFF
     -DSDL2MIXER_MP3=OFF
     -DSDL2MIXER_MIDI=OFF
     -DSDL2MIXER_OPUS=OFF
     -DSDL2MIXER_WAVPACK=OFF
-  )
-
-  # OGG via in-tree stb_vorbis when available (matches Android).
-  mixer_args+=(
     -DSDL2MIXER_VORBIS=STB
+    -DSDL2MIXER_DEPS_SHARED=OFF
   )
-
-  if [ "$XMP_OK" = 1 ]; then
-    mixer_args+=(
-      -DSDL2MIXER_MOD_XMP=ON
-      -DSDL2MIXER_MOD_MODPLUG=OFF
-      -Dxmp_LIBRARY="$PREFIX/lib/libxmp.a"
-      -Dxmp_INCLUDE_PATH="$PREFIX/include"
-    )
-  else
-    mixer_args+=(
-      -DSDL2MIXER_MOD=OFF
-      -DSDL2MIXER_MOD_XMP=OFF
-    )
-  fi
 
   set +e
   emcmake cmake ../SDL2_mixer-src "${mixer_args[@]}"
   mix_cfg=$?
   set -e
   if [ "$mix_cfg" -ne 0 ]; then
-    echo "retry SDL2_mixer with fewer codec options..."
+    echo "retry SDL2_mixer cmake with explicit xmp paths..."
     rm -rf ./*
-    set +e
     emcmake cmake ../SDL2_mixer-src \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-      -DCMAKE_PREFIX_PATH="$PREFIX" \
-      -DSDL2_LIBRARY="$SDL2_LIB" \
-      -DSDL2_INCLUDE_DIR="$SDL2_INC" \
-      -DBUILD_SHARED_LIBS=OFF \
-      -DSDL2MIXER_SAMPLES=OFF \
-      -DSDL2MIXER_VENDORED=ON \
-      -DSDL2MIXER_VORBIS=STB \
-      -DSDL2MIXER_FLAC=OFF \
-      -DSDL2MIXER_MOD_XMP="$([ "$XMP_OK" = 1 ] && echo ON || echo OFF)" \
-      -DSDL2MIXER_MP3=OFF \
-      -DSDL2MIXER_MIDI=OFF \
-      -DSDL2MIXER_OPUS=OFF
-    mix_cfg=$?
-    set -e
+      "${mixer_args[@]}" \
+      -Dxmp_LIBRARY="$PREFIX/lib/libxmp.a" \
+      -Dxmp_INCLUDE_PATH="$PREFIX/include" \
+      -Dlibxmp_LIBRARY="$PREFIX/lib/libxmp.a" \
+      -Dlibxmp_INCLUDE_DIR="$PREFIX/include"
   fi
-  if [ "$mix_cfg" -eq 0 ]; then
-    emmake make -j"${NIX_BUILD_CORES:-$(nproc)}"
-    emmake make install || true
+  emmake make -j"${NIX_BUILD_CORES:-$(nproc)}"
+  emmake make install || true
+
+  if [ ! -f "$PREFIX/lib/libSDL2_mixer.a" ]; then
+    find . -name 'libSDL2_mixer.a' -exec cp -v {} "$PREFIX/lib/" \; || true
   fi
   if [ ! -f "$PREFIX/lib/libSDL2_mixer.a" ]; then
-    find . -name 'libSDL2_mixer.a' -exec cp {} "$PREFIX/lib/" \; || true
+    echo "error: libSDL2_mixer.a not produced" >&2
+    exit 1
   fi
+
+  # Headers
   if [ ! -f "$PREFIX/include/SDL_mixer.h" ]; then
     if [ -f ../SDL2_mixer-src/include/SDL_mixer.h ]; then
       cp ../SDL2_mixer-src/include/SDL_mixer.h "$PREFIX/include/"
@@ -297,12 +287,20 @@ EOF
     mkdir -p "$PREFIX/include/SDL2"
     cp "$PREFIX/include/SDL_mixer.h" "$PREFIX/include/SDL2/"
   fi
-  cd ..
-  if [ -f "$PREFIX/lib/libSDL2_mixer.a" ]; then
-    echo "==> SDL2_mixer ready: $PREFIX/lib/libSDL2_mixer.a"
-  else
-    echo "warning: SDL2_mixer build did not produce libSDL2_mixer.a" >&2
+
+  # Confirm the static mixer actually references xmp (nm may be llvm-nm).
+  if command -v llvm-nm >/dev/null 2>&1 || command -v nm >/dev/null 2>&1; then
+    NM=$(command -v llvm-nm || command -v nm)
+    if $NM "$PREFIX/lib/libSDL2_mixer.a" 2>/dev/null | grep -qi 'xmp_'; then
+      echo "==> SDL2_mixer archive references xmp symbols (good)"
+    else
+      echo "warning: no xmp symbols found in libSDL2_mixer.a — game must link libxmp.a" >&2
+    fi
   fi
+
+  cd ..
+  echo "==> SDL2_mixer ready: $(ls -la "$PREFIX/lib/libSDL2_mixer.a")"
+  ls -la "$PREFIX/lib"/libxmp* "$PREFIX/lib"/libSDL2_mixer* 2>/dev/null || true
 fi
 
 echo "==> wasm SDL libs build finished (prefix=$PREFIX)"
