@@ -38,6 +38,8 @@ bool process_load_game_menu();
 
 void update_load_save_game_menu(Menu* pmenu);
 void parse_path_args(int argc, char * argv[]);
+/** Flush/populate IndexedDB-backed saves (no-op off Emscripten). */
+void st_emscripten_fs_sync(int populate);
 void parseargs(int argc, char * argv[]);
 
 #endif /*SUPERTUX_SETUP_H*/

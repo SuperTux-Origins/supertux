@@ -178,6 +178,7 @@ void saveconfig (void)
       fprintf(config, ")\n");
 
       fclose(config);
+      st_emscripten_fs_sync(0); /* persist config to IndexedDB on web */
     }
 
 }

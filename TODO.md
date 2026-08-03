@@ -222,12 +222,13 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 - [x] CMake: `SDL2_ROOT`, Emscripten link options, no system GLESv2 on wasm
 - [x] Flake packages: `wasm-sdl-libs`, `supertux-milestone1-wasm`
 - [x] Flake app: `supertux-milestone1-wasm` (local HTTP server + open browser)
-- [ ] `nix build .#wasm-sdl-libs` — verify static `libSDL2.a` / `libSDL2_image.a` (script installs to prefix/)
-- [ ] `nix build .#supertux-milestone1-wasm` — first full link (may need iterate)
+- [x] `nix build .#wasm-sdl-libs` — static `libSDL2.a` + `libSDL2_image.a` (explicit PrivateSDL2 paths)
+- [x] `nix build .#supertux-milestone1-wasm` — full link OK (html/js/wasm + preloaded .data)
 - [x] Runtime datadir on wasm: `/data` preload + `emscripten_prepare_paths`;
       `open_game_file` tries `/data/<rel>` on MEMFS
 - [ ] First browser smoke: canvas paints (even without full `data/`)
 - [ ] With `data/`: title screen → start game → one level → quit
+- [x] IDBFS for config/saves under `/home/web_user` (survive reload)
 - [ ] Replace ASYNCIFY with real frame pump (title / session / worldmap)
 - [ ] Optional: SDL2_mixer + formats for wasm (or keep `ENABLE_SOUND=OFF`)
 - [ ] Document `nix build` / `nix run` wasm targets in `AGENTS.md` / README
@@ -254,3 +255,5 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 | 2026-08-03 | Phase 5 scaffold: wasm.nix, scripts, CMake EMSCRIPTEN/SDL2_ROOT, flake targets |
 | 2026-08-03 | Emscripten datadir/userdir + open_game_file /data; SDL wasm install prefix |
 | 2026-08-03 | Fix wasm SDL2_image: pass SDL2_LIBRARY/INCLUDE_DIR to PrivateSDL2 finder |
+| 2026-08-03 | First successful `nix build .#supertux-milestone1-wasm` (zlib via emconfigure; ASYNCIFY; data preload) |
+| 2026-08-03 | IDBFS mount + sync on startup / saveconfig / worldmap savegame |

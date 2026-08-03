@@ -12,6 +12,9 @@
 #include <string>
 #include "platform_config.h"
 #include <SDL_image.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 #ifdef __ANDROID__
 #include <jni.h>
 #include <android/asset_manager.h>
@@ -596,8 +599,25 @@ android_prepare_paths(void)
 /*
  * Wasm packages assets with --preload-file …@/data (see build-wasm-app.sh).
  * DATA_PREFIX is compiled as "/data". Config/saves live under a writable
- * MEMFS path (no HOME / XDG on the web).
+ * path backed by IndexedDB (IDBFS) so progress survives page reloads.
+ *
+ * Requires ASYNCIFY (already on the wasm link line) so FS.syncfs can block
+ * until IndexedDB finishes.
  */
+void st_emscripten_fs_sync(int populate)
+{
+  /* populate=1: IndexedDB → MEMFS (startup). populate=0: MEMFS → IndexedDB. */
+  EM_ASM({
+    var populate = $0;
+    Asyncify.handleSleep(function (wakeUp) {
+      FS.syncfs(!!populate, function (err) {
+        if (err) console.error("SuperTux IDBFS syncfs:", err);
+        wakeUp();
+      });
+    });
+  }, populate ? 1 : 0);
+}
+
 static void
 emscripten_prepare_paths(void)
 {
@@ -608,7 +628,22 @@ emscripten_prepare_paths(void)
     datadir = DATA_PREFIX; /* typically "/data" */
 
   st_log("Emscripten: datadir = %s (MEMFS preload)", datadir.c_str());
-  st_log("Emscripten: userdir = %s", userdir_override.c_str());
+  st_log("Emscripten: userdir = %s (IDBFS)", userdir_override.c_str());
+
+  /* Mount IDBFS over /home/web_user so config + saves persist. */
+  EM_ASM({
+    try {
+      FS.mkdir("/home/web_user");
+    } catch (e) {}
+    try {
+      FS.mount(IDBFS, {}, "/home/web_user");
+      console.log("SuperTux: IDBFS mounted at /home/web_user");
+    } catch (e) {
+      /* Already mounted on soft restart — ignore. */
+      console.log("SuperTux: IDBFS mount skipped:", e);
+    }
+  });
+  st_emscripten_fs_sync(1); /* load previous saves/config from IndexedDB */
 
   std::string probe = datadir + "/images/status/letters-white.png";
   if (!game_file_exists(probe))
@@ -616,6 +651,11 @@ emscripten_prepare_paths(void)
            probe.c_str());
   else
     st_log("Emscripten: data probe OK (%s)", probe.c_str());
+}
+#else
+void st_emscripten_fs_sync(int /*populate*/)
+{
+  /* no-op on native / Android */
 }
 #endif /* __EMSCRIPTEN__ */
 

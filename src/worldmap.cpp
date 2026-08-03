@@ -1165,6 +1165,8 @@ WorldMap::savegame(const std::string& filename)
 
   out << "   )\n"
       << " )\n\n;; EOF ;;" << std::endl;
+  out.close();
+  st_emscripten_fs_sync(0); /* persist slot to IndexedDB on web */
 }
 
 void
