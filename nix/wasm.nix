@@ -1,29 +1,3 @@
-# Emscripten / WebAssembly pipeline for SuperTux Milestone 1.
-#
-# Pattern mirrors helloworld-fireos (apk/nix/wasm.nix):
-#   - Build SDL2 (+ SDL2_image, optional SDL2_mixer + libxmp) once as static
-#     wasm libs from flake inputs (no -sUSE_SDL=2 network port).
-#   - emcmake the game CMake tree against that prefix.
-#   - Serve HTML over local HTTP (file:// cannot fetch .wasm).
-#
-# Main loop: app_loop + emscripten_set_main_loop (ASYNCIFY off by default).
-# Sound: optional; needs sdlMixerSrc (+ libxmpSrc for .mod/.xm music).
-#
-# Usage (from flake.nix):
-#   wasm = import ./nix/wasm.nix {
-#     inherit pkgs;
-#     sdlSrc = sdl2-src;
-#     sdlImageSrc = sdl2-image-src;
-#     sdlMixerSrc = sdl2-mixer-src;
-#     libxmpSrc = libxmp-src;
-#     sdlVersion = "2.30.3";
-#   };
-#   packages.supertux-milestone1-wasm = wasm.mkApp {
-#     appName = "supertux-milestone1";
-#     srcDir = ./.;
-#     dataDir = ./data;   # optional; empty tree → no preload
-#     enableSound = true; # requires mixer in sdlWasmLibs
-#   };
 { pkgs
 , sdlSrc
 , sdlVersion
@@ -33,51 +7,46 @@
 }:
 
 let
-  sdlWasmLibs = pkgs.stdenv.mkDerivation {
-    pname = "sdl2-wasm-libs";
-    version =
-      if sdlMixerSrc != null then "${sdlVersion}+image+mixer"
-      else if sdlImageSrc != null then "${sdlVersion}+image"
-      else sdlVersion;
+  lib = pkgs.lib;
 
+  # Shared install helper bits for a single-component prefix under $PWD/prefix.
+  installPrefixPhase = ''
+    runHook preInstall
+    mkdir -p $out
+    if [ -d prefix ]; then
+      cp -a prefix/. $out/
+    else
+      mkdir -p $out/lib $out/include
+    fi
+    runHook postInstall
+  '';
+
+  # --- SDL2 only -----------------------------------------------------------
+  sdl2WasmLibs = pkgs.stdenv.mkDerivation {
+    pname = "sdl2-wasm";
+    version = sdlVersion;
     dontUnpack = true;
     dontConfigure = true;
     dontUseCmakeConfigure = true;
     nativeBuildInputs = [ pkgs.emscripten pkgs.cmake pkgs.python3 ];
-
     env = {
       SDL_SRC = "${sdlSrc}";
-    } // pkgs.lib.optionalAttrs (sdlImageSrc != null) {
-      SDL_IMAGE_SRC = "${sdlImageSrc}";
-    } // pkgs.lib.optionalAttrs (sdlMixerSrc != null) {
-      SDL_MIXER_SRC = "${sdlMixerSrc}";
-    } // pkgs.lib.optionalAttrs (libxmpSrc != null) {
-      LIBXMP_SRC = "${libxmpSrc}";
     };
-
     buildPhase = ''
       runHook preBuild
       bash ${./scripts/build-wasm-sdl-libs.sh}
       runHook postBuild
     '';
-
     installPhase = ''
       runHook preInstall
       mkdir -p $out
-      # Prefer staged install prefix from build-wasm-sdl-libs.sh.
       if [ -d prefix ]; then
         cp -a prefix/. $out/
       else
         mkdir -p $out/lib $out/include
         find . -name 'libSDL2.a' -exec cp {} $out/lib/ \;
-        find . -name 'libSDL2_image.a' -exec cp {} $out/lib/ \; || true
-        find . -name 'libSDL2_mixer.a' -exec cp {} $out/lib/ \; || true
-        find . -name 'libxmp.a' -exec cp {} $out/lib/ \; || true
         if [ -d SDL2-src/include ]; then cp -a SDL2-src/include/. $out/include/; fi
-        find . -name 'SDL_image.h' -exec cp {} $out/include/ \; || true
-        find . -name 'SDL_mixer.h' -exec cp {} $out/include/ \; || true
       fi
-      # Convenience: pkg-config stubs so CMake pkg_check_modules can work if used.
       mkdir -p $out/lib/pkgconfig
       cat > $out/lib/pkgconfig/sdl2.pc <<EOF
 prefix=$out
@@ -90,8 +59,41 @@ Version: ${sdlVersion}
 Libs: -L\''${libdir} -lSDL2
 Cflags: -I\''${includedir} -I\''${includedir}/SDL2
 EOF
-      if [ -f $out/lib/libSDL2_image.a ]; then
-        cat > $out/lib/pkgconfig/SDL2_image.pc <<EOF
+      runHook postInstall
+    '';
+  };
+
+  # --- SDL2_image (depends on sdl2WasmLibs) --------------------------------
+  sdl2Image = if sdlImageSrc == null then null else pkgs.stdenv.mkDerivation {
+      pname = "sdl2-image-wasm";
+      version = "2.8.2";
+      dontUnpack = true;
+      dontConfigure = true;
+      dontUseCmakeConfigure = true;
+      nativeBuildInputs = [ pkgs.emscripten pkgs.cmake pkgs.python3 ];
+      env = {
+        SDL_PREFIX = "${sdl2WasmLibs}";
+        SDL_IMAGE_SRC = "${sdlImageSrc}";
+      };
+      buildPhase = ''
+        runHook preBuild
+        bash ${./scripts/build-wasm-sdl-libs.sh}
+        runHook postBuild
+      '';
+      installPhase = ''
+        runHook preInstall
+        mkdir -p $out/lib $out/include $out/lib/pkgconfig
+        if [ -d prefix ]; then
+          # Prefer only image artifacts if present; still copy tree for cmake configs.
+          cp -a prefix/. $out/
+          # Drop SDL2 core copies if the script staged any (should not with SDL_PREFIX).
+          rm -f $out/lib/libSDL2.a $out/lib/libSDL2main.a 2>/dev/null || true
+        fi
+        if [ ! -f $out/lib/libSDL2_image.a ]; then
+          find . -name 'libSDL2_image.a' -exec cp {} $out/lib/ \; || true
+        fi
+        if [ -f $out/lib/libSDL2_image.a ]; then
+          cat > $out/lib/pkgconfig/SDL2_image.pc <<EOF
 prefix=$out
 libdir=\''${prefix}/lib
 includedir=\''${prefix}/include
@@ -102,11 +104,46 @@ Requires: sdl2
 Libs: -L\''${libdir} -lSDL2_image
 Cflags: -I\''${includedir}
 EOF
-      fi
-      if [ -f $out/lib/libSDL2_mixer.a ]; then
-        xmp_libs=""
-        if [ -f $out/lib/libxmp.a ]; then xmp_libs=" -lxmp"; fi
-        cat > $out/lib/pkgconfig/SDL2_mixer.pc <<EOF
+        fi
+        runHook postInstall
+      '';
+    };
+
+  # --- SDL2_mixer + libxmp (depends on sdl2WasmLibs) -----------------------
+  sdl2Mixer = if sdlMixerSrc == null then null else pkgs.stdenv.mkDerivation {
+      pname = "sdl2-mixer-wasm";
+      version = "2.8.0";
+      dontUnpack = true;
+      dontConfigure = true;
+      dontUseCmakeConfigure = true;
+      nativeBuildInputs = [ pkgs.emscripten pkgs.cmake pkgs.python3 ];
+      env = {
+        SDL_PREFIX = "${sdl2WasmLibs}";
+        SDL_MIXER_SRC = "${sdlMixerSrc}";
+      } // lib.optionalAttrs (libxmpSrc != null) {
+        LIBXMP_SRC = "${libxmpSrc}";
+      };
+      buildPhase = ''
+        runHook preBuild
+        bash ${./scripts/build-wasm-sdl-libs.sh}
+        runHook postBuild
+      '';
+      installPhase = ''
+        runHook preInstall
+        mkdir -p $out/lib $out/include $out/lib/pkgconfig
+        if [ -d prefix ]; then
+          cp -a prefix/. $out/
+          rm -f $out/lib/libSDL2.a $out/lib/libSDL2main.a 2>/dev/null || true
+        fi
+        for lib in libSDL2_mixer.a libxmp.a; do
+          if [ ! -f $out/lib/$lib ]; then
+            find . -name "$lib" -exec cp {} $out/lib/ \; || true
+          fi
+        done
+        if [ -f $out/lib/libSDL2_mixer.a ]; then
+          xmp_libs=""
+          if [ -f $out/lib/libxmp.a ]; then xmp_libs=" -lxmp"; fi
+          cat > $out/lib/pkgconfig/SDL2_mixer.pc <<EOF
 prefix=$out
 libdir=\''${prefix}/lib
 includedir=\''${prefix}/include
@@ -117,9 +154,9 @@ Requires: sdl2
 Libs: -L\''${libdir} -lSDL2_mixer$xmp_libs
 Cflags: -I\''${includedir}
 EOF
-      fi
-      if [ -f $out/lib/libxmp.a ] && [ ! -f $out/lib/pkgconfig/libxmp.pc ]; then
-        cat > $out/lib/pkgconfig/libxmp.pc <<EOF
+        fi
+        if [ -f $out/lib/libxmp.a ]; then
+          cat > $out/lib/pkgconfig/libxmp.pc <<EOF
 prefix=$out
 libdir=\''${prefix}/lib
 includedir=\''${prefix}/include
@@ -129,11 +166,19 @@ Version: 4.6.0
 Libs: -L\''${libdir} -lxmp
 Cflags: -I\''${includedir}
 EOF
-      fi
-      runHook postInstall
-    '';
-  };
+        fi
+        runHook postInstall
+      '';
+    };
 
+  # Combined prefix for the game (and legacy attribute name).
+  sdlWasmLibs = pkgs.symlinkJoin {
+    name = "sdl2-wasm-libs-${sdlVersion}";
+    paths =
+      [ sdl2WasmLibs ]
+      ++ lib.optional (sdl2Image != null) sdl2Image
+      ++ lib.optional (sdl2Mixer != null) sdl2Mixer;
+  };
 
   # Static zlib for wasm (lispreader / .gz levels). Offline — no -sUSE_ZLIB port.
   zlibWasmLibs = pkgs.stdenv.mkDerivation {
@@ -407,5 +452,6 @@ EOF
     meta.description = description;
   };
 in {
-  inherit sdlWasmLibs zlibWasmLibs mkApp mkOpenBrowserApp;
+  inherit sdl2WasmLibs sdlWasmLibs zlibWasmLibs mkApp mkOpenBrowserApp;
+  inherit sdl2Image sdl2Mixer;
 }

@@ -1,25 +1,45 @@
 #!/usr/bin/env bash
-# Builds SDL2 (+ optional SDL2_image, SDL2_mixer, libxmp) as static libraries
-# for wasm32 via emcmake/emmake. Expects (set by nix/wasm.nix):
-#   SDL_SRC          - extracted SDL2 source tree
-#   SDL_IMAGE_SRC    - optional extracted SDL2_image source tree
-#   SDL_MIXER_SRC    - optional extracted SDL2_mixer source tree
-#   LIBXMP_SRC       - optional libxmp source (MOD/XM for Milestone 1 music)
+# Builds SDL2 / SDL2_image / SDL2_mixer(+libxmp) as static wasm32 libraries.
+#
+# Layered flake outputs set:
+#   SDL_SRC          - build SDL2 from this tree (omit if SDL_PREFIX is set)
+#   SDL_PREFIX       - prebuilt SDL2 prefix (for image/mixer-only builds)
+#   SDL_IMAGE_SRC    - build SDL2_image when set
+#   SDL_MIXER_SRC    - build SDL2_mixer when set (requires LIBXMP_SRC)
+#   LIBXMP_SRC       - libxmp sources for MOD/XM
 #   NIX_BUILD_CORES  - parallel jobs
 #
-# Installs into $PWD/prefix so dependents can find SDL2 via explicit
-# SDL2_LIBRARY / SDL2_INCLUDE_DIR (SDL2_image's PrivateSDL2 finder does not
-# always honour CMAKE_PREFIX_PATH alone under emcmake).
+# Installs into $PWD/prefix. Image/mixer find SDL2 via explicit
+# SDL2_LIBRARY / SDL2_INCLUDE_DIR under emcmake.
 set -euo pipefail
 
 export EM_CACHE="${TMPDIR:-/tmp}/emcache"
 mkdir -p "$EM_CACHE"
 
 PREFIX="$PWD/prefix"
-mkdir -p "$PREFIX"
+mkdir -p "$PREFIX/lib" "$PREFIX/include"
 
-echo "==> SDL2 static (wasm32) → $PREFIX"
-cp -a "$SDL_SRC" SDL2-src
+# ---------------------------------------------------------------------------
+# SDL2 core
+# ---------------------------------------------------------------------------
+if [ -n "${SDL_PREFIX:-}" ] && [ -f "${SDL_PREFIX}/lib/libSDL2.a" ]; then
+  echo "==> reusing prebuilt SDL2 from SDL_PREFIX=$SDL_PREFIX"
+  # Do not copy into PREFIX — image/mixer packages stay thin; only their
+  # own artifacts are installed. CMake is pointed at SDL_PREFIX directly.
+  SDL2_LIB="$SDL_PREFIX/lib/libSDL2.a"
+  if [ -f "$SDL_PREFIX/include/SDL2/SDL.h" ]; then
+    SDL2_INC="$SDL_PREFIX/include/SDL2"
+  elif [ -f "$SDL_PREFIX/include/SDL.h" ]; then
+    SDL2_INC="$SDL_PREFIX/include"
+  else
+    SDL2_INC="$SDL_PREFIX/include/SDL2"
+  fi
+  # Prefer CMAKE_PREFIX_PATH from the prebuilt tree for SDL2Config.cmake.
+  export CMAKE_PREFIX_PATH="$SDL_PREFIX${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
+  export PKG_CONFIG_PATH="$SDL_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+elif [ -n "${SDL_SRC:-}" ]; then
+  echo "==> SDL2 static (wasm32) → $PREFIX"
+  cp -a "$SDL_SRC" SDL2-src
 chmod -R u+w SDL2-src
 mkdir -p build-sdl2
 cd build-sdl2
@@ -56,6 +76,10 @@ fi
 echo "==> SDL2 ready: lib=$SDL2_LIB include=$SDL2_INC"
 ls -la "$SDL2_LIB"
 ls -la "$SDL2_INC/SDL.h"
+else
+  echo "error: need SDL_SRC or SDL_PREFIX with libSDL2.a" >&2
+  exit 1
+fi
 
 if [ -n "${SDL_IMAGE_SRC:-}" ]; then
   echo "==> SDL2_image static (wasm32, stb backend)"

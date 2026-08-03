@@ -103,7 +103,7 @@
         };
 
         # WebAssembly (Emscripten) — same SDL2 / mixer / libxmp inputs as Android.
-        # Mixer+libxmp built into wasm-sdl-libs; enableSound on for wasm playtest.
+        # Libs split: wasm-sdl2, wasm-sdl2-image, wasm-sdl2-mixer (+ joined wasm-sdl-libs).
         wasm = import ./nix/wasm.nix {
           inherit pkgs;
           sdlSrc = sdl2-src;
@@ -247,7 +247,11 @@
           };
 
           # WebAssembly (Emscripten + SDL2 + GLES2/WebGL).
-          wasm-sdl-libs = wasm.sdlWasmLibs;
+          # Split so SDL2 / image / mixer rebuild independently; joined for the app.
+          wasm-sdl2 = wasm.sdl2WasmLibs;
+          wasm-sdl2-image = wasm.sdl2Image;
+          wasm-sdl2-mixer = wasm.sdl2Mixer;
+          wasm-sdl-libs = wasm.sdlWasmLibs;  # symlinkJoin of the above
           wasm-zlib-libs = wasm.zlibWasmLibs;
           supertux-milestone1-wasm = wasm.mkApp {
             appName = "supertux-milestone1";
