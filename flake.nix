@@ -304,10 +304,71 @@
             };
             checks = {
               android-sdl-libs = android.sdlAndroidLibs;
+              supertux-milestone1-android = android.mkApk {
+                appName = "supertux-milestone1";
+                appDir = ./android;
+                outApkName = androidApkName;
+                keystore = ./keystore/debug.keystore;
+                gameSrcDir = ./src;
+                gameDataDir = ./data;
+                stbImageH = stbImageH;
+                gameVersion = version;
+              };
+              wasm-sdl-libs = wasm.sdlWasmLibs;
+              supertux-milestone1-wasm = wasm.mkApp {
+                appName = "supertux-milestone1";
+                srcDir = ./.;
+                dataDir = wasmDataDir;
+                enableSound = true;
+                enableGles2 = true;
+                enableAsyncify = false;
+                versionFull = version;
+                gitRev = gitRev;
+                sourceUrl = "https://github.com/SuperTux-Origins/supertux-milestone1";
+              };
             };
           };
 
-      in {
+        # Wine runner (helloworld-fireos nix/windows.nix mkRunApp pattern).
+        # wineWow64Packages (Wine 10+): single `wine` binary; temp WINEPREFIX each run.
+        mkWineApp = pkg: name: description: {
+          type = "app";
+          program = toString (pkgs.writeShellScript name ''
+            set -euo pipefail
+            export WINEPREFIX=$(mktemp -d)
+            export WINEARCH=win64
+            export WINEDLLOVERRIDES="mscoree,mshtml="
+            # Prefer colocated SDL2.dll over Wine's built-in.
+            export WINEDLLOVERRIDES="SDL2=n,$WINEDLLOVERRIDES"
+            trap 'rm -rf "$WINEPREFIX"' EXIT
+            ${pkgs.wineWow64Packages.stable}/bin/wineboot --init >/dev/null 2>&1 || true
+            cd ${pkg}
+            exe=
+            for c in supertux-milestone1.exe *.exe; do
+              if [ -f "$c" ]; then exe="$c"; break; fi
+            done
+            if [ -z "$exe" ]; then
+              echo "error: no .exe found in ${pkg}" >&2
+              exit 1
+            fi
+            exec ${pkgs.wineWow64Packages.stable}/bin/wine "./$exe" "$@"
+          '');
+          meta.description = description;
+        };
+
+        # Lightweight output shape checks (used by checks.*).
+        mkSanity = name: pkg: script:
+          pkgs.runCommand "check-${name}" {
+            nativeBuildInputs = [ pkgs.file pkgs.binutils ];
+          } ''
+            set -euo pipefail
+            echo "== sanity: ${name} =="
+            ${script}
+            mkdir -p "$out"
+            echo ok > "$out/result"
+          '';
+
+      in rec {
         packages = {
           default = pkgSdl2;
           supertux-milestone1-sdl2 = pkgSdl2;
@@ -320,13 +381,62 @@
         } // linuxExtras.packages;
 
         checks = {
+          # Always build the default native package.
           supertux-milestone1-sdl2 = pkgSdl2;
+          sanity-sdl2 = mkSanity "sdl2" pkgSdl2 ''
+            test -x ${pkgSdl2}/bin/supertux-milestone1
+            file ${pkgSdl2}/bin/supertux-milestone1 | grep -qi 'elf\|executable'
+            test -d ${pkgSdl2}/share/supertux-milestone1 || test -d ${pkgSdl2}/share
+          '';
         } // lib.optionalAttrs (!isWin) {
           supertux-milestone1-sdl1 = pkgSdl1;
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
           supertux-milestone1-win64 = win64Package;
           supertux-milestone1-win32 = win32Package;
-        } // linuxExtras.checks;
+
+          sanity-sdl1 = mkSanity "sdl1" pkgSdl1 ''
+            test -x ${pkgSdl1}/bin/supertux-milestone1
+            file ${pkgSdl1}/bin/supertux-milestone1 | grep -qi 'elf\|executable'
+          '';
+          sanity-sdl2-gles2 = mkSanity "sdl2-gles2" pkgSdl2Gles2 ''
+            test -x ${pkgSdl2Gles2}/bin/supertux-milestone1
+            file ${pkgSdl2Gles2}/bin/supertux-milestone1 | grep -qi 'elf\|executable'
+          '';
+          # Win packages are flat: .exe + DLLs (+ data/) at the root.
+          sanity-win64 = mkSanity "win64" win64Package ''
+            test -f ${win64Package}/supertux-milestone1.exe \
+              || ls ${win64Package}/*.exe >/dev/null
+            file ${win64Package}/supertux-milestone1.exe 2>/dev/null \
+              | grep -qi 'PE32+\|MS Windows' \
+              || file ${win64Package}/*.exe | grep -qi 'PE32+\|MS Windows'
+            ls ${win64Package}/*.dll >/dev/null
+          '';
+          sanity-win32 = mkSanity "win32" win32Package ''
+            test -f ${win32Package}/supertux-milestone1.exe \
+              || ls ${win32Package}/*.exe >/dev/null
+            file ${win32Package}/supertux-milestone1.exe 2>/dev/null \
+              | grep -qi 'PE32\|MS Windows' \
+              || file ${win32Package}/*.exe | grep -qi 'PE32\|MS Windows'
+            ls ${win32Package}/*.dll >/dev/null
+          '';
+        } // linuxExtras.checks
+          // lib.optionalAttrs (!isWin) {
+          # Android / wasm shape checks (packages live in linuxExtras).
+          sanity-android = mkSanity "android" packages.supertux-milestone1-android ''
+            apk=$(find ${packages.supertux-milestone1-android} -name '*.apk' | head -1)
+            test -n "$apk"
+            test -s "$apk"
+            # APK is a zip; must start with PK.
+            test "$(od -An -tx1 -N2 "$apk" | tr -d ' \n')" = "504b"
+          '';
+          sanity-wasm = mkSanity "wasm" packages.supertux-milestone1-wasm ''
+            test -f ${packages.supertux-milestone1-wasm}/supertux-milestone1.html \
+              || test -f ${packages.supertux-milestone1-wasm}/index.html \
+              || ls ${packages.supertux-milestone1-wasm}/*.html >/dev/null
+            ls ${packages.supertux-milestone1-wasm}/*.wasm >/dev/null
+            ls ${packages.supertux-milestone1-wasm}/*.js >/dev/null
+          '';
+        };
 
         apps = {
           default = {
@@ -350,6 +460,12 @@
             program = "${pkgSdl2Gles2}/bin/supertux-milestone1";
             meta.description = "SuperTux Milestone 1 (SDL2 + OpenGL ES 2.0)";
           };
+          supertux-milestone1-win64 = mkWineApp win64Package
+            "supertux-milestone1-win64-wine"
+            "SuperTux Milestone 1 (Win64 via Wine, temp WINEPREFIX)";
+          supertux-milestone1-win32 = mkWineApp win32Package
+            "supertux-milestone1-win32-wine"
+            "SuperTux Milestone 1 (Win32 via Wine, temp WINEPREFIX)";
         } // linuxExtras.apps;
       }
     );
