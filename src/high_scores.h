@@ -10,6 +10,8 @@ extern int hs_score;
 extern std::string hs_name; /* highscores global variables*/
 
 void save_hs(int score);
+void save_hs_begin(int score);
+bool save_hs_frame(void);
 void load_hs();
 
 #endif

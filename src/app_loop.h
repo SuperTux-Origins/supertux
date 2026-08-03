@@ -6,17 +6,21 @@
 
 #include <string>
 
+class Surface;
+
 /**
  * Top-level screen ownership for the Emscripten frame pump.
  * Native builds keep the historic nested busy loops; on Emscripten
- * app_run() drives title / worldmap / session via frame() helpers
- * without nesting run()/display().
+ * app_run() drives title / worldmap / session / overlays via frame()
+ * helpers without nesting run()/display()/confirm/credits.
  */
 
 enum AppScreen {
   APP_SCREEN_TITLE = 0,
   APP_SCREEN_WORLDMAP,
   APP_SCREEN_SESSION,
+  APP_SCREEN_CONFIRM,
+  APP_SCREEN_TEXT,
   APP_SCREEN_DONE
 };
 
@@ -32,8 +36,25 @@ void app_request_worldmap(const std::string& map_file,
                           const std::string& save_file,
                           bool is_full_path_map = false);
 
-/** Request a level session from the active worldmap (Emscripten only). */
-void app_request_session(const std::string& level_path, int mode);
+/**
+ * Request a level session (Emscripten only).
+ * Matches GameSession(subset_or_path, levelnb, mode):
+ *   ST_GL_LOAD_LEVEL_FILE — subset_or_path is a full level path; levelnb ignored
+ *   ST_GL_PLAY            — subset name + 1-based level number
+ */
+void app_request_session(const std::string& subset_or_path, int levelnb, int mode);
+
+/** Yes/No confirm to delete a save slot (title load menu). */
+void app_request_delete_slot(int slot);
+
+/**
+ * Scrollable text overlay (credits / intro).
+ * surface is not owned unless own_surface is true.
+ */
+void app_request_text_scroll(const std::string& file,
+                             Surface* surface,
+                             float scroll_speed,
+                             bool own_surface = false);
 
 /**
  * Run the whole game under a single frame callback (Emscripten).

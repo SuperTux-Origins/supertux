@@ -51,58 +51,87 @@ Menu* contrib_subset_menu   = 0;
 std::vector<Menu*> Menu::last_menus;
 Menu* Menu::current_ = 0;
 
-/* just displays a Yes/No text that can be used to confirm stuff */
-bool confirm_dialog(std::string text)
+/* Yes/No confirm dialog — frame helpers + blocking wrapper. */
+
+static Surface* confirm_cap_screen = 0;
+static Menu* confirm_menu = 0;
+static bool confirm_done = false;
+static bool confirm_yes = false;
+
+void confirm_dialog_begin(const std::string& text)
 {
-  Surface* cap_screen = Surface::CaptureScreen();
-  
-  Menu* dialog = new Menu;
-  dialog->additem(MN_DEACTIVE, text,0,0);
-  dialog->additem(MN_HL,"",0,0);
-  dialog->additem(MN_ACTION,"Yes",0,0,true);
-  dialog->additem(MN_ACTION,"No",0,0,false);
-  dialog->additem(MN_HL,"",0,0);
+  delete confirm_cap_screen;
+  delete confirm_menu;
+  confirm_cap_screen = Surface::CaptureScreen();
+  confirm_menu = new Menu;
+  confirm_menu->additem(MN_DEACTIVE, text,0,0);
+  confirm_menu->additem(MN_HL,"",0,0);
+  confirm_menu->additem(MN_ACTION,"Yes",0,0,true);
+  confirm_menu->additem(MN_ACTION,"No",0,0,false);
+  confirm_menu->additem(MN_HL,"",0,0);
+  Menu::set_current(confirm_menu);
+  confirm_done = false;
+  confirm_yes = false;
+}
 
-  Menu::set_current(dialog);
+bool confirm_dialog_frame(void)
+{
+  if (!confirm_menu || confirm_done)
+    return false;
 
-  while(true)
-  {
-    SDL_Event event;
-
-    while (SDL_PollEvent(&event))
+  SDL_Event event;
+  while (SDL_PollEvent(&event))
     {
-      dialog->event(event);
+      confirm_menu->event(event);
     }
 
-    cap_screen->draw(0,0);
+  if (confirm_cap_screen)
+    confirm_cap_screen->draw(0,0);
 
-    dialog->draw();
-    dialog->action();
+  confirm_menu->draw();
+  confirm_menu->action();
 
-    switch (dialog->check())
+  switch (confirm_menu->check())
     {
     case true:
-      delete cap_screen;
-      Menu::set_current(0);
-      delete dialog;
-      return true;
+      confirm_yes = true;
+      confirm_done = true;
       break;
     case false:
-      delete cap_screen;
-      Menu::set_current(0);
-      delete dialog;
-      return false;
+      confirm_yes = false;
+      confirm_done = true;
       break;
     default:
       break;
     }
 
-    mouse_cursor->draw();
-    flipscreen();
-    SDL_Delay(25);
-  }
+  if (confirm_done)
+    {
+      delete confirm_cap_screen;
+      confirm_cap_screen = 0;
+      Menu::set_current(0);
+      delete confirm_menu;
+      confirm_menu = 0;
+      return false;
+    }
 
+  mouse_cursor->draw();
+  flipscreen();
+  st_frame_delay(25);
+  return true;
+}
 
+bool confirm_dialog_result(void)
+{
+  return confirm_yes;
+}
+
+bool confirm_dialog(std::string text)
+{
+  confirm_dialog_begin(text);
+  while (confirm_dialog_frame())
+    { /* busy loop */ }
+  return confirm_dialog_result();
 }
 
 /** SDL2: show soft keyboard only while a text/num field is selected. */

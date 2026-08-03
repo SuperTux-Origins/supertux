@@ -27,19 +27,23 @@ APP_NAME="${APP_NAME:-supertux-milestone1}"
 ENABLE_SOUND="${ENABLE_SOUND:-0}"
 ENABLE_GLES2="${ENABLE_GLES2:-1}"
 
-# ASYNCIFY: temporary so nested title/gameloop/worldmap while+SDL_Delay loops
-# do not freeze the browser tab. Replace with a real frame callback later
-# (see TODO.md Phase 5).
+# ASYNCIFY: optional safety net for residual nested waits (fade/wait_for_event).
+# Main path uses emscripten_set_main_loop + st_frame_delay() no-ops.
+# Default OFF (ENABLE_ASYNCIFY=0); set enableAsyncify = true in mkApp if needed.
 LINK_FLAGS=(
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
-  "SHELL:-sASYNCIFY=1"
-  "SHELL:-sASYNCIFY_STACK_SIZE=1048576"
   "SHELL:-sFULL_ES2=1"
   "SHELL:-sMIN_WEBGL_VERSION=1"
   "SHELL:-sMAX_WEBGL_VERSION=2"
   "SHELL:-sFORCE_FILESYSTEM=1"
   "SHELL:-sEXIT_RUNTIME=0"
 )
+if [ "${ENABLE_ASYNCIFY:-0}" = 1 ]; then
+  LINK_FLAGS+=("SHELL:-sASYNCIFY=1" "SHELL:-sASYNCIFY_STACK_SIZE=1048576")
+  echo "==> ASYNCIFY enabled"
+else
+  echo "==> ASYNCIFY disabled (default; set enableAsyncify=true in mkApp if a path freezes)"
+fi
 
 PRELOAD=()
 if [ -n "${DATA_DIR:-}" ] && [ -d "$DATA_DIR" ]; then

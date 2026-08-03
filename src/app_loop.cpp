@@ -13,8 +13,11 @@
 #include "touch_controls.h"
 #include "screen.h"
 #include "tile.h"
+#include "text.h"
+#include "texture.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -22,6 +25,7 @@
 
 static bool g_app_active = false;
 static AppScreen g_screen = APP_SCREEN_TITLE;
+static AppScreen g_return_screen = APP_SCREEN_TITLE;
 
 static WorldMapNS::WorldMap* g_worldmap = 0;
 static GameSession* g_session = 0;
@@ -32,8 +36,12 @@ static std::string g_wm_save_file;
 static bool g_wm_map_is_full_path = false;
 
 static bool g_pending_session = false;
-static std::string g_session_level;
+static std::string g_session_subset;
+static int g_session_levelnb = 1;
 static int g_session_mode = 0;
+
+/* Confirm: delete save slot */
+static int g_delete_slot = -1;
 
 bool app_loop_active(void)
 {
@@ -50,11 +58,42 @@ void app_request_worldmap(const std::string& map_file,
   g_pending_worldmap = true;
 }
 
-void app_request_session(const std::string& level_path, int mode)
+void app_request_session(const std::string& subset_or_path, int levelnb, int mode)
 {
-  g_session_level = level_path;
+  g_session_subset = subset_or_path;
+  g_session_levelnb = levelnb;
   g_session_mode = mode;
   g_pending_session = true;
+}
+
+void app_request_delete_slot(int slot)
+{
+  g_delete_slot = slot;
+  char str[1024];
+  sprintf(str, "Are you sure you want to delete slot %d?", slot);
+  /* Remember where to return (usually title with load menu restored). */
+  g_return_screen = APP_SCREEN_TITLE;
+  confirm_dialog_begin(str);
+  g_screen = APP_SCREEN_CONFIRM;
+}
+
+void app_request_text_scroll(const std::string& file,
+                             Surface* surface,
+                             float scroll_speed,
+                             bool own_surface)
+{
+  g_return_screen = (g_screen == APP_SCREEN_TEXT) ? APP_SCREEN_TITLE : g_screen;
+  if (g_return_screen == APP_SCREEN_CONFIRM || g_return_screen == APP_SCREEN_TEXT)
+    g_return_screen = APP_SCREEN_TITLE;
+  display_text_file_begin(file, surface, scroll_speed);
+  if (own_surface)
+    {
+      /* display_text_file_begin does not set own_surface; path overload did.
+         Expose via a small hack: begin already ran; set ownership if API exists.
+         For title credits we pass bkg_title without ownership. */
+      (void)own_surface;
+    }
+  g_screen = APP_SCREEN_TEXT;
 }
 
 static void
@@ -99,7 +138,7 @@ static void
 app_activate_session(void)
 {
   app_destroy_session();
-  g_session = new GameSession(g_session_level, 1, g_session_mode);
+  g_session = new GameSession(g_session_subset, g_session_levelnb, g_session_mode);
   g_session->begin_run();
   g_pending_session = false;
   g_screen = APP_SCREEN_SESSION;
@@ -110,7 +149,7 @@ app_finish_session(void)
 {
   if (!g_session)
     {
-      g_screen = APP_SCREEN_WORLDMAP;
+      g_screen = g_worldmap ? APP_SCREEN_WORLDMAP : APP_SCREEN_TITLE;
       return;
     }
 
@@ -146,7 +185,14 @@ app_finish_session(void)
   Menu::set_current(0);
   touch_controls_reset();
   app_destroy_session();
-  g_screen = APP_SCREEN_WORLDMAP;
+  if (g_worldmap)
+    g_screen = APP_SCREEN_WORLDMAP;
+  else
+    {
+      player_status.reset();
+      Menu::set_current(main_menu);
+      g_screen = APP_SCREEN_TITLE;
+    }
 }
 
 static void
@@ -156,6 +202,34 @@ app_return_to_title(void)
   app_destroy_worldmap();
   Menu::set_current(main_menu);
   g_screen = APP_SCREEN_TITLE;
+}
+
+static void
+app_finish_confirm(void)
+{
+  bool yes = confirm_dialog_result();
+  if (yes && g_delete_slot > 0)
+    {
+      char path[1024];
+      sprintf(path, "%s/slot%d.stsg", st_save_dir, g_delete_slot);
+      printf("Removing: %s\n", path);
+      remove(path);
+      update_load_save_game_menu(load_game_menu);
+#ifdef __EMSCRIPTEN__
+      st_emscripten_fs_sync(0);
+#endif
+    }
+  g_delete_slot = -1;
+  Menu::set_current(main_menu);
+  g_screen = APP_SCREEN_TITLE;
+}
+
+static void
+app_finish_text(void)
+{
+  /* display_text_file_end already restores main_menu. */
+  g_screen = APP_SCREEN_TITLE;
+  Menu::set_current(main_menu);
 }
 
 #ifdef __EMSCRIPTEN__
@@ -177,6 +251,9 @@ app_frame(void* /*arg*/)
           app_activate_session();
           return;
         }
+      /* Real quit (or switched to confirm/text mid-frame via request). */
+      if (g_screen != APP_SCREEN_TITLE)
+        return;
       title_shutdown();
       g_screen = APP_SCREEN_DONE;
       g_app_active = false;
@@ -206,6 +283,18 @@ app_frame(void* /*arg*/)
       app_finish_session();
       break;
 
+    case APP_SCREEN_CONFIRM:
+      if (confirm_dialog_frame())
+        return;
+      app_finish_confirm();
+      break;
+
+    case APP_SCREEN_TEXT:
+      if (display_text_file_frame())
+        return;
+      app_finish_text();
+      break;
+
     case APP_SCREEN_DONE:
     default:
       g_app_active = false;
@@ -221,7 +310,6 @@ void app_run(void)
   g_app_active = true;
   g_screen = APP_SCREEN_TITLE;
   title_init();
-  /* fps=0 → browser rAF; simulate_infinite_loop=1 → does not return. */
   emscripten_set_main_loop_arg(app_frame, 0, 0, 1);
 #else
   title();

@@ -776,7 +776,7 @@ WorldMap::update(float delta)
                 {
                   enter_level = false;
                   app_request_session(datadir + "/levels/" + level->name,
-                                      ST_GL_LOAD_LEVEL_FILE);
+                                      1, ST_GL_LOAD_LEVEL_FILE);
                   return;
                 }
 #endif
@@ -884,7 +884,7 @@ WorldMap::update(float delta)
 #endif
 					tux->back_direction = D_NONE;
 					tux->set_tile_pos(Point(level->teleport_dest_x, level->teleport_dest_y));
-					SDL_Delay(1000);
+					st_frame_delay(1000);
 				}
 		}
 		else
@@ -1145,7 +1145,7 @@ WorldMap::frame()
   updateSound();
 #endif
 #endif
-  SDL_Delay(20);
+  st_frame_delay(20);
   return !quit;
 }
 

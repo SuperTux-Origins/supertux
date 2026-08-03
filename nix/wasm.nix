@@ -150,6 +150,7 @@ EOF
   , dataDir ? null
   , enableSound ? false
   , enableGles2 ? true
+  , enableAsyncify ? false   # main path uses app_loop; set true if residual waits freeze
   }:
     pkgs.stdenv.mkDerivation {
       pname = "${appName}-wasm";
@@ -166,6 +167,7 @@ EOF
         SDL_WASM_LIBS = sdlWasmLibs;
         ENABLE_SOUND = if enableSound then "1" else "0";
         ENABLE_GLES2 = if enableGles2 then "1" else "0";
+        ENABLE_ASYNCIFY = if enableAsyncify then "1" else "0";
         PKG_CONFIG_PATH = "${sdlWasmLibs}/lib/pkgconfig";
         ZLIB_WASM_LIBS = zlibWasmLibs;
       } // pkgs.lib.optionalAttrs (dataDir != null) {

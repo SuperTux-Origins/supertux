@@ -78,6 +78,10 @@ enum LevelEditorSettingsMenuIDs {
   };
 
 bool confirm_dialog(std::string text);
+/** Split form for a future non-blocking pump (confirm_dialog still blocks). */
+void confirm_dialog_begin(const std::string& text);
+bool confirm_dialog_frame(void);  /* true while dialog is open */
+bool confirm_dialog_result(void); /* valid after frame returns false */
 
 /* Kinds of menu items */
 enum MenuItemKind {

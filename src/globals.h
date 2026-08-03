@@ -88,6 +88,8 @@ extern bool show_mouse;
 
 /** Always-on log: SDL_Log on SDL2 (logcat on Android), fprintf on SDL 1.2. */
 void st_log(const char* fmt, ...);
+/** SDL_Delay, or no-op when the Emscripten app_loop owns pacing. */
+void st_frame_delay(unsigned int ms);
 
 /** Verbose diagnostics (no-op unless verbose_mode); routes through st_log. */
 void st_vlog(const char* fmt, ...);

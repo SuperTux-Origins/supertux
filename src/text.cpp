@@ -9,6 +9,7 @@
 #include "screen.h"
 #include "text.h"
 #include "setup.h"
+#include "menu.h"
 #include "touch_controls.h"
 #ifndef NOSOUND
 #include "sound.h"
@@ -229,205 +230,258 @@ Text::erasecenteredtext(const  char * text, int y, Surface * ptexture, int updat
 #define SCROLL      60
 #define ITEMS_SPACE 4
 
-void display_text_file(const std::string& file, const std::string& surface, float scroll_speed)
-{
-  Surface* sur = new Surface(datadir + surface, IGNORE_ALPHA);
-  display_text_file(file, sur, scroll_speed);
-  delete sur;
-}
+/* Scrollable text (credits / intro) — frame helpers + blocking wrapper. */
 
-void display_text_file(const std::string& file, Surface* surface, float scroll_speed)
-{
-  int done;
+struct TextFileScroll {
+  Surface* surface;
+  bool own_surface;
+  string_list_type names;
   float scroll;
   float speed;
-  int y;
+  int done;
   int length;
-  FILE* fi;
-  char temp[1024];
-  string_list_type names;
+  Uint32 lastticks;
+  bool active;
+};
+
+static TextFileScroll g_textscroll = {};
+
+
+void display_text_file_begin(const std::string& file, Surface* surface, float scroll_speed)
+{
+  if (g_textscroll.active)
+    display_text_file_end();
+
+  g_textscroll.surface = surface;
+  g_textscroll.own_surface = false;
+  g_textscroll.scroll = 0;
+  g_textscroll.speed = scroll_speed / 50;
+  g_textscroll.done = 0;
+  g_textscroll.active = true;
+  string_list_init(&g_textscroll.names);
+
   char filename[1024];
-  string_list_init(&names);
+  char temp[1024];
+  FILE* fi;
   sprintf(filename,"%s/%s", datadir.c_str(), file.c_str());
   if((fi = fopen(filename,"r")) != NULL)
     {
       while(fgets(temp, sizeof(temp), fi) != NULL)
         {
           temp[strlen(temp)-1]='\0';
-          string_list_add_item(&names,temp);
+          string_list_add_item(&g_textscroll.names,temp);
         }
       fclose(fi);
     }
   else
     {
-      string_list_add_item(&names,"File was not found!");
-      string_list_add_item(&names,filename);
-      string_list_add_item(&names,"Shame on the guy, who");
-      string_list_add_item(&names,"forgot to include it");
-      string_list_add_item(&names,"in your SuperTux distribution.");
+      string_list_add_item(&g_textscroll.names,"File was not found!");
+      string_list_add_item(&g_textscroll.names,filename);
+      string_list_add_item(&g_textscroll.names,"Shame on the guy, who");
+      string_list_add_item(&g_textscroll.names,"forgot to include it");
+      string_list_add_item(&g_textscroll.names,"in your SuperTux distribution.");
     }
 
-
-  scroll = 0;
-  speed = scroll_speed / 50;
-  done = 0;
-
-  length = names.num_items;
-
+  g_textscroll.length = g_textscroll.names.num_items;
   SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+  g_textscroll.lastticks = SDL_GetTicks();
+}
 
-  Uint32 lastticks = SDL_GetTicks();
-  while(done == 0)
+void display_text_file_end(void)
+{
+  if (!g_textscroll.active)
+    return;
+  string_list_free(&g_textscroll.names);
+  if (g_textscroll.own_surface)
     {
-      /* Input: Escape / Back / touch Menu / tap skips the cutscene. */
-      SDL_Event event;
-      while(SDL_PollEvent(&event))
+      delete g_textscroll.surface;
+      g_textscroll.surface = 0;
+    }
+  g_textscroll.active = false;
+  SDL_EnableKeyRepeat(0, 0);
+  Menu::set_current(main_menu);
+}
+
+bool display_text_file_frame(void)
+{
+  if (!g_textscroll.active || g_textscroll.done)
+    {
+      if (g_textscroll.active)
+        display_text_file_end();
+      return false;
+    }
+
+  Surface* surface = g_textscroll.surface;
+  float& scroll = g_textscroll.scroll;
+  float& speed = g_textscroll.speed;
+  int& done = g_textscroll.done;
+  int length = g_textscroll.length;
+  string_list_type& names = g_textscroll.names;
+  int y;
+
+  SDL_Event event;
+  while(SDL_PollEvent(&event))
+    {
+      if (touch_controls_event(event))
         {
-          if (touch_controls_event(event))
+          if (touch_controls_escape_pressed()
+              || touch_controls_held(4)
+              || touch_controls_held(5)
+              || touch_controls_held(6))
+            done = 1;
+          continue;
+        }
+      if (st_is_escape_event(event))
+        {
+          done = 1;
+          continue;
+        }
+      switch(event.type)
+        {
+        case SDL_KEYDOWN:
+          switch(event.key.keysym.sym)
             {
-              if (touch_controls_escape_pressed()
-                  || touch_controls_held(4)  /* jump */
-                  || touch_controls_held(5)  /* action */
-                  || touch_controls_held(6)) /* both */
-                done = 1;
-              continue;
-            }
-          if (st_is_escape_event(event))
-            {
-              done = 1;
-              continue;
-            }
-          switch(event.type)
-            {
-            case SDL_KEYDOWN:
-              switch(event.key.keysym.sym)
-                {
-                case SDLK_UP:
-                  speed -= SPEED_INC;
-                  break;
-                case SDLK_DOWN:
-                  speed += SPEED_INC;
-                  break;
-                case SDLK_SPACE:
-                case SDLK_RETURN:
-                  if(speed >= 0)
-                    scroll += SCROLL;
-                  break;
-                default:
-                  break;
-                }
+            case SDLK_UP:
+              speed -= SPEED_INC;
               break;
-#ifdef GP2X
-            case SDL_JOYBUTTONDOWN:
-              if ( event.jbutton.button == joystick_keymap.down_button ) {
-                speed += SPEED_INC;
-              }
-              if ( event.jbutton.button == joystick_keymap.up_button ) {
-                speed -= SPEED_INC;
-              }
-              if ( event.jbutton.button == joystick_keymap.b_button ) {
-                done = 1;
-              }
-              if ( event.jbutton.button == joystick_keymap.a_button ) {
+            case SDLK_DOWN:
+              speed += SPEED_INC;
+              break;
+            case SDLK_SPACE:
+            case SDLK_RETURN:
+              if(speed >= 0)
                 scroll += SCROLL;
-              }
-              break;
-#endif
-#ifdef USE_SDL2
-            case SDL_FINGERDOWN:
-              /* Any tap outside the pad also skips. */
-              done = 1;
-              break;
-#endif
-            case SDL_MOUSEBUTTONDOWN:
-              done = 1;
-              break;
-            case SDL_QUIT:
-              done = 1;
               break;
             default:
               break;
             }
-        }
-
-      if(speed > MAX_VEL)
-        speed = MAX_VEL;
-      else if(speed < -MAX_VEL)
-        speed = -MAX_VEL;
-
-      /* draw the credits */
-      surface->draw_bg();
-
-      y = 0;
-      for(int i = 0; i < length; i++)
-        {
-        switch(names.item[i][0])
-          {
-          case ' ':
-            white_small_text->drawf(names.item[i]+1, 0, screen->h+y-int(scroll),
-                A_HMIDDLE, A_TOP, 1);
-            y += white_small_text->h+ITEMS_SPACE;
-#ifdef RES320X240
-	    y += 6;
-#endif
-            break;
-          case '	':
-            white_text->drawf(names.item[i]+1, 0, screen->h+y-int(scroll),
-                A_HMIDDLE, A_TOP, 1);
-            y += white_text->h+ITEMS_SPACE;
-#ifdef RES320X240
-	    y += 6;
-#endif
-            break;
-          case '-':
-#ifdef RES320X240
-            white_text->drawf(names.item[i]+1, 0, screen->h+y-int(scroll), A_HMIDDLE, A_TOP, 3);
-#else
-            white_big_text->drawf(names.item[i]+1, 0, screen->h+y-int(scroll), A_HMIDDLE, A_TOP, 3);
-#endif
-            y += white_big_text->h+ITEMS_SPACE;
-#ifdef RES320X240
-	    y += 6;
-#endif
-            break;
-          default:
-            blue_text->drawf(names.item[i], 0, screen->h+y-int(scroll),
-                A_HMIDDLE, A_TOP, 1);
-            y += blue_text->h+ITEMS_SPACE;
-#ifdef RES320X240
-	    y += 6;
-#endif
-            break;
+          break;
+#ifdef GP2X
+        case SDL_JOYBUTTONDOWN:
+          if ( event.jbutton.button == joystick_keymap.down_button ) {
+            speed += SPEED_INC;
           }
+          if ( event.jbutton.button == joystick_keymap.up_button ) {
+            speed -= SPEED_INC;
+          }
+          if ( event.jbutton.button == joystick_keymap.b_button ) {
+            done = 1;
+          }
+          if ( event.jbutton.button == joystick_keymap.a_button ) {
+            scroll += SCROLL;
+          }
+          break;
+#endif
+#ifdef USE_SDL2
+        case SDL_FINGERDOWN:
+          done = 1;
+          break;
+#endif
+        case SDL_MOUSEBUTTONDOWN:
+          done = 1;
+          break;
+        case SDL_QUIT:
+          done = 1;
+          break;
+        default:
+          break;
         }
+    }
 
-      /* Keep the virtual pad visible so players can skip (Menu / Jump / Action). */
-      touch_controls_draw();
+  if(speed > MAX_VEL)
+    speed = MAX_VEL;
+  else if(speed < -MAX_VEL)
+    speed = -MAX_VEL;
 
-      flipscreen();
+  surface->draw_bg();
 
-      if(screen->h+y-scroll < 0 && 20+screen->h+y-scroll < 0)
-        done = 1;
+  y = 0;
+  for(int i = 0; i < length; i++)
+    {
+    switch(names.item[i][0])
+      {
+      case ' ':
+        white_small_text->drawf(names.item[i]+1, 0, screen->h+y-int(scroll),
+            A_HMIDDLE, A_TOP, 1);
+        y += white_small_text->h+ITEMS_SPACE;
+#ifdef RES320X240
+        y += 6;
+#endif
+        break;
+      case '\t':
+        white_text->drawf(names.item[i]+1, 0, screen->h+y-int(scroll),
+            A_HMIDDLE, A_TOP, 1);
+        y += white_text->h+ITEMS_SPACE;
+#ifdef RES320X240
+        y += 6;
+#endif
+        break;
+      case '-':
+#ifdef RES320X240
+        white_text->drawf(names.item[i]+1, 0, screen->h+y-int(scroll), A_HMIDDLE, A_TOP, 3);
+#else
+        white_big_text->drawf(names.item[i]+1, 0, screen->h+y-int(scroll), A_HMIDDLE, A_TOP, 3);
+#endif
+        y += white_big_text->h+ITEMS_SPACE;
+#ifdef RES320X240
+        y += 6;
+#endif
+        break;
+      default:
+        blue_text->drawf(names.item[i], 0, screen->h+y-int(scroll),
+            A_HMIDDLE, A_TOP, 1);
+        y += blue_text->h+ITEMS_SPACE;
+#ifdef RES320X240
+        y += 6;
+#endif
+        break;
+      }
+    }
 
-      Uint32 ticks = SDL_GetTicks();
-      scroll += speed * (ticks - lastticks);
-      lastticks = ticks;
-      if(scroll < 0)
-        scroll = 0;
+  touch_controls_draw();
+  flipscreen();
+
+  if(screen->h+y-scroll < 0 && 20+screen->h+y-scroll < 0)
+    done = 1;
+
+  Uint32 ticks = SDL_GetTicks();
+  scroll += speed * (ticks - g_textscroll.lastticks);
+  g_textscroll.lastticks = ticks;
+  if(scroll < 0)
+    scroll = 0;
 
 #ifndef GP2X
-    SDL_Delay(10);
+  st_frame_delay(10);
 #else
-    SDL_Delay(2);
+  st_frame_delay(2);
 #ifndef NOSOUND
-    updateSound();
+  updateSound();
 #endif
 #endif
 
+  if (done)
+    {
+      display_text_file_end();
+      return false;
     }
-  string_list_free(&names);
-
-  SDL_EnableKeyRepeat(0, 0);    // disables key repeating
-  Menu::set_current(main_menu);
+  return true;
 }
+
+void display_text_file(const std::string& file, Surface* surface, float scroll_speed)
+{
+  display_text_file_begin(file, surface, scroll_speed);
+  while (display_text_file_frame())
+    { /* busy loop */ }
+}
+
+void display_text_file(const std::string& file, const std::string& surface, float scroll_speed)
+{
+  Surface* sur = new Surface(datadir + surface, IGNORE_ALPHA);
+  display_text_file_begin(file, sur, scroll_speed);
+  g_textscroll.own_surface = true;
+  while (display_text_file_frame())
+    { /* busy loop */ }
+}
+
+
 

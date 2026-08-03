@@ -817,7 +817,7 @@ void st_menu(void)
   main_menu->additem(MN_GOTO, "Bonus Levels",0,contrib_menu, MNID_CONTRIB);
   main_menu->additem(MN_GOTO, "Options",0,options_menu, MNID_OPTIONMENU);
   
-#ifndef GP2X
+#if !defined(GP2X) && !defined(__EMSCRIPTEN__)
   main_menu->additem(MN_ACTION,"Level Editor",0,0, MNID_LEVELEDITOR);
 #endif
   main_menu->additem(MN_ACTION,"Credits",0,0, MNID_CREDITS);
@@ -961,6 +961,10 @@ bool process_load_game_menu()
 
       if (access(slotfile, F_OK) != 0)
         {
+#ifdef __EMSCRIPTEN__
+          /* Intro uses blocking display_text_file; skip under app_loop. */
+          if (!app_loop_active())
+#endif
           draw_intro();
         }
 

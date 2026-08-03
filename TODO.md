@@ -229,13 +229,20 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 - [ ] First browser smoke: canvas paints (even without full `data/`)
 - [ ] With `data/`: title screen → start game → one level → quit
 - [x] IDBFS for config/saves under `/home/web_user` (survive reload)
-- [~] Replace ASYNCIFY with real frame pump (title / session / worldmap)
+- [x] Replace ASYNCIFY with real frame pump (title / session / worldmap / confirm / text)
   - [x] Extract `GameSession::frame()` / `WorldMap::frame()` (busy loops call them)
   - [x] Extract `title_frame()` (+ init/shutdown); `title()` calls the loop
   - [x] Top-level `app_loop` state machine (TITLE / WORLDMAP / SESSION) + `emscripten_set_main_loop`
   - [x] Hand-off from load-game + worldmap enter-level (no nested run/display when `app_loop_active`)
-  - [ ] Frame remaining dialogs (confirm, credits, high scores, editor, contrib subset)
-  - [ ] Drop ASYNCIFY once dialogs are non-blocking
+  - [x] Contrib subset levels via `app_request_session(subset, levelnb, ST_GL_PLAY)`
+  - [~] Frame remaining dialogs (confirm, credits, high scores, editor)
+    - [x] `confirm_dialog_begin/frame/result`
+    - [x] `display_text_file_begin/frame/end` (credits / intro)
+    - [x] Wire app_loop screens for confirm + credits (no nested calls)
+    - [x] High scores frame helpers (`save_hs_begin/frame`)
+    - [x] Hide level editor on Emscripten; skip intro under app_loop
+  - [x] Drop ASYNCIFY by default (`enableAsyncify = false`); re-enable if residual waits freeze
+    - [x] `st_frame_delay()` no-op under `app_loop_active()`
 - [ ] Optional: SDL2_mixer + formats for wasm (or keep `ENABLE_SOUND=OFF`)
 - [ ] Document `nix build` / `nix run` wasm targets in `AGENTS.md` / README
 
@@ -267,3 +274,8 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 | 2026-08-03 | Extract title_frame / title_init / title_shutdown |
 | 2026-08-03 | app_loop: Emscripten TITLE/WORLDMAP/SESSION state machine + main_loop |
 | 2026-08-03 | Split wasm zlib into flake output `wasm-zlib-libs` |
+| 2026-08-03 | app_request_session(subset, levelnb, mode); contrib subset non-blocking |
+| 2026-08-03 | Extract confirm_dialog + display_text_file frame helpers |
+| 2026-08-03 | Emscripten: no level editor menu; skip intro; save_hs frames |
+| 2026-08-03 | st_frame_delay; optional ENABLE_ASYNCIFY=0 for wasm link |
+| 2026-08-03 | ASYNCIFY off by default (mkApp enableAsyncify=false) |

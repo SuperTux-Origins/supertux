@@ -172,3 +172,17 @@ int wait_for_event(SDL_Event& event,unsigned int min_delay, unsigned int max_del
 
   return 0;
 }
+
+void st_frame_delay(unsigned int ms)
+{
+#ifdef __EMSCRIPTEN__
+  /* Browser requestAnimationFrame paces the app_loop; blocking delay freezes
+     the tab unless ASYNCIFY is enabled. */
+  extern bool app_loop_active(void);
+  if (app_loop_active())
+    return;
+#endif
+  if (ms)
+    SDL_Delay(ms);
+}
+

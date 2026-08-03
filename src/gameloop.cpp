@@ -782,7 +782,7 @@ GameSession::frame()
     return false;
 
 #ifdef GP2X
-  SDL_Delay(10);
+  st_frame_delay(10);
 #endif
   /* Calculate the movement-factor */
   double frame_ratio = ((double)(update_time-last_update_time))/((double)FRAME_RATE);
@@ -814,7 +814,7 @@ GameSession::frame()
   else
     {
       ++pause_menu_frame;
-      SDL_Delay(50);
+      st_frame_delay(50);
     }
 
   draw();
@@ -832,7 +832,7 @@ GameSession::frame()
      the results in SDL mode aren't perfect (thought the 100 FPS are reached), even on an AMD2500+. */
   if(last_update_time >= update_time - 12)
     {
-      SDL_Delay(10);
+      st_frame_delay(10);
       update_time = st_get_ticks();
     }
 

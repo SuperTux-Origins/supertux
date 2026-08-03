@@ -60,62 +60,34 @@ void load_hs(void)
   lisp_free(root_obj);
 }
 
-void save_hs(int score)
+static Surface* hs_bkgd = 0;
+static bool hs_active = false;
+
+void save_hs_begin(int score)
 {
-  char str[80];
+  if (hs_active)
+    {
+      delete hs_bkgd;
+      hs_bkgd = 0;
+      hs_active = false;
+    }
 
-  Surface* bkgd;
-  SDL_Event event;
-
-  bkgd = new Surface(datadir + "/images/highscore/highscore.png", IGNORE_ALPHA);
-
+  hs_bkgd = new Surface(datadir + "/images/highscore/highscore.png", IGNORE_ALPHA);
   hs_score = score;
-
   Menu::set_current(highscore_menu);
 
   if(!highscore_menu->item[0].input)
     highscore_menu->item[0].input = (char*) malloc(strlen(hs_name.c_str()) + 1);
 
   strcpy(highscore_menu->item[0].input,hs_name.c_str());
+  hs_active = true;
+}
 
-  /* ask for player's name */
-  while(Menu::current())
-    {
-      bkgd->draw_bg();
-
-      blue_text->drawf("Congratulations", 0, 130, A_HMIDDLE, A_TOP, 2, NO_UPDATE);
-      blue_text->draw("Your score:", 150, 180, 1, NO_UPDATE);
-      sprintf(str, "%d", hs_score);
-      yellow_nums->draw(str, 350, 170, 1, NO_UPDATE);
-
-      Menu::current()->draw();
-      Menu::current()->action();
-
-      flipscreen();
-
-      while(SDL_PollEvent(&event))
-        if(event.type == SDL_KEYDOWN)
-          Menu::current()->event(event);
-
-      switch (highscore_menu->check())
-        {
-        case 0:
-          if(highscore_menu->item[0].input != NULL)
-            hs_name = highscore_menu->item[0].input;
-          break;
-        }
-
-      SDL_Delay(25);
-    }
-
-
-  /* Save to file: */
-
+static void
+save_hs_write_file(void)
+{
   FILE* fi;
-  std::string filename;
-
-  /* Save data file: */
-  filename = highscore_filename;
+  std::string filename = highscore_filename;
 
   fcreatedir(filename.c_str());
   if(fwriteable(filename.c_str()))
@@ -124,33 +96,69 @@ void save_hs(int score)
       if (fi == NULL)
         {
           perror(filename.c_str());
+          return;
         }
 
-      /* Write header: */
       fprintf(fi,";SuperTux HighScores\n");
       fprintf(fi,"(supertux-highscore\n");
-
-      /* Save title info: */
       fprintf(fi,"  (name \"%s\")\n", hs_name.c_str());
-
-      /* Save the description: */
       fprintf(fi,"  (score \"%i\")\n", hs_score);
-
       fprintf( fi,")");
       fclose(fi);
     }
+}
 
-/*
-  fi = opendata(highscore_filename, "w");
-  if (fi != NULL)
+bool save_hs_frame(void)
+{
+  if (!hs_active)
+    return false;
+
+  char str[80];
+  SDL_Event event;
+
+  hs_bkgd->draw_bg();
+
+  blue_text->drawf("Congratulations", 0, 130, A_HMIDDLE, A_TOP, 2, NO_UPDATE);
+  blue_text->draw("Your score:", 150, 180, 1, NO_UPDATE);
+  sprintf(str, "%d", hs_score);
+  yellow_nums->draw(str, 350, 170, 1, NO_UPDATE);
+
+  Menu::current()->draw();
+  Menu::current()->action();
+
+  flipscreen();
+
+  while(SDL_PollEvent(&event))
+    if(event.type == SDL_KEYDOWN)
+      Menu::current()->event(event);
+
+  switch (highscore_menu->check())
     {
-      fprintf(fi, "# Supertux highscore file\n\n");
+    case 0:
+      if(highscore_menu->item[0].input != NULL)
+        hs_name = highscore_menu->item[0].input;
+      break;
+    }
 
-      fprintf(fi, "name=%s\n", hs_name);
-      fprintf(fi, "highscore=%d\n", hs_score);
+  if (!Menu::current())
+    {
+      save_hs_write_file();
+      delete hs_bkgd;
+      hs_bkgd = 0;
+      hs_active = false;
+#ifdef __EMSCRIPTEN__
+      st_emscripten_fs_sync(0);
+#endif
+      return false;
+    }
 
-      fprintf(fi, "# (File automatically created.)\n");
+  st_frame_delay(25);
+  return true;
+}
 
-      fclose(fi);
-    }*/
+void save_hs(int score)
+{
+  save_hs_begin(score);
+  while (save_hs_frame())
+    { /* busy loop */ }
 }

@@ -254,6 +254,7 @@
             dataDir = wasmDataDir;
             enableSound = false;
             enableGles2 = true;
+            enableAsyncify = false;  # app_loop + st_frame_delay; true if a path freezes
           };
         };
 
