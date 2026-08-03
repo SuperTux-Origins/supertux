@@ -126,32 +126,46 @@
           sha256 = "sha256-WUwv411JSItDgtv67I+YNm3vyoGdkWrJW+zz519CALM=";
         };
 
-        mkSuperTux = { useSDL2 ? true, useGLES2 ? false, pname ? "supertux-milestone1" }:
+        # targetPkgs: native pkgs for Linux builds, or pkgs.pkgsCross.mingw32 for Win32.
+        # SDL-*-win32 flake packages are keyed by the *build* system (e.g. x86_64-linux),
+        # not the Windows hostPlatform string.
+        mkSuperTux = {
+          useSDL2 ? true,
+          useGLES2 ? false,
+          pname ? "supertux-milestone1",
+          targetPkgs ? pkgs,
+        }:
           let
+            p = targetPkgs;
             # GLES2 implies SDL2 + OpenGL path (shader renderer, no libGLU).
             effectiveSDL2 = useSDL2 || useGLES2;
+            isWin = p.stdenv.hostPlatform.isWindows;
+            # Flake inputs that ship MinGW SDL1.2 DLLs + import libs.
+            sdlWin = SDL-win32.packages.${pkgs.system}.default;
+            sdlImageWin = SDL_image-win32.packages.${pkgs.system}.default;
+            sdlMixerWin = SDL_mixer-win32.packages.${pkgs.system}.default;
           in
-          pkgs.stdenv.mkDerivation rec {
+          p.stdenv.mkDerivation rec {
             inherit pname;
             inherit version;
             src = nixpkgs.lib.cleanSource ./.;
             enableParallelBuilding = true;
 
-            # Keep debug symbols (and optionally split them to $debug).
+            # Keep debug symbols on native Linux; MinGW strip/split is flaky.
             dontStrip = true;
-            separateDebugInfo = true;
+            separateDebugInfo = !isWin;
 
             nativeBuildInputs = [
-              pkgs.buildPackages.cmake
-              pkgs.buildPackages.pkg-config
-            ] ++ nixpkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-              pkgs.addDriverRunpath
+              p.buildPackages.cmake
+              p.buildPackages.pkg-config
+            ] ++ nixpkgs.lib.optionals p.stdenv.hostPlatform.isLinux [
+              p.addDriverRunpath
             ];
 
             cmakeFlags = [
               "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
               "-DENABLE_SOUND=ON"
-              "-DENABLE_OPENGL=ON"
+              "-DENABLE_OPENGL=${if isWin then "OFF" else "ON"}"
               "-DENABLE_GLES2=${if useGLES2 then "ON" else "OFF"}"
               "-DENABLE_SDL2=${if effectiveSDL2 then "ON" else "OFF"}"
               "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
@@ -159,53 +173,56 @@
             ];
 
             buildInputs =
-              (if pkgs.stdenv.hostPlatform.isWindows && !effectiveSDL2 then [
-                SDL-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
-                SDL_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
-                SDL_mixer-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
+              (if isWin && !effectiveSDL2 then [
+                sdlWin
+                sdlImageWin
+                sdlMixerWin
               ] else if effectiveSDL2 then [
-                pkgs.SDL2
-                pkgs.SDL2_image
-                pkgs.SDL2_mixer
+                p.SDL2
+                p.SDL2_image
+                p.SDL2_mixer
               ] ++ (if useGLES2 then [
-                pkgs.libGL          # EGL/GLX dispatch often needed by SDL2 ES
-                pkgs.libglvnd
+                p.libGL
+                p.libglvnd
               ] else [
-                pkgs.libGL
+                p.libGL
               ]) else [
-                pkgs.SDL
-                pkgs.SDL_image
-                pkgs.SDL_mixer
-                pkgs.libGL
-                pkgs.libGLU
+                p.SDL
+                p.SDL_image
+                p.SDL_mixer
+                p.libGL
+                p.libGLU
               ]) ++ [
-                pkgs.zlib
-                pkgs.libpng
-                pkgs.libjpeg
-                pkgs.libtiff
+                p.zlib
+              ] ++ nixpkgs.lib.optionals (!isWin) [
+                p.libpng
+                p.libjpeg
+                p.libtiff
               ];
 
-            postFixup = nixpkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
+            postFixup = nixpkgs.lib.optionalString p.stdenv.hostPlatform.isLinux ''
               addDriverRunpath $out/bin/supertux-milestone1
-            '' + nixpkgs.lib.optionalString pkgs.stdenv.hostPlatform.isWindows ''
+            '' + nixpkgs.lib.optionalString isWin ''
               mkdir -p $out/bin/
-              find ${pkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
-              find ${pkgs.stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
+              # Runtime DLLs next to the .exe (Windows loader search path).
+              find ${p.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \; || true
+              find ${p.stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \; || true
               ${if effectiveSDL2 then "" else ''
-              ln -sfv ${SDL-win32.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/*.dll $out/bin/
-              ln -sfv ${SDL_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/*.dll $out/bin/
-              ln -sfv ${SDL_mixer-win32.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/*.dll $out/bin/
+              ln -sfv ${sdlWin}/bin/*.dll $out/bin/ || true
+              ln -sfv ${sdlImageWin}/bin/*.dll $out/bin/ || true
+              ln -sfv ${sdlMixerWin}/bin/*.dll $out/bin/ || true
               ''}
             '';
 
             meta = with nixpkgs.lib; {
               description = "SuperTux Milestone 1 (${
-                if useGLES2 then "SDL2 + GLES2"
+                if isWin then "Win32 SDL1.2 cross"
+                else if useGLES2 then "SDL2 + GLES2"
                 else if effectiveSDL2 then "SDL2"
                 else "SDL 1.2"
               })";
               license = licenses.gpl2Plus;
-              platforms = platforms.linux ++ platforms.windows;
+              platforms = if isWin then platforms.windows else platforms.linux;
               mainProgram = "supertux-milestone1";
             };
           };
@@ -217,6 +234,14 @@
           useGLES2 = true;
           pname = "supertux-milestone1-sdl2-gles2";
         };
+        # Real MinGW cross build (SDL1.2 + grumnix win32 SDL inputs). Not a
+        # repack of the native Linux binary.
+        pkgWin32 = mkSuperTux {
+          useSDL2 = false;
+          useGLES2 = false;
+          pname = "supertux-milestone1-win32";
+          targetPkgs = pkgs.pkgsCross.mingw32;
+        };
       in rec {
         packages = {
           default = pkgSdl2;
@@ -224,15 +249,8 @@
           supertux-milestone1-sdl1 = pkgSdl1;
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
 
-          supertux-milestone1-win32 = pkgs.runCommand "supertux-milestone1-win32" {} ''
-            mkdir -p $out/data
-            cp -vr ${pkgSdl1}/bin/supertux-milestone1.exe $out/ 2>/dev/null \
-              || cp -vr ${pkgSdl1}/bin/supertux-milestone1 $out/
-            cp -vLr ${pkgSdl1}/bin/*.dll $out/ 2>/dev/null || true
-            if [ -d ${pkgSdl1}/share/supertux-milestone1 ]; then
-              cp -vr ${pkgSdl1}/share/supertux-milestone1/. $out/data/
-            fi
-          '';
+          # MinGW32 cross (SDL 1.2). See pkgWin32 / mkSuperTux targetPkgs.
+          supertux-milestone1-win32 = pkgWin32;
 
           # Android APK (Fire OS 5 / API 22 baseline). Requires Linux + SDK.
           android-sdl-libs = android.sdlAndroidLibs;
