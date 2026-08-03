@@ -433,20 +433,30 @@ EOF
       set -euo pipefail
       cd ${pkg}
 
+      # Fixed port so IndexedDB (IDBFS) keeps the same origin across runs.
+      # Override with SUPERTUX_WASM_PORT=… if 8765 is busy.
+      port="''${SUPERTUX_WASM_PORT:-8765}"
+
       port_file=$(mktemp)
       server_pid=
       trap 'kill "$server_pid" 2>/dev/null || true; rm -f "$port_file"' EXIT
 
       ${pkgs.python3}/bin/python3 -c '
       import http.server, socketserver, sys
-      port_file = sys.argv[1]
+      port_file, port = sys.argv[1], int(sys.argv[2])
       class Quiet(http.server.SimpleHTTPRequestHandler):
           def log_message(self, *a): pass
       socketserver.TCPServer.allow_reuse_address = True
-      with socketserver.TCPServer(("127.0.0.1", 0), Quiet) as httpd:
-          open(port_file, "w").write(str(httpd.server_address[1]))
-          httpd.serve_forever()
-      ' "$port_file" &
+      try:
+          httpd = socketserver.TCPServer(("127.0.0.1", port), Quiet)
+      except OSError as e:
+          sys.stderr.write(
+              "error: cannot bind 127.0.0.1:%s (%s)\n"
+              "       set SUPERTUX_WASM_PORT to a free port\n" % (port, e))
+          sys.exit(1)
+      open(port_file, "w").write(str(httpd.server_address[1]))
+      httpd.serve_forever()
+      ' "$port_file" "$port" &
       server_pid=$!
 
       for i in $(seq 1 50); do
@@ -454,7 +464,7 @@ EOF
         sleep 0.05
       done
       if [ ! -s "$port_file" ]; then
-        echo "error: local HTTP server failed to start" >&2
+        echo "error: local HTTP server failed to start on port $port" >&2
         exit 1
       fi
       port=$(cat "$port_file")
@@ -464,6 +474,7 @@ EOF
       fi
       url="http://127.0.0.1:''${port}/''${html}"
       echo "Serving ${appName} at $url  (Ctrl-C to stop)"
+      echo "  IDBFS origin is tied to this host:port — keep the port stable to retain saves."
 
       if [ -n "''${BROWSER:-}" ]; then
         "$BROWSER" "$url" >/dev/null 2>&1 || true
