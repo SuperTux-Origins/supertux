@@ -232,13 +232,20 @@ EOF
   };
 
 
-  wasmShell = pkgs.writeText "supertux-wasm-shell.html" ''
+  # HTML shell with source/revision footer. versionFull / gitRev filled by mkApp.
+  mkWasmShell = { versionFull, gitRev, sourceUrl }:
+    let
+      revUrl =
+        if gitRev == "dirty" || gitRev == "" then sourceUrl
+        else "${sourceUrl}/tree/${gitRev}";
+    in
+    pkgs.writeText "supertux-wasm-shell.html" ''
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  <title>SuperTux Milestone 1</title>
+  <title>SuperTux Milestone 1 ${versionFull}</title>
   <style>
     html, body {
       margin: 0; padding: 0; height: 100%;
@@ -256,7 +263,7 @@ EOF
       background: #000;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
-      max-width: 100vw; max-height: 90vh;
+      max-width: 100vw; max-height: 85vh;
       outline: none;
     }
     #status { font-size: 0.9rem; opacity: 0.85; min-height: 1.2em; }
@@ -268,6 +275,11 @@ EOF
       height: 100%; width: 0%; background: #4af;
       transition: width 0.15s ease-out;
     }
+    #meta {
+      font-size: 0.75rem; opacity: 0.7; text-align: center;
+      line-height: 1.5; max-width: 90vw;
+    }
+    #meta a { color: #8cf; }
   </style>
 </head>
 <body>
@@ -275,6 +287,12 @@ EOF
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
     <div id="status">Loading…</div>
     <div id="progress"><div id="progress-bar"></div></div>
+    <div id="meta">
+      SuperTux Milestone 1 <strong>${versionFull}</strong><br>
+      <a href="${sourceUrl}" target="_blank" rel="noopener">Source</a>
+      ·
+      <a href="${revUrl}" target="_blank" rel="noopener">Revision ${gitRev}</a>
+    </div>
   </div>
   <script type='text/javascript'>
     var statusElement = document.getElementById('status');
@@ -336,7 +354,6 @@ EOF
   {{{ SCRIPT }}}
 </body>
 </html>
-
   '';
 
   mkApp = {
@@ -346,10 +363,16 @@ EOF
   , enableSound ? false
   , enableGles2 ? true
   , enableAsyncify ? false   # main path uses app_loop; set true if residual waits freeze
+  , versionFull ? "0.1.5-dev"
+  , gitRev ? "dirty"
+  , sourceUrl ? "https://github.com/SuperTux-Origins/supertux-milestone1"
   }:
+    let
+      shell = mkWasmShell { inherit versionFull gitRev sourceUrl; };
+    in
     pkgs.stdenv.mkDerivation {
       pname = "${appName}-wasm";
-      version = "0.1.0";
+      version = versionFull;
 
       dontUnpack = true;
       dontConfigure = true;
@@ -363,7 +386,8 @@ EOF
         ENABLE_SOUND = if enableSound then "1" else "0";
         ENABLE_GLES2 = if enableGles2 then "1" else "0";
         ENABLE_ASYNCIFY = if enableAsyncify then "1" else "0";
-        WASM_SHELL = "${wasmShell}";
+        PROJECT_VERSION_FULL = versionFull;
+        WASM_SHELL = "${shell}";
         PKG_CONFIG_PATH = "${sdlWasmLibs}/lib/pkgconfig";
         ZLIB_WASM_LIBS = zlibWasmLibs;
       } // pkgs.lib.optionalAttrs (dataDir != null) {

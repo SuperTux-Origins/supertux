@@ -122,10 +122,12 @@ let
     # Optional game data directory packaged as APK assets.
     gameDataDir ? null,
     stbImageH ? null,
+    # Full version for SUPERTUX_MILESTONE1_VERSION (e.g. 0.1.5-dev+gabc1234).
+    gameVersion ? "0.1.5-dev",
   }:
     pkgs.stdenvNoCC.mkDerivation {
       pname = appName;
-      version = "1.0.0";
+      version = gameVersion;
 
       dontUnpack = true;
       nativeBuildInputs = [ androidSdk pkgs.jdk17 pkgs.zip pkgs.gnumake pkgs.unzip ];
@@ -140,6 +142,7 @@ let
         SDL_PREBUILT_MK = sdlPrebuiltAndroidMk;
         SDL_ANDROID_LIBS = sdlAndroidLibs;
         KEYSTORE = "${keystore}";
+        SUPERTUX_VERSION = gameVersion;
       } // pkgs.lib.optionalAttrs (gameSrcDir != null) {
         GAME_SRC_DIR = "${gameSrcDir}";
       } // pkgs.lib.optionalAttrs (sdl2ImageSrc != null) {

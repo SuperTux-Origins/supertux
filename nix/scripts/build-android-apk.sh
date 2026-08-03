@@ -7,6 +7,7 @@
 #   GAME_DATA_DIR              - required data/ tree packaged as assets
 #   APPLICATION_MK, TOP_ANDROID_MK, SDL_PREBUILT_MK, SDL_ANDROID_LIBS
 #   KEYSTORE, STB_IMAGE_H
+#   SUPERTUX_VERSION           - full version string (e.g. 0.1.5-dev+gabc1234)
 set -euo pipefail
 
 NDK="$ANDROID_HOME/ndk-bundle"
@@ -79,10 +80,15 @@ fi
 
 cp "$KEYSTORE" debug.keystore
 
+# Bake VERSION+g<rev> into SUPERTUX_MILESTONE1_VERSION (see jni/Android.mk).
+SUPERTUX_VERSION="${SUPERTUX_VERSION:-0.1.5-dev}"
+echo "==> SUPERTUX_VERSION=$SUPERTUX_VERSION"
+
 "$NDK/ndk-build" \
   NDK_PROJECT_PATH="$PWD/src" \
   APP_BUILD_SCRIPT="$PWD/src/jni/Android.mk" \
   NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
+  SUPERTUX_VERSION="$SUPERTUX_VERSION" \
   -j"${NIX_BUILD_CORES:-$(nproc)}"
 
 mkdir -p out

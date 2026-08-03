@@ -244,6 +244,7 @@
             gameSrcDir = ./src;
             gameDataDir = ./data;
             stbImageH = stbImageH;
+            gameVersion = version;
           };
 
           # WebAssembly (Emscripten + SDL2 + GLES2/WebGL).
@@ -260,6 +261,9 @@
             enableSound = true;
             enableGles2 = true;
             enableAsyncify = false;  # app_loop + st_frame_delay; true if a path freezes
+            versionFull = version;
+            gitRev = gitRev;
+            sourceUrl = "https://github.com/SuperTux-Origins/supertux-milestone1";
           };
         };
 
@@ -304,6 +308,7 @@
               gameSrcDir = ./src;
               gameDataDir = ./data;
               stbImageH = stbImageH;
+              gameVersion = version;
             };
             apkFileName = androidApkName;
             description = "Install SuperTux Milestone 1 APK via adb";

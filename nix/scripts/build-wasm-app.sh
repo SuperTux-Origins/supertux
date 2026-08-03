@@ -9,6 +9,8 @@
 #   ENABLE_SOUND     - 0|1 (default 0; needs libSDL2_mixer.a + libxmp.a in SDL_WASM_LIBS)
 #   ENABLE_GLES2     - 0|1 (default 1 — WebGL via GLES2 path)
 #   CMAKE_VERBOSE    - if 1, pass --verbose to cmake --build
+#   PROJECT_VERSION_FULL - e.g. 0.1.5-dev+gabc1234 (CMake SUPERTUX_MILESTONE1_VERSION)
+#   GIT_REV / SOURCE_URL - stamped into the HTML shell footer when present
 set -euo pipefail
 
 export EM_CACHE="${TMPDIR:-/tmp}/emcache"
@@ -62,6 +64,12 @@ else
   echo "==> no DATA_DIR — building without assets (title will fail at runtime)"
 fi
 
+PROJECT_VERSION_FULL="${PROJECT_VERSION_FULL:-}"
+if [ -z "$PROJECT_VERSION_FULL" ] && [ -f "$SRC_DIR/VERSION" ]; then
+  PROJECT_VERSION_FULL="$(head -1 "$SRC_DIR/VERSION" | tr -d '\r\n')"
+fi
+echo "==> PROJECT_VERSION_FULL=${PROJECT_VERSION_FULL:-"(unset)"}"
+
 cmake_args=(
   -S "$SRC_DIR"
   -B build
@@ -74,6 +82,9 @@ cmake_args=(
   -DSDL2_ROOT="$SDL_WASM_LIBS"
   -DEMSCRIPTEN_LINK_FLAGS="${LINK_FLAGS[*]} ${PRELOAD[*]}"
 )
+if [ -n "$PROJECT_VERSION_FULL" ]; then
+  cmake_args+=(-DPROJECT_VERSION_FULL="$PROJECT_VERSION_FULL")
+fi
 if [ -n "$ZLIB_PREFIX" ] && [ -d "$ZLIB_PREFIX" ]; then
   cmake_args+=(-DZLIB_ROOT="$ZLIB_PREFIX")
 fi
