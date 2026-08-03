@@ -70,10 +70,7 @@
         gitRev = "${self.shortRev or self.dirtyShortRev or "dirty"}";
         version = "${versionBase}+g${gitRev}";
 
-        # ---- SuperTux derivation ----
-        # Split Linux / Windows builders so the Windows attr path never mentions
-        # pkgs.SDL2_mixer (unsupported on x86_64-windows).
-
+        # ---- SuperTux derivation (native Linux) ----
         mkSuperTuxLinux = {
           useSDL2 ? true,
           useGLES2 ? false,
@@ -124,56 +121,78 @@
             };
           };
 
-        mkSuperTuxWin = { pname ? "supertux-milestone1" }:
-          let
-            # ONLY resolved when this function is called (Windows systems).
-            sdl2Win = SDL2-win32.packages.${pkgs.stdenv.hostPlatform.system}.default;
-            sdl2ImageWin = SDL2_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default;
-          in
-          pkgs.stdenv.mkDerivation rec {
-            inherit pname version;
-            src = lib.cleanSource ./.;
-            enableParallelBuilding = true;
-            dontStrip = true;
-            separateDebugInfo = false;
-            nativeBuildInputs = [
-              pkgs.buildPackages.cmake
-              pkgs.buildPackages.pkg-config
-            ];
-            cmakeFlags = [
-              "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
-              "-DENABLE_SOUND=OFF"
-              "-DENABLE_OPENGL=ON"
-              "-DENABLE_GLES2=OFF"
-              "-DENABLE_SDL2=ON"
-              "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
-              "-DPROJECT_VERSION_FULL=${version}"
-            ];
-            buildInputs = [ sdl2Win sdl2ImageWin pkgs.zlib ];
-            postFixup = ''
-              mkdir -p $out/bin/
-              find ${pkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
-              find ${pkgs.stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
-              ln -sfv ${sdl2Win}/bin/*.dll $out/bin/
-              ln -sfv ${sdl2ImageWin}/bin/*.dll $out/bin/
-            '';
-            meta = with lib; {
-              description = "SuperTux Milestone 1 (Windows SDL2)";
-              license = licenses.gpl2Plus;
-              platforms = platforms.windows;
-              mainProgram = "supertux-milestone1";
-            };
-          };
+        pkgSdl2 = mkSuperTuxLinux { useSDL2 = true; pname = "supertux-milestone1-sdl2"; };
+        pkgSdl1 = mkSuperTuxLinux { useSDL2 = false; pname = "supertux-milestone1-sdl1"; };
+        pkgSdl2Gles2 = mkSuperTuxLinux {
+          useSDL2 = true; useGLES2 = true;
+          pname = "supertux-milestone1-sdl2-gles2";
+        };
 
-        pkgSdl2 = if isWin then mkSuperTuxWin { pname = "supertux-milestone1-sdl2"; }
-                  else mkSuperTuxLinux { useSDL2 = true; pname = "supertux-milestone1-sdl2"; };
-        pkgSdl1 = if isWin then null
-                  else mkSuperTuxLinux { useSDL2 = false; pname = "supertux-milestone1-sdl1"; };
-        pkgSdl2Gles2 = if isWin then null
-                  else mkSuperTuxLinux {
-                    useSDL2 = true; useGLES2 = true;
-                    pname = "supertux-milestone1-sdl2-gles2";
-                  };
+        # ---- Windows cross (from Linux only, same idea as android/wasm) ----
+        # SDL2-win32 flakes expose packages under x86_64-windows / i686-windows.
+        # Build with pkgsCross; stage .exe + DLLs + data/ into a flat output.
+        mkWinCross = { crossPkgs, winSystem, pname }:
+          let
+            sdl2Win = SDL2-win32.packages.${winSystem}.default;
+            sdl2ImageWin = SDL2_image-win32.packages.${winSystem}.default;
+            game = crossPkgs.stdenv.mkDerivation {
+              inherit pname version;
+              src = lib.cleanSource ./.;
+              enableParallelBuilding = true;
+              dontStrip = true;
+              separateDebugInfo = false;
+              nativeBuildInputs = [
+                crossPkgs.buildPackages.cmake
+                crossPkgs.buildPackages.pkg-config
+              ];
+              cmakeFlags = [
+                "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+                "-DENABLE_SOUND=OFF"
+                "-DENABLE_OPENGL=ON"
+                "-DENABLE_GLES2=OFF"
+                "-DENABLE_SDL2=ON"
+                "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
+                "-DPROJECT_VERSION_FULL=${version}"
+              ];
+              buildInputs = [ sdl2Win sdl2ImageWin crossPkgs.zlib ];
+              postFixup = ''
+                mkdir -p $out/bin/
+                find ${crossPkgs.windows.mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
+                find ${crossPkgs.stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
+                ln -sfv ${sdl2Win}/bin/*.dll $out/bin/
+                ln -sfv ${sdl2ImageWin}/bin/*.dll $out/bin/
+              '';
+              meta = with lib; {
+                description = "SuperTux Milestone 1 (${pname})";
+                license = licenses.gpl2Plus;
+                platforms = platforms.windows;
+                mainProgram = "supertux-milestone1";
+              };
+            };
+          in
+          # Flat redistributable: .exe + DLLs + data/ at the root (pingus-style).
+          pkgs.runCommand pname { } ''
+            mkdir -p $out/data
+            cp -vr ${game}/bin/supertux-milestone1.exe $out/ 2>/dev/null \
+              || cp -vr ${game}/bin/*.exe $out/
+            cp -vLr ${game}/bin/*.dll $out/ 2>/dev/null || true
+            if [ -d ${game}/share/supertux-milestone1 ]; then
+              cp -vr ${game}/share/supertux-milestone1/. $out/data/
+            fi
+          '';
+
+        # Only define cross packages on Linux build hosts.
+        win64Package = if isWin then null else mkWinCross {
+          crossPkgs = pkgs.pkgsCross.mingwW64;
+          winSystem = "x86_64-windows";
+          pname = "supertux-milestone1-win64";
+        };
+        win32Package = if isWin then null else mkWinCross {
+          crossPkgs = pkgs.pkgsCross.mingw32;
+          winSystem = "i686-windows";
+          pname = "supertux-milestone1-win32";
+        };
+
 
         # ---- Linux-only: Android + wasm (must not eval on *-windows) ----
         linuxExtras =
@@ -285,46 +304,19 @@
             };
             checks = {
               android-sdl-libs = android.sdlAndroidLibs;
-              supertux-milestone1-android =
-                android.mkApk {
-                  appName = "supertux-milestone1";
-                  appDir = ./android;
-                  outApkName = androidApkName;
-                  keystore = ./keystore/debug.keystore;
-                  gameSrcDir = ./src;
-                  gameDataDir = ./data;
-                  stbImageH = stbImageH;
-                  gameVersion = version;
-                };
             };
           };
 
-      in rec {
+      in {
         packages = {
           default = pkgSdl2;
           supertux-milestone1-sdl2 = pkgSdl2;
-          # SDL1 only on native Unix (no SDL1 MinGW path).
         } // lib.optionalAttrs (!isWin) {
+          # Native Linux + Windows cross under the *build* system (like android/wasm).
           supertux-milestone1-sdl1 = pkgSdl1;
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
-        } // lib.optionalAttrs isWin {
-          # pingus-style: flat dir with .exe + DLLs + data/
-          default = pkgSdl2;
-          supertux-milestone1-sdl2 = pkgSdl2;
-          supertux-milestone1-win32 = pkgs.runCommand "supertux-milestone1-win32" {} ''
-            mkdir -p $out/data
-            cp -vr ${pkgSdl2}/bin/supertux-milestone1.exe $out/ 2>/dev/null \
-              || cp -vr ${pkgSdl2}/bin/*.exe $out/
-            cp -vLr ${pkgSdl2}/bin/*.dll $out/ 2>/dev/null || true
-            if [ -d ${pkgSdl2}/share/supertux-milestone1 ]; then
-              cp -vr ${pkgSdl2}/share/supertux-milestone1/. $out/data/
-            fi
-          '';
-        } // lib.optionalAttrs (!isWin) {
-          # From Linux hosts: re-export the Windows package (like building
-          # packages.x86_64-windows.supertux-milestone1-win32).
-          supertux-milestone1-win32 =
-            self.packages.x86_64-windows.supertux-milestone1-win32;
+          supertux-milestone1-win64 = win64Package; # mingwW64 → x86_64 PE
+          supertux-milestone1-win32 = win32Package; # mingw32  → i686 PE
         } // linuxExtras.packages;
 
         checks = {
@@ -332,10 +324,8 @@
         } // lib.optionalAttrs (!isWin) {
           supertux-milestone1-sdl1 = pkgSdl1;
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
-          supertux-milestone1-win32 =
-            self.packages.x86_64-windows.supertux-milestone1-win32;
-        } // lib.optionalAttrs isWin {
-          supertux-milestone1-win32 = packages.supertux-milestone1-win32;
+          supertux-milestone1-win64 = win64Package;
+          supertux-milestone1-win32 = win32Package;
         } // linuxExtras.checks;
 
         apps = {
