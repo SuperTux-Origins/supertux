@@ -149,6 +149,12 @@ if [ -n "${SDL_MIXER_SRC:-}" ]; then
   cp -a "$LIBXMP_SRC" SDL2_mixer-src/external/libxmp
   chmod -R u+w SDL2_mixer-src/external/libxmp
 
+  # libxmp 4.6 still declares cmake_minimum_required < 3.5; modern CMake rejects it.
+  if [ -f SDL2_mixer-src/external/libxmp/CMakeLists.txt ]; then
+    sed -i -E 's/cmake_minimum_required\s*\(\s*VERSION\s+[0-9.]+/cmake_minimum_required(VERSION 3.16/' \
+      SDL2_mixer-src/external/libxmp/CMakeLists.txt || true
+  fi
+
   # Also install a standalone libxmp.a into PREFIX for the game link line
   # (some mixer builds only reference symbols, not merge the archive).
   echo "==> libxmp static → $PREFIX (standalone + vendored)"
@@ -159,6 +165,7 @@ if [ -n "${SDL_MIXER_SRC:-}" ]; then
     emcmake cmake ../SDL2_mixer-src/external/libxmp \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+      -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
       -DBUILD_SHARED=OFF \
       -DBUILD_STATIC=ON \
       -DBUILD_SHARED_LIBS=OFF \
@@ -178,12 +185,14 @@ if [ -n "${SDL_MIXER_SRC:-}" ]; then
     find . -name 'libxmp_static.a' -exec cp -v {} "$PREFIX/lib/libxmp.a" \; || true
   fi
   if [ ! -f "$PREFIX/lib/libxmp.a" ]; then
-    # Autotools fallback
+    # Autotools fallback — must declare wasm host or configure tries to run a.out.
     (
       cd SDL2_mixer-src/external/libxmp
       if [ -f configure ] || [ -f configure.ac ]; then
         [ -f configure ] || autoreconf -fi || true
         emconfigure ./configure \
+          --host=wasm32-unknown-emscripten \
+          --build="$(cc -dumpmachine 2>/dev/null || echo x86_64-pc-linux-gnu)" \
           --prefix="$PREFIX" \
           --enable-static \
           --disable-shared \
@@ -228,6 +237,7 @@ EOF
     -DCMAKE_BUILD_TYPE=Release
     -DCMAKE_INSTALL_PREFIX="$PREFIX"
     -DCMAKE_PREFIX_PATH="$PREFIX"
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     -DSDL2_DIR="$PREFIX/lib/cmake/SDL2"
     -DSDL2_LIBRARY="$SDL2_LIB"
     -DSDL2_INCLUDE_DIR="$SDL2_INC"
