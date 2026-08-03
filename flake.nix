@@ -405,6 +405,20 @@
           '');
           meta.description = description;
         };
+        mkWin32Zip = pkg: name: pkgs.runCommand name {} ''
+            mkdir -p $out
+            WORKDIR=$(mktemp -d)
+
+            cp --no-preserve mode,ownership --verbose --recursive \
+              ${pkg}/. "$WORKDIR"
+
+            cd "$WORKDIR"
+            ${nixpkgs.legacyPackages.x86_64-linux.zip}/bin/zip \
+              -r \
+              $out/${name}-${version}-${system}.zip \
+              .
+          '';
+
 
         # Lightweight output shape checks (used by checks.*).
         mkSanity = name: pkg: script:
@@ -428,6 +442,8 @@
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
           supertux-milestone1-win32-x64 = win64Package; # mingwW64 → x86_64 PE
           supertux-milestone1-win32-x86 = win32Package; # mingw32  → i686 PE
+          supertux-milestone1-win32-x64-zip = mkWin32Zip win64Package "supertux-milestone1";
+          supertux-milestone1-win32-x86-zip = mkWin32Zip win32Package "supertux-milestone1";
         } // linuxExtras.packages;
 
         checks = {
@@ -443,6 +459,8 @@
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
           supertux-milestone1-win32-x64 = win64Package;
           supertux-milestone1-win32-x86 = win32Package;
+          supertux-milestone1-win32-x64-zip = mkWin32Zip win64Package "supertux-milestone1";
+          supertux-milestone1-win32-x86-zip = mkWin32Zip win32Package "supertux-milestone1";
 
           sanity-sdl1 = mkSanity "sdl1" pkgSdl1 ''
             test -x ${pkgSdl1}/bin/supertux-milestone1
