@@ -86,7 +86,7 @@
       <button type="button" id="btn-display-native" class="active" title="Original resolution">640×480</button>
       <button type="button" id="btn-display-fit" title="Scale to fit the browser window">Fit window</button>
       <button type="button" id="btn-display-fullscreen" title="Browser fullscreen">Fullscreen</button>
-      <button type="button" id="btn-pause" title="Pause the game (Escape)">Pause</button>
+      <button type="button" id="btn-pause" title="Freeze the game loop (tab hide also freezes)">Pause</button>
     </div>
     <div class="toolbar toolbar-backup" title="Progress is stored in this browser (IndexedDB). Use these to back up or move to another machine.">
       <button type="button" id="btn-download-backup" disabled>Download backup</button>
@@ -277,32 +277,49 @@
     }
 
 
-    function stRequestPause() {
+    var stLoopPaused = false;
+    var stUserPaused = false; /* Pause button; visibility uses the same freeze */
+
+    function stSetLoopPaused(paused, fromUser) {
+      if (typeof Module === 'undefined') return;
+      if (paused === stLoopPaused) {
+        if (fromUser) stUserPaused = paused;
+        return;
+      }
       try {
-        if (typeof Module === 'undefined') return;
-        if (typeof Module._st_emscripten_request_pause === 'function') {
-          Module._st_emscripten_request_pause();
-          return;
+        if (paused) {
+          if (typeof Module.pauseMainLoop === 'function')
+            Module.pauseMainLoop();
+          else if (typeof Module.ccall === 'function')
+            Module.ccall('emscripten_pause_main_loop', null, [], []);
+        } else {
+          if (typeof Module.resumeMainLoop === 'function')
+            Module.resumeMainLoop();
+          else if (typeof Module.ccall === 'function')
+            Module.ccall('emscripten_resume_main_loop', null, [], []);
         }
-        if (typeof Module.ccall === 'function') {
-          Module.ccall('st_emscripten_request_pause', null, [], []);
-          return;
+        stLoopPaused = paused;
+        if (fromUser) stUserPaused = paused;
+        var bp = document.getElementById('btn-pause');
+        if (bp) {
+          bp.textContent = stLoopPaused ? 'Resume' : 'Pause';
+          bp.className = stLoopPaused ? 'active' : '';
         }
-        console.warn('SuperTux: pause export not available yet');
-      } catch (e) { console.warn('SuperTux: pause failed', e); }
+      } catch (e) { console.warn('SuperTux: main-loop pause failed', e); }
     }
 
     function stEnablePauseControls() {
       var bp = document.getElementById('btn-pause');
-      if (bp) bp.onclick = function() { stRequestPause(); };
+      if (bp) bp.onclick = function() {
+        stSetLoopPaused(!stLoopPaused, true);
+      };
       document.addEventListener('visibilitychange', function() {
-        if (document.hidden)
-          stRequestPause();
-      });
-      window.addEventListener('blur', function() {
-        /* Some browsers only fire blur for the window; still request pause. */
-        if (document.hidden)
-          stRequestPause();
+        if (document.hidden) {
+          stSetLoopPaused(true, false);
+        } else if (!stUserPaused) {
+          /* Only auto-resume if the user did not press Pause. */
+          stSetLoopPaused(false, false);
+        }
       });
     }
 

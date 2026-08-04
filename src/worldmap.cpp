@@ -543,10 +543,6 @@ WorldMap::get_input()
   enter_level = false;
   input_direction = D_NONE;
 
-  /* Web shell Pause / tab hidden: open pause menu (do not toggle closed). */
-  if (app_consume_pause_request() && !Menu::current())
-    on_escape_press();
-
   /*
    * Input ownership:
    *   1. Update the touch pad from the event (always).

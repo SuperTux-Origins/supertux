@@ -26,7 +26,6 @@
 static bool g_app_active = false;
 static AppScreen g_screen = APP_SCREEN_TITLE;
 static AppScreen g_return_screen = APP_SCREEN_TITLE;
-static bool g_pause_request = false;
 
 static WorldMapNS::WorldMap* g_worldmap = 0;
 static GameSession* g_session = 0;
@@ -48,43 +47,6 @@ bool app_loop_active(void)
 {
   return g_app_active;
 }
-
-void app_request_pause(void)
-{
-  /* Session / worldmap consume this and open their pause menus.
-     Title / confirm ignore a dangling flag. */
-  g_pause_request = true;
-}
-
-bool app_consume_pause_request(void)
-{
-  if (!g_pause_request)
-    return false;
-  g_pause_request = false;
-  return true;
-}
-
-#ifdef __EMSCRIPTEN__
-/* JS shell: Module._st_emscripten_request_pause() */
-extern "C" EMSCRIPTEN_KEEPALIVE void
-st_emscripten_request_pause(void)
-{
-  app_request_pause();
-  /* Inject Escape so the existing input path opens the pause menu even if
-     the flag is only observed a frame later. On the title root menu Escape
-     is a no-op (does not exit). */
-  SDL_Event e;
-  memset(&e, 0, sizeof(e));
-  e.type = SDL_KEYDOWN;
-  e.key.type = SDL_KEYDOWN;
-  e.key.state = SDL_PRESSED;
-  e.key.keysym.sym = SDLK_ESCAPE;
-#ifdef USE_SDL2
-  e.key.keysym.scancode = SDL_SCANCODE_ESCAPE;
-#endif
-  SDL_PushEvent(&e);
-}
-#endif
 
 void app_request_worldmap(const std::string& map_file,
                           const std::string& save_file,

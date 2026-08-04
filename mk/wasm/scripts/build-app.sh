@@ -44,8 +44,8 @@ LINK_FLAGS=(
   "SHELL:-lidbfs.js"
   # Canvas / pause hooks for mk/wasm/shell.html. Comma list (no JS-array
   # quotes) survives CMake separate_arguments(NATIVE_COMMAND).
-  "SHELL:-sEXPORTED_FUNCTIONS=_main,_st_emscripten_canvas_resize,_st_emscripten_canvas_native,_st_emscripten_request_pause"
-  "SHELL:-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,FS"
+  "SHELL:-sEXPORTED_FUNCTIONS=_main,_st_emscripten_canvas_resize,_st_emscripten_canvas_native"
+  "SHELL:-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,FS,pauseMainLoop,resumeMainLoop"
 )
 if [ "${ENABLE_ASYNCIFY:-0}" = 1 ]; then
   LINK_FLAGS+=("SHELL:-sASYNCIFY=1" "SHELL:-sASYNCIFY_STACK_SIZE=1048576")

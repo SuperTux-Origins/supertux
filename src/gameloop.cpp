@@ -23,7 +23,6 @@
 #include "defines.h"
 #include "globals.h"
 #include "gameloop.h"
-#include "app_loop.h"
 #include "screen.h"
 #include "setup.h"
 #include "high_scores.h"
@@ -200,10 +199,6 @@ GameSession::on_escape_press()
 void
 GameSession::process_events()
 {
-  /* Web shell Pause button / tab hidden → same as Escape. */
-  if (app_consume_pause_request())
-    on_escape_press();
-
   if (end_sequence != NO_ENDSEQUENCE)
     {
       Player& tux = *world->get_tux();
@@ -306,8 +301,6 @@ GameSession::process_events()
                       tux.key_event((SDLKey)keymap.right, UP);
                       tux.key_event((SDLKey)keymap.fire, UP);
                       touch_controls_reset();
-                      /* Auto-pause when the window/tab loses focus. */
-                      on_escape_press();
                     }
                   break;
 #endif
