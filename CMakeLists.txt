@@ -27,7 +27,7 @@ option(ENABLE_SOUND  "Audio (SDL_mixer / SDL2_mixer)" ON)
 option(ENABLE_OPENGL "OpenGL rendering path" ON)
 option(ENABLE_GLES2  "OpenGL ES 2.0 path (shader quads; implies ENABLE_OPENGL; prefer ENABLE_SDL2)" OFF)
 option(ENABLE_SDL2   "SDL2 backend (OFF = SDL 1.2)" OFF)
-option(ENABLE_DEBUG  "DEBUG define, -O0 -g" OFF)
+option(ENABLE_DEBUG  "DEBUG define; unoptimized build with extra warnings" OFF)
 
 if(ENABLE_GLES2)
   set(ENABLE_OPENGL ON CACHE BOOL "OpenGL rendering path" FORCE)
@@ -216,7 +216,40 @@ if(ENABLE_GLES2)
 endif()
 if(ENABLE_DEBUG)
   target_compile_definitions(supertux-milestone1 PRIVATE DEBUG)
-  target_compile_options(supertux-milestone1 PRIVATE -Wall -Wextra -O0 -g)
+  # Thorough debug build: no optimise, rich symbols, frame pointers, extra
+  # diagnostics. Keep -Werror off — this tree is C++98-era and still noisy.
+  target_compile_options(supertux-milestone1 PRIVATE
+    -O0 -g3
+    -fno-omit-frame-pointer
+    -fno-inline
+    -Wall -Wextra
+    -Wshadow
+    -Wformat=2
+    -Wundef
+    -Wpointer-arith
+    -Wcast-qual
+    -Wwrite-strings
+    -Wmissing-declarations
+    -Wredundant-decls
+    -Winit-self
+    -Wuninitialized
+  )
+  # GCC/Clang extras when available (harmless if the driver rejects some).
+  include(CheckCXXCompilerFlag)
+  foreach(_st_debug_flag
+      -Wnull-dereference
+      -Wduplicated-cond
+      -Wduplicated-branches
+      -Wlogical-op
+      -Wrestrict)
+    string(REPLACE "=" "_" _st_cache "HAS_${_st_debug_flag}")
+    string(REPLACE "-" "_" _st_cache "${_st_cache}")
+    check_cxx_compiler_flag("${_st_debug_flag}" ${_st_cache})
+    if(${_st_cache})
+      target_compile_options(supertux-milestone1 PRIVATE ${_st_debug_flag})
+    endif()
+  endforeach()
+  message(STATUS "ENABLE_DEBUG: DEBUG + -O0 -g3 + extra warnings")
 endif()
 
 target_link_libraries(supertux-milestone1 PRIVATE

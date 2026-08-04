@@ -93,6 +93,7 @@
         mkSuperTuxLinux = {
           useSDL2 ? true,
           useGLES2 ? false,
+          enableDebug ? false,
           pname ? "supertux-milestone1",
         }:
           let
@@ -110,11 +111,12 @@
               pkgs.addDriverRunpath
             ];
             cmakeFlags = [
-              "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+              "-DCMAKE_BUILD_TYPE=${if enableDebug then "Debug" else "RelWithDebInfo"}"
               "-DENABLE_SOUND=ON"
               "-DENABLE_OPENGL=ON"
               "-DENABLE_GLES2=${if useGLES2 then "ON" else "OFF"}"
               "-DENABLE_SDL2=${if effectiveSDL2 then "ON" else "OFF"}"
+              "-DENABLE_DEBUG=${if enableDebug then "ON" else "OFF"}"
               "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
               "-DPROJECT_VERSION_FULL=${version}"
             ];
@@ -145,6 +147,12 @@
         pkgSdl2Gles2 = mkSuperTuxLinux {
           useSDL2 = true; useGLES2 = true;
           pname = "supertux-milestone1-sdl2-gles2";
+        };
+        # Desktop SDL2 with ENABLE_DEBUG: -O0 -g3, extra warnings (see CMakeLists).
+        pkgSdlDebug = mkSuperTuxLinux {
+          useSDL2 = true;
+          enableDebug = true;
+          pname = "supertux-milestone1-sdl2-debug";
         };
 
         # ---- Windows cross (from Linux only, same idea as android/wasm) ----
@@ -440,6 +448,8 @@
           # Native Linux + Windows cross under the *build* system (like android/wasm).
           supertux-milestone1-sdl1 = pkgSdl1;
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
+          # SDL2 + ENABLE_DEBUG (unoptimized, extra warnings).
+          supertux-milestone1-sdl2-debug = pkgSdlDebug;
           supertux-milestone1-win32-x64 = win64Package; # mingwW64 → x86_64 PE
           supertux-milestone1-win32-x86 = win32Package; # mingw32  → i686 PE
           supertux-milestone1-win32-x64-zip = mkWin32Zip win64Package "supertux-milestone1";
@@ -516,6 +526,11 @@
             type = "app";
             program = "${pkgSdl2}/bin/supertux-milestone1";
             meta.description = "SuperTux Milestone 1 (SDL2)";
+          };
+          supertux-milestone1-sdl2-debug = {
+            type = "app";
+            program = "${pkgSdlDebug}/bin/supertux-milestone1";
+            meta.description = "SuperTux Milestone 1 (SDL2, ENABLE_DEBUG)";
           };
         } // lib.optionalAttrs (!isWin) {
           supertux-milestone1-sdl1 = {
