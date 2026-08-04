@@ -175,6 +175,17 @@ create_game_window(const char* title, bool opengl, bool* fullscreen_inout)
   Uint32 base = opengl ? SDL_WINDOW_OPENGL : 0;
   SDL_Window* win = NULL;
 
+#ifdef __EMSCRIPTEN__
+  /* Browser canvas: never use SDL exclusive fullscreen — it leaves the
+     canvas at the wrong size after exit. Page UI uses the Fullscreen API
+     and CSS fit modes; SDL stays at a resizable windowed canvas. */
+  (void)fullscreen_inout;
+  win = SDL_CreateWindow(title,
+                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                         ST_SCREEN_W, ST_SCREEN_H,
+                         base | SDL_WINDOW_RESIZABLE);
+  return win;
+#else
   if (*fullscreen_inout)
     {
       win = SDL_CreateWindow(title,
@@ -207,6 +218,7 @@ create_game_window(const char* title, bool opengl, bool* fullscreen_inout)
     }
 
   return win;
+#endif
 }
 
 static void
@@ -475,6 +487,10 @@ bool platform_video_init(bool fullscreen, bool opengl)
   }
 
   use_fullscreen = fullscreen;
+#ifdef __EMSCRIPTEN__
+  /* Shell HTML owns fullscreen / fit; SDL stays windowed on the canvas. */
+  use_fullscreen = false;
+#endif
   use_gl = opengl;
 
   VLOG("[video] driver=%s DISPLAY=%s\n",
@@ -707,3 +723,34 @@ void platform_set_icon(SDL_Surface* icon)
   if (st_window && icon)
     SDL_SetWindowIcon(st_window, icon);
 }
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+
+/* Called from the HTML shell when the canvas CSS/fullscreen size changes
+   so SDL's window and the letterbox match the drawable. */
+extern "C" EMSCRIPTEN_KEEPALIVE void
+st_emscripten_canvas_resize(int w, int h)
+{
+  if (w < 16)
+    w = ST_SCREEN_W;
+  if (h < 16)
+    h = ST_SCREEN_H;
+  if (!st_window)
+    return;
+  SDL_SetWindowSize(st_window, w, h);
+  st_update_letterbox(w, h);
+#ifndef NOOPENGL
+  if (use_gl)
+    gl_setup_viewport();
+#endif
+  VLOG("[video] emscripten canvas resize %dx%d\n", w, h);
+}
+
+/* Restore native logical size (e.g. after leaving browser fullscreen). */
+extern "C" EMSCRIPTEN_KEEPALIVE void
+st_emscripten_canvas_native(void)
+{
+  st_emscripten_canvas_resize(ST_SCREEN_W, ST_SCREEN_H);
+}
+#endif /* __EMSCRIPTEN__ */

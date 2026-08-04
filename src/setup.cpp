@@ -844,7 +844,9 @@ void st_menu(void)
 #else
   options_menu->additem(MN_DEACTIVE,"OpenGL (not supported)",use_gl, 0, MNID_OPENGL);
 #endif
+#ifndef __EMSCRIPTEN__
   options_menu->additem(MN_TOGGLE,"Fullscreen",use_fullscreen,0, MNID_FULLSCREEN);
+#endif
 #endif
 #ifndef NOSOUND
   if(audio_device)
