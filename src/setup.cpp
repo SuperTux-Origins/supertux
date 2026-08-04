@@ -831,7 +831,10 @@ void st_menu(void)
   main_menu->additem(MN_ACTION,"Level Editor",0,0, MNID_LEVELEDITOR);
 #endif
   main_menu->additem(MN_ACTION,"Credits",0,0, MNID_CREDITS);
+#ifndef __EMSCRIPTEN__
+  /* Quit is meaningless in a browser tab — close the tab instead. */
   main_menu->additem(MN_ACTION,"Quit",0,0, MNID_QUITMAINMENU);
+#endif
 
   options_menu->additem(MN_LABEL,"Options",0,0);
   options_menu->additem(MN_HL,"",0,0);
@@ -943,7 +946,8 @@ void st_menu(void)
   worldmap_menu->additem(MN_ACTION,"Continue",0,0,MNID_RETURNWORLDMAP);
   worldmap_menu->additem(MN_GOTO,"Options",0,options_menu);
   worldmap_menu->additem(MN_HL,"",0,0);
-  worldmap_menu->additem(MN_ACTION,"Quit Game",0,0,MNID_QUITWORLDMAP);
+  /* Returns to the title screen (does not exit the process). */
+  worldmap_menu->additem(MN_ACTION,"Exit to Title",0,0,MNID_QUITWORLDMAP);
 
   highscore_menu->additem(MN_TEXTFIELD,"Enter your name:",0,0);
 }
