@@ -423,6 +423,23 @@ destroy_sw_presenter(void)
     }
 }
 
+/** Apply Smooth-graphics setting to the software frame texture. */
+static void
+software_apply_scale_filter(void)
+{
+  const char* quality = use_texture_filtering ? "1" : "0";
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, quality);
+  if (!st_sw_tex)
+    return;
+#ifdef SDL_VERSION_ATLEAST
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+  SDL_SetTextureScaleMode(
+      st_sw_tex,
+      use_texture_filtering ? SDL_ScaleModeLinear : SDL_ScaleModeNearest);
+#endif
+#endif
+}
+
 /** SDL_Renderer path: works on Emscripten where GetWindowSurface is a no-op. */
 static bool
 init_sw_presenter(void)
@@ -442,9 +459,6 @@ init_sw_presenter(void)
       return false;
     }
 
-  /* Integer scale of the 640×480 backbuffer — no bilinear bleed. */
-  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-
   st_sw_tex = SDL_CreateTexture(st_sw_renderer,
                                 SDL_PIXELFORMAT_ARGB8888,
                                 SDL_TEXTUREACCESS_STREAMING,
@@ -455,6 +469,8 @@ init_sw_presenter(void)
       destroy_sw_presenter();
       return false;
     }
+  /* Smooth graphics option → linear vs nearest when scaling the frame. */
+  software_apply_scale_filter();
   return true;
 }
 
@@ -468,8 +484,13 @@ software_present(void)
   SDL_GetWindowSize(st_window, &ww, &wh);
   st_update_letterbox(ww, wh);
 
-  /* Prefer renderer present on Emscripten; also if surface path is unavailable. */
+  /* Prefer renderer present on Emscripten; also if surface path is unavailable.
+     When Smooth graphics is on and the window is not 1:1, use the renderer so
+     we can bilinear-scale (SDL_BlitScaled is always nearest). */
   bool use_renderer = (st_sw_renderer != NULL && st_sw_tex != NULL);
+  bool need_scale = (ww != ST_SCREEN_W || wh != ST_SCREEN_H
+                     || st_margin_l != 0.0f || st_margin_r != 0.0f
+                     || st_margin_t != 0.0f || st_margin_b != 0.0f);
 #ifdef __EMSCRIPTEN__
   use_renderer = true;
   if (!st_sw_renderer || !st_sw_tex)
@@ -477,10 +498,17 @@ software_present(void)
       if (!init_sw_presenter())
         return;
     }
+#else
+  if (!use_renderer && use_texture_filtering && need_scale)
+    {
+      if (init_sw_presenter())
+        use_renderer = true;
+    }
 #endif
 
   if (use_renderer && st_sw_renderer && st_sw_tex)
     {
+      software_apply_scale_filter();
       if (SDL_MUSTLOCK(st_backbuffer))
         SDL_LockSurface(st_backbuffer);
       SDL_UpdateTexture(st_sw_tex, NULL, st_backbuffer->pixels, st_backbuffer->pitch);
@@ -962,12 +990,17 @@ void platform_set_caption(const char* title, const char* /*icon*/)
 void platform_apply_frame_filter(void)
 {
 #ifndef NOOPENGL
+  if (use_gl)
+    {
 #ifdef USE_GLES2
-  gles2_renderer_set_frame_filter(use_texture_filtering);
+      gles2_renderer_set_frame_filter(use_texture_filtering);
 #else
-  desktop_gl_apply_frame_filter();
+      desktop_gl_apply_frame_filter();
 #endif
+      return;
+    }
 #endif
+  software_apply_scale_filter();
 }
 
 void platform_present(bool /*full_update*/)
