@@ -782,15 +782,13 @@ WorldMap::update(float delta)
               level->y == tux->get_tile_pos().y)
             {
               std::cout << "Enter the current level: " << level->name << std::endl;;
-#ifdef __EMSCRIPTEN__
-              if (app_loop_active())
+if (app_loop_active())
                 {
                   enter_level = false;
                   app_request_session(datadir + "/levels/" + level->name,
                                       1, ST_GL_LOAD_LEVEL_FILE);
                   return;
                 }
-#endif
               {
               GameSession session(datadir +  "/levels/" + level->name,
                                   1, ST_GL_LOAD_LEVEL_FILE);

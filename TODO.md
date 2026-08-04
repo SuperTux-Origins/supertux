@@ -325,10 +325,10 @@ main WASM menu paths.
 - [x] Frame-based **game-over / result** overlays (same pattern as intro)
 - [x] On session finish in `app_loop`, if level has `extro_filename`, queue
       `app_request_text_scroll` (then credits) instead of dropping them
-- [ ] Prefer shared frame pump for desktop too (busy `while (frame())` wrappers only)
-- [ ] Guard or frame-ify `save_hs` if ever reachable under app_loop
-- [ ] Keep OpenGL forced on WASM; leave ASYNCIFY **off** by default
-- [ ] Document unified loop in `AGENTS.md`
+- [x] Shared frame pump on desktop (`app_run` + `app_frame`; same state machine as wasm)
+- [x] Guard blocking wrappers under `app_loop_active()` (`save_hs`, `confirm_dialog`, `display_text_file`)
+- [x] Keep OpenGL forced on WASM; leave ASYNCIFY **off** by default
+- [x] Document unified loop in `AGENTS.md`
 
 ### Freeze risk summary (policy)
 
@@ -339,7 +339,7 @@ Diagnose before fixing; do not re-enable ASYNCIFY for parity. Prefer timer +
 
 | Date | Item |
 |------|------|
-| 2026-08-04 | ASYNCIFY removal audit → Phase 6; frame-based level intro started |
+| 2026-08-04 | ASYNCIFY removal audit → Phase 6; frame intro/end; unified app_run desktop+wasm |
 | 2026-08-03 | Phase 5 scaffold: wasm.nix, scripts, CMake EMSCRIPTEN/SDL2_ROOT, flake targets |
 | 2026-08-03 | Emscripten datadir/userdir + open_game_file /data; SDL wasm install prefix |
 | 2026-08-03 | Fix wasm SDL2_image: pass SDL2_LIBRARY/INCLUDE_DIR to PrivateSDL2 finder |

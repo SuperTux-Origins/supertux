@@ -255,7 +255,6 @@ app_finish_text(void)
   Menu::set_current(main_menu);
 }
 
-#ifdef __EMSCRIPTEN__
 static void
 app_frame(void* /*arg*/)
 {
@@ -280,6 +279,8 @@ app_frame(void* /*arg*/)
       title_shutdown();
       g_screen = APP_SCREEN_DONE;
       g_app_active = false;
+#ifdef __EMSCRIPTEN__
+      /* Full teardown only on wasm — desktop main() cleans up after app_run. */
       clearscreen(0, 0, 0);
       updatescreen();
       unloadshared();
@@ -287,6 +288,7 @@ app_frame(void* /*arg*/)
       ::TileManager::destroy_instance();
       st_shutdown();
       emscripten_cancel_main_loop();
+#endif
       break;
 
     case APP_SCREEN_WORLDMAP:
@@ -321,20 +323,25 @@ app_frame(void* /*arg*/)
     case APP_SCREEN_DONE:
     default:
       g_app_active = false;
+#ifdef __EMSCRIPTEN__
       emscripten_cancel_main_loop();
+#endif
       break;
     }
 }
-#endif /* __EMSCRIPTEN__ */
 
 void app_run(void)
 {
-#ifdef __EMSCRIPTEN__
   g_app_active = true;
   g_screen = APP_SCREEN_TITLE;
   title_init();
+#ifdef __EMSCRIPTEN__
+  /* rAF-paced; does not return. */
   emscripten_set_main_loop_arg(app_frame, 0, 0, 1);
 #else
-  title();
+  /* Same state machine as wasm; frame helpers pace via st_frame_delay. */
+  while (g_app_active && g_screen != APP_SCREEN_DONE)
+    app_frame(0);
+  g_app_active = false;
 #endif
 }

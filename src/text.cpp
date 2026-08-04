@@ -8,6 +8,7 @@
 #include "defines.h"
 #include "screen.h"
 #include "text.h"
+#include "app_loop.h"
 #include "setup.h"
 #include "menu.h"
 #include "touch_controls.h"
@@ -469,6 +470,11 @@ bool display_text_file_frame(void)
 
 void display_text_file(const std::string& file, Surface* surface, float scroll_speed)
 {
+  if (app_loop_active())
+    {
+      fprintf(stderr, "display_text_file: blocked under app_loop (use begin/frame)\n");
+      return;
+    }
   display_text_file_begin(file, surface, scroll_speed, false);
   while (display_text_file_frame())
     { /* busy loop */ }
@@ -476,6 +482,11 @@ void display_text_file(const std::string& file, Surface* surface, float scroll_s
 
 void display_text_file(const std::string& file, const std::string& surface, float scroll_speed)
 {
+  if (app_loop_active())
+    {
+      fprintf(stderr, "display_text_file: blocked under app_loop (use begin/frame)\n");
+      return;
+    }
   Surface* sur = new Surface(datadir + surface, IGNORE_ALPHA);
   display_text_file_begin(file, sur, scroll_speed, true);
   while (display_text_file_frame())

@@ -9,10 +9,11 @@
 class Surface;
 
 /**
- * Top-level screen ownership for the Emscripten frame pump.
- * Native builds keep the historic nested busy loops; on Emscripten
+ * Top-level screen ownership for the non-blocking frame pump.
  * app_run() drives title / worldmap / session / overlays via frame()
- * helpers without nesting run()/display()/confirm/credits.
+ * helpers without nesting run()/display()/confirm/credits. Used on
+ * Emscripten (emscripten_set_main_loop) and desktop (busy while +
+ * st_frame_delay). Nested busy loops remain for leveleditor / CLI.
  */
 
 enum AppScreen {
@@ -24,7 +25,7 @@ enum AppScreen {
   APP_SCREEN_DONE
 };
 
-/** True when the Emscripten non-blocking app loop is active. */
+/** True while app_run() owns the top-level frame pump. */
 bool app_loop_active(void);
 
 /**
@@ -37,7 +38,7 @@ void app_request_worldmap(const std::string& map_file,
                           bool is_full_path_map = false);
 
 /**
- * Request a level session (Emscripten only).
+ * Request a level session (non-blocking hand-off under app_loop).
  * Matches GameSession(subset_or_path, levelnb, mode):
  *   ST_GL_LOAD_LEVEL_FILE — subset_or_path is a full level path; levelnb ignored
  *   ST_GL_PLAY            — subset name + 1-based level number
@@ -57,8 +58,9 @@ void app_request_text_scroll(const std::string& file,
                              bool own_surface = false);
 
 /**
- * Run the whole game under a single frame callback (Emscripten).
- * Does not return until the user quits (cancels the main loop).
+ * Run the whole game under the unified frame pump.
+ * Emscripten: emscripten_set_main_loop (does not return).
+ * Desktop: while (app_frame) until quit; returns to main for teardown.
  */
 void app_run(void);
 

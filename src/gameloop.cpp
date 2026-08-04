@@ -847,7 +847,7 @@ GameSession::process_overlay()
         }
       else if (pending_exit != ES_NONE)
         {
-          exit_status = pending_exit;
+          exit_status = static_cast<ExitStatus>(pending_exit);
           pending_exit = ES_NONE;
         }
       return (exit_status == ES_NONE);

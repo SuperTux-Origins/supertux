@@ -16,6 +16,7 @@
 #include "platform_config.h"
 #include "globals.h"
 #include "menu.h"
+#include "app_loop.h"
 #include "screen.h"
 #include "setup.h"
 #ifndef NOSOUND
@@ -128,6 +129,11 @@ bool confirm_dialog_result(void)
 
 bool confirm_dialog(std::string text)
 {
+  if (app_loop_active())
+    {
+      fprintf(stderr, "confirm_dialog: blocked under app_loop (use begin/frame)\n");
+      return false;
+    }
   confirm_dialog_begin(text);
   while (confirm_dialog_frame())
     { /* busy loop */ }

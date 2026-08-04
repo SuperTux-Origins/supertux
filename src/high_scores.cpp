@@ -4,10 +4,12 @@
 /* Open the highscore file: */
 
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "globals.h"
 #include "high_scores.h"
+#include "app_loop.h"
 #include "menu.h"
 #include "screen.h"
 #include "texture.h"
@@ -158,6 +160,12 @@ bool save_hs_frame(void)
 
 void save_hs(int score)
 {
+  if (app_loop_active())
+    {
+      /* Nested busy loop would freeze under the frame pump. */
+      fprintf(stderr, "save_hs: blocked under app_loop (use save_hs_begin/frame)\n");
+      return;
+    }
   save_hs_begin(score);
   while (save_hs_frame())
     { /* busy loop */ }

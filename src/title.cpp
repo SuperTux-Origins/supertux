@@ -138,8 +138,7 @@ void check_contrib_menu()
       // Loading fade
       fadeout();
 
-#ifdef __EMSCRIPTEN__
-      if (app_loop_active())
+if (app_loop_active())
         {
           std::string mapfile = worldmap_list.item[index - contrib_subsets.size()];
           std::string savegame = mapfile;
@@ -149,7 +148,6 @@ void check_contrib_menu()
           Menu::set_current(0);
           return;
         }
-#endif
       WorldMapNS::WorldMap worldmap;
       worldmap.loadmap(worldmap_list.item[index - contrib_subsets.size()]);
 //      worldmap.set_levels_as_solved();
@@ -174,14 +172,12 @@ void check_contrib_subset_menu()
       if (contrib_subset_menu->get_item_by_id(index).kind == MN_ACTION)
         {
           std::cout << "Starting level: " << index << std::endl;
-#ifdef __EMSCRIPTEN__
-          if (app_loop_active())
+if (app_loop_active())
             {
               app_request_session(current_contrib_subset, index, ST_GL_PLAY);
               Menu::set_current(0);
               return;
             }
-#endif
           {
           GameSession session(current_contrib_subset, index, ST_GL_PLAY);
           session.run();
@@ -451,13 +447,11 @@ title_frame(void)
 #endif
               break;
             case MNID_CREDITS:
-#ifdef __EMSCRIPTEN__
-              if (app_loop_active())
+if (app_loop_active())
                 {
                   app_request_text_scroll("CREDITS", bkg_title, SCROLL_SPEED_CREDITS, false);
                   return true; /* yield to app_loop TEXT screen */
                 }
-#endif
 #ifndef NOSOUND
               music_manager = new MusicManager();
 #ifdef GP2X
@@ -491,8 +485,7 @@ title_frame(void)
              && title_last_event.key.keysym.sym == SDLK_DELETE)
             {
             int slot = menu->get_active_item_id();
-#ifdef __EMSCRIPTEN__
-            if (app_loop_active())
+if (app_loop_active())
               {
                 draw_background();
                 app_request_delete_slot(slot);
@@ -500,7 +493,6 @@ title_frame(void)
                 return true; /* yield to app_loop CONFIRM screen */
               }
             else
-#endif
               {
             char str[1024];
             sprintf(str,"Are you sure you want to delete slot %d?", slot);

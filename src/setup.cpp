@@ -982,23 +982,19 @@ bool process_load_game_menu()
 
       if (access(slotfile, F_OK) != 0)
         {
-#ifdef __EMSCRIPTEN__
-          /* Intro uses blocking display_text_file; skip under app_loop. */
+/* Intro uses blocking display_text_file; skip under app_loop. */
           if (!app_loop_active())
-#endif
           draw_intro();
         }
 
       fadeout();
-#ifdef __EMSCRIPTEN__
-      if (app_loop_active())
+if (app_loop_active())
         {
           /* Non-blocking hand-off to the top-level frame pump. */
           app_request_worldmap("world1.stwm", slotfile, false);
           Menu::set_current(0);
           return true;
         }
-#endif
       {
       WorldMapNS::WorldMap worldmap;
       

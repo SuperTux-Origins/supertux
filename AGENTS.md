@@ -47,7 +47,7 @@ When unsure, prefer the smallest change that stops a crash or unblocks SDL2 play
 
 ## Architecture sketch
 
-- **Entry**: `src/supertux.cpp` → directory setup, parse args, audio/video/joystick, menus, then title / level / leveleditor.
+- **Entry**: `src/supertux.cpp` → directory setup, parse args, audio/video/joystick, menus, then `app_run()` (unified frame pump) or CLI level / leveleditor.
 - **Video**: `setup.cpp` chooses SDL software or OpenGL (`use_gl`). Drawing goes through `Surface` / `SurfaceImpl` (`texture.cpp`) and helpers in `screen.cpp`.
 - **Game**: `World` + `Player` + `BadGuy` + tiles (`tile.cpp`) + collision (`collision.cpp`). Session loop in `gameloop.cpp`.
 - **World map**: `worldmap.cpp` (separate from in-level `World`).
@@ -99,7 +99,9 @@ nix develop .#supertux-milestone1-sdl2-gles2
 
 Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL1-oriented via existing win32 SDL inputs.
 
-**WebAssembly:** `nix/wasm.nix` + `mk/wasm/scripts/` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL); `ENABLE_SOUND` optional (mixer+libxmp in `wasm-sdl-libs`, default off until playtested). Offline static **zlib** is `wasm-zlib-libs` (`ZLIB_ROOT`). Runtime uses `app_loop` + `emscripten_set_main_loop` (TITLE / WORLDMAP / SESSION / CONFIRM / TEXT); `st_frame_delay()` no-ops under that pump. **ASYNCIFY** is **off** by default (`enableAsyncify = true` in `mkApp` / `ENABLE_ASYNCIFY=1` if a residual wait freezes the tab). Assets preload to `/data`; config/saves use **IDBFS** under `/home/web_user`. Level editor is hidden on wasm.
+**Unified frame pump (`app_loop`):** Desktop and WebAssembly share the same top-level state machine in `src/app_loop.cpp` (`APP_SCREEN_TITLE` / `WORLDMAP` / `SESSION` / `CONFIRM` / `TEXT`). `app_run()` drives it — via `emscripten_set_main_loop` on wasm, or a desktop `while (app_frame)` paced by `st_frame_delay`. Nested `title()` / `GameSession::run()` / `WorldMap::display()` remain for CLI level start and the level editor only. Hand-offs use `app_request_*` when `app_loop_active()`. Blocking wrappers (`confirm_dialog`, `display_text_file`, `save_hs`) refuse under the pump.
+
+**WebAssembly:** `nix/wasm.nix` + `mk/wasm/scripts/` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL); `ENABLE_SOUND` optional (mixer+libxmp in `wasm-sdl-libs`, default off until playtested). Offline static **zlib** is `wasm-zlib-libs` (`ZLIB_ROOT`). Under wasm, `st_frame_delay()` no-ops while `app_loop_active()` so `requestAnimationFrame` paces the tab. **ASYNCIFY** is **off** by default (`ENABLE_ASYNCIFY=1` only as a safety net if a residual wait freezes the tab). Assets preload to `/data`; config/saves use **IDBFS** under `/home/web_user`. Level editor is hidden on wasm.
 
 ### Platform layer
 

@@ -49,13 +49,9 @@ int main(int argc, char * argv[])
     }
   else
     {
-#ifdef __EMSCRIPTEN__
-      /* Single frame pump: title ↔ worldmap ↔ session (no nested busy loops). */
+      /* Unified frame pump: title ↔ worldmap ↔ session (no nested busy loops).
+         Emscripten: does not return; desktop: returns for teardown below. */
       app_run();
-      /* app_run() uses emscripten_set_main_loop and does not return. */
-#else
-      title();
-#endif
     }
 
 #ifndef __EMSCRIPTEN__
