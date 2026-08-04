@@ -812,6 +812,12 @@ bool touch_controls_process_event(SDL_Event& event, bool* want_escape)
   if (want_escape)
     *want_escape = false;
 
+  /* Window close / SIGINT→SDL_QUIT must reach the caller's quit path.
+     When a menu is open we would otherwise return true for every event and
+     swallow SDL_QUIT (title always has main_menu; pause menus too). */
+  if (event.type == SDL_QUIT)
+    return false;
+
   bool ate = touch_controls_event(event);
   bool esc = st_is_escape_event(event) || touch_controls_escape_pressed();
   Menu* menu = Menu::current();

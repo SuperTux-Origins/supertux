@@ -246,8 +246,9 @@ GameSession::process_events()
 
           switch(event.type)
             {
-            case SDL_QUIT:        /* Quit event - quit: */
-              st_abort("Received window close", "");
+            case SDL_QUIT:
+              st_shutdown();
+              exit(0);
               break;
               
             case SDL_KEYDOWN:     /* A keypress! */
@@ -314,8 +315,9 @@ GameSession::process_events()
               switch(event.type)
                 {
 #ifndef GP2X
-                case SDL_QUIT:        /* Quit event - quit: */
-                  st_abort("Received window close", "");
+                case SDL_QUIT:
+                  st_shutdown();
+                  exit(0);
                   break;
 
 #ifdef USE_SDL2

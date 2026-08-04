@@ -596,7 +596,8 @@ WorldMap::get_input()
       switch(event.type)
         {
         case SDL_QUIT:
-          st_abort("Received window close", "");
+          st_shutdown();
+          exit(0);
           break;
 
 #ifdef USE_SDL2
