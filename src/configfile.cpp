@@ -132,6 +132,11 @@ void loadconfig(void)
   reader.read_int ("gamecontroller-up", &gamecontroller_keymap.up);
   reader.read_int ("gamecontroller-menu", &gamecontroller_keymap.menu);
   reader.read_int ("gamecontroller-menu-alt", &gamecontroller_keymap.menu_alt);
+  reader.read_int ("gamecontroller-analog-deadzone", &gamecontroller_keymap.analog_dead_zone);
+  if (gamecontroller_keymap.analog_dead_zone < 0)
+    gamecontroller_keymap.analog_dead_zone = 0;
+  if (gamecontroller_keymap.analog_dead_zone > 32767)
+    gamecontroller_keymap.analog_dead_zone = 32767;
 #endif
 
   reader.read_int ("keyboard-jump", &keymap.jump);
@@ -198,6 +203,7 @@ void saveconfig (void)
       fprintf(config, "\t(gamecontroller-up  %d)\n", gamecontroller_keymap.up);
       fprintf(config, "\t(gamecontroller-menu  %d)\n", gamecontroller_keymap.menu);
       fprintf(config, "\t(gamecontroller-menu-alt  %d)\n", gamecontroller_keymap.menu_alt);
+      fprintf(config, "\t(gamecontroller-analog-deadzone  %d)\n", gamecontroller_keymap.analog_dead_zone);
 #endif
       fprintf(config, "\t(keyboard-jump  %d)\n", keymap.jump);
       fprintf(config, "\t(keyboard-duck  %d)\n", keymap.duck);

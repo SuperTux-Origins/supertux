@@ -637,7 +637,7 @@ WorldMap::get_input()
           if (!use_joystick)
             break;
           {
-            const int dz = 16000;
+            const int dz = gamecontroller_keymap.analog_dead_zone;
             if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
               {
                 if (event.caxis.value < -dz)

@@ -340,6 +340,14 @@ void Menu::get_controlfield_key_into_input(MenuItem *item)
 #ifdef USE_SDL2
   if (Menu::current() == options_gamepad_menu)
     {
+      /* Analog dead zone is a numeric threshold, not a button index. */
+      if (item->int_p == &gamecontroller_keymap.analog_dead_zone)
+        {
+          char tmp[64];
+          snprintf(tmp, 64, "%d", *item->int_p);
+          item->change_input(tmp);
+          return;
+        }
       const char* cn = st_gamecontroller_button_name(*item->int_p);
       if (cn)
         {
@@ -918,14 +926,51 @@ Menu::event(SDL_Event& event)
         Menu::pop_current();
         return;
       }
+      /* Joystick / Gamepad Setup: keyboard only navigates. Binding is done
+         with the device itself (axis/button events). Keyboard Setup still
+         captures the pressed key as the binding. */
+      if (Menu::current() == options_joystick_menu
 #ifdef USE_SDL2
-      /* Gamepad fields only accept controller buttons, not keyboard keys. */
-      if (Menu::current() == options_gamepad_menu)
-        return;
+          || Menu::current() == options_gamepad_menu
 #endif
-      *item[active_item].int_p = key;
-      menuaction = MENU_ACTION_DOWN;
-      return;
+          )
+        {
+#ifdef USE_SDL2
+          if (Menu::current() == options_gamepad_menu
+              && item[active_item].int_p == &gamecontroller_keymap.analog_dead_zone
+              && (key == SDLK_LEFT || key == SDLK_RIGHT))
+            {
+              int step = 1000;
+              if (key == SDLK_LEFT)
+                {
+                  gamecontroller_keymap.analog_dead_zone -= step;
+                  if (gamecontroller_keymap.analog_dead_zone < 0)
+                    gamecontroller_keymap.analog_dead_zone = 0;
+                }
+              else
+                {
+                  gamecontroller_keymap.analog_dead_zone += step;
+                  if (gamecontroller_keymap.analog_dead_zone > 32767)
+                    gamecontroller_keymap.analog_dead_zone = 32767;
+                }
+              get_controlfield_key_into_input(&item[active_item]);
+              return;
+            }
+#endif
+          if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT
+              || key == SDLK_RIGHT || key == SDLK_RETURN || key == SDLK_SPACE)
+            {
+              /* fall through to switch(key) for menu navigation */
+            }
+          else
+            return;
+        }
+      else
+        {
+          *item[active_item].int_p = key;
+          menuaction = MENU_ACTION_DOWN;
+          return;
+        }
     }
 
 
@@ -1044,10 +1089,45 @@ Menu::event(SDL_Event& event)
     if (item[active_item].kind == MN_CONTROLFIELD
         && Menu::current() == options_gamepad_menu)
       {
+        /* Dead zone is adjusted with D-Pad left/right, not bound to a button. */
+        if (item[active_item].int_p == &gamecontroller_keymap.analog_dead_zone)
+          {
+            if (event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_LEFT
+                || event.cbutton.button == (Uint8)gamecontroller_keymap.left)
+              {
+                gamecontroller_keymap.analog_dead_zone -= 1000;
+                if (gamecontroller_keymap.analog_dead_zone < 0)
+                  gamecontroller_keymap.analog_dead_zone = 0;
+                get_controlfield_key_into_input(&item[active_item]);
+                return;
+              }
+            if (event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT
+                || event.cbutton.button == (Uint8)gamecontroller_keymap.right)
+              {
+                gamecontroller_keymap.analog_dead_zone += 1000;
+                if (gamecontroller_keymap.analog_dead_zone > 32767)
+                  gamecontroller_keymap.analog_dead_zone = 32767;
+                get_controlfield_key_into_input(&item[active_item]);
+                return;
+              }
+            if (event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_UP
+                || event.cbutton.button == (Uint8)gamecontroller_keymap.up)
+              {
+                menuaction = MENU_ACTION_UP;
+                return;
+              }
+            if (event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN
+                || event.cbutton.button == (Uint8)gamecontroller_keymap.duck)
+              {
+                menuaction = MENU_ACTION_DOWN;
+                return;
+              }
+            return;
+          }
         if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu
             || event.cbutton.button == (Uint8)gamecontroller_keymap.menu_alt)
           {
-            /* Leave field without binding menu keys while editing? Allow bind. */
+            /* Allow binding menu keys while editing. */
           }
         *item[active_item].int_p = (int)event.cbutton.button;
         menuaction = MENU_ACTION_DOWN;

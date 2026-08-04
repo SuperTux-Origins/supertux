@@ -65,18 +65,22 @@ struct JoystickKeymap
 extern JoystickKeymap joystick_keymap;
 
 #ifdef USE_SDL2
-/** Logical actions → SDL_GameControllerButton values (remappable). */
+/** Logical actions → SDL_GameControllerButton values (remappable).
+ *  D-Pad movement uses left/right/up/duck buttons.
+ *  Analog stick movement always uses LEFTX/LEFTY with analog_dead_zone. */
 struct GameControllerKeymap
 {
   int jump;
   int fire;
   int fire_alt;
-  int duck;
-  int left;
-  int right;
-  int up;
+  int duck;   /* D-Pad down */
+  int left;   /* D-Pad left */
+  int right;  /* D-Pad right */
+  int up;     /* D-Pad up */
   int menu;
   int menu_alt;
+  /** Half-range stick dead zone for LEFTX/LEFTY (0..32767). Default 16000. */
+  int analog_dead_zone;
 
   GameControllerKeymap();
 };

@@ -363,13 +363,17 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 | SDL1 `SDL_Joystick` | **Yes** | Axes/buttons + Options “Joystick Setup” (when a stick is open) |
 | Start/Back → pause/menu | Yes | GameController Start/Back; SDL1 start button |
 | In-level + worldmap | Yes | Controller events (SDL2) / JOY* (SDL1) |
-| Options remap | SDL1 only | SDL2 uses fixed standard layout (“Gamepad: connected/none”) |
+| Options remap | Yes | SDL1 Joystick Setup; SDL2 Gamepad Setup (buttons + analog dead zone) |
+| Dual movement | Yes | D-Pad buttons (remappable) + LEFTX/LEFTY analog (dead zone) |
+| Analog dead zone | Yes | `gamecontroller_keymap.analog_dead_zone` (default 16000), Left/Right in menu |
 | Wasm / Android physical pad | **Smoke-test** | Same GameController path when the OS exposes a mapped pad |
 
 ### Tasks
 
 - [x] SDL2: `SDL_GameController` init/open; session + worldmap event mapping; hot-plug
 - [x] SDL1: keep joystick path; show **Joystick Setup** in Options when a stick is open
+- [x] SDL2 Gamepad Setup: D-Pad vs analog movement sections; configurable analog dead zone
+- [x] Keyboard can navigate Joystick/Gamepad Setup (arrows/Enter; device binds fields)
 - [ ] Document observed behaviour after smoke tests (this section)
 - [ ] **Desktop Linux (SDL2):** plug in a pad — move, jump, action, start/pause on title, worldmap, and in-level
 - [ ] **Desktop Linux (SDL1):** same smoke if a stick is available
@@ -378,13 +382,13 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 - [ ] **Android:** physical Bluetooth/USB gamepad (not only on-screen touch controls)
 - [ ] **Wasm:** browser gamepad (Chrome/Firefox); note if SDL never sees axes without extra flags
 - [ ] Confirm Options joystick setup menus are reachable and persist to config on non-GP2X builds
-- [ ] If pads work only as raw axes with wrong buttons: consider optional `SDL_GameController` mapping layer (SDL2-only), without breaking existing index config
 - [ ] Hot-plug: open/close joystick on add/remove if smoke tests show “plugin after start” fails
 
 ---
 
 | Date | Item |
 |------|------|
+| 2026-08-04 | Gamepad: D-Pad + analog movement sections, analog dead zone, keyboard nav in setup |
 | 2026-08-04 | Phase 7 display polish; Phase 8 joystick/gamepad inventory + smoke-test matrix |
 | 2026-08-04 | ASYNCIFY removal audit → Phase 6; frame intro/end; unified app_run desktop+wasm |
 | 2026-08-03 | Phase 5 scaffold: wasm.nix, scripts, CMake EMSCRIPTEN/SDL2_ROOT, flake targets |
