@@ -149,7 +149,7 @@
           pname = "supertux-milestone1-sdl2-gles2";
         };
         # Desktop SDL2 with ENABLE_DEBUG: -O0 -g3, extra warnings (see CMakeLists).
-        pkgSdlDebug = mkSuperTuxLinux {
+        pkgSdl2Debug = mkSuperTuxLinux {
           useSDL2 = true;
           enableDebug = true;
           pname = "supertux-milestone1-sdl2-debug";
@@ -449,7 +449,7 @@
           supertux-milestone1-sdl1 = pkgSdl1;
           supertux-milestone1-sdl2-gles2 = pkgSdl2Gles2;
           # SDL2 + ENABLE_DEBUG (unoptimized, extra warnings).
-          supertux-milestone1-sdl2-debug = pkgSdlDebug;
+          supertux-milestone1-sdl2-debug = pkgSdl2Debug;
           supertux-milestone1-win32-x64 = win64Package; # mingwW64 → x86_64 PE
           supertux-milestone1-win32-x86 = win32Package; # mingw32  → i686 PE
           supertux-milestone1-win32-x64-zip = mkWin32Zip win64Package "supertux-milestone1";
@@ -529,7 +529,7 @@
           };
           supertux-milestone1-sdl2-debug = {
             type = "app";
-            program = "${pkgSdlDebug}/bin/supertux-milestone1";
+            program = "${pkgSdl2Debug}/bin/supertux-milestone1";
             meta.description = "SuperTux Milestone 1 (SDL2, ENABLE_DEBUG)";
           };
         } // lib.optionalAttrs (!isWin) {

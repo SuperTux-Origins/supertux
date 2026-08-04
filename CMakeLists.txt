@@ -218,10 +218,14 @@ if(ENABLE_DEBUG)
   target_compile_definitions(supertux-milestone1 PRIVATE DEBUG)
   # Thorough debug build: no optimise, rich symbols, frame pointers, extra
   # diagnostics. Keep -Werror off — this tree is C++98-era and still noisy.
+  # Nix/glibc hardening sets _FORTIFY_SOURCE; that needs -O and otherwise
+  # warns on every TU under -O0. Force it off for debug builds.
   target_compile_options(supertux-milestone1 PRIVATE
     -O0 -g3
     -fno-omit-frame-pointer
     -fno-inline
+    -U_FORTIFY_SOURCE
+    -D_FORTIFY_SOURCE=0
     -Wall -Wextra
     -Wshadow
     -Wformat=2
