@@ -62,4 +62,14 @@ void app_request_text_scroll(const std::string& file,
  */
 void app_run(void);
 
+/**
+ * Request pause (open in-game / worldmap pause menu). Used by the web
+ * shell Pause button and by Page Visibility when the tab is hidden.
+ * Harmless on native; no-op if already in a menu or on the title screen.
+ */
+void app_request_pause(void);
+
+/** True once after app_request_pause until consumed by session/worldmap. */
+bool app_consume_pause_request(void);
+
 #endif /* SUPERTUX_APP_LOOP_H */

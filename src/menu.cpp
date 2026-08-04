@@ -185,6 +185,12 @@ Menu::pop_current()
   }
   else
   {
+#ifdef __EMSCRIPTEN__
+    /* Root menu + Escape must not clear current_ (that ends the app loop).
+       Stay on the active root entry; title_frame also re-applies main_menu. */
+    if (current_)
+      return;
+#endif
     current_ = 0;
   }
   menu_sync_text_input(current_);

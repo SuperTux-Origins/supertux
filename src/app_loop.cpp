@@ -26,6 +26,7 @@
 static bool g_app_active = false;
 static AppScreen g_screen = APP_SCREEN_TITLE;
 static AppScreen g_return_screen = APP_SCREEN_TITLE;
+static bool g_pause_request = false;
 
 static WorldMapNS::WorldMap* g_worldmap = 0;
 static GameSession* g_session = 0;
@@ -47,6 +48,30 @@ bool app_loop_active(void)
 {
   return g_app_active;
 }
+
+void app_request_pause(void)
+{
+  /* Only meaningful while playing; title/confirm ignore it. */
+  if (g_screen == APP_SCREEN_SESSION || g_screen == APP_SCREEN_WORLDMAP)
+    g_pause_request = true;
+}
+
+bool app_consume_pause_request(void)
+{
+  if (!g_pause_request)
+    return false;
+  g_pause_request = false;
+  return true;
+}
+
+#ifdef __EMSCRIPTEN__
+/* JS shell: Module._st_emscripten_request_pause() */
+extern "C" EMSCRIPTEN_KEEPALIVE void
+st_emscripten_request_pause(void)
+{
+  app_request_pause();
+}
+#endif
 
 void app_request_worldmap(const std::string& map_file,
                           const std::string& save_file,

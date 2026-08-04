@@ -341,7 +341,14 @@ bool
 title_frame(void)
 {
   if (!Menu::current())
-    return false;
+    {
+#ifdef __EMSCRIPTEN__
+      /* Escape on the root menu clears current_; never exit the tab. */
+      Menu::set_current(main_menu);
+#else
+      return false;
+#endif
+    }
 
   // if we spent to much time on a menu entry
   if( (update_time - last_update_time) > 1000)
@@ -365,11 +372,23 @@ title_frame(void)
       (void)want_escape;
      // FIXME: QUIT signal should be handled more generic, not locally
       if (event.type == SDL_QUIT)
-        Menu::set_current(0);
+        {
+#ifdef __EMSCRIPTEN__
+          /* Browser owns the tab lifecycle; ignore SDL_QUIT. */
+#else
+          Menu::set_current(0);
+#endif
+        }
     }
 
   if (!Menu::current())
-    return false;
+    {
+#ifdef __EMSCRIPTEN__
+      Menu::set_current(main_menu);
+#else
+      return false;
+#endif
+    }
 
   /* Draw the background: */
   draw_demo(demo_session, frame_ratio);

@@ -43,7 +43,7 @@ LINK_FLAGS=(
   # runtime logs "IDBFS is not defined" and persistence is a no-op.
   "SHELL:-lidbfs.js"
   # Canvas resize hooks used by mk/wasm/shell.html display-mode buttons.
-  "SHELL:-sEXPORTED_FUNCTIONS=['_main','_st_emscripten_canvas_resize','_st_emscripten_canvas_native']"
+  "SHELL:-sEXPORTED_FUNCTIONS=['_main','_st_emscripten_canvas_resize','_st_emscripten_canvas_native','_st_emscripten_request_pause']"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap','FS']"
 )
 if [ "${ENABLE_ASYNCIFY:-0}" = 1 ]; then

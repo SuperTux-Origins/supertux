@@ -543,6 +543,10 @@ WorldMap::get_input()
   enter_level = false;
   input_direction = D_NONE;
 
+  /* Web shell Pause / tab hidden: open pause menu (do not toggle closed). */
+  if (app_consume_pause_request() && !Menu::current())
+    on_escape_press();
+
   /*
    * Input ownership:
    *   1. Update the touch pad from the event (always).
@@ -588,6 +592,17 @@ WorldMap::get_input()
         case SDL_QUIT:
           st_abort("Received window close", "");
           break;
+
+#ifdef USE_SDL2
+        case SDL_WINDOWEVENT:
+          if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST
+              || event.window.event == SDL_WINDOWEVENT_MINIMIZED)
+            {
+              if (!Menu::current())
+                on_escape_press();
+            }
+          break;
+#endif
 
         case SDL_KEYDOWN:
           switch(event.key.keysym.sym)
