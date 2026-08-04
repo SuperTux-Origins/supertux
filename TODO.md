@@ -359,19 +359,17 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 
 | Mechanism | Present? | Notes |
 |-----------|----------|--------|
-| `SDL_INIT_JOYSTICK` + `SDL_JoystickOpen` | Yes | `setup.cpp` after video init; `js` global |
-| Axis + button events in play / worldmap | Yes | `JOYAXISMOTION` / `JOYBUTTON*` in `gameloop.cpp`, `worldmap.cpp` |
-| Configurable button/axis indices | Yes | `joystick_keymap` + config file; Options “Joystick Setup” (esp. GP2X menus) |
-| Start button → pause/menu | Yes | Maps to same path as Esc |
-| `SDL_GameController` / standard mappings | **No** | No `SDL_INIT_GAMECONTROLLER`, no controller DB |
-| Hot-plug (`SDL_JOYDEVICEADDED`) | **Unknown / likely no** | Open once at startup |
-| Wasm / browser gamepad | **Unknown** | Needs Emscripten + browser Gamepad API path through SDL |
-| Android physical gamepad | **Unknown** | Touch pad is separate (`touch_controls`); joystick init may still run |
-
-Default: `use_joystick = true` and `joystick_num = 0` unless config sets joystick to `-1`. If open fails, joystick is disabled quietly.
+| SDL2 `SDL_GameController` | **Yes** | Standard mapping; `game_controller` global; hot-plug add/remove |
+| SDL1 `SDL_Joystick` | **Yes** | Axes/buttons + Options “Joystick Setup” (when a stick is open) |
+| Start/Back → pause/menu | Yes | GameController Start/Back; SDL1 start button |
+| In-level + worldmap | Yes | Controller events (SDL2) / JOY* (SDL1) |
+| Options remap | SDL1 only | SDL2 uses fixed standard layout (“Gamepad: connected/none”) |
+| Wasm / Android physical pad | **Smoke-test** | Same GameController path when the OS exposes a mapped pad |
 
 ### Tasks
 
+- [x] SDL2: `SDL_GameController` init/open; session + worldmap event mapping; hot-plug
+- [x] SDL1: keep joystick path; show **Joystick Setup** in Options when a stick is open
 - [ ] Document observed behaviour after smoke tests (this section)
 - [ ] **Desktop Linux (SDL2):** plug in a pad — move, jump, action, start/pause on title, worldmap, and in-level
 - [ ] **Desktop Linux (SDL1):** same smoke if a stick is available

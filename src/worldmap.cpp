@@ -627,7 +627,65 @@ WorldMap::get_input()
           break;
 #endif
 
-#ifndef NOSOUND
+#ifdef USE_SDL2
+        case SDL_CONTROLLERDEVICEADDED:
+        case SDL_CONTROLLERDEVICEREMOVED:
+          st_gamepad_process_device_event(event);
+          break;
+
+        case SDL_CONTROLLERAXISMOTION:
+          if (!use_joystick)
+            break;
+          {
+            const int dz = 16000;
+            if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
+              {
+                if (event.caxis.value < -dz)
+                  input_direction = D_WEST;
+                else if (event.caxis.value > dz)
+                  input_direction = D_EAST;
+              }
+            else if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
+              {
+                if (event.caxis.value > dz)
+                  input_direction = D_SOUTH;
+                else if (event.caxis.value < -dz)
+                  input_direction = D_NORTH;
+              }
+          }
+          break;
+
+        case SDL_CONTROLLERBUTTONDOWN:
+          if (!use_joystick)
+            break;
+          switch (event.cbutton.button)
+            {
+            case SDL_CONTROLLER_BUTTON_A:
+            case SDL_CONTROLLER_BUTTON_B:
+            case SDL_CONTROLLER_BUTTON_X:
+              enter_level = true;
+              break;
+            case SDL_CONTROLLER_BUTTON_DPAD_UP:
+              input_direction = D_NORTH;
+              break;
+            case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+              input_direction = D_SOUTH;
+              break;
+            case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+              input_direction = D_WEST;
+              break;
+            case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+              input_direction = D_EAST;
+              break;
+            case SDL_CONTROLLER_BUTTON_START:
+            case SDL_CONTROLLER_BUTTON_BACK:
+              on_escape_press();
+              break;
+            default:
+              break;
+            }
+          break;
+#else
 #ifdef GP2X
         case SDL_JOYBUTTONDOWN:
           if (event.jbutton.button == joystick_keymap.b_button
@@ -652,14 +710,11 @@ WorldMap::get_input()
             on_escape_press();
           break;
         case SDL_JOYBUTTONUP:
-          /* Non-GP2X: directions come from axes only (see JOYAXISMOTION).
-             JoystickKeymap has no up/down/left/right_button outside GP2X. */
           if (event.jbutton.button == joystick_keymap.a_button)
             enter_level = true;
           else if (event.jbutton.button == joystick_keymap.start_button)
             on_escape_press();
           break;
-#endif
 #endif
 
         case SDL_JOYAXISMOTION:
@@ -678,6 +733,7 @@ WorldMap::get_input()
                 input_direction = D_NORTH;
             }
           break;
+#endif
 
         default:
           break;

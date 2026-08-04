@@ -252,10 +252,22 @@ GameSession::process_events()
               }
               break;
 
+#ifdef USE_SDL2
+            case SDL_CONTROLLERBUTTONDOWN:
+              if (event.cbutton.button == SDL_CONTROLLER_BUTTON_START
+                  || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
+                on_escape_press();
+              break;
+            case SDL_CONTROLLERDEVICEADDED:
+            case SDL_CONTROLLERDEVICEREMOVED:
+              st_gamepad_process_device_event(event);
+              break;
+#else
             case SDL_JOYBUTTONDOWN:
               if (event.jbutton.button == joystick_keymap.start_button)
                 on_escape_press();
               break;
+#endif
             }
         }
     }
@@ -439,6 +451,105 @@ GameSession::process_events()
 		  }
 		  break;
 #endif
+#ifdef USE_SDL2
+                case SDL_CONTROLLERDEVICEADDED:
+                case SDL_CONTROLLERDEVICEREMOVED:
+                  st_gamepad_process_device_event(event);
+                  break;
+
+                case SDL_CONTROLLERAXISMOTION:
+                  if (!use_joystick)
+                    break;
+                  {
+                    const int dz = 16000;
+                    if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
+                      {
+                        if (event.caxis.value < -dz)
+                          {
+                            tux.input.left  = DOWN;
+                            tux.input.right = UP;
+                          }
+                        else if (event.caxis.value > dz)
+                          {
+                            tux.input.left  = UP;
+                            tux.input.right = DOWN;
+                          }
+                        else
+                          {
+                            tux.input.left  = UP;
+                            tux.input.right = UP;
+                          }
+                      }
+                    else if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
+                      {
+                        if (event.caxis.value > dz)
+                          tux.input.down = DOWN;
+                        else
+                          tux.input.down = UP;
+                      }
+                  }
+                  break;
+
+                case SDL_CONTROLLERBUTTONDOWN:
+                  if (!use_joystick)
+                    break;
+                  switch (event.cbutton.button)
+                    {
+                    case SDL_CONTROLLER_BUTTON_A:
+                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                      tux.input.up = DOWN;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_B:
+                    case SDL_CONTROLLER_BUTTON_X:
+                      tux.input.fire = DOWN;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                      tux.input.down = DOWN;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+                      tux.input.left = DOWN;
+                      tux.input.right = UP;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+                      tux.input.right = DOWN;
+                      tux.input.left = UP;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_START:
+                    case SDL_CONTROLLER_BUTTON_BACK:
+                      on_escape_press();
+                      break;
+                    default:
+                      break;
+                    }
+                  break;
+
+                case SDL_CONTROLLERBUTTONUP:
+                  if (!use_joystick)
+                    break;
+                  switch (event.cbutton.button)
+                    {
+                    case SDL_CONTROLLER_BUTTON_A:
+                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                      tux.input.up = UP;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_B:
+                    case SDL_CONTROLLER_BUTTON_X:
+                      tux.input.fire = UP;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                      tux.input.down = UP;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+                      tux.input.left = UP;
+                      break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+                      tux.input.right = UP;
+                      break;
+                    default:
+                      break;
+                    }
+                  break;
+#else
 		case SDL_JOYHATMOTION:
 		  if (!use_joystick)
 		    break;
@@ -561,6 +672,7 @@ GameSession::process_events()
                   else if (event.jbutton.button == joystick_keymap.left_button)
                     tux.input.left = UP;
                   break;
+#endif
 #endif
                 default:
                   break;
@@ -822,6 +934,7 @@ GameSession::process_overlay()
           || event.type == SDL_MOUSEBUTTONDOWN
 #ifdef USE_SDL2
           || event.type == SDL_FINGERDOWN
+          || event.type == SDL_CONTROLLERBUTTONDOWN
 #endif
          )
         {

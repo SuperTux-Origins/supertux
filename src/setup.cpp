@@ -879,10 +879,18 @@ void st_menu(void)
   options_menu->additem(MN_GOTO,"Keyboard Setup",0,options_keys_menu);
 #endif
 
-  //if(use_joystick)
 #ifdef GP2X
   options_menu->additem(MN_GOTO,"Joystick Move Setup",0,options_joystick_axis_menu);
   options_menu->additem(MN_GOTO,"Joystick Action Setup",0,options_joystick_button_menu);
+#elif defined(USE_SDL2)
+  /* Standard SDL_GameController mapping — no manual axis/button setup. */
+  options_menu->additem(MN_DEACTIVE,
+                        use_joystick ? "Gamepad: connected" : "Gamepad: none",
+                        0, 0, 0);
+#else
+  /* SDL1: classic joystick remap menu (populated below when use_joystick). */
+  if (use_joystick)
+    options_menu->additem(MN_GOTO, "Joystick Setup", 0, options_joystick_menu);
 #endif
 
   options_menu->additem(MN_HL,"",0,0);
@@ -1368,13 +1376,13 @@ void st_print_init_status(void)
   if (use_joystick)
     {
       const char* name = NULL;
-#ifndef USE_SDL2
-      name = SDL_JoystickName(joystick_num);
+#ifdef USE_SDL2
+      if (game_controller)
+        name = SDL_GameControllerName(game_controller);
 #else
-      if (js)
-        name = SDL_JoystickName(js);
+      name = SDL_JoystickName(joystick_num);
 #endif
-      st_vlog("    joystick        initialized (index %d%s%s%s)\n",
+      st_vlog("    gamepad         initialized (index %d%s%s%s)\n",
               joystick_num,
               name ? ", \"" : "",
               name ? name : "",
@@ -1382,7 +1390,7 @@ void st_print_init_status(void)
     }
   else
     {
-      st_vlog("    joystick        skipped (none available or open failed)\n");
+      st_vlog("    gamepad         skipped (none available or open failed)\n");
     }
 
   st_vlog("    keyboard        active\n");
@@ -1410,9 +1418,87 @@ void st_video_setup_gl(void)
 
 void st_joystick_setup(void)
 {
+#ifdef USE_SDL2
+  /* SDL2: SDL_GameController only (standard layout). Raw SDL_Joystick is SDL1. */
+  use_joystick = true;
+  game_controller = NULL;
 
-  /* Init Joystick: */
+  if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0)
+    {
+      fprintf(stderr, "Warning: I could not initialize game controllers!\n"
+              "The Simple DirectMedia error that occured was:\n"
+              "%s\n\n", SDL_GetError());
+      use_joystick = false;
+      if (verbose_mode)
+        st_vlog("[pad] SDL_InitSubSystem(GAMECONTROLLER) failed: %s\n",
+                SDL_GetError());
+      return;
+    }
 
+  int njoy = SDL_NumJoysticks();
+  if (verbose_mode)
+    {
+      st_vlog("[pad] SDL_NumJoysticks() = %d (prefer index %d)\n",
+              njoy, joystick_num);
+      for (int i = 0; i < njoy; ++i)
+        {
+          const char* name = SDL_IsGameController(i)
+            ? SDL_GameControllerNameForIndex(i)
+            : SDL_JoystickNameForIndex(i);
+          st_vlog("[pad]   [%d] %s \"%s\"\n", i,
+                  SDL_IsGameController(i) ? "controller" : "joystick-only",
+                  name ? name : "(unnamed)");
+        }
+    }
+
+  int open_idx = -1;
+  if (joystick_num >= 0 && joystick_num < njoy
+      && SDL_IsGameController(joystick_num))
+    open_idx = joystick_num;
+  else
+    {
+      for (int i = 0; i < njoy; ++i)
+        {
+          if (SDL_IsGameController(i))
+            {
+              open_idx = i;
+              break;
+            }
+        }
+    }
+
+  if (open_idx < 0)
+    {
+      if (verbose_mode)
+        st_vlog("[pad] no SDL_GameController devices — skipping\n");
+      else if (njoy > 0)
+        fprintf(stderr,
+                "Warning: Joystick(s) present but none have a gamecontroller "
+                "mapping. Use a standard gamepad or add an SDL mapping.\n");
+      use_joystick = false;
+      return;
+    }
+
+  game_controller = SDL_GameControllerOpen(open_idx);
+  if (!game_controller)
+    {
+      fprintf(stderr, "Warning: Could not open game controller %d.\n"
+              "The Simple DirectMedia error that occured was:\n"
+              "%s\n\n", open_idx, SDL_GetError());
+      use_joystick = false;
+      return;
+    }
+
+  joystick_num = open_idx;
+  if (verbose_mode)
+    {
+      const char* name = SDL_GameControllerName(game_controller);
+      st_vlog("[pad] opened index %d \"%s\"\n",
+              open_idx, name ? name : "(unnamed)");
+    }
+  use_joystick = true;
+#else
+  /* SDL 1.2: classic joystick axes/buttons + optional Options remap. */
   use_joystick = true;
   js = NULL;
 
@@ -1421,7 +1507,6 @@ void st_joystick_setup(void)
       fprintf(stderr, "Warning: I could not initialize joystick!\n"
               "The Simple DirectMedia error that occured was:\n"
               "%s\n\n", SDL_GetError());
-
       use_joystick = false;
       if (verbose_mode)
         st_vlog("[joy] SDL_InitSubSystem(JOYSTICK) failed: %s\n", SDL_GetError());
@@ -1435,56 +1520,45 @@ void st_joystick_setup(void)
                   njoy, joystick_num);
           for (int i = 0; i < njoy; ++i)
             {
-#ifdef USE_SDL2
-              const char* jname = SDL_JoystickNameForIndex(i);
-#else
               const char* jname = SDL_JoystickName(i);
-#endif
               st_vlog("[joy]   [%d] \"%s\"\n", i, jname ? jname : "(unnamed)");
             }
         }
 
-      /* Open joystick: */
       if (njoy <= 0)
         {
           if (verbose_mode)
             st_vlog("[joy] no joysticks available — skipping\n");
           else
             fprintf(stderr, "Warning: No joysticks are available.\n");
-
+          use_joystick = false;
+        }
+      else if (joystick_num >= njoy)
+        {
+          fprintf(stderr, "Warning: Joystick number %d unavailable (have %d).\n",
+                  joystick_num, njoy);
           use_joystick = false;
         }
       else
         {
           js = SDL_JoystickOpen(joystick_num);
-
           if (js == NULL)
             {
               fprintf(stderr, "Warning: Could not open joystick %d.\n"
                       "The Simple DirectMedia error that occured was:\n"
                       "%s\n\n", joystick_num, SDL_GetError());
-
               use_joystick = false;
-              if (verbose_mode)
-                st_vlog("[joy] open index %d failed: %s\n",
-                        joystick_num, SDL_GetError());
             }
 #ifndef GP2X
           else
             {
               int naxes = SDL_JoystickNumAxes(js);
               int nbuttons = SDL_JoystickNumButtons(js);
-#ifdef USE_SDL2
-              const char* jname = SDL_JoystickName(js);
-#else
               const char* jname = SDL_JoystickName(joystick_num);
-#endif
               if (verbose_mode)
                 st_vlog("[joy] opened index %d \"%s\" (%d axes, %d buttons)\n",
-                        joystick_num,
-                        jname ? jname : "(unnamed)",
+                        joystick_num, jname ? jname : "(unnamed)",
                         naxes, nbuttons);
-
               if (naxes < 2)
                 {
                   fprintf(stderr,
@@ -1492,31 +1566,79 @@ void st_joystick_setup(void)
                   SDL_JoystickClose(js);
                   js = NULL;
                   use_joystick = false;
-                  if (verbose_mode)
-                    st_vlog("[joy] rejected: need >= 2 axes (have %d)\n", naxes);
                 }
               else if (nbuttons < 2)
                 {
                   fprintf(stderr,
-                          "Warning: "
-                          "Joystick does not have enough buttons!\n");
-                  /* Close rejected device so it cannot keep sending events. */
+                          "Warning: Joystick does not have enough buttons!\n");
                   SDL_JoystickClose(js);
                   js = NULL;
                   use_joystick = false;
-                  if (verbose_mode)
-                    st_vlog("[joy] rejected: need >= 2 buttons (have %d)\n",
-                            nbuttons);
                 }
             }
 #endif
         }
     }
+#endif
 
   if (verbose_mode)
-    st_vlog("[joy] use_joystick=%s js=%p\n",
-            use_joystick ? "true" : "false", (void*)js);
+    {
+#ifdef USE_SDL2
+      st_vlog("[pad] use_joystick=%s controller=%p\n",
+              use_joystick ? "true" : "false", (void*)game_controller);
+#else
+      st_vlog("[joy] use_joystick=%s js=%p\n",
+              use_joystick ? "true" : "false", (void*)js);
+#endif
+    }
 }
+
+#ifdef USE_SDL2
+void
+st_gamepad_process_device_event(const SDL_Event& event)
+{
+  if (event.type == SDL_CONTROLLERDEVICEADDED)
+    {
+      if (game_controller)
+        return;
+      int idx = event.cdevice.which;
+      if (!SDL_IsGameController(idx))
+        return;
+      game_controller = SDL_GameControllerOpen(idx);
+      if (game_controller)
+        {
+          use_joystick = true;
+          joystick_num = idx;
+          if (verbose_mode)
+            {
+              const char* name = SDL_GameControllerName(game_controller);
+              st_vlog("[pad] hot-plug open [%d] \"%s\"\n",
+                      idx, name ? name : "(unnamed)");
+            }
+        }
+    }
+  else if (event.type == SDL_CONTROLLERDEVICEREMOVED)
+    {
+      if (!game_controller)
+        return;
+      SDL_JoystickID my_id =
+        SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(game_controller));
+      if (event.cdevice.which == my_id)
+        {
+          SDL_GameControllerClose(game_controller);
+          game_controller = NULL;
+          use_joystick = false;
+          if (verbose_mode)
+            st_vlog("[pad] controller removed\n");
+        }
+    }
+}
+#else
+void
+st_gamepad_process_device_event(const SDL_Event& /*event*/)
+{
+}
+#endif
 
 void st_sdl_init(void)
 {

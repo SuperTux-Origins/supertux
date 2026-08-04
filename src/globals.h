@@ -106,7 +106,12 @@ extern char* st_dir;
 extern char* st_save_dir;
 
 extern float game_speed;
+#ifdef USE_SDL2
+/** Open gamepad via SDL_GameController (SDL2 only). */
+extern SDL_GameController* game_controller;
+#else
 extern SDL_Joystick * js;
+#endif
 
 int wait_for_event(SDL_Event& event,unsigned int min_delay = 0, unsigned int max_delay = 0, bool empty_events = false);
 

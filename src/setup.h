@@ -26,6 +26,8 @@ void st_video_setup_gl(void);
 void st_video_setup(void);
 void st_audio_setup(void);
 void st_joystick_setup(void);
+/** SDL2: handle controller add/remove in the event pump. */
+void st_gamepad_process_device_event(const SDL_Event& event);
 void st_shutdown(void);
 void st_menu(void);
 void st_abort(const std::string& reason, const std::string& details);

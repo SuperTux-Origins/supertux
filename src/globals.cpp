@@ -108,7 +108,11 @@ bool launch_leveleditor_mode = false;
 /* SuperTux directory ($HOME/.supertux-milestone1) and save directory($HOME/.supertux-milestone1/save) */
 char *st_dir, *st_save_dir;
 
+#ifdef USE_SDL2
+SDL_GameController* game_controller = 0;
+#else
 SDL_Joystick * js;
+#endif
 
 /* Returns 1 for every button event, 2 for a quit event and 0 for no event. */
 int wait_for_event(SDL_Event& event,unsigned int min_delay, unsigned int max_delay, bool empty_events)
