@@ -51,9 +51,9 @@ bool app_loop_active(void)
 
 void app_request_pause(void)
 {
-  /* Only meaningful while playing; title/confirm ignore it. */
-  if (g_screen == APP_SCREEN_SESSION || g_screen == APP_SCREEN_WORLDMAP)
-    g_pause_request = true;
+  /* Session / worldmap consume this and open their pause menus.
+     Title / confirm ignore a dangling flag. */
+  g_pause_request = true;
 }
 
 bool app_consume_pause_request(void)
@@ -70,6 +70,19 @@ extern "C" EMSCRIPTEN_KEEPALIVE void
 st_emscripten_request_pause(void)
 {
   app_request_pause();
+  /* Inject Escape so the existing input path opens the pause menu even if
+     the flag is only observed a frame later. On the title root menu Escape
+     is a no-op (does not exit). */
+  SDL_Event e;
+  memset(&e, 0, sizeof(e));
+  e.type = SDL_KEYDOWN;
+  e.key.type = SDL_KEYDOWN;
+  e.key.state = SDL_PRESSED;
+  e.key.keysym.sym = SDLK_ESCAPE;
+#ifdef USE_SDL2
+  e.key.keysym.scancode = SDL_SCANCODE_ESCAPE;
+#endif
+  SDL_PushEvent(&e);
 }
 #endif
 

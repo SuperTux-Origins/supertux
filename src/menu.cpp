@@ -186,9 +186,9 @@ Menu::pop_current()
   else
   {
 #ifdef __EMSCRIPTEN__
-    /* Root menu + Escape must not clear current_ (that ends the app loop).
-       Stay on the active root entry; title_frame also re-applies main_menu. */
-    if (current_)
+    /* Escape on the title root must not clear current_ (that ends the app
+       loop). Pause / worldmap root menus may still close. */
+    if (current_ == main_menu)
       return;
 #endif
     current_ = 0;

@@ -278,9 +278,18 @@
 
 
     function stRequestPause() {
-      if (typeof Module !== 'undefined' && typeof Module._st_emscripten_request_pause === 'function') {
-        try { Module._st_emscripten_request_pause(); } catch (e) { console.warn(e); }
-      }
+      try {
+        if (typeof Module === 'undefined') return;
+        if (typeof Module._st_emscripten_request_pause === 'function') {
+          Module._st_emscripten_request_pause();
+          return;
+        }
+        if (typeof Module.ccall === 'function') {
+          Module.ccall('st_emscripten_request_pause', null, [], []);
+          return;
+        }
+        console.warn('SuperTux: pause export not available yet');
+      } catch (e) { console.warn('SuperTux: pause failed', e); }
     }
 
     function stEnablePauseControls() {
