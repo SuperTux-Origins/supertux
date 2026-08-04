@@ -42,10 +42,10 @@ LINK_FLAGS=(
   # IDBFS JS library (FS.mount(IDBFS, …) for config/saves). Without this,
   # runtime logs "IDBFS is not defined" and persistence is a no-op.
   "SHELL:-lidbfs.js"
-  # Canvas / pause hooks for mk/wasm/shell.html. Comma list (no JS-array
+  # Canvas resize + C main-loop pause/resume for mk/wasm/shell.html. Comma list (no JS-array
   # quotes) survives CMake separate_arguments(NATIVE_COMMAND).
-  "SHELL:-sEXPORTED_FUNCTIONS=_main,_st_emscripten_canvas_resize,_st_emscripten_canvas_native"
-  "SHELL:-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,FS,pauseMainLoop,resumeMainLoop"
+  "SHELL:-sEXPORTED_FUNCTIONS=_main,_st_emscripten_canvas_resize,_st_emscripten_canvas_native,_emscripten_pause_main_loop,_emscripten_resume_main_loop"
+  "SHELL:-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,FS"
 )
 if [ "${ENABLE_ASYNCIFY:-0}" = 1 ]; then
   LINK_FLAGS+=("SHELL:-sASYNCIFY=1" "SHELL:-sASYNCIFY_STACK_SIZE=1048576")

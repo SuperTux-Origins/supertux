@@ -287,16 +287,21 @@
         return;
       }
       try {
+        /* Emscripten 3+/5+: C API, not Module.pauseMainLoop runtime helpers. */
         if (paused) {
-          if (typeof Module.pauseMainLoop === 'function')
-            Module.pauseMainLoop();
+          if (typeof Module._emscripten_pause_main_loop === 'function')
+            Module._emscripten_pause_main_loop();
           else if (typeof Module.ccall === 'function')
             Module.ccall('emscripten_pause_main_loop', null, [], []);
+          else
+            throw new Error('emscripten_pause_main_loop not exported');
         } else {
-          if (typeof Module.resumeMainLoop === 'function')
-            Module.resumeMainLoop();
+          if (typeof Module._emscripten_resume_main_loop === 'function')
+            Module._emscripten_resume_main_loop();
           else if (typeof Module.ccall === 'function')
             Module.ccall('emscripten_resume_main_loop', null, [], []);
+          else
+            throw new Error('emscripten_resume_main_loop not exported');
         }
         stLoopPaused = paused;
         if (fromUser) stUserPaused = paused;
