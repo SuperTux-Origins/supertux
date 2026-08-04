@@ -86,6 +86,9 @@ inline bool st_is_escape_key(SDL_Keycode key)
 {
   if (key == SDLK_ESCAPE)
     return true;
+  /* Browser fullscreen steals Esc; F1/Tab still open pause/worldmap menus. */
+  if (key == SDLK_F1 || key == SDLK_TAB)
+    return true;
   /* SDL_SCANCODE_AC_BACK = 270; keycode = scancode | (1<<30). */
   if (key == (SDL_Keycode)SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_BACK))
     return true;
@@ -93,9 +96,10 @@ inline bool st_is_escape_key(SDL_Keycode key)
 }
 
 /**
- * Escape / Android Back — KEYDOWN only (one edge per physical press).
- * Android Back arrives as SDLK_AC_BACK / SDL_SCANCODE_AC_BACK when
- * SDL_HINT_ANDROID_TRAP_BACK_BUTTON is set before SDL_Init.
+ * Escape / menu keys — KEYDOWN only (one edge per physical press).
+ * Includes Esc, F1, Tab (F1/Tab for browser fullscreen where Esc exits FS),
+ * and Android Back (SDLK_AC_BACK / SDL_SCANCODE_AC_BACK when
+ * SDL_HINT_ANDROID_TRAP_BACK_BUTTON is set before SDL_Init).
  * Matching KEYUP as well would toggle menus twice (KEYDOWN closes,
  * KEYUP opens again — looks like "Back does nothing").
  */
@@ -214,7 +218,7 @@ inline bool st_key_held(const Uint8* keystate, SDLKey key)
 
 inline bool st_is_escape_key(SDLKey key)
 {
-  return key == SDLK_ESCAPE;
+  return key == SDLK_ESCAPE || key == SDLK_F1 || key == SDLK_TAB;
 }
 
 inline bool st_is_escape_event(const SDL_Event& event)
