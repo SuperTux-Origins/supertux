@@ -29,7 +29,8 @@ enum OptionsMenuIDs {
   MNID_SOUND,
   MNID_MUSIC,
   MNID_SHOWFPS,
-  MNID_SHOWMOUSE
+  MNID_SHOWMOUSE,
+  MNID_JUMP_WITH_UP
   };
 
 enum GameMenuIDs {

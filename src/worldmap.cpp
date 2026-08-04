@@ -564,6 +564,16 @@ WorldMap::get_input()
 
       if (Menu::current())
         {
+#ifdef USE_SDL2
+          /* Menu button toggles the pause menu closed (do not treat as HIT). */
+          if (event.type == SDL_CONTROLLERBUTTONDOWN
+              && use_joystick
+              && (int)event.cbutton.button == gamecontroller_keymap.menu)
+            {
+              on_escape_press();
+              continue;
+            }
+#endif
           /* Menu owned the event inside process_event (or keyboard below). */
           if (!routed)
             Menu::current()->event(event);
@@ -591,12 +601,7 @@ WorldMap::get_input()
 
 #ifdef USE_SDL2
         case SDL_WINDOWEVENT:
-          if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST
-              || event.window.event == SDL_WINDOWEVENT_MINIMIZED)
-            {
-              if (!Menu::current())
-                on_escape_press();
-            }
+          /* Focus loss: do not pause / open the worldmap menu. */
           break;
 #endif
 
@@ -661,8 +666,7 @@ WorldMap::get_input()
           {
             int b = (int)event.cbutton.button;
             if (b == gamecontroller_keymap.jump
-                || b == gamecontroller_keymap.fire
-                || b == gamecontroller_keymap.fire_alt)
+                || b == gamecontroller_keymap.fire)
               enter_level = true;
             else if (b == gamecontroller_keymap.up)
               input_direction = D_NORTH;
@@ -672,8 +676,7 @@ WorldMap::get_input()
               input_direction = D_WEST;
             else if (b == gamecontroller_keymap.right)
               input_direction = D_EAST;
-            else if (b == gamecontroller_keymap.menu
-                     || b == gamecontroller_keymap.menu_alt)
+            else if (b == gamecontroller_keymap.menu)
               on_escape_press();
           }
           break;
@@ -732,7 +735,9 @@ WorldMap::get_input()
         }
     }
 
-  /* Continuous walk / enter from held keys + pad while no menu. */
+  /* Continuous walk / enter from held keys, touch pad, and gamepad while no menu.
+   * input_direction is cleared at the start of each get_input(); BUTTONDOWN alone
+   * only lasts one frame, so we must poll held controller state every frame. */
   if (!Menu::current())
     {
       const Uint8 *keystate = SDL_GetKeyState(NULL);
@@ -745,6 +750,44 @@ WorldMap::get_input()
         input_direction = D_NORTH;
       else if (st_key_held(keystate, SDLK_DOWN) || touch_controls_held(3))
         input_direction = D_SOUTH;
+
+#ifdef USE_SDL2
+      if (use_joystick && game_controller)
+        {
+          const int dz = gamecontroller_keymap.analog_dead_zone;
+          Sint16 ax = SDL_GameControllerGetAxis(game_controller,
+                                                SDL_CONTROLLER_AXIS_LEFTX);
+          Sint16 ay = SDL_GameControllerGetAxis(game_controller,
+                                                SDL_CONTROLLER_AXIS_LEFTY);
+          if (SDL_GameControllerGetButton(game_controller,
+                (SDL_GameControllerButton)gamecontroller_keymap.left)
+              || ax < -dz)
+            input_direction = D_WEST;
+          else if (SDL_GameControllerGetButton(game_controller,
+                (SDL_GameControllerButton)gamecontroller_keymap.right)
+                   || ax > dz)
+            input_direction = D_EAST;
+          else if (SDL_GameControllerGetButton(game_controller,
+                (SDL_GameControllerButton)gamecontroller_keymap.up)
+                   || ay < -dz)
+            input_direction = D_NORTH;
+          else if (SDL_GameControllerGetButton(game_controller,
+                (SDL_GameControllerButton)gamecontroller_keymap.duck)
+                   || ay > dz)
+            input_direction = D_SOUTH;
+
+          /* Enter level: edge-trigger so holding Jump does not re-enter. */
+          static bool prev_enter = false;
+          bool enter_now =
+            SDL_GameControllerGetButton(game_controller,
+              (SDL_GameControllerButton)gamecontroller_keymap.jump)
+            || SDL_GameControllerGetButton(game_controller,
+              (SDL_GameControllerButton)gamecontroller_keymap.fire);
+          if (enter_now && !prev_enter)
+            enter_level = true;
+          prev_enter = enter_now;
+        }
+#endif
 
       if (touch_controls_just_pressed(4) || touch_controls_just_pressed(5)
           || touch_controls_just_pressed(6))
@@ -976,6 +1019,13 @@ if (app_loop_active())
         {
           process_options_menu();
         }
+#ifdef USE_SDL2
+      else if(menu == options_gamepad_menu
+              || menu == options_gamepad_analog_menu)
+        {
+          process_gamepad_menu();
+        }
+#endif
     }
 }
 

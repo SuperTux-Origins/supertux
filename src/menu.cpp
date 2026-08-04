@@ -1169,23 +1169,20 @@ Menu::event(SDL_Event& event)
         /* Only bind buttons on the main Gamepad Setup menu. */
         if (Menu::current() != options_gamepad_menu)
           return;
-        if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu
-            || event.cbutton.button == (Uint8)gamecontroller_keymap.menu_alt)
-          {
-            /* Allow binding menu keys while editing. */
-          }
         *item[active_item].int_p = (int)event.cbutton.button;
         menuaction = MENU_ACTION_DOWN;
         return;
       }
     if (use_joystick)
       {
+        if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu)
+          {
+            /* Same as Escape: close/pop this menu. */
+            Menu::pop_current();
+            return;
+          }
         if (event.cbutton.button == (Uint8)gamecontroller_keymap.jump
-            || event.cbutton.button == (Uint8)gamecontroller_keymap.fire
-            || event.cbutton.button == (Uint8)gamecontroller_keymap.fire_alt)
-          menuaction = MENU_ACTION_HIT;
-        else if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu
-                 || event.cbutton.button == (Uint8)gamecontroller_keymap.menu_alt)
+            || event.cbutton.button == (Uint8)gamecontroller_keymap.fire)
           menuaction = MENU_ACTION_HIT;
         else if (event.cbutton.button == (Uint8)gamecontroller_keymap.up)
           menuaction = MENU_ACTION_UP;

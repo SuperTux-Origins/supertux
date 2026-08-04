@@ -125,14 +125,13 @@ void loadconfig(void)
 #ifdef USE_SDL2
   reader.read_int ("gamecontroller-jump", &gamecontroller_keymap.jump);
   reader.read_int ("gamecontroller-fire", &gamecontroller_keymap.fire);
-  reader.read_int ("gamecontroller-fire-alt", &gamecontroller_keymap.fire_alt);
   reader.read_int ("gamecontroller-duck", &gamecontroller_keymap.duck);
   reader.read_int ("gamecontroller-left", &gamecontroller_keymap.left);
   reader.read_int ("gamecontroller-right", &gamecontroller_keymap.right);
   reader.read_int ("gamecontroller-up", &gamecontroller_keymap.up);
   reader.read_int ("gamecontroller-menu", &gamecontroller_keymap.menu);
-  reader.read_int ("gamecontroller-menu-alt", &gamecontroller_keymap.menu_alt);
   reader.read_int ("gamecontroller-analog-deadzone", &gamecontroller_keymap.analog_dead_zone);
+  reader.read_bool("gamecontroller-jump-with-up", &gamecontroller_keymap.jump_with_up);
   if (gamecontroller_keymap.analog_dead_zone < 0)
     gamecontroller_keymap.analog_dead_zone = 0;
   if (gamecontroller_keymap.analog_dead_zone > 32767)
@@ -196,14 +195,14 @@ void saveconfig (void)
 #ifdef USE_SDL2
       fprintf(config, "\t(gamecontroller-jump  %d)\n", gamecontroller_keymap.jump);
       fprintf(config, "\t(gamecontroller-fire  %d)\n", gamecontroller_keymap.fire);
-      fprintf(config, "\t(gamecontroller-fire-alt  %d)\n", gamecontroller_keymap.fire_alt);
       fprintf(config, "\t(gamecontroller-duck  %d)\n", gamecontroller_keymap.duck);
       fprintf(config, "\t(gamecontroller-left  %d)\n", gamecontroller_keymap.left);
       fprintf(config, "\t(gamecontroller-right %d)\n", gamecontroller_keymap.right);
       fprintf(config, "\t(gamecontroller-up  %d)\n", gamecontroller_keymap.up);
       fprintf(config, "\t(gamecontroller-menu  %d)\n", gamecontroller_keymap.menu);
-      fprintf(config, "\t(gamecontroller-menu-alt  %d)\n", gamecontroller_keymap.menu_alt);
       fprintf(config, "\t(gamecontroller-analog-deadzone  %d)\n", gamecontroller_keymap.analog_dead_zone);
+      fprintf(config, "\t(gamecontroller-jump-with-up  %s)\n",
+              gamecontroller_keymap.jump_with_up ? "#t" : "#f");
 #endif
       fprintf(config, "\t(keyboard-jump  %d)\n", keymap.jump);
       fprintf(config, "\t(keyboard-duck  %d)\n", keymap.duck);

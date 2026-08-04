@@ -40,14 +40,13 @@ GameControllerKeymap::GameControllerKeymap()
 {
   jump     = SDL_CONTROLLER_BUTTON_A;
   fire     = SDL_CONTROLLER_BUTTON_B;
-  fire_alt = SDL_CONTROLLER_BUTTON_X;
   duck     = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
   left     = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
   right    = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
   up       = SDL_CONTROLLER_BUTTON_DPAD_UP;
   menu     = SDL_CONTROLLER_BUTTON_START;
-  menu_alt = SDL_CONTROLLER_BUTTON_BACK;
   analog_dead_zone = 16000;
+  jump_with_up = false;
 }
 GameControllerKeymap gamecontroller_keymap;
 #endif

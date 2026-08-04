@@ -34,6 +34,7 @@ void st_abort(const std::string& reason, const std::string& details);
 /** When --verbose: print render path and subsystem init/skip summary to stderr. */
 void st_print_init_status(void);
 void process_options_menu(void);
+void process_gamepad_menu(void);
 
 /** Return true if the gameloop() was entered, false otherwise */
 bool process_load_game_menu();

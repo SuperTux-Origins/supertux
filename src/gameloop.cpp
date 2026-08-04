@@ -201,7 +201,13 @@ GameSession::on_escape_press()
     {
       exit_status = ES_LEVEL_ABORT;
     }
-  else if (!Menu::current())
+  else if (Menu::current())
+    {
+      /* Menu / Start button toggles pause menu closed. */
+      Menu::set_current(0);
+      st_pause_ticks_stop();
+    }
+  else
     {
       Menu::set_current(game_menu);
       st_pause_ticks_start();
@@ -254,8 +260,7 @@ GameSession::process_events()
 
 #ifdef USE_SDL2
             case SDL_CONTROLLERBUTTONDOWN:
-              if ((int)event.cbutton.button == gamecontroller_keymap.menu
-                  || (int)event.cbutton.button == gamecontroller_keymap.menu_alt)
+              if ((int)event.cbutton.button == gamecontroller_keymap.menu)
                 on_escape_press();
               break;
             case SDL_CONTROLLERDEVICEADDED:
@@ -496,10 +501,10 @@ GameSession::process_events()
                   {
                     int b = (int)event.cbutton.button;
                     if (b == gamecontroller_keymap.jump
-                        || b == gamecontroller_keymap.up)
+                        || (gamecontroller_keymap.jump_with_up
+                            && b == gamecontroller_keymap.up))
                       tux.input.up = DOWN;
-                    if (b == gamecontroller_keymap.fire
-                        || b == gamecontroller_keymap.fire_alt)
+                    if (b == gamecontroller_keymap.fire)
                       tux.input.fire = DOWN;
                     if (b == gamecontroller_keymap.duck)
                       tux.input.down = DOWN;
@@ -513,8 +518,7 @@ GameSession::process_events()
                         tux.input.right = DOWN;
                         tux.input.left = UP;
                       }
-                    if (b == gamecontroller_keymap.menu
-                        || b == gamecontroller_keymap.menu_alt)
+                    if (b == gamecontroller_keymap.menu)
                       on_escape_press();
                   }
                   break;
@@ -525,10 +529,10 @@ GameSession::process_events()
                   {
                     int b = (int)event.cbutton.button;
                     if (b == gamecontroller_keymap.jump
-                        || b == gamecontroller_keymap.up)
+                        || (gamecontroller_keymap.jump_with_up
+                            && b == gamecontroller_keymap.up))
                       tux.input.up = UP;
-                    if (b == gamecontroller_keymap.fire
-                        || b == gamecontroller_keymap.fire_alt)
+                    if (b == gamecontroller_keymap.fire)
                       tux.input.fire = UP;
                     if (b == gamecontroller_keymap.duck)
                       tux.input.down = UP;
@@ -855,6 +859,13 @@ GameSession::process_menu()
         {
           process_options_menu();
         }
+#ifdef USE_SDL2
+      else if(menu == options_gamepad_menu
+              || menu == options_gamepad_analog_menu)
+        {
+          process_gamepad_menu();
+        }
+#endif
       else if(menu == load_game_menu )
         {
           process_load_game_menu();
