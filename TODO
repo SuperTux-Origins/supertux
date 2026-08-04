@@ -1,7 +1,0 @@
-- [ ] check gamepad support on Android
-- [ ] check dynamic gamepad connect/disconnect
-- [ ] version number isn't properly set in title screen (maybe elsewhere) on Android
-- [ ] since we aren't bound by the 640x480 rectangle, we can make the menu bigger on android
-- [ ] tile rendering artifacts should be solvable by rendering to an
-      offscreen buffer and scaling that, instead of rendering the
-      tiles scaled

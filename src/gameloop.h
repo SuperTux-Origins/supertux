@@ -32,6 +32,12 @@ class GameSession
   Timer fps_timer;
   Timer frame_timer;
   Timer endsequence_timer;
+  /** Non-blocking intro / end / result overlays (shared by app_loop + run()). */
+  enum OverlayKind { OVERLAY_NONE, OVERLAY_INTRO, OVERLAY_ENDSCREEN, OVERLAY_RESULT };
+  OverlayKind overlay;
+  Timer overlay_timer;
+  unsigned int overlay_min_ms;
+  int pending_exit; /* ExitStatus */
   World* world;
   int st_gl_mode;
   int levelnb;
@@ -99,6 +105,11 @@ class GameSession
   void process_events();
 
   void levelintro();
+  void draw_levelintro();
+  void draw_endscreen_content();
+  void draw_resultscreen_content();
+  /** True while an overlay still owns the frame. */
+  bool process_overlay();
   void drawstatus();
   void drawendscreen();
   void drawresultscreen(void);

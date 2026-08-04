@@ -10,7 +10,7 @@
 void display_text_file(const std::string& file, const std::string& surface, float scroll_speed);
 void display_text_file(const std::string& file, Surface* surface, float scroll_speed);
 /** Split form for a future non-blocking pump (display_text_file still blocks). */
-void display_text_file_begin(const std::string& file, Surface* surface, float scroll_speed);
+void display_text_file_begin(const std::string& file, Surface* surface, float scroll_speed, bool own_surface = false);
 bool display_text_file_frame(void); /* true while scrolling */
 void display_text_file_end(void);
 

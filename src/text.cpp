@@ -247,13 +247,13 @@ struct TextFileScroll {
 static TextFileScroll g_textscroll = {};
 
 
-void display_text_file_begin(const std::string& file, Surface* surface, float scroll_speed)
+void display_text_file_begin(const std::string& file, Surface* surface, float scroll_speed, bool own_surface)
 {
   if (g_textscroll.active)
     display_text_file_end();
 
   g_textscroll.surface = surface;
-  g_textscroll.own_surface = false;
+  g_textscroll.own_surface = own_surface;
   g_textscroll.scroll = 0;
   g_textscroll.speed = scroll_speed / 50;
   g_textscroll.done = 0;
@@ -469,7 +469,7 @@ bool display_text_file_frame(void)
 
 void display_text_file(const std::string& file, Surface* surface, float scroll_speed)
 {
-  display_text_file_begin(file, surface, scroll_speed);
+  display_text_file_begin(file, surface, scroll_speed, false);
   while (display_text_file_frame())
     { /* busy loop */ }
 }
@@ -477,8 +477,7 @@ void display_text_file(const std::string& file, Surface* surface, float scroll_s
 void display_text_file(const std::string& file, const std::string& surface, float scroll_speed)
 {
   Surface* sur = new Surface(datadir + surface, IGNORE_ALPHA);
-  display_text_file_begin(file, sur, scroll_speed);
-  g_textscroll.own_surface = true;
+  display_text_file_begin(file, sur, scroll_speed, true);
   while (display_text_file_frame())
     { /* busy loop */ }
 }

@@ -210,11 +210,10 @@ ASYNCIFY with a perfect main-loop refactor before first paint.
 | CMake `SDL2_ROOT` / `EMSCRIPTEN` | skip pkg-config system GLES; `.html` suffix |
 | Flake | `wasm-sdl-libs`, `supertux-milestone1-wasm` package + app |
 
-Nested loops (`title()`, `GameSession::run()`, `WorldMap::display()`) use
-blocking `while` + `SDL_Delay`. Browsers need either:
-
-1. **ASYNCIFY** (temporary, current default in the wasm link line), or  
-2. A single frame callback (`emscripten_set_main_loop`) — preferred long-term.
+Nested loops (`title()`, `GameSession::run()`, `WorldMap::display()`) used
+blocking `while` + `SDL_Delay`. Browsers need a single frame callback
+(`emscripten_set_main_loop`). **ASYNCIFY is off by default** (`ENABLE_ASYNCIFY=0`);
+the frame pump is the supported path. Optional ASYNCIFY remains only as a safety net.
 
 ### Tasks
 
@@ -259,14 +258,88 @@ blocking `while` + `SDL_Delay`. Browsers need either:
 ### Known blockers
 
 - **No `data/` in thin trees** — preload skipped; runtime will miss assets.
-- **Main loops** — ASYNCIFY is a stopgap; stack size may need tuning.
 - **Audio** — mixer+libxmp build path wired; default app still `ENABLE_SOUND=OFF` until playtested.
 - **C++98 + emscripten** — should work; watch for missing POSIX (`access`, paths).
 
 ---
 
+## Phase 6 — Unified frame pump (ASYNCIFY removal parity)
+
+**Goal:** The non-blocking frame architecture used on WASM becomes the shared
+code path for all platforms. Desktop busy loops remain as thin wrappers around
+the same `frame()` APIs. No reliance on ASYNCIFY for correct behaviour.
+
+**Audit (2026-08-04):** With `ENABLE_ASYNCIFY=0`, interactive shell paths
+(title / worldmap / session / confirm / text) are frame-driven and do **not**
+freeze. Residual gaps are **skipped wait durations** and **skipped post-level
+story text**, not main-loop hangs.
+
+### Architecture (sound under `app_loop`)
+
+| Path | Under WASM `app_loop` | Status |
+|------|----------------------|--------|
+| Title | `title_frame()` once per tick | OK |
+| Worldmap | `get_input` / draw per tick | OK |
+| Level play | `GameSession::frame()` per tick (not `run()`) | OK |
+| Credits | `app_request_text_scroll` → TEXT screen | OK |
+| Delete slot confirm | `app_request_delete_slot` → CONFIRM screen | OK |
+| Load / start worldmap | `app_request_worldmap` | OK |
+| Enter level from map | `app_request_session` | OK |
+| Contrib levels | `app_request_session` | OK |
+| Level editor | Not offered on Emscripten | OK |
+| Startup intro (`draw_intro`) | Skipped when `app_loop_active()` | OK (no freeze) |
+
+**Guards already in place:** `st_frame_delay()` no-op under `app_loop_active()`;
+`wait_for_event()` single-poll under app_loop; blocking wrappers avoided on
+main WASM menu paths.
+
+### Residual behaviour gaps (not freezes)
+
+1. **Level intro** (`GameSession::levelintro`) — `wait_for_event(1000, 3000)`
+   returns immediately under app_loop → one-frame flash.
+2. **Game over / result screens** (`drawendscreen`, `drawresultscreen`) —
+   same pattern with 2–5 s waits → instant flash.
+3. **Worldmap level extro + credits** — native path runs blocking
+   `display_text_file` after `session.run()`; WASM `app_finish_session`
+   never queues that sequence.
+4. **High score name entry** (`save_hs` busy loop) — unused on current WASM
+   play path; would freeze if called mid-`app_loop`.
+5. **Native-only busy loops** — safe if never entered under Emscripten main:
+   `GameSession::run()`, `title()`, `confirm_dialog()`, `display_text_file()`,
+   `leveleditor()`, `high_scores` wrapper.
+6. **`fadeout()`** — one frame of “Loading…”; fine without ASYNCIFY.
+7. **Demo level in title** — frame-based, no nested `run()` — OK.
+
+### Freeze risk
+
+| Risk | Severity |
+|------|----------|
+| Main title / map / play / credits / confirm | **Low** — frame-driven |
+| Accidental `confirm_dialog` / `display_text_file` / `save_hs` / `session.run()` while `app_loop_active()` | **High if triggered** — avoided on menu paths |
+| Level intro / game-over **duration** | Behaviour gap, not a freeze |
+| Worldmap end **extro/credits** | Missing feature on WASM, not a freeze |
+
+### Tasks
+
+- [x] Frame-based **level intro** (timer + input skip; works under app_loop and desktop `run()`)
+- [x] Frame-based **game-over / result** overlays (same pattern as intro)
+- [x] On session finish in `app_loop`, if level has `extro_filename`, queue
+      `app_request_text_scroll` (then credits) instead of dropping them
+- [ ] Prefer shared frame pump for desktop too (busy `while (frame())` wrappers only)
+- [ ] Guard or frame-ify `save_hs` if ever reachable under app_loop
+- [ ] Keep OpenGL forced on WASM; leave ASYNCIFY **off** by default
+- [ ] Document unified loop in `AGENTS.md`
+
+### Freeze risk summary (policy)
+
+Diagnose before fixing; do not re-enable ASYNCIFY for parity. Prefer timer +
+`APP_SCREEN_*` / session overlay states. ASYNCIFY is a last-resort safety net only.
+
+---
+
 | Date | Item |
 |------|------|
+| 2026-08-04 | ASYNCIFY removal audit → Phase 6; frame-based level intro started |
 | 2026-08-03 | Phase 5 scaffold: wasm.nix, scripts, CMake EMSCRIPTEN/SDL2_ROOT, flake targets |
 | 2026-08-03 | Emscripten datadir/userdir + open_game_file /data; SDL wasm install prefix |
 | 2026-08-03 | Fix wasm SDL2_image: pass SDL2_LIBRARY/INCLUDE_DIR to PrivateSDL2 finder |

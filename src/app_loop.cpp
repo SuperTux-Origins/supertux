@@ -7,6 +7,7 @@
 #include "worldmap.h"
 #include "menu.h"
 #include "setup.h"
+#include "defines.h"
 #include "globals.h"
 #include "player.h"
 #include "resources.h"
@@ -47,6 +48,9 @@ static int g_session_mode = 0;
 
 /* Confirm: delete save slot */
 static int g_delete_slot = -1;
+
+/* After worldmap extro text, show CREDITS then leave map. */
+static bool g_pending_credits_after_extro = false;
 
 bool app_loop_active(void)
 {
@@ -90,14 +94,7 @@ void app_request_text_scroll(const std::string& file,
   g_return_screen = (g_screen == APP_SCREEN_TEXT) ? APP_SCREEN_TITLE : g_screen;
   if (g_return_screen == APP_SCREEN_CONFIRM || g_return_screen == APP_SCREEN_TEXT)
     g_return_screen = APP_SCREEN_TITLE;
-  display_text_file_begin(file, surface, scroll_speed);
-  if (own_surface)
-    {
-      /* display_text_file_begin does not set own_surface; path overload did.
-         Expose via a small hack: begin already ran; set ownership if API exists.
-         For title credits we pass bkg_title without ownership. */
-      (void)own_surface;
-    }
+  display_text_file_begin(file, surface, scroll_speed, own_surface);
   g_screen = APP_SCREEN_TEXT;
 }
 
@@ -159,6 +156,7 @@ app_finish_session(void)
     }
 
   GameSession::ExitStatus st = g_session->get_exit_status();
+  std::string extro_file;
 
   if (g_worldmap)
     {
@@ -176,6 +174,8 @@ app_finish_session(void)
               else
                 player_status.bonus = PlayerStatus::NO_BONUS;
             }
+          if (!level->extro_filename.empty())
+            extro_file = level->extro_filename;
         }
       else if (st == GameSession::ES_GAME_OVER)
         {
@@ -190,6 +190,17 @@ app_finish_session(void)
   Menu::set_current(0);
   touch_controls_reset();
   app_destroy_session();
+
+  /* Worldmap final-level story: queue non-blocking text, then credits, then title. */
+  if (!extro_file.empty())
+    {
+      app_destroy_worldmap();
+      g_pending_credits_after_extro = true;
+      Surface* bg = new Surface(datadir + "/images/background/extro.jpg", IGNORE_ALPHA);
+      app_request_text_scroll(extro_file, bg, SCROLL_SPEED_MESSAGE, true);
+      return;
+    }
+
   if (g_worldmap)
     g_screen = APP_SCREEN_WORLDMAP;
   else
@@ -232,6 +243,13 @@ app_finish_confirm(void)
 static void
 app_finish_text(void)
 {
+  if (g_pending_credits_after_extro)
+    {
+      g_pending_credits_after_extro = false;
+      Surface* bg = new Surface(datadir + "/images/background/oiltux.jpg", IGNORE_ALPHA);
+      app_request_text_scroll("CREDITS", bg, SCROLL_SPEED_CREDITS, true);
+      return;
+    }
   /* display_text_file_end already restores main_menu. */
   g_screen = APP_SCREEN_TITLE;
   Menu::set_current(main_menu);

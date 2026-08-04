@@ -46,6 +46,7 @@ GameSession* GameSession::current_ = 0;
 
 GameSession::GameSession(const std::string& subset_, int levelnb_, int mode)
   : world(0), st_gl_mode(mode), levelnb(levelnb_), end_sequence(NO_ENDSEQUENCE),
+    overlay(OVERLAY_NONE), overlay_min_ms(0), pending_exit(ES_NONE),
     subset(subset_)
 {
   fps_cnt = 0;
@@ -56,6 +57,7 @@ GameSession::GameSession(const std::string& subset_, int levelnb_, int mode)
 
   fps_timer.init(true);            
   frame_timer.init(true);
+  overlay_timer.init(true);
 
   restart_level();
 
@@ -122,17 +124,24 @@ GameSession::restart_level()
         }
     }
     
-  if (st_gl_mode != ST_GL_DEMO_GAME)
-    {
-      if(st_gl_mode == ST_GL_PLAY || st_gl_mode == ST_GL_LOAD_LEVEL_FILE)
-        levelintro();
-    }
+  overlay = OVERLAY_NONE;
+  pending_exit = ES_NONE;
+  overlay_timer.stop();
 
-  time_left.init(true);
-  start_timers();
+  if (st_gl_mode != ST_GL_DEMO_GAME
+      && (st_gl_mode == ST_GL_PLAY || st_gl_mode == ST_GL_LOAD_LEVEL_FILE))
+    {
+      /* Non-blocking intro: process_overlay() finishes it then starts timers. */
+      levelintro();
+    }
+  else
+    {
+      time_left.init(true);
+      start_timers();
 #ifndef NOSOUND
-  world->play_music(LEVEL_MUSIC);
+      world->play_music(LEVEL_MUSIC);
 #endif
+    }
 }
 
 GameSession::~GameSession()
@@ -141,14 +150,10 @@ GameSession::~GameSession()
 }
 
 void
-GameSession::levelintro(void)
+GameSession::draw_levelintro(void)
 {
-#ifndef NOSOUND
-  music_manager->halt_music();
-#endif
-  
   char str[60];
- 
+
   if (get_level()->img_bkgd)
     get_level()->img_bkgd->draw(0, 0);
   else
@@ -159,15 +164,22 @@ GameSession::levelintro(void)
 
   sprintf(str, "TUX x %d", player_status.lives);
   white_text->drawf(str, 0, 224, A_HMIDDLE, A_TOP, 1);
-  
+
   sprintf(str, "by %s", world->get_level()->author.c_str());
   white_small_text->drawf(str, 0, 360, A_HMIDDLE, A_TOP, 1);
-  
+}
 
-  flipscreen();
-
-  SDL_Event event;
-  wait_for_event(event,1000,3000,true);
+void
+GameSession::levelintro(void)
+{
+#ifndef NOSOUND
+  music_manager->halt_music();
+#endif
+  /* Frame-driven: min 1s, max 3s (same as historic wait_for_event). */
+  overlay = OVERLAY_INTRO;
+  overlay_min_ms = 1000;
+  overlay_timer.start(3000);
+  pending_exit = ES_NONE;
 }
 
 /* Reset Timers */
@@ -604,9 +616,11 @@ GameSession::check_end_conditions()
       if (player_status.lives < 0)
         { // No more lives!?
           if(st_gl_mode != ST_GL_TEST)
-            drawendscreen();
-          
-          exit_status = ES_GAME_OVER;
+            {
+              drawendscreen(); /* sets overlay + pending_exit */
+            }
+          else
+            exit_status = ES_GAME_OVER;
         }
       else
         { // Still has lives, so reset Tux to the levelstart
@@ -775,9 +789,82 @@ GameSession::run()
   return exit_status;
 }
 
+
+bool
+GameSession::process_overlay()
+{
+  if (overlay == OVERLAY_NONE)
+    return false;
+
+  /* Draw overlay content. */
+  if (overlay == OVERLAY_INTRO)
+    draw_levelintro();
+  else if (overlay == OVERLAY_ENDSCREEN)
+    draw_endscreen_content();
+  else if (overlay == OVERLAY_RESULT)
+    draw_resultscreen_content();
+
+  flipscreen();
+
+  /* Input: skip after minimum duration (same semantics as wait_for_event). */
+  SDL_Event event;
+  bool skip = false;
+  while (SDL_PollEvent(&event))
+    {
+      if (event.type == SDL_QUIT)
+        {
+          exit_status = ES_LEVEL_ABORT;
+          overlay = OVERLAY_NONE;
+          return false;
+        }
+      if (event.type == SDL_KEYDOWN
+          || event.type == SDL_JOYBUTTONDOWN
+          || event.type == SDL_MOUSEBUTTONDOWN
+#ifdef USE_SDL2
+          || event.type == SDL_FINGERDOWN
+#endif
+         )
+        {
+          if (overlay_timer.get_gone() >= (int)overlay_min_ms)
+            skip = true;
+        }
+    }
+
+  if (skip || !overlay_timer.check())
+    {
+      OverlayKind done = overlay;
+      overlay = OVERLAY_NONE;
+      overlay_timer.stop();
+
+      if (done == OVERLAY_INTRO)
+        {
+          time_left.init(true);
+          start_timers();
+#ifndef NOSOUND
+          world->play_music(LEVEL_MUSIC);
+#endif
+          update_time = last_update_time = st_get_ticks();
+        }
+      else if (pending_exit != ES_NONE)
+        {
+          exit_status = pending_exit;
+          pending_exit = ES_NONE;
+        }
+      return (exit_status == ES_NONE);
+    }
+
+  st_frame_delay(20);
+  return true; /* still in overlay — keep session running */
+}
+
 bool
 GameSession::frame()
 {
+  if (exit_status != ES_NONE)
+    return false;
+
+  if (process_overlay())
+    return true;
   if (exit_status != ES_NONE)
     return false;
 
@@ -956,7 +1043,7 @@ GameSession::drawstatus()
 }
 
 void
-GameSession::drawendscreen()
+GameSession::draw_endscreen_content()
 {
   char str[80];
 
@@ -972,15 +1059,20 @@ GameSession::drawendscreen()
 
   sprintf(str, "COINS: %d", player_status.distros);
   gold_text->drawf(str, 0, 256, A_HMIDDLE, A_TOP, 1);
-
-  flipscreen();
-  
-  SDL_Event event;
-  wait_for_event(event,2000,5000,true);
 }
 
 void
-GameSession::drawresultscreen(void)
+GameSession::drawendscreen()
+{
+  /* Frame-driven overlay; process_overlay applies pending_exit when done. */
+  overlay = OVERLAY_ENDSCREEN;
+  overlay_min_ms = 2000;
+  overlay_timer.start(5000);
+  pending_exit = ES_GAME_OVER;
+}
+
+void
+GameSession::draw_resultscreen_content()
 {
   char str[80];
 
@@ -996,11 +1088,15 @@ GameSession::drawresultscreen(void)
 
   sprintf(str, "COINS: %d", player_status.distros);
   gold_text->drawf(str, 0, 256, A_HMIDDLE, A_TOP, 1);
+}
 
-  flipscreen();
-  
-  SDL_Event event;
-  wait_for_event(event,2000,5000,true);
+void
+GameSession::drawresultscreen(void)
+{
+  overlay = OVERLAY_RESULT;
+  overlay_min_ms = 2000;
+  overlay_timer.start(5000);
+  pending_exit = ES_LEVEL_FINISHED;
 }
 
 std::string slotinfo(int slot)
