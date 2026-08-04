@@ -34,7 +34,7 @@ chmod -R u+w zlib-src
   cd zlib-src
   if [ -x ./configure ] || [ -f ./configure ]; then
     emconfigure ./configure --static --prefix="$PREFIX"
-    emmake make -j"${NIX_BUILD_CORES:-$(nproc)}"
+    emmake make -j"${NIX_BUILD_CORES:-${JOBS:-$(nproc)}}"
     emmake make install
   else
     echo "zlib: no configure — compiling sources with emcc"

@@ -99,7 +99,7 @@ nix develop .#supertux-milestone1-sdl2-gles2
 
 Both flake packages use **CMake** (not Autotools). Win32 zip packages remain SDL1-oriented via existing win32 SDL inputs.
 
-**WebAssembly:** `nix/wasm.nix` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL); `ENABLE_SOUND` optional (mixer+libxmp in `wasm-sdl-libs`, default off until playtested). Offline static **zlib** is `wasm-zlib-libs` (`ZLIB_ROOT`). Runtime uses `app_loop` + `emscripten_set_main_loop` (TITLE / WORLDMAP / SESSION / CONFIRM / TEXT); `st_frame_delay()` no-ops under that pump. **ASYNCIFY** is **off** by default (`enableAsyncify = true` in `mkApp` / `ENABLE_ASYNCIFY=1` if a residual wait freezes the tab). Assets preload to `/data`; config/saves use **IDBFS** under `/home/web_user`. Level editor is hidden on wasm.
+**WebAssembly:** `nix/wasm.nix` + `mk/wasm/scripts/` builds offline SDL2 (+ SDL2_image) via `emcmake` (same flake `sdl2-src` / `sdl2-image-src` inputs as Android — **not** Emscripten’s network `-sUSE_SDL=2` port). Game flags: `ENABLE_SDL2=ON`, `ENABLE_GLES2=ON` (WebGL); `ENABLE_SOUND` optional (mixer+libxmp in `wasm-sdl-libs`, default off until playtested). Offline static **zlib** is `wasm-zlib-libs` (`ZLIB_ROOT`). Runtime uses `app_loop` + `emscripten_set_main_loop` (TITLE / WORLDMAP / SESSION / CONFIRM / TEXT); `st_frame_delay()` no-ops under that pump. **ASYNCIFY** is **off** by default (`enableAsyncify = true` in `mkApp` / `ENABLE_ASYNCIFY=1` if a residual wait freezes the tab). Assets preload to `/data`; config/saves use **IDBFS** under `/home/web_user`. Level editor is hidden on wasm.
 
 ### Platform layer
 
@@ -162,8 +162,9 @@ Autotools + GP2X wrappers are parked under `mk/gp2x/` (see `mk/gp2x/README.md`).
 | `src/menu.cpp` / `title.cpp` | UI |
 | `src/sound.cpp` / `music_manager.cpp` | audio |
 | `src/lispreader.cpp` | data parsing |
-| `android/` | Android packaging (manifest, jni/Android.mk, icons) |
-| `nix/android.nix` + `nix/scripts/build-android-*.sh` | APK pipeline (helloworld-fireos pattern) |
+| `mk/android/app/` | Android packaging (manifest, jni/Android.mk, icons) |
+| `nix/android.nix` + `mk/android/scripts/` | APK pipeline (scripts usable outside Nix) |
+| `nix/wasm.nix` + `mk/wasm/scripts/` | Emscripten app + static SDL/zlib recipes |
 
 ### Android APK
 
@@ -175,7 +176,7 @@ nix run .#install-android-supertux-milestone1   # adb install -r
 
 - SDL2 is built once as `android-sdl-libs` (ndk-build); the game links it as a prebuilt.
 - SDL2_image is compiled into `libmain.so` with the stb backend (no system libpng).
-- **SDL2_mixer** is built into `android-sdl-libs` (OGG via in-tree stb_vorbis) and linked from `libmain.so`. Force silence with `SUPER_TUX_ENABLE_SOUND=0` in `android/jni/Android.mk` if needed.
+- **SDL2_mixer** is built into `android-sdl-libs` (OGG via in-tree stb_vorbis) and linked from `libmain.so`. Force silence with `SUPER_TUX_ENABLE_SOUND=0` in `mk/android/app/jni/Android.mk` if needed.
 - **GLES2 is the default renderer** on Android (`USE_GLES2`, linked `-lGLESv2`). ES 2.0 is required by the Android CDD and available on API 22 / Fire OS 5. Software fallback remains if context creation fails.
 - The repo-root `data/` tree is packaged into the APK as assets.
 - Target baseline matches Fire OS 5 / API 22 (`armeabi-v7a` + `arm64-v8a`).

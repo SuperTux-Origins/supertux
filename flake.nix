@@ -235,7 +235,7 @@
         win64Package = if isWin then null else mkWinCross {
           crossPkgs = pkgs.pkgsCross.mingwW64;
           winSystem = "x86_64-windows";
-          pname = "supertux-milestone1-win32-x86";
+          pname = "supertux-milestone1-win32-x64";
         };
         win32Package = if isWin then null else mkWinCross {
           crossPkgs = pkgs.pkgsCross.mingw32;
@@ -298,9 +298,9 @@
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
                 appName = "supertux-milestone1";
-                appDir = ./android;
+                appDir = ./mk/android/app;
                 outApkName = androidApkName;
-                keystore = ./keystore/debug.keystore;
+                keystore = ./mk/android/keystore/debug.keystore;
                 gameSrcDir = ./src;
                 gameDataDir = ./data;
                 stbImageH = stbImageH;
@@ -327,9 +327,9 @@
               install-android-supertux-milestone1 = android.mkInstallApp {
                 pkg = android.mkApk {
                   appName = "supertux-milestone1";
-                  appDir = ./android;
+                  appDir = ./mk/android/app;
                   outApkName = androidApkName;
-                  keystore = ./keystore/debug.keystore;
+                  keystore = ./mk/android/keystore/debug.keystore;
                   gameSrcDir = ./src;
                   gameDataDir = ./data;
                   stbImageH = stbImageH;
@@ -356,9 +356,9 @@
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
                 appName = "supertux-milestone1";
-                appDir = ./android;
+                appDir = ./mk/android/app;
                 outApkName = androidApkName;
-                keystore = ./keystore/debug.keystore;
+                keystore = ./mk/android/keystore/debug.keystore;
                 gameSrcDir = ./src;
                 gameDataDir = ./data;
                 stbImageH = stbImageH;

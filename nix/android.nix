@@ -14,7 +14,7 @@
 #     compilePlatform = "33";      # javac classpath only, see comment below
 #     targetAbis = [ "armeabi-v7a" "arm64-v8a" ];
 #   };
-#   android.mkApk { appName = "myapp"; appDir = ./apps/myapp; outApkName = "myapp.apk"; keystore = ./keystore/debug.keystore; }
+#   android.mkApk { appName = "myapp"; appDir = ./apps/myapp; outApkName = "myapp.apk"; keystore = ./mk/android/keystore/debug.keystore; }
 { pkgs
 , sdlSrc
 , sdlVersion
@@ -74,14 +74,14 @@ let
     buildPhase = ''
       runHook preBuild
       export ANDROID_HOME=${androidSdk}/libexec/android-sdk
-      bash ${./scripts/build-android-sdl-libs.sh}
+      bash ${../mk/android/scripts/build-sdl-libs.sh}
       runHook postBuild
     '';
 
     installPhase = ''
       runHook preInstall
       TARGET_ABIS=${pkgs.lib.escapeShellArg targetAbisStr} \
-        bash ${./scripts/install-android-sdl-libs.sh}
+        bash ${../mk/android/scripts/install-sdl-libs.sh}
       runHook postInstall
     '';
   };
@@ -161,7 +161,7 @@ let
         runHook preBuild
         export ANDROID_HOME=${androidSdk}/libexec/android-sdk
         TARGET_ABIS=${pkgs.lib.escapeShellArg targetAbisStr} \
-          bash ${./scripts/build-android-apk.sh}
+          bash ${../mk/android/scripts/build-apk.sh}
         runHook postBuild
       '';
 

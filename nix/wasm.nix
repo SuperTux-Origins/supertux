@@ -34,7 +34,7 @@ let
     };
     buildPhase = ''
       runHook preBuild
-      bash ${./scripts/build-wasm-sdl-libs.sh}
+      bash ${../mk/wasm/scripts/build-sdl2.sh}
       runHook postBuild
     '';
     installPhase = ''
@@ -77,7 +77,7 @@ EOF
       };
       buildPhase = ''
         runHook preBuild
-        bash ${./scripts/build-wasm-sdl-libs.sh}
+        bash ${../mk/wasm/scripts/build-sdl2-image.sh}
         runHook postBuild
       '';
       installPhase = ''
@@ -125,7 +125,7 @@ EOF
       };
       buildPhase = ''
         runHook preBuild
-        bash ${./scripts/build-wasm-sdl-libs.sh}
+        bash ${../mk/wasm/scripts/build-sdl2-mixer.sh}
         runHook postBuild
       '';
       installPhase = ''
@@ -195,7 +195,7 @@ EOF
 
     buildPhase = ''
       runHook preBuild
-      bash ${./scripts/build-wasm-zlib.sh}
+      bash ${../mk/wasm/scripts/build-zlib.sh}
       runHook postBuild
     '';
 
@@ -232,129 +232,16 @@ EOF
   };
 
 
-  # HTML shell with source/revision footer. versionFull / gitRev filled by mkApp.
+  # HTML shell: template under mk/wasm/shell.html (@versionFull@ @gitRev@ @sourceUrl@ @revUrl@).
   mkWasmShell = { versionFull, gitRev, sourceUrl }:
     let
       revUrl =
         if gitRev == "dirty" || gitRev == "" then sourceUrl
         else "${sourceUrl}/tree/${gitRev}";
     in
-    pkgs.writeText "supertux-wasm-shell.html" ''
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  <title>SuperTux Milestone 1 ${versionFull}</title>
-  <style>
-    html, body {
-      margin: 0; padding: 0; height: 100%;
-      background: #0a0a12; color: #c8d0e0;
-      font-family: system-ui, sans-serif;
-      overflow: hidden;
-    }
-    #wrap {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      min-height: 100%; gap: 0.75rem;
-    }
-    canvas.emscripten {
-      display: block;
-      background: #000;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-      max-width: 100vw; max-height: 85vh;
-      outline: none;
-    }
-    #status { font-size: 0.9rem; opacity: 0.85; min-height: 1.2em; }
-    #progress {
-      width: min(320px, 80vw); height: 6px;
-      background: #1a1a28; border-radius: 3px; overflow: hidden;
-    }
-    #progress > div {
-      height: 100%; width: 0%; background: #4af;
-      transition: width 0.15s ease-out;
-    }
-    #meta {
-      font-size: 0.75rem; opacity: 0.7; text-align: center;
-      line-height: 1.5; max-width: 90vw;
-    }
-    #meta a { color: #8cf; }
-  </style>
-</head>
-<body>
-  <div id="wrap">
-    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
-    <div id="status">Loading…</div>
-    <div id="progress"><div id="progress-bar"></div></div>
-    <div id="meta">
-      SuperTux Milestone 1 <strong>${versionFull}</strong><br>
-      <a href="${sourceUrl}" target="_blank" rel="noopener">Source</a>
-      ·
-      <a href="${revUrl}" target="_blank" rel="noopener">Revision ${gitRev}</a>
-    </div>
-  </div>
-  <script type='text/javascript'>
-    var statusElement = document.getElementById('status');
-    var progressBar = document.getElementById('progress-bar');
-    var Module = {
-      preRun: [],
-      postRun: [],
-      print: function(text) {
-        if (arguments.length > 1)
-          text = Array.prototype.slice.call(arguments).join(' ');
-        console.log(text);
-      },
-      printErr: function(text) {
-        if (arguments.length > 1)
-          text = Array.prototype.slice.call(arguments).join(' ');
-        console.error(text);
-      },
-      canvas: (function() {
-        var canvas = document.getElementById('canvas');
-        canvas.addEventListener('webglcontextlost', function(e) {
-          alert('WebGL context lost. Reload the page.');
-          e.preventDefault();
-        }, false);
-        return canvas;
-      })(),
-      setStatus: function(text) {
-        if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: ''' };
-        if (text === Module.setStatus.last.text) return;
-        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
-        var now = Date.now();
-        if (m && now - Module.setStatus.last.time < 30) return;
-        Module.setStatus.last.time = now;
-        Module.setStatus.last.text = text;
-        if (m) {
-          progressBar.style.width = (parseInt(m[2]) / parseInt(m[4]) * 100) + '%';
-          statusElement.innerHTML = m[1];
-        } else {
-          progressBar.style.width = text ? progressBar.style.width : '100%';
-          statusElement.innerHTML = text;
-          if (!text) document.getElementById('progress').style.display = 'none';
-        }
-      },
-      totalDependencies: 0,
-      monitorRunDependencies: function(left) {
-        this.totalDependencies = Math.max(this.totalDependencies, left);
-        Module.setStatus(left
-          ? 'Preparing… (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')'
-          : 'All downloads complete.');
-      }
+    pkgs.replaceVars ../mk/wasm/shell.html {
+      inherit versionFull gitRev sourceUrl revUrl;
     };
-    Module.setStatus('Downloading…');
-    window.onerror = function(event) {
-      Module.setStatus('Exception thrown, see JavaScript console');
-      Module.setStatus = function(text) {
-        if (text) console.error('[post-exception status] ' + text);
-      };
-    };
-  </script>
-  {{{ SCRIPT }}}
-</body>
-</html>
-  '';
 
   mkApp = {
     appName
@@ -399,7 +286,7 @@ EOF
         # Emscripten + pkg-config stubs for our static libs.
         export EM_PKG_CONFIG_PATH="${sdlWasmLibs}/lib/pkgconfig"
         export PKG_CONFIG_PATH="${sdlWasmLibs}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-        bash ${./scripts/build-wasm-app.sh}
+        bash ${../mk/wasm/scripts/build-app.sh}
         runHook postBuild
       '';
 
@@ -431,61 +318,14 @@ EOF
     type = "app";
     program = toString (pkgs.writeShellScript "serve-${appName}-wasm" ''
       set -euo pipefail
-      cd ${pkg}
-
-      # Fixed port so IndexedDB (IDBFS) keeps the same origin across runs.
-      # Override with SUPERTUX_WASM_PORT=… if 8765 is busy.
-      port="''${SUPERTUX_WASM_PORT:-8765}"
-
-      port_file=$(mktemp)
-      server_pid=
-      trap 'kill "$server_pid" 2>/dev/null || true; rm -f "$port_file"' EXIT
-
-      ${pkgs.python3}/bin/python3 -c '
-      import http.server, socketserver, sys
-      port_file, port = sys.argv[1], int(sys.argv[2])
-      class Quiet(http.server.SimpleHTTPRequestHandler):
-          def log_message(self, *a): pass
-      socketserver.TCPServer.allow_reuse_address = True
-      try:
-          httpd = socketserver.TCPServer(("127.0.0.1", port), Quiet)
-      except OSError as e:
-          sys.stderr.write(
-              "error: cannot bind 127.0.0.1:%s (%s)\n"
-              "       set SUPERTUX_WASM_PORT to a free port\n" % (port, e))
-          sys.exit(1)
-      open(port_file, "w").write(str(httpd.server_address[1]))
-      httpd.serve_forever()
-      ' "$port_file" "$port" &
-      server_pid=$!
-
-      for i in $(seq 1 50); do
-        [ -s "$port_file" ] && break
-        sleep 0.05
-      done
-      if [ ! -s "$port_file" ]; then
-        echo "error: local HTTP server failed to start on port $port" >&2
-        exit 1
-      fi
-      port=$(cat "$port_file")
-      html="${appName}.html"
-      if [ ! -f "$html" ]; then
-        html=$(ls -1 *.html 2>/dev/null | head -1 || true)
-      fi
-      url="http://127.0.0.1:''${port}/''${html}"
-      echo "Serving ${appName} at $url  (Ctrl-C to stop)"
-      echo "  IDBFS origin is tied to this host:port — keep the port stable to retain saves."
-
-      if [ -n "''${BROWSER:-}" ]; then
-        "$BROWSER" "$url" >/dev/null 2>&1 || true
-      else
-        ${pkgs.xdg-utils}/bin/xdg-open "$url" >/dev/null 2>&1 || true
-      fi
-
-      wait "$server_pid"
+      export PKG=${pkg}
+      export APP_NAME=${appName}
+      export PATH=${pkgs.python3}/bin:${pkgs.xdg-utils}/bin:$PATH
+      exec bash ${../mk/wasm/scripts/serve.sh}
     '');
     meta.description = description;
   };
+
 in {
   inherit sdl2WasmLibs sdlWasmLibs zlibWasmLibs mkApp mkOpenBrowserApp;
   inherit sdl2Image sdl2Mixer;

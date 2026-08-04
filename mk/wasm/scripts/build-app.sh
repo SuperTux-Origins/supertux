@@ -98,7 +98,7 @@ if [ "${CMAKE_VERBOSE:-0}" = 1 ]; then
 fi
 
 echo "==> cmake --build"
-cmake --build build --parallel "${NIX_BUILD_CORES:-$(nproc)}" "${verbose[@]}"
+cmake --build build --parallel "${NIX_BUILD_CORES:-${JOBS:-$(nproc)}}" "${verbose[@]}"
 
 # Emscripten names the outputs after the CMake target (supertux-milestone1).
 out_base="build/${APP_NAME}"

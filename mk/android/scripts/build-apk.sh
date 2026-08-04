@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the SuperTux Milestone 1 APK, linking SDL2 as a prebuilt library.
-# Expects environment variables from nix/android.nix:
+# Required environment:
 #   ANDROID_HOME, BUILD_TOOLS_VERSION, PACKAGE_PLATFORM, TARGET_ABIS
 #   APP_NAME, APP_DIR          - android/ packaging dir (manifest, res, jni/)
 #   GAME_SRC_DIR               - path to C++ sources (repo src/)
@@ -89,7 +89,7 @@ echo "==> SUPERTUX_VERSION=$SUPERTUX_VERSION"
   APP_BUILD_SCRIPT="$PWD/src/jni/Android.mk" \
   NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
   SUPERTUX_VERSION="$SUPERTUX_VERSION" \
-  -j"${NIX_BUILD_CORES:-$(nproc)}"
+  -j"${NIX_BUILD_CORES:-${JOBS:-$(nproc)}}"
 
 mkdir -p out
 

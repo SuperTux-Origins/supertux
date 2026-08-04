@@ -2,7 +2,7 @@
 # Builds SDL2 (and optionally SDL2_mixer) native libraries via ndk-build,
 # plus SDLActivity Java glue (javac/d8).
 #
-# Env from nix/android.nix:
+# Required environment:
 #   ANDROID_HOME, BUILD_TOOLS_VERSION, COMPILE_PLATFORM, PACKAGE_PLATFORM
 #   SDL_SRC            - SDL2 source tree
 #   SDL_MIXER_SRC      - optional SDL2_mixer source tree

@@ -72,7 +72,7 @@ LOCAL_LDLIBS := -llog -landroid -lz -lGLESv2
 
 LOCAL_CFLAGS += -DUSE_SDL2 -DUSE_GLES2
 LOCAL_CPPFLAGS += -DUSE_SDL2 -DUSE_GLES2 -std=c++98
-# SUPERTUX_VERSION injected by nix/scripts/build-android-apk.sh (VERSION+g<rev>).
+# SUPERTUX_VERSION injected by mk/android/scripts/build-apk.sh (VERSION+g<rev>).
 ifndef SUPERTUX_VERSION
 SUPERTUX_VERSION := 0.1.5-dev
 endif
