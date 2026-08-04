@@ -214,10 +214,11 @@ create_game_window(const char* title, bool opengl, bool* fullscreen_inout)
 
   if (!win)
     {
+      /* Resizable: letterbox scales the fixed 640×480 backbuffer to the window. */
       win = SDL_CreateWindow(title,
                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                              ST_SCREEN_W, ST_SCREEN_H,
-                             base);
+                             base | SDL_WINDOW_RESIZABLE);
     }
 
   return win;
@@ -815,19 +816,22 @@ void platform_video_shutdown(void)
       SDL_GL_DeleteContext(st_gl_context);
       st_gl_context = NULL;
     }
-  if (screen && use_gl)
-    {
-      SDL_FreeSurface(screen);
-      screen = NULL;
-    }
 #endif
+  /* Free surfaces without consulting global use_gl — options toggles flip
+     use_gl *before* st_video_setup() calls shutdown, so the old mode must
+     be inferred from what we actually allocated (avoids double-free of the
+     software backbuffer when switching software → GL). */
   if (st_backbuffer)
     {
-      /* screen aliases st_backbuffer in software mode */
       if (screen == st_backbuffer)
         screen = NULL;
       SDL_FreeSurface(st_backbuffer);
       st_backbuffer = NULL;
+    }
+  if (screen)
+    {
+      SDL_FreeSurface(screen);
+      screen = NULL;
     }
   if (st_window)
     {
