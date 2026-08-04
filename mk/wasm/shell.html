@@ -68,6 +68,28 @@
       width: 100%; height: 100%;
       max-width: none; max-height: none;
     }
+    /* Fullscreen: hide page chrome so the 4:3 slot can use the full
+       viewport. Leaving the toolbar/meta visible made the flex column
+       taller than 100vh and cropped the canvas at the top. */
+    #wrap:fullscreen,
+    #wrap:-webkit-full-screen {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      gap: 0;
+      justify-content: center;
+      background: #000;
+    }
+    #wrap:fullscreen #status,
+    #wrap:fullscreen #progress,
+    #wrap:fullscreen .toolbar,
+    #wrap:fullscreen #meta,
+    #wrap:-webkit-full-screen #status,
+    #wrap:-webkit-full-screen #progress,
+    #wrap:-webkit-full-screen .toolbar,
+    #wrap:-webkit-full-screen #meta {
+      display: none !important;
+    }
     #wrap:fullscreen #canvas-slot.mode-fit,
     #wrap:-webkit-full-screen #canvas-slot.mode-fit {
       width: min(100vw, calc(100vh * 4 / 3));
