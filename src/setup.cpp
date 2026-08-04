@@ -691,6 +691,35 @@ void parse_path_args(int argc, char* argv[])
     }
 }
 
+/* Application subdirectory under XDG bases (not the SuperTux 0.6 name). */
+#ifndef ST_XDG_APP_DIR
+#define ST_XDG_APP_DIR "supertux-milestone1"
+#endif
+
+/** mkdir -p for absolute paths (creates intermediate components). */
+static void
+st_mkdir_p(const char* dir)
+{
+  if (!dir || !dir[0])
+    return;
+  char tmp[1024];
+  size_t n = strlen(dir);
+  if (n >= sizeof(tmp))
+    n = sizeof(tmp) - 1;
+  memcpy(tmp, dir, n);
+  tmp[n] = '\0';
+  for (char* p = tmp + 1; *p; ++p)
+    {
+      if (*p == '/')
+        {
+          *p = '\0';
+          mkdir(tmp, 0755);
+          *p = '/';
+        }
+    }
+  mkdir(tmp, 0755);
+}
+
 void st_directory_setup(void)
 {
 #ifdef __ANDROID__
@@ -702,72 +731,63 @@ void st_directory_setup(void)
 
   if (!userdir_override.empty())
     {
+      /* Single root: config at root, saves in <userdir>/save (Android,
+         Emscripten IDBFS, and --userdir). */
       st_dir = (char *) malloc(userdir_override.size() + 1);
       strcpy(st_dir, userdir_override.c_str());
+      st_save_dir = (char *) malloc(userdir_override.size() + strlen("/save") + 1);
+      strcpy(st_save_dir, userdir_override.c_str());
+      strcat(st_save_dir, "/save");
     }
   else
     {
+      /* XDG Base Directory:
+       *   config → $XDG_CONFIG_HOME/supertux-milestone1
+       *   saves  → $XDG_STATE_HOME/supertux-milestone1
+       * Relative XDG_* values are invalid per the spec and are ignored. */
       std::string config_home(".");
+      std::string state_home(".");
 
 #ifndef WIN32
       std::string home = ".";
       const char* home_c = getenv("HOME");
-      if (home_c)
-        {
-          home = home_c;
-        }
+      if (home_c && home_c[0] == '/')
+        home = home_c;
 
       const char* config_home_c = getenv("XDG_CONFIG_HOME");
-      if (config_home_c)
-        {
-          config_home = config_home_c;
-        }
+      if (config_home_c && config_home_c[0] == '/')
+        config_home = config_home_c;
       else
-        {
-          config_home = home + "/.config";
-        }
+        config_home = home + "/.config";
+
+      const char* state_home_c = getenv("XDG_STATE_HOME");
+      if (state_home_c && state_home_c[0] == '/')
+        state_home = state_home_c;
+      else
+        state_home = home + "/.local/state";
+#else
+      /* Windows: keep config and saves under one user folder next to the
+         legacy layout until a proper Known Folder path is added. */
+      config_home = ".";
+      state_home = ".";
 #endif
 
-      st_dir = (char *) malloc(sizeof(char) * (config_home.size() +
-                                               strlen("/supertux-milestone1") + 1));
+      st_dir = (char *) malloc(config_home.size() + strlen("/" ST_XDG_APP_DIR) + 1);
       strcpy(st_dir, config_home.c_str());
-      strcat(st_dir, "/supertux-milestone1");
+      strcat(st_dir, "/" ST_XDG_APP_DIR);
+
+      st_save_dir = (char *) malloc(state_home.size() + strlen("/" ST_XDG_APP_DIR) + 1);
+      strcpy(st_save_dir, state_home.c_str());
+      strcat(st_save_dir, "/" ST_XDG_APP_DIR);
     }
 
-  st_save_dir = (char *) malloc(sizeof(char) * (strlen(st_dir) + strlen("/save") + 1));
-
-  strcpy(st_save_dir,st_dir);
-  strcat(st_save_dir,"/save");
-
-  /* Create them. In the case they exist they won't destroy anything.
-     On Emscripten, create intermediate path components (MEMFS starts empty). */
-#ifdef __EMSCRIPTEN__
-  {
-    char tmp[1024];
-    size_t n = strlen(st_dir);
-    if (n >= sizeof(tmp))
-      n = sizeof(tmp) - 1;
-    memcpy(tmp, st_dir, n);
-    tmp[n] = '\0';
-    for (char* p = tmp + 1; *p; ++p)
-      {
-        if (*p == '/')
-          {
-            *p = '\0';
-            mkdir(tmp, 0755);
-            *p = '/';
-          }
-      }
-    mkdir(tmp, 0755);
-  }
-#else
-  mkdir(st_dir, 0755);
-#endif
-  mkdir(st_save_dir, 0755);
+  /* Create config, state, and user-levels directories (no-op if they exist). */
+  st_mkdir_p(st_dir);
+  st_mkdir_p(st_save_dir);
 
   char str[1024];
   snprintf(str, sizeof(str), "%s/levels", st_dir);
-  mkdir(str, 0755);
+  st_mkdir_p(str);
 
   // User has not that a datadir, so we try some magic
   // Android / Emscripten set datadir in their prepare_paths helpers.
@@ -807,6 +827,7 @@ void st_directory_setup(void)
     }
 #endif /* !__ANDROID__ && !__EMSCRIPTEN__ */
   st_log("Configdir: %s", st_dir ? st_dir : "(null)");
+  st_log("Savedir: %s", st_save_dir ? st_save_dir : "(null)");
   st_log("Datadir: %s", datadir.c_str());
 }
 

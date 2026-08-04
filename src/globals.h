@@ -126,7 +126,10 @@ extern int joystick_num;
 extern char* level_startup_file;
 extern bool launch_leveleditor_mode;
 
-/* SuperTux directory ($HOME/.supertux) and save directory($HOME/.supertux/save) */
+/* XDG paths (desktop):
+ *   st_dir      — $XDG_CONFIG_HOME/supertux-milestone1  (config, user levels)
+ *   st_save_dir — $XDG_STATE_HOME/supertux-milestone1   (save slots)
+ * --userdir overrides both under one root (saves in <userdir>/save). */
 extern char* st_dir;
 extern char* st_save_dir;
 
