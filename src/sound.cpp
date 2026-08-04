@@ -294,3 +294,27 @@ void decreaseSoundVolume(void)
 	else md_volume -= 13;
 }
 #endif
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+
+/* Called from the HTML shell when the main loop is frozen/resumed so music
+   and sound effects stop with the game (pauseMainLoop alone does not). */
+extern "C" EMSCRIPTEN_KEEPALIVE void
+st_emscripten_audio_pause(void)
+{
+  if (!audio_device)
+    return;
+  Mix_PauseMusic();
+  Mix_Pause(-1); /* all channels */
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void
+st_emscripten_audio_resume(void)
+{
+  if (!audio_device)
+    return;
+  Mix_ResumeMusic();
+  Mix_Resume(-1);
+}
+#endif /* __EMSCRIPTEN__ */

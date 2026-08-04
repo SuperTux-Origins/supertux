@@ -44,7 +44,7 @@ LINK_FLAGS=(
   "SHELL:-lidbfs.js"
   # Canvas resize + C main-loop pause/resume for mk/wasm/shell.html. Comma list (no JS-array
   # quotes) survives CMake separate_arguments(NATIVE_COMMAND).
-  "SHELL:-sEXPORTED_FUNCTIONS=_main,_st_emscripten_canvas_resize,_st_emscripten_canvas_native,_emscripten_pause_main_loop,_emscripten_resume_main_loop"
+  "SHELL:-sEXPORTED_FUNCTIONS=_main,_st_emscripten_canvas_resize,_st_emscripten_canvas_native,_emscripten_pause_main_loop,_emscripten_resume_main_loop,_st_emscripten_audio_pause,_st_emscripten_audio_resume"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,FS"
 )
 if [ "${ENABLE_ASYNCIFY:-0}" = 1 ]; then

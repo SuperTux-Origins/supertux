@@ -21,6 +21,11 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#ifdef NOSOUND
+/* sound.cpp is not linked — keep the shell's audio exports defined. */
+extern "C" EMSCRIPTEN_KEEPALIVE void st_emscripten_audio_pause(void) {}
+extern "C" EMSCRIPTEN_KEEPALIVE void st_emscripten_audio_resume(void) {}
+#endif
 #endif
 
 static bool g_app_active = false;

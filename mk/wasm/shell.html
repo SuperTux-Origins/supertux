@@ -303,6 +303,20 @@
           else
             throw new Error('emscripten_resume_main_loop not exported');
         }
+        /* SDL_mixer runs outside the main loop — pause/resume with it. */
+        try {
+          if (paused) {
+            if (typeof Module._st_emscripten_audio_pause === 'function')
+              Module._st_emscripten_audio_pause();
+            else if (typeof Module.ccall === 'function')
+              Module.ccall('st_emscripten_audio_pause', null, [], []);
+          } else {
+            if (typeof Module._st_emscripten_audio_resume === 'function')
+              Module._st_emscripten_audio_resume();
+            else if (typeof Module.ccall === 'function')
+              Module.ccall('st_emscripten_audio_resume', null, [], []);
+          }
+        } catch (ae) { console.warn('SuperTux: audio pause failed', ae); }
         stLoopPaused = paused;
         if (fromUser) stUserPaused = paused;
         var bp = document.getElementById('btn-pause');
