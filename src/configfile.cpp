@@ -92,6 +92,10 @@ void loadconfig(void)
     use_gl = true;
   else
     use_gl = false;
+#ifdef __EMSCRIPTEN__
+  /* Browser build always keeps GLES2; saved "sdl" would crash on mode switch. */
+  use_gl = true;
+#endif
 
   reader.read_int ("joystick", &joystick_num);
   if (!(joystick_num >= 0))

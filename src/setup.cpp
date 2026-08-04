@@ -841,7 +841,10 @@ void st_menu(void)
   options_menu->additem(MN_LABEL,"Options",0,0);
   options_menu->additem(MN_HL,"",0,0);
 #ifndef GP2X
-#ifndef NOOPENGL
+#if defined(__EMSCRIPTEN__)
+  /* WebGL context teardown for GL↔software is unstable in the browser. */
+  options_menu->additem(MN_DEACTIVE,"OpenGL (required)",1, 0, MNID_OPENGL);
+#elif !defined(NOOPENGL)
   options_menu->additem(MN_TOGGLE,"OpenGL",use_gl,0, MNID_OPENGL);
 #else
   options_menu->additem(MN_DEACTIVE,"OpenGL (not supported)",use_gl, 0, MNID_OPENGL);
@@ -1026,14 +1029,14 @@ void process_options_menu(void)
   switch (options_menu->check())
     {
     case MNID_OPENGL:
-#ifndef NOOPENGL
+#if defined(__EMSCRIPTEN__) || defined(NOOPENGL)
+      options_menu->get_item_by_id(MNID_OPENGL).toggled = use_gl;
+#else
       if(use_gl != options_menu->isToggled(MNID_OPENGL))
         {
           use_gl = !use_gl;
           st_video_setup();
         }
-#else
-      options_menu->get_item_by_id(MNID_OPENGL).toggled = false;
 #endif
       break;
     case MNID_FULLSCREEN:
@@ -1175,6 +1178,12 @@ void st_general_free(void)
 
 void st_video_setup(void)
 {
+#ifdef __EMSCRIPTEN__
+  /* Do not destroy/recreate the WebGL context for a software fallback —
+     that path is unstable in the browser. */
+  use_gl = true;
+#endif
+
   /* Free GL textures while the context is still current. Tearing down the
      context first and then calling glDeleteTextures corrupts memory on
      Emscripten (often crashes later inside the audio ScriptProcessor). */
@@ -1197,8 +1206,14 @@ void st_video_setup(void)
               "trying windowed software\n",
               (int)use_fullscreen, (int)use_gl);
       use_fullscreen = false;
+#ifdef __EMSCRIPTEN__
+      /* Keep GLES2 — software video re-init is not supported in the browser. */
+      use_gl = true;
+      if (!platform_video_init(false, true))
+#else
       use_gl = false;
       if (!platform_video_init(false, false))
+#endif
         {
 #ifdef GP2X_VERSION
           chdir("/usr/gp2x");
