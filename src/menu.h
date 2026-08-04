@@ -173,6 +173,9 @@ public:
   Timer effect;
   int arrange_left;
   int active_item;
+  /** Index of MN_CONTROLFIELD waiting for a key/button, or -1 when idle.
+      Navigation works while idle; Enter/HIT starts bind; Escape cancels. */
+  int control_bind_item;
 
   std::vector<MenuItem> item;
 

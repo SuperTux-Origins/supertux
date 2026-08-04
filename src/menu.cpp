@@ -176,9 +176,13 @@ void
 Menu::push_current(Menu* pmenu)
 {
   if (current_)
-    last_menus.push_back(current_);
+    {
+      current_->control_bind_item = -1;
+      last_menus.push_back(current_);
+    }
 
   current_ = pmenu;
+  current_->control_bind_item = -1;
   current_->effect.start(500);
   menu_sync_text_input(current_);
 }
@@ -186,9 +190,13 @@ Menu::push_current(Menu* pmenu)
 void
 Menu::pop_current()
 {
+  if (current_)
+    current_->control_bind_item = -1;
+
   if (!last_menus.empty())
   {
     current_ = last_menus.back();
+    current_->control_bind_item = -1;
     current_->effect.start(500);
 
     last_menus.pop_back();
@@ -211,8 +219,14 @@ Menu::set_current(Menu* menu)
 {
   last_menus.clear();
 
+  if (current_)
+    current_->control_bind_item = -1;
+
   if (menu)
-    menu->effect.start(500);
+    {
+      menu->control_bind_item = -1;
+      menu->effect.start(500);
+    }
 
   current_ = menu;
   menu_sync_text_input(current_);
@@ -441,6 +455,7 @@ Menu::Menu()
   pos_y        = screen->h/2;
   arrange_left = 0;
   active_item  = 0;
+  control_bind_item = -1;
   effect.init(false);
 }
 
@@ -503,6 +518,9 @@ Menu::action()
         --active_item;
       else
         active_item = int(item.size())-1;
+      /* Moving away cancels an in-progress control bind. */
+      if (active_item != prev_active)
+        control_bind_item = -1;
       if (verbose_mode && active_item != prev_active)
         st_vlog("[menu] active_item %d -> %d (UP)\n",
                 prev_active, active_item);
@@ -513,6 +531,8 @@ Menu::action()
         ++active_item;
       else
         active_item = 0;
+      if (active_item != prev_active)
+        control_bind_item = -1;
       if (verbose_mode && active_item != prev_active)
         st_vlog("[menu] active_item %d -> %d (DOWN)\n",
                 prev_active, active_item);
@@ -564,6 +584,16 @@ Menu::action()
         case MN_NUMFIELD:
           menuaction = MENU_ACTION_DOWN;
           action();
+          break;
+
+        case MN_CONTROLFIELD:
+          /* Dead-zone field is adjusted with Left/Right, not rebound. */
+#ifdef USE_SDL2
+          if (item[active_item].int_p == &gamecontroller_keymap.analog_dead_zone)
+            break;
+#endif
+          /* Enter bind mode: next key/button sets the binding. */
+          control_bind_item = active_item;
           break;
 
         case MN_BACK:
@@ -740,7 +770,10 @@ Menu::draw_item(int index, // Position of the current item in the menu
                0,0,0,128);
 
       if(pitem.kind == MN_CONTROLFIELD) {
-        get_controlfield_key_into_input(&pitem);
+        if (control_bind_item == index)
+          pitem.change_input("...");
+        else
+          get_controlfield_key_into_input(&pitem);
       }
 
       if(pitem.kind == MN_TEXTFIELD || pitem.kind == MN_NUMFIELD)
@@ -925,55 +958,63 @@ Menu::event(SDL_Event& event)
     {
       if(st_is_escape_key(key))
       {
+        if (control_bind_item == active_item)
+          {
+            /* Cancel bind mode, keep previous assignment. */
+            control_bind_item = -1;
+            get_controlfield_key_into_input(&item[active_item]);
+            return;
+          }
         Menu::pop_current();
         return;
       }
-      /* Joystick / Gamepad Setup: keyboard only navigates. Binding is done
-         with the device itself (axis/button events). Keyboard Setup still
-         captures the pressed key as the binding. */
-      if (Menu::current() == options_joystick_menu
+
 #ifdef USE_SDL2
-          || Menu::current() == options_gamepad_menu
-          || Menu::current() == options_gamepad_analog_menu
-#endif
-          )
+      /* Dead zone: Left/Right adjust value while focused (no bind mode). */
+      if (Menu::current() == options_gamepad_analog_menu
+          && item[active_item].int_p == &gamecontroller_keymap.analog_dead_zone
+          && (key == SDLK_LEFT || key == SDLK_RIGHT))
         {
-#ifdef USE_SDL2
-          if (Menu::current() == options_gamepad_analog_menu
-              && item[active_item].int_p == &gamecontroller_keymap.analog_dead_zone
-              && (key == SDLK_LEFT || key == SDLK_RIGHT))
+          int step = 1000;
+          if (key == SDLK_LEFT)
             {
-              int step = 1000;
-              if (key == SDLK_LEFT)
-                {
-                  gamecontroller_keymap.analog_dead_zone -= step;
-                  if (gamecontroller_keymap.analog_dead_zone < 0)
-                    gamecontroller_keymap.analog_dead_zone = 0;
-                }
-              else
-                {
-                  gamecontroller_keymap.analog_dead_zone += step;
-                  if (gamecontroller_keymap.analog_dead_zone > 32767)
-                    gamecontroller_keymap.analog_dead_zone = 32767;
-                }
-              get_controlfield_key_into_input(&item[active_item]);
-              return;
-            }
-#endif
-          if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT
-              || key == SDLK_RIGHT || key == SDLK_RETURN || key == SDLK_SPACE)
-            {
-              /* fall through to switch(key) for menu navigation */
+              gamecontroller_keymap.analog_dead_zone -= step;
+              if (gamecontroller_keymap.analog_dead_zone < 0)
+                gamecontroller_keymap.analog_dead_zone = 0;
             }
           else
-            return;
+            {
+              gamecontroller_keymap.analog_dead_zone += step;
+              if (gamecontroller_keymap.analog_dead_zone > 32767)
+                gamecontroller_keymap.analog_dead_zone = 32767;
+            }
+          get_controlfield_key_into_input(&item[active_item]);
+          return;
         }
-      else
+#endif
+
+      if (control_bind_item == active_item)
         {
-          *item[active_item].int_p = key;
+          /* Joystick / Gamepad Setup: keyboard never binds device buttons. */
+          if (Menu::current() == options_joystick_menu
+#ifdef USE_SDL2
+              || Menu::current() == options_gamepad_menu
+              || Menu::current() == options_gamepad_analog_menu
+#endif
+              )
+            {
+              /* Ignore keys while waiting for a pad button. */
+              return;
+            }
+          /* Keyboard Setup: capture any key as the new binding. */
+          *item[active_item].int_p = (int)key;
+          control_bind_item = -1;
+          get_controlfield_key_into_input(&item[active_item]);
           menuaction = MENU_ACTION_DOWN;
           return;
         }
+      /* Idle control field: arrows / Enter fall through for navigation /
+         starting bind mode (HIT). */
     }
 
 
@@ -1166,17 +1207,38 @@ Menu::event(SDL_Event& event)
               }
             return;
           }
-        /* Only bind buttons on the main Gamepad Setup menu. */
-        if (Menu::current() != options_gamepad_menu)
-          return;
-        *item[active_item].int_p = (int)event.cbutton.button;
-        menuaction = MENU_ACTION_DOWN;
-        return;
+
+        if (control_bind_item == active_item
+            && Menu::current() == options_gamepad_menu)
+          {
+            /* Waiting for a button: capture it (Menu/Start cancels). */
+            if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu
+                || event.cbutton.button == SDL_CONTROLLER_BUTTON_START
+                || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
+              {
+                control_bind_item = -1;
+                get_controlfield_key_into_input(&item[active_item]);
+                return;
+              }
+            *item[active_item].int_p = (int)event.cbutton.button;
+            control_bind_item = -1;
+            get_controlfield_key_into_input(&item[active_item]);
+            menuaction = MENU_ACTION_DOWN;
+            return;
+          }
+        /* Idle: fall through so D-Pad / Jump navigate and HIT starts bind. */
       }
     if (use_joystick)
       {
         if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu)
           {
+            if (control_bind_item >= 0)
+              {
+                control_bind_item = -1;
+                if (active_item >= 0 && active_item < (int)item.size())
+                  get_controlfield_key_into_input(&item[active_item]);
+                return;
+              }
             /* Same as Escape: close/pop this menu. */
             Menu::pop_current();
             return;
@@ -1201,6 +1263,17 @@ Menu::event(SDL_Event& event)
     if (verbose_mode)
       st_vlog("[menu] JOYBUTTONDOWN btn=%d use_joystick=%d\n",
               (int)event.jbutton.button, (int)use_joystick);
+    if (use_joystick
+        && item[active_item].kind == MN_CONTROLFIELD
+        && control_bind_item == active_item
+        && Menu::current() == options_joystick_menu)
+      {
+        *item[active_item].int_p = (int)event.jbutton.button;
+        control_bind_item = -1;
+        get_controlfield_key_into_input(&item[active_item]);
+        menuaction = MENU_ACTION_DOWN;
+        return;
+      }
     if (use_joystick)
       menuaction = MENU_ACTION_HIT;
     break;
@@ -1210,10 +1283,22 @@ Menu::event(SDL_Event& event)
     {
       if( event.jbutton.button == joystick_keymap.start_button )
       {
+        if (control_bind_item == active_item)
+          {
+            control_bind_item = -1;
+            get_controlfield_key_into_input(&item[active_item]);
+            return;
+          }
         Menu::pop_current();
         return;
       }
 
+      if (control_bind_item != active_item)
+        {
+          /* Idle: let buttons navigate / HIT below. */
+        }
+      else
+        {
        static int save[8]={-1,-1,-1,-1,-1,-1,-1,-1};
        int itemid=get_active_item_id();
        int inputkey;
@@ -1234,6 +1319,7 @@ Menu::event(SDL_Event& event)
        }
 
         *item[active_item].int_p = event.jbutton.button;
+        control_bind_item = -1;
 	
 	bool okay=true;
 	
@@ -1247,6 +1333,7 @@ Menu::event(SDL_Event& event)
 	else menuaction = MENU_ACTION_NONE;
 
       return;
+        }
     } 
     
       if (event.jbutton.button == joystick_keymap.a_button)
