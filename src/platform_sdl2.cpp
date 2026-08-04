@@ -25,6 +25,9 @@ static SDL_GLContext st_gl_context = NULL;
 /* Owned software backbuffer — window surface from SDL_GetWindowSurface is
    invalidated on resize/format changes; the engine treats `screen` as stable. */
 static SDL_Surface* st_backbuffer = NULL;
+/* Emscripten (and fallback) software present: stream backbuffer via renderer. */
+static SDL_Renderer* st_sw_renderer = NULL;
+static SDL_Texture* st_sw_tex = NULL;
 
 /* Letterbox used by software present / GL viewport — keep in sync so
    touch/mouse window coords can be mapped back to logical ST_SCREEN. */
@@ -222,17 +225,108 @@ create_game_window(const char* title, bool opengl, bool* fullscreen_inout)
 }
 
 static void
+destroy_sw_presenter(void)
+{
+  if (st_sw_tex)
+    {
+      SDL_DestroyTexture(st_sw_tex);
+      st_sw_tex = NULL;
+    }
+  if (st_sw_renderer)
+    {
+      SDL_DestroyRenderer(st_sw_renderer);
+      st_sw_renderer = NULL;
+    }
+}
+
+/** SDL_Renderer path: works on Emscripten where GetWindowSurface is a no-op. */
+static bool
+init_sw_presenter(void)
+{
+  destroy_sw_presenter();
+  if (!st_window)
+    return false;
+
+  st_sw_renderer = SDL_CreateRenderer(st_window, -1,
+                                      SDL_RENDERER_ACCELERATED
+                                      | SDL_RENDERER_PRESENTVSYNC);
+  if (!st_sw_renderer)
+    st_sw_renderer = SDL_CreateRenderer(st_window, -1, SDL_RENDERER_SOFTWARE);
+  if (!st_sw_renderer)
+    {
+      fprintf(stderr, "Error: SDL_CreateRenderer: %s\n", SDL_GetError());
+      return false;
+    }
+
+  /* Integer scale of the 640×480 backbuffer — no bilinear bleed. */
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
+  st_sw_tex = SDL_CreateTexture(st_sw_renderer,
+                                SDL_PIXELFORMAT_ARGB8888,
+                                SDL_TEXTUREACCESS_STREAMING,
+                                ST_SCREEN_W, ST_SCREEN_H);
+  if (!st_sw_tex)
+    {
+      fprintf(stderr, "Error: SDL_CreateTexture: %s\n", SDL_GetError());
+      destroy_sw_presenter();
+      return false;
+    }
+  return true;
+}
+
+static void
 software_present(void)
 {
   if (!st_window || !st_backbuffer)
     return;
 
+  int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
+  SDL_GetWindowSize(st_window, &ww, &wh);
+  st_update_letterbox(ww, wh);
+
+  /* Prefer renderer present on Emscripten; also if surface path is unavailable. */
+  bool use_renderer = (st_sw_renderer != NULL && st_sw_tex != NULL);
+#ifdef __EMSCRIPTEN__
+  use_renderer = true;
+  if (!st_sw_renderer || !st_sw_tex)
+    {
+      if (!init_sw_presenter())
+        return;
+    }
+#endif
+
+  if (use_renderer && st_sw_renderer && st_sw_tex)
+    {
+      if (SDL_MUSTLOCK(st_backbuffer))
+        SDL_LockSurface(st_backbuffer);
+      SDL_UpdateTexture(st_sw_tex, NULL, st_backbuffer->pixels, st_backbuffer->pitch);
+      if (SDL_MUSTLOCK(st_backbuffer))
+        SDL_UnlockSurface(st_backbuffer);
+
+      SDL_SetRenderDrawColor(st_sw_renderer, 0, 0, 0, 255);
+      SDL_RenderClear(st_sw_renderer);
+      SDL_Rect dst;
+      dst.x = st_lb_ox;
+      dst.y = st_lb_oy;
+      dst.w = st_lb_dw > 0 ? st_lb_dw : 1;
+      dst.h = st_lb_dh > 0 ? st_lb_dh : 1;
+      SDL_RenderCopy(st_sw_renderer, st_sw_tex, NULL, &dst);
+      /* Touch overlay paints via software onto window surface — not available
+         with renderer. Skip; pad is GL/overlay oriented. */
+      SDL_RenderPresent(st_sw_renderer);
+      return;
+    }
+
   SDL_Surface* window_surface = SDL_GetWindowSurface(st_window);
   if (!window_surface)
     {
-      /* Surface can be lost after mode changes; try once to recover. */
-      VLOG("[video] GetWindowSurface failed (%s), recreating backbuffer path\n",
+      VLOG("[video] GetWindowSurface failed (%s); trying renderer present\n",
            SDL_GetError());
+      if (init_sw_presenter())
+        {
+          software_present();
+          return;
+        }
       return;
     }
 
@@ -246,7 +340,6 @@ software_present(void)
     }
   else
     {
-      /* Letterbox scale into desktop-fullscreen or HiDPI window. */
       SDL_Rect dst;
       dst.x = st_lb_ox;
       dst.y = st_lb_oy;
@@ -258,7 +351,6 @@ software_present(void)
       SDL_BlitScaled(st_backbuffer, NULL, window_surface, &dst);
     }
 
-  /* Touch overlay must be painted after the scaled blit (FillRect wipes it). */
   if (touch_controls_is_enabled())
     touch_controls_draw();
 
@@ -614,32 +706,56 @@ bool platform_video_init(bool fullscreen, bool opengl)
         return false;
       }
 
+    if (st_backbuffer)
+      {
+        SDL_FreeSurface(st_backbuffer);
+        st_backbuffer = NULL;
+      }
+
+#ifdef __EMSCRIPTEN__
+    /* Canvas has no usable window surface; fixed ARGB8888 backbuffer + renderer. */
+    st_backbuffer = SDL_CreateRGBSurfaceWithFormat(
+        0, ST_SCREEN_W, ST_SCREEN_H, 32, SDL_PIXELFORMAT_ARGB8888);
+    if (!st_backbuffer)
+      {
+        fprintf(stderr, "Error: software backbuffer: %s\n", SDL_GetError());
+        return false;
+      }
+    if (!init_sw_presenter())
+      {
+        fprintf(stderr, "Error: software presenter (renderer) init failed\n");
+        return false;
+      }
+#else
     {
       SDL_Surface* window_surface = SDL_GetWindowSurface(st_window);
       if (!window_surface)
         {
-          fprintf(stderr, "Error: SDL_GetWindowSurface failed: %s\n", SDL_GetError());
-          SDL_Log("platform_video_init failed: %s", SDL_GetError());
-          return false;
+          /* Some platforms lack a window surface — fall back to renderer. */
+          st_backbuffer = SDL_CreateRGBSurfaceWithFormat(
+              0, ST_SCREEN_W, ST_SCREEN_H, 32, SDL_PIXELFORMAT_ARGB8888);
+          if (!st_backbuffer || !init_sw_presenter())
+            {
+              fprintf(stderr, "Error: software video path failed: %s\n",
+                      SDL_GetError());
+              return false;
+            }
         }
-
-      if (st_backbuffer)
+      else
         {
-          SDL_FreeSurface(st_backbuffer);
-          st_backbuffer = NULL;
+          st_backbuffer = create_software_backbuffer(window_surface);
+          if (!st_backbuffer)
+            {
+              fprintf(stderr, "Error: software backbuffer: %s\n", SDL_GetError());
+              return false;
+            }
         }
-      st_backbuffer = create_software_backbuffer(window_surface);
-      if (!st_backbuffer)
-        {
-          fprintf(stderr, "Error: software backbuffer: %s\n", SDL_GetError());
-          SDL_Log("platform_video_init failed: %s", SDL_GetError());
-          return false;
-        }
-      screen = st_backbuffer;
-      SDL_FillRect(st_backbuffer, NULL,
-                   SDL_MapRGB(st_backbuffer->format, 0, 0, 0));
-      software_present();
     }
+#endif
+    screen = st_backbuffer;
+    SDL_FillRect(st_backbuffer, NULL,
+                 SDL_MapRGB(st_backbuffer->format, 0, 0, 0));
+    software_present();
     log_window("software ready");
   }
 
@@ -689,6 +805,7 @@ void platform_video_shutdown(void)
 {
   VLOG("[video] shutdown window=%p glctx=%p\n",
        (void*)st_window, (void*)st_gl_context);
+  destroy_sw_presenter();
 #ifndef NOOPENGL
 #ifdef USE_GLES2
   gles2_renderer_shutdown();
