@@ -231,7 +231,6 @@ static bool create_fbo(int w, int h)
   glBindTexture(GL_TEXTURE_2D, g_fbo_tex);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   {
-    extern bool use_texture_filtering;
     GLint filt = use_texture_filtering ? GL_LINEAR : GL_NEAREST;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filt);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filt);

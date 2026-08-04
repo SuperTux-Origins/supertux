@@ -9,6 +9,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)
 
 LOCAL_SRC_FILES := \
+	app_loop.cpp \
 	badguy.cpp \
 	button.cpp \
 	collision.cpp \
