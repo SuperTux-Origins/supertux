@@ -73,14 +73,14 @@ Text::~Text()
 }
 
 void
-Text::draw(const  char* text, int x, int y, int shadowsize, int update)
+Text::draw(const  char* text, int x, int y, int shadowsize, int update, int text_lift)
 {
   if(text != NULL)
     {
       if(shadowsize != 0)
         draw_chars(shadow_chars, text,x+shadowsize,y+shadowsize, update);
 
-      draw_chars(chars, text,x,y, update);
+      draw_chars(chars, text,x,y - text_lift, update);
     }
 }
 
@@ -139,7 +139,8 @@ Text::draw_chars(Surface* pchars,const  char* text, int x, int y, int update)
 
 void
 Text::draw_align(const char* text, int x, int y,
-                      TextHAlign halign, TextVAlign valign, int shadowsize, int update)
+                      TextHAlign halign, TextVAlign valign, int shadowsize, int update,
+                      int text_lift)
 {
   if(text != NULL)
     {
@@ -170,7 +171,7 @@ Text::draw_align(const char* text, int x, int y,
           break;
         }
 
-      draw(text, x, y, shadowsize, update);
+      draw(text, x, y, shadowsize, update, text_lift);
     }
 }
 

@@ -45,10 +45,11 @@ class Text
   Text(const std::string& file, int kind, int w, int h);
   ~Text();
 
-  void draw(const char* text, int x, int y, int shadowsize = 1, int update = NO_UPDATE);
+  /** text_lift: shift only the glyph layer up (shadow stays put). */
+  void draw(const char* text, int x, int y, int shadowsize = 1, int update = NO_UPDATE, int text_lift = 0);
   void draw_chars(Surface* pchars, const char* text, int x, int y, int update = NO_UPDATE);
   void drawf(const char* text, int x, int y, TextHAlign halign, TextVAlign valign, int shadowsize, int update = NO_UPDATE);
-  void draw_align(const char* text, int x, int y, TextHAlign halign, TextVAlign valign, int shadowsize = 1, int update = NO_UPDATE);
+  void draw_align(const char* text, int x, int y, TextHAlign halign, TextVAlign valign, int shadowsize = 1, int update = NO_UPDATE, int text_lift = 0);
   void erasetext(const char * text, int x, int y, Surface* surf, int update, int shadowsize);
   void erasecenteredtext(const char * text, int y, Surface* surf, int update, int shadowsize);
 };

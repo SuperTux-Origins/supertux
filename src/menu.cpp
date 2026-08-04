@@ -714,16 +714,16 @@ Menu::draw_item(int index, // Position of the current item in the menu
   if (arrange_left)
     x_pos += (int)(24) - menu_width/2 + (text_width + input_width + list_width)/2;
 
-  /* Active row: bar + stronger drop-shadow (shadow is a separate glyph layer
-     offset by shadow_size) so the selection pops without relying on colour only. */
+  /* Active row: snow bar; glyphs lift a few px while the shadow stays put. */
+  int text_lift = 0;
   if (index == active_item
       && pitem.kind != MN_HL
       && pitem.kind != MN_LABEL
       && pitem.kind != MN_DEACTIVE)
     {
-      shadow_size = 5;
+      shadow_size = 2;
+      text_lift = 2;
       text_font = blue_text;
-      y_pos -= 1; /* slight lift */
 #ifndef RES320X240
       int bar_x = pos_x - menu_width / 2 + 8;
       int bar_w = menu_width - 16;
@@ -731,9 +731,9 @@ Menu::draw_item(int index, // Position of the current item in the menu
       int bar_x = pos_x - menu_width / 4 + 4;
       int bar_w = menu_width / 2 - 8;
 #endif
-      fillrect(bar_x, y_pos - 11, bar_w, 22, 40, 80, 160, 160);
-      fillrect(bar_x, y_pos - 11, bar_w, 2, 180, 220, 255, 200);
-      fillrect(bar_x, y_pos + 9, bar_w, 2, 20, 40, 80, 180);
+      fillrect(bar_x, y_pos - 11, bar_w, 22, 245, 250, 255, 150);
+      fillrect(bar_x, y_pos - 11, bar_w, 2, 255, 255, 255, 220);
+      fillrect(bar_x, y_pos + 9, bar_w, 2, 200, 210, 230, 160);
     }
 
   switch (pitem.kind)
@@ -811,7 +811,7 @@ Menu::draw_item(int index, // Position of the current item in the menu
 
       text_font->draw_align(pitem.text,
                             x_pos - (input_width + font_width)/2, y_pos,
-                            A_HMIDDLE, A_VMIDDLE, shadow_size);
+                            A_HMIDDLE, A_VMIDDLE, shadow_size, NO_UPDATE, text_lift);
       break;
     }
   case MN_STRINGSELECT:
@@ -838,19 +838,21 @@ Menu::draw_item(int index, // Position of the current item in the menu
 
       text_font->draw_align(pitem.text,
                             x_pos - list_pos_2/2, y_pos,
-                            A_HMIDDLE, A_VMIDDLE, shadow_size);
+                            A_HMIDDLE, A_VMIDDLE, shadow_size, NO_UPDATE, text_lift);
       break;
     }
   case MN_BACK:
     {
-      text_font->draw_align(pitem.text, x_pos, y_pos, A_HMIDDLE, A_VMIDDLE, shadow_size);
+      text_font->draw_align(pitem.text, x_pos, y_pos, A_HMIDDLE, A_VMIDDLE,
+                            shadow_size, NO_UPDATE, text_lift);
       back->draw( x_pos + text_width/2  + font_width, y_pos - 8);
       break;
     }
 
   case MN_TOGGLE:
     {
-      text_font->draw_align(pitem.text, x_pos, y_pos, A_HMIDDLE, A_VMIDDLE, shadow_size);
+      text_font->draw_align(pitem.text, x_pos, y_pos, A_HMIDDLE, A_VMIDDLE,
+                            shadow_size, NO_UPDATE, text_lift);
 
       if(pitem.toggled)
         checkbox_checked->draw(
@@ -863,11 +865,13 @@ Menu::draw_item(int index, // Position of the current item in the menu
       break;
     }
   case MN_ACTION:
-    text_font->draw_align(pitem.text, x_pos, y_pos, A_HMIDDLE, A_VMIDDLE, shadow_size);
+    text_font->draw_align(pitem.text, x_pos, y_pos, A_HMIDDLE, A_VMIDDLE,
+                          shadow_size, NO_UPDATE, text_lift);
     break;
 
   case MN_GOTO:
-    text_font->draw_align(pitem.text, x_pos, y_pos, A_HMIDDLE, A_VMIDDLE, shadow_size);
+    text_font->draw_align(pitem.text, x_pos, y_pos, A_HMIDDLE, A_VMIDDLE,
+                          shadow_size, NO_UPDATE, text_lift);
     break;
   }
 }
