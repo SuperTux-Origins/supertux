@@ -79,10 +79,10 @@ void app_request_delete_slot(int slot)
 {
   g_delete_slot = slot;
   char str[1024];
-  sprintf(str, "Are you sure you want to delete slot %d?", slot);
+  sprintf(str, "Delete Slot %d", slot);
   /* Remember where to return (usually title with load menu restored). */
   g_return_screen = APP_SCREEN_TITLE;
-  confirm_dialog_begin(str);
+  confirm_dialog_begin("", str, "Cancel");
   g_screen = APP_SCREEN_CONFIRM;
 }
 

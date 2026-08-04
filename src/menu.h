@@ -80,8 +80,12 @@ enum LevelEditorSettingsMenuIDs {
   };
 
 bool confirm_dialog(std::string text);
-/** Split form for a future non-blocking pump (confirm_dialog still blocks). */
-void confirm_dialog_begin(const std::string& text);
+/** Split form for a future non-blocking pump (confirm_dialog still blocks).
+ *  text: optional header (empty = no header line).
+ *  confirm_label / cancel_label: action buttons (defaults Yes / No). */
+void confirm_dialog_begin(const std::string& text,
+                          const std::string& confirm_label = "Yes",
+                          const std::string& cancel_label = "No");
 bool confirm_dialog_frame(void);  /* true while dialog is open */
 bool confirm_dialog_result(void); /* valid after frame returns false */
 

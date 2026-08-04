@@ -63,17 +63,22 @@ static Menu* confirm_menu = 0;
 static bool confirm_done = false;
 static bool confirm_yes = false;
 
-void confirm_dialog_begin(const std::string& text)
+void confirm_dialog_begin(const std::string& text,
+                          const std::string& confirm_label,
+                          const std::string& cancel_label)
 {
   delete confirm_cap_screen;
   delete confirm_menu;
   confirm_cap_screen = Surface::CaptureScreen();
   confirm_menu = new Menu;
-  confirm_menu->additem(MN_DEACTIVE, text,0,0);
-  confirm_menu->additem(MN_HL,"",0,0);
-  confirm_menu->additem(MN_ACTION,"Yes",0,0,true);
-  confirm_menu->additem(MN_ACTION,"No",0,0,false);
-  confirm_menu->additem(MN_HL,"",0,0);
+  if (!text.empty())
+    {
+      confirm_menu->additem(MN_DEACTIVE, text, 0, 0);
+      confirm_menu->additem(MN_HL, "", 0, 0);
+    }
+  confirm_menu->additem(MN_ACTION, confirm_label, 0, 0, true);
+  confirm_menu->additem(MN_ACTION, cancel_label, 0, 0, false);
+  confirm_menu->additem(MN_HL, "", 0, 0);
   Menu::set_current(confirm_menu);
   confirm_done = false;
   confirm_yes = false;
@@ -709,11 +714,27 @@ Menu::draw_item(int index, // Position of the current item in the menu
   if (arrange_left)
     x_pos += (int)(24) - menu_width/2 + (text_width + input_width + list_width)/2;
 
-  if(index == active_item)
-  {
-    shadow_size = 3;
-    text_font = blue_text;
-  }
+  /* Active row: bar + stronger drop-shadow (shadow is a separate glyph layer
+     offset by shadow_size) so the selection pops without relying on colour only. */
+  if (index == active_item
+      && pitem.kind != MN_HL
+      && pitem.kind != MN_LABEL
+      && pitem.kind != MN_DEACTIVE)
+    {
+      shadow_size = 5;
+      text_font = blue_text;
+      y_pos -= 1; /* slight lift */
+#ifndef RES320X240
+      int bar_x = pos_x - menu_width / 2 + 8;
+      int bar_w = menu_width - 16;
+#else
+      int bar_x = pos_x - menu_width / 4 + 4;
+      int bar_w = menu_width / 2 - 8;
+#endif
+      fillrect(bar_x, y_pos - 11, bar_w, 22, 40, 80, 160, 160);
+      fillrect(bar_x, y_pos - 11, bar_w, 2, 180, 220, 255, 200);
+      fillrect(bar_x, y_pos + 9, bar_w, 2, 20, 40, 80, 180);
+    }
 
   switch (pitem.kind)
   {
