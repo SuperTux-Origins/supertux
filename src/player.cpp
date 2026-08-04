@@ -29,6 +29,7 @@ PlayerKeymap::PlayerKeymap()
 {
   keymap.jump  = SDLK_SPACE;
   keymap.duck  = SDLK_DOWN;
+  keymap.up    = SDLK_UP;
   keymap.left  = SDLK_LEFT;
   keymap.right = SDLK_RIGHT;
   keymap.fire  = SDLK_LCTRL;

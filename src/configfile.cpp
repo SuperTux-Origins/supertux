@@ -140,6 +140,8 @@ void loadconfig(void)
 
   reader.read_int ("keyboard-jump", &keymap.jump);
   reader.read_int ("keyboard-duck", &keymap.duck);
+  reader.read_int ("keyboard-down", &keymap.duck); /* preferred name; overrides duck if both set */
+  reader.read_int ("keyboard-up", &keymap.up);
   reader.read_int ("keyboard-left", &keymap.left);
   reader.read_int ("keyboard-right", &keymap.right);
   reader.read_int ("keyboard-fire", &keymap.fire);
@@ -205,7 +207,8 @@ void saveconfig (void)
               gamecontroller_keymap.jump_with_up ? "#t" : "#f");
 #endif
       fprintf(config, "\t(keyboard-jump  %d)\n", keymap.jump);
-      fprintf(config, "\t(keyboard-duck  %d)\n", keymap.duck);
+      fprintf(config, "\t(keyboard-down  %d)\n", keymap.duck);
+      fprintf(config, "\t(keyboard-up  %d)\n", keymap.up);
       fprintf(config, "\t(keyboard-left  %d)\n", keymap.left);
       fprintf(config, "\t(keyboard-right %d)\n", keymap.right);
       fprintf(config, "\t(keyboard-fire  %d)\n", keymap.fire);

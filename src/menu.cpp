@@ -1006,11 +1006,11 @@ Menu::event(SDL_Event& event)
               /* Ignore keys while waiting for a pad button. */
               return;
             }
-          /* Keyboard Setup: capture any key as the new binding. */
+          /* Keyboard Setup: capture any key as the new binding.
+             Stay on this field (do not auto-advance). */
           *item[active_item].int_p = (int)key;
           control_bind_item = -1;
           get_controlfield_key_into_input(&item[active_item]);
-          menuaction = MENU_ACTION_DOWN;
           return;
         }
       /* Idle control field: arrows / Enter fall through for navigation /
@@ -1223,7 +1223,6 @@ Menu::event(SDL_Event& event)
             *item[active_item].int_p = (int)event.cbutton.button;
             control_bind_item = -1;
             get_controlfield_key_into_input(&item[active_item]);
-            menuaction = MENU_ACTION_DOWN;
             return;
           }
         /* Idle: fall through so D-Pad / Jump navigate and HIT starts bind. */
@@ -1271,7 +1270,6 @@ Menu::event(SDL_Event& event)
         *item[active_item].int_p = (int)event.jbutton.button;
         control_bind_item = -1;
         get_controlfield_key_into_input(&item[active_item]);
-        menuaction = MENU_ACTION_DOWN;
         return;
       }
     if (use_joystick)
@@ -1329,8 +1327,8 @@ Menu::event(SDL_Event& event)
 	for ( i=0;i<itemid-11;i++ ) {
 	    if ( save[i] == event.jbutton.button ) okay=false;
 	}
-	if ( okay == true ) menuaction = MENU_ACTION_DOWN;
-	else menuaction = MENU_ACTION_NONE;
+	/* Stay on this field after a successful bind. */
+	menuaction = MENU_ACTION_NONE;
 
       return;
         }

@@ -18,6 +18,7 @@
 #include "touch_controls.h"
 #include "app_loop.h"
 #include "platform_config.h"
+#include "player.h"
 
 #define DISPLAY_MAP_MESSAGE_TIME 2800
 
@@ -743,13 +744,13 @@ WorldMap::get_input()
     {
       const Uint8 *keystate = SDL_GetKeyState(NULL);
 
-      if (st_key_held(keystate, SDLK_LEFT) || touch_controls_held(0))
+      if (st_key_held(keystate, (SDLKey)keymap.left) || touch_controls_held(0))
         input_direction = D_WEST;
-      else if (st_key_held(keystate, SDLK_RIGHT) || touch_controls_held(1))
+      else if (st_key_held(keystate, (SDLKey)keymap.right) || touch_controls_held(1))
         input_direction = D_EAST;
-      else if (st_key_held(keystate, SDLK_UP) || touch_controls_held(2))
+      else if (st_key_held(keystate, (SDLKey)keymap.up) || touch_controls_held(2))
         input_direction = D_NORTH;
-      else if (st_key_held(keystate, SDLK_DOWN) || touch_controls_held(3))
+      else if (st_key_held(keystate, (SDLKey)keymap.duck) || touch_controls_held(3))
         input_direction = D_SOUTH;
 
 #ifdef USE_SDL2
