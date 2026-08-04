@@ -52,6 +52,8 @@
 #include "intro.h"
 #ifndef NOSOUND
 #include "music_manager.h"
+#include "sound.h"
+#include <SDL_mixer.h>
 #endif
 
 #include "player.h"
@@ -1173,6 +1175,19 @@ void st_general_free(void)
 
 void st_video_setup(void)
 {
+  /* Free GL textures while the context is still current. Tearing down the
+     context first and then calling glDeleteTextures corrupts memory on
+     Emscripten (often crashes later inside the audio ScriptProcessor). */
+  Surface::unload_all();
+
+#ifndef NOSOUND
+  if (audio_device)
+    {
+      Mix_HaltMusic();
+      Mix_HaltChannel(-1);
+    }
+#endif
+
   if (!platform_video_init(use_fullscreen, use_gl))
     {
       /* Options toggles can request a mode the driver rejects; fall back

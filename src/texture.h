@@ -57,6 +57,8 @@ public:
   static Surfaces surfaces;
 public:
   static void reload_all();
+  /** Free all SurfaceImpls while the GL context is still valid (mode switch). */
+  static void unload_all();
   static void debug_check();
 
   Surface(SDL_Surface* surf, int use_alpha);  

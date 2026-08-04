@@ -156,6 +156,25 @@ Surface::reload()
     w = impl->w;
     h = impl->h;
   }
+  else
+  {
+    w = 0;
+    h = 0;
+  }
+}
+
+void
+Surface::unload_all()
+{
+  /* Delete implementations (incl. glDeleteTextures) before the GL context
+     is destroyed. reload_all() recreates them after the new mode is up. */
+  for (Surfaces::iterator i = surfaces.begin(); i != surfaces.end(); ++i)
+    {
+      delete (*i)->impl;
+      (*i)->impl = 0;
+      (*i)->w = 0;
+      (*i)->h = 0;
+    }
 }
 
 Surface::~Surface()
@@ -199,6 +218,8 @@ Surface::debug_check()
 void
 Surface::draw(float x, float y, Uint8 alpha, bool update)
 {
+  if (!impl)
+    return;
   if (impl)
   {
 #ifdef GP2X
@@ -213,6 +234,8 @@ Surface::draw(float x, float y, Uint8 alpha, bool update)
 void
 Surface::draw_bg(Uint8 alpha, bool update)
 {
+  if (!impl)
+    return;
   if (impl)
   {
     if (impl->draw_bg(alpha, update) == -2)
@@ -223,6 +246,8 @@ Surface::draw_bg(Uint8 alpha, bool update)
 void
 Surface::draw_part(float sx, float sy, float x, float y, float w, float h,  Uint8 alpha, bool update)
 {
+  if (!impl)
+    return;
   if (impl)
   {
 #ifdef GP2X
@@ -237,6 +262,8 @@ Surface::draw_part(float sx, float sy, float x, float y, float w, float h,  Uint
 void
 Surface::draw_stretched(float x, float y, int w, int h, Uint8 alpha, bool update)
 {
+  if (!impl)
+    return;
   if (impl)
   {
 #ifdef GP2X
@@ -491,7 +518,10 @@ SurfaceOpenGL::SurfaceOpenGL(const std::string& file, int x, int y, int w, int h
 
 SurfaceOpenGL::~SurfaceOpenGL()
 {
-  glDeleteTextures(1, &gl_texture);
+  /* Context may already be gone during a failed teardown — skip GL calls. */
+  if (gl_texture && SDL_GL_GetCurrentContext() != NULL)
+    glDeleteTextures(1, &gl_texture);
+  gl_texture = 0;
 }
 
 void
