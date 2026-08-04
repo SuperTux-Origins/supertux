@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2024-2026 SuperTux Milestone 1 port contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// GLES2 shader renderer — textured and solid quads for SuperTux Milestone 1.
+// GLES2 shader renderer — textured/solid quads into a 640×480 FBO, then
+// one nearest-neighbour scale into the window letterbox.
 
 #ifdef USE_GLES2
 
@@ -23,6 +24,11 @@ GLint  g_a_pos = -1;
 GLint  g_a_uv = -1;
 GLint  g_a_color = -1;
 bool   g_ready = false;
+
+GLuint g_fbo = 0;
+GLuint g_fbo_tex = 0;
+int    g_fbo_w = 0;
+int    g_fbo_h = 0;
 
 /* Column-major orthographic projection: maps (0,0)-(W,H) with Y-down. */
 float g_mvp[16];
@@ -57,8 +63,6 @@ static GLuint compile_shader(GLenum type, const char* src)
   return s;
 }
 
-/* GLSL ES 1.00 (#version 100) — required by many GLES2 compilers; without
-   it Mesa reports "syntax error, unexpected NEW_IDENTIFIER" on attribute. */
 static const char* kVS_ES =
   "#version 100\n"
   "attribute vec2 a_pos;\n"
@@ -85,8 +89,6 @@ static const char* kFS_ES =
   "  gl_FragColor = mix(v_color, t * v_color, u_use_tex);\n"
   "}\n";
 
-/* Desktop GLSL 1.20 fallback if the context is not actually ES (some
-   drivers ignore PROFILE_ES and hand back a compatibility context). */
 static const char* kVS_GL =
   "#version 120\n"
   "attribute vec2 a_pos;\n"
@@ -117,7 +119,6 @@ static bool context_looks_like_gles(void)
   const char* ver = (const char*)glGetString(GL_VERSION);
   if (!ver)
     return false;
-  /* Typical strings: "OpenGL ES 2.0 ...", "OpenGL ES 3.1 ..." */
   return strstr(ver, "OpenGL ES") != NULL || strstr(ver, "OpenGL-ES") != NULL;
 }
 
@@ -204,6 +205,60 @@ static void draw_vertices(const Vertex* verts, int count, GLenum mode,
   glUseProgram(0);
 }
 
+static void destroy_fbo(void)
+{
+  if (g_fbo)
+    {
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      glDeleteFramebuffers(1, &g_fbo);
+      g_fbo = 0;
+    }
+  if (g_fbo_tex)
+    {
+      glDeleteTextures(1, &g_fbo_tex);
+      g_fbo_tex = 0;
+    }
+  g_fbo_w = g_fbo_h = 0;
+}
+
+static bool create_fbo(int w, int h)
+{
+  destroy_fbo();
+  if (w < 1) w = ST_SCREEN_W;
+  if (h < 1) h = ST_SCREEN_H;
+
+  glGenTextures(1, &g_fbo_tex);
+  glBindTexture(GL_TEXTURE_2D, g_fbo_tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  /* Nearest: integer scale of the whole frame — no inter-tile bleed. */
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glGenFramebuffers(1, &g_fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                         GL_TEXTURE_2D, g_fbo_tex, 0);
+
+  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+      fprintf(stderr, "Error: GLES2 backbuffer FBO incomplete (0x%x)\n",
+              (unsigned)status);
+      destroy_fbo();
+      return false;
+    }
+
+  g_fbo_w = w;
+  g_fbo_h = h;
+  glViewport(0, 0, w, h);
+  mat4_ortho(g_mvp, 0.0f, (float)w, (float)h, 0.0f);
+  glClearColor(0.f, 0.f, 0.f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  return true;
+}
+
 } // namespace
 
 bool gles2_renderer_init(void)
@@ -221,8 +276,6 @@ bool gles2_renderer_init(void)
       st_vlog("[video]   GL_RENDERER=%s\n", gl_ren ? gl_ren : "(null)");
     }
 
-  /* Prefer ES 1.00 sources on an ES context; fall back to GLSL 1.20 if the
-     driver handed us a desktop compatibility context despite PROFILE_ES. */
   bool ok = false;
   if (is_es)
     {
@@ -233,10 +286,7 @@ bool gles2_renderer_init(void)
   if (!ok)
     ok = link_program(kVS_GL, kFS_GL);
   if (!ok && !is_es)
-    {
-      /* Last resort: ES sources on a non-ES context (some EGL stacks). */
-      ok = link_program(kVS_ES, kFS_ES);
-    }
+    ok = link_program(kVS_ES, kFS_ES);
   if (!ok)
     {
       fprintf(stderr,
@@ -254,15 +304,23 @@ bool gles2_renderer_init(void)
   g_a_uv = glGetAttribLocation(g_program, "a_uv");
   g_a_color = glGetAttribLocation(g_program, "a_color");
 
-  mat4_ortho(g_mvp, 0.0f, (float)ST_SCREEN_W, (float)ST_SCREEN_H, 0.0f);
+  if (!create_fbo(ST_SCREEN_W, ST_SCREEN_H))
+    {
+      glDeleteProgram(g_program);
+      g_program = 0;
+      return false;
+    }
+
   g_ready = true;
   if (verbose_mode)
-    st_vlog("[video] GLES2 renderer ready (shader textured/solid quads)\n");
+    st_vlog("[video] GLES2 renderer ready (FBO %dx%d + shader quads)\n",
+            g_fbo_w, g_fbo_h);
   return true;
 }
 
 void gles2_renderer_shutdown(void)
 {
+  destroy_fbo();
   if (g_program)
     {
       glDeleteProgram(g_program);
@@ -271,32 +329,65 @@ void gles2_renderer_shutdown(void)
   g_ready = false;
 }
 
-void gles2_renderer_set_viewport_rect(int ox, int oy, int dw, int dh)
+void gles2_renderer_bind_backbuffer(void)
 {
-  if (dw < 1) dw = 1;
-  if (dh < 1) dh = 1;
-  glViewport(ox, oy, dw, dh);
-  mat4_ortho(g_mvp, 0.0f, (float)ST_SCREEN_W, (float)ST_SCREEN_H, 0.0f);
+  if (!g_ready || !g_fbo)
+    return;
+  glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+  glViewport(0, 0, g_fbo_w, g_fbo_h);
+  mat4_ortho(g_mvp, 0.0f, (float)g_fbo_w, (float)g_fbo_h, 0.0f);
 }
 
-void gles2_renderer_set_viewport(int drawable_w, int drawable_h)
+void gles2_renderer_present(int drawable_w, int drawable_h,
+                            int ox, int oy, int dw, int dh)
 {
-  /* Fallback when platform margins are not applied: classic centered fit. */
-  float sx = (float)drawable_w / (float)ST_SCREEN_W;
-  float sy = (float)drawable_h / (float)ST_SCREEN_H;
-  float scale = (sx < sy) ? sx : sy;
-  int dw = (int)(ST_SCREEN_W * scale + 0.5f);
-  int dh = (int)(ST_SCREEN_H * scale + 0.5f);
+  if (!g_ready || !g_fbo_tex)
+    return;
+  if (drawable_w < 1) drawable_w = 1;
+  if (drawable_h < 1) drawable_h = 1;
   if (dw < 1) dw = 1;
   if (dh < 1) dh = 1;
-  gles2_renderer_set_viewport_rect((drawable_w - dw) / 2,
-                                   (drawable_h - dh) / 2, dw, dh);
+
+  /* Default framebuffer (window / canvas). */
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glViewport(0, 0, drawable_w, drawable_h);
+  mat4_ortho(g_mvp, 0.0f, (float)drawable_w, (float)drawable_h, 0.0f);
+
+  glDisable(GL_BLEND);
+  glClearColor(0.f, 0.f, 0.f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  /* Letterbox rect is top-down (SDL); our ortho is also Y-down. */
+  float x = (float)ox;
+  float y = (float)oy;
+  float w = (float)dw;
+  float h = (float)dh;
+  /* FBO texture is Y-up in GL; our FBO was drawn Y-down, so flip V. */
+  Vertex verts[4] = {
+    { x,     y,     0.f, 1.f, 1.f, 1.f, 1.f, 1.f },
+    { x + w, y,     1.f, 1.f, 1.f, 1.f, 1.f, 1.f },
+    { x,     y + h, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f },
+    { x + w, y + h, 1.f, 0.f, 1.f, 1.f, 1.f, 1.f },
+  };
+  draw_vertices(verts, 4, GL_TRIANGLE_STRIP, g_fbo_tex, true);
+}
+
+void gles2_renderer_set_viewport_rect(int /*ox*/, int /*oy*/, int /*dw*/, int /*dh*/)
+{
+  /* Drawing always targets the fixed FBO; letterbox is applied in present(). */
+  gles2_renderer_bind_backbuffer();
+}
+
+void gles2_renderer_set_viewport(int /*drawable_w*/, int /*drawable_h*/)
+{
+  gles2_renderer_bind_backbuffer();
 }
 
 void gles2_renderer_set_overlay(int drawable_w, int drawable_h)
 {
   if (drawable_w < 1) drawable_w = 1;
   if (drawable_h < 1) drawable_h = 1;
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glViewport(0, 0, drawable_w, drawable_h);
   mat4_ortho(g_mvp, 0.0f, (float)drawable_w, (float)drawable_h, 0.0f);
 }
@@ -335,13 +426,13 @@ void gles2_draw_gradient(float x, float y, float w, float h,
                          unsigned char r0, unsigned char g0, unsigned char b0,
                          unsigned char r1, unsigned char g1, unsigned char b1)
 {
-  float tR = r0 / 255.0f, tG = g0 / 255.0f, tB = b0 / 255.0f;
-  float bR = r1 / 255.0f, bG = g1 / 255.0f, bB = b1 / 255.0f;
+  float r0f = r0 / 255.0f, g0f = g0 / 255.0f, b0f = b0 / 255.0f;
+  float r1f = r1 / 255.0f, g1f = g1 / 255.0f, b1f = b1 / 255.0f;
   Vertex verts[4] = {
-    { x,     y,     0, 0, tR, tG, tB, 1.0f },
-    { x + w, y,     0, 0, tR, tG, tB, 1.0f },
-    { x,     y + h, 0, 0, bR, bG, bB, 1.0f },
-    { x + w, y + h, 0, 0, bR, bG, bB, 1.0f },
+    { x,     y,     0, 0, r0f, g0f, b0f, 1.f },
+    { x + w, y,     0, 0, r0f, g0f, b0f, 1.f },
+    { x,     y + h, 0, 0, r1f, g1f, b1f, 1.f },
+    { x + w, y + h, 0, 0, r1f, g1f, b1f, 1.f },
   };
   draw_vertices(verts, 4, GL_TRIANGLE_STRIP, 0, false);
 }
@@ -350,25 +441,18 @@ void gles2_draw_line(float x1, float y1, float x2, float y2,
                      unsigned char r, unsigned char g,
                      unsigned char b, unsigned char a)
 {
-  /* Approximate a 1px line as a thin quad so we stay on the triangle path. */
-  float dx = x2 - x1;
-  float dy = y2 - y1;
+  float dx = x2 - x1, dy = y2 - y1;
   float len = sqrtf(dx * dx + dy * dy);
-  if (len < 1e-4f)
+  if (len < 0.001f)
     {
       gles2_draw_solid_quad(x1, y1, 1.0f, 1.0f, r, g, b, a);
       return;
     }
-  float nx = -dy / len * 0.5f;
-  float ny =  dx / len * 0.5f;
-  float rf = r / 255.0f, gf = g / 255.0f, bf = b / 255.0f, af = a / 255.0f;
-  Vertex verts[4] = {
-    { x1 + nx, y1 + ny, 0, 0, rf, gf, bf, af },
-    { x1 - nx, y1 - ny, 0, 0, rf, gf, bf, af },
-    { x2 + nx, y2 + ny, 0, 0, rf, gf, bf, af },
-    { x2 - nx, y2 - ny, 0, 0, rf, gf, bf, af },
-  };
-  draw_vertices(verts, 4, GL_TRIANGLE_STRIP, 0, false);
+  /* Axis-aligned approximation for short HUD lines. */
+  if (fabsf(dx) >= fabsf(dy))
+    gles2_draw_solid_quad(x1 < x2 ? x1 : x2, y1, len, 1.0f, r, g, b, a);
+  else
+    gles2_draw_solid_quad(x1, y1 < y2 ? y1 : y2, 1.0f, len, r, g, b, a);
 }
 
 #endif /* USE_GLES2 */

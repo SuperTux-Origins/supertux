@@ -276,15 +276,14 @@ gl_setup_viewport(void)
 
   st_update_letterbox(ww, wh);
 
-  /* st_lb_oy is top-down (SDL); glViewport Y is bottom-up. With asymmetric
-     touch margins the two differ — using top-down Y parks the game too low. */
+#ifdef USE_GLES2
+  /* Game draws into a fixed 640×480 FBO; letterbox is applied at present. */
+  gles2_renderer_bind_backbuffer();
+#else
+  /* Immediate-mode desktop GL: letterbox viewport on the window FB. */
   int gl_oy = wh - st_lb_oy - st_lb_dh;
   if (gl_oy < 0)
     gl_oy = 0;
-
-#ifdef USE_GLES2
-  gles2_renderer_set_viewport_rect(st_lb_ox, gl_oy, st_lb_dw, st_lb_dh);
-#else
   glViewport(st_lb_ox, gl_oy, st_lb_dw, st_lb_dh);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -658,14 +657,23 @@ void platform_present(bool /*full_update*/)
 #ifndef NOOPENGL
   if (use_gl && st_window)
     {
-      /* Re-apply viewport in case of desktop-fullscreen / drawable size change. */
+      int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
+      SDL_GL_GetDrawableSize(st_window, &ww, &wh);
+      st_update_letterbox(ww, wh);
+#ifdef USE_GLES2
+      /* Scale the 640×480 FBO into the letterbox once (nearest). */
+      gles2_renderer_present(ww, wh, st_lb_ox, st_lb_oy, st_lb_dw, st_lb_dh);
+#else
       gl_setup_viewport();
-      /* Overlay (bezel, touch pad) is in window pixel space and must be
-         drawn after the letterboxed game viewport, before the swap.
-         Callers may also draw it; a second pass is harmless. */
+#endif
+      /* Overlay (bezel, touch pad) in window pixels on the default FB. */
       if (touch_controls_is_enabled())
         touch_controls_draw();
       SDL_GL_SwapWindow(st_window);
+#ifdef USE_GLES2
+      /* Next frame's clears/draws go to the offscreen backbuffer again. */
+      gles2_renderer_bind_backbuffer();
+#endif
       return;
     }
 #endif

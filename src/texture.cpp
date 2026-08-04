@@ -535,7 +535,7 @@ SurfaceOpenGL::create_gl(SDL_Surface * surf, GLuint * tex)
 
   /*
    * POT textures are larger than the image: the gutter is left cleared
-   * (transparent black). With GL_LINEAR, UVs at the image edge (u=w/pw)
+   * (transparent black). With GL_NEAREST (or LINEAR), UVs at the image edge (u=w/pw)
    * bilinear-sample into that gutter and pick up a dark fringe. That shows
    * up as a 1px seam when the same image is drawn edge-to-edge (parallax
    * background). Tiles rarely do that, so they looked fine.
@@ -568,8 +568,8 @@ SurfaceOpenGL::create_gl(SDL_Surface * surf, GLuint * tex)
 
   glGenTextures(1, tex);
   glBindTexture(GL_TEXTURE_2D, *tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 #ifndef USE_GLES2
