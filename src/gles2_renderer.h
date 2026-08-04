@@ -31,6 +31,9 @@ void gles2_renderer_bind_backbuffer(void);
 void gles2_renderer_present(int drawable_w, int drawable_h,
                             int ox, int oy, int dw, int dh);
 
+/** MIN/MAG on the 640×480 FBO colour texture (whole-frame upscale). */
+void gles2_renderer_set_frame_filter(bool linear);
+
 /** Full-drawable overlay pass in window pixels (Y-down) on the default FB. */
 void gles2_renderer_set_overlay(int drawable_w, int drawable_h);
 

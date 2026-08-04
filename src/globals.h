@@ -81,6 +81,8 @@ extern MouseCursor * mouse_cursor;
 extern bool use_gl;
 extern bool use_joystick;
 extern bool use_fullscreen;
+/** OpenGL: linear filtering when scaling sprites / the 640×480 frame. */
+extern bool use_texture_filtering;
 extern bool debug_mode;
 extern bool verbose_mode;
 extern bool show_fps;

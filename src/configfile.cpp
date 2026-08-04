@@ -28,6 +28,7 @@ static void defaults ()
 
   use_fullscreen = false;
   show_fps = false;
+  use_texture_filtering = false;
 #ifdef USE_GLES2
   /* GLES2 builds (Android + optional desktop): prefer the shader path. */
   use_gl = true;
@@ -85,6 +86,7 @@ void loadconfig(void)
             use_music ? "#t" : "#f");
 #endif
   reader.read_bool("show_fps",   &show_fps);
+  reader.read_bool("texture_filter", &use_texture_filtering);
 
   std::string video;
   reader.read_string ("video", &video);
@@ -149,6 +151,7 @@ void saveconfig (void)
       fprintf(config, "\t(music      %s)\n", "#f");
 #endif
       fprintf(config, "\t(show_fps   %s)\n", show_fps       ? "#t" : "#f");
+      fprintf(config, "\t(texture_filter %s)\n", use_texture_filtering ? "#t" : "#f");
 
       fprintf(config, "\n\t;; either \"opengl\" or \"sdl\"\n");
       fprintf(config, "\t(video      \"%s\")\n", use_gl ? "opengl" : "sdl");

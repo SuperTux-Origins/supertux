@@ -778,9 +778,39 @@ void platform_present(bool /*full_update*/)
       SDL_GL_GetDrawableSize(st_window, &ww, &wh);
       st_update_letterbox(ww, wh);
 #ifdef USE_GLES2
-      /* Scale the 640×480 FBO into the letterbox once (nearest). */
+      /* Scale the 640×480 FBO into the letterbox (filter from option). */
       gles2_renderer_present(ww, wh, st_lb_ox, st_lb_oy, st_lb_dw, st_lb_dh);
 #else
+      /* Immediate-mode: game already drew into the letterbox viewport.
+         Clear full drawable first so resize margins are solid black, then
+         the next frame draws into the letterbox again after swap. */
+      glViewport(0, 0, ww, wh);
+      glDisable(GL_SCISSOR_TEST);
+      glClearColor(0.f, 0.f, 0.f, 1.f);
+      /* Paint black bars only — full clear would wipe the just-drawn frame. */
+      {
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        glOrtho(0, ww, wh, 0, -1.0, 1.0);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(0.f, 0.f, 0.f);
+        if (st_lb_oy > 0)
+          glRecti(0, 0, ww, st_lb_oy);
+        if (st_lb_oy + st_lb_dh < wh)
+          glRecti(0, st_lb_oy + st_lb_dh, ww, wh);
+        if (st_lb_ox > 0)
+          glRecti(0, st_lb_oy, st_lb_ox, st_lb_oy + st_lb_dh);
+        if (st_lb_ox + st_lb_dw < ww)
+          glRecti(st_lb_ox + st_lb_dw, st_lb_oy, ww, st_lb_oy + st_lb_dh);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+      }
       gl_setup_viewport();
 #endif
       /* Overlay (bezel, touch pad) in window pixels on the default FB. */
@@ -790,6 +820,12 @@ void platform_present(bool /*full_update*/)
 #ifdef USE_GLES2
       /* Next frame's clears/draws go to the offscreen backbuffer again. */
       gles2_renderer_bind_backbuffer();
+#else
+      /* Prep next back buffer: full black then letterbox viewport for draws. */
+      glViewport(0, 0, ww, wh);
+      glClearColor(0.f, 0.f, 0.f, 1.f);
+      glClear(GL_COLOR_BUFFER_BIT);
+      gl_setup_viewport();
 #endif
       return;
     }

@@ -230,9 +230,12 @@ static bool create_fbo(int w, int h)
   glGenTextures(1, &g_fbo_tex);
   glBindTexture(GL_TEXTURE_2D, g_fbo_tex);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-  /* Linear upscale of the whole 640×480 frame into the window letterbox. */
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  {
+    extern bool use_texture_filtering;
+    GLint filt = use_texture_filtering ? GL_LINEAR : GL_NEAREST;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filt);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filt);
+  }
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -336,6 +339,16 @@ void gles2_renderer_bind_backbuffer(void)
   glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
   glViewport(0, 0, g_fbo_w, g_fbo_h);
   mat4_ortho(g_mvp, 0.0f, (float)g_fbo_w, (float)g_fbo_h, 0.0f);
+}
+
+void gles2_renderer_set_frame_filter(bool linear)
+{
+  if (!g_fbo_tex)
+    return;
+  GLint filt = linear ? GL_LINEAR : GL_NEAREST;
+  glBindTexture(GL_TEXTURE_2D, g_fbo_tex);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filt);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filt);
 }
 
 void gles2_renderer_present(int drawable_w, int drawable_h,

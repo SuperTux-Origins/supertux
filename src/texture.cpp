@@ -197,6 +197,27 @@ Surface::~Surface()
 }
 
 void
+Surface::apply_gl_filters_all()
+{
+#ifndef NOOPENGL
+  if (!use_gl)
+    return;
+  GLint filt = use_texture_filtering ? GL_LINEAR : GL_NEAREST;
+  for (Surfaces::iterator i = surfaces.begin(); i != surfaces.end(); ++i)
+    {
+      if (!(*i)->impl)
+        continue;
+      SurfaceOpenGL* gl = static_cast<SurfaceOpenGL*>((*i)->impl);
+      if (!gl->gl_texture)
+        continue;
+      glBindTexture(GL_TEXTURE_2D, gl->gl_texture);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filt);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filt);
+    }
+#endif
+}
+
+void
 Surface::reload_all()
 {
   for(Surfaces::iterator i = surfaces.begin(); i != surfaces.end(); ++i)
@@ -608,8 +629,11 @@ SurfaceOpenGL::create_gl(SDL_Surface * surf, GLuint * tex)
 
   glGenTextures(1, tex);
   glBindTexture(GL_TEXTURE_2D, *tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  {
+    GLint filt = use_texture_filtering ? GL_LINEAR : GL_NEAREST;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filt);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filt);
+  }
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 #ifndef USE_GLES2

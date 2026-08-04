@@ -43,6 +43,9 @@
 #include "touch_controls.h"
 #include "screen.h"
 #include "texture.h"
+#ifdef USE_GLES2
+#include "gles2_renderer.h"
+#endif
 #include "menu.h"
 #include "gameloop.h"
 #include "configfile.h"
@@ -852,6 +855,9 @@ void st_menu(void)
 #ifndef __EMSCRIPTEN__
   options_menu->additem(MN_TOGGLE,"Fullscreen",use_fullscreen,0, MNID_FULLSCREEN);
 #endif
+#if !defined(NOOPENGL)
+  options_menu->additem(MN_TOGGLE,"Smooth graphics",use_texture_filtering,0, MNID_TEXTUREFILTER);
+#endif
 #endif
 #ifndef NOSOUND
   if(audio_device)
@@ -1042,6 +1048,21 @@ void process_options_menu(void)
           st_video_setup();
         }
       break;
+#ifndef NOOPENGL
+    case MNID_TEXTUREFILTER:
+      if (use_texture_filtering != options_menu->isToggled(MNID_TEXTUREFILTER))
+        {
+          use_texture_filtering = !use_texture_filtering;
+          if (use_gl)
+            {
+              Surface::apply_gl_filters_all();
+#ifdef USE_GLES2
+              gles2_renderer_set_frame_filter(use_texture_filtering);
+#endif
+            }
+        }
+      break;
+#endif
 #ifndef NOSOUND
     case MNID_SOUND:
       if(use_sound != options_menu->isToggled(MNID_SOUND))
