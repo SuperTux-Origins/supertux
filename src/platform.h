@@ -34,6 +34,8 @@ void platform_set_caption(const char* title, const char* icon);
 
 /** Present the backbuffer (Flip / SwapBuffers / UpdateWindowSurface). */
 void platform_present(bool full_update);
+/** Re-apply MIN/MAG on the offscreen frame texture (smooth-graphics option). */
+void platform_apply_frame_filter(void);
 
 /** Partial update (software path); no-op or full present on some backends. */
 void platform_update_rect(int x, int y, int w, int h);

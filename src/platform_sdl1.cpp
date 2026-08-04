@@ -104,6 +104,8 @@ void platform_set_caption(const char* title, const char* icon)
   SDL_WM_SetCaption(title, icon);
 }
 
+void platform_apply_frame_filter(void) {}
+
 void platform_present(bool full_update)
 {
 #ifndef NOOPENGL

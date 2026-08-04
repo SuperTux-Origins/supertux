@@ -1056,9 +1056,7 @@ void process_options_menu(void)
           if (use_gl)
             {
               Surface::apply_gl_filters_all();
-#ifdef USE_GLES2
-              gles2_renderer_set_frame_filter(use_texture_filtering);
-#endif
+              platform_apply_frame_filter();
             }
         }
       break;

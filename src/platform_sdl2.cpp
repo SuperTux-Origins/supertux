@@ -45,6 +45,189 @@ static int st_overlay_active = 0;
 
 #define VLOG(...) st_vlog(__VA_ARGS__)
 
+#ifndef NOOPENGL
+#ifndef USE_GLES2
+/* Desktop immediate-mode: render game 1:1 into a 640×480 FBO, then scale
+   once into the window letterbox (same model as GLES2 / software). */
+static GLuint st_desk_fbo = 0;
+static GLuint st_desk_fbo_tex = 0;
+
+#ifndef GL_FRAMEBUFFER
+#define GL_FRAMEBUFFER 0x8D40
+#endif
+#ifndef GL_COLOR_ATTACHMENT0
+#define GL_COLOR_ATTACHMENT0 0x8CE0
+#endif
+#ifndef GL_FRAMEBUFFER_COMPLETE
+#define GL_FRAMEBUFFER_COMPLETE 0x8CD5
+#endif
+
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+typedef void (APIENTRY *ST_PFNGLGENFRAMEBUFFERSPROC)(GLsizei, GLuint*);
+typedef void (APIENTRY *ST_PFNGLBINDFRAMEBUFFERPROC)(GLenum, GLuint);
+typedef void (APIENTRY *ST_PFNGLDELETEFRAMEBUFFERSPROC)(GLsizei, const GLuint*);
+typedef void (APIENTRY *ST_PFNGLFRAMEBUFFERTEXTURE2DPROC)(GLenum, GLenum, GLenum, GLuint, GLint);
+typedef GLenum (APIENTRY *ST_PFNGLCHECKFRAMEBUFFERSTATUSPROC)(GLenum);
+
+static ST_PFNGLGENFRAMEBUFFERSPROC st_glGenFramebuffers = NULL;
+static ST_PFNGLBINDFRAMEBUFFERPROC st_glBindFramebuffer = NULL;
+static ST_PFNGLDELETEFRAMEBUFFERSPROC st_glDeleteFramebuffers = NULL;
+static ST_PFNGLFRAMEBUFFERTEXTURE2DPROC st_glFramebufferTexture2D = NULL;
+static ST_PFNGLCHECKFRAMEBUFFERSTATUSPROC st_glCheckFramebufferStatus = NULL;
+
+static bool
+desktop_gl_load_fbo_procs(void)
+{
+  if (st_glGenFramebuffers && st_glBindFramebuffer && st_glDeleteFramebuffers
+      && st_glFramebufferTexture2D && st_glCheckFramebufferStatus)
+    return true;
+  st_glGenFramebuffers = (ST_PFNGLGENFRAMEBUFFERSPROC)
+    SDL_GL_GetProcAddress("glGenFramebuffers");
+  if (!st_glGenFramebuffers)
+    st_glGenFramebuffers = (ST_PFNGLGENFRAMEBUFFERSPROC)
+      SDL_GL_GetProcAddress("glGenFramebuffersEXT");
+  st_glBindFramebuffer = (ST_PFNGLBINDFRAMEBUFFERPROC)
+    SDL_GL_GetProcAddress("glBindFramebuffer");
+  if (!st_glBindFramebuffer)
+    st_glBindFramebuffer = (ST_PFNGLBINDFRAMEBUFFERPROC)
+      SDL_GL_GetProcAddress("glBindFramebufferEXT");
+  st_glDeleteFramebuffers = (ST_PFNGLDELETEFRAMEBUFFERSPROC)
+    SDL_GL_GetProcAddress("glDeleteFramebuffers");
+  if (!st_glDeleteFramebuffers)
+    st_glDeleteFramebuffers = (ST_PFNGLDELETEFRAMEBUFFERSPROC)
+      SDL_GL_GetProcAddress("glDeleteFramebuffersEXT");
+  st_glFramebufferTexture2D = (ST_PFNGLFRAMEBUFFERTEXTURE2DPROC)
+    SDL_GL_GetProcAddress("glFramebufferTexture2D");
+  if (!st_glFramebufferTexture2D)
+    st_glFramebufferTexture2D = (ST_PFNGLFRAMEBUFFERTEXTURE2DPROC)
+      SDL_GL_GetProcAddress("glFramebufferTexture2DEXT");
+  st_glCheckFramebufferStatus = (ST_PFNGLCHECKFRAMEBUFFERSTATUSPROC)
+    SDL_GL_GetProcAddress("glCheckFramebufferStatus");
+  if (!st_glCheckFramebufferStatus)
+    st_glCheckFramebufferStatus = (ST_PFNGLCHECKFRAMEBUFFERSTATUSPROC)
+      SDL_GL_GetProcAddress("glCheckFramebufferStatusEXT");
+  return st_glGenFramebuffers && st_glBindFramebuffer && st_glDeleteFramebuffers
+      && st_glFramebufferTexture2D && st_glCheckFramebufferStatus;
+}
+
+static void
+desktop_gl_fbo_shutdown(void)
+{
+  if (st_glBindFramebuffer)
+    st_glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  if (st_desk_fbo && st_glDeleteFramebuffers)
+    {
+      st_glDeleteFramebuffers(1, &st_desk_fbo);
+      st_desk_fbo = 0;
+    }
+  if (st_desk_fbo_tex)
+    {
+      glDeleteTextures(1, &st_desk_fbo_tex);
+      st_desk_fbo_tex = 0;
+    }
+}
+
+static void
+desktop_gl_apply_frame_filter(void)
+{
+  if (!st_desk_fbo_tex)
+    return;
+  GLint filt = use_texture_filtering ? GL_LINEAR : GL_NEAREST;
+  glBindTexture(GL_TEXTURE_2D, st_desk_fbo_tex);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filt);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filt);
+}
+
+static bool
+desktop_gl_fbo_init(void)
+{
+  desktop_gl_fbo_shutdown();
+  if (!desktop_gl_load_fbo_procs())
+    {
+      fprintf(stderr, "Warning: GL framebuffer entry points missing\n");
+      return false;
+    }
+
+  glGenTextures(1, &st_desk_fbo_tex);
+  glBindTexture(GL_TEXTURE_2D, st_desk_fbo_tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ST_SCREEN_W, ST_SCREEN_H, 0,
+               GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  desktop_gl_apply_frame_filter();
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  st_glGenFramebuffers(1, &st_desk_fbo);
+  st_glBindFramebuffer(GL_FRAMEBUFFER, st_desk_fbo);
+  st_glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                            GL_TEXTURE_2D, st_desk_fbo_tex, 0);
+  GLenum status = st_glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  st_glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+      fprintf(stderr, "Error: desktop GL FBO incomplete (0x%x)\n", (unsigned)status);
+      desktop_gl_fbo_shutdown();
+      return false;
+    }
+  VLOG("[video] desktop GL FBO %dx%d ready\n", ST_SCREEN_W, ST_SCREEN_H);
+  return true;
+}
+
+static void
+desktop_gl_bind_backbuffer(void)
+{
+  if (!st_desk_fbo || !st_glBindFramebuffer)
+    return;
+  st_glBindFramebuffer(GL_FRAMEBUFFER, st_desk_fbo);
+  glViewport(0, 0, ST_SCREEN_W, ST_SCREEN_H);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+}
+
+static void
+desktop_gl_present(int ww, int wh, int ox, int oy, int dw, int dh)
+{
+  if (!st_desk_fbo_tex || !st_glBindFramebuffer)
+    return;
+  if (ww < 1) ww = 1;
+  if (wh < 1) wh = 1;
+  if (dw < 1) dw = 1;
+  if (dh < 1) dh = 1;
+
+  st_glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glViewport(0, 0, ww, wh);
+  glDisable(GL_SCISSOR_TEST);
+  glClearColor(0.f, 0.f, 0.f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, ww, wh, 0, -1.0, 1.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+  glDisable(GL_BLEND);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, st_desk_fbo_tex);
+  desktop_gl_apply_frame_filter();
+  glColor4f(1.f, 1.f, 1.f, 1.f);
+  /* FBO was drawn Y-down; flip V when sampling. */
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.f, 1.f); glVertex2i(ox, oy);
+  glTexCoord2f(1.f, 1.f); glVertex2i(ox + dw, oy);
+  glTexCoord2f(1.f, 0.f); glVertex2i(ox + dw, oy + dh);
+  glTexCoord2f(0.f, 0.f); glVertex2i(ox, oy + dh);
+  glEnd();
+  glDisable(GL_TEXTURE_2D);
+}
+#endif /* !USE_GLES2 */
+#endif /* !NOOPENGL */
+
+
 static void
 st_update_letterbox(int window_w, int window_h)
 {
@@ -373,16 +556,8 @@ gl_setup_viewport(void)
   /* Game draws into a fixed 640×480 FBO; letterbox is applied at present. */
   gles2_renderer_bind_backbuffer();
 #else
-  /* Immediate-mode desktop GL: letterbox viewport on the window FB. */
-  int gl_oy = wh - st_lb_oy - st_lb_dh;
-  if (gl_oy < 0)
-    gl_oy = 0;
-  glViewport(st_lb_ox, gl_oy, st_lb_dw, st_lb_dh);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(0, ST_SCREEN_W, ST_SCREEN_H, 0, -1.0, 1.0);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  /* Desktop: draw 1:1 into offscreen FBO; letterbox at present. */
+  desktop_gl_bind_backbuffer();
 #endif
 }
 #endif
@@ -397,6 +572,8 @@ void platform_overlay_begin(void)
 #ifdef USE_GLES2
       gles2_renderer_set_overlay(ww, wh);
 #else
+      if (st_glBindFramebuffer)
+        st_glBindFramebuffer(GL_FRAMEBUFFER, 0);
       glViewport(0, 0, ww, wh);
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
@@ -643,32 +820,45 @@ bool platform_video_init(bool fullscreen, bool opengl)
                 }
               glDisable(GL_DEPTH_TEST);
               glDisable(GL_CULL_FACE);
+              {
+                bool gl_ok = true;
 #ifdef USE_GLES2
-              if (!gles2_renderer_init())
-                {
-                  fprintf(stderr, "Warning: GLES2 renderer init failed\n");
-                  SDL_GL_DeleteContext(st_gl_context);
-                  st_gl_context = NULL;
-                  SDL_FreeSurface(screen);
-                  screen = NULL;
-                  SDL_DestroyWindow(st_window);
-                  st_window = NULL;
-                }
-              else
-#endif
-                {
-                  gl_setup_viewport();
-                  /* Black frame immediately so the window is not garbage. */
-                  glClearColor(0.f, 0.f, 0.f, 1.f);
-                  glClear(GL_COLOR_BUFFER_BIT);
-                  SDL_GL_SwapWindow(st_window);
-#ifdef USE_GLES2
-                  log_window("GLES2 ready");
+                if (!gles2_renderer_init())
+                  {
+                    fprintf(stderr, "Warning: GLES2 renderer init failed\n");
+                    gl_ok = false;
+                  }
 #else
-                  log_window("GL ready");
+                if (!desktop_gl_fbo_init())
+                  {
+                    fprintf(stderr, "Warning: desktop GL FBO init failed\n");
+                    gl_ok = false;
+                  }
 #endif
-                  return true;
-                }
+                if (!gl_ok)
+                  {
+                    SDL_GL_DeleteContext(st_gl_context);
+                    st_gl_context = NULL;
+                    SDL_FreeSurface(screen);
+                    screen = NULL;
+                    SDL_DestroyWindow(st_window);
+                    st_window = NULL;
+                  }
+                else
+                  {
+                    gl_setup_viewport();
+                    /* Black frame immediately so the window is not garbage. */
+                    glClearColor(0.f, 0.f, 0.f, 1.f);
+                    glClear(GL_COLOR_BUFFER_BIT);
+                    SDL_GL_SwapWindow(st_window);
+#ifdef USE_GLES2
+                    log_window("GLES2 ready");
+#else
+                    log_window("GL FBO ready");
+#endif
+                    return true;
+                  }
+              }
             }
           if (st_window)
             {
@@ -769,6 +959,17 @@ void platform_set_caption(const char* title, const char* /*icon*/)
     SDL_SetWindowTitle(st_window, title);
 }
 
+void platform_apply_frame_filter(void)
+{
+#ifndef NOOPENGL
+#ifdef USE_GLES2
+  gles2_renderer_set_frame_filter(use_texture_filtering);
+#else
+  desktop_gl_apply_frame_filter();
+#endif
+#endif
+}
+
 void platform_present(bool /*full_update*/)
 {
 #ifndef NOOPENGL
@@ -781,37 +982,8 @@ void platform_present(bool /*full_update*/)
       /* Scale the 640×480 FBO into the letterbox (filter from option). */
       gles2_renderer_present(ww, wh, st_lb_ox, st_lb_oy, st_lb_dw, st_lb_dh);
 #else
-      /* Immediate-mode: game already drew into the letterbox viewport.
-         Clear full drawable first so resize margins are solid black, then
-         the next frame draws into the letterbox again after swap. */
-      glViewport(0, 0, ww, wh);
-      glDisable(GL_SCISSOR_TEST);
-      glClearColor(0.f, 0.f, 0.f, 1.f);
-      /* Paint black bars only — full clear would wipe the just-drawn frame. */
-      {
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glOrtho(0, ww, wh, 0, -1.0, 1.0);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        glDisable(GL_TEXTURE_2D);
-        glColor3f(0.f, 0.f, 0.f);
-        if (st_lb_oy > 0)
-          glRecti(0, 0, ww, st_lb_oy);
-        if (st_lb_oy + st_lb_dh < wh)
-          glRecti(0, st_lb_oy + st_lb_dh, ww, wh);
-        if (st_lb_ox > 0)
-          glRecti(0, st_lb_oy, st_lb_ox, st_lb_oy + st_lb_dh);
-        if (st_lb_ox + st_lb_dw < ww)
-          glRecti(st_lb_ox + st_lb_dw, st_lb_oy, ww, st_lb_oy + st_lb_dh);
-        glPopMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-      }
-      gl_setup_viewport();
+      /* Scale the 640×480 FBO into the letterbox (filter from option). */
+      desktop_gl_present(ww, wh, st_lb_ox, st_lb_oy, st_lb_dw, st_lb_dh);
 #endif
       /* Overlay (bezel, touch pad) in window pixels on the default FB. */
       if (touch_controls_is_enabled())
@@ -821,11 +993,7 @@ void platform_present(bool /*full_update*/)
       /* Next frame's clears/draws go to the offscreen backbuffer again. */
       gles2_renderer_bind_backbuffer();
 #else
-      /* Prep next back buffer: full black then letterbox viewport for draws. */
-      glViewport(0, 0, ww, wh);
-      glClearColor(0.f, 0.f, 0.f, 1.f);
-      glClear(GL_COLOR_BUFFER_BIT);
-      gl_setup_viewport();
+      desktop_gl_bind_backbuffer();
 #endif
       return;
     }
@@ -846,6 +1014,8 @@ void platform_video_shutdown(void)
 #ifndef NOOPENGL
 #ifdef USE_GLES2
   gles2_renderer_shutdown();
+#else
+  desktop_gl_fbo_shutdown();
 #endif
   if (st_gl_context)
     {
