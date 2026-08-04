@@ -43,6 +43,9 @@ Menu* options_keys_menu     = 0;
 Menu* options_joystick_menu = 0;
 Menu* options_joystick_axis_menu = 0;
 Menu* options_joystick_button_menu = 0;
+#ifdef USE_SDL2
+Menu* options_gamepad_menu = 0;
+#endif
 Menu* highscore_menu = 0;
 Menu* load_game_menu = 0;
 Menu* save_game_menu = 0;
@@ -302,9 +305,53 @@ std::string MenuItem::get_input_with_symbol(bool active_item)
 
 /* Set ControlField a key */
 //TODO (GP2X): get joystick in here somehow
+
+#ifdef USE_SDL2
+static const char*
+st_gamecontroller_button_name(int btn)
+{
+  switch (btn)
+    {
+    case SDL_CONTROLLER_BUTTON_A: return "A";
+    case SDL_CONTROLLER_BUTTON_B: return "B";
+    case SDL_CONTROLLER_BUTTON_X: return "X";
+    case SDL_CONTROLLER_BUTTON_Y: return "Y";
+    case SDL_CONTROLLER_BUTTON_BACK: return "Back";
+    case SDL_CONTROLLER_BUTTON_GUIDE: return "Guide";
+    case SDL_CONTROLLER_BUTTON_START: return "Start";
+    case SDL_CONTROLLER_BUTTON_LEFTSTICK: return "Left Stick";
+    case SDL_CONTROLLER_BUTTON_RIGHTSTICK: return "Right Stick";
+    case SDL_CONTROLLER_BUTTON_LEFTSHOULDER: return "Left Shoulder";
+    case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER: return "Right Shoulder";
+    case SDL_CONTROLLER_BUTTON_DPAD_UP: return "D-Pad Up";
+    case SDL_CONTROLLER_BUTTON_DPAD_DOWN: return "D-Pad Down";
+    case SDL_CONTROLLER_BUTTON_DPAD_LEFT: return "D-Pad Left";
+    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: return "D-Pad Right";
+#ifdef SDL_CONTROLLER_BUTTON_MISC1
+    case SDL_CONTROLLER_BUTTON_MISC1: return "Misc1";
+#endif
+    default: return 0;
+    }
+}
+#endif
 void Menu::get_controlfield_key_into_input(MenuItem *item)
 {
 #ifndef GP2X
+#ifdef USE_SDL2
+  if (Menu::current() == options_gamepad_menu)
+    {
+      const char* cn = st_gamecontroller_button_name(*item->int_p);
+      if (cn)
+        {
+          item->change_input(cn);
+          return;
+        }
+      char tmp[64];
+      snprintf(tmp, 64, "Button %d", *item->int_p);
+      item->change_input(tmp);
+      return;
+    }
+#endif
   switch(*item->int_p)
   {
   case SDLK_UP:
@@ -843,7 +890,6 @@ Menu::event(SDL_Event& event)
   SDLKey key;
   switch(event.type)
   {
-#ifndef GP2X
   case SDL_KEYDOWN:
     key = event.key.keysym.sym;
     SDLMod keymod;
@@ -872,6 +918,11 @@ Menu::event(SDL_Event& event)
         Menu::pop_current();
         return;
       }
+#ifdef USE_SDL2
+      /* Gamepad fields only accept controller buttons, not keyboard keys. */
+      if (Menu::current() == options_gamepad_menu)
+        return;
+#endif
       *item[active_item].int_p = key;
       menuaction = MENU_ACTION_DOWN;
       return;
@@ -986,6 +1037,40 @@ Menu::event(SDL_Event& event)
       else if (event.jaxis.value < -joystick_keymap.dead_zone)
         menuaction = MENU_ACTION_UP;
     }
+    break;
+
+#ifdef USE_SDL2
+  case SDL_CONTROLLERBUTTONDOWN:
+    if (item[active_item].kind == MN_CONTROLFIELD
+        && Menu::current() == options_gamepad_menu)
+      {
+        if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu
+            || event.cbutton.button == (Uint8)gamecontroller_keymap.menu_alt)
+          {
+            /* Leave field without binding menu keys while editing? Allow bind. */
+          }
+        *item[active_item].int_p = (int)event.cbutton.button;
+        menuaction = MENU_ACTION_DOWN;
+        return;
+      }
+    if (use_joystick)
+      {
+        if (event.cbutton.button == (Uint8)gamecontroller_keymap.jump
+            || event.cbutton.button == (Uint8)gamecontroller_keymap.fire
+            || event.cbutton.button == (Uint8)gamecontroller_keymap.fire_alt)
+          menuaction = MENU_ACTION_HIT;
+        else if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu
+                 || event.cbutton.button == (Uint8)gamecontroller_keymap.menu_alt)
+          menuaction = MENU_ACTION_HIT;
+        else if (event.cbutton.button == (Uint8)gamecontroller_keymap.up)
+          menuaction = MENU_ACTION_UP;
+        else if (event.cbutton.button == (Uint8)gamecontroller_keymap.duck)
+          menuaction = MENU_ACTION_DOWN;
+        else if (event.cbutton.button == (Uint8)gamecontroller_keymap.left)
+          menuaction = MENU_ACTION_LEFT;
+        else if (event.cbutton.button == (Uint8)gamecontroller_keymap.right)
+          menuaction = MENU_ACTION_RIGHT;
+      }
     break;
 #endif
 

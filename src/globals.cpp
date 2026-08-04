@@ -35,6 +35,23 @@ JoystickKeymap::JoystickKeymap()
 
 JoystickKeymap joystick_keymap;
 
+#ifdef USE_SDL2
+GameControllerKeymap::GameControllerKeymap()
+{
+  jump     = SDL_CONTROLLER_BUTTON_A;
+  fire     = SDL_CONTROLLER_BUTTON_B;
+  fire_alt = SDL_CONTROLLER_BUTTON_X;
+  duck     = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+  left     = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+  right    = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+  up       = SDL_CONTROLLER_BUTTON_DPAD_UP;
+  menu     = SDL_CONTROLLER_BUTTON_START;
+  menu_alt = SDL_CONTROLLER_BUTTON_BACK;
+}
+GameControllerKeymap gamecontroller_keymap;
+#endif
+
+
 SDL_Surface * screen;
 Text* black_text;
 Text* gold_text;

@@ -819,6 +819,9 @@ void st_menu(void)
   options_joystick_menu = new Menu();
   options_joystick_axis_menu = new Menu();
   options_joystick_button_menu = new Menu();
+#ifdef USE_SDL2
+  options_gamepad_menu = new Menu();
+#endif
   load_game_menu = new Menu();
   save_game_menu = new Menu();
   game_menu      = new Menu();
@@ -883,10 +886,7 @@ void st_menu(void)
   options_menu->additem(MN_GOTO,"Joystick Move Setup",0,options_joystick_axis_menu);
   options_menu->additem(MN_GOTO,"Joystick Action Setup",0,options_joystick_button_menu);
 #elif defined(USE_SDL2)
-  /* Standard SDL_GameController mapping — no manual axis/button setup. */
-  options_menu->additem(MN_DEACTIVE,
-                        use_joystick ? "Gamepad: connected" : "Gamepad: none",
-                        0, 0, 0);
+  options_menu->additem(MN_GOTO, "Gamepad Setup", 0, options_gamepad_menu);
 #else
   /* SDL1: classic joystick remap menu (populated below when use_joystick). */
   if (use_joystick)
@@ -905,6 +905,22 @@ void st_menu(void)
   options_keys_menu->additem(MN_CONTROLFIELD,"Power/Run", 0,0, 0,&keymap.fire);
   options_keys_menu->additem(MN_HL,"",0,0);
   options_keys_menu->additem(MN_BACK,"Back",0,0);
+
+#ifdef USE_SDL2
+  options_gamepad_menu->additem(MN_LABEL,"Gamepad Setup",0,0);
+  options_gamepad_menu->additem(MN_HL,"",0,0);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Jump", 0,0, 0,&gamecontroller_keymap.jump);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Duck", 0,0, 0,&gamecontroller_keymap.duck);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Left", 0,0, 0,&gamecontroller_keymap.left);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Right", 0,0, 0,&gamecontroller_keymap.right);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Up", 0,0, 0,&gamecontroller_keymap.up);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Power/Run", 0,0, 0,&gamecontroller_keymap.fire);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Power/Run (alt)", 0,0, 0,&gamecontroller_keymap.fire_alt);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Menu", 0,0, 0,&gamecontroller_keymap.menu);
+  options_gamepad_menu->additem(MN_CONTROLFIELD,"Menu (alt)", 0,0, 0,&gamecontroller_keymap.menu_alt);
+  options_gamepad_menu->additem(MN_HL,"",0,0);
+  options_gamepad_menu->additem(MN_BACK,"Back",0,0);
+#endif
 
 #ifndef GP2X
   if(use_joystick)
@@ -1194,6 +1210,9 @@ void st_general_free(void)
   delete options_joystick_button_menu;
   delete options_joystick_axis_menu;
   delete options_joystick_menu;
+#ifdef USE_SDL2
+  delete options_gamepad_menu;
+#endif
   delete options_keys_menu;
   delete options_menu;
   delete main_menu;

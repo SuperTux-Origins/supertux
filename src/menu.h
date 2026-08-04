@@ -228,6 +228,9 @@ extern Menu* options_keys_menu;
 extern Menu* options_joystick_menu;
 extern Menu* options_joystick_axis_menu;
 extern Menu* options_joystick_button_menu;
+#ifdef USE_SDL2
+extern Menu* options_gamepad_menu;
+#endif
 extern Menu* highscore_menu;
 extern Menu* load_game_menu;
 extern Menu* save_game_menu;

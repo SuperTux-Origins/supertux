@@ -64,6 +64,26 @@ struct JoystickKeymap
 
 extern JoystickKeymap joystick_keymap;
 
+#ifdef USE_SDL2
+/** Logical actions → SDL_GameControllerButton values (remappable). */
+struct GameControllerKeymap
+{
+  int jump;
+  int fire;
+  int fire_alt;
+  int duck;
+  int left;
+  int right;
+  int up;
+  int menu;
+  int menu_alt;
+
+  GameControllerKeymap();
+};
+extern GameControllerKeymap gamecontroller_keymap;
+#endif
+
+
 extern SDL_Surface * screen;
 extern Text* black_text;
 extern Text* gold_text;

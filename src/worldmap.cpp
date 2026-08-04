@@ -658,32 +658,24 @@ WorldMap::get_input()
         case SDL_CONTROLLERBUTTONDOWN:
           if (!use_joystick)
             break;
-          switch (event.cbutton.button)
-            {
-            case SDL_CONTROLLER_BUTTON_A:
-            case SDL_CONTROLLER_BUTTON_B:
-            case SDL_CONTROLLER_BUTTON_X:
+          {
+            int b = (int)event.cbutton.button;
+            if (b == gamecontroller_keymap.jump
+                || b == gamecontroller_keymap.fire
+                || b == gamecontroller_keymap.fire_alt)
               enter_level = true;
-              break;
-            case SDL_CONTROLLER_BUTTON_DPAD_UP:
+            else if (b == gamecontroller_keymap.up)
               input_direction = D_NORTH;
-              break;
-            case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+            else if (b == gamecontroller_keymap.duck)
               input_direction = D_SOUTH;
-              break;
-            case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+            else if (b == gamecontroller_keymap.left)
               input_direction = D_WEST;
-              break;
-            case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+            else if (b == gamecontroller_keymap.right)
               input_direction = D_EAST;
-              break;
-            case SDL_CONTROLLER_BUTTON_START:
-            case SDL_CONTROLLER_BUTTON_BACK:
+            else if (b == gamecontroller_keymap.menu
+                     || b == gamecontroller_keymap.menu_alt)
               on_escape_press();
-              break;
-            default:
-              break;
-            }
+          }
           break;
 #else
 #ifdef GP2X

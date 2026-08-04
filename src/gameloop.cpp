@@ -254,8 +254,8 @@ GameSession::process_events()
 
 #ifdef USE_SDL2
             case SDL_CONTROLLERBUTTONDOWN:
-              if (event.cbutton.button == SDL_CONTROLLER_BUTTON_START
-                  || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
+              if ((int)event.cbutton.button == gamecontroller_keymap.menu
+                  || (int)event.cbutton.button == gamecontroller_keymap.menu_alt)
                 on_escape_press();
               break;
             case SDL_CONTROLLERDEVICEADDED:
@@ -493,61 +493,50 @@ GameSession::process_events()
                 case SDL_CONTROLLERBUTTONDOWN:
                   if (!use_joystick)
                     break;
-                  switch (event.cbutton.button)
-                    {
-                    case SDL_CONTROLLER_BUTTON_A:
-                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                  {
+                    int b = (int)event.cbutton.button;
+                    if (b == gamecontroller_keymap.jump
+                        || b == gamecontroller_keymap.up)
                       tux.input.up = DOWN;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_B:
-                    case SDL_CONTROLLER_BUTTON_X:
+                    if (b == gamecontroller_keymap.fire
+                        || b == gamecontroller_keymap.fire_alt)
                       tux.input.fire = DOWN;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                    if (b == gamecontroller_keymap.duck)
                       tux.input.down = DOWN;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-                      tux.input.left = DOWN;
-                      tux.input.right = UP;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-                      tux.input.right = DOWN;
-                      tux.input.left = UP;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_START:
-                    case SDL_CONTROLLER_BUTTON_BACK:
+                    if (b == gamecontroller_keymap.left)
+                      {
+                        tux.input.left = DOWN;
+                        tux.input.right = UP;
+                      }
+                    if (b == gamecontroller_keymap.right)
+                      {
+                        tux.input.right = DOWN;
+                        tux.input.left = UP;
+                      }
+                    if (b == gamecontroller_keymap.menu
+                        || b == gamecontroller_keymap.menu_alt)
                       on_escape_press();
-                      break;
-                    default:
-                      break;
-                    }
+                  }
                   break;
 
                 case SDL_CONTROLLERBUTTONUP:
                   if (!use_joystick)
                     break;
-                  switch (event.cbutton.button)
-                    {
-                    case SDL_CONTROLLER_BUTTON_A:
-                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                  {
+                    int b = (int)event.cbutton.button;
+                    if (b == gamecontroller_keymap.jump
+                        || b == gamecontroller_keymap.up)
                       tux.input.up = UP;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_B:
-                    case SDL_CONTROLLER_BUTTON_X:
+                    if (b == gamecontroller_keymap.fire
+                        || b == gamecontroller_keymap.fire_alt)
                       tux.input.fire = UP;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                    if (b == gamecontroller_keymap.duck)
                       tux.input.down = UP;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+                    if (b == gamecontroller_keymap.left)
                       tux.input.left = UP;
-                      break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+                    if (b == gamecontroller_keymap.right)
                       tux.input.right = UP;
-                      break;
-                    default:
-                      break;
-                    }
+                  }
                   break;
 #else
 		case SDL_JOYHATMOTION:
