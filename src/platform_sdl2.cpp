@@ -484,29 +484,14 @@ software_present(void)
   SDL_GetWindowSize(st_window, &ww, &wh);
   st_update_letterbox(ww, wh);
 
-  /* Prefer renderer present on Emscripten; also if surface path is unavailable.
-     When Smooth graphics is on and the window is not 1:1, use the renderer so
-     we can bilinear-scale (SDL_BlitScaled is always nearest). */
-  bool use_renderer = (st_sw_renderer != NULL && st_sw_tex != NULL);
-  bool need_scale = (ww != ST_SCREEN_W || wh != ST_SCREEN_H
-                     || st_margin_l != 0.0f || st_margin_r != 0.0f
-                     || st_margin_t != 0.0f || st_margin_b != 0.0f);
-#ifdef __EMSCRIPTEN__
-  use_renderer = true;
+  /* Software present always goes through SDL_Renderer (letterbox + filter). */
   if (!st_sw_renderer || !st_sw_tex)
     {
       if (!init_sw_presenter())
         return;
     }
-#else
-  if (!use_renderer && use_texture_filtering && need_scale)
-    {
-      if (init_sw_presenter())
-        use_renderer = true;
-    }
-#endif
 
-  if (use_renderer && st_sw_renderer && st_sw_tex)
+  if (st_sw_renderer && st_sw_tex)
     {
       software_apply_scale_filter();
       if (SDL_MUSTLOCK(st_backbuffer))
@@ -931,8 +916,9 @@ bool platform_video_init(bool fullscreen, bool opengl)
         st_backbuffer = NULL;
       }
 
-#ifdef __EMSCRIPTEN__
-    /* Canvas has no usable window surface; fixed ARGB8888 backbuffer + renderer. */
+    /* Fixed 640×480 backbuffer + SDL_Renderer present for all software builds.
+       Do not mix SDL_GetWindowSurface with a renderer on the same window —
+       CreateRenderer then fails with "Parameter 'renderer' is invalid". */
     st_backbuffer = SDL_CreateRGBSurfaceWithFormat(
         0, ST_SCREEN_W, ST_SCREEN_H, 32, SDL_PIXELFORMAT_ARGB8888);
     if (!st_backbuffer)
@@ -945,32 +931,6 @@ bool platform_video_init(bool fullscreen, bool opengl)
         fprintf(stderr, "Error: software presenter (renderer) init failed\n");
         return false;
       }
-#else
-    {
-      SDL_Surface* window_surface = SDL_GetWindowSurface(st_window);
-      if (!window_surface)
-        {
-          /* Some platforms lack a window surface — fall back to renderer. */
-          st_backbuffer = SDL_CreateRGBSurfaceWithFormat(
-              0, ST_SCREEN_W, ST_SCREEN_H, 32, SDL_PIXELFORMAT_ARGB8888);
-          if (!st_backbuffer || !init_sw_presenter())
-            {
-              fprintf(stderr, "Error: software video path failed: %s\n",
-                      SDL_GetError());
-              return false;
-            }
-        }
-      else
-        {
-          st_backbuffer = create_software_backbuffer(window_surface);
-          if (!st_backbuffer)
-            {
-              fprintf(stderr, "Error: software backbuffer: %s\n", SDL_GetError());
-              return false;
-            }
-        }
-    }
-#endif
     screen = st_backbuffer;
     SDL_FillRect(st_backbuffer, NULL,
                  SDL_MapRGB(st_backbuffer->format, 0, 0, 0));
