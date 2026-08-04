@@ -36,8 +36,8 @@ When unsure, prefer the smallest change that stops a crash or unblocks SDL2 play
 
 | Area | Status |
 |------|--------|
-| Original Autotools build | Present (`configure.ac`, `Makefile.am`, `autogen.sh`) |
-| **CMake build** | **Done** — root `CMakeLists.txt`; Autotools retained for reference |
+| Original Autotools build | **Parked** under `mk/gp2x/` (reference + historical GP2X only) |
+| **CMake build** | **Done** — root `CMakeLists.txt` (supported path) |
 | Graphics / input | SDL 1.2 + optional OpenGL (immediate) or GLES2 (shaders); software via `SurfaceSDL` |
 | Audio | SDL_mixer 1.x (optional `-DNOSOUND`); GP2X uses a separate path |
 | Platforms of historical interest | Desktop Linux/Windows, experimental GP2X, 320×240 test build |
@@ -107,7 +107,7 @@ Video init/present goes through `src/platform.h` (`platform_sdl1.cpp` or `platfo
 
 Runtime resolves assets under `DATA_PREFIX` / discovered `datadir` (see `st_directory_setup()`), normally the repo-root `data/` tree.
 
-Autotools remain in the tree for reference but are not the maintained path forward.
+Autotools + GP2X wrappers are parked under `mk/gp2x/` (see `mk/gp2x/README.md`). Not the maintained path forward; no investment unless explicitly requested.
 
 ## Dependencies
 

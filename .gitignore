@@ -1,5 +1,6 @@
 *~
 *.o
+# Autotools generated (root, if ever restored)
 /Makefile
 /Makefile.in
 /aclocal.m4
@@ -19,6 +20,14 @@
 /src/Makefile
 /src/Makefile.in
 /src/supertux-milestone1
+# Autotools generated under parked mk/gp2x/
+/mk/gp2x/Makefile
+/mk/gp2x/Makefile.in
+/mk/gp2x/configure
+/mk/gp2x/aclocal.m4
+/mk/gp2x/autom4te.cache/
+/mk/gp2x/src/Makefile
+/mk/gp2x/src/Makefile.in
 /result
 /result-*
 

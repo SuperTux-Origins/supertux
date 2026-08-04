@@ -1,6 +1,6 @@
 SUBDIRS = src data
 
-ACLOCAL_AMFLAGS = -I mk/autoconf
+ACLOCAL_AMFLAGS = -I autoconf
 AUTOMAKE_OPTIONS = 1.6 dist-bzip2
 
 desktopdir = $(datadir)/applications
@@ -14,4 +14,4 @@ svgicon_DATA = supertux-milestone1.svg
 
 EXTRA_DIST = AUTHORS README COPYING INSTALL NEWS LEVELDESIGN ChangeLog \
 	     supertux-milestone1.desktop supertux-milestone1.png autogen.sh \
-	     $(wildcard mk/autoconf/*.m4)
+	     $(wildcard autoconf/*.m4)
