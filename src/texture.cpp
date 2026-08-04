@@ -518,9 +518,19 @@ SurfaceOpenGL::SurfaceOpenGL(const std::string& file, int x, int y, int w, int h
 
 SurfaceOpenGL::~SurfaceOpenGL()
 {
-  /* Context may already be gone during a failed teardown — skip GL calls. */
-  if (gl_texture && SDL_GL_GetCurrentContext() != NULL)
-    glDeleteTextures(1, &gl_texture);
+  /* Context may already be gone during a failed teardown — skip GL calls.
+     SDL_GL_GetCurrentContext is SDL2-only. */
+  if (gl_texture)
+    {
+#ifdef USE_SDL2
+      if (SDL_GL_GetCurrentContext() == NULL)
+        {
+          gl_texture = 0;
+          return;
+        }
+#endif
+      glDeleteTextures(1, &gl_texture);
+    }
   gl_texture = 0;
 }
 
