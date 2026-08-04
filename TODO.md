@@ -107,6 +107,7 @@ Thin layer in `src/platform*.{h,cpp}`:
 - [x] Fullscreen / present: FULLSCREEN → FULLSCREEN_DESKTOP → windowed; software letterbox scale; video re-init falls back instead of exit
 - [x] **GLES2 optional path** (`ENABLE_GLES2`): ES 2.0 context, `gles2_renderer` shader quads, texture upload without `GL_UNPACK_ROW_LENGTH` / `GL_RGB10_A2`; desktop immediate-mode GL retained when GLES2 is off
 - [ ] Smoke playtest with `data/`: title demo, one level, worldmap, pause menu, options, quit — SDL1, SDL2, and GLES2
+- [ ] Joystick/gamepad smoke — see **Phase 8** (all platforms)
 - [x] Wire Android APK to GLES2 renderer (default; `USE_GLES2` + `-lGLESv2`; software fallback)
 
 ### Rendering strategy
@@ -337,8 +338,56 @@ Diagnose before fixing; do not re-enable ASYNCIFY for parity. Prefer timer +
 
 ---
 
+## Phase 7 — Display / input polish (desktop + wasm)
+
+Work landed while unifying the frame pump; keep checked as regressions are found.
+
+- [x] Resizable SDL2 window; letterbox scale of fixed 640×480 (aspect preserved)
+- [x] Desktop OpenGL: offscreen 640×480 FBO + single letterbox present (same model as GLES2)
+- [x] Software present: SDL_Renderer only (no GetWindowSurface mix); Smooth graphics via scale mode
+- [x] Options **Smooth graphics** (`use_texture_filtering`, config `texture_filter`) — GL sprites + frame upscale + software renderer
+- [x] Fix OpenGL option toggle double-free (`platform_video_shutdown` must not key off flipped `use_gl`)
+- [x] Wasm HTML fullscreen: hide page chrome so canvas is not cropped; Esc still exits browser FS
+- [x] Menu keys: F1 and Tab act like Esc (browser FS steals Esc)
+- [x] Android NDK: build `app_loop.cpp`; fix `use_texture_filtering` linkage in `gles2_renderer.cpp`
+
+---
+
+## Phase 8 — Joystick / gamepad support
+
+**Status (code inventory, not playtested):** the Milestone 1 engine has **classic SDL joystick** support, not the newer SDL2 Game Controller API.
+
+| Mechanism | Present? | Notes |
+|-----------|----------|--------|
+| `SDL_INIT_JOYSTICK` + `SDL_JoystickOpen` | Yes | `setup.cpp` after video init; `js` global |
+| Axis + button events in play / worldmap | Yes | `JOYAXISMOTION` / `JOYBUTTON*` in `gameloop.cpp`, `worldmap.cpp` |
+| Configurable button/axis indices | Yes | `joystick_keymap` + config file; Options “Joystick Setup” (esp. GP2X menus) |
+| Start button → pause/menu | Yes | Maps to same path as Esc |
+| `SDL_GameController` / standard mappings | **No** | No `SDL_INIT_GAMECONTROLLER`, no controller DB |
+| Hot-plug (`SDL_JOYDEVICEADDED`) | **Unknown / likely no** | Open once at startup |
+| Wasm / browser gamepad | **Unknown** | Needs Emscripten + browser Gamepad API path through SDL |
+| Android physical gamepad | **Unknown** | Touch pad is separate (`touch_controls`); joystick init may still run |
+
+Default: `use_joystick = true` and `joystick_num = 0` unless config sets joystick to `-1`. If open fails, joystick is disabled quietly.
+
+### Tasks
+
+- [ ] Document observed behaviour after smoke tests (this section)
+- [ ] **Desktop Linux (SDL2):** plug in a pad — move, jump, action, start/pause on title, worldmap, and in-level
+- [ ] **Desktop Linux (SDL1):** same smoke if a stick is available
+- [ ] **Desktop GLES2 build:** same as SDL2
+- [ ] **Windows (MinGW packages):** same smoke with an XInput/DirectInput pad
+- [ ] **Android:** physical Bluetooth/USB gamepad (not only on-screen touch controls)
+- [ ] **Wasm:** browser gamepad (Chrome/Firefox); note if SDL never sees axes without extra flags
+- [ ] Confirm Options joystick setup menus are reachable and persist to config on non-GP2X builds
+- [ ] If pads work only as raw axes with wrong buttons: consider optional `SDL_GameController` mapping layer (SDL2-only), without breaking existing index config
+- [ ] Hot-plug: open/close joystick on add/remove if smoke tests show “plugin after start” fails
+
+---
+
 | Date | Item |
 |------|------|
+| 2026-08-04 | Phase 7 display polish; Phase 8 joystick/gamepad inventory + smoke-test matrix |
 | 2026-08-04 | ASYNCIFY removal audit → Phase 6; frame intro/end; unified app_run desktop+wasm |
 | 2026-08-03 | Phase 5 scaffold: wasm.nix, scripts, CMake EMSCRIPTEN/SDL2_ROOT, flake targets |
 | 2026-08-03 | Emscripten datadir/userdir + open_game_file /data; SDL wasm install prefix |
