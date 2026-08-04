@@ -1049,15 +1049,24 @@ bool process_load_game_menu()
 
       if (access(slotfile, F_OK) != 0)
         {
-/* Intro uses blocking display_text_file; skip under app_loop. */
-          if (!app_loop_active())
+          /* New game: show story intro, then worldmap. */
+          if (app_loop_active())
+            {
+              app_request_worldmap("world1.stwm", slotfile, false);
+              Surface* intro_bg = new Surface(
+                  datadir + "/images/background/arctis2.jpg", IGNORE_ALPHA);
+              app_request_text_scroll("intro.txt", intro_bg,
+                                     SCROLL_SPEED_MESSAGE, true);
+              Menu::set_current(0);
+              return true;
+            }
           draw_intro();
         }
 
       fadeout();
-if (app_loop_active())
+      if (app_loop_active())
         {
-          /* Non-blocking hand-off to the top-level frame pump. */
+          /* Existing save: go straight to the worldmap. */
           app_request_worldmap("world1.stwm", slotfile, false);
           Menu::set_current(0);
           return true;

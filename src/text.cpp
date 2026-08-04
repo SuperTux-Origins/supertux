@@ -12,6 +12,7 @@
 #include "setup.h"
 #include "menu.h"
 #include "touch_controls.h"
+#include "player.h"
 #ifndef NOSOUND
 #include "sound.h"
 #endif
@@ -340,22 +341,18 @@ bool display_text_file_frame(void)
       switch(event.type)
         {
         case SDL_KEYDOWN:
-          switch(event.key.keysym.sym)
-            {
-            case SDLK_UP:
+          {
+            SDLKey key = event.key.keysym.sym;
+            if (key == (SDLKey)keymap.up)
               speed -= SPEED_INC;
-              break;
-            case SDLK_DOWN:
+            else if (key == (SDLKey)keymap.duck)
               speed += SPEED_INC;
-              break;
-            case SDLK_SPACE:
-            case SDLK_RETURN:
-              if(speed >= 0)
-                scroll += SCROLL;
-              break;
-            default:
-              break;
-            }
+            else if (key == (SDLKey)keymap.jump || key == (SDLKey)keymap.fire)
+              {
+                if (speed >= 0)
+                  scroll += SCROLL;
+              }
+          }
           break;
 #ifdef GP2X
         case SDL_JOYBUTTONDOWN:
@@ -374,6 +371,24 @@ bool display_text_file_frame(void)
           break;
 #endif
 #ifdef USE_SDL2
+        case SDL_CONTROLLERBUTTONDOWN:
+          if (use_joystick)
+            {
+              int b = (int)event.cbutton.button;
+              if (b == gamecontroller_keymap.up)
+                speed -= SPEED_INC;
+              else if (b == gamecontroller_keymap.duck)
+                speed += SPEED_INC;
+              else if (b == gamecontroller_keymap.jump
+                       || b == gamecontroller_keymap.fire)
+                {
+                  if (speed >= 0)
+                    scroll += SCROLL;
+                }
+              else if (b == gamecontroller_keymap.menu)
+                done = 1;
+            }
+          break;
         case SDL_FINGERDOWN:
           done = 1;
           break;

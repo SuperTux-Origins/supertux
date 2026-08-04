@@ -608,15 +608,11 @@ WorldMap::get_input()
 #endif
 
         case SDL_KEYDOWN:
-          switch(event.key.keysym.sym)
-            {
-            case SDLK_LCTRL:
-            case SDLK_RETURN:
+          {
+            SDLKey key = event.key.keysym.sym;
+            if (key == (SDLKey)keymap.jump || key == (SDLKey)keymap.fire)
               enter_level = true;
-              break;
-            default:
-              break;
-            }
+          }
           break;
 
 #ifdef TSCONTROL

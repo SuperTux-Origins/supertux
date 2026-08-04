@@ -250,6 +250,12 @@ app_finish_text(void)
       app_request_text_scroll("CREDITS", bg, SCROLL_SPEED_CREDITS, true);
       return;
     }
+  /* New-game story intro: continue into the queued worldmap. */
+  if (g_pending_worldmap)
+    {
+      app_activate_worldmap();
+      return;
+    }
   /* display_text_file_end already restores main_menu. */
   g_screen = APP_SCREEN_TITLE;
   Menu::set_current(main_menu);
