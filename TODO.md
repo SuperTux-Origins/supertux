@@ -388,6 +388,7 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 
 | Date | Item |
 |------|------|
+| 2026-08-04 | Gamepad menu: Analog submenu; stick nav uses dead zone + edge detect (ignore raw JOYAXIS) |
 | 2026-08-04 | Gamepad: D-Pad + analog movement sections, analog dead zone, keyboard nav in setup |
 | 2026-08-04 | Phase 7 display polish; Phase 8 joystick/gamepad inventory + smoke-test matrix |
 | 2026-08-04 | ASYNCIFY removal audit → Phase 6; frame intro/end; unified app_run desktop+wasm |

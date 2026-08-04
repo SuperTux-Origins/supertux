@@ -821,6 +821,7 @@ void st_menu(void)
   options_joystick_button_menu = new Menu();
 #ifdef USE_SDL2
   options_gamepad_menu = new Menu();
+  options_gamepad_analog_menu = new Menu();
 #endif
   load_game_menu = new Menu();
   save_game_menu = new Menu();
@@ -907,8 +908,8 @@ void st_menu(void)
   options_keys_menu->additem(MN_BACK,"Back",0,0);
 
 #ifdef USE_SDL2
-  /* D-Pad buttons and analog stick are independent movement sources.
-   * Analog always uses LEFTX/LEFTY; dead zone is adjustable below. */
+  /* D-Pad buttons remappable here; analog stick (LEFTX/LEFTY) + dead zone
+   * live in the Analog submenu. */
   options_gamepad_menu->additem(MN_LABEL,"Gamepad Setup",0,0);
   options_gamepad_menu->additem(MN_HL,"",0,0);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Jump", 0,0, 0,&gamecontroller_keymap.jump);
@@ -917,21 +918,23 @@ void st_menu(void)
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Menu", 0,0, 0,&gamecontroller_keymap.menu);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Menu (alt)", 0,0, 0,&gamecontroller_keymap.menu_alt);
   options_gamepad_menu->additem(MN_HL,"",0,0);
-  options_gamepad_menu->additem(MN_LABEL,"Movement (D-Pad)",0,0);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Left", 0,0, 0,&gamecontroller_keymap.left);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Right", 0,0, 0,&gamecontroller_keymap.right);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Up", 0,0, 0,&gamecontroller_keymap.up);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Duck", 0,0, 0,&gamecontroller_keymap.duck);
   options_gamepad_menu->additem(MN_HL,"",0,0);
-  options_gamepad_menu->additem(MN_LABEL,"Movement (analog)",0,0);
-  options_gamepad_menu->additem(MN_DEACTIVE,"Left (analog)", 0,0);
-  options_gamepad_menu->additem(MN_DEACTIVE,"Right (analog)", 0,0);
-  options_gamepad_menu->additem(MN_DEACTIVE,"Up (analog)", 0,0);
-  options_gamepad_menu->additem(MN_DEACTIVE,"Down (analog)", 0,0);
-  /* Dead zone: Left/Right adjust by 1000 while this field is selected. */
-  options_gamepad_menu->additem(MN_CONTROLFIELD,"Analog dead zone", 0,0, 0,&gamecontroller_keymap.analog_dead_zone);
+  options_gamepad_menu->additem(MN_GOTO,"Analog Setup",0,options_gamepad_analog_menu);
   options_gamepad_menu->additem(MN_HL,"",0,0);
   options_gamepad_menu->additem(MN_BACK,"Back",0,0);
+
+  options_gamepad_analog_menu->additem(MN_LABEL,"Analog Setup",0,0);
+  options_gamepad_analog_menu->additem(MN_HL,"",0,0);
+  options_gamepad_analog_menu->additem(MN_DEACTIVE,"Left stick → move",0,0);
+  options_gamepad_analog_menu->additem(MN_DEACTIVE,"(LEFTX / LEFTY)",0,0);
+  /* Dead zone: Left/Right adjust by 1000 while this field is selected. */
+  options_gamepad_analog_menu->additem(MN_CONTROLFIELD,"Dead zone", 0,0, 0,&gamecontroller_keymap.analog_dead_zone);
+  options_gamepad_analog_menu->additem(MN_HL,"",0,0);
+  options_gamepad_analog_menu->additem(MN_BACK,"Back",0,0);
 #endif
 
 #ifndef GP2X
@@ -1223,6 +1226,7 @@ void st_general_free(void)
   delete options_joystick_axis_menu;
   delete options_joystick_menu;
 #ifdef USE_SDL2
+  delete options_gamepad_analog_menu;
   delete options_gamepad_menu;
 #endif
   delete options_keys_menu;

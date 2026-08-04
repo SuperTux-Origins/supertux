@@ -45,6 +45,7 @@ Menu* options_joystick_axis_menu = 0;
 Menu* options_joystick_button_menu = 0;
 #ifdef USE_SDL2
 Menu* options_gamepad_menu = 0;
+Menu* options_gamepad_analog_menu = 0;
 #endif
 Menu* highscore_menu = 0;
 Menu* load_game_menu = 0;
@@ -338,7 +339,8 @@ void Menu::get_controlfield_key_into_input(MenuItem *item)
 {
 #ifndef GP2X
 #ifdef USE_SDL2
-  if (Menu::current() == options_gamepad_menu)
+  if (Menu::current() == options_gamepad_menu
+      || Menu::current() == options_gamepad_analog_menu)
     {
       /* Analog dead zone is a numeric threshold, not a button index. */
       if (item->int_p == &gamecontroller_keymap.analog_dead_zone)
@@ -932,11 +934,12 @@ Menu::event(SDL_Event& event)
       if (Menu::current() == options_joystick_menu
 #ifdef USE_SDL2
           || Menu::current() == options_gamepad_menu
+          || Menu::current() == options_gamepad_analog_menu
 #endif
           )
         {
 #ifdef USE_SDL2
-          if (Menu::current() == options_gamepad_menu
+          if (Menu::current() == options_gamepad_analog_menu
               && item[active_item].int_p == &gamecontroller_keymap.analog_dead_zone
               && (key == SDLK_LEFT || key == SDLK_RIGHT))
             {
@@ -1068,6 +1071,13 @@ Menu::event(SDL_Event& event)
        break;
        
   case  SDL_JOYAXISMOTION:
+#ifdef USE_SDL2
+    /* SDL2 GameController path owns the stick; raw JOYAXIS still fires for the
+       same device with the tiny SDL1 dead_zone (4096) and no edge detect —
+       that made menus hyper-twitchy. Ignore when a controller is open. */
+    if (game_controller)
+      break;
+#endif
     if (verbose_mode)
       st_vlog("[menu] JOYAXIS which=%d axis=%d value=%d use_joystick=%d dead=%d\n",
               (int)event.jaxis.which, (int)event.jaxis.axis,
@@ -1085,9 +1095,41 @@ Menu::event(SDL_Event& event)
     break;
 
 #ifdef USE_SDL2
+  case SDL_CONTROLLERAXISMOTION:
+    if (!use_joystick)
+      break;
+    {
+      /* Edge-triggered: only fire when crossing into a direction from neutral
+         (or the opposite side). Holding the stick must not spam UP/DOWN. */
+      static int menu_stick_x = 0; /* -1 left, 0 neutral, +1 right */
+      static int menu_stick_y = 0; /* -1 up,   0 neutral, +1 down */
+      const int dz = gamecontroller_keymap.analog_dead_zone;
+      int v = event.caxis.value;
+      if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
+        {
+          int dir = 0;
+          if (v < -dz) dir = -1;
+          else if (v > dz) dir = 1;
+          if (dir != 0 && dir != menu_stick_x)
+            menuaction = (dir < 0) ? MENU_ACTION_LEFT : MENU_ACTION_RIGHT;
+          menu_stick_x = dir;
+        }
+      else if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
+        {
+          int dir = 0;
+          if (v < -dz) dir = -1;
+          else if (v > dz) dir = 1;
+          if (dir != 0 && dir != menu_stick_y)
+            menuaction = (dir < 0) ? MENU_ACTION_UP : MENU_ACTION_DOWN;
+          menu_stick_y = dir;
+        }
+    }
+    break;
+
   case SDL_CONTROLLERBUTTONDOWN:
     if (item[active_item].kind == MN_CONTROLFIELD
-        && Menu::current() == options_gamepad_menu)
+        && (Menu::current() == options_gamepad_menu
+            || Menu::current() == options_gamepad_analog_menu))
       {
         /* Dead zone is adjusted with D-Pad left/right, not bound to a button. */
         if (item[active_item].int_p == &gamecontroller_keymap.analog_dead_zone)
@@ -1124,6 +1166,9 @@ Menu::event(SDL_Event& event)
               }
             return;
           }
+        /* Only bind buttons on the main Gamepad Setup menu. */
+        if (Menu::current() != options_gamepad_menu)
+          return;
         if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu
             || event.cbutton.button == (Uint8)gamecontroller_keymap.menu_alt)
           {
