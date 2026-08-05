@@ -30,6 +30,7 @@ enum OptionsMenuIDs {
   MNID_MUSIC,
   MNID_SHOWFPS,
   MNID_SHOWMOUSE,
+  MNID_TOUCH_SCHEME,
   /* SDL2 GameController device picker (options_gamepad_device_menu). */
   MNID_GAMEPAD_NONE = 900,          /* keyboard only / close pad */
   MNID_GAMEPAD_DEVICE_BASE = 901    /* + device index 0..N-1 */
@@ -242,6 +243,7 @@ extern Menu* options_joystick_button_menu;
 extern Menu* options_gamepad_menu;
 extern Menu* options_gamepad_analog_menu;
 extern Menu* options_gamepad_device_menu;
+extern Menu* options_touch_menu;
 #endif
 extern Menu* highscore_menu;
 extern Menu* load_game_menu;

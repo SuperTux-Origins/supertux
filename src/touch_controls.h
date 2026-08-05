@@ -16,6 +16,10 @@ class Player;
 void touch_controls_set_enabled(bool enabled);
 bool touch_controls_is_enabled(void);
 
+/** 0 = virtual pad (buttons), 1 = screen zones (claw-friendly). */
+int  touch_controls_get_scheme(void);
+void touch_controls_set_scheme(int scheme);
+
 /** Clear all held buttons (focus loss, menu open, level restart). */
 void touch_controls_reset(void);
 

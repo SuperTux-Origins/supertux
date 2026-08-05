@@ -47,6 +47,7 @@ Menu* options_joystick_button_menu = 0;
 Menu* options_gamepad_menu = 0;
 Menu* options_gamepad_analog_menu = 0;
 Menu* options_gamepad_device_menu = 0;
+Menu* options_touch_menu = 0;
 
 /* CONTROLLER* and JOY* both fire for the same physical press on many
    platforms. After we handle a controller event, ignore raw joystick for a
@@ -697,6 +698,13 @@ Menu::action()
               break;
             }
 #endif
+          /* Touchpad scheme picks — stay in the submenu. */
+          if (item[active_item].id == MNID_TOUCH_SCHEME
+              || item[active_item].id == MNID_TOUCH_SCHEME + 1)
+            {
+              item[active_item].toggled = true;
+              break;
+            }
           Menu::set_current(0);
           item[active_item].toggled = true;
           break;

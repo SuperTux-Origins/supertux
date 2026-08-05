@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string>
 #include "configfile.h"
+#include "touch_controls.h"
 #include "setup.h"
 #include "globals.h"
 #include "lispreader.h"
@@ -150,6 +151,11 @@ void loadconfig(void)
   reader.read_int ("keyboard-right", &keymap.right);
   reader.read_int ("keyboard-fire", &keymap.fire);
   reader.read_int ("keyboard-menu", &keymap.menu);
+  {
+    int ts = touch_controls_get_scheme();
+    reader.read_int ("touch-scheme", &ts);
+    touch_controls_set_scheme(ts);
+  }
 
   lisp_free(root_obj);
   fclose(file);
@@ -216,6 +222,7 @@ void saveconfig (void)
       fprintf(config, "\t(keyboard-right %d)\n", keymap.right);
       fprintf(config, "\t(keyboard-fire  %d)\n", keymap.fire);
       fprintf(config, "\t(keyboard-menu  %d)\n", keymap.menu);
+      fprintf(config, "\t(touch-scheme  %d)\n", touch_controls_get_scheme());
 
       fprintf(config, ")\n");
 

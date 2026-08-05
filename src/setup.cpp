@@ -847,6 +847,7 @@ void st_menu(void)
   options_gamepad_analog_menu = new Menu();
   options_gamepad_device_menu = new Menu();
 #endif
+  options_touch_menu = new Menu();
   load_game_menu = new Menu();
   save_game_menu = new Menu();
   game_menu      = new Menu();
@@ -905,6 +906,7 @@ void st_menu(void)
   options_menu->additem(MN_TOGGLE,"Show FPS  ",show_fps,0, MNID_SHOWFPS);
 #ifndef GP2X
   options_menu->additem(MN_GOTO,"Keyboard Setup",0,options_keys_menu);
+  options_menu->additem(MN_GOTO,"Touchpad Setup",0,options_touch_menu);
 #endif
 
 #ifdef GP2X
@@ -969,6 +971,18 @@ void st_menu(void)
   options_gamepad_device_menu->additem(MN_HL,"",0,0);
   options_gamepad_device_menu->additem(MN_BACK,"Back",0,0);
 #endif
+
+  options_touch_menu->additem(MN_LABEL,"Touchpad Setup",0,0);
+  options_touch_menu->additem(MN_HL,"",0,0);
+  options_touch_menu->additem(MN_DEACTIVE,"Scheme:",0,0);
+  options_touch_menu->additem(MN_ACTION,"Virtual Pad",0,0, MNID_TOUCH_SCHEME);
+  options_touch_menu->additem(MN_ACTION,"Screen Zones",0,0, MNID_TOUCH_SCHEME + 1);
+  options_touch_menu->additem(MN_HL,"",0,0);
+  options_touch_menu->additem(MN_DEACTIVE,"Pad: buttons + sticky hold",0,0);
+  options_touch_menu->additem(MN_DEACTIVE,"Zones: L=move R=jump/run",0,0);
+  options_touch_menu->additem(MN_DEACTIVE,"(claw: two thumbs)",0,0);
+  options_touch_menu->additem(MN_HL,"",0,0);
+  options_touch_menu->additem(MN_BACK,"Back",0,0);
 
 #ifndef GP2X
   if(use_joystick)
@@ -1216,6 +1230,15 @@ st_gamepad_select(int device_index)
 /* Handle changes made to global settings in the options menu. */
 void process_options_menu(void)
 {
+  if (Menu::current() == options_touch_menu)
+    {
+      int id = options_touch_menu->check();
+      if (id == MNID_TOUCH_SCHEME)
+        touch_controls_set_scheme(0);
+      else if (id == MNID_TOUCH_SCHEME + 1)
+        touch_controls_set_scheme(1);
+      return;
+    }
 #ifdef USE_SDL2
   {
     static Menu* last_options_cur = 0;

@@ -52,12 +52,28 @@ static TcButton tc_btn[TC_COUNT];
 static bool tc_inited_layout = false;
 static int tc_layout_ww = 0;
 static int tc_layout_wh = 0;
-/* Sticky Both: once a finger swipes Action→Both, stay on Both until the
-   finger moves well into the lower Action zone (hysteresis / Fitts). */
+/* Sticky Both: Action→Both swipe stays until deep in lower Action. */
 static bool tc_sticky_both = false;
-/* Sticky d-pad direction (TC_LEFT..TC_DOWN, or -1). Outer-edge slack only;
-   the cross centre gap clears sticky so the player can stop without lift. */
+/* Sticky d-pad: outer edges keep direction; only centre dead-zone or lift
+   releases (fat-finger / drift tolerance — industry virtual-pad practice). */
 static int tc_sticky_dpad = -1;
+/* Sticky face: Jump / Action stay held while finger drifts nearby. */
+static bool tc_sticky_jump = false;
+static bool tc_sticky_action = false;
+
+/* 0 = virtual pad (buttons), 1 = half-screen zones (claw-friendly). */
+static int tc_scheme = 0;
+
+#ifdef USE_SDL2
+static SDL_FingerID tc_zone_move_finger = (SDL_FingerID)-1;
+static SDL_FingerID tc_zone_face_finger = (SDL_FingerID)-1;
+#else
+static int tc_zone_move_finger = -1;
+static int tc_zone_face_finger = -1;
+#endif
+static int tc_zone_ox = 0, tc_zone_oy = 0;
+static bool tc_zone_move_active = false;
+static bool tc_zone_face_active = false;
 
 /* Default content margins when the pad is enabled (fractions of window). */
 static const float TC_MARGIN_L = 0.11f;
@@ -184,6 +200,30 @@ bool touch_controls_is_enabled(void)
   return tc_enabled;
 }
 
+int touch_controls_get_scheme(void)
+{
+  return tc_scheme;
+}
+
+void touch_controls_set_scheme(int scheme)
+{
+  if (scheme < 0) scheme = 0;
+  if (scheme > 1) scheme = 1;
+  if (scheme == tc_scheme)
+    return;
+  tc_scheme = scheme;
+  touch_controls_reset();
+  /* Zones need almost no side chrome; pad keeps classic margins. */
+  if (tc_enabled)
+    {
+      if (tc_scheme == 1)
+        platform_set_content_margins(0.04f, 0.04f, 0.04f, 0.06f);
+      else
+        platform_set_content_margins(TC_MARGIN_L, TC_MARGIN_R,
+                                     TC_MARGIN_T, TC_MARGIN_B);
+    }
+}
+
 void touch_controls_reset(void)
 {
   if (!tc_inited_layout)
@@ -196,6 +236,17 @@ void touch_controls_reset(void)
     }
   tc_sticky_both = false;
   tc_sticky_dpad = -1;
+  tc_sticky_jump = false;
+  tc_sticky_action = false;
+  tc_zone_move_active = false;
+  tc_zone_face_active = false;
+  #ifdef USE_SDL2
+  tc_zone_move_finger = (SDL_FingerID)-1;
+  tc_zone_face_finger = (SDL_FingerID)-1;
+#else
+  tc_zone_move_finger = -1;
+  tc_zone_face_finger = -1;
+#endif
 }
 
 static int
@@ -210,21 +261,26 @@ tc_hit_raw(int x, int y)
   return -1;
 }
 
-/* Hit-test with Action/Both hysteresis: once sticky, stay on Both until the
-   finger is clearly in the lower 2/3 of Action (or leaves the column). */
+/* Pad hit-test with strong hold hysteresis (virtual gamepad practice):
+ *  - Enter a direction/button on the visual cell.
+ *  - Stay held while the finger drifts; outer edges keep the hold.
+ *  - D-pad: only the cross *centre* dead-zone (or lift) releases.
+ *  - Jump/Action: expanded sticky rect until neutral gap or lift. */
 static int
 tc_hit(int x, int y)
 {
   const TcButton& act = tc_btn[TC_ACTION];
   const TcButton& both = tc_btn[TC_BOTH];
-  bool in_col = (x >= act.x && x < act.x + act.w
-                 && y >= both.y && y < act.y + act.h);
+  const TcButton& jmp = tc_btn[TC_JUMP];
+
+  /* --- Action / Both column --- */
+  int col_L = act.x - act.w / 4;
+  int col_R = act.x + act.w + act.w / 4;
+  bool in_col = (x >= col_L && x < col_R
+                 && y >= both.y - both.h / 4 && y < act.y + act.h + act.h / 4);
 
   if (in_col)
     {
-      /* Shared edge is act.y (Both bottom == Action top). Hysteresis:
-         enter Both as soon as y crosses above the edge; leave Both only
-         when deep in the lower part of Action — never a dead band. */
       int enter_both_y = act.y;
       int leave_both_y = act.y + (act.h * 3) / 4;
 
@@ -239,20 +295,66 @@ tc_hit(int x, int y)
         }
 
       if (tc_sticky_both || y < enter_both_y)
-        return TC_BOTH;
+        {
+          tc_sticky_action = true;
+          return TC_BOTH;
+        }
+      tc_sticky_action = true;
       return TC_ACTION;
     }
 
-  /* Outside the column: clear sticky so a new press starts fresh. */
-  if (!(x >= act.x && x < act.x + act.w))
-    tc_sticky_both = false;
+  if (!(x >= act.x - act.w / 2 && x < act.x + act.w + act.w / 2))
+    {
+      tc_sticky_both = false;
+      /* Keep sticky_action if still near Action after drift — handled below. */
+    }
+
+  /* --- Sticky Jump: large expand while held; only leaves far away --- */
+  if (tc_sticky_jump)
+    {
+      int exp = jmp.w; /* full button size of slack */
+      if (exp < 48) exp = 48;
+      int L = jmp.x - exp, R = jmp.x + jmp.w + exp;
+      int T = jmp.y - exp, B = jmp.y + jmp.h + exp;
+      /* Do not steal the Action column while sticky jump. */
+      if (x >= L && x < R && y >= T && y < B
+          && !(x >= col_L && x < col_R && y >= both.y && y < act.y + act.h))
+        return TC_JUMP;
+      tc_sticky_jump = false;
+    }
+
+  /* --- Sticky Action alone (not in Both column path) --- */
+  if (tc_sticky_action && !tc_sticky_both)
+    {
+      int exp = act.w;
+      if (exp < 48) exp = 48;
+      int L = act.x - exp / 2, R = act.x + act.w + exp;
+      int T = act.y - exp / 2, B = act.y + act.h + exp / 2;
+      if (x >= L && x < R && y >= T && y < B)
+        return TC_ACTION;
+      tc_sticky_action = false;
+    }
 
   int hit = tc_hit_raw(x, y);
 
-  /* D-pad: once a direction is pressed, expand its hit zone *outward*
-     only so sliding further past the outer edge keeps the direction.
-     Do not claim the cross centre gap — that must remain a release
-     zone (finger back to centre = stop). */
+  if (hit == TC_JUMP)
+    {
+      tc_sticky_jump = true;
+      return TC_JUMP;
+    }
+  if (hit == TC_ACTION)
+    {
+      tc_sticky_action = true;
+      return TC_ACTION;
+    }
+  if (hit == TC_BOTH)
+    {
+      tc_sticky_both = true;
+      tc_sticky_action = true;
+      return TC_BOTH;
+    }
+
+  /* --- D-pad: enter on cell; sticky expands outward a lot; centre releases --- */
   if (hit >= TC_LEFT && hit <= TC_DOWN)
     {
       tc_sticky_dpad = hit;
@@ -261,41 +363,67 @@ tc_hit(int x, int y)
 
   if (tc_sticky_dpad >= TC_LEFT && tc_sticky_dpad <= TC_DOWN)
     {
+      const TcButton& Lbtn = tc_btn[TC_LEFT];
+      const TcButton& Rbtn = tc_btn[TC_RIGHT];
+      const TcButton& Ubtn = tc_btn[TC_UP];
+      const TcButton& Dbtn = tc_btn[TC_DOWN];
+      /* Cross centre = gap between the four arms (stop zone). */
+      int cx0 = Lbtn.x + Lbtn.w;
+      int cx1 = Rbtn.x;
+      int cy0 = Ubtn.y + Ubtn.h;
+      int cy1 = Dbtn.y;
+      if (cx1 < cx0) { int t = cx0; cx0 = cx1; cx1 = t; }
+      if (cy1 < cy0) { int t = cy0; cy0 = cy1; cy1 = t; }
+      /* Slightly enlarge the dead zone so "return to centre" is easy. */
+      int pad = (cx1 - cx0) / 4;
+      if (pad < 8) pad = 8;
+      if (x >= cx0 - pad && x < cx1 + pad && y >= cy0 - pad && y < cy1 + pad)
+        {
+          tc_sticky_dpad = -1;
+          return -1;
+        }
+
+      /* Huge outward sticky region so sliding off the outer edge keeps hold. */
       const TcButton& b = tc_btn[tc_sticky_dpad];
-      int expand = b.w / 2; /* modest outward slack */
-      if (expand < 24) expand = 24;
-      if (expand > 64) expand = 64;
-      int cross = expand / 3; /* slight cross-axis fat-finger room */
-      int L = b.x, R = b.x + b.w, T = b.y, B = b.y + b.h;
+      int expand = b.w * 2;
+      if (expand < 80) expand = 80;
+      if (expand > 200) expand = 200;
+      int cross = b.h; /* generous vertical/horizontal fat-finger room */
+      int L = b.x, R = b.x + b.w, T = b.y, Btm = b.y + b.h;
       if (tc_sticky_dpad == TC_LEFT)
         {
           L -= expand;
           T -= cross;
-          B += cross;
-          /* R stays at original inner edge — centre gap is free */
+          Btm += cross;
+          /* Inner edge stays short of centre gap */
+          R = cx0 - pad;
         }
       else if (tc_sticky_dpad == TC_RIGHT)
         {
           R += expand;
           T -= cross;
-          B += cross;
+          Btm += cross;
+          L = cx1 + pad;
         }
       else if (tc_sticky_dpad == TC_UP)
         {
           T -= expand;
           L -= cross;
           R += cross;
+          Btm = cy0 - pad;
         }
-      else /* TC_DOWN */
+      else
         {
-          B += expand;
+          Btm += expand;
           L -= cross;
           R += cross;
+          T = cy1 + pad;
         }
 
-      if (x >= L && x < R && y >= T && y < B)
+      if (x >= L && x < R && y >= T && y < Btm)
         return tc_sticky_dpad;
 
+      /* Far away: drop sticky */
       tc_sticky_dpad = -1;
     }
 
@@ -431,7 +559,11 @@ tc_release_finger(TcFingerId finger)
         }
     }
   if (owned_face)
-    tc_sticky_both = false;
+    {
+      tc_sticky_both = false;
+      tc_sticky_jump = false;
+      tc_sticky_action = false;
+    }
   if (owned_dpad)
     tc_sticky_dpad = -1;
 }
@@ -470,12 +602,184 @@ tc_move_finger(TcFingerId finger, int x, int y)
     }
 }
 
+
+/* ---- Zones scheme (half-screen, claw-friendly) -------------------------
+ * Left half: floating stick from touch origin (Suzy Cube / floating VPad).
+ * Right half: Jump (upper) / Action (lower) / Both (middle strip).
+ * Two fingers work independently — classic claw grip.
+ */
+static void
+tc_zone_clear_dirs(void)
+{
+  for (int i = TC_LEFT; i <= TC_DOWN; ++i)
+    {
+      tc_btn[i].held = false;
+      tc_btn[i].has_finger = false;
+    }
+}
+
+static void
+tc_zone_apply_move(int x, int y)
+{
+  tc_zone_clear_dirs();
+  int dx = x - tc_zone_ox;
+  int dy = y - tc_zone_oy;
+  int dead = tc_layout_wh / 20;
+  if (dead < 18) dead = 18;
+  if (dead > 40) dead = 40;
+  int adx = dx < 0 ? -dx : dx;
+  int ady = dy < 0 ? -dy : dy;
+  if (adx < dead && ady < dead)
+    return;
+  /* 4-way exclusive: dominant axis wins (platformer-friendly). */
+  if (adx >= ady)
+    {
+      if (dx < 0)
+        { tc_btn[TC_LEFT].held = true; tc_btn[TC_LEFT].has_finger = true; }
+      else
+        { tc_btn[TC_RIGHT].held = true; tc_btn[TC_RIGHT].has_finger = true; }
+    }
+  else
+    {
+      if (dy < 0)
+        { tc_btn[TC_UP].held = true; tc_btn[TC_UP].has_finger = true; }
+      else
+        { tc_btn[TC_DOWN].held = true; tc_btn[TC_DOWN].has_finger = true; }
+    }
+}
+
+static void
+tc_zone_apply_face(int y)
+{
+  tc_btn[TC_JUMP].held = false;
+  tc_btn[TC_JUMP].has_finger = false;
+  tc_btn[TC_ACTION].held = false;
+  tc_btn[TC_ACTION].has_finger = false;
+  tc_btn[TC_BOTH].held = false;
+  tc_btn[TC_BOTH].has_finger = false;
+  /* Upper third = jump, lower third = action, middle = both (run+jump). */
+  int top = tc_layout_wh / 6;
+  int bot = tc_layout_wh - tc_layout_wh / 6;
+  int mid0 = tc_layout_wh * 2 / 5;
+  int mid1 = tc_layout_wh * 3 / 5;
+  if (y < mid0)
+    {
+      tc_btn[TC_JUMP].held = true;
+      tc_btn[TC_JUMP].has_finger = true;
+    }
+  else if (y > mid1)
+    {
+      tc_btn[TC_ACTION].held = true;
+      tc_btn[TC_ACTION].has_finger = true;
+    }
+  else
+    {
+      tc_btn[TC_BOTH].held = true;
+      tc_btn[TC_BOTH].has_finger = true;
+    }
+  (void)top; (void)bot;
+}
+
+static bool
+tc_zone_event(const SDL_Event& event)
+{
+#ifdef USE_SDL2
+  switch (event.type)
+    {
+    case SDL_FINGERDOWN:
+      {
+        int wx, wy;
+        tc_event_to_window(event.tfinger.x, event.tfinger.y, &wx, &wy);
+        /* Menu stays a real button in the top-left. */
+        if (tc_hit_raw(wx, wy) == TC_MENU)
+          {
+            tc_press(TC_MENU, event.tfinger.fingerId);
+            return true;
+          }
+        if (wx < tc_layout_ww / 2)
+          {
+            tc_zone_move_finger = event.tfinger.fingerId;
+            tc_zone_ox = wx;
+            tc_zone_oy = wy;
+            tc_zone_move_active = true;
+            tc_zone_apply_move(wx, wy);
+            return true;
+          }
+        tc_zone_face_finger = event.tfinger.fingerId;
+        tc_zone_face_active = true;
+        tc_zone_apply_face(wy);
+        return true;
+      }
+    case SDL_FINGERMOTION:
+      {
+        int wx, wy;
+        tc_event_to_window(event.tfinger.x, event.tfinger.y, &wx, &wy);
+        if (tc_zone_move_active && event.tfinger.fingerId == tc_zone_move_finger)
+          {
+            tc_zone_apply_move(wx, wy);
+            return true;
+          }
+        if (tc_zone_face_active && event.tfinger.fingerId == tc_zone_face_finger)
+          {
+            tc_zone_apply_face(wy);
+            return true;
+          }
+        /* Menu drag */
+        if (tc_btn[TC_MENU].has_finger
+            && tc_btn[TC_MENU].finger == event.tfinger.fingerId)
+          {
+            tc_move_finger(event.tfinger.fingerId, wx, wy);
+            return true;
+          }
+      }
+      break;
+    case SDL_FINGERUP:
+      {
+        if (tc_zone_move_active && event.tfinger.fingerId == tc_zone_move_finger)
+          {
+            tc_zone_move_active = false;
+            tc_zone_move_finger = (SDL_FingerID)-1;
+            tc_zone_clear_dirs();
+            return true;
+          }
+        if (tc_zone_face_active && event.tfinger.fingerId == tc_zone_face_finger)
+          {
+            tc_zone_face_active = false;
+            tc_zone_face_finger = (SDL_FingerID)-1;
+            tc_btn[TC_JUMP].held = false;
+            tc_btn[TC_JUMP].has_finger = false;
+            tc_btn[TC_ACTION].held = false;
+            tc_btn[TC_ACTION].has_finger = false;
+            tc_btn[TC_BOTH].held = false;
+            tc_btn[TC_BOTH].has_finger = false;
+            return true;
+          }
+        if (tc_btn[TC_MENU].has_finger
+            && tc_btn[TC_MENU].finger == event.tfinger.fingerId)
+          {
+            tc_release_finger(event.tfinger.fingerId);
+            return true;
+          }
+      }
+      break;
+    default:
+      break;
+    }
+#else
+  (void)event;
+#endif
+  return false;
+}
+
 bool touch_controls_event(const SDL_Event& event)
 {
   if (!tc_enabled)
     return false;
 
   tc_ensure_layout();
+  if (tc_scheme == 1)
+    return tc_zone_event(event);
+
 
 #ifdef USE_SDL2
   switch (event.type)
@@ -689,6 +993,28 @@ void touch_controls_draw(void)
     return;
 
   tc_ensure_layout();
+
+  /* Zones: light half-screen guides + menu only (no full virtual pad). */
+  if (tc_scheme == 1)
+    {
+      int ww = tc_layout_ww, wh = tc_layout_wh;
+      platform_overlay_begin();
+      platform_overlay_fillrect(0, 0, ww / 2, wh, 40, 60, 90, 28);
+      platform_overlay_fillrect(ww / 2, 0, ww - ww / 2, wh, 90, 50, 40, 28);
+      /* Split lines for face thirds */
+      int mid0 = wh * 2 / 5, mid1 = wh * 3 / 5;
+      platform_overlay_fillrect(ww / 2, mid0, ww / 2, 2, 255, 255, 255, 40);
+      platform_overlay_fillrect(ww / 2, mid1, ww / 2, 2, 255, 255, 255, 40);
+      /* Menu button only */
+      {
+        int alpha = tc_btn[TC_MENU].held ? 230 : 160;
+        platform_overlay_fillrect(tc_btn[TC_MENU].x, tc_btn[TC_MENU].y,
+                                  tc_btn[TC_MENU].w, tc_btn[TC_MENU].h,
+                                  60, 60, 180, alpha);
+      }
+      platform_overlay_end();
+      return;
+    }
 
   int ww = ST_SCREEN_W, wh = ST_SCREEN_H;
   platform_get_window_size(&ww, &wh);
