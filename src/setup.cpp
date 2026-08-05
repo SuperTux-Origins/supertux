@@ -976,11 +976,11 @@ void st_menu(void)
   options_touch_menu->additem(MN_HL,"",0,0);
   options_touch_menu->additem(MN_DEACTIVE,"Scheme:",0,0);
   options_touch_menu->additem(MN_ACTION,"Virtual Pad",0,0, MNID_TOUCH_SCHEME);
-  options_touch_menu->additem(MN_ACTION,"Screen Zones",0,0, MNID_TOUCH_SCHEME + 1);
+  options_touch_menu->additem(MN_ACTION,"Side Panels",0,0, MNID_TOUCH_SCHEME + 1);
   options_touch_menu->additem(MN_HL,"",0,0);
-  options_touch_menu->additem(MN_DEACTIVE,"Pad: buttons + sticky hold",0,0);
-  options_touch_menu->additem(MN_DEACTIVE,"Zones: L=move R=jump/run",0,0);
-  options_touch_menu->additem(MN_DEACTIVE,"(claw: two thumbs)",0,0);
+  options_touch_menu->additem(MN_DEACTIVE,"Pad: virtual buttons",0,0);
+  options_touch_menu->additem(MN_DEACTIVE,"Sides: L/R walk alone",0,0);
+  options_touch_menu->additem(MN_DEACTIVE,"Both: L=jump R=run",0,0);
   options_touch_menu->additem(MN_HL,"",0,0);
   options_touch_menu->additem(MN_BACK,"Back",0,0);
 

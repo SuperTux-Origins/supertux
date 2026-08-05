@@ -61,19 +61,20 @@ static int tc_sticky_dpad = -1;
 static bool tc_sticky_jump = false;
 static bool tc_sticky_action = false;
 
-/* 0 = virtual pad (buttons), 1 = half-screen zones (claw-friendly). */
+/* 0 = virtual pad (buttons), 1 = left/right side panels. */
 static int tc_scheme = 0;
 
+/* Scheme 1: one finger on a half = walk that way; both halves held =
+   left half → jump, right half → run/action (no walk from those holds). */
 #ifdef USE_SDL2
-static SDL_FingerID tc_zone_move_finger = (SDL_FingerID)-1;
-static SDL_FingerID tc_zone_face_finger = (SDL_FingerID)-1;
+static SDL_FingerID tc_side_left_finger = (SDL_FingerID)-1;
+static SDL_FingerID tc_side_right_finger = (SDL_FingerID)-1;
 #else
-static int tc_zone_move_finger = -1;
-static int tc_zone_face_finger = -1;
+static int tc_side_left_finger = -1;
+static int tc_side_right_finger = -1;
 #endif
-static int tc_zone_ox = 0, tc_zone_oy = 0;
-static bool tc_zone_move_active = false;
-static bool tc_zone_face_active = false;
+static bool tc_side_left_down = false;
+static bool tc_side_right_down = false;
 
 /* Default content margins when the pad is enabled (fractions of window). */
 static const float TC_MARGIN_L = 0.11f;
@@ -238,14 +239,14 @@ void touch_controls_reset(void)
   tc_sticky_dpad = -1;
   tc_sticky_jump = false;
   tc_sticky_action = false;
-  tc_zone_move_active = false;
-  tc_zone_face_active = false;
-  #ifdef USE_SDL2
-  tc_zone_move_finger = (SDL_FingerID)-1;
-  tc_zone_face_finger = (SDL_FingerID)-1;
+  tc_side_left_down = false;
+  tc_side_right_down = false;
+#ifdef USE_SDL2
+  tc_side_left_finger = (SDL_FingerID)-1;
+  tc_side_right_finger = (SDL_FingerID)-1;
 #else
-  tc_zone_move_finger = -1;
-  tc_zone_face_finger = -1;
+  tc_side_left_finger = -1;
+  tc_side_right_finger = -1;
 #endif
 }
 
@@ -603,15 +604,16 @@ tc_move_finger(TcFingerId finger, int x, int y)
 }
 
 
-/* ---- Zones scheme (half-screen, claw-friendly) -------------------------
- * Left half: floating stick from touch origin (Suzy Cube / floating VPad).
- * Right half: Jump (upper) / Action (lower) / Both (middle strip).
- * Two fingers work independently — classic claw grip.
+/* ---- Side panels (scheme 1) -------------------------------------------
+ * Left half of the screen  = walk left when alone.
+ * Right half of the screen = walk right when alone.
+ * Both halves held: left finger = Jump, right finger = Run/Action.
+ * Menu button stays top-left.
  */
 static void
-tc_zone_clear_dirs(void)
+tc_sides_clear_play(void)
 {
-  for (int i = TC_LEFT; i <= TC_DOWN; ++i)
+  for (int i = TC_LEFT; i <= TC_BOTH; ++i)
     {
       tc_btn[i].held = false;
       tc_btn[i].has_finger = false;
@@ -619,69 +621,31 @@ tc_zone_clear_dirs(void)
 }
 
 static void
-tc_zone_apply_move(int x, int y)
+tc_sides_recompute(void)
 {
-  tc_zone_clear_dirs();
-  int dx = x - tc_zone_ox;
-  int dy = y - tc_zone_oy;
-  int dead = tc_layout_wh / 20;
-  if (dead < 18) dead = 18;
-  if (dead > 40) dead = 40;
-  int adx = dx < 0 ? -dx : dx;
-  int ady = dy < 0 ? -dy : dy;
-  if (adx < dead && ady < dead)
-    return;
-  /* 4-way exclusive: dominant axis wins (platformer-friendly). */
-  if (adx >= ady)
+  tc_sides_clear_play();
+  if (tc_side_left_down && tc_side_right_down)
     {
-      if (dx < 0)
-        { tc_btn[TC_LEFT].held = true; tc_btn[TC_LEFT].has_finger = true; }
-      else
-        { tc_btn[TC_RIGHT].held = true; tc_btn[TC_RIGHT].has_finger = true; }
-    }
-  else
-    {
-      if (dy < 0)
-        { tc_btn[TC_UP].held = true; tc_btn[TC_UP].has_finger = true; }
-      else
-        { tc_btn[TC_DOWN].held = true; tc_btn[TC_DOWN].has_finger = true; }
-    }
-}
-
-static void
-tc_zone_apply_face(int y)
-{
-  tc_btn[TC_JUMP].held = false;
-  tc_btn[TC_JUMP].has_finger = false;
-  tc_btn[TC_ACTION].held = false;
-  tc_btn[TC_ACTION].has_finger = false;
-  tc_btn[TC_BOTH].held = false;
-  tc_btn[TC_BOTH].has_finger = false;
-  /* Upper third = jump, lower third = action, middle = both (run+jump). */
-  int top = tc_layout_wh / 6;
-  int bot = tc_layout_wh - tc_layout_wh / 6;
-  int mid0 = tc_layout_wh * 2 / 5;
-  int mid1 = tc_layout_wh * 3 / 5;
-  if (y < mid0)
-    {
+      /* Chord: sides become face buttons, not directions. */
       tc_btn[TC_JUMP].held = true;
       tc_btn[TC_JUMP].has_finger = true;
-    }
-  else if (y > mid1)
-    {
       tc_btn[TC_ACTION].held = true;
       tc_btn[TC_ACTION].has_finger = true;
     }
-  else
+  else if (tc_side_left_down)
     {
-      tc_btn[TC_BOTH].held = true;
-      tc_btn[TC_BOTH].has_finger = true;
+      tc_btn[TC_LEFT].held = true;
+      tc_btn[TC_LEFT].has_finger = true;
     }
-  (void)top; (void)bot;
+  else if (tc_side_right_down)
+    {
+      tc_btn[TC_RIGHT].held = true;
+      tc_btn[TC_RIGHT].has_finger = true;
+    }
 }
 
 static bool
-tc_zone_event(const SDL_Event& event)
+tc_sides_event(const SDL_Event& event)
 {
 #ifdef USE_SDL2
   switch (event.type)
@@ -690,7 +654,6 @@ tc_zone_event(const SDL_Event& event)
       {
         int wx, wy;
         tc_event_to_window(event.tfinger.x, event.tfinger.y, &wx, &wy);
-        /* Menu stays a real button in the top-left. */
         if (tc_hit_raw(wx, wy) == TC_MENU)
           {
             tc_press(TC_MENU, event.tfinger.fingerId);
@@ -698,66 +661,71 @@ tc_zone_event(const SDL_Event& event)
           }
         if (wx < tc_layout_ww / 2)
           {
-            tc_zone_move_finger = event.tfinger.fingerId;
-            tc_zone_ox = wx;
-            tc_zone_oy = wy;
-            tc_zone_move_active = true;
-            tc_zone_apply_move(wx, wy);
-            return true;
+            tc_side_left_finger = event.tfinger.fingerId;
+            tc_side_left_down = true;
           }
-        tc_zone_face_finger = event.tfinger.fingerId;
-        tc_zone_face_active = true;
-        tc_zone_apply_face(wy);
+        else
+          {
+            tc_side_right_finger = event.tfinger.fingerId;
+            tc_side_right_down = true;
+          }
+        tc_sides_recompute();
         return true;
       }
     case SDL_FINGERMOTION:
       {
         int wx, wy;
         tc_event_to_window(event.tfinger.x, event.tfinger.y, &wx, &wy);
-        if (tc_zone_move_active && event.tfinger.fingerId == tc_zone_move_finger)
-          {
-            tc_zone_apply_move(wx, wy);
-            return true;
-          }
-        if (tc_zone_face_active && event.tfinger.fingerId == tc_zone_face_finger)
-          {
-            tc_zone_apply_face(wy);
-            return true;
-          }
-        /* Menu drag */
         if (tc_btn[TC_MENU].has_finger
             && tc_btn[TC_MENU].finger == event.tfinger.fingerId)
           {
             tc_move_finger(event.tfinger.fingerId, wx, wy);
             return true;
           }
+        /* Allow sliding across the midline to re-assign the side. */
+        if (event.tfinger.fingerId == tc_side_left_finger
+            || event.tfinger.fingerId == tc_side_right_finger)
+          {
+            bool want_left = (wx < tc_layout_ww / 2);
+            if (event.tfinger.fingerId == tc_side_left_finger && !want_left)
+              {
+                tc_side_left_down = false;
+                tc_side_left_finger = (SDL_FingerID)-1;
+                tc_side_right_finger = event.tfinger.fingerId;
+                tc_side_right_down = true;
+              }
+            else if (event.tfinger.fingerId == tc_side_right_finger && want_left)
+              {
+                tc_side_right_down = false;
+                tc_side_right_finger = (SDL_FingerID)-1;
+                tc_side_left_finger = event.tfinger.fingerId;
+                tc_side_left_down = true;
+              }
+            tc_sides_recompute();
+            return true;
+          }
       }
       break;
     case SDL_FINGERUP:
       {
-        if (tc_zone_move_active && event.tfinger.fingerId == tc_zone_move_finger)
-          {
-            tc_zone_move_active = false;
-            tc_zone_move_finger = (SDL_FingerID)-1;
-            tc_zone_clear_dirs();
-            return true;
-          }
-        if (tc_zone_face_active && event.tfinger.fingerId == tc_zone_face_finger)
-          {
-            tc_zone_face_active = false;
-            tc_zone_face_finger = (SDL_FingerID)-1;
-            tc_btn[TC_JUMP].held = false;
-            tc_btn[TC_JUMP].has_finger = false;
-            tc_btn[TC_ACTION].held = false;
-            tc_btn[TC_ACTION].has_finger = false;
-            tc_btn[TC_BOTH].held = false;
-            tc_btn[TC_BOTH].has_finger = false;
-            return true;
-          }
         if (tc_btn[TC_MENU].has_finger
             && tc_btn[TC_MENU].finger == event.tfinger.fingerId)
           {
             tc_release_finger(event.tfinger.fingerId);
+            return true;
+          }
+        if (event.tfinger.fingerId == tc_side_left_finger)
+          {
+            tc_side_left_down = false;
+            tc_side_left_finger = (SDL_FingerID)-1;
+            tc_sides_recompute();
+            return true;
+          }
+        if (event.tfinger.fingerId == tc_side_right_finger)
+          {
+            tc_side_right_down = false;
+            tc_side_right_finger = (SDL_FingerID)-1;
+            tc_sides_recompute();
             return true;
           }
       }
@@ -778,7 +746,7 @@ bool touch_controls_event(const SDL_Event& event)
 
   tc_ensure_layout();
   if (tc_scheme == 1)
-    return tc_zone_event(event);
+    return tc_sides_event(event);
 
 
 #ifdef USE_SDL2
@@ -994,18 +962,16 @@ void touch_controls_draw(void)
 
   tc_ensure_layout();
 
-  /* Zones: light half-screen guides + menu only (no full virtual pad). */
+  /* Side panels: left = ← / Jump, right = → / Run when both held. */
   if (tc_scheme == 1)
     {
       int ww = tc_layout_ww, wh = tc_layout_wh;
       platform_overlay_begin();
-      platform_overlay_fillrect(0, 0, ww / 2, wh, 40, 60, 90, 28);
-      platform_overlay_fillrect(ww / 2, 0, ww - ww / 2, wh, 90, 50, 40, 28);
-      /* Split lines for face thirds */
-      int mid0 = wh * 2 / 5, mid1 = wh * 3 / 5;
-      platform_overlay_fillrect(ww / 2, mid0, ww / 2, 2, 255, 255, 255, 40);
-      platform_overlay_fillrect(ww / 2, mid1, ww / 2, 2, 255, 255, 255, 40);
-      /* Menu button only */
+      int la = tc_side_left_down ? 70 : 28;
+      int ra = tc_side_right_down ? 70 : 28;
+      platform_overlay_fillrect(0, 0, ww / 2, wh, 40, 80, 140, la);
+      platform_overlay_fillrect(ww / 2, 0, ww - ww / 2, wh, 140, 70, 40, ra);
+      platform_overlay_fillrect(ww / 2 - 1, 0, 2, wh, 255, 255, 255, 50);
       {
         int alpha = tc_btn[TC_MENU].held ? 230 : 160;
         platform_overlay_fillrect(tc_btn[TC_MENU].x, tc_btn[TC_MENU].y,
