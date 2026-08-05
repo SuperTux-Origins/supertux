@@ -1203,6 +1203,13 @@ Menu::event(SDL_Event& event)
          without a #ifdef (enum member is invisible to the preprocessor). */
       if (st_is_escape_key(key))
         {
+          if (control_bind_item >= 0)
+            {
+              control_bind_item = -1;
+              if (active_item >= 0 && active_item < (int)item.size())
+                get_controlfield_key_into_input(&item[active_item]);
+              break;
+            }
           Menu::pop_current();
           break;
         }
@@ -1365,15 +1372,9 @@ Menu::event(SDL_Event& event)
         if (control_bind_item == active_item
             && Menu::current() == options_gamepad_menu)
           {
-            /* Waiting for a button: capture it (Menu/Start cancels). */
-            if (event.cbutton.button == (Uint8)gamecontroller_keymap.menu
-                || event.cbutton.button == SDL_CONTROLLER_BUTTON_START
-                || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
-              {
-                control_bind_item = -1;
-                get_controlfield_key_into_input(&item[active_item]);
-                return;
-              }
+            /* Waiting for a button: capture any button (incl. Start/Menu).
+               Cancel rebind with keyboard Escape only — treating Start as
+               cancel made the Menu binding impossible to set or change. */
             if (!item[active_item].int_p)
               {
                 control_bind_item = -1;
@@ -1395,10 +1396,12 @@ Menu::event(SDL_Event& event)
                 control_bind_item = -1;
                 if (active_item >= 0 && active_item < (int)item.size())
                   get_controlfield_key_into_input(&item[active_item]);
+                st_gamepad_menu_ack();
                 return;
               }
             /* Same as Escape: close/pop this menu. */
             Menu::pop_current();
+            st_gamepad_menu_ack();
             return;
           }
         if (event.cbutton.button == (Uint8)gamecontroller_keymap.jump
@@ -1441,14 +1444,7 @@ Menu::event(SDL_Event& event)
             && control_bind_item == active_item
             && Menu::current() == options_gamepad_menu)
           {
-            if (cbtn == gamecontroller_keymap.menu
-                || cbtn == SDL_CONTROLLER_BUTTON_START
-                || cbtn == SDL_CONTROLLER_BUTTON_BACK)
-              {
-                control_bind_item = -1;
-                get_controlfield_key_into_input(&item[active_item]);
-                return;
-              }
+            /* Capture any mapped button (incl. Start/Menu). Esc cancels. */
             if (!item[active_item].int_p)
               {
                 control_bind_item = -1;
@@ -1467,9 +1463,11 @@ Menu::event(SDL_Event& event)
                 control_bind_item = -1;
                 if (active_item >= 0 && active_item < (int)item.size())
                   get_controlfield_key_into_input(&item[active_item]);
+                st_gamepad_menu_ack();
                 return;
               }
             Menu::pop_current();
+            st_gamepad_menu_ack();
             return;
           }
         if (cbtn == gamecontroller_keymap.jump

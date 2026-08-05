@@ -771,6 +771,13 @@ GameSession::process_events()
             }
         } /* while */
     }
+
+#ifdef USE_SDL2
+  /* Poll Menu/Start — CONTROLLERBUTTONDOWN is missing on some hosts; worldmap
+     already polls face buttons the same way for enter/walk. */
+  if (st_gamepad_menu_just_pressed())
+    on_escape_press();
+#endif
 }
 
 void

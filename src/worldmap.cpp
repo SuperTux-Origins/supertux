@@ -839,6 +839,12 @@ WorldMap::get_input()
           || touch_controls_just_pressed(6))
         enter_level = true;
     }
+
+#ifdef USE_SDL2
+  /* Poll Menu/Start (edge) even when CONTROLLERBUTTONDOWN is absent. */
+  if (st_gamepad_menu_just_pressed())
+    on_escape_press();
+#endif
 }
 
 

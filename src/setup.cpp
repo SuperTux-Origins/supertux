@@ -1831,6 +1831,36 @@ st_filter_event(SDL_Event& event, bool* want_escape)
 }
 
 #ifdef USE_SDL2
+static bool st_menu_btn_prev = false;
+
+bool
+st_gamepad_menu_just_pressed(void)
+{
+  if (!game_controller || !use_joystick)
+    return false;
+  bool now = SDL_GameControllerGetButton(
+      game_controller,
+      (SDL_GameControllerButton)gamecontroller_keymap.menu) != 0;
+  bool edge = now && !st_menu_btn_prev;
+  st_menu_btn_prev = now;
+  if (edge && verbose_mode)
+    st_vlog("[pad] menu button edge (poll) btn=%d\n",
+            gamecontroller_keymap.menu);
+  return edge;
+}
+
+void
+st_gamepad_menu_ack(void)
+{
+  /* Menu::event already closed/popped on this press — keep prev in sync with
+     the held button so the end-of-frame poll does not re-open the root menu. */
+  if (!game_controller || !use_joystick)
+    return;
+  st_menu_btn_prev = SDL_GameControllerGetButton(
+      game_controller,
+      (SDL_GameControllerButton)gamecontroller_keymap.menu) != 0;
+}
+
 void
 st_gamepad_process_device_event(const SDL_Event& event)
 {

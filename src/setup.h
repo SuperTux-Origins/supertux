@@ -43,6 +43,16 @@ void st_gamepad_select(int device_index);
  * (may still return false so the event is visible to the caller).
  */
 bool st_filter_event(SDL_Event& event, bool* want_escape);
+#ifdef USE_SDL2
+/**
+ * Edge-triggered GameController Menu binding (one frame).
+ * Prefer this over CONTROLLERBUTTONDOWN — some hosts only expose a reliable
+ * Menu/Start via SDL_GameControllerGetButton (same as worldmap axis poll).
+ */
+bool st_gamepad_menu_just_pressed(void);
+/** Call when Menu already handled Menu/Start this frame (avoids poll re-open). */
+void st_gamepad_menu_ack(void);
+#endif
 void st_shutdown(void);
 void st_menu(void);
 void st_abort(const std::string& reason, const std::string& details);
