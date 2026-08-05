@@ -965,6 +965,7 @@ GameSession::process_menu()
             }
         }
       else if(menu == options_menu
+               || menu == options_touch_menu
 #ifdef USE_SDL2
                || menu == options_gamepad_device_menu
 #endif
