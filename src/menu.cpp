@@ -684,6 +684,19 @@ Menu::action()
           break;
 
         case MN_ACTION:
+          /* Most actions are terminal (Quit, Credits, Abort Level, …) and
+             clear the menu stack so the caller can read check() and leave.
+             Select-Controller rows must stay open so the player can pick
+             another pad without falling through to “no menu” (title exit). */
+#ifdef USE_SDL2
+          if (item[active_item].id == MNID_GAMEPAD_NONE
+              || (item[active_item].id >= MNID_GAMEPAD_DEVICE_BASE
+                  && item[active_item].id < MNID_GAMEPAD_DEVICE_BASE + 64))
+            {
+              item[active_item].toggled = true;
+              break;
+            }
+#endif
           Menu::set_current(0);
           item[active_item].toggled = true;
           break;
