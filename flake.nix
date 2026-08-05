@@ -275,8 +275,10 @@
               includeEmulator = false;
               includeSources = false;
             }).androidsdk;
-            android = import ./nix/android.nix {
-              pkgs = androidPkgs;
+            gp2x = import ./nix/gp2x.nix {
+              inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config qemu file pkgsi686Linux bash binutils;
+            };
+            android = import ./nix/android.nix {              pkgs = androidPkgs;
               sdlSrc = sdl2-src;
               sdlVersion = "2.30.3";
               sdlMixerSrc = sdl2-mixer-src;
@@ -303,6 +305,12 @@
             };
           in {
             packages = {
+              open2x-sysroot = gp2x.open2xSysroot;
+              supertux-milestone1-gp2x = gp2x.mkSuperTuxGp2x {
+                src = lib.cleanSource ./.;
+                inherit version;
+                pname = "supertux-milestone1-gp2x";
+              };
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
                 appName = "supertux-milestone1";
@@ -361,6 +369,12 @@
               };
             };
             checks = {
+              open2x-sysroot = gp2x.open2xSysroot;
+              supertux-milestone1-gp2x = gp2x.mkSuperTuxGp2x {
+                src = lib.cleanSource ./.;
+                inherit version;
+                pname = "supertux-milestone1-gp2x";
+              };
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
                 appName = "supertux-milestone1";
@@ -513,6 +527,12 @@
               || ls ${packages.supertux-milestone1-wasm}/*.html >/dev/null
             ls ${packages.supertux-milestone1-wasm}/*.wasm >/dev/null
             ls ${packages.supertux-milestone1-wasm}/*.js >/dev/null
+          '';
+          sanity-gp2x = mkSanity "gp2x" packages.supertux-milestone1-gp2x ''
+            bin=${packages.supertux-milestone1-gp2x}/bin/supertux-milestone1.gpe
+            test -x "$bin"
+            file "$bin" | grep -qi 'ARM\|arm'
+            readelf -h "$bin" | grep -q 'soft'
           '';
         };
 

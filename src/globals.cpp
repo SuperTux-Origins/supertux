@@ -30,6 +30,9 @@ JoystickKeymap::JoystickKeymap()
   right_button = GP2X_BUTTON_RIGHT;
   volup_button  = GP2X_BUTTON_VOLUP;
   voldown_button = GP2X_BUTTON_VOLDOWN;
+  x_axis = 0;
+  y_axis = 1;
+  dead_zone = 4096;
 #endif
 }
 

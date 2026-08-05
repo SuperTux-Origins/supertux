@@ -4,8 +4,9 @@ This is the **primary reason** the tree still builds with **SDL 1.2**: both
 handhelds ship community firmwares that expose SDL 1.2 (not SDL2). Desktop
 defaults remain SDL2 via CMake; handheld targets force the SDL1 backend.
 
-Status: **documented + CMake/toolchain scaffolding**. A full device-tested
-binary still needs a host with the historical toolchain + libpack installed.
+Status: **CMake + flake target compile**. Cross-builds with the historical
+Open2x toolchain produce an ARM soft-float `.gpe`. Device smoke-test still
+needed on hardware.
 
 ---
 
@@ -205,3 +206,28 @@ Legacy configure shape:
 - Optional mikmod for `ENABLE_SOUND` under GP2X
 - `nix` package that only builds when a toolchain path is provided
 - Device smoke checklist (boot → title → level → volume keys)
+
+---
+
+## Nix flake (recommended)
+
+```bash
+nix build .#supertux-milestone1-gp2x
+# → result/bin/supertux-milestone1.gpe   (ARM soft-float ELF)
+# → result/share/supertux-milestone1/README-GP2X.txt
+```
+
+Supporting packages:
+
+| Attribute | Purpose |
+|-----------|---------|
+| `open2x-sysroot` | Open2x gcc-4.1.1 + libpack (SDL 1.2) |
+| `supertux-milestone1-gp2x` | Game binary `.gpe` + README |
+
+The flake downloads the Open2x toolchain and libpack from the nanard.free.fr
+mirrors (same hashes as the grafx2 install script). Host tools are **i686**;
+on x86_64 without IA32 emulation, wrappers use `qemu-i386`.
+
+Manual CMake path remains supported when `OPEN2X_ROOT` is already installed
+under `/opt/open2x/…`.
+

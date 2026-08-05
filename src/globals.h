@@ -57,6 +57,10 @@ struct JoystickKeymap
   int right_button;
   int volup_button;
   int voldown_button;
+  /* Present for shared menu/config paths; GP2X mainly uses D-pad buttons. */
+  int x_axis;
+  int y_axis;
+  int dead_zone;
 
   JoystickKeymap();
 #endif

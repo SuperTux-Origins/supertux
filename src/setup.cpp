@@ -79,6 +79,8 @@
 #endif
 
 #ifdef GP2X
+/* CMake may pass -DDATA_PREFIX=…; handheld layout is always relative data/. */
+#undef DATA_PREFIX
 #define DATA_PREFIX "data/"
 #endif
 

@@ -429,7 +429,10 @@ Primary reason SDL 1.2 remains supported. Details: `mk/gp2x/CROSSCOMPILE.md`.
 - [x] CMake `ENABLE_GP2X` / `ENABLE_RES320X240` + force SDL1 / no GL
 - [x] `OPEN2X_ROOT` / `OPENWIZ_ROOT` SDL 1.2 sysroot discovery
 - [x] Toolchain files `mk/gp2x/toolchain-open2x.cmake`, `toolchain-openwiz.cmake`
-- [ ] Device smoke test with real Open2x libpack on host
+- [x] Nix flake target `supertux-milestone1-gp2x` (Open2x toolchain + libpack fetch)
+- [x] CMake/Open2x link order (shared SDL preferred; static .gpe optional)
+- [x] GP2X JoystickKeymap: x/y/dead_zone for shared menu/config paths
+- [ ] Device smoke test on real GP2X hardware
 - [ ] Optional static `.gpe` link recipe (lib order: image, SDL, png, jpeg, z, pthread, m)
 - [ ] Optional mikmod when `ENABLE_SOUND=ON` under `GP2X`
 - [ ] Nix package gated on toolchain path (optional)
