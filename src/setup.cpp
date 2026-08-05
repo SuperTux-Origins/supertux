@@ -942,8 +942,6 @@ void st_menu(void)
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Right", 0,0, 0,&gamecontroller_keymap.right);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Up", 0,0, 0,&gamecontroller_keymap.up);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Down", 0,0, 0,&gamecontroller_keymap.duck);
-  options_gamepad_menu->additem(MN_TOGGLE,"Jump with Up",
-                                gamecontroller_keymap.jump_with_up, 0, MNID_JUMP_WITH_UP);
   options_gamepad_menu->additem(MN_HL,"",0,0);
   options_gamepad_menu->additem(MN_GOTO,"Analog Setup",0,options_gamepad_analog_menu);
   options_gamepad_menu->additem(MN_HL,"",0,0);
@@ -1095,22 +1093,9 @@ bool process_load_game_menu()
     }
 }
 
-/* Sync Gamepad Setup toggles into gamecontroller_keymap. */
-void process_gamepad_menu(void)
-{
-#ifdef USE_SDL2
-  if (options_gamepad_menu)
-    gamecontroller_keymap.jump_with_up =
-      options_gamepad_menu->isToggled(MNID_JUMP_WITH_UP);
-#else
-  /* no-op without SDL2 */
-#endif
-}
-
 /* Handle changes made to global settings in the options menu. */
 void process_options_menu(void)
 {
-  process_gamepad_menu();
   switch (options_menu->check())
     {
     case MNID_OPENGL:

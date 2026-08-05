@@ -502,9 +502,7 @@ GameSession::process_events()
                     break;
                   {
                     int b = (int)event.cbutton.button;
-                    if (b == gamecontroller_keymap.jump
-                        || (gamecontroller_keymap.jump_with_up
-                            && b == gamecontroller_keymap.up))
+                    if (b == gamecontroller_keymap.jump)
                       tux.input.up = DOWN;
                     if (b == gamecontroller_keymap.fire)
                       tux.input.fire = DOWN;
@@ -530,9 +528,7 @@ GameSession::process_events()
                     break;
                   {
                     int b = (int)event.cbutton.button;
-                    if (b == gamecontroller_keymap.jump
-                        || (gamecontroller_keymap.jump_with_up
-                            && b == gamecontroller_keymap.up))
+                    if (b == gamecontroller_keymap.jump)
                       tux.input.up = UP;
                     if (b == gamecontroller_keymap.fire)
                       tux.input.fire = UP;
@@ -861,13 +857,6 @@ GameSession::process_menu()
         {
           process_options_menu();
         }
-#ifdef USE_SDL2
-      else if(menu == options_gamepad_menu
-              || menu == options_gamepad_analog_menu)
-        {
-          process_gamepad_menu();
-        }
-#endif
       else if(menu == load_game_menu )
         {
           process_load_game_menu();

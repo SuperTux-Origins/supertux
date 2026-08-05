@@ -1017,13 +1017,6 @@ if (app_loop_active())
         {
           process_options_menu();
         }
-#ifdef USE_SDL2
-      else if(menu == options_gamepad_menu
-              || menu == options_gamepad_analog_menu)
-        {
-          process_gamepad_menu();
-        }
-#endif
     }
 }
 

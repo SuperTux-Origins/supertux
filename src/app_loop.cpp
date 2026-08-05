@@ -269,6 +269,11 @@ app_frame(void* /*arg*/)
     case APP_SCREEN_TITLE:
       if (title_frame())
         return;
+      /* title_frame may have switched to TEXT/CONFIRM (e.g. new-game
+         intro, credits, delete-slot). Do not steal into a pending
+         worldmap/session until that screen finishes. */
+      if (g_screen != APP_SCREEN_TITLE)
+        return;
       if (g_pending_worldmap)
         {
           app_activate_worldmap();
@@ -279,9 +284,7 @@ app_frame(void* /*arg*/)
           app_activate_session();
           return;
         }
-      /* Real quit (or switched to confirm/text mid-frame via request). */
-      if (g_screen != APP_SCREEN_TITLE)
-        return;
+      /* Real quit. */
       title_shutdown();
       g_screen = APP_SCREEN_DONE;
       g_app_active = false;

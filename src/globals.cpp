@@ -46,7 +46,6 @@ GameControllerKeymap::GameControllerKeymap()
   up       = SDL_CONTROLLER_BUTTON_DPAD_UP;
   menu     = SDL_CONTROLLER_BUTTON_START;
   analog_dead_zone = 16000;
-  jump_with_up = false;
 }
 GameControllerKeymap gamecontroller_keymap;
 #endif
