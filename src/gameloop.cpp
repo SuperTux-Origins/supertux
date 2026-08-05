@@ -899,8 +899,25 @@ GameSession::begin_run()
   SDL_Event event;
   while (SDL_PollEvent(&event)) {}
 
-  if (world)
-    draw();
+  if (!world)
+    return;
+
+  /* restart_level() often arms OVERLAY_INTRO before begin_run(). Drawing the
+     playfield here caused a one-frame blip of the level (worldmap → intro). */
+  if (overlay != OVERLAY_NONE)
+    {
+      if (overlay == OVERLAY_INTRO)
+        draw_levelintro();
+      else if (overlay == OVERLAY_ENDSCREEN)
+        draw_endscreen_content();
+      else if (overlay == OVERLAY_RESULT)
+        draw_resultscreen_content();
+      flipscreen();
+    }
+  else
+    {
+      draw();
+    }
 }
 
 GameSession::ExitStatus
@@ -1022,6 +1039,12 @@ GameSession::frame()
     {
       // Update the world
       check_end_conditions();
+      if (exit_status != ES_NONE)
+        return false;
+      /* Death restart / game-over may have armed an overlay this frame —
+         present it instead of one more playfield frame. */
+      if (overlay != OVERLAY_NONE)
+        return process_overlay();
       if (end_sequence == ENDSEQUENCE_RUNNING)
          action(frame_ratio/2);
       else if(end_sequence == NO_ENDSEQUENCE)

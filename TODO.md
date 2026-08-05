@@ -296,8 +296,8 @@ main WASM menu paths.
 
 ### Residual behaviour gaps (not freezes)
 
-1. **Level intro** (`GameSession::levelintro`) — `wait_for_event(1000, 3000)`
-   returns immediately under app_loop → one-frame flash.
+1. **Level intro** — frame-driven `OVERLAY_INTRO` (min 1s / max 3s). Fixed
+   playfield blip before intro (`begin_run` + mid-frame `restart_level`).
 2. **Game over / result screens** (`drawendscreen`, `drawresultscreen`) —
    same pattern with 2–5 s waits → instant flash.
 3. **Worldmap level extro + credits** — native path runs blocking
