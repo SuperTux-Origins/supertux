@@ -28,11 +28,45 @@ PlayerKeymap keymap;
 PlayerKeymap::PlayerKeymap()
 {
   keymap.jump  = SDLK_SPACE;
-  keymap.duck  = SDLK_DOWN;
-  keymap.up    = SDLK_UP;
+  keymap.fire  = SDLK_LCTRL;
+  keymap.menu  = SDLK_TAB;   /* optional Menu; Esc remains hardcoded */
   keymap.left  = SDLK_LEFT;
   keymap.right = SDLK_RIGHT;
-  keymap.fire  = SDLK_LCTRL;
+  keymap.up    = SDLK_UP;
+  keymap.duck  = SDLK_DOWN;
+}
+
+bool
+st_is_escape_key(SDLKey key)
+{
+  if (key == SDLK_ESCAPE)
+    return true;
+  /* Optional Menu binding (default Tab). */
+  if (keymap.menu != 0 && key == (SDLKey)keymap.menu)
+    return true;
+  /* Browser fullscreen often steals Esc; F1 remains a fixed alternate. */
+  if (key == SDLK_F1)
+    return true;
+#ifdef USE_SDL2
+  /* SDL_SCANCODE_AC_BACK = 270; keycode = scancode | (1<<30). */
+  if (key == (SDLKey)SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_BACK))
+    return true;
+#endif
+  return false;
+}
+
+bool
+st_is_escape_event(const SDL_Event& event)
+{
+  if (event.type != SDL_KEYDOWN)
+    return false;
+#ifdef USE_SDL2
+  if (event.key.repeat)
+    return false;
+  if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK)
+    return true;
+#endif
+  return st_is_escape_key(event.key.keysym.sym);
 }
 
 void player_input_init(player_input_type* pplayer_input)

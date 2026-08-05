@@ -82,37 +82,13 @@ inline bool st_key_held(const Uint8* keystate, SDL_Keycode key)
  * AC_BACK branch was compiled out — Back reached Menu::event (sym=
  * 1073742094) but matched no case and did nothing.
  */
-inline bool st_is_escape_key(SDL_Keycode key)
-{
-  if (key == SDLK_ESCAPE)
-    return true;
-  /* Browser fullscreen steals Esc; F1/Tab still open pause/worldmap menus. */
-  if (key == SDLK_F1 || key == SDLK_TAB)
-    return true;
-  /* SDL_SCANCODE_AC_BACK = 270; keycode = scancode | (1<<30). */
-  if (key == (SDL_Keycode)SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_BACK))
-    return true;
-  return false;
-}
-
 /**
- * Escape / menu keys — KEYDOWN only (one edge per physical press).
- * Includes Esc, F1, Tab (F1/Tab for browser fullscreen where Esc exits FS),
- * and Android Back (SDLK_AC_BACK / SDL_SCANCODE_AC_BACK when
- * SDL_HINT_ANDROID_TRAP_BACK_BUTTON is set before SDL_Init).
- * Matching KEYUP as well would toggle menus twice (KEYDOWN closes,
- * KEYUP opens again — looks like "Back does nothing").
+ * Escape / menu keys. Esc and Android Back are always active.
+ * Optional Menu binding is PlayerKeymap::menu (default Tab); implemented
+ * in player.cpp so it can read the live keymap.
  */
-inline bool st_is_escape_event(const SDL_Event& event)
-{
-  if (event.type != SDL_KEYDOWN)
-    return false;
-  if (event.key.repeat)
-    return false;
-  if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK)
-    return true;
-  return st_is_escape_key(event.key.keysym.sym);
-}
+bool st_is_escape_key(SDL_Keycode key);
+bool st_is_escape_event(const SDL_Event& event);
 
 /* Key-repeat / UNICODE: approximate no-ops under SDL2. */
 #ifndef SDL_DEFAULT_REPEAT_DELAY
@@ -216,15 +192,8 @@ inline bool st_key_held(const Uint8* keystate, SDLKey key)
   return keystate[(unsigned)key] != 0;
 }
 
-inline bool st_is_escape_key(SDLKey key)
-{
-  return key == SDLK_ESCAPE || key == SDLK_F1 || key == SDLK_TAB;
-}
-
-inline bool st_is_escape_event(const SDL_Event& event)
-{
-  return event.type == SDL_KEYDOWN && st_is_escape_key(event.key.keysym.sym);
-}
+bool st_is_escape_key(SDLKey key);
+bool st_is_escape_event(const SDL_Event& event);
 
 inline int st_set_color_key(SDL_Surface* surface, Uint32 flag, Uint32 key)
 {

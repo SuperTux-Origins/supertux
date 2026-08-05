@@ -38,12 +38,13 @@ struct PlayerKeymap
 {
 public:
   int jump;
-  int duck;   /* Down: duck in-level / worldmap south (menu label "Down") */
-  int up;     /* Worldmap north / menu-style up; not jump (Jump is separate) */
+  int fire;   /* Power/Run */
+  int menu;   /* Optional pause/menu (default Tab); Esc stays hardcoded */
   int left;
   int right;
-  int fire;
-  
+  int up;     /* Worldmap north / menu-style up; not jump (Jump is separate) */
+  int duck;   /* Down: duck in-level / worldmap south (menu label "Down") */
+
   PlayerKeymap();
 };
 

@@ -144,6 +144,7 @@ void loadconfig(void)
   reader.read_int ("keyboard-left", &keymap.left);
   reader.read_int ("keyboard-right", &keymap.right);
   reader.read_int ("keyboard-fire", &keymap.fire);
+  reader.read_int ("keyboard-menu", &keymap.menu);
 
   lisp_free(root_obj);
   fclose(file);
@@ -209,6 +210,7 @@ void saveconfig (void)
       fprintf(config, "\t(keyboard-left  %d)\n", keymap.left);
       fprintf(config, "\t(keyboard-right %d)\n", keymap.right);
       fprintf(config, "\t(keyboard-fire  %d)\n", keymap.fire);
+      fprintf(config, "\t(keyboard-menu  %d)\n", keymap.menu);
 
       fprintf(config, ")\n");
 

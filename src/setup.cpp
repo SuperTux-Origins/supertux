@@ -918,14 +918,17 @@ void st_menu(void)
   options_menu->additem(MN_HL,"",0,0);
   options_menu->additem(MN_BACK,"Back",0,0);
   
-  options_keys_menu->additem(MN_LABEL,"Key Setup",0,0);
+  /* Same order/names as Gamepad Setup (Menu is optional; Esc stays hardwired). */
+  options_keys_menu->additem(MN_LABEL,"Keyboard Setup",0,0);
   options_keys_menu->additem(MN_HL,"",0,0);
-  options_keys_menu->additem(MN_CONTROLFIELD,"Left move", 0,0, 0,&keymap.left);
-  options_keys_menu->additem(MN_CONTROLFIELD,"Right move", 0,0, 0,&keymap.right);
-  options_keys_menu->additem(MN_CONTROLFIELD,"Up", 0,0, 0,&keymap.up);
-  options_keys_menu->additem(MN_CONTROLFIELD,"Down", 0,0, 0,&keymap.duck);
   options_keys_menu->additem(MN_CONTROLFIELD,"Jump", 0,0, 0,&keymap.jump);
   options_keys_menu->additem(MN_CONTROLFIELD,"Power/Run", 0,0, 0,&keymap.fire);
+  options_keys_menu->additem(MN_CONTROLFIELD,"Menu", 0,0, 0,&keymap.menu);
+  options_keys_menu->additem(MN_HL,"",0,0);
+  options_keys_menu->additem(MN_CONTROLFIELD,"Left", 0,0, 0,&keymap.left);
+  options_keys_menu->additem(MN_CONTROLFIELD,"Right", 0,0, 0,&keymap.right);
+  options_keys_menu->additem(MN_CONTROLFIELD,"Up", 0,0, 0,&keymap.up);
+  options_keys_menu->additem(MN_CONTROLFIELD,"Down", 0,0, 0,&keymap.duck);
   options_keys_menu->additem(MN_HL,"",0,0);
   options_keys_menu->additem(MN_BACK,"Back",0,0);
 
