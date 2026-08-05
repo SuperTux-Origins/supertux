@@ -267,7 +267,21 @@ Level::load(const std::string& filename)
 
   if (root_obj->type == LISP_TYPE_EOF || root_obj->type == LISP_TYPE_PARSE_ERROR)
     {
-      printf("World: Parse Error in file %s", filename.c_str());
+      printf("Level: Parse Error in file %s\n", filename.c_str());
+      lisp_free(root_obj);
+      return -1;
+    }
+
+  /* Plain text (intro/extro/CREDITS) or other non-level lisp must not
+     reach lisp_symbol(lisp_car(...)) — car may not be a cons/symbol and
+     strcmp then SIGSEGVs under NDEBUG. */
+  if (!lisp_cons_p(root_obj)
+      || lisp_nil_p(lisp_car(root_obj))
+      || !lisp_symbol_p(lisp_car(root_obj))
+      || strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-level") != 0)
+    {
+      printf("Level: not a supertux-level file: %s\n", filename.c_str());
+      lisp_free(root_obj);
       return -1;
     }
 
@@ -276,8 +290,7 @@ Level::load(const std::string& filename)
   vector<int> fg_tm;
 
   int version = 0;
-  if (strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-level") == 0)
-    {
+  {
       LispReader reader(lisp_cdr(root_obj));
       version = 0;
       reader.read_int("version",  &version);
