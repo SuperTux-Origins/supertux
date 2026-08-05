@@ -1,11 +1,18 @@
-# Parked: Autotools + GP2X (legacy)
+# GP2X / Wiz (Open2x / OpenWiz)
 
-This directory holds the **historical Autotools build** and the **GP2X cross wrappers**.  
-It is **not** the supported build path. Desktop, Windows, Android, and WASM use **CMake** and the root `flake.nix`.
+**Start here for cross-compile:** [`CROSSCOMPILE.md`](CROSSCOMPILE.md) —
+research notes, toolchain layout, libraries, and CMake examples.
 
-Do not invest in this tree unless explicitly requested. A full CMake/flake GP2X port is deferred indefinitely.
+Supported path going forward is **CMake**:
 
-## What was moved here
+- `-DENABLE_GP2X=ON -DENABLE_RES320X240=ON`
+- `-DCMAKE_TOOLCHAIN_FILE=mk/gp2x/toolchain-open2x.cmake` (or `toolchain-openwiz.cmake`)
+- SDL 1.2 only (`ENABLE_SDL2=OFF`) — the reason this tree still maintains the SDL1 backend
+
+Desktop / Windows / Android / WASM continue to use root `CMakeLists.txt` + `flake.nix`.
+The remainder of this directory is the **historical Autotools** tree (reference only).
+
+## What was moved here (Autotools archive)
 
 | Path | Role |
 |------|------|

@@ -27,8 +27,11 @@ This is a **historical** codebase. The point of work here is **not** to moderniz
 **Out of scope**
 
 - Gameplay balance, new enemies, level-design features, camera “feel”, UI redesign.
-- Investing in legacy targets (`GP2X`, `RES320X240`, `TSCONTROL`) unless explicitly requested.
 - Large refactors or C++ modernization for their own sake.
+- Legacy `TSCONTROL` (old touchscreen path); modern touch is `touch_controls.cpp`.
+
+**Handheld (GP2X / Wiz):** SDL 1.2 is required (Open2x/OpenWiz). See `mk/gp2x/CROSSCOMPILE.md`.
+CMake: `-DENABLE_GP2X=ON -DENABLE_RES320X240=ON` + Open2x/OpenWiz toolchain file.
 
 When unsure, prefer the smallest change that stops a crash or unblocks SDL2 playtest. Track concrete work in `TODO.md`.
 
@@ -36,11 +39,11 @@ When unsure, prefer the smallest change that stops a crash or unblocks SDL2 play
 
 | Area | Status |
 |------|--------|
-| Original Autotools build | **Parked** under `mk/gp2x/` (reference + historical GP2X only) |
+| Original Autotools build | **Parked** under `mk/gp2x/` (reference only) |
 | **CMake build** | **Done** — root `CMakeLists.txt` (supported path) |
 | Graphics / input | SDL 1.2 + optional OpenGL (immediate) or GLES2 (shaders); software via `SurfaceSDL` |
-| Audio | SDL_mixer 1.x (optional `-DNOSOUND`); GP2X uses a separate path |
-| Platforms of historical interest | Desktop Linux/Windows, experimental GP2X, 320×240 test build |
+| Audio | SDL_mixer 1.x (optional `-DNOSOUND`); GP2X historically mikmod |
+| GP2X / Wiz | **In progress** — CMake `ENABLE_GP2X` + toolchains; see `mk/gp2x/CROSSCOMPILE.md` |
 | SDL2 port | **Compiles** via platform layer + `platform_config.h`; playtest still open |
 
 **Version:** the only source of truth is the top-level `VERSION` file (e.g. `0.1.5-dev`). CMake reads it into `PROJECT_VERSION_FULL` and defines `SUPERTUX_MILESTONE1_VERSION` for the sources. Nix appends `+g<shortRev>` when packaging. Use `--version` to print it. For a release, drop the `-dev` suffix, commit, and tag `vX.Y.Z`.
@@ -109,7 +112,8 @@ Video init/present goes through `src/platform.h` (`platform_sdl1.cpp` or `platfo
 
 Runtime resolves assets under `DATA_PREFIX` / discovered `datadir` (see `st_directory_setup()`), normally the repo-root `data/` tree.
 
-Autotools + GP2X wrappers are parked under `mk/gp2x/` (see `mk/gp2x/README.md`). Not the maintained path forward; no investment unless explicitly requested.
+GP2X/Wiz cross-compile: `mk/gp2x/CROSSCOMPILE.md` + `toolchain-open2x.cmake` /
+`toolchain-openwiz.cmake`. Autotools under `mk/gp2x/` remain reference-only.
 
 ## Dependencies
 
@@ -139,7 +143,8 @@ Autotools + GP2X wrappers are parked under `mk/gp2x/` (see `mk/gp2x/README.md`).
    - audio open/load/play
 4. `data/` belongs in the tree. Do not invent alternate data-discovery schemes; runtime still uses `DATA_PREFIX` / `datadir` as today.
 5. Prefer clear, minimal diffs. This is a historical codebase — match local style (tabs/spaces as in neighboring files) unless reforming a whole module.
-6. GP2X / 320×240 paths are legacy; do not invest in them unless explicitly requested. CMake may omit those options initially.
+6. GP2X / Wiz: use CMake `ENABLE_GP2X` + `ENABLE_RES320X240` and the Open2x/OpenWiz
+   toolchain files; keep SDL1. Do not revive Autotools for new work.
 7. **Do not change gameplay or level design** unless fixing a crash or an SDL2 blocker. No balance tweaks, new mechanics, or content work.
 8. **Commit message in chat:** After any larger change (new subsystem, multi-file refactor, completed TODO phase, etc.), end the reply with a proposed **git commit message** (subject + optional body). Use imperative mood, explain *why* when non-obvious, and keep the subject ~50–72 characters when practical. Do not run `git commit` unless the user asks.
 9. **Diagnose before fixing — no speculative hacks.** If the root cause is not confirmed by logs, a reproducible test, or a clear code path, **do not** “fix” by papering over symptoms (extra guards, random hints, dead-zone tweaks, `#ifdef` workarounds). Instead:

@@ -409,3 +409,18 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 | 2026-08-03 | Custom wasm HTML shell; non-blocking wait_for_event/fade under app_loop |
 | 2026-08-03 | IDBFS syncfs without Asyncify.handleSleep (ASYNCIFY-off safe) |
 | 2026-08-03 | Wasm SDL2_mixer + libxmp in build-wasm-sdl-libs; flake wires sources; CMake links libxmp |
+
+---
+
+## GP2X / Wiz cross-compile (Open2x / OpenWiz)
+
+Primary reason SDL 1.2 remains supported. Details: `mk/gp2x/CROSSCOMPILE.md`.
+
+- [x] Document Open2x / OpenWiz toolchains, libs, soft-float, packaging
+- [x] CMake `ENABLE_GP2X` / `ENABLE_RES320X240` + force SDL1 / no GL
+- [x] `OPEN2X_ROOT` / `OPENWIZ_ROOT` SDL 1.2 sysroot discovery
+- [x] Toolchain files `mk/gp2x/toolchain-open2x.cmake`, `toolchain-openwiz.cmake`
+- [ ] Device smoke test with real Open2x libpack on host
+- [ ] Optional static `.gpe` link recipe (lib order: image, SDL, png, jpeg, z, pthread, m)
+- [ ] Optional mikmod when `ENABLE_SOUND=ON` under `GP2X`
+- [ ] Nix package gated on toolchain path (optional)
