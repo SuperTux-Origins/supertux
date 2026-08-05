@@ -278,6 +278,11 @@
             gp2x = import ./nix/gp2x.nix {
               inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config qemu file pkgsi686Linux bash binutils;
             };
+            r36s = import ./nix/r36s.nix {
+              inherit (pkgs) lib;
+              pkgsBuildHost = pkgs;
+              pkgsCross = pkgs.pkgsCross;
+            };
             android = import ./nix/android.nix {              pkgs = androidPkgs;
               sdlSrc = sdl2-src;
               sdlVersion = "2.30.3";
@@ -316,6 +321,13 @@
                 src = lib.cleanSource ./.;
                 inherit version;
                 pname = "supertux-milestone1-wiz";
+              };
+              # aarch64 SDL2+GLES2 via pkgsCross (qemu / CI). Device-ready
+              # ArkOS binaries need an old glibc sysroot — mk/r36s/CROSSCOMPILE.md.
+              supertux-milestone1-r36s = r36s.mkSuperTuxR36s {
+                src = lib.cleanSource ./.;
+                inherit version;
+                pname = "supertux-milestone1-r36s";
               };
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
@@ -386,6 +398,11 @@
                 src = lib.cleanSource ./.;
                 inherit version;
                 pname = "supertux-milestone1-wiz";
+              };
+              supertux-milestone1-r36s = r36s.mkSuperTuxR36s {
+                src = lib.cleanSource ./.;
+                inherit version;
+                pname = "supertux-milestone1-r36s";
               };
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {

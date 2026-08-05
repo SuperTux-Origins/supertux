@@ -33,6 +33,8 @@ This is a **historical** codebase. The point of work here is **not** to moderniz
 **Handheld (GP2X / Wiz):** SDL 1.2 is required (Open2x/OpenWiz). See `mk/gp2x/CROSSCOMPILE.md`.
 CMake: `-DENABLE_GP2X=ON -DENABLE_RES320X240=ON` + Open2x/OpenWiz toolchain file.
 
+**Handheld (R36S / ArkOS):** RK3326, 640×480, Ubuntu 19.10-based userspace. Prefer SDL2 + GLES2 (no `RES320X240`). Device-compatible builds need an old glibc sysroot — see `mk/r36s/CROSSCOMPILE.md`. Flake: `nix build .#supertux-milestone1-r36s` (pkgsCross aarch64; not stock-ArkOS glibc).
+
 When unsure, prefer the smallest change that stops a crash or unblocks SDL2 playtest. Track concrete work in `TODO.md`.
 
 ## Project state (high level)
@@ -44,6 +46,7 @@ When unsure, prefer the smallest change that stops a crash or unblocks SDL2 play
 | Graphics / input | SDL 1.2 + optional OpenGL (immediate) or GLES2 (shaders); software via `SurfaceSDL` |
 | Audio | SDL_mixer 1.x (optional `-DNOSOUND`); GP2X historically mikmod |
 | GP2X / Wiz | **In progress** — CMake `ENABLE_GP2X` + toolchains; see `mk/gp2x/CROSSCOMPILE.md` |
+| R36S / ArkOS | **Scaffolding** — `mk/r36s/` toolchains + `.#supertux-milestone1-r36s` pkgsCross; sysroot path for device ABI |
 | SDL2 port | **Compiles** via platform layer + `platform_config.h`; playtest still open |
 
 **Version:** the only source of truth is the top-level `VERSION` file (e.g. `0.1.5-dev`). CMake reads it into `PROJECT_VERSION_FULL` and defines `SUPERTUX_MILESTONE1_VERSION` for the sources. Nix appends `+g<shortRev>` when packaging. Use `--version` to print it. For a release, drop the `-dev` suffix, commit, and tag `vX.Y.Z`.
@@ -95,6 +98,7 @@ nix build .#wasm-sdl-libs                   # SDL2 (+ image) static for wasm32
 nix build .#wasm-zlib-libs                  # static zlib for wasm32 (lispreader)
 nix build .#supertux-milestone1-wasm        # Emscripten HTML/JS/Wasm
 nix run .#supertux-milestone1-wasm          # serve over HTTP + open browser
+nix build .#supertux-milestone1-r36s        # aarch64 SDL2+GLES2 (pkgsCross; see mk/r36s/)
 nix develop                                 # SDL2 (matches default package)
 nix develop .#supertux-milestone1-sdl1
 nix develop .#supertux-milestone1-sdl2-gles2
@@ -114,6 +118,10 @@ Runtime resolves assets under `DATA_PREFIX` / discovered `datadir` (see `st_dire
 
 GP2X/Wiz cross-compile: `mk/gp2x/CROSSCOMPILE.md` + `toolchain-open2x.cmake` /
 `toolchain-openwiz.cmake`. Autotools under `mk/gp2x/` remain reference-only.
+
+R36S/ArkOS: `mk/r36s/CROSSCOMPILE.md` + `toolchain-arkos-aarch64.cmake` (and
+optional `toolchain-arkos-armhf.cmake`). Sysroot from device or Debian Buster
+debootstrap; flake `.#supertux-milestone1-r36s` is nixpkgs-cross only.
 
 ## Dependencies
 
@@ -145,6 +153,8 @@ GP2X/Wiz cross-compile: `mk/gp2x/CROSSCOMPILE.md` + `toolchain-open2x.cmake` /
 5. Prefer clear, minimal diffs. This is a historical codebase — match local style (tabs/spaces as in neighboring files) unless reforming a whole module.
 6. GP2X / Wiz: use CMake `ENABLE_GP2X` + `ENABLE_RES320X240` and the Open2x/OpenWiz
    toolchain files; keep SDL1. Do not revive Autotools for new work.
+   R36S/ArkOS: SDL2 + GLES2, **no** `RES320X240`; link against an ArkOS-compatible
+   sysroot for on-device runs (`mk/r36s/`).
 7. **Do not change gameplay or level design** unless fixing a crash or an SDL2 blocker. No balance tweaks, new mechanics, or content work.
 8. **Commit message in chat:** After any larger change (new subsystem, multi-file refactor, completed TODO phase, etc.), end the reply with a proposed **git commit message** (subject + optional body). Use imperative mood, explain *why* when non-obvious, and keep the subject ~50–72 characters when practical. Do not run `git commit` unless the user asks.
 9. **Diagnose before fixing — no speculative hacks.** If the root cause is not confirmed by logs, a reproducible test, or a clear code path, **do not** “fix” by papering over symptoms (extra guards, random hints, dead-zone tweaks, `#ifdef` workarounds). Instead:
@@ -172,6 +182,7 @@ GP2X/Wiz cross-compile: `mk/gp2x/CROSSCOMPILE.md` + `toolchain-open2x.cmake` /
 | `mk/android/app/` | Android packaging (manifest, jni/Android.mk, icons) |
 | `nix/android.nix` + `mk/android/scripts/` | APK pipeline (scripts usable outside Nix) |
 | `nix/wasm.nix` + `mk/wasm/scripts/` | Emscripten app + static SDL/zlib recipes |
+| `mk/r36s/` + `nix/r36s.nix` | R36S/ArkOS aarch64 (and armhf) cross notes + flake package |
 
 ### Android APK
 
