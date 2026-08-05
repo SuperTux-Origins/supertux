@@ -46,6 +46,45 @@ Menu* options_joystick_button_menu = 0;
 #ifdef USE_SDL2
 Menu* options_gamepad_menu = 0;
 Menu* options_gamepad_analog_menu = 0;
+
+/* CONTROLLER* and JOY* both fire for the same physical press on many
+   platforms. After we handle a controller event, ignore raw joystick for a
+   short window so bind mode does not immediately re-HIT. If only JOY arrives
+   (common on some WASM builds), the window never starts and JOY still works. */
+static Uint32 menu_controller_handled_ms = 0;
+
+static void
+menu_mark_controller_handled(void)
+{
+  menu_controller_handled_ms = SDL_GetTicks();
+}
+
+static bool
+menu_joy_suppressed_by_controller(void)
+{
+  if (!game_controller)
+    return false;
+  return (SDL_GetTicks() - menu_controller_handled_ms) < 80;
+}
+
+/* Map a raw joystick button index to an SDL_GameControllerButton via the
+   open controller's binding table. Returns -1 if unbound. */
+static int
+menu_joy_button_to_controller_button(int joy_button)
+{
+  if (!game_controller || joy_button < 0)
+    return -1;
+  for (int b = 0; b < SDL_CONTROLLER_BUTTON_MAX; ++b)
+    {
+      SDL_GameControllerButtonBind bind =
+        SDL_GameControllerGetBindForButton(
+            game_controller, (SDL_GameControllerButton)b);
+      if (bind.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON
+          && bind.value.button == joy_button)
+        return b;
+    }
+  return -1;
+}
 #endif
 Menu* highscore_menu = 0;
 Menu* load_game_menu = 0;
@@ -1179,6 +1218,11 @@ Menu::event(SDL_Event& event)
       if (verbose_mode)
         st_vlog("[menu] JOYHAT value=0x%x use_joystick=%d\n",
                 (unsigned)event.jhat.value, (int)use_joystick);
+#ifdef USE_SDL2
+      /* Dual-event residual after CONTROLLERBUTTON / AXIS — skip briefly. */
+      if (menu_joy_suppressed_by_controller())
+        break;
+#endif
       if (!use_joystick)
         break;
       if(event.jhat.value & SDL_HAT_UP)
@@ -1248,6 +1292,10 @@ Menu::event(SDL_Event& event)
     break;
 
   case SDL_CONTROLLERBUTTONDOWN:
+    menu_mark_controller_handled();
+    if (verbose_mode)
+      st_vlog("[menu] CONTROLLERBUTTONDOWN btn=%d use_joystick=%d\n",
+              (int)event.cbutton.button, (int)use_joystick);
     if (item[active_item].kind == MN_CONTROLFIELD
         && (Menu::current() == options_gamepad_menu
             || Menu::current() == options_gamepad_analog_menu))
@@ -1347,6 +1395,71 @@ Menu::event(SDL_Event& event)
     if (verbose_mode)
       st_vlog("[menu] JOYBUTTONDOWN btn=%d use_joystick=%d\n",
               (int)event.jbutton.button, (int)use_joystick);
+#ifdef USE_SDL2
+    /* Dual-event devices: controller path already ran — skip residual JOY. */
+    if (menu_joy_suppressed_by_controller())
+      break;
+
+    /* When a GameController is open, never treat raw JOYBUTTON as a blind
+       HIT — residual button indices (e.g. btn=12 with a hat event) would
+       select menu items while the player is only navigating. Map through
+       the controller bind table instead (covers WASM hosts that only
+       deliver JOY* for a mapped pad). */
+    if (game_controller)
+      {
+        int cbtn = menu_joy_button_to_controller_button((int)event.jbutton.button);
+        if (cbtn < 0)
+          break;
+
+        if (item[active_item].kind == MN_CONTROLFIELD
+            && control_bind_item == active_item
+            && Menu::current() == options_gamepad_menu)
+          {
+            if (cbtn == gamecontroller_keymap.menu
+                || cbtn == SDL_CONTROLLER_BUTTON_START
+                || cbtn == SDL_CONTROLLER_BUTTON_BACK)
+              {
+                control_bind_item = -1;
+                get_controlfield_key_into_input(&item[active_item]);
+                return;
+              }
+            if (!item[active_item].int_p)
+              {
+                control_bind_item = -1;
+                return;
+              }
+            *item[active_item].int_p = cbtn;
+            control_bind_item = -1;
+            get_controlfield_key_into_input(&item[active_item]);
+            return;
+          }
+
+        if (cbtn == gamecontroller_keymap.menu)
+          {
+            if (control_bind_item >= 0)
+              {
+                control_bind_item = -1;
+                if (active_item >= 0 && active_item < (int)item.size())
+                  get_controlfield_key_into_input(&item[active_item]);
+                return;
+              }
+            Menu::pop_current();
+            return;
+          }
+        if (cbtn == gamecontroller_keymap.jump
+            || cbtn == gamecontroller_keymap.fire)
+          menuaction = MENU_ACTION_HIT;
+        else if (cbtn == gamecontroller_keymap.up)
+          menuaction = MENU_ACTION_UP;
+        else if (cbtn == gamecontroller_keymap.duck)
+          menuaction = MENU_ACTION_DOWN;
+        else if (cbtn == gamecontroller_keymap.left)
+          menuaction = MENU_ACTION_LEFT;
+        else if (cbtn == gamecontroller_keymap.right)
+          menuaction = MENU_ACTION_RIGHT;
+        break;
+      }
+#endif
     if (use_joystick
         && item[active_item].kind == MN_CONTROLFIELD
         && control_bind_item == active_item
@@ -1362,6 +1475,7 @@ Menu::event(SDL_Event& event)
         get_controlfield_key_into_input(&item[active_item]);
         return;
       }
+    /* Classic joystick only: any button confirms (no GameController open). */
     if (use_joystick)
       menuaction = MENU_ACTION_HIT;
     break;

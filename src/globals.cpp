@@ -195,9 +195,13 @@ int wait_for_event(SDL_Event& event,unsigned int min_delay, unsigned int max_del
                   /* Keypress - skip intro: */
                   return 1;
                 }
-              else if (event.type == SDL_JOYBUTTONDOWN)
+              else if (event.type == SDL_JOYBUTTONDOWN
+#ifdef USE_SDL2
+                       || event.type == SDL_CONTROLLERBUTTONDOWN
+#endif
+                      )
                 {
-                  /* Fire button - skip intro: */
+                  /* Fire / gamepad button - skip intro: */
                   return 1;
                 }
               else if (event.type == SDL_MOUSEBUTTONDOWN)

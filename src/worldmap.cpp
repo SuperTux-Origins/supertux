@@ -714,6 +714,23 @@ WorldMap::get_input()
               on_escape_press();
           }
           break;
+
+        /* D-pad as hat (dual with CONTROLLER DPAD_* on many pads). */
+        case SDL_JOYHATMOTION:
+          if (!use_joystick)
+            break;
+          {
+            Uint8 hv = event.jhat.value;
+            if (hv & SDL_HAT_LEFT)
+              input_direction = D_WEST;
+            else if (hv & SDL_HAT_RIGHT)
+              input_direction = D_EAST;
+            else if (hv & SDL_HAT_UP)
+              input_direction = D_NORTH;
+            else if (hv & SDL_HAT_DOWN)
+              input_direction = D_SOUTH;
+          }
+          break;
 #else
 #ifdef GP2X
         case SDL_JOYBUTTONDOWN:

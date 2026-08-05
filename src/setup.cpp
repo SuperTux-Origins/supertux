@@ -1564,6 +1564,12 @@ void st_joystick_setup(void)
       return;
     }
 
+  /* Ensure CONTROLLER* events are delivered (not only raw JOY*). Some
+     hosts/WASM builds leave the subsystem enabled but events quiet until
+     this is set explicitly. */
+  SDL_GameControllerEventState(SDL_ENABLE);
+  SDL_JoystickEventState(SDL_ENABLE);
+
   joystick_num = open_idx;
   if (verbose_mode)
     {

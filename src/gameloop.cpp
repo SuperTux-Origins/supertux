@@ -558,6 +558,88 @@ GameSession::process_events()
                       tux.input.right = UP;
                   }
                   break;
+
+                /* JOYHAT still fires for many GameControllers (d-pad as hat).
+                   CONTROLLERBUTTON DPAD_* is preferred when present; hat is a
+                   fallback so movement works if only JOY* arrives. */
+                case SDL_JOYHATMOTION:
+                  if (!use_joystick)
+                    break;
+                  {
+                    Uint8 hv = event.jhat.value;
+                    if (hv & SDL_HAT_RIGHT)
+                      {
+                        tux.input.left  = UP;
+                        tux.input.right = DOWN;
+                      }
+                    else if (hv & SDL_HAT_LEFT)
+                      {
+                        tux.input.left  = DOWN;
+                        tux.input.right = UP;
+                      }
+                    else
+                      {
+                        tux.input.left  = UP;
+                        tux.input.right = UP;
+                      }
+                    if (hv & SDL_HAT_DOWN)
+                      tux.input.down = DOWN;
+                    else
+                      tux.input.down = UP;
+                  }
+                  break;
+
+                /* Raw JOYAXIS/JOYBUTTON only when no GameController owns the
+                   device — residual dual events must not fight the keymap. */
+                case SDL_JOYAXISMOTION:
+                  if (!use_joystick || game_controller)
+                    break;
+                  if (event.jaxis.axis == joystick_keymap.x_axis)
+                    {
+                      if (event.jaxis.value < -joystick_keymap.dead_zone)
+                        {
+                          tux.input.left  = DOWN;
+                          tux.input.right = UP;
+                        }
+                      else if (event.jaxis.value > joystick_keymap.dead_zone)
+                        {
+                          tux.input.left  = UP;
+                          tux.input.right = DOWN;
+                        }
+                      else
+                        {
+                          tux.input.left  = UP;
+                          tux.input.right = UP;
+                        }
+                    }
+                  else if (event.jaxis.axis == joystick_keymap.y_axis)
+                    {
+                      if (event.jaxis.value > joystick_keymap.dead_zone)
+                        tux.input.down = DOWN;
+                      else
+                        tux.input.down = UP;
+                    }
+                  break;
+
+                case SDL_JOYBUTTONDOWN:
+                  if (!use_joystick || game_controller)
+                    break;
+                  if (event.jbutton.button == joystick_keymap.a_button)
+                    tux.input.up = DOWN;
+                  else if (event.jbutton.button == joystick_keymap.b_button)
+                    tux.input.fire = DOWN;
+                  else if (event.jbutton.button == joystick_keymap.start_button)
+                    on_escape_press();
+                  break;
+
+                case SDL_JOYBUTTONUP:
+                  if (!use_joystick || game_controller)
+                    break;
+                  if (event.jbutton.button == joystick_keymap.a_button)
+                    tux.input.up = UP;
+                  else if (event.jbutton.button == joystick_keymap.b_button)
+                    tux.input.fire = UP;
+                  break;
 #else
 		case SDL_JOYHATMOTION:
 		  if (!use_joystick)
@@ -573,8 +655,8 @@ GameSession::process_events()
 			tux.input.right = UP;
 		  }
 		  if (event.jhat.value == SDL_HAT_CENTERED) {
-                        tux.input.left  = DOWN;
-			tux.input.right = DOWN;
+                        tux.input.left  = UP;
+			tux.input.right = UP;
                   }
 		 
 		  if ( (event.jhat.value ==  ( SDL_HAT_DOWN)) ||
@@ -621,7 +703,7 @@ GameSession::process_events()
                         tux.input.down = UP;
                     }
                   break;
-#endif            
+            
                 case SDL_JOYBUTTONDOWN:
 #ifndef GP2X
                   if (!use_joystick)
@@ -683,6 +765,7 @@ GameSession::process_events()
                   break;
 #endif
 #endif
+#endif /* GP2X */
                 default:
                   break;
                 }  /* switch */

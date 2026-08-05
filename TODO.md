@@ -355,7 +355,7 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 
 ## Phase 8 — Joystick / gamepad support
 
-**Status (code inventory, not playtested):** the Milestone 1 engine has **classic SDL joystick** support, not the newer SDL2 Game Controller API.
+**Status:** SDL2 uses `SDL_GameController`; SDL1 keeps classic `SDL_Joystick`. Dual-event residual (JOY* + CONTROLLER*) is handled so raw JOYBUTTON cannot blind-HIT menus and in-level JOYHAT works as a d-pad fallback.
 
 | Mechanism | Present? | Notes |
 |-----------|----------|--------|
@@ -388,6 +388,7 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 
 | Date | Item |
 |------|------|
+| 2026-08-05 | SDL2 gamepad: stop residual JOYBUTTON menu HIT; JOYHAT fallback in-level/worldmap; ignore raw JOY when controller open |
 | 2026-08-04 | Gamepad menu: Analog submenu; stick nav uses dead zone + edge detect (ignore raw JOYAXIS) |
 | 2026-08-04 | Gamepad: D-Pad + analog movement sections, analog dead zone, keyboard nav in setup |
 | 2026-08-04 | Phase 7 display polish; Phase 8 joystick/gamepad inventory + smoke-test matrix |
