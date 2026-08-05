@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <string>
+#include <vector>
 #include "platform_config.h"
 #include "globals.h"
 #include "defines.h"
@@ -13,6 +15,7 @@
 #include "menu.h"
 #include "touch_controls.h"
 #include "player.h"
+#include "game_file.h"
 #ifndef NOSOUND
 #include "sound.h"
 #endif
@@ -263,30 +266,39 @@ void display_text_file_begin(const std::string& file, Surface* surface, float sc
   g_textscroll.active = true;
   string_list_init(&g_textscroll.names);
 
-  char filename[1024];
-  char temp[1024];
-  FILE* fi = 0;
-  /* Prefer the path as given (CLI absolute/relative), else datadir/file. */
-  if (faccessible(file.c_str()))
-    snprintf(filename, sizeof(filename), "%s", file.c_str());
-  else
-    snprintf(filename, sizeof(filename), "%s/%s", datadir.c_str(), file.c_str());
-  fi = fopen(filename, "r");
-  if (fi != NULL)
+  /* Resolve via open_game_file (APK assets, MEMFS /data preload, install).
+     Plain fopen("intro.txt") fails on WASM even when /data/intro.txt exists
+     because faccessible() succeeds through open_game_file while fopen does not
+     search the preload mount. */
+  std::string path = file;
+  if (!game_file_exists(path) && !datadir.empty())
+    path = datadir + "/" + file;
+
+  std::vector<char> buf;
+  char shown[1024];
+  snprintf(shown, sizeof(shown), "%s", path.c_str());
+
+  if (game_file_read(path, buf))
     {
-      while(fgets(temp, sizeof(temp), fi) != NULL)
+      buf.push_back('\0');
+      const char* p = &buf[0];
+      while (*p)
         {
-          size_t len = strlen(temp);
-          if (len > 0 && temp[len - 1] == '\n')
-            temp[len - 1] = '\0';
-          string_list_add_item(&g_textscroll.names,temp);
+          const char* line = p;
+          while (*p && *p != '\n' && *p != '\r')
+            ++p;
+          std::string row(line, p - line);
+          if (*p == '\r')
+            ++p;
+          if (*p == '\n')
+            ++p;
+          string_list_add_item(&g_textscroll.names, row.c_str());
         }
-      fclose(fi);
     }
   else
     {
       string_list_add_item(&g_textscroll.names,"File was not found!");
-      string_list_add_item(&g_textscroll.names,filename);
+      string_list_add_item(&g_textscroll.names,shown);
       string_list_add_item(&g_textscroll.names,"Shame on the guy, who");
       string_list_add_item(&g_textscroll.names,"forgot to include it");
       string_list_add_item(&g_textscroll.names,"in your SuperTux distribution.");
