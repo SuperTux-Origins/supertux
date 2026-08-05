@@ -58,15 +58,33 @@ st_is_escape_key(SDLKey key)
 bool
 st_is_escape_event(const SDL_Event& event)
 {
-  if (event.type != SDL_KEYDOWN)
-    return false;
+  if (event.type == SDL_KEYDOWN)
+    {
 #ifdef USE_SDL2
-  if (event.key.repeat)
-    return false;
-  if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK)
+      if (event.key.repeat)
+        return false;
+      if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK)
+        return true;
+#endif
+      return st_is_escape_key(event.key.keysym.sym);
+    }
+
+  /* Gamepad Menu / Start — same role as Escape outside of menus.
+     (Menu navigation still maps this via Menu::event when a menu is open.) */
+#ifdef USE_SDL2
+  if (event.type == SDL_CONTROLLERBUTTONDOWN && use_joystick
+      && (int)event.cbutton.button == gamecontroller_keymap.menu)
+    return true;
+  /* Raw joystick Start only when no GameController is open (avoid dual fire). */
+  if (event.type == SDL_JOYBUTTONDOWN && use_joystick && !game_controller
+      && event.jbutton.button == (Uint8)joystick_keymap.start_button)
+    return true;
+#else
+  if (event.type == SDL_JOYBUTTONDOWN && use_joystick
+      && event.jbutton.button == joystick_keymap.start_button)
     return true;
 #endif
-  return st_is_escape_key(event.key.keysym.sym);
+  return false;
 }
 
 void player_input_init(player_input_type* pplayer_input)

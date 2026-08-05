@@ -824,18 +824,21 @@ bool touch_controls_process_event(SDL_Event& event, bool* want_escape)
 
   if (menu)
     {
-      if (esc)
+      /* Do not treat Menu/Start as Escape while rebinding a control field —
+         that would steal the press meant to assign the Menu button. */
+      bool binding = false;
+      if (menu->active_item >= 0
+          && menu->active_item < (int)menu->item.size()
+          && menu->item[menu->active_item].kind == MN_CONTROLFIELD)
+        binding = true;
+
+      if (esc && !binding)
         tc_inject_menu_key(menu, SDLK_ESCAPE);
       else if (!ate)
         menu->event(event);
 
       /* Do not inject pad nav as KEYDOWNs while binding a key — that would
          capture SDLK_UP/RETURN etc. into the configurator. */
-      bool binding = false;
-      if (menu->active_item >= 0
-          && menu->active_item < (int)menu->item.size()
-          && menu->item[menu->active_item].kind == MN_CONTROLFIELD)
-        binding = true;
       int tact = 0;
       if (!binding && touch_controls_menu_nav(&tact))
         {
