@@ -212,9 +212,9 @@ Legacy configure shape:
 ## Nix flake (recommended)
 
 ```bash
-nix build .#supertux-milestone1-gp2x
-# → result/bin/supertux-milestone1.gpe   (ARM soft-float ELF)
-# → result/share/supertux-milestone1/README-GP2X.txt
+nix build .#supertux-milestone1-gp2x   # classic GP2X / Open2x
+nix build .#supertux-milestone1-wiz    # GP2X Wiz / GPH SDK
+# → result/bin/supertux-milestone1.gpe
 ```
 
 Supporting packages:
@@ -222,7 +222,9 @@ Supporting packages:
 | Attribute | Purpose |
 |-----------|---------|
 | `open2x-sysroot` | Open2x gcc-4.1.1 + libpack (SDL 1.2) |
-| `supertux-milestone1-gp2x` | Game binary `.gpe` + README |
+| `openwiz-sysroot` | GPH_SDK 10.02 (`arm-linux` + DGE SDL 1.2) |
+| `supertux-milestone1-gp2x` | GP2X Open2x `.gpe` |
+| `supertux-milestone1-wiz` | Wiz GPH `.gpe` |
 
 The flake downloads the Open2x toolchain and libpack from the nanard.free.fr
 mirrors (same hashes as the grafx2 install script). Host tools are **i686**;

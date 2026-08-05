@@ -306,10 +306,16 @@
           in {
             packages = {
               open2x-sysroot = gp2x.open2xSysroot;
+              openwiz-sysroot = gp2x.openwizSysroot;
               supertux-milestone1-gp2x = gp2x.mkSuperTuxGp2x {
                 src = lib.cleanSource ./.;
                 inherit version;
                 pname = "supertux-milestone1-gp2x";
+              };
+              supertux-milestone1-wiz = gp2x.mkSuperTuxWiz {
+                src = lib.cleanSource ./.;
+                inherit version;
+                pname = "supertux-milestone1-wiz";
               };
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
@@ -370,10 +376,16 @@
             };
             checks = {
               open2x-sysroot = gp2x.open2xSysroot;
+              openwiz-sysroot = gp2x.openwizSysroot;
               supertux-milestone1-gp2x = gp2x.mkSuperTuxGp2x {
                 src = lib.cleanSource ./.;
                 inherit version;
                 pname = "supertux-milestone1-gp2x";
+              };
+              supertux-milestone1-wiz = gp2x.mkSuperTuxWiz {
+                src = lib.cleanSource ./.;
+                inherit version;
+                pname = "supertux-milestone1-wiz";
               };
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
@@ -533,6 +545,11 @@
             test -x "$bin"
             file "$bin" | grep -qi 'ARM\|arm'
             readelf -h "$bin" | grep -q 'soft'
+          '';
+          sanity-wiz = mkSanity "wiz" packages.supertux-milestone1-wiz ''
+            bin=${packages.supertux-milestone1-wiz}/bin/supertux-milestone1.gpe
+            test -x "$bin"
+            file "$bin" | grep -qi 'ARM\|arm'
           '';
         };
 
