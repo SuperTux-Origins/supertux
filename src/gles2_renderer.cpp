@@ -164,7 +164,7 @@ struct Vertex {
 };
 
 static void draw_vertices(const Vertex* verts, int count, GLenum mode,
-                          GLuint tex, bool use_tex)
+                          GLuint tex, bool use_tex, bool blend = true)
 {
   if (!g_ready)
     return;
@@ -184,8 +184,15 @@ static void draw_vertices(const Vertex* verts, int count, GLenum mode,
       glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  if (blend)
+    {
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+  else
+    {
+      glDisable(GL_BLEND);
+    }
 
   glEnableVertexAttribArray(g_a_pos);
   glEnableVertexAttribArray(g_a_uv);
@@ -201,7 +208,8 @@ static void draw_vertices(const Vertex* verts, int count, GLenum mode,
   glDisableVertexAttribArray(g_a_pos);
   glDisableVertexAttribArray(g_a_uv);
   glDisableVertexAttribArray(g_a_color);
-  glDisable(GL_BLEND);
+  if (blend)
+    glDisable(GL_BLEND);
   glUseProgram(0);
 }
 
@@ -381,7 +389,10 @@ void gles2_renderer_present(int drawable_w, int drawable_h,
     { x,     y + h, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f },
     { x + w, y + h, 1.f, 0.f, 1.f, 1.f, 1.f, 1.f },
   };
-  draw_vertices(verts, 4, GL_TRIANGLE_STRIP, g_fbo_tex, true);
+  /* FBO already holds final composited colours (incl. translucent menu
+     bars). Blending again would multiply by the FBO alpha and grey out
+     near-white highlights — match desktop GL direct-to-window look. */
+  draw_vertices(verts, 4, GL_TRIANGLE_STRIP, g_fbo_tex, true, false);
 }
 
 void gles2_renderer_set_viewport_rect(int /*ox*/, int /*oy*/, int /*dw*/, int /*dh*/)
