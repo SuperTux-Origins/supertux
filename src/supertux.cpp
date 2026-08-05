@@ -56,6 +56,32 @@ path_basename(const char* path)
   return s ? s + 1 : path;
 }
 
+/** True for .txt or the datadir CREDITS file (no extension in tree). */
+static bool
+is_text_startup_file(const char* path)
+{
+  if (path_has_ext(path, ".txt"))
+    return true;
+  const char* base = path_basename(path);
+  if (!base || !base[0])
+    return false;
+  return strcmp(base, "CREDITS") == 0 || strcmp(base, "credits") == 0;
+}
+
+static bool
+is_credits_basename(const char* path)
+{
+  const char* base = path_basename(path);
+  if (!base || !base[0])
+    return false;
+  if (strcmp(base, "CREDITS") == 0 || strcmp(base, "credits") == 0)
+    return true;
+  if (path_has_ext(base, ".txt")
+      && (strncmp(base, "CREDITS", 7) == 0 || strncmp(base, "credits", 7) == 0))
+    return true;
+  return false;
+}
+
 int main(int argc, char * argv[])
 {
   st_log("SuperTux Milestone 1 %s starting", VERSION);
@@ -81,25 +107,20 @@ int main(int argc, char * argv[])
     }
   else if (level_startup_file)
     {
-      /* Direct jump by extension:
-           .stl  → level session
-           .stwm → worldmap
-           .txt  → story/credits text scroller
-         Unknown extensions keep the historical level-file behaviour. */
+      /* Direct jump by extension / known names:
+           .stl            → level session
+           .stwm           → worldmap
+           .txt / CREDITS  → story/credits text scroller
+         Other paths keep the historical level-file behaviour. */
       if (path_has_ext(level_startup_file, ".stwm"))
         {
           WorldMapNS::WorldMap worldmap;
           worldmap.loadmap(level_startup_file);
           worldmap.display();
         }
-      else if (path_has_ext(level_startup_file, ".txt"))
+      else if (is_text_startup_file(level_startup_file))
         {
-          const char* base = path_basename(level_startup_file);
-          bool credits = false;
-          if (base && base[0]
-              && (strncmp(base, "CREDITS", 7) == 0
-                  || strncmp(base, "credits", 7) == 0))
-            credits = true;
+          bool credits = is_credits_basename(level_startup_file);
           const char* bg = credits
             ? "/images/background/oiltux.jpg"
             : "/images/background/arctis2.jpg";

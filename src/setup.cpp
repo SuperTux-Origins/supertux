@@ -1874,9 +1874,12 @@ void st_shutdown(void)
 
 void st_abort(const std::string& reason, const std::string& details)
 {
+  /* User-facing fatal error (missing data, bad level, …) — clean process
+     exit with failure status, not abort()/SIGABRT. */
   st_log("Error: %s %s", reason.c_str(), details.c_str());
+  fprintf(stderr, "Error: %s %s\n", reason.c_str(), details.c_str());
   st_shutdown();
-  abort();
+  exit(1);
 }
 
 /* Set Icon (private) */
