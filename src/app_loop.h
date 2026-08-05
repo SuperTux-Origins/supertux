@@ -29,6 +29,21 @@ enum AppScreen {
 bool app_loop_active(void);
 
 /**
+ * Frame-driven full-screen black fade (works under app_loop / WASM).
+ * Alpha is 0 = transparent, 255 = solid black. Draw with app_fade_draw()
+ * after the current scene, before flipscreen().
+ */
+int  app_fade_alpha(void);
+void app_fade_draw(void);
+bool app_fade_active(void);
+/** Start fade to black (out) or from black (in). duration_ms ~250–400. */
+void app_fade_start_out(int duration_ms = 300);
+void app_fade_start_in(int duration_ms = 300);
+/** True once the current fade has reached its end alpha. */
+bool app_fade_finished(void);
+void app_fade_clear(void);
+
+/**
  * Request a worldmap after the current title frame ends.
  * map_file: e.g. "world1.stwm" or a path accepted by loadmap/set_map_file.
  * save_file: full path to .stsg (may not exist yet).

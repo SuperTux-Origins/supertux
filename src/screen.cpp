@@ -18,6 +18,7 @@
 
 #include "defines.h"
 #include "globals.h"
+#include "app_loop.h"
 #include "platform.h"
 #include "screen.h"
 #include "setup.h"
@@ -109,16 +110,21 @@ delete sur;
 
 void fade(Surface *surface, int seconds, bool fade_out)
 {
-#ifdef __EMSCRIPTEN__
-  extern bool app_loop_active(void);
+  /* Under the unified frame pump a busy-loop freezes the game / WASM.
+     Kick a frame-driven black fade instead; the next scene presents it. */
   if (app_loop_active())
     {
-      /* No busy-loop fade without ASYNCIFY — single present. */
-      surface->draw(0, 0, fade_out ? 255 : 0);
+      int ms = seconds > 0 ? seconds : 300;
+      if (fade_out)
+        app_fade_start_out(ms);
+      else
+        app_fade_start_in(ms);
+      if (surface)
+        surface->draw(0, 0, fade_out ? 0 : 255);
+      app_fade_draw();
       flipscreen();
       return;
     }
-#endif
 
 float alpha;
 if (fade_out)
@@ -392,6 +398,20 @@ void flipscreen(void)
 
 void fadeout()
 {
+  if (app_loop_active())
+    {
+      /* Non-blocking: start fade-out; caller queues the next screen. */
+      app_fade_start_out(300);
+      clearscreen(0, 0, 0);
+      if (white_text)
+        white_text->draw_align("Loading...", screen->w/2, screen->h/2, A_HMIDDLE, A_TOP);
+      if (touch_controls_is_enabled())
+        touch_controls_draw();
+      app_fade_draw();
+      flipscreen();
+      return;
+    }
+
   clearscreen(0, 0, 0);
   white_text->draw_align("Loading...", screen->w/2, screen->h/2, A_HMIDDLE, A_TOP);
   /* Bezel/margins live in the window overlay; GLES present does not paint

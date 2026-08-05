@@ -16,6 +16,7 @@
 #include "tile.h"
 #include "text.h"
 #include "texture.h"
+#include "timer.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -52,9 +53,80 @@ static int g_delete_slot = -1;
 /* After worldmap extro text, show CREDITS then leave map. */
 static bool g_pending_credits_after_extro = false;
 
+/* Frame-driven black fade (replaces busy-loop fade under app_loop). */
+enum FadePhase { FADE_IDLE = 0, FADE_OUT, FADE_IN };
+static FadePhase g_fade_phase = FADE_IDLE;
+static int g_fade_from = 0;
+static int g_fade_to = 0;
+static unsigned int g_fade_start_ms = 0;
+static int g_fade_duration_ms = 300;
+/* After session ends: hold last frame under fade-out before teardown. */
+static bool g_session_exit_fading = false;
+
 bool app_loop_active(void)
 {
   return g_app_active;
+}
+
+static void
+app_fade_begin(int from_a, int to_a, int duration_ms)
+{
+  if (from_a < 0) from_a = 0;
+  if (from_a > 255) from_a = 255;
+  if (to_a < 0) to_a = 0;
+  if (to_a > 255) to_a = 255;
+  g_fade_from = from_a;
+  g_fade_to = to_a;
+  g_fade_duration_ms = duration_ms > 0 ? duration_ms : 300;
+  g_fade_start_ms = st_get_ticks();
+  g_fade_phase = (to_a > from_a) ? FADE_OUT : FADE_IN;
+}
+
+void app_fade_start_out(int duration_ms)
+{
+  app_fade_begin(app_fade_alpha(), 255, duration_ms);
+}
+
+void app_fade_start_in(int duration_ms)
+{
+  app_fade_begin(255, 0, duration_ms);
+}
+
+void app_fade_clear(void)
+{
+  g_fade_phase = FADE_IDLE;
+  g_fade_from = g_fade_to = 0;
+}
+
+bool app_fade_active(void)
+{
+  return g_fade_phase != FADE_IDLE;
+}
+
+int app_fade_alpha(void)
+{
+  if (g_fade_phase == FADE_IDLE)
+    return 0;
+  unsigned int gone = st_get_ticks() - g_fade_start_ms;
+  if (gone >= (unsigned int)g_fade_duration_ms)
+    return g_fade_to;
+  float t = (float)gone / (float)g_fade_duration_ms;
+  return (int)(g_fade_from + (g_fade_to - g_fade_from) * t);
+}
+
+bool app_fade_finished(void)
+{
+  if (g_fade_phase == FADE_IDLE)
+    return true;
+  return (st_get_ticks() - g_fade_start_ms) >= (unsigned int)g_fade_duration_ms;
+}
+
+void app_fade_draw(void)
+{
+  int a = app_fade_alpha();
+  if (a <= 0)
+    return;
+  fillrect(0, 0, (float)screen->w, (float)screen->h, 0, 0, 0, a);
 }
 
 void app_request_worldmap(const std::string& map_file,
@@ -253,7 +325,18 @@ app_finish_text(void)
   /* New-game story intro: continue into the queued worldmap. */
   if (g_pending_worldmap)
     {
+      if (g_fade_phase == FADE_IDLE)
+        app_fade_start_out(250);
+      if (g_fade_phase == FADE_OUT && !app_fade_finished())
+        {
+          clearscreen(0, 0, 0);
+          app_fade_draw();
+          flipscreen();
+          /* Stay on TEXT; next frame re-enters finish until fade completes. */
+          return;
+        }
       app_activate_worldmap();
+      app_fade_start_in(300);
       return;
     }
   /* display_text_file_end already restores main_menu. */
@@ -268,20 +351,62 @@ app_frame(void* /*arg*/)
     {
     case APP_SCREEN_TITLE:
       if (title_frame())
-        return;
+        {
+          /* Pending map/session: fade to black, then switch. */
+          if ((g_pending_worldmap || g_pending_session)
+              && g_fade_phase == FADE_IDLE)
+            app_fade_start_out(300);
+          if (g_fade_phase == FADE_OUT)
+            {
+              app_fade_draw();
+              flipscreen();
+              if (app_fade_finished())
+                {
+                  if (g_pending_worldmap)
+                    {
+                      app_activate_worldmap();
+                      app_fade_start_in(300);
+                    }
+                  else if (g_pending_session)
+                    {
+                      app_activate_session();
+                      app_fade_start_in(300);
+                    }
+                }
+              return;
+            }
+          if (g_fade_phase == FADE_IN)
+            {
+              app_fade_draw();
+              flipscreen();
+              if (app_fade_finished())
+                app_fade_clear();
+              return;
+            }
+          return;
+        }
       /* title_frame may have switched to TEXT/CONFIRM (e.g. new-game
          intro, credits, delete-slot). Do not steal into a pending
          worldmap/session until that screen finishes. */
       if (g_screen != APP_SCREEN_TITLE)
         return;
-      if (g_pending_worldmap)
+      if (g_pending_worldmap || g_pending_session)
         {
-          app_activate_worldmap();
-          return;
-        }
-      if (g_pending_session)
-        {
-          app_activate_session();
+          if (g_fade_phase == FADE_IDLE)
+            app_fade_start_out(300);
+          if (g_fade_phase == FADE_OUT && !app_fade_finished())
+            {
+              /* Title already stopped drawing; hold black. */
+              clearscreen(0, 0, 0);
+              app_fade_draw();
+              flipscreen();
+              return;
+            }
+          if (g_pending_worldmap)
+            app_activate_worldmap();
+          else
+            app_activate_session();
+          app_fade_start_in(300);
           return;
         }
       /* Real quit. */
@@ -303,18 +428,74 @@ app_frame(void* /*arg*/)
     case APP_SCREEN_WORLDMAP:
       if (g_pending_session)
         {
+          if (g_fade_phase == FADE_IDLE)
+            app_fade_start_out(300);
+          if (g_fade_phase == FADE_OUT && !app_fade_finished())
+            {
+              /* Keep last map frame under rising black (map draws + fade). */
+              if (g_worldmap)
+                g_worldmap->frame();
+              else
+                {
+                  clearscreen(0, 0, 0);
+                  app_fade_draw();
+                  flipscreen();
+                }
+              return;
+            }
           app_activate_session();
+          app_fade_start_in(350);
           return;
         }
       if (g_worldmap && g_worldmap->frame())
-        return;
+        {
+          if (g_fade_phase == FADE_IN)
+            {
+              if (app_fade_finished())
+                app_fade_clear();
+            }
+          return;
+        }
+      /* Leaving map → title: fade out first. */
+      if (g_fade_phase == FADE_IDLE)
+        app_fade_start_out(300);
+      if (g_fade_phase == FADE_OUT && !app_fade_finished())
+        {
+          if (g_worldmap)
+            g_worldmap->frame();
+          return;
+        }
       app_return_to_title();
+      app_fade_start_in(300);
       break;
 
     case APP_SCREEN_SESSION:
       if (g_session && g_session->frame())
-        return;
+        {
+          if (g_fade_phase == FADE_IN && app_fade_finished())
+            app_fade_clear();
+          return;
+        }
+      /* Session requested exit — fade to black before teardown. */
+      if (g_session && !g_session_exit_fading)
+        {
+          g_session_exit_fading = true;
+          app_fade_start_out(300);
+        }
+      if (g_session_exit_fading && g_fade_phase == FADE_OUT
+          && !app_fade_finished())
+        {
+          if (g_session)
+            {
+              g_session->draw();
+              app_fade_draw();
+              flipscreen();
+            }
+          return;
+        }
+      g_session_exit_fading = false;
       app_finish_session();
+      app_fade_start_in(300);
       break;
 
     case APP_SCREEN_CONFIRM:

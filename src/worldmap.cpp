@@ -1286,6 +1286,8 @@ WorldMap::frame()
   else
     touch_controls_draw();
 #endif
+  if (app_loop_active())
+    app_fade_draw();
   flipscreen();
 
 #ifndef NOSOUND

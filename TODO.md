@@ -412,6 +412,15 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 
 ---
 
+### Scene fades (Phase 6)
+
+- [x] Frame-driven black fade (`app_fade_*`) under app_loop (desktop + WASM)
+- [x] Worldmap ↔ level session: fade out before switch, fade in on arrival
+- [x] Session exit → map/title: fade out last frame, fade in destination
+- [x] Title → worldmap/session and story-text → worldmap: fade out/in
+- [x] Legacy `fade()` / `fadeout()` kick frame-driven path when `app_loop_active()`
+- [ ] Optional: image-based fade (historic `fade(surface,…)`) as multi-frame overlay
+
 ## GP2X / Wiz cross-compile (Open2x / OpenWiz)
 
 Primary reason SDL 1.2 remains supported. Details: `mk/gp2x/CROSSCOMPILE.md`.

@@ -25,6 +25,7 @@
 #include "gameloop.h"
 #include "screen.h"
 #include "setup.h"
+#include "app_loop.h"
 #include "high_scores.h"
 #include "menu.h"
 #include "touch_controls.h"
@@ -847,6 +848,8 @@ GameSession::draw()
   updateSound();
 #endif
 #endif
+  if (app_loop_active())
+    app_fade_draw();
   updatescreen();
 }
 
@@ -912,6 +915,8 @@ GameSession::begin_run()
         draw_endscreen_content();
       else if (overlay == OVERLAY_RESULT)
         draw_resultscreen_content();
+      if (app_loop_active())
+        app_fade_draw();
       flipscreen();
     }
   else
@@ -949,6 +954,8 @@ GameSession::process_overlay()
   else if (overlay == OVERLAY_RESULT)
     draw_resultscreen_content();
 
+  if (app_loop_active())
+    app_fade_draw();
   flipscreen();
 
   /* Input: skip after minimum duration (same semantics as wait_for_event). */

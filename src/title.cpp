@@ -534,6 +534,8 @@ if (app_loop_active())
   mouse_cursor->draw();
   touch_controls_draw();
 
+  if (app_loop_active())
+    app_fade_draw();
   flipscreen();
 
   /* Set the time of the last update and the time of the current update */
