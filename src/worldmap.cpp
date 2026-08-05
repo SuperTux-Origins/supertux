@@ -591,7 +591,7 @@ WorldMap::get_input()
   while (SDL_PollEvent(&event))
     {
       bool want_escape = false;
-      bool routed = touch_controls_process_event(event, &want_escape);
+      bool routed = st_filter_event(event, &want_escape);
 
       if (want_escape)
         {
@@ -667,11 +667,6 @@ WorldMap::get_input()
 #endif
 
 #ifdef USE_SDL2
-        case SDL_CONTROLLERDEVICEADDED:
-        case SDL_CONTROLLERDEVICEREMOVED:
-          st_gamepad_process_device_event(event);
-          break;
-
         case SDL_CONTROLLERAXISMOTION:
           if (!use_joystick)
             break;

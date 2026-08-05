@@ -1013,7 +1013,7 @@ void le_change_object_properties(GameObject *pobj)
     while (SDL_PollEvent(&event))
     {
       bool want_escape = false;
-      if (touch_controls_process_event(event, &want_escape))
+      if (st_filter_event(event, &want_escape))
         continue;
       if (want_escape)
         {
@@ -1078,7 +1078,7 @@ void le_checkevents()
   while(SDL_PollEvent(&event))
   {
     bool want_escape = false;
-    if (touch_controls_process_event(event, &want_escape))
+    if (st_filter_event(event, &want_escape))
       {
         /* Pad ate the event, or an open menu owned it (nav + Back). */
         if (!le_world && !Menu::current())

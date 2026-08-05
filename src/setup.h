@@ -34,6 +34,15 @@ void update_gamepad_device_menu(void);
 /** Close current pad and open device index (SDL joystick index), or -1 = none. */
 void st_gamepad_select(int device_index);
 #endif
+/**
+ * Shared pre-filter for one polled SDL_Event (call from every PollEvent loop).
+ *  1. GameController add/remove (SDL2) — always handled here.
+ *  2. touch_controls_process_event — touch pad + open menu ownership.
+ * Returns true if the caller should skip mode-specific handling.
+ * Sets *want_escape when Escape/Back/Menu was pressed with no menu open
+ * (may still return false so the event is visible to the caller).
+ */
+bool st_filter_event(SDL_Event& event, bool* want_escape);
 void st_shutdown(void);
 void st_menu(void);
 void st_abort(const std::string& reason, const std::string& details);

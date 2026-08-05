@@ -388,6 +388,7 @@ Work landed while unifying the frame pump; keep checked as regressions are found
 
 | Date | Item |
 |------|------|
+| 2026-08-05 | Central st_filter_event (gamepad hot-plug + touch/menu) for all main PollEvent pumps |
 | 2026-08-05 | SDL2 GameController picker GUI (Options → Gamepad Setup → Select Controller) |
 | 2026-08-05 | SDL2 gamepad: stop residual JOYBUTTON menu HIT; JOYHAT fallback in-level/worldmap; ignore raw JOY when controller open |
 | 2026-08-04 | Gamepad menu: Analog submenu; stick nav uses dead zone + edge detect (ignore raw JOYAXIS) |

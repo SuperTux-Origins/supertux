@@ -1811,6 +1811,25 @@ void st_joystick_setup(void)
     }
 }
 
+bool
+st_filter_event(SDL_Event& event, bool* want_escape)
+{
+  if (want_escape)
+    *want_escape = false;
+
+#ifdef USE_SDL2
+  /* Always handle hot-plug here so title/wasm/editor cannot miss it. */
+  if (event.type == SDL_CONTROLLERDEVICEADDED
+      || event.type == SDL_CONTROLLERDEVICEREMOVED)
+    {
+      st_gamepad_process_device_event(event);
+      return true;
+    }
+#endif
+
+  return touch_controls_process_event(event, want_escape);
+}
+
 #ifdef USE_SDL2
 void
 st_gamepad_process_device_event(const SDL_Event& event)

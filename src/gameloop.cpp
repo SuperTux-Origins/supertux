@@ -254,6 +254,14 @@ GameSession::process_events()
       SDL_Event event;
       while (SDL_PollEvent(&event))
         {
+          bool want_escape = false;
+          if (st_filter_event(event, &want_escape))
+            {
+              if (want_escape)
+                on_escape_press();
+              continue;
+            }
+
           /* Check for menu-events, if the menu is shown */
           if (Menu::current())
             {
@@ -282,10 +290,6 @@ GameSession::process_events()
               if ((int)event.cbutton.button == gamecontroller_keymap.menu)
                 on_escape_press();
               break;
-            case SDL_CONTROLLERDEVICEADDED:
-            case SDL_CONTROLLERDEVICEREMOVED:
-              st_gamepad_process_device_event(event);
-              break;
 #else
             case SDL_JOYBUTTONDOWN:
               if (event.jbutton.button == joystick_keymap.start_button)
@@ -304,7 +308,7 @@ GameSession::process_events()
       while (SDL_PollEvent(&event))
         {
           bool want_escape = false;
-          bool routed = touch_controls_process_event(event, &want_escape);
+          bool routed = st_filter_event(event, &want_escape);
 
           if (want_escape)
             {
@@ -477,11 +481,6 @@ GameSession::process_events()
 		  break;
 #endif
 #ifdef USE_SDL2
-                case SDL_CONTROLLERDEVICEADDED:
-                case SDL_CONTROLLERDEVICEREMOVED:
-                  st_gamepad_process_device_event(event);
-                  break;
-
                 case SDL_CONTROLLERAXISMOTION:
                   if (!use_joystick)
                     break;
