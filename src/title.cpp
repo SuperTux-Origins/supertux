@@ -361,6 +361,14 @@ title_frame(void)
   while (SDL_PollEvent(&event))
     {
       title_last_event = event;
+#ifdef USE_SDL2
+      /* Browser Gamepad API: pads often appear only after a button press
+         (gamepadconnected → CONTROLLERDEVICEADDED). Must handle on title
+         or the pad never opens until a level starts. */
+      if (event.type == SDL_CONTROLLERDEVICEADDED
+          || event.type == SDL_CONTROLLERDEVICEREMOVED)
+        st_gamepad_process_device_event(event);
+#endif
       bool want_escape = false;
       if (touch_controls_process_event(event, &want_escape))
         continue;
