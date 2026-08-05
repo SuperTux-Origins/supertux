@@ -101,6 +101,8 @@ int main(int argc, char * argv[])
   st_menu();
   loadshared();
 
+  int cli_fail = 0;
+
   if (launch_leveleditor_mode && level_startup_file)
     {
     leveleditor(level_startup_file);
@@ -131,7 +133,11 @@ int main(int argc, char * argv[])
         {
           /* .stl or any other path treated as a level file. */
           GameSession session(level_startup_file, 1, ST_GL_LOAD_LEVEL_FILE);
-          session.run();
+          if (session.run() == GameSession::ES_LEVEL_ABORT)
+            {
+              fprintf(stderr, "Failed to load level: %s\n", level_startup_file);
+              cli_fail = 1;
+            }
         }
     }
   else
@@ -154,5 +160,5 @@ int main(int argc, char * argv[])
   st_shutdown();
 #endif
 
-  return 0;
+  return cli_fail;
 }

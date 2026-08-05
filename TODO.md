@@ -424,3 +424,26 @@ Primary reason SDL 1.2 remains supported. Details: `mk/gp2x/CROSSCOMPILE.md`.
 - [ ] Optional static `.gpe` link recipe (lib order: image, SDL, png, jpeg, z, pthread, m)
 - [ ] Optional mikmod when `ENABLE_SOUND=ON` under `GP2X`
 - [ ] Nix package gated on toolchain path (optional)
+
+---
+
+## Robustness audit (SEGFAULT / error handling)
+
+From in-depth code audit. Goal: no SIGSEGV on corrupt/missing data in release (NDEBUG).
+
+### Critical
+- [x] Shared lisp root helper (`lisp_expect_symbol_root` / `lisp_element_symbol`)
+- [x] Harden `worldmap.cpp` tile/map loaders (no bare `lisp_symbol(lisp_car(...))`)
+- [x] Harden `tile.cpp` tileset loader (same)
+- [x] Harden `configfile.cpp` — type checks, always `fclose` + `lisp_free` on error paths
+- [x] Worldmap `TileManager::get` — range check + null-safe (no assert-only)
+- [x] `anim_speed <= 0` guard in `Tile::draw` / `draw_stretched`
+
+### High
+- [x] Reject `width <= 0` (and absurd upper bound) in `Level::load`
+- [x] Clamp world draw tile indices to valid `[0, width)` / `y ∈ [0,15)`
+- [x] Menu `MN_CONTROLFIELD` bind: null-check `int_p` before write
+
+### Medium / follow-up
+- [x] Replace tileset/worldmap `assert(0)` on wrong root with log + soft fail or `st_abort`
+- [x] Optional: `GameSession` soft-fail on bad level instead of process exit mid-play

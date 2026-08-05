@@ -1083,6 +1083,11 @@ Menu::event(SDL_Event& event)
             }
           /* Keyboard Setup: capture any key as the new binding.
              Stay on this field (do not auto-advance). */
+          if (!item[active_item].int_p)
+            {
+              control_bind_item = -1;
+              return;
+            }
           *item[active_item].int_p = (int)key;
           control_bind_item = -1;
           get_controlfield_key_into_input(&item[active_item]);
@@ -1295,6 +1300,11 @@ Menu::event(SDL_Event& event)
                 get_controlfield_key_into_input(&item[active_item]);
                 return;
               }
+            if (!item[active_item].int_p)
+              {
+                control_bind_item = -1;
+                return;
+              }
             *item[active_item].int_p = (int)event.cbutton.button;
             control_bind_item = -1;
             get_controlfield_key_into_input(&item[active_item]);
@@ -1342,6 +1352,11 @@ Menu::event(SDL_Event& event)
         && control_bind_item == active_item
         && Menu::current() == options_joystick_menu)
       {
+        if (!item[active_item].int_p)
+          {
+            control_bind_item = -1;
+            return;
+          }
         *item[active_item].int_p = (int)event.jbutton.button;
         control_bind_item = -1;
         get_controlfield_key_into_input(&item[active_item]);
@@ -1391,6 +1406,11 @@ Menu::event(SDL_Event& event)
 	    default : break;
        }
 
+        if (!item[active_item].int_p)
+          {
+            control_bind_item = -1;
+            break;
+          }
         *item[active_item].int_p = event.jbutton.button;
         control_bind_item = -1;
 	

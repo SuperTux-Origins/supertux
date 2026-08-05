@@ -91,7 +91,7 @@ class GameSession
   void draw();
   void action(double frame_ratio);
 
-  Level* get_level() { return world->get_level(); }
+  Level* get_level() { return world ? world->get_level() : 0; }
   World* get_world() { return world; }
 
   static GameSession* current() { return current_; }

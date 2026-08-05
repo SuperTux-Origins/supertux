@@ -84,6 +84,7 @@ GameSession::restart_level()
     }
   
   delete world;
+  world = 0;
 
   if (st_gl_mode == ST_GL_LOAD_LEVEL_FILE)
     {
@@ -96,6 +97,18 @@ GameSession::restart_level()
   else
     {
       world = new World(subset, levelnb);
+    }
+
+  /* Bad / missing level: leave the session without process exit. */
+  if (!world || !world->get_level() || !world->get_level()->is_valid())
+    {
+      std::cout << "GameSession: level load failed, aborting session\n";
+      delete world;
+      world = 0;
+      exit_status = ES_LEVEL_ABORT;
+      overlay = OVERLAY_NONE;
+      pending_exit = ES_NONE;
+      return;
     }
 
   // Set Tux to the nearest reset point
@@ -152,20 +165,24 @@ GameSession::~GameSession()
 void
 GameSession::draw_levelintro(void)
 {
+  Level* lev = get_level();
+  if (!lev)
+    return;
+
   char str[60];
 
-  if (get_level()->img_bkgd)
-    get_level()->img_bkgd->draw(0, 0);
+  if (lev->img_bkgd)
+    lev->img_bkgd->draw(0, 0);
   else
-    drawgradient(get_level()->bkgd_top, get_level()->bkgd_bottom);
+    drawgradient(lev->bkgd_top, lev->bkgd_bottom);
 
-  sprintf(str, "%s", world->get_level()->name.c_str());
+  sprintf(str, "%s", lev->name.c_str());
   gold_text->drawf(str, 0, 200, A_HMIDDLE, A_TOP, 1);
 
   sprintf(str, "TUX x %d", player_status.lives);
   white_text->drawf(str, 0, 224, A_HMIDDLE, A_TOP, 1);
 
-  sprintf(str, "by %s", world->get_level()->author.c_str());
+  sprintf(str, "by %s", lev->author.c_str());
   white_small_text->drawf(str, 0, 360, A_HMIDDLE, A_TOP, 1);
 }
 
@@ -737,9 +754,9 @@ GameSession::check_end_conditions()
 void
 GameSession::action(double frame_ratio)
 {
-  if (exit_status == ES_NONE)
+  if (exit_status == ES_NONE && world)
     {
-      if (!Menu::current() && !game_pause && world)
+      if (!Menu::current() && !game_pause)
         touch_controls_apply_player(*world->get_tux());
       // Update Tux and the World
       world->action(frame_ratio);
@@ -749,6 +766,8 @@ GameSession::action(double frame_ratio)
 void 
 GameSession::draw()
 {
+  if (!world)
+    return;
   world->draw();
   drawstatus();
 
@@ -871,20 +890,26 @@ GameSession::begin_run()
   current_ = this;
 
   fps_cnt = 0;
-  exit_status = ES_NONE;
+  /* Preserve ES_LEVEL_ABORT from a failed restart_level() in the ctor. */
+  if (exit_status != ES_LEVEL_ABORT)
+    exit_status = ES_NONE;
   update_time = last_update_time = st_get_ticks();
 
   // Eat unneeded events
   SDL_Event event;
   while (SDL_PollEvent(&event)) {}
 
-  draw();
+  if (world)
+    draw();
 }
 
 GameSession::ExitStatus
 GameSession::run()
 {
   begin_run();
+
+  if (exit_status == ES_LEVEL_ABORT || !world)
+    return exit_status == ES_NONE ? ES_LEVEL_ABORT : exit_status;
 
   while (frame())
     { /* busy loop — frame() does one iteration */ }
@@ -964,7 +989,7 @@ GameSession::process_overlay()
 bool
 GameSession::frame()
 {
-  if (exit_status != ES_NONE)
+  if (exit_status != ES_NONE || !world)
     return false;
 
   if (process_overlay())

@@ -1365,4 +1365,38 @@ lisp_object_t* lisp_read_from_file(const std::string& filename)
   return lisp_read(&stream);
 }
 
+int
+lisp_expect_symbol_root(lisp_object_t* obj, const char* expected_root)
+{
+  if (!obj || !expected_root)
+    return 0;
+  if (obj->type == LISP_TYPE_EOF || obj->type == LISP_TYPE_PARSE_ERROR)
+    return 0;
+  if (!lisp_cons_p(obj))
+    return 0;
+  {
+    lisp_object_t* car = lisp_car(obj);
+    if (lisp_nil_p(car) || !lisp_symbol_p(car))
+      return 0;
+    return strcmp(lisp_symbol(car), expected_root) == 0 ? 1 : 0;
+  }
+}
+
+int
+lisp_element_symbol(lisp_object_t* obj, const char** out_sym)
+{
+  if (out_sym)
+    *out_sym = 0;
+  if (!obj || !lisp_cons_p(obj))
+    return 0;
+  {
+    lisp_object_t* car = lisp_car(obj);
+    if (lisp_nil_p(car) || !lisp_symbol_p(car))
+      return 0;
+    if (out_sym)
+      *out_sym = lisp_symbol(car);
+    return 1;
+  }
+}
+
 // EOF //

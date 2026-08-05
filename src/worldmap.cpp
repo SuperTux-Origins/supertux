@@ -83,73 +83,89 @@ TileManager::TileManager()
   if (!root_obj)
     st_abort("Couldn't load file", stwt_filename);
 
-  if (strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-worldmap-tiles") == 0)
+  if (!lisp_expect_symbol_root(root_obj, "supertux-worldmap-tiles"))
     {
-      lisp_object_t* cur = lisp_cdr(root_obj);
-
-      while(!lisp_nil_p(cur))
-        {
-          lisp_object_t* element = lisp_car(cur);
-
-          if (strcmp(lisp_symbol(lisp_car(element)), "tile") == 0)
-            {
-              int id = 0;
-              std::string filename = "<invalid>";
-
-              Tile* tile = new Tile;             
-              tile->north = true;
-              tile->east  = true;
-              tile->south = true;
-              tile->west  = true;
-              tile->stop  = true;
-              tile->auto_walk = false;
-  
-              LispReader reader(lisp_cdr(element));
-              reader.read_int("id",  &id);
-              reader.read_bool("north", &tile->north);
-              reader.read_bool("south", &tile->south);
-              reader.read_bool("west",  &tile->west);
-              reader.read_bool("east",  &tile->east);
-              reader.read_bool("stop",  &tile->stop);
-              reader.read_bool("auto-walk",  &tile->auto_walk);
-              reader.read_string("image",  &filename);
-
-              std::string temp;
-              reader.read_string("one-way",  &temp);
-              tile->one_way = BOTH_WAYS;
-              if(!temp.empty())
-                {
-                if(temp == "north-south")
-                  tile->one_way = NORTH_SOUTH_WAY;
-                else if(temp == "south-north")
-                  tile->one_way = SOUTH_NORTH_WAY;
-                else if(temp == "east-west")
-                  tile->one_way = EAST_WEST_WAY;
-                else if(temp == "west-east")
-                  tile->one_way = WEST_EAST_WAY;
-                }
-
-              tile->sprite = new Surface(
-                           datadir +  "/images/worldmap/" + filename, 
-                           USE_ALPHA);
-
-              if (id >= int(tiles.size()))
-                tiles.resize(id+1);
-
-              tiles[id] = tile;
-            }
-          else
-            {
-              puts("Unhandled symbol");
-            }
-
-          cur = lisp_cdr(cur);
-        }
+      lisp_free(root_obj);
+      st_abort("Not a supertux-worldmap-tiles file", stwt_filename);
     }
-  else
-    {
-      assert(0);
-    }
+
+  {
+    lisp_object_t* cur = lisp_cdr(root_obj);
+
+    while(!lisp_nil_p(cur))
+      {
+        lisp_object_t* element = lisp_car(cur);
+        const char* el_sym = 0;
+
+        if (!lisp_element_symbol(element, &el_sym))
+          {
+            cur = lisp_cdr(cur);
+            continue;
+          }
+
+        if (strcmp(el_sym, "tile") == 0)
+          {
+            int id = 0;
+            std::string filename = "<invalid>";
+
+            Tile* tile = new Tile;
+            tile->north = true;
+            tile->east  = true;
+            tile->south = true;
+            tile->west  = true;
+            tile->stop  = true;
+            tile->auto_walk = false;
+
+            LispReader reader(lisp_cdr(element));
+            reader.read_int("id",  &id);
+            reader.read_bool("north", &tile->north);
+            reader.read_bool("south", &tile->south);
+            reader.read_bool("west",  &tile->west);
+            reader.read_bool("east",  &tile->east);
+            reader.read_bool("stop",  &tile->stop);
+            reader.read_bool("auto-walk",  &tile->auto_walk);
+            reader.read_string("image",  &filename);
+
+            std::string temp;
+            reader.read_string("one-way",  &temp);
+            tile->one_way = BOTH_WAYS;
+            if(!temp.empty())
+              {
+              if(temp == "north-south")
+                tile->one_way = NORTH_SOUTH_WAY;
+              else if(temp == "south-north")
+                tile->one_way = SOUTH_NORTH_WAY;
+              else if(temp == "east-west")
+                tile->one_way = EAST_WEST_WAY;
+              else if(temp == "west-east")
+                tile->one_way = WEST_EAST_WAY;
+              }
+
+            tile->sprite = new Surface(
+                         datadir +  "/images/worldmap/" + filename,
+                         USE_ALPHA);
+
+            if (id < 0)
+              {
+                delete tile;
+                cur = lisp_cdr(cur);
+                continue;
+              }
+            if (id >= int(tiles.size()))
+              tiles.resize(id+1, 0);
+
+            if (tiles[id] != 0 && tiles[id] != tile)
+              delete tiles[id];
+            tiles[id] = tile;
+          }
+        else
+          {
+            puts("Unhandled symbol");
+          }
+
+        cur = lisp_cdr(cur);
+      }
+  }
 
   lisp_free(root_obj);
 }
@@ -163,7 +179,8 @@ TileManager::~TileManager()
 Tile*
 TileManager::get(int i)
 {
-  assert(i >=0 && i < int(tiles.size()));
+  if (i < 0 || i >= int(tiles.size()))
+    return 0;
   return tiles[i];
 }
 
@@ -301,15 +318,17 @@ Tux::update(float delta)
             }
 
           Tile* cur_tile = worldmap->at(tile_pos);
-          if (cur_tile->stop || (level && (!level->name.empty() || level->teleport_dest_x != -1)))
+          if (!cur_tile
+              || cur_tile->stop
+              || (level && (!level->name.empty() || level->teleport_dest_x != -1)))
             {
               stop();
             }
           else
             {
-              if (worldmap->at(tile_pos)->auto_walk)
+              if (cur_tile->auto_walk)
                 { // Turn to a new direction
-                  Tile* tile = worldmap->at(tile_pos);
+                  Tile* tile = cur_tile;
                   Direction dir = D_NONE;
                   
                   if (tile->north && back_direction != D_NORTH)
@@ -411,93 +430,108 @@ WorldMap::load_map()
   lisp_object_t* root_obj = lisp_read_from_file(map_file);
   if (!root_obj)
     st_abort("Couldn't load file", map_file);
-  
-  if (strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-worldmap") == 0)
+
+  if (!lisp_expect_symbol_root(root_obj, "supertux-worldmap"))
     {
-      lisp_object_t* cur = lisp_cdr(root_obj);
-
-      while(!lisp_nil_p(cur))
-        {
-          lisp_object_t* element = lisp_car(cur);
-
-          if (strcmp(lisp_symbol(lisp_car(element)), "tilemap") == 0)
-            {
-              LispReader reader(lisp_cdr(element));
-              reader.read_int("width",  &width);
-              reader.read_int("height", &height);
-              reader.read_int_vector("data", &tilemap);
-            }
-          else if (strcmp(lisp_symbol(lisp_car(element)), "properties") == 0)
-            {
-              LispReader reader(lisp_cdr(element));
-              reader.read_string("name",  &name);
-              reader.read_string("music", &music);
-   	      reader.read_int("start_pos_x", &start_x);
-	      reader.read_int("start_pos_y", &start_y);
-            }
-          else if (strcmp(lisp_symbol(lisp_car(element)), "levels") == 0)
-            {
-              lisp_object_t* cur = lisp_cdr(element);
-              
-              while(!lisp_nil_p(cur))
-                {
-                  lisp_object_t* element = lisp_car(cur);
-                  
-                  if (strcmp(lisp_symbol(lisp_car(element)), "level") == 0)
-                    {
-                      Level level;
-                      LispReader reader(lisp_cdr(element));
-                      level.solved = false;
-                      
-                      level.north = true;
-                      level.east  = true;
-                      level.south = true;
-                      level.west  = true;
-
-                      reader.read_string("extro-filename",  &level.extro_filename);
-                      reader.read_string("name",  &level.name);
-                      reader.read_int("x", &level.x);
-                      reader.read_int("y", &level.y);
-                      reader.read_string("map-message", &level.display_map_message);
-                      level.auto_path = true;
-                      reader.read_bool("auto-path", &level.auto_path);
-                      level.passive_message = true;
-                      reader.read_bool("passive-message", &level.passive_message);
-							 
-							 level.invisible_teleporter = false;
-							 level.teleport_dest_x = level.teleport_dest_y = -1;
-							 reader.read_int("dest_x", &level.teleport_dest_x);
-							 reader.read_int("dest_y", &level.teleport_dest_y);
-							 reader.read_string("teleport-message", &level.teleport_message);
-							 reader.read_bool("invisible-teleporter", &level.invisible_teleporter);
-                      
-							 level.apply_action_north = level.apply_action_south =
-                            level.apply_action_east = level.apply_action_west = true;
-                      reader.read_bool("apply-action-up", &level.apply_action_north);
-                      reader.read_bool("apply-action-down", &level.apply_action_south);
-                      reader.read_bool("apply-action-left", &level.apply_action_west);
-                      reader.read_bool("apply-action-right", &level.apply_action_east);
-
-                      if(!level.name.empty())
-                        get_level_title(&level);   // get level's title
-
-                      levels.push_back(level);
-                    }
-                  
-                  cur = lisp_cdr(cur);      
-                }
-            }
-          else
-            {
-              
-            }
-          
-          cur = lisp_cdr(cur);
-        }
+      lisp_free(root_obj);
+      st_abort("Not a supertux-worldmap file", map_file);
     }
 
-    lisp_free(root_obj);   
-    tux = new Tux(this);
+  {
+    lisp_object_t* cur = lisp_cdr(root_obj);
+
+    while(!lisp_nil_p(cur))
+      {
+        lisp_object_t* element = lisp_car(cur);
+        const char* el_sym = 0;
+
+        if (!lisp_element_symbol(element, &el_sym))
+          {
+            cur = lisp_cdr(cur);
+            continue;
+          }
+
+        if (strcmp(el_sym, "tilemap") == 0)
+          {
+            LispReader reader(lisp_cdr(element));
+            reader.read_int("width",  &width);
+            reader.read_int("height", &height);
+            reader.read_int_vector("data", &tilemap);
+            if (width <= 0 || height <= 0)
+              {
+                lisp_free(root_obj);
+                st_abort("Worldmap tilemap has invalid size", map_file);
+              }
+          }
+        else if (strcmp(el_sym, "properties") == 0)
+          {
+            LispReader reader(lisp_cdr(element));
+            reader.read_string("name",  &name);
+            reader.read_string("music", &music);
+            reader.read_int("start_pos_x", &start_x);
+            reader.read_int("start_pos_y", &start_y);
+          }
+        else if (strcmp(el_sym, "levels") == 0)
+          {
+            lisp_object_t* lcur = lisp_cdr(element);
+
+            while(!lisp_nil_p(lcur))
+              {
+                lisp_object_t* lelem = lisp_car(lcur);
+                const char* lsym = 0;
+
+                if (lisp_element_symbol(lelem, &lsym)
+                    && strcmp(lsym, "level") == 0)
+                  {
+                    Level level;
+                    LispReader reader(lisp_cdr(lelem));
+                    level.solved = false;
+
+                    level.north = true;
+                    level.east  = true;
+                    level.south = true;
+                    level.west  = true;
+
+                    reader.read_string("extro-filename",  &level.extro_filename);
+                    reader.read_string("name",  &level.name);
+                    reader.read_int("x", &level.x);
+                    reader.read_int("y", &level.y);
+                    reader.read_string("map-message", &level.display_map_message);
+                    level.auto_path = true;
+                    reader.read_bool("auto-path", &level.auto_path);
+                    level.passive_message = true;
+                    reader.read_bool("passive-message", &level.passive_message);
+
+                    level.invisible_teleporter = false;
+                    level.teleport_dest_x = level.teleport_dest_y = -1;
+                    reader.read_int("dest_x", &level.teleport_dest_x);
+                    reader.read_int("dest_y", &level.teleport_dest_y);
+                    reader.read_string("teleport-message", &level.teleport_message);
+                    reader.read_bool("invisible-teleporter", &level.invisible_teleporter);
+
+                    level.apply_action_north = level.apply_action_south =
+                      level.apply_action_east = level.apply_action_west = true;
+                    reader.read_bool("apply-action-up", &level.apply_action_north);
+                    reader.read_bool("apply-action-down", &level.apply_action_south);
+                    reader.read_bool("apply-action-left", &level.apply_action_west);
+                    reader.read_bool("apply-action-right", &level.apply_action_east);
+
+                    if(!level.name.empty())
+                      get_level_title(&level);
+
+                    levels.push_back(level);
+                  }
+
+                lcur = lisp_cdr(lcur);
+              }
+          }
+
+        cur = lisp_cdr(cur);
+      }
+  }
+
+  lisp_free(root_obj);
+  tux = new Tux(this);
 }
 
 void WorldMap::get_level_title(Levels::pointer level)
@@ -516,10 +550,12 @@ void WorldMap::get_level_title(Levels::pointer level)
 
   if (root_obj->type == LISP_TYPE_EOF || root_obj->type == LISP_TYPE_PARSE_ERROR)
   {
-    printf("World: Parse Error in file %s", level->name.c_str());
+    printf("World: Parse Error in file %s\n", level->name.c_str());
+    lisp_free(root_obj);
+    return;
   }
 
-  if (strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-level") == 0)
+  if (lisp_expect_symbol_root(root_obj, "supertux-level"))
   {
     LispReader reader(lisp_cdr(root_obj));
     reader.read_string("name",  &level->title);
@@ -824,36 +860,42 @@ WorldMap::path_ok(Direction direction, Point old_pos, Point* new_pos)
 
   if (!(new_pos->x >= 0 && new_pos->x < width
         && new_pos->y >= 0 && new_pos->y < height))
-    { // New position is outsite the tilemap
+    { // New position is outside the tilemap
       return false;
     }
-  else if(at(*new_pos)->one_way != BOTH_WAYS)
+
+  Tile* new_tile = at(*new_pos);
+  Tile* old_tile = at(old_pos);
+  if (!new_tile || !old_tile)
+    return false;
+
+  if(new_tile->one_way != BOTH_WAYS)
     {
-      if((at(*new_pos)->one_way == NORTH_SOUTH_WAY && direction != D_SOUTH) ||
-         (at(*new_pos)->one_way == SOUTH_NORTH_WAY && direction != D_NORTH) ||
-         (at(*new_pos)->one_way == EAST_WEST_WAY && direction != D_WEST) ||
-         (at(*new_pos)->one_way == WEST_EAST_WAY && direction != D_EAST))
+      if((new_tile->one_way == NORTH_SOUTH_WAY && direction != D_SOUTH) ||
+         (new_tile->one_way == SOUTH_NORTH_WAY && direction != D_NORTH) ||
+         (new_tile->one_way == EAST_WEST_WAY && direction != D_WEST) ||
+         (new_tile->one_way == WEST_EAST_WAY && direction != D_EAST))
         return false;
       return true;
     }
   else
-    { // Check if we the tile allows us to go to new_pos
+    { // Check if the tile allows us to go to new_pos
       switch(direction)
         {
         case D_WEST:
-          return (at(old_pos)->west && at(*new_pos)->east);
+          return (old_tile->west && new_tile->east);
 
         case D_EAST:
-          return (at(old_pos)->east && at(*new_pos)->west);
+          return (old_tile->east && new_tile->west);
 
         case D_NORTH:
-          return (at(old_pos)->north && at(*new_pos)->south);
+          return (old_tile->north && new_tile->south);
 
         case D_SOUTH:
-          return (at(old_pos)->south && at(*new_pos)->north);
+          return (old_tile->south && new_tile->north);
 
         case D_NONE:
-          assert(!"path_ok() can't work if direction is NONE");
+          return false;
         }
       return false;
     }
@@ -901,14 +943,17 @@ if (app_loop_active())
                         Direction dir = D_NONE;
                         Tile* tile = at(tux->get_tile_pos());
 
-                        if (tile->north && tux->back_direction != D_NORTH)
-                          dir = D_NORTH;
-                        else if (tile->south && tux->back_direction != D_SOUTH)
-                          dir = D_SOUTH;
-                        else if (tile->east && tux->back_direction != D_EAST)
-                          dir = D_EAST;
-                        else if (tile->west && tux->back_direction != D_WEST)
-                          dir = D_WEST;
+                        if (tile)
+                          {
+                            if (tile->north && tux->back_direction != D_NORTH)
+                              dir = D_NORTH;
+                            else if (tile->south && tux->back_direction != D_SOUTH)
+                              dir = D_SOUTH;
+                            else if (tile->east && tux->back_direction != D_EAST)
+                              dir = D_EAST;
+                            else if (tile->west && tux->back_direction != D_WEST)
+                              dir = D_WEST;
+                          }
 
                         if (dir != D_NONE)
                           {
@@ -1023,12 +1068,16 @@ if (app_loop_active())
 Tile*
 WorldMap::at(Point p)
 {
-  assert(p.x >= 0 
-         && p.x < width
-         && p.y >= 0
-         && p.y < height);
-
-  return tile_manager->get(tilemap[width * p.y + p.x]);
+  if (width <= 0 || height <= 0)
+    return 0;
+  if (p.x < 0 || p.x >= width || p.y < 0 || p.y >= height)
+    return 0;
+  {
+    size_t idx = (size_t)width * (size_t)p.y + (size_t)p.x;
+    if (idx >= tilemap.size())
+      return 0;
+    return tile_manager->get(tilemap[idx]);
+  }
 }
 
 WorldMap::Level*
@@ -1052,8 +1101,9 @@ WorldMap::draw(const Point& offset)
     for(int x = 0; x < width; ++x)
       {
         Tile* tile = at(Point(x, y));
-        tile->sprite->draw(x*32 + offset.x,
-                           y*32 + offset.y);
+        if (tile && tile->sprite)
+          tile->sprite->draw(x*32 + offset.x,
+                             y*32 + offset.y);
       }
   
   for(Levels::iterator i = levels.begin(); i != levels.end(); ++i)

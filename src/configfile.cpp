@@ -68,11 +68,16 @@ void loadconfig(void)
   lisp_stream_init_file (&stream, file);
   root_obj = lisp_read (&stream);
 
-  if (root_obj->type == LISP_TYPE_EOF || root_obj->type == LISP_TYPE_PARSE_ERROR)
-    return;
-
-  if (strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-config") != 0)
-    return;
+  if (!root_obj
+      || root_obj->type == LISP_TYPE_EOF
+      || root_obj->type == LISP_TYPE_PARSE_ERROR
+      || !lisp_expect_symbol_root(root_obj, "supertux-config"))
+    {
+      if (root_obj)
+        lisp_free(root_obj);
+      fclose(file);
+      return;
+    }
 
   LispReader reader(lisp_cdr(root_obj));
 

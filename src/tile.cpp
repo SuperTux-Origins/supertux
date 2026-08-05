@@ -57,25 +57,28 @@ void TileManager::load_tileset(std::string filename, bool replace)
   if (!root_obj)
     st_abort("Couldn't load file", filename);
 
-  if (!lisp_cons_p(root_obj) || !lisp_symbol_p(lisp_car(root_obj)))
-    st_abort("Tileset root is not a list starting with a symbol", filename);
-
-  if (strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-tiles") == 0)
+  if (!lisp_expect_symbol_root(root_obj, "supertux-tiles"))
     {
+      lisp_free(root_obj);
+      st_abort("Not a supertux-tiles file", filename);
+    }
+
+  {
       lisp_object_t* cur = lisp_cdr(root_obj);
       int tileset_id = 0;
 
       while(!lisp_nil_p(cur))
         {
           lisp_object_t* element = lisp_car(cur);
+          const char* el_sym = 0;
 
-          if (!lisp_cons_p(element) || !lisp_symbol_p(lisp_car(element)))
+          if (!lisp_element_symbol(element, &el_sym))
             {
               cur = lisp_cdr(cur);
               continue;
             }
 
-          if (strcmp(lisp_symbol(lisp_car(element)), "tile") == 0)
+          if (strcmp(el_sym, "tile") == 0)
             {
               Tile* tile = new Tile;
               tile->id      = -1;
@@ -100,6 +103,7 @@ void TileManager::load_tileset(std::string filename, bool replace)
                           "  Each (tile ...) form must include a non-negative integer id.\n"
                           "  Example: (tile (id 10) (images \"block.png\") (solid #t))\n\n",
                           filename.c_str());
+                  lisp_free(root_obj);
                   st_abort("Invalid tile definition (missing or bad id)", filename);
                 }
               reader.read_bool("solid",     &tile->solid);
@@ -111,6 +115,8 @@ void TileManager::load_tileset(std::string filename, bool replace)
               reader.read_bool("goal",      &tile->goal);
               reader.read_int("data",       &tile->data);
               reader.read_int("anim-speed", &tile->anim_speed);
+              if (tile->anim_speed <= 0)
+                tile->anim_speed = 25;
               reader.read_int("next-tile",  &tile->next_tile);
               reader.read_string_vector("images",  &tile->filenames);
               reader.read_string_vector("editor-images", &tile->editor_filenames);
@@ -143,7 +149,7 @@ void TileManager::load_tileset(std::string filename, bool replace)
 
               tiles[tile->id + tileset_id] = tile;
             }
-          else if (strcmp(lisp_symbol(lisp_car(element)), "tileset") == 0)
+          else if (strcmp(el_sym, "tileset") == 0)
             {
               LispReader reader(lisp_cdr(element));
               std::string child_file;
@@ -152,17 +158,17 @@ void TileManager::load_tileset(std::string filename, bool replace)
               /* Merge nested tileset without clearing tiles already parsed. */
               load_tileset(child_file, false);
             }
-          else if (strcmp(lisp_symbol(lisp_car(element)), "tilegroup") == 0)
+          else if (strcmp(el_sym, "tilegroup") == 0)
             {
               TileGroup new_;
               LispReader reader(lisp_cdr(element));
               reader.read_string("name",  &new_.name);
-              reader.read_int_vector("tiles", &new_.tiles);	      
+              reader.read_int_vector("tiles", &new_.tiles);
               if(!tilegroups_)
                 tilegroups_ = new std::set<TileGroup>;
               tilegroups_->insert(new_);
             }
-          else if (strcmp(lisp_symbol(lisp_car(element)), "properties") == 0)
+          else if (strcmp(el_sym, "properties") == 0)
             {
               LispReader reader(lisp_cdr(element));
               reader.read_int("id",  &tileset_id);
@@ -175,11 +181,7 @@ void TileManager::load_tileset(std::string filename, bool replace)
 
           cur = lisp_cdr(cur);
         }
-    }
-  else
-    {
-      assert(0);
-    }
+  }
 
   lisp_free(root_obj);
   if(replace)
@@ -194,17 +196,14 @@ Tile::draw(float x, float y, unsigned int c, Uint8 alpha)
       Tile* ptile = TileManager::instance()->get(c);
       if(ptile)
         {
+          int aspeed = ptile->anim_speed > 0 ? ptile->anim_speed : 25;
           if(ptile->images.size() > 1)
             {
-              ptile->images[( ((global_frame_counter*25) / ptile->anim_speed) % (ptile->images.size()))]->draw(x,y, alpha);
+              ptile->images[( ((global_frame_counter*25) / aspeed) % (ptile->images.size()))]->draw(x,y, alpha);
             }
           else if (ptile->images.size() == 1)
             {
               ptile->images[0]->draw(x,y, alpha);
-            }
-          else
-            {
-              //printf("Tile not dravable %u\n", c);
             }
         }
     }
@@ -218,17 +217,14 @@ Tile::draw_stretched(float x, float y, int w, int h, unsigned int c, Uint8 alpha
       Tile* ptile = TileManager::instance()->get(c);
       if(ptile)
         {
+          int aspeed = ptile->anim_speed > 0 ? ptile->anim_speed : 25;
           if(ptile->images.size() > 1)
             {
-              ptile->images[( ((global_frame_counter*25) / ptile->anim_speed) % (ptile->images.size()))]->draw_stretched(x,y,w,h, alpha);
+              ptile->images[( ((global_frame_counter*25) / aspeed) % (ptile->images.size()))]->draw_stretched(x,y,w,h, alpha);
             }
           else if (ptile->images.size() == 1)
             {
               ptile->images[0]->draw_stretched(x,y, w, h, alpha);
-            }
-          else
-            {
-              //printf("Tile not dravable %u\n", c);
             }
         }
     }

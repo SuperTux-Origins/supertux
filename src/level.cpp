@@ -176,23 +176,32 @@ void LevelSubset::save()
 }
 
 Level::Level()
-  : img_bkgd(0)
+  : img_bkgd(0), valid_(false)
 {
   init_defaults();
 }
 
 Level::Level(const std::string& subset, int level)
-  : img_bkgd(0)
+  : img_bkgd(0), valid_(false)
 {
+  init_defaults();
   if(load(subset, level) < 0)
-    st_abort("Couldn't load level from subset", subset.c_str());
+    {
+      std::cout << "Level: Couldn't load level from subset: " << subset
+                << " #" << level << std::endl;
+      valid_ = false;
+    }
 }
 
 Level::Level(const std::string& filename)
-  : img_bkgd(0)
+  : img_bkgd(0), valid_(false)
 {
+  init_defaults();
   if(load(filename) < 0)
-    st_abort("Couldn't load level " , filename.c_str());
+    {
+      std::cout << "Level: Couldn't load level: " << filename << std::endl;
+      valid_ = false;
+    }
 }
 
 Level::~Level()
@@ -203,6 +212,7 @@ Level::~Level()
 void
 Level::init_defaults()
 {
+  valid_     = false;
   name       = "UnNamed";
   author     = "UnNamed";
   song_title = "Mortimers_chipdisko.mod";
@@ -275,10 +285,7 @@ Level::load(const std::string& filename)
   /* Plain text (intro/extro/CREDITS) or other non-level lisp must not
      reach lisp_symbol(lisp_car(...)) — car may not be a cons/symbol and
      strcmp then SIGSEGVs under NDEBUG. */
-  if (!lisp_cons_p(root_obj)
-      || lisp_nil_p(lisp_car(root_obj))
-      || !lisp_symbol_p(lisp_car(root_obj))
-      || strcmp(lisp_symbol(lisp_car(root_obj)), "supertux-level") != 0)
+  if (!lisp_expect_symbol_root(root_obj, "supertux-level"))
     {
       printf("Level: not a supertux-level file: %s\n", filename.c_str());
       lisp_free(root_obj);
@@ -295,7 +302,18 @@ Level::load(const std::string& filename)
       version = 0;
       reader.read_int("version",  &version);
       if(!reader.read_int("width",  &width))
-        st_abort("No width specified for level.", "");
+        {
+          printf("Level: no width specified: %s\n", filename.c_str());
+          lisp_free(root_obj);
+          return -1;
+        }
+      /* width<=0 or absurd values blow tile vectors / gettileid. */
+      if (width <= 0 || width > 100000)
+        {
+          printf("Level: invalid width %d in %s\n", width, filename.c_str());
+          lisp_free(root_obj);
+          return -1;
+        }
       if (!reader.read_int("start_pos_x", &start_pos_x)) start_pos_x = 100;
       if (!reader.read_int("start_pos_y", &start_pos_y)) start_pos_y = 170;
       time_left = 500;
@@ -522,6 +540,7 @@ Level::load(const std::string& filename)
     }
 
   lisp_free(root_obj);
+  valid_ = true;
   return 0;
 }
 

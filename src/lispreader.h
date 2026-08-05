@@ -99,6 +99,19 @@ lisp_object_t* lisp_read (lisp_stream_t *in);
 lisp_object_t* lisp_read_from_file(const std::string& filename);
 void lisp_free (lisp_object_t *obj);
 
+/**
+ * True if obj is a non-nil cons whose car is a symbol equal to expected_root
+ * (e.g. "supertux-level"). Safe under NDEBUG — never calls lisp_symbol/car
+ * without type checks (those use assert and SIGSEGV in release on bad data).
+ */
+int lisp_expect_symbol_root(lisp_object_t* obj, const char* expected_root);
+
+/**
+ * True if obj is a non-nil cons whose car is a symbol (any name).
+ * On success, *out_sym is set to the symbol string (owned by obj).
+ */
+int lisp_element_symbol(lisp_object_t* obj, const char** out_sym);
+
 lisp_object_t* lisp_read_from_string (const char *buf);
 
 int lisp_compile_pattern (lisp_object_t **obj, int *num_subs);

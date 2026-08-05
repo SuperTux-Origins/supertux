@@ -89,6 +89,9 @@ class Level
   Level(const std::string& filename);
   ~Level();
 
+  /** True after a successful load(); constructors no longer abort on failure. */
+  bool is_valid() const { return valid_; }
+
   /** Will the Level structure with default values */
   void init_defaults();
   
@@ -127,6 +130,9 @@ class Level
   unsigned int get_tile_at(int x, int y) const;
 
   void load_image(Surface** ptexture, std::string theme, const char * file, int use_alpha);
+
+ private:
+  bool valid_;
 };
 
 #endif /*SUPERTUX_LEVEL_H*/

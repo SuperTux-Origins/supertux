@@ -31,14 +31,20 @@ World::World(const std::string& filename)
 
   set_defaults();
 
-  get_level()->load_gfx();
-  activate_bad_guys();
-  activate_particle_systems();
+  if (level && level->is_valid())
+    {
+      get_level()->load_gfx();
+      activate_bad_guys();
+      activate_particle_systems();
 #ifndef NOSOUND
-  get_level()->load_song();
+      get_level()->load_song();
 #endif
-
-  apply_bonuses();
+      apply_bonuses();
+    }
+  else
+    {
+      std::cout << "World: level not valid, skipping gfx/enemies/music setup\n";
+    }
 
   scrolling_timer.init(true);
 }
@@ -54,14 +60,20 @@ World::World(const std::string& subset, int level_nr)
 
   set_defaults();
 
-  get_level()->load_gfx();
-  activate_bad_guys();
-  activate_particle_systems();
+  if (level && level->is_valid())
+    {
+      get_level()->load_gfx();
+      activate_bad_guys();
+      activate_particle_systems();
 #ifndef NOSOUND
-  get_level()->load_song();
+      get_level()->load_song();
 #endif
-
-  apply_bonuses();
+      apply_bonuses();
+    }
+  else
+    {
+      std::cout << "World: level not valid, skipping gfx/enemies/music setup\n";
+    }
 
   scrolling_timer.init(true);
 }
@@ -204,8 +216,11 @@ World::draw()
     {
       for (x = 0; x < 21; ++x)
         {
-          Tile::draw(32*x - fmodf(scroll_x, 32), y * 32,
-                     level->bg_tiles[(int)y][(int)x + (int)(scroll_x / 32)]);
+          int col = (int)x + (int)(scroll_x / 32);
+          unsigned int tid = 0;
+          if (col >= 0 && col < level->width)
+            tid = level->bg_tiles[(int)y][col];
+          Tile::draw(32*x - fmodf(scroll_x, 32), y * 32, tid);
         }
     }
 
@@ -214,8 +229,11 @@ World::draw()
     {
       for (x = 0; x < 21; ++x)
         {
-          Tile::draw(32*x - fmodf(scroll_x, 32), y * 32,
-                     level->ia_tiles[(int)y][(int)x + (int)(scroll_x / 32)]);
+          int col = (int)x + (int)(scroll_x / 32);
+          unsigned int tid = 0;
+          if (col >= 0 && col < level->width)
+            tid = level->ia_tiles[(int)y][col];
+          Tile::draw(32*x - fmodf(scroll_x, 32), y * 32, tid);
         }
     }
 
@@ -248,8 +266,11 @@ World::draw()
     {
       for (x = 0; x < 21; ++x)
         {
-          Tile::draw(32*x - fmodf(scroll_x, 32), y * 32,
-                     level->fg_tiles[(int)y][(int)x + (int)(scroll_x / 32)]);
+          int col = (int)x + (int)(scroll_x / 32);
+          unsigned int tid = 0;
+          if (col >= 0 && col < level->width)
+            tid = level->fg_tiles[(int)y][col];
+          Tile::draw(32*x - fmodf(scroll_x, 32), y * 32, tid);
         }
     }
 
