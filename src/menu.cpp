@@ -46,6 +46,7 @@ Menu* options_joystick_button_menu = 0;
 #ifdef USE_SDL2
 Menu* options_gamepad_menu = 0;
 Menu* options_gamepad_analog_menu = 0;
+Menu* options_gamepad_device_menu = 0;
 
 /* CONTROLLER* and JOY* both fire for the same physical press on many
    platforms. After we handle a controller event, ignore raw joystick for a
@@ -576,7 +577,19 @@ Menu::additem(MenuItem* pmenu_item)
 void
 Menu::clear()
 {
+  for (unsigned int i = 0; i < item.size(); ++i)
+    {
+      free(item[i].text);
+      free(item[i].input);
+      string_list_free(item[i].list);
+      item[i].text = 0;
+      item[i].input = 0;
+      item[i].list = 0;
+    }
   item.clear();
+  active_item = 0;
+  control_bind_item = -1;
+  hit_item = -1;
 }
 
 /* Process actions done on the menu */

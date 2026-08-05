@@ -1075,7 +1075,11 @@ if (app_loop_active())
               break;
             }
         }
-      else if(menu == options_menu)
+      else if(menu == options_menu
+#ifdef USE_SDL2
+               || menu == options_gamepad_device_menu
+#endif
+              )
         {
           process_options_menu();
         }

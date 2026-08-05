@@ -845,6 +845,7 @@ void st_menu(void)
 #ifdef USE_SDL2
   options_gamepad_menu = new Menu();
   options_gamepad_analog_menu = new Menu();
+  options_gamepad_device_menu = new Menu();
 #endif
   load_game_menu = new Menu();
   save_game_menu = new Menu();
@@ -939,6 +940,8 @@ void st_menu(void)
    * live in the Analog submenu. */
   options_gamepad_menu->additem(MN_LABEL,"Gamepad Setup",0,0);
   options_gamepad_menu->additem(MN_HL,"",0,0);
+  options_gamepad_menu->additem(MN_GOTO,"Select Controller",0,options_gamepad_device_menu);
+  options_gamepad_menu->additem(MN_HL,"",0,0);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Jump", 0,0, 0,&gamecontroller_keymap.jump);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Power/Run", 0,0, 0,&gamecontroller_keymap.fire);
   options_gamepad_menu->additem(MN_CONTROLFIELD,"Menu", 0,0, 0,&gamecontroller_keymap.menu);
@@ -960,6 +963,11 @@ void st_menu(void)
   options_gamepad_analog_menu->additem(MN_CONTROLFIELD,"Dead zone", 0,0, 0,&gamecontroller_keymap.analog_dead_zone);
   options_gamepad_analog_menu->additem(MN_HL,"",0,0);
   options_gamepad_analog_menu->additem(MN_BACK,"Back",0,0);
+
+  /* Filled by update_gamepad_device_menu() when the menu is shown. */
+  options_gamepad_device_menu->additem(MN_LABEL,"Select Controller",0,0);
+  options_gamepad_device_menu->additem(MN_HL,"",0,0);
+  options_gamepad_device_menu->additem(MN_BACK,"Back",0,0);
 #endif
 
 #ifndef GP2X
@@ -1098,9 +1106,137 @@ bool process_load_game_menu()
     }
 }
 
+#ifdef USE_SDL2
+void
+update_gamepad_device_menu(void)
+{
+  if (!options_gamepad_device_menu)
+    return;
+
+  int keep_active = options_gamepad_device_menu->active_item;
+
+  options_gamepad_device_menu->clear();
+  options_gamepad_device_menu->additem(MN_LABEL, "Select Controller", 0, 0);
+  options_gamepad_device_menu->additem(MN_HL, "", 0, 0);
+
+  int njoy = SDL_NumJoysticks();
+  int listed = 0;
+  for (int i = 0; i < njoy; ++i)
+    {
+      if (!SDL_IsGameController(i))
+        continue;
+
+      const char* name = SDL_GameControllerNameForIndex(i);
+      char line[160];
+      int active = (game_controller && use_joystick && joystick_num == i);
+      snprintf(line, sizeof(line), "%s[%d] %s",
+               active ? "* " : "  ",
+               i, name ? name : "(unnamed)");
+      options_gamepad_device_menu->additem(
+          MN_ACTION, line, 0, 0, MNID_GAMEPAD_DEVICE_BASE + i);
+      ++listed;
+    }
+
+  if (listed == 0)
+    options_gamepad_device_menu->additem(
+        MN_DEACTIVE, "(no mapped gamepads)", 0, 0);
+
+  options_gamepad_device_menu->additem(MN_HL, "", 0, 0);
+  {
+    char none_line[64];
+    snprintf(none_line, sizeof(none_line), "%sKeyboard only",
+             (!use_joystick || !game_controller) ? "* " : "  ");
+    options_gamepad_device_menu->additem(
+        MN_ACTION, none_line, 0, 0, MNID_GAMEPAD_NONE);
+  }
+  options_gamepad_device_menu->additem(MN_HL, "", 0, 0);
+  options_gamepad_device_menu->additem(MN_BACK, "Back", 0, 0);
+
+  if (keep_active >= 0
+      && keep_active < (int)options_gamepad_device_menu->item.size())
+    options_gamepad_device_menu->active_item = keep_active;
+  else
+    options_gamepad_device_menu->active_item = 0;
+}
+
+void
+st_gamepad_select(int device_index)
+{
+  if (game_controller)
+    {
+      SDL_GameControllerClose(game_controller);
+      game_controller = NULL;
+    }
+  use_joystick = false;
+
+  if (device_index < 0)
+    {
+      joystick_num = -1;
+      if (verbose_mode)
+        st_vlog("[pad] select: keyboard only\n");
+      update_gamepad_device_menu();
+      return;
+    }
+
+  int njoy = SDL_NumJoysticks();
+  if (device_index >= njoy || !SDL_IsGameController(device_index))
+    {
+      fprintf(stderr, "Warning: Game controller index %d unavailable.\n",
+              device_index);
+      joystick_num = -1;
+      update_gamepad_device_menu();
+      return;
+    }
+
+  game_controller = SDL_GameControllerOpen(device_index);
+  if (!game_controller)
+    {
+      fprintf(stderr, "Warning: Could not open game controller %d.\n"
+              "The Simple DirectMedia error that occured was:\n"
+              "%s\n\n", device_index, SDL_GetError());
+      joystick_num = -1;
+      update_gamepad_device_menu();
+      return;
+    }
+
+  SDL_GameControllerEventState(SDL_ENABLE);
+  SDL_JoystickEventState(SDL_ENABLE);
+  joystick_num = device_index;
+  use_joystick = true;
+  if (verbose_mode)
+    {
+      const char* name = SDL_GameControllerName(game_controller);
+      st_vlog("[pad] select: opened index %d \"%s\"\n",
+              device_index, name ? name : "(unnamed)");
+    }
+  update_gamepad_device_menu();
+}
+#endif
+
 /* Handle changes made to global settings in the options menu. */
 void process_options_menu(void)
 {
+#ifdef USE_SDL2
+  {
+    static Menu* last_options_cur = 0;
+    Menu* cur = Menu::current();
+    if (cur == options_gamepad_device_menu)
+      {
+        if (last_options_cur != options_gamepad_device_menu)
+          update_gamepad_device_menu();
+        last_options_cur = options_gamepad_device_menu;
+
+        int id = options_gamepad_device_menu->check();
+        if (id == MNID_GAMEPAD_NONE)
+          st_gamepad_select(-1);
+        else if (id >= MNID_GAMEPAD_DEVICE_BASE)
+          st_gamepad_select(id - MNID_GAMEPAD_DEVICE_BASE);
+        return;
+      }
+    last_options_cur = cur;
+  }
+#endif
+
   switch (options_menu->check())
     {
     case MNID_OPENGL:
@@ -1260,6 +1396,7 @@ void st_general_free(void)
   delete options_joystick_axis_menu;
   delete options_joystick_menu;
 #ifdef USE_SDL2
+  delete options_gamepad_device_menu;
   delete options_gamepad_analog_menu;
   delete options_gamepad_menu;
 #endif
@@ -1681,7 +1818,11 @@ st_gamepad_process_device_event(const SDL_Event& event)
   if (event.type == SDL_CONTROLLERDEVICEADDED)
     {
       if (game_controller)
-        return;
+        {
+          if (Menu::current() == options_gamepad_device_menu)
+            update_gamepad_device_menu();
+          return;
+        }
       int idx = event.cdevice.which;
       if (!SDL_IsGameController(idx))
         return;
@@ -1696,12 +1837,18 @@ st_gamepad_process_device_event(const SDL_Event& event)
               st_vlog("[pad] hot-plug open [%d] \"%s\"\n",
                       idx, name ? name : "(unnamed)");
             }
+          if (Menu::current() == options_gamepad_device_menu)
+            update_gamepad_device_menu();
         }
     }
   else if (event.type == SDL_CONTROLLERDEVICEREMOVED)
     {
       if (!game_controller)
-        return;
+        {
+          if (Menu::current() == options_gamepad_device_menu)
+            update_gamepad_device_menu();
+          return;
+        }
       SDL_JoystickID my_id =
         SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(game_controller));
       if (event.cdevice.which == my_id)
@@ -1712,6 +1859,8 @@ st_gamepad_process_device_event(const SDL_Event& event)
           if (verbose_mode)
             st_vlog("[pad] controller removed\n");
         }
+      if (Menu::current() == options_gamepad_device_menu)
+        update_gamepad_device_menu();
     }
 }
 #else
