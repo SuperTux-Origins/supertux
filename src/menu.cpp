@@ -419,11 +419,61 @@ void Menu::get_controlfield_key_into_input(MenuItem *item)
   case SDLK_LALT:
     item->change_input("Left Alt");
     break;
+  case SDLK_TAB:
+    item->change_input("Tab");
+    break;
+  case SDLK_ESCAPE:
+    item->change_input("Escape");
+    break;
+  case SDLK_BACKSPACE:
+    item->change_input("Backspace");
+    break;
+  case SDLK_DELETE:
+    item->change_input("Delete");
+    break;
+  case SDLK_HOME:
+    item->change_input("Home");
+    break;
+  case SDLK_END:
+    item->change_input("End");
+    break;
+  case SDLK_PAGEUP:
+    item->change_input("Page Up");
+    break;
+  case SDLK_PAGEDOWN:
+    item->change_input("Page Down");
+    break;
+  case SDLK_INSERT:
+    item->change_input("Insert");
+    break;
+  case SDLK_CAPSLOCK:
+    item->change_input("Caps Lock");
+    break;
+  case SDLK_F1:  item->change_input("F1");  break;
+  case SDLK_F2:  item->change_input("F2");  break;
+  case SDLK_F3:  item->change_input("F3");  break;
+  case SDLK_F4:  item->change_input("F4");  break;
+  case SDLK_F5:  item->change_input("F5");  break;
+  case SDLK_F6:  item->change_input("F6");  break;
+  case SDLK_F7:  item->change_input("F7");  break;
+  case SDLK_F8:  item->change_input("F8");  break;
+  case SDLK_F9:  item->change_input("F9");  break;
+  case SDLK_F10: item->change_input("F10"); break;
+  case SDLK_F11: item->change_input("F11"); break;
+  case SDLK_F12: item->change_input("F12"); break;
   default:
     {
-      char tmp[64];
-      snprintf(tmp, 64, "%d", *item->int_p);
-      item->change_input(tmp);
+      /* Letters, digits, and other keys: SDL label beats a raw keycode
+         (SDL2 keycodes are large scancode-based values). */
+      const char* name = SDL_GetKeyName((SDLKey)*item->int_p);
+      if (name && name[0])
+        item->change_input(name);
+      else
+        {
+          char tmp[64];
+          snprintf(tmp, 64, "Key %d", *item->int_p);
+          item->change_input(tmp);
+        }
     }
     break;
   }
