@@ -18,6 +18,43 @@
 #include "resources.h"
 #include "texture.h"
 #include "tile.h"
+#include "text.h"
+#include <string.h>
+
+/** Case-insensitive suffix match; ext includes the dot (e.g. ".stl"). */
+static bool
+path_has_ext(const char* path, const char* ext)
+{
+  if (!path || !ext)
+    return false;
+  size_t n = strlen(path);
+  size_t m = strlen(ext);
+  if (n < m)
+    return false;
+  for (size_t i = 0; i < m; ++i)
+    {
+      char a = path[n - m + i];
+      char b = ext[i];
+      if (a >= 'A' && a <= 'Z') a = (char)(a + ('a' - 'A'));
+      if (b >= 'A' && b <= 'Z') b = (char)(b + ('a' - 'A'));
+      if (a != b)
+        return false;
+    }
+  return true;
+}
+
+/** Basename of path (last component); may be empty. */
+static const char*
+path_basename(const char* path)
+{
+  if (!path)
+    return "";
+  const char* s = strrchr(path, '/');
+  const char* b = strrchr(path, '\\');
+  if (b && (!s || b > s))
+    s = b;
+  return s ? s + 1 : path;
+}
 
 int main(int argc, char * argv[])
 {
@@ -44,8 +81,37 @@ int main(int argc, char * argv[])
     }
   else if (level_startup_file)
     {
-      GameSession session(level_startup_file, 1, ST_GL_LOAD_LEVEL_FILE);
-      session.run();
+      /* Direct jump by extension:
+           .stl  → level session
+           .stwm → worldmap
+           .txt  → story/credits text scroller
+         Unknown extensions keep the historical level-file behaviour. */
+      if (path_has_ext(level_startup_file, ".stwm"))
+        {
+          WorldMapNS::WorldMap worldmap;
+          worldmap.loadmap(level_startup_file);
+          worldmap.display();
+        }
+      else if (path_has_ext(level_startup_file, ".txt"))
+        {
+          const char* base = path_basename(level_startup_file);
+          bool credits = false;
+          if (base && base[0]
+              && (strncmp(base, "CREDITS", 7) == 0
+                  || strncmp(base, "credits", 7) == 0))
+            credits = true;
+          const char* bg = credits
+            ? "/images/background/oiltux.jpg"
+            : "/images/background/arctis2.jpg";
+          float speed = credits ? SCROLL_SPEED_CREDITS : SCROLL_SPEED_MESSAGE;
+          display_text_file(level_startup_file, bg, speed);
+        }
+      else
+        {
+          /* .stl or any other path treated as a level file. */
+          GameSession session(level_startup_file, 1, ST_GL_LOAD_LEVEL_FILE);
+          session.run();
+        }
     }
   else
     {

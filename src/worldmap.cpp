@@ -1370,7 +1370,13 @@ void
 WorldMap::loadmap(const std::string& filename)
 {
   savegame_file = "";
-  set_map_file(filename);
+  /* Basename → levels/worldmaps/<name>; path with slash is used as-is
+     (CLI / contrib absolute or relative paths). */
+  if (filename.find('/') != std::string::npos
+      || filename.find('\\') != std::string::npos)
+    map_file = filename;
+  else
+    set_map_file(filename);
   load_map();
 }
 

@@ -2047,7 +2047,7 @@ void parseargs(int argc, char * argv[])
         {     /* Show help: */
           puts("Super Tux " VERSION "\n"
                "  Please see the file \"README.txt\" for more details.\n");
-          printf("Usage: %s [OPTIONS] FILENAME\n\n", argv[0]);
+          printf("Usage: %s [OPTIONS] [FILE]\n\n", argv[0]);
           puts("Display Options:\n"
                "  -w, --window        Run in window mode.\n"
                "  -f, --fullscreen    Run in fullscreen mode.\n"
@@ -2073,7 +2073,13 @@ void parseargs(int argc, char * argv[])
                "  --help              Display a help message summarizing command-line\n"
                "                      options, license and game controls.\n"
                "  --usage             Display a brief message summarizing command-line options.\n"
-               "  --version           Display the version of SuperTux you're running.\n\n"
+               "  --version           Display the version of SuperTux you're running.\n"
+               "\n"
+               "Direct start (optional FILE):\n"
+               "  *.stl               Play that level immediately\n"
+               "  *.stwm              Open that worldmap immediately\n"
+               "  *.txt               Show the story/credits text scroller\n"
+               "                      (CREDITS* uses the credits background)\n\n"
                );
           exit(0);
         }
@@ -2155,7 +2161,8 @@ void usage(char * prog, int ret)
 
   /* Display the usage message: */
 
-  fprintf(fi, "Usage: %s [--fullscreen] [--opengl] [--disable-sound] [--disable-music] [--debug-mode] | [--usage | --help | --version] FILENAME\n",
+  fprintf(fi, "Usage: %s [OPTIONS] [FILE]\n"
+          "  FILE may be a .stl level, .stwm worldmap, or .txt story/credits scroll.\n",
           prog);
 
 

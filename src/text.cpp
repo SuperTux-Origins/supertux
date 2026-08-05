@@ -265,13 +265,20 @@ void display_text_file_begin(const std::string& file, Surface* surface, float sc
 
   char filename[1024];
   char temp[1024];
-  FILE* fi;
-  sprintf(filename,"%s/%s", datadir.c_str(), file.c_str());
-  if((fi = fopen(filename,"r")) != NULL)
+  FILE* fi = 0;
+  /* Prefer the path as given (CLI absolute/relative), else datadir/file. */
+  if (faccessible(file.c_str()))
+    snprintf(filename, sizeof(filename), "%s", file.c_str());
+  else
+    snprintf(filename, sizeof(filename), "%s/%s", datadir.c_str(), file.c_str());
+  fi = fopen(filename, "r");
+  if (fi != NULL)
     {
       while(fgets(temp, sizeof(temp), fi) != NULL)
         {
-          temp[strlen(temp)-1]='\0';
+          size_t len = strlen(temp);
+          if (len > 0 && temp[len - 1] == '\n')
+            temp[len - 1] = '\0';
           string_list_add_item(&g_textscroll.names,temp);
         }
       fclose(fi);
