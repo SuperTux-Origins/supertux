@@ -279,7 +279,7 @@
               inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config qemu file pkgsi686Linux bash binutils;
             };
             r36s = import ./nix/r36s.nix {
-              inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config;
+              inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config writeShellScript;
               pkgsCross = pkgs.pkgsCross;
             };
             android = import ./nix/android.nix {              pkgs = androidPkgs;

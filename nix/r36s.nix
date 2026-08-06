@@ -8,8 +8,6 @@
 #   nix build .#arkos-sysroot
 #   nix build .#supertux-milestone1-r36s
 #
-# If the URL hash is wrong, Nix prints the expected hash on first fetch.
-#
 { lib
 , stdenv
 , stdenvNoCC
@@ -17,12 +15,10 @@
 , cmake
 , pkg-config
 , pkgsCross
+, writeShellScript
 }:
 
 let
-  # ---------------------------------------------------------------------------
-  # Sysroot (device-compatible headers + .so)
-  # ---------------------------------------------------------------------------
   arkosSysrootSrc = fetchurl {
     name = "arkos-sysroot.tar.gz";
     url = "http:///localhost:8888/arkos-sysroot2.tar.gz";
@@ -31,6 +27,10 @@ let
     hash = "sha256-nIlMQ3P0uBrRQ9/k2x1s9DpdnF8iqA2wBLSB/20uXYg=";
   };
 
+  # Allow hash to be overridden by the user who already fetched the tarball;
+  # if the placeholder remains, Nix will print the expected hash.
+  khrplatformH = ../mk/r36s/include/KHR/khrplatform.h;
+
   arkosSysroot = stdenvNoCC.mkDerivation {
     pname = "arkos-sysroot";
     version = "0.1";
@@ -38,9 +38,6 @@ let
 
     dontConfigure = true;
     dontBuild = true;
-
-    # Foreign aarch64 rootfs: do not patchelf / strip / rewrite shebangs, and
-    # allow dangling multiarch/soname symlinks typical of a partial sysroot.
     dontPatchELF = true;
     dontStrip = true;
     dontPatchShebangs = true;
@@ -50,10 +47,6 @@ let
       runHook preInstall
       mkdir -p "$out"
 
-      # Accept common layouts:
-      #   ./usr/...
-      #   ./sysroot/usr/...
-      #   ./<top>/usr/...
       if [ -d usr ]; then
         cp -a . "$out/"
       elif [ -d sysroot/usr ]; then
@@ -76,17 +69,32 @@ let
         exit 1
       }
 
-      # Convenience symlink used by docs / scripts
+      for base in "$out/usr/include" "$out/usr/lib" "$out/lib"; do
+        if [ -d "$base/aarch64-linux-gnu" ] && [ ! -e "$base/aarch64-unknown-linux-gnu" ]; then
+          ln -sfn aarch64-linux-gnu "$base/aarch64-unknown-linux-gnu"
+        fi
+      done
+
+      mkdir -p "$out/usr/include/KHR"
+      cp -f ${khrplatformH} "$out/usr/include/KHR/khrplatform.h"
+
+      # Debian libc.so linker scripts embed absolute /lib/... paths. Rewrite
+      # ONLY the multiarch absolute prefixes (not a bare "/lib/" which would
+      # re-match inside /nix/store/.../lib/... and double the path).
+      find "$out" -type f \( -name 'libc.so' -o -name 'libpthread.so' -o -name 'libm.so' -o -name 'libdl.so' -o -name 'librt.so' -o -name 'libutil.so' -o -name 'libresolv.so' -o -name 'libanl.so' -o -name 'libBrokenLocale.so' -o -name 'libthread_db.so' \) 2>/dev/null | while read -r f; do
+        if grep -qE 'GROUP|INPUT' "$f" 2>/dev/null; then
+          echo "patching linker script $f"
+          # Match only when the path starts at a token boundary (space, (, =).
+          sed -i -E \
+            -e "s#(^|[[:space:](=])/usr/lib/aarch64-linux-gnu/#\1$out/usr/lib/aarch64-linux-gnu/#g" \
+            -e "s#(^|[[:space:](=])/lib/aarch64-linux-gnu/#\1$out/lib/aarch64-linux-gnu/#g" \
+            "$f" || true
+          case "$f" in *libc.so) echo "---- $f ----"; cat "$f"; echo "--------";; esac
+        fi
+      done
+
       ln -sfn . "$out/sysroot"
-
-      # Record layout for debugging
-      {
-        echo "arkos-sysroot unpacked for SuperTux Milestone 1"
-        echo "source=${arkosSysrootSrc}"
-        ls -la "$out" | head -20
-        ls "$out/usr/lib/aarch64-linux-gnu" 2>/dev/null | head -5 || true
-      } > "$out/SYSROOT.txt"
-
+      echo "arkos-sysroot ready" > "$out/SYSROOT.txt"
       runHook postInstall
     '';
 
@@ -98,32 +106,118 @@ let
     };
   };
 
-  # Cross toolchain from nixpkgs (compiler only — libs come from the sysroot).
   crossPkgs = pkgsCross.aarch64-multiplatform;
   crossCc = crossPkgs.stdenv.cc;
-  targetPrefix = crossCc.targetPrefix; # e.g. aarch64-unknown-linux-gnu-
+  targetPrefix = crossCc.targetPrefix;
 
-  # ---------------------------------------------------------------------------
-  # Game binary linked against the ArkOS sysroot
-  # ---------------------------------------------------------------------------
+  # Wrappers inject -nostdinc + ordered isystem so:
+  #   1) libstdc++ (from nixpkgs gcc)
+  #   2) gcc fixed headers (stddef.h)
+  #   3) ArkOS glibc headers only (never gcc's modern sys-include)
+  # That avoids __attr_dealloc_free errors from mixing glibc 2.30 cdefs with
+  # modern stdlib.h, and keeps #include_next <stdlib.h> working.
+  mkWrappers = sysroot: let
+    gcc = crossCc.cc;
+    tp = lib.removeSuffix "-" targetPrefix; # aarch64-unknown-linux-gnu
+    libdir = "${sysroot}/usr/lib/aarch64-linux-gnu";
+    # libstdc++ lives under the gcc package; versioned path.
+    cxxInc = "${gcc}/include/c++/${gcc.version}";
+    cxxIncTarget = "${cxxInc}/${tp}";
+    fixedInc = "${gcc}/lib/gcc/${tp}/${gcc.version}/include";
+    fixedInc2 = "${gcc}/lib/gcc/${tp}/${gcc.version}/include-fixed";
+    libgccDir = "${gcc}/lib/gcc/${tp}/${gcc.version}";
+    commonC = ''
+      -nostdinc \
+      -isystem ${fixedInc} \
+      -isystem ${fixedInc2} \
+      -isystem ${sysroot}/usr/include/aarch64-linux-gnu \
+      -isystem ${sysroot}/usr/include \
+      --sysroot=${sysroot} \
+      -Wl,--sysroot=${sysroot} \
+      -B${libdir} \
+      -B${libgccDir} \
+      -L${libdir} \
+      -L${libgccDir} \
+      -L${sysroot}/usr/lib \
+      -L${sysroot}/lib \
+      -L${sysroot}/lib/aarch64-linux-gnu \
+      -pthread \
+      -Wl,-rpath-link,${libdir} \
+      -Wl,-rpath-link,${sysroot}/usr/lib/aarch64-linux-gnu \
+      -Wl,-rpath-link,${sysroot}/lib/aarch64-linux-gnu \
+      -Wl,-rpath-link,${sysroot}/usr/lib/aarch64-linux-gnu/pulseaudio \
+      -Wl,-rpath-link,${sysroot}/lib/aarch64-linux-gnu/pulseaudio \
+      -Wl,--as-needed \
+      -march=armv8-a \
+      -mtune=cortex-a35 \
+    '';
+    commonCxx = ''
+      -nostdinc \
+      -isystem ${cxxInc} \
+      -isystem ${cxxIncTarget} \
+      -isystem ${cxxInc}/backward \
+      -isystem ${fixedInc} \
+      -isystem ${fixedInc2} \
+      -isystem ${sysroot}/usr/include/aarch64-linux-gnu \
+      -isystem ${sysroot}/usr/include \
+      --sysroot=${sysroot} \
+      -Wl,--sysroot=${sysroot} \
+      -B${libdir} \
+      -B${libgccDir} \
+      -L${libdir} \
+      -L${libgccDir} \
+      -L${sysroot}/usr/lib \
+      -L${sysroot}/lib \
+      -L${sysroot}/lib/aarch64-linux-gnu \
+      -pthread \
+      -Wl,-rpath-link,${libdir} \
+      -Wl,-rpath-link,${sysroot}/usr/lib/aarch64-linux-gnu \
+      -Wl,-rpath-link,${sysroot}/lib/aarch64-linux-gnu \
+      -Wl,-rpath-link,${sysroot}/usr/lib/aarch64-linux-gnu/pulseaudio \
+      -Wl,-rpath-link,${sysroot}/lib/aarch64-linux-gnu/pulseaudio \
+      -Wl,--as-needed \
+      -march=armv8-a \
+      -mtune=cortex-a35 \
+    '';
+    bintoolsBin = "${crossCc.bintools}/bin";
+  in {
+    cc = writeShellScript "aarch64-arkos-gcc" ''
+      export PATH="${crossCc.bintools}/bin:$PATH"
+      exec ${gcc}/bin/${targetPrefix}gcc \
+        -B${crossCc.bintools}/bin \
+        ${commonC} \
+        "$@"
+    '';
+    cxx = writeShellScript "aarch64-arkos-g++" ''
+      export PATH="${crossCc.bintools}/bin:$PATH"
+      exec ${gcc}/bin/${targetPrefix}g++ \
+        -B${crossCc.bintools}/bin \
+        ${commonCxx} \
+        "$@"
+    '';
+  };
+
   mkSuperTuxR36s = {
     src
   , version
   , pname ? "supertux-milestone1-r36s"
   , enableSound ? true
   }:
+    let
+      wrappers = mkWrappers arkosSysroot;
+    in
     stdenv.mkDerivation {
       inherit pname version src;
 
       nativeBuildInputs = [
         cmake
         pkg-config
-        crossCc
+        crossCc.bintools
       ];
 
-      # No nixpkgs SDL/Mesa on the link line — only the sysroot.
       strictDeps = true;
 
+      # Avoid host cmakeDefaults forcing the wrong compilers after our flags.
       cmakeFlags = [
         "-DCMAKE_SYSTEM_NAME=Linux"
         "-DCMAKE_SYSTEM_PROCESSOR=aarch64"
@@ -133,12 +227,12 @@ let
         "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY"
         "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY"
         "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY"
-        "-DCMAKE_C_COMPILER=${crossCc}/bin/${targetPrefix}gcc"
-        "-DCMAKE_CXX_COMPILER=${crossCc}/bin/${targetPrefix}g++"
-        "-DCMAKE_C_FLAGS_INIT=-march=armv8-a -mtune=cortex-a35"
-        "-DCMAKE_CXX_FLAGS_INIT=-march=armv8-a -mtune=cortex-a35"
-        # Prefer the sysroot libstdc++ ABI when possible; still link via cross gcc.
-        "-DCMAKE_EXE_LINKER_FLAGS_INIT=--sysroot=${arkosSysroot}"
+        "-DCMAKE_C_COMPILER=${wrappers.cc}"
+        "-DCMAKE_CXX_COMPILER=${wrappers.cxx}"
+        "-DCMAKE_C_COMPILER_WORKS=1"
+        "-DCMAKE_CXX_COMPILER_WORKS=1"
+        "-DCMAKE_C_COMPILER_FORCED=TRUE"
+        "-DCMAKE_CXX_COMPILER_FORCED=TRUE"
         "-DENABLE_SDL2=ON"
         "-DENABLE_GLES2=ON"
         "-DENABLE_OPENGL=ON"
@@ -157,12 +251,27 @@ let
         export PKG_CONFIG_DIR=""
         export PKG_CONFIG_PATH=""
         export PKG_CONFIG_LIBDIR="${arkosSysroot}/usr/lib/aarch64-linux-gnu/pkgconfig:${arkosSysroot}/usr/lib/pkgconfig:${arkosSysroot}/usr/share/pkgconfig"
-        echo "PKG_CONFIG_SYSROOT_DIR=$PKG_CONFIG_SYSROOT_DIR"
-        echo "PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR"
         pkg-config --exists sdl2 && pkg-config --modversion sdl2 || true
+
+        ZLIB_LIB=
+        for cand in \
+          "${arkosSysroot}/usr/lib/aarch64-linux-gnu/libz.so" \
+          "${arkosSysroot}/lib/aarch64-linux-gnu/libz.so" \
+          "${arkosSysroot}/usr/lib/aarch64-linux-gnu/libz.so.1" \
+          "${arkosSysroot}/lib/aarch64-linux-gnu/libz.so.1"
+        do
+          if [ -e "$cand" ]; then ZLIB_LIB="$cand"; break; fi
+        done
+        if [ -z "$ZLIB_LIB" ]; then
+          echo "arkos-sysroot: no libz.so found" >&2
+          exit 1
+        fi
+        cmakeFlagsArray+=(
+          "-DZLIB_INCLUDE_DIR=${arkosSysroot}/usr/include"
+          "-DZLIB_LIBRARY=$ZLIB_LIB"
+        )
       '';
 
-      # cmakeInstallPhase installs the binary; add README + PortMaster-style launcher.
       postInstall = ''
         mkdir -p $out/share/supertux-milestone1
         if [ -d "$src/data" ]; then
@@ -173,22 +282,14 @@ SuperTux Milestone 1 — R36S / ArkOS (sysroot-linked)
 ====================================================
 
 Binary: bin/supertux-milestone1
-  SDL2 + GLES2, logical 640×480, linked against the ArkOS aarch64 sysroot
-  (https://github.com/grumnix/arkos-sysroot.tar.gz).
+  SDL2 + GLES2, linked against the ArkOS aarch64 sysroot.
 
-Deploy:
-  1. Copy bin/supertux-milestone1 and share/supertux-milestone1/ (data) to the device
-  2. Ensure runtime libs exist on ArkOS (SDL2, GLES/EGL, libpng, …)
-  3. Run: ./supertux-milestone1 --fullscreen -v
-
-If ldd reports missing .so files (e.g. libopusfile), install the matching
-packages on the device or ship them under libs/ + LD_LIBRARY_PATH.
+Deploy the binary + share/supertux-milestone1 data to the device.
 EOF_README
         cat > $out/share/supertux-milestone1/supertux-milestone1.sh << 'LAUNCH'
 #!/bin/bash
 DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
-# export LD_LIBRARY_PATH="$DIR/libs:$LD_LIBRARY_PATH"
 BIN="$DIR/../bin/supertux-milestone1"
 if [ ! -x "$BIN" ]; then BIN="$DIR/supertux-milestone1"; fi
 exec "$BIN" --fullscreen "$@"
