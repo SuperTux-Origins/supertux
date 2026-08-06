@@ -25,10 +25,10 @@ let
   # ---------------------------------------------------------------------------
   arkosSysrootSrc = fetchurl {
     name = "arkos-sysroot.tar.gz";
-    url = "file:///tmp/arkos-sysroot.tar.gz";
+    url = "http:///localhost:8888/arkos-sysroot2.tar.gz";
     # Replace after:  nix store prefetch-file https://github.com/grumnix/arkos-sysroot.tar.gz
     # (or let `nix build .#arkos-sysroot` print the correct hash).
-    hash = "sha256-zUa1d/8qVZD7msJyzenSMtAB7CwvsskaK2YJmsbbWBI=";
+    hash = "sha256-nIlMQ3P0uBrRQ9/k2x1s9DpdnF8iqA2wBLSB/20uXYg=";
   };
 
   arkosSysroot = stdenvNoCC.mkDerivation {
