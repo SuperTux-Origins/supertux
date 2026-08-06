@@ -97,7 +97,28 @@ cmake --build build -j2
 
 Slow (1 GB RAM) but guaranteed ABI match.
 
-### D. Nix flake reference cross (newer glibc)
+### D. Nix flake + published ArkOS sysroot (preferred for device)
+
+```bash
+nix build .#arkos-sysroot              # unpacks the published tarball
+nix build .#supertux-milestone1-r36s   # links against that sysroot
+```
+
+Sysroot URL (flake `fetchurl`):
+
+```text
+https://github.com/grumnix/arkos-sysroot.tar.gz
+```
+
+If the hash in `nix/r36s.nix` is still a placeholder, the first build fails with
+the correct `sha256-…` — paste it into `arkosSysrootSrc.hash` and rebuild.
+
+The resulting binary uses the **sysroot’s glibc/SDL2/GLES**, not nixpkgs Mesa,
+so it should not look for `/run/opengl-driver`.
+
+### E. Nix flake pkgsCross only (newer glibc — qemu/CI)
+
+
 
 ```bash
 nix build .#supertux-milestone1-r36s

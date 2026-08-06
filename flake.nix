@@ -279,8 +279,7 @@
               inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config qemu file pkgsi686Linux bash binutils;
             };
             r36s = import ./nix/r36s.nix {
-              inherit (pkgs) lib;
-              pkgsBuildHost = pkgs;
+              inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config;
               pkgsCross = pkgs.pkgsCross;
             };
             android = import ./nix/android.nix {              pkgs = androidPkgs;
@@ -312,6 +311,7 @@
             packages = {
               open2x-sysroot = gp2x.open2xSysroot;
               openwiz-sysroot = gp2x.openwizSysroot;
+              arkos-sysroot = r36s.arkosSysroot;
               supertux-milestone1-gp2x = gp2x.mkSuperTuxGp2x {
                 src = lib.cleanSource ./.;
                 inherit version;
@@ -322,8 +322,8 @@
                 inherit version;
                 pname = "supertux-milestone1-wiz";
               };
-              # aarch64 SDL2+GLES2 via pkgsCross (qemu / CI). Device-ready
-              # ArkOS binaries need an old glibc sysroot — mk/r36s/CROSSCOMPILE.md.
+              # aarch64 SDL2+GLES2 linked against published ArkOS sysroot.
+              # See mk/r36s/CROSSCOMPILE.md and nix/r36s.nix.
               supertux-milestone1-r36s = r36s.mkSuperTuxR36s {
                 src = lib.cleanSource ./.;
                 inherit version;
@@ -389,6 +389,7 @@
             checks = {
               open2x-sysroot = gp2x.open2xSysroot;
               openwiz-sysroot = gp2x.openwizSysroot;
+              arkos-sysroot = r36s.arkosSysroot;
               supertux-milestone1-gp2x = gp2x.mkSuperTuxGp2x {
                 src = lib.cleanSource ./.;
                 inherit version;
