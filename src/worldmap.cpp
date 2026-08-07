@@ -608,6 +608,7 @@ WorldMap::get_input()
               && (int)event.cbutton.button == gamecontroller_keymap.menu)
             {
               on_escape_press();
+              st_gamepad_menu_ack();
               continue;
             }
 #endif
@@ -706,7 +707,10 @@ WorldMap::get_input()
             else if (b == gamecontroller_keymap.right)
               input_direction = D_EAST;
             else if (b == gamecontroller_keymap.menu)
-              on_escape_press();
+              {
+                on_escape_press();
+                st_gamepad_menu_ack();
+              }
           }
           break;
 

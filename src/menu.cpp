@@ -1260,8 +1260,8 @@ Menu::event(SDL_Event& event)
         st_vlog("[menu] JOYHAT value=0x%x use_joystick=%d\n",
                 (unsigned)event.jhat.value, (int)use_joystick);
 #ifdef USE_SDL2
-      /* Dual-event residual after CONTROLLERBUTTON / AXIS — skip briefly. */
-      if (menu_joy_suppressed_by_controller())
+      /* D-Pad also arrives as CONTROLLERBUTTON DPAD_*; ignore residual hat. */
+      if (game_controller || menu_joy_suppressed_by_controller())
         break;
 #endif
       if (!use_joystick)
@@ -1433,64 +1433,18 @@ Menu::event(SDL_Event& event)
       st_vlog("[menu] JOYBUTTONDOWN btn=%d use_joystick=%d\n",
               (int)event.jbutton.button, (int)use_joystick);
 #ifdef USE_SDL2
-    /* Dual-event devices: controller path already ran — skip residual JOY. */
-    if (menu_joy_suppressed_by_controller())
+    /* Dual-event pads fire CONTROLLERBUTTONDOWN (logical id) then
+       JOYBUTTONDOWN (raw id) for the same press. Gamepad keymap stores
+       SDL_GameControllerButton values; binding a raw index (e.g. 12) makes
+       in-game CONTROLLERBUTTON compares fail and labels show "Button 12".
+       When a GameController is open, only the CONTROLLER* path may touch
+       binds / navigation. (WASM hosts without CONTROLLER events leave
+       game_controller null and still use the classic path below.) */
+    if (game_controller)
       break;
 
-    /* When a GameController is open, never treat raw JOYBUTTON as a blind
-       HIT — residual button indices (e.g. btn=12 with a hat event) would
-       select menu items while the player is only navigating. Map through
-       the controller bind table instead (covers WASM hosts that only
-       deliver JOY* for a mapped pad). */
-    if (game_controller)
-      {
-        int cbtn = menu_joy_button_to_controller_button((int)event.jbutton.button);
-        if (cbtn < 0)
-          break;
-
-        if (item[active_item].kind == MN_CONTROLFIELD
-            && control_bind_item == active_item
-            && Menu::current() == options_gamepad_menu)
-          {
-            /* Capture any mapped button (incl. Start/Menu). Esc cancels. */
-            if (!item[active_item].int_p)
-              {
-                control_bind_item = -1;
-                return;
-              }
-            *item[active_item].int_p = cbtn;
-            control_bind_item = -1;
-            get_controlfield_key_into_input(&item[active_item]);
-            return;
-          }
-
-        if (cbtn == gamecontroller_keymap.menu)
-          {
-            if (control_bind_item >= 0)
-              {
-                control_bind_item = -1;
-                if (active_item >= 0 && active_item < (int)item.size())
-                  get_controlfield_key_into_input(&item[active_item]);
-                st_gamepad_menu_ack();
-                return;
-              }
-            Menu::pop_current();
-            st_gamepad_menu_ack();
-            return;
-          }
-        if (cbtn == gamecontroller_keymap.jump
-            || cbtn == gamecontroller_keymap.fire)
-          menuaction = MENU_ACTION_HIT;
-        else if (cbtn == gamecontroller_keymap.up)
-          menuaction = MENU_ACTION_UP;
-        else if (cbtn == gamecontroller_keymap.duck)
-          menuaction = MENU_ACTION_DOWN;
-        else if (cbtn == gamecontroller_keymap.left)
-          menuaction = MENU_ACTION_LEFT;
-        else if (cbtn == gamecontroller_keymap.right)
-          menuaction = MENU_ACTION_RIGHT;
-        break;
-      }
+    if (menu_joy_suppressed_by_controller())
+      break;
 #endif
     if (use_joystick
         && item[active_item].kind == MN_CONTROLFIELD

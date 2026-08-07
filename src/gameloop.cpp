@@ -288,7 +288,11 @@ GameSession::process_events()
 #ifdef USE_SDL2
             case SDL_CONTROLLERBUTTONDOWN:
               if ((int)event.cbutton.button == gamecontroller_keymap.menu)
-                on_escape_press();
+                {
+                  on_escape_press();
+                  /* Prevent same-frame poll edge from toggling the menu closed. */
+                  st_gamepad_menu_ack();
+                }
               break;
 #else
             case SDL_JOYBUTTONDOWN:
@@ -328,6 +332,25 @@ GameSession::process_events()
               tux.key_event((SDLKey)keymap.left, UP);
               tux.key_event((SDLKey)keymap.right, UP);
               tux.key_event((SDLKey)keymap.fire, UP);
+              continue;
+            }
+
+          /* Pause menu owns input while open (same as worldmap / end-sequence). */
+          if (Menu::current())
+            {
+#ifdef USE_SDL2
+              if (event.type == SDL_CONTROLLERBUTTONDOWN
+                  && use_joystick
+                  && (int)event.cbutton.button == gamecontroller_keymap.menu)
+                {
+                  on_escape_press();
+                  st_gamepad_menu_ack();
+                  continue;
+                }
+#endif
+              Menu::current()->event(event);
+              if (!Menu::current())
+                st_pause_ticks_stop();
               continue;
             }
 
@@ -536,7 +559,10 @@ GameSession::process_events()
                         tux.input.left = UP;
                       }
                     if (b == gamecontroller_keymap.menu)
-                      on_escape_press();
+                      {
+                        on_escape_press();
+                        st_gamepad_menu_ack();
+                      }
                   }
                   break;
 
