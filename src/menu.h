@@ -243,8 +243,8 @@ extern Menu* options_joystick_button_menu;
 extern Menu* options_gamepad_menu;
 extern Menu* options_gamepad_analog_menu;
 extern Menu* options_gamepad_device_menu;
-extern Menu* options_touch_menu;
 #endif
+extern Menu* options_touch_menu;
 extern Menu* highscore_menu;
 extern Menu* load_game_menu;
 extern Menu* save_game_menu;

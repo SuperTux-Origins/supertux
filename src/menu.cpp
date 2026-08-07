@@ -47,8 +47,10 @@ Menu* options_joystick_button_menu = 0;
 Menu* options_gamepad_menu = 0;
 Menu* options_gamepad_analog_menu = 0;
 Menu* options_gamepad_device_menu = 0;
+#endif
 Menu* options_touch_menu = 0;
 
+#ifdef USE_SDL2
 /* CONTROLLER* and JOY* both fire for the same physical press on many
    platforms. After we handle a controller event, ignore raw joystick for a
    short window so bind mode does not immediately re-HIT. If only JOY arrives
