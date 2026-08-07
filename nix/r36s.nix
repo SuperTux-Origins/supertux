@@ -111,48 +111,51 @@ let
   targetPrefix = crossCc.targetPrefix;
 
   # Wrappers inject -nostdinc + ordered isystem so:
-  #   1) libstdc++ (from nixpkgs gcc)
+  #   1) libstdc++ *headers* from nixpkgs gcc (compile only)
   #   2) gcc fixed headers (stddef.h)
   #   3) ArkOS glibc headers only (never gcc's modern sys-include)
   # That avoids __attr_dealloc_free errors from mixing glibc 2.30 cdefs with
   # modern stdlib.h, and keeps #include_next <stdlib.h> working.
+  #
+  # Link is different: GCC 15's libstdc++/libgcc_s need GLIBC_2.32–2.38, but
+  # ArkOS is ~2.30. g++ also injects an absolute path to its own libstdc++.so,
+  # so -L order alone is ignored. We therefore:
+  #   - compile with modern headers + _GLIBCXX_USE_CXX11_ABI=0 (old ABI)
+  #   - -nostdlib++ so g++ does not force its libstdc++; link sysroot -lstdc++
+  #   - -static-libgcc (libgcc.a has no versioned GLIBC_2.3x deps)
+  #   - --allow-shlib-undefined for DT_NEEDED of sysroot libs (e.g. opusfile
+  #     from SDL2_mixer) that exist on the device at runtime
   mkWrappers = sysroot: let
     gcc = crossCc.cc;
     tp = lib.removeSuffix "-" targetPrefix; # aarch64-unknown-linux-gnu
     libdir = "${sysroot}/usr/lib/aarch64-linux-gnu";
-    # libstdc++ lives under the gcc package; versioned path.
     cxxInc = "${gcc}/include/c++/${gcc.version}";
     cxxIncTarget = "${cxxInc}/${tp}";
     fixedInc = "${gcc}/lib/gcc/${tp}/${gcc.version}/include";
     fixedInc2 = "${gcc}/lib/gcc/${tp}/${gcc.version}/include-fixed";
     libgccDir = "${gcc}/lib/gcc/${tp}/${gcc.version}";
-    commonC = ''
+    gccLibOut = lib.getLib gcc;
+    libgccLib = "${gccLibOut}/lib";
+    libgccLibTarget = "${gccLibOut}/${tp}/lib";
+    # Compile-only flags (safe with -c). No -L/-B lib paths that pull Scrt1.o.
+    # -fno-exceptions: avoid GCC 15 libgcc_eh (_dl_find_object / GLIBC_2.35).
+    # Milestone 1 does not rely on C++ exceptions.
+    commonCompile = ''
       -nostdinc \
+      --sysroot=${sysroot} \
       -isystem ${fixedInc} \
       -isystem ${fixedInc2} \
       -isystem ${sysroot}/usr/include/aarch64-linux-gnu \
       -isystem ${sysroot}/usr/include \
-      --sysroot=${sysroot} \
-      -Wl,--sysroot=${sysroot} \
-      -B${libdir} \
-      -B${libgccDir} \
-      -L${libdir} \
-      -L${libgccDir} \
-      -L${sysroot}/usr/lib \
-      -L${sysroot}/lib \
-      -L${sysroot}/lib/aarch64-linux-gnu \
       -pthread \
-      -Wl,-rpath-link,${libdir} \
-      -Wl,-rpath-link,${sysroot}/usr/lib/aarch64-linux-gnu \
-      -Wl,-rpath-link,${sysroot}/lib/aarch64-linux-gnu \
-      -Wl,-rpath-link,${sysroot}/usr/lib/aarch64-linux-gnu/pulseaudio \
-      -Wl,-rpath-link,${sysroot}/lib/aarch64-linux-gnu/pulseaudio \
-      -Wl,--as-needed \
+      -fno-exceptions \
       -march=armv8-a \
       -mtune=cortex-a35 \
     '';
-    commonCxx = ''
+    commonCompileCxx = ''
       -nostdinc \
+      -D_GLIBCXX_USE_CXX11_ABI=0 \
+      --sysroot=${sysroot} \
       -isystem ${cxxInc} \
       -isystem ${cxxIncTarget} \
       -isystem ${cxxInc}/backward \
@@ -160,40 +163,85 @@ let
       -isystem ${fixedInc2} \
       -isystem ${sysroot}/usr/include/aarch64-linux-gnu \
       -isystem ${sysroot}/usr/include \
+      -pthread \
+      -fno-exceptions \
+      -march=armv8-a \
+      -mtune=cortex-a35 \
+    '';
+    # Link flags: sysroot libs first; never prefer modern libstdc++.
+    # -shared-libgcc: prefer sysroot libgcc_s over GCC 15 libgcc_eh.a.
+    # -Wl,-Bdynamic before -pthread: do not pick static libpthread.a
+    # (that needs __pointer_chk_guard_local, only in the shared objects).
+    commonLink = ''
       --sysroot=${sysroot} \
       -Wl,--sysroot=${sysroot} \
       -B${libdir} \
       -B${libgccDir} \
       -L${libdir} \
-      -L${libgccDir} \
       -L${sysroot}/usr/lib \
       -L${sysroot}/lib \
       -L${sysroot}/lib/aarch64-linux-gnu \
+      -L${libgccDir} \
+      -L${libgccLib} \
+      -L${libgccLibTarget} \
+      -shared-libgcc \
+      -Wl,-Bdynamic \
       -pthread \
       -Wl,-rpath-link,${libdir} \
       -Wl,-rpath-link,${sysroot}/usr/lib/aarch64-linux-gnu \
       -Wl,-rpath-link,${sysroot}/lib/aarch64-linux-gnu \
       -Wl,-rpath-link,${sysroot}/usr/lib/aarch64-linux-gnu/pulseaudio \
       -Wl,-rpath-link,${sysroot}/lib/aarch64-linux-gnu/pulseaudio \
+      -Wl,--allow-shlib-undefined \
       -Wl,--as-needed \
       -march=armv8-a \
       -mtune=cortex-a35 \
     '';
-    bintoolsBin = "${crossCc.bintools}/bin";
   in {
     cc = writeShellScript "aarch64-arkos-gcc" ''
       export PATH="${crossCc.bintools}/bin:$PATH"
-      exec ${gcc}/bin/${targetPrefix}gcc \
-        -B${crossCc.bintools}/bin \
-        ${commonC} \
-        "$@"
+      is_compile=
+      for a in "$@"; do
+        case "$a" in
+          -c|-S|-E|-M|-MM|-MD|-MMD) is_compile=1 ;;
+        esac
+      done
+      if [ -n "$is_compile" ]; then
+        exec ${gcc}/bin/${targetPrefix}gcc \
+          -B${crossCc.bintools}/bin \
+          ${commonCompile} \
+          "$@"
+      else
+        exec ${gcc}/bin/${targetPrefix}gcc \
+          -B${crossCc.bintools}/bin \
+          ${commonCompile} \
+          ${commonLink} \
+          "$@"
+      fi
     '';
+    # -lstdc++ only on real link lines, AFTER object files (as-needed safe).
     cxx = writeShellScript "aarch64-arkos-g++" ''
       export PATH="${crossCc.bintools}/bin:$PATH"
-      exec ${gcc}/bin/${targetPrefix}g++ \
-        -B${crossCc.bintools}/bin \
-        ${commonCxx} \
-        "$@"
+      is_compile=
+      for a in "$@"; do
+        case "$a" in
+          -c|-S|-E|-M|-MM|-MD|-MMD) is_compile=1 ;;
+        esac
+      done
+      if [ -n "$is_compile" ]; then
+        exec ${gcc}/bin/${targetPrefix}g++ \
+          -B${crossCc.bintools}/bin \
+          ${commonCompileCxx} \
+          "$@"
+      else
+        exec ${gcc}/bin/${targetPrefix}g++ \
+          -B${crossCc.bintools}/bin \
+          ${commonCompileCxx} \
+          -nostdlib++ \
+          ${commonLink} \
+          "$@" \
+          -Wl,--no-as-needed -lstdc++ -Wl,--as-needed
+      fi
     '';
   };
 
@@ -233,6 +281,13 @@ let
         "-DCMAKE_CXX_COMPILER_WORKS=1"
         "-DCMAKE_C_COMPILER_FORCED=TRUE"
         "-DCMAKE_CXX_COMPILER_FORCED=TRUE"
+        # Device binary must use ArkOS libs at runtime, not nix store paths.
+        # Skipping RPATH rewrite also avoids cmake_install.cmake failing when
+        # the linked RUNPATH does not contain the sysroot's /usr/lib/... path.
+        "-DCMAKE_SKIP_RPATH=ON"
+        "-DCMAKE_SKIP_INSTALL_RPATH=ON"
+        "-DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF"
+        "-DCMAKE_INSTALL_RPATH="
         "-DENABLE_SDL2=ON"
         "-DENABLE_GLES2=ON"
         "-DENABLE_OPENGL=ON"
@@ -245,7 +300,15 @@ let
         "-DARKOS_SYSROOT=${arkosSysroot}"
       ];
 
+      # Do not let nix stdenv rewrite RUNPATH to modern glibc / gcc-15 libs.
+      dontPatchELF = true;
+      dontStrip = true;
+
       preConfigure = ''
+        # Prevent stdenv from injecting -rpath to modern nixpkgs glibc/gcc.
+        export NIX_DONT_SET_RPATH=1
+        export NIX_NO_SELF_RPATH=1
+
         export PKG_CONFIG="pkg-config"
         export PKG_CONFIG_SYSROOT_DIR="${arkosSysroot}"
         export PKG_CONFIG_DIR=""
@@ -274,8 +337,11 @@ let
 
       postInstall = ''
         mkdir -p $out/share/supertux-milestone1
+        # CMake may have installed data/ as non-writable; ensure we can add files.
+        chmod -R u+w $out/share/supertux-milestone1 || true
         if [ -d "$src/data" ]; then
           cp -a "$src/data/." $out/share/supertux-milestone1/ || true
+          chmod -R u+w $out/share/supertux-milestone1 || true
         fi
         cat > $out/share/supertux-milestone1/README-R36S.txt << EOF_README
 SuperTux Milestone 1 — R36S / ArkOS (sysroot-linked)
