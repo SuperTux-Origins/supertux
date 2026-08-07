@@ -125,7 +125,11 @@ nix build .#supertux-milestone1-r36s
 # PortMaster-ready tree (launcher + data + metadata):
 nix build .#supertux-milestone1-r36s-portmaster
 # → result/SuperTux Milestone 1.sh , result/supertux-milestone1/ , …
-#    cp -a result/* /roms/ports/   # or zip for PortMaster autoinstall
+#    cp -a result/* /roms/ports/
+
+# PortMaster autoinstall zip:
+nix build .#supertux-milestone1-r36s-portmaster-zip
+# → result/supertux-milestone1.zip  →  ports/PortMaster/autoinstall/
 ```
 
 The binary is linked against the **ArkOS sysroot** (not modern nixpkgs glibc), so it runs on stock ArkOS when device SDL2/GLES are present.
@@ -171,6 +175,10 @@ Preferred: build and install the PortMaster package:
 ```bash
 nix build .#supertux-milestone1-r36s-portmaster
 cp -a result/"SuperTux Milestone 1.sh" result/supertux-milestone1 /roms/ports/
+
+# Or autoinstall zip:
+nix build .#supertux-milestone1-r36s-portmaster-zip
+# copy result/supertux-milestone1.zip → ports/PortMaster/autoinstall/
 ```
 
 Manual layout:

@@ -279,7 +279,7 @@
               inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config qemu file pkgsi686Linux bash binutils;
             };
             r36s = import ./nix/r36s.nix {
-              inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config writeShellScript;
+              inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config writeShellScript zip;
               pkgsCross = pkgs.pkgsCross;
             };
             # Build once; packages and PortMaster packaging both consume this.
@@ -287,6 +287,12 @@
               src = lib.cleanSource ./.;
               inherit version;
               pname = "supertux-milestone1-r36s";
+            };
+            supertuxMilestone1R36sPortMaster = r36s.mkSuperTuxR36sPortMaster {
+              r36sPkg = supertuxMilestone1R36s;
+              inherit version;
+              pname = "supertux-milestone1-r36s-portmaster";
+              screenshotSrc = ./supertux-milestone1.png;
             };
             android = import ./nix/android.nix {              pkgs = androidPkgs;
               sdlSrc = sdl2-src;
@@ -333,12 +339,15 @@
               supertux-milestone1-r36s = supertuxMilestone1R36s;
               # PortMaster-ready tree: launcher + data + metadata for /roms/ports.
               #   nix build .#supertux-milestone1-r36s-portmaster
-              #   cp -a result/* /roms/ports/   # or zip for autoinstall
-              supertux-milestone1-r36s-portmaster = r36s.mkSuperTuxR36sPortMaster {
-                r36sPkg = supertuxMilestone1R36s;
+              #   cp -a result/* /roms/ports/
+              supertux-milestone1-r36s-portmaster = supertuxMilestone1R36sPortMaster;
+              # Single zip for PortMaster autoinstall:
+              #   nix build .#supertux-milestone1-r36s-portmaster-zip
+              #   → result/supertux-milestone1.zip → ports/PortMaster/autoinstall/
+              supertux-milestone1-r36s-portmaster-zip = r36s.mkSuperTuxR36sPortMasterZip {
+                portMasterPkg = supertuxMilestone1R36sPortMaster;
                 inherit version;
-                pname = "supertux-milestone1-r36s-portmaster";
-                screenshotSrc = ./supertux-milestone1.png;
+                pname = "supertux-milestone1-r36s-portmaster-zip";
               };
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {

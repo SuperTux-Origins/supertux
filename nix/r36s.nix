@@ -17,6 +17,7 @@
 , pkg-config
 , pkgsCross
 , writeShellScript
+, zip
 }:
 
 let
@@ -603,11 +604,7 @@ In-game defaults: D-pad / left stick move, **A** jump, **B** run/fire, **Start**
 Thanks to the SuperTux developers and the PortMaster / ArkOS communities.
 EOF_README
 
-        # Convenience: a single zip for autoinstall (optional for the user)
-        ( cd "$root" && tar -cf "$root/supertux-milestone1-portmaster.tar" \
-            "${scriptName}" "${portDirName}" port.json README.md \
-            gameinfo.xml screenshot.png cover.png )
-      '';
+        '';
 
       meta = with lib; {
         description = "PortMaster package of SuperTux Milestone 1 for R36S/ArkOS";
@@ -617,7 +614,39 @@ EOF_README
       };
     };
 
+  # Zip of the PortMaster tree for autoinstall (ports/PortMaster/autoinstall/).
+  # Flat archive: launcher + port dir + metadata at zip root (matches port.json).
+  mkSuperTuxR36sPortMasterZip = {
+    portMasterPkg
+  , version
+  , pname ? "supertux-milestone1-r36s-portmaster-zip"
+  , zipName ? "supertux-milestone1.zip"
+  }:
+    stdenvNoCC.mkDerivation {
+      inherit pname version;
+      dontUnpack = true;
+      dontConfigure = true;
+      dontBuild = true;
+      dontFixup = true;
+      dontPatchShebangs = true;
+
+      nativeBuildInputs = [ zip ];
+
+      installPhase = ''
+        set -euo pipefail
+        mkdir -p "$out"
+        ( cd "${portMasterPkg}" && zip -r -9 "$out/${zipName}" . )
+      '';
+
+      meta = with lib; {
+        description = "PortMaster autoinstall zip of SuperTux Milestone 1 for R36S/ArkOS";
+        license = licenses.gpl3Plus;
+        platforms = platforms.linux;
+        hydraPlatforms = [];
+      };
+    };
+
 in
 {
-  inherit arkosSysroot mkSuperTuxR36s mkSuperTuxR36sPortMaster;
+  inherit arkosSysroot mkSuperTuxR36s mkSuperTuxR36sPortMaster mkSuperTuxR36sPortMasterZip;
 }

@@ -100,6 +100,7 @@ nix build .#supertux-milestone1-wasm        # Emscripten HTML/JS/Wasm
 nix run .#supertux-milestone1-wasm          # serve over HTTP + open browser
 nix build .#supertux-milestone1-r36s        # aarch64 SDL2+GLES2 (ArkOS sysroot; see mk/r36s/)
 nix build .#supertux-milestone1-r36s-portmaster  # PortMaster tree for /roms/ports/
+nix build .#supertux-milestone1-r36s-portmaster-zip  # autoinstall zip
 nix develop                                 # SDL2 (matches default package)
 nix develop .#supertux-milestone1-sdl1
 nix develop .#supertux-milestone1-sdl2-gles2
