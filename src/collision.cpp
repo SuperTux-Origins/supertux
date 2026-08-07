@@ -51,19 +51,35 @@ bool collision_object_map(const base_type& base)
 
 void* collision_func(const base_type& base, tiletestfunction function)
 {
+  if (!World::current() || !World::current()->get_level())
+    return 0;
+
   const Level& level = *World::current()->get_level();
   TileManager& tilemanager = *TileManager::instance();
-  
+
+  /* Reject non-finite / absurd boxes (e.g. after a huge post-suspend step). */
+  if (base.width <= 0 || base.height <= 0
+      || base.width > 512 || base.height > 512)
+    return 0;
+
   int starttilex = int(base.x) / 32;
   int starttiley = int(base.y) / 32;
   int max_x = int(base.x + base.width);
   int max_y = int(base.y + base.height);
 
-  for(int x = starttilex; x*32 < max_x; ++x) {
-    for(int y = starttiley; y*32 < max_y; ++y) {
+  /* Cap walk so a bad AABB cannot spin for minutes (x*32 overflow, etc.). */
+  int endtilex = max_x / 32 + 1;
+  int endtiley = max_y / 32 + 1;
+  if (endtilex - starttilex > 32)
+    endtilex = starttilex + 32;
+  if (endtiley - starttiley > 32)
+    endtiley = starttiley + 32;
+
+  for (int x = starttilex; x < endtilex; ++x) {
+    for (int y = starttiley; y < endtiley; ++y) {
       Tile* tile = tilemanager.get(level.get_tile_at(x, y));
       void* result = function(tile);
-      if(result != 0)
+      if (result != 0)
         return result;
     }
   }
@@ -143,6 +159,11 @@ void collision_swept_object_map(base_type* old, base_type* current)
       xd = (current->x - old->x) / lpath;
       yd = (current->y - old->y) / lpath;
     }
+
+  /* Huge post-suspend steps would otherwise iterate hundreds of thousands
+     of times and look like a hang inside collision. */
+  if (lpath > 512.0f)
+    lpath = 512.0f;
 
   steps = (int)(lpath / (float)16);
 

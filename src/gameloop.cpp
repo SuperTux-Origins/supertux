@@ -375,6 +375,13 @@ GameSession::process_events()
                       tux.key_event((SDLKey)keymap.fire, UP);
                       touch_controls_reset();
                     }
+                  /* Suspend/resume (handheld sleep, alt-tab): drop the
+                     multi-second tick gap so the next frame_ratio is not huge. */
+                  if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED
+                      || event.window.event == SDL_WINDOWEVENT_RESTORED)
+                    {
+                      update_time = last_update_time = st_get_ticks();
+                    }
                   break;
 #endif
 
@@ -1141,8 +1148,15 @@ GameSession::frame()
 #ifdef GP2X
   st_frame_delay(10);
 #endif
-  /* Calculate the movement-factor */
-  double frame_ratio = ((double)(update_time-last_update_time))/((double)FRAME_RATE);
+  /* Calculate the movement-factor. Cap elapsed time so suspend/resume (or a
+     long stall) cannot produce a multi-thousand frame_ratio that teleports
+     Tux and hangs swept collision / tile walks. Same idea as title_frame. */
+  if (update_time - last_update_time > 1000)
+    update_time = last_update_time = st_get_ticks();
+  double frame_ratio = ((double)(update_time - last_update_time))
+                       / ((double)FRAME_RATE);
+  if (frame_ratio > 2.5)
+    frame_ratio = 2.5;
 
   if(!frame_timer.check())
     {
