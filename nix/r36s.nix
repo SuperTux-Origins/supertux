@@ -22,9 +22,10 @@
 let
   arkosSysrootSrc = fetchurl {
     name = "arkos-sysroot.tar.gz";
-    url = "http:///localhost:8888/arkos-sysroot2.tar.gz";
-    # Replace after:  nix store prefetch-file https://github.com/grumnix/arkos-sysroot.tar.gz
-    # (or let `nix build .#arkos-sysroot` print the correct hash).
+    # Published sysroot (glibc ~2.30 + SDL2/GLES). If the hash drifts, run:
+    #   nix store prefetch-file <url>
+    # and paste the new sha256-… here.
+    url = "https://github.com/grumnix/arkos-sysroot/releases/download/v0.1/arkos-sysroot.tar.gz";
     hash = "sha256-nIlMQ3P0uBrRQ9/k2x1s9DpdnF8iqA2wBLSB/20uXYg=";
   };
 
@@ -37,8 +38,11 @@ let
     version = "0.1";
     src = arkosSysrootSrc;
 
+    # Unpack-only: aarch64 ELF + linker scripts must not be touched by the
+    # host fixup (patchelf "wrong ELF type", strip, shebang rewrite).
     dontConfigure = true;
     dontBuild = true;
+    dontFixup = true;
     dontPatchELF = true;
     dontStrip = true;
     dontPatchShebangs = true;
@@ -90,7 +94,6 @@ let
             -e "s#(^|[[:space:](=])/usr/lib/aarch64-linux-gnu/#\1$out/usr/lib/aarch64-linux-gnu/#g" \
             -e "s#(^|[[:space:](=])/lib/aarch64-linux-gnu/#\1$out/lib/aarch64-linux-gnu/#g" \
             "$f" || true
-          case "$f" in *libc.so) echo "---- $f ----"; cat "$f"; echo "--------";; esac
         fi
       done
 
@@ -441,12 +444,14 @@ LAUNCH
         install -m755 "${r36sPkg}/bin/supertux-milestone1" \
           "$gamedir/supertux-milestone1"
 
-        # Game data (CMake DATA_PREFIX was share/supertux-milestone1)
+        # Game data (CMake DATA_PREFIX was share/supertux-milestone1).
+        # Store paths are mode 444/555; make writable so we can drop helpers.
         if [ -d "${r36sPkg}/share/supertux-milestone1" ]; then
           cp -a "${r36sPkg}/share/supertux-milestone1/." "$gamedir/data/"
-          # Keep only game assets under data/; drop helper scripts if present
+          chmod -R u+w "$gamedir/data"
+          # Keep only game assets under data/; drop packaging helpers
           rm -f "$gamedir/data/supertux-milestone1.sh" \
-                "$gamedir/data/README-R36S.txt" || true
+                "$gamedir/data/README-R36S.txt"
         fi
 
         # Placeholder / project icon as screenshot + cover (PortMaster wants

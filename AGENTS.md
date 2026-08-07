@@ -33,7 +33,7 @@ This is a **historical** codebase. The point of work here is **not** to moderniz
 **Handheld (GP2X / Wiz):** SDL 1.2 is required (Open2x/OpenWiz). See `mk/gp2x/CROSSCOMPILE.md`.
 CMake: `-DENABLE_GP2X=ON -DENABLE_RES320X240=ON` + Open2x/OpenWiz toolchain file.
 
-**Handheld (R36S / ArkOS):** RK3326, 640×480, Ubuntu 19.10-based userspace. Prefer SDL2 + GLES2 (no `RES320X240`). Device-compatible builds need an old glibc sysroot — see `mk/r36s/CROSSCOMPILE.md`. Flake: `nix build .#supertux-milestone1-r36s` (pkgsCross aarch64; not stock-ArkOS glibc).
+**Handheld (R36S / ArkOS):** RK3326, 640×480, Ubuntu 19.10-based userspace. Prefer SDL2 + GLES2 (no `RES320X240`). Device-compatible builds link against an ArkOS sysroot (glibc ~2.30) — see `mk/r36s/CROSSCOMPILE.md`. Flake: `nix build .#supertux-milestone1-r36s` (sysroot-linked aarch64) and `.#supertux-milestone1-r36s-portmaster` (PortMaster tree for `/roms/ports`).
 
 When unsure, prefer the smallest change that stops a crash or unblocks SDL2 playtest. Track concrete work in `TODO.md`.
 
@@ -46,7 +46,7 @@ When unsure, prefer the smallest change that stops a crash or unblocks SDL2 play
 | Graphics / input | SDL 1.2 + optional OpenGL (immediate) or GLES2 (shaders); software via `SurfaceSDL` |
 | Audio | SDL_mixer 1.x (optional `-DNOSOUND`); GP2X historically mikmod |
 | GP2X / Wiz | **In progress** — CMake `ENABLE_GP2X` + toolchains; see `mk/gp2x/CROSSCOMPILE.md` |
-| R36S / ArkOS | **Scaffolding** — `mk/r36s/` toolchains + `.#supertux-milestone1-r36s` pkgsCross; sysroot path for device ABI |
+| R36S / ArkOS | **Working** — `mk/r36s/` toolchains + `.#supertux-milestone1-r36s` (sysroot-linked) + `.#supertux-milestone1-r36s-portmaster` |
 | SDL2 port | **Compiles** via platform layer + `platform_config.h`; playtest still open |
 
 **Version:** the only source of truth is the top-level `VERSION` file (e.g. `0.1.5-dev`). CMake reads it into `PROJECT_VERSION_FULL` and defines `SUPERTUX_MILESTONE1_VERSION` for the sources. Nix appends `+g<shortRev>` when packaging. Use `--version` to print it. For a release, drop the `-dev` suffix, commit, and tag `vX.Y.Z`.
@@ -98,7 +98,8 @@ nix build .#wasm-sdl-libs                   # SDL2 (+ image) static for wasm32
 nix build .#wasm-zlib-libs                  # static zlib for wasm32 (lispreader)
 nix build .#supertux-milestone1-wasm        # Emscripten HTML/JS/Wasm
 nix run .#supertux-milestone1-wasm          # serve over HTTP + open browser
-nix build .#supertux-milestone1-r36s        # aarch64 SDL2+GLES2 (pkgsCross; see mk/r36s/)
+nix build .#supertux-milestone1-r36s        # aarch64 SDL2+GLES2 (ArkOS sysroot; see mk/r36s/)
+nix build .#supertux-milestone1-r36s-portmaster  # PortMaster tree for /roms/ports/
 nix develop                                 # SDL2 (matches default package)
 nix develop .#supertux-milestone1-sdl1
 nix develop .#supertux-milestone1-sdl2-gles2
@@ -120,8 +121,9 @@ GP2X/Wiz cross-compile: `mk/gp2x/CROSSCOMPILE.md` + `toolchain-open2x.cmake` /
 `toolchain-openwiz.cmake`. Autotools under `mk/gp2x/` remain reference-only.
 
 R36S/ArkOS: `mk/r36s/CROSSCOMPILE.md` + `toolchain-arkos-aarch64.cmake` (and
-optional `toolchain-arkos-armhf.cmake`). Sysroot from device or Debian Buster
-debootstrap; flake `.#supertux-milestone1-r36s` is nixpkgs-cross only.
+optional `toolchain-arkos-armhf.cmake`). Sysroot from device, Debian Buster
+debootstrap, or the published tarball used by flake `.#supertux-milestone1-r36s`
+(sysroot-linked; not modern nixpkgs glibc).
 
 ## Dependencies
 

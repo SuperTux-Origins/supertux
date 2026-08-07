@@ -107,7 +107,7 @@ nix build .#supertux-milestone1-r36s   # links against that sysroot
 Sysroot URL (flake `fetchurl`):
 
 ```text
-https://github.com/grumnix/arkos-sysroot.tar.gz
+https://github.com/grumnix/arkos-sysroot/releases/download/v0.1/arkos-sysroot.tar.gz
 ```
 
 If the hash in `nix/r36s.nix` is still a placeholder, the first build fails with

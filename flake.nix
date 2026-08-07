@@ -282,6 +282,12 @@
               inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config writeShellScript;
               pkgsCross = pkgs.pkgsCross;
             };
+            # Build once; packages and PortMaster packaging both consume this.
+            supertuxMilestone1R36s = r36s.mkSuperTuxR36s {
+              src = lib.cleanSource ./.;
+              inherit version;
+              pname = "supertux-milestone1-r36s";
+            };
             android = import ./nix/android.nix {              pkgs = androidPkgs;
               sdlSrc = sdl2-src;
               sdlVersion = "2.30.3";
@@ -324,20 +330,12 @@
               };
               # aarch64 SDL2+GLES2 linked against published ArkOS sysroot.
               # See mk/r36s/CROSSCOMPILE.md and nix/r36s.nix.
-              supertux-milestone1-r36s = r36s.mkSuperTuxR36s {
-                src = lib.cleanSource ./.;
-                inherit version;
-                pname = "supertux-milestone1-r36s";
-              };
+              supertux-milestone1-r36s = supertuxMilestone1R36s;
               # PortMaster-ready tree: launcher + data + metadata for /roms/ports.
               #   nix build .#supertux-milestone1-r36s-portmaster
               #   cp -a result/* /roms/ports/   # or zip for autoinstall
               supertux-milestone1-r36s-portmaster = r36s.mkSuperTuxR36sPortMaster {
-                r36sPkg = r36s.mkSuperTuxR36s {
-                  src = lib.cleanSource ./.;
-                  inherit version;
-                  pname = "supertux-milestone1-r36s";
-                };
+                r36sPkg = supertuxMilestone1R36s;
                 inherit version;
                 pname = "supertux-milestone1-r36s-portmaster";
                 screenshotSrc = ./supertux-milestone1.png;
@@ -413,11 +411,7 @@
                 inherit version;
                 pname = "supertux-milestone1-wiz";
               };
-              supertux-milestone1-r36s = r36s.mkSuperTuxR36s {
-                src = lib.cleanSource ./.;
-                inherit version;
-                pname = "supertux-milestone1-r36s";
-              };
+              supertux-milestone1-r36s = supertuxMilestone1R36s;
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
                 appName = "supertux-milestone1";
