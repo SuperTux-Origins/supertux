@@ -168,13 +168,14 @@ let
       -march=armv8-a \
       -mtune=cortex-a35 \
     '';
-    # Link flags: sysroot libs first; never prefer modern libstdc++.
-    # -shared-libgcc: prefer sysroot libgcc_s over GCC 15 libgcc_eh.a.
-    # -Wl,-Bdynamic before -pthread: do not pick static libpthread.a
-    # (that needs __pointer_chk_guard_local, only in the shared objects).
+    # Link flags: sysroot first for libc/SDL; add modern gcc -L only so
+    # -shared-libgcc can find libgcc_s (stdc++ is still the absolute sysroot
+    # path in the cxx wrapper — not -lstdc++).
+    # Explicit dynamic linker so the binary runs on ArkOS (not /nix/store/.../ld).
     commonLink = ''
       --sysroot=${sysroot} \
       -Wl,--sysroot=${sysroot} \
+      -Wl,--dynamic-linker=/lib/ld-linux-aarch64.so.1 \
       -B${libdir} \
       -B${libgccDir} \
       -L${libdir} \
@@ -219,7 +220,8 @@ let
           "$@"
       fi
     '';
-    # -lstdc++ only on real link lines, AFTER object files (as-needed safe).
+    # Link sysroot libstdc++ by absolute path so g++ cannot pick GCC 15's
+    # (which requires GLIBCXX_3.4.32 not present on ArkOS).
     cxx = writeShellScript "aarch64-arkos-g++" ''
       export PATH="${crossCc.bintools}/bin:$PATH"
       is_compile=
@@ -234,13 +236,28 @@ let
           ${commonCompileCxx} \
           "$@"
       else
+        stdcpp=
+        for cand in \
+          "${libdir}/libstdc++.so" \
+          "${libdir}/libstdc++.so.6" \
+          "${sysroot}/usr/lib/libstdc++.so" \
+          "${sysroot}/usr/lib/libstdc++.so.6" \
+          "${sysroot}/lib/aarch64-linux-gnu/libstdc++.so" \
+          "${sysroot}/lib/aarch64-linux-gnu/libstdc++.so.6"
+        do
+          if [ -e "$cand" ]; then stdcpp="$cand"; break; fi
+        done
+        if [ -z "$stdcpp" ]; then
+          echo "aarch64-arkos-g++: no libstdc++ in sysroot" >&2
+          exit 1
+        fi
         exec ${gcc}/bin/${targetPrefix}g++ \
           -B${crossCc.bintools}/bin \
           ${commonCompileCxx} \
           -nostdlib++ \
           ${commonLink} \
           "$@" \
-          -Wl,--no-as-needed -lstdc++ -Wl,--as-needed
+          -Wl,--no-as-needed "$stdcpp" -Wl,--as-needed
       fi
     '';
   };
