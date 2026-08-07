@@ -7,6 +7,7 @@
 # Usage:
 #   nix build .#arkos-sysroot
 #   nix build .#supertux-milestone1-r36s
+#   nix build .#supertux-milestone1-r36s-portmaster   # PortMaster tree for /roms/ports
 #
 { lib
 , stdenv
@@ -388,7 +389,185 @@ LAUNCH
       };
     };
 
+  # Wrap a mkSuperTuxR36s result as a PortMaster-ready tree:
+  #   SuperTux Milestone 1.sh + supertux-milestone1/ + metadata
+  # Copy into /roms/ports/ or zip for PortMaster autoinstall.
+  mkSuperTuxR36sPortMaster = {
+    r36sPkg
+  , version
+  , pname ? "supertux-milestone1-r36s-portmaster"
+  , title ? "SuperTux Milestone 1"
+  , scriptName ? "SuperTux Milestone 1.sh"
+  , portDirName ? "supertux-milestone1"
+  , screenshotSrc ? ../supertux-milestone1.png
+  }:
+    stdenvNoCC.mkDerivation {
+      inherit pname version;
+      dontUnpack = true;
+      dontConfigure = true;
+      dontBuild = true;
+
+      # Binary is already cross-built; this is only packaging.
+      nativeBuildInputs = [ ];
+
+      installPhase = ''
+        set -euo pipefail
+        root="$out"
+        gamedir="$root/${portDirName}"
+        mkdir -p "$gamedir/data" "$gamedir/licenses" "$gamedir/conf"
+
+        # Binary from the R36S derivation
+        install -m755 "${r36sPkg}/bin/supertux-milestone1" \
+          "$gamedir/supertux-milestone1"
+
+        # Game data (CMake DATA_PREFIX was share/supertux-milestone1)
+        if [ -d "${r36sPkg}/share/supertux-milestone1" ]; then
+          cp -a "${r36sPkg}/share/supertux-milestone1/." "$gamedir/data/"
+          # Keep only game assets under data/; drop helper scripts if present
+          rm -f "$gamedir/data/supertux-milestone1.sh" \
+                "$gamedir/data/README-R36S.txt" || true
+        fi
+
+        # Placeholder / project icon as screenshot + cover (PortMaster wants
+        # 4:3 gameplay ideally; icon is fine until a real capture is added).
+        if [ -f "${screenshotSrc}" ]; then
+          cp -f "${screenshotSrc}" "$root/screenshot.png"
+          cp -f "${screenshotSrc}" "$root/cover.png"
+          cp -f "${screenshotSrc}" "$gamedir/cover.png"
+        else
+          # Minimal valid 1x1 PNG if the asset is missing
+          printf '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\xf8\x0f\x00\x00\x01\x01\x00\x05\x18\xd8N\x00\x00\x00\x00IEND\xaeB`\x82' \
+            > "$root/screenshot.png"
+          cp -f "$root/screenshot.png" "$root/cover.png"
+          cp -f "$root/screenshot.png" "$gamedir/cover.png"
+        fi
+
+        # License stubs
+        if [ -d "${r36sPkg}/share/licenses" ]; then
+          cp -a "${r36sPkg}/share/licenses/." "$gamedir/licenses/" || true
+        fi
+        cat > "$gamedir/licenses/README.txt" << 'EOF_LIC'
+SuperTux Milestone 1 — see upstream GPL-3.0-or-later and LICENSES/ in the source tree.
+This PortMaster package redistributes the game binary and data for ArkOS/R36S.
+EOF_LIC
+
+        # PortMaster launch script (sources control.txt → SDL_GAMECONTROLLERCONFIG)
+        cat > "$root/${scriptName}" << 'EOF_LAUNCH'
+#!/bin/bash
+# SuperTux Milestone 1 — PortMaster launcher for R36S / ArkOS
+
+XDG_DATA_HOME=''${XDG_DATA_HOME:-$HOME/.local/share}
+
+if [ -d "/opt/system/Tools/PortMaster/" ]; then
+  controlfolder="/opt/system/Tools/PortMaster"
+elif [ -d "/opt/tools/PortMaster/" ]; then
+  controlfolder="/opt/tools/PortMaster"
+elif [ -d "$XDG_DATA_HOME/PortMaster/" ]; then
+  controlfolder="$XDG_DATA_HOME/PortMaster"
+else
+  controlfolder="/roms/ports/PortMaster"
+fi
+
+source "$controlfolder/control.txt"
+[ -f "''${controlfolder}/mod_''${CFW_NAME}.txt" ] && source "''${controlfolder}/mod_''${CFW_NAME}.txt"
+get_controls
+
+GAMEDIR="/$directory/ports/supertux-milestone1"
+CONFDIR="$GAMEDIR/conf"
+
+mkdir -p "$CONFDIR"
+cd "$GAMEDIR" || exit 1
+
+> "$GAMEDIR/log.txt" && exec > >(tee "$GAMEDIR/log.txt") 2>&1
+
+export XDG_DATA_HOME="$CONFDIR"
+export XDG_CONFIG_HOME="$CONFDIR"
+export SDL_GAMECONTROLLERCONFIG="$sdl_controllerconfig"
+
+# Native aarch64 SDL2 gamecontroller input — no gptokeyb needed.
+pm_platform_helper "$GAMEDIR/supertux-milestone1" 2>/dev/null || true
+
+./supertux-milestone1 --fullscreen "$@"
+pm_finish 2>/dev/null || true
+EOF_LAUNCH
+        chmod +x "$root/${scriptName}"
+
+        # port.json (PortMaster catalog / autoinstall metadata)
+        cat > "$root/port.json" << EOF_JSON
+{
+  "version": 2,
+  "name": "supertux-milestone1.zip",
+  "items": [
+    "${scriptName}",
+    "${portDirName}"
+  ],
+  "items_opt": null,
+  "attr": {
+    "title": "${title}",
+    "desc": "Classic SuperTux Milestone 1 (SDL2 + GLES2) for ArkOS / R36S. Free jump-and-run platformer starring Tux.",
+    "inst": "Ready to run. Copy SuperTux Milestone 1.sh and the supertux-milestone1/ folder into /roms/ports/ (or install the zip via PortMaster autoinstall).",
+    "genres": ["platform", "action"],
+    "porter": ["SuperTux-Origins"],
+    "image": {},
+    "rtr": true,
+    "runtime": null,
+    "reqs": [],
+    "arch": ["aarch64"]
+  }
+}
+EOF_JSON
+
+        # EmulationStation metadata (cover used as list art)
+        cat > "$root/gameinfo.xml" << EOF_XML
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./${scriptName}</path>
+    <name>${title}</name>
+    <desc>Classic SuperTux Milestone 1 — free jump-and-run platformer starring Tux. SDL2 + GLES2 build for ArkOS / R36S.</desc>
+    <releasedate>20040511T000000</releasedate>
+    <developer>SuperTux Team</developer>
+    <publisher>SuperTux-Origins</publisher>
+    <genre>Platform</genre>
+    <image>./${portDirName}/cover.png</image>
+  </game>
+</gameList>
+EOF_XML
+
+        cat > "$root/README.md" << 'EOF_README'
+## SuperTux Milestone 1 (R36S / ArkOS)
+
+Native **aarch64** build linked against the ArkOS sysroot (SDL2 + GLES2).
+
+### Install
+
+1. Copy `SuperTux Milestone 1.sh` and the `supertux-milestone1/` directory to `/roms/ports/` on the device, **or**
+2. Zip this folder and place the zip in `ports/PortMaster/autoinstall/`, then open PortMaster once.
+
+### Controls
+
+Uses PortMaster `control.txt` / `SDL_GAMECONTROLLERCONFIG` (GO-Super Gamepad on R36S). In-game: D-pad/stick move, A jump, B run/fire, Start menu.
+
+### Credits
+
+Thanks to the SuperTux developers and the PortMaster / ArkOS communities.
+EOF_README
+
+        # Convenience: a single zip for autoinstall (optional for the user)
+        ( cd "$root" && tar -cf "$root/supertux-milestone1-portmaster.tar" \
+            "${scriptName}" "${portDirName}" port.json README.md \
+            gameinfo.xml screenshot.png cover.png )
+      '';
+
+      meta = with lib; {
+        description = "PortMaster package of SuperTux Milestone 1 for R36S/ArkOS";
+        license = licenses.gpl3Plus;
+        platforms = platforms.linux;
+        hydraPlatforms = [];
+      };
+    };
+
 in
 {
-  inherit arkosSysroot mkSuperTuxR36s;
+  inherit arkosSysroot mkSuperTuxR36s mkSuperTuxR36sPortMaster;
 }

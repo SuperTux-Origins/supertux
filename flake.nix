@@ -329,6 +329,19 @@
                 inherit version;
                 pname = "supertux-milestone1-r36s";
               };
+              # PortMaster-ready tree: launcher + data + metadata for /roms/ports.
+              #   nix build .#supertux-milestone1-r36s-portmaster
+              #   cp -a result/* /roms/ports/   # or zip for autoinstall
+              supertux-milestone1-r36s-portmaster = r36s.mkSuperTuxR36sPortMaster {
+                r36sPkg = r36s.mkSuperTuxR36s {
+                  src = lib.cleanSource ./.;
+                  inherit version;
+                  pname = "supertux-milestone1-r36s";
+                };
+                inherit version;
+                pname = "supertux-milestone1-r36s-portmaster";
+                screenshotSrc = ./supertux-milestone1.png;
+              };
               android-sdl-libs = android.sdlAndroidLibs;
               supertux-milestone1-android = android.mkApk {
                 appName = "supertux-milestone1";
