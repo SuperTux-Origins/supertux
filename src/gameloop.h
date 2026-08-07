@@ -69,7 +69,9 @@ class GameSession
   ExitStatus exit_status;
  public:
 
-  Timer time_left;
+  /** Remaining level time (ms). Counts down with simulated frame deltas
+      (same clock as enemy/player motion), not wall SDL_GetTicks. */
+  int time_remaining_ms;
 
   GameSession(const std::string& subset, int levelnb, int mode);
   ~GameSession();

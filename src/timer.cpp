@@ -7,21 +7,45 @@
 
 unsigned int st_pause_ticks, st_pause_count;
 
+/* Last raw SDL_GetTicks() seen by st_get_ticks(). Used to detect long stalls
+   (hardware suspend, debugger) where the tick counter still advances but the
+   game was not simulating — those gaps must not drain level time_left. */
+static unsigned int st_last_raw_ticks = 0;
+
+/* Gaps longer than this (ms) while not in an explicit pause are treated as
+   suspended time and folded into st_pause_ticks. Normal frames are ~10–50ms. */
+static const unsigned int ST_SUSPEND_GAP_MS = 500;
+
 unsigned int st_get_ticks(void)
 {
-  /* st_pause_ticks accumulates time spent while paused.
+  unsigned int raw = SDL_GetTicks();
+
+  /* Auto-exclude long wall-clock jumps when the pause menu is not already
+     holding the clock. Explicit pause (st_pause_count != 0) already freezes
+     the return value; updating st_last_raw_ticks there avoids double-counting
+     when the menu is closed. */
+  if (st_last_raw_ticks != 0 && st_pause_count == 0)
+    {
+      unsigned int gap = raw - st_last_raw_ticks;
+      if (gap > ST_SUSPEND_GAP_MS)
+        st_pause_ticks += gap;
+    }
+  st_last_raw_ticks = raw;
+
+  /* st_pause_ticks accumulates time spent while paused / suspended.
      st_pause_count is the wall-clock moment pause started (0 = not paused).
      While paused, freeze the returned clock at the pause start. */
-  if(st_pause_count != 0)
+  if (st_pause_count != 0)
     return st_pause_count - st_pause_ticks;
   else
-    return SDL_GetTicks() - st_pause_ticks;
+    return raw - st_pause_ticks;
 }
 
 void st_pause_ticks_init(void)
 {
   st_pause_ticks = 0;
   st_pause_count = 0;
+  st_last_raw_ticks = 0;
 }
 
 void st_pause_ticks_start(void)

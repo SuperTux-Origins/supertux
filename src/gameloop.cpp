@@ -48,7 +48,7 @@ GameSession* GameSession::current_ = 0;
 GameSession::GameSession(const std::string& subset_, int levelnb_, int mode)
   : world(0), st_gl_mode(mode), levelnb(levelnb_), end_sequence(NO_ENDSEQUENCE),
     overlay(OVERLAY_NONE), overlay_min_ms(0), pending_exit(ES_NONE),
-    subset(subset_)
+    time_remaining_ms(0), subset(subset_)
 {
   current_ = this;
   
@@ -147,7 +147,6 @@ GameSession::restart_level()
     }
   else
     {
-      time_left.init(true);
       start_timers();
 #ifndef NOSOUND
       world->play_music(LEVEL_MUSIC);
@@ -202,7 +201,8 @@ void
 GameSession::start_timers()
 {
   st_pause_ticks_init();
-  time_left.start(world->get_level()->time_left*1000);
+  /* Level budget in ms — advanced only when the session simulates a frame. */
+  time_remaining_ms = world->get_level()->time_left * 1000;
   update_time = st_get_ticks();
 }
 
@@ -375,8 +375,9 @@ GameSession::process_events()
                       tux.key_event((SDLKey)keymap.fire, UP);
                       touch_controls_reset();
                     }
-                  /* Suspend/resume (handheld sleep, alt-tab): drop the
-                     multi-second tick gap so the next frame_ratio is not huge. */
+                  /* Focus restore: drop a multi-second frame_ratio gap if the
+                     process kept running while unfocused (alt-tab). Hardware
+                     suspend may not deliver these events. */
                   if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED
                       || event.window.event == SDL_WINDOWEVENT_RESTORED)
                     {
@@ -1114,7 +1115,6 @@ GameSession::process_overlay()
 
       if (done == OVERLAY_INTRO)
         {
-          time_left.init(true);
           start_timers();
 #ifndef NOSOUND
           world->play_music(LEVEL_MUSIC);
@@ -1213,8 +1213,20 @@ GameSession::frame()
       update_time = st_get_ticks();
     }
 
-  /* Handle time: */
-  if (!time_left.check() && world->get_tux()->dying == DYING_NOT
+  /* Handle time: same simulated delta as action() (frame_ratio * FRAME_RATE). */
+  if (!game_pause && !Menu::current() && time_remaining_ms > 0
+      && end_sequence == NO_ENDSEQUENCE)
+    {
+      int step_ms = (int)(frame_ratio * (double)FRAME_RATE);
+      if (step_ms < 0)
+        step_ms = 0;
+      if (step_ms >= time_remaining_ms)
+        time_remaining_ms = 0;
+      else
+        time_remaining_ms -= step_ms;
+    }
+
+  if (time_remaining_ms <= 0 && world->get_tux()->dying == DYING_NOT
           && !end_sequence)
     world->get_tux()->kill(Player::KILL);
 
@@ -1225,7 +1237,7 @@ GameSession::frame()
       world->play_music(HERRING_MUSIC);
     }
   /* are we low on time ? */
-  else if (time_left.get_left() < TIME_WARNING && !end_sequence)
+  else if (time_remaining_ms < TIME_WARNING && !end_sequence)
     {
       world->play_music(HURRYUP_MUSIC);
     }
@@ -1282,10 +1294,10 @@ GameSession::drawstatus()
       white_text->draw("Press ESC To Return",0,20,1);
     }
 
-  if(!time_left.check()) {
+  if(time_remaining_ms <= 0) {
     white_text->draw("TIME'S UP", 224/xdiv, 0, 1);
-  } else if (time_left.get_left() > TIME_WARNING || (global_frame_counter % 10) < 5) {
-    sprintf(str, "%d", time_left.get_left() / 1000 );
+  } else if (time_remaining_ms > TIME_WARNING || (global_frame_counter % 10) < 5) {
+    sprintf(str, "%d", time_remaining_ms / 1000 );
     white_text->draw("TIME", 224/xdiv, 0, 1);
     gold_text->draw(str, 304/xdiv, 0, 1);
   }
