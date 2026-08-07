@@ -170,7 +170,7 @@ bool confirm_dialog_frame(void)
 
   mouse_cursor->draw();
   flipscreen();
-  st_frame_delay(25);
+  st_frame_pace();
   return true;
 }
 

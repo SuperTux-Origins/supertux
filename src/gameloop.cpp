@@ -1122,7 +1122,8 @@ GameSession::process_overlay()
       return (exit_status == ES_NONE);
     }
 
-  st_frame_delay(20);
+  /* Level intro / end / result overlays — same soft pace as play. */
+  st_frame_pace();
   return true; /* still in overlay — keep session running */
 }
 

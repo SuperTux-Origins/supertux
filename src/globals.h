@@ -120,6 +120,9 @@ extern bool show_mouse;
 void st_log(const char* fmt, ...);
 /** SDL_Delay, or no-op when the Emscripten app_loop owns pacing. */
 void st_frame_delay(unsigned int ms);
+/** Soft frame pace matching GameSession: sleep ~10ms only when the last
+ *  frame finished in under ~12ms, so title/worldmap/story match in-level FPS. */
+void st_frame_pace(void);
 
 /** Verbose diagnostics (no-op unless verbose_mode); routes through st_log. */
 void st_vlog(const char* fmt, ...);

@@ -237,3 +237,17 @@ void st_frame_delay(unsigned int ms)
     SDL_Delay(ms);
 }
 
+void st_frame_pace(void)
+{
+  /* Same soft cap as GameSession::frame() — avoid spinning at unlimited FPS
+     without the fixed 20–25ms sleeps that capped title/worldmap at ~40–50. */
+  static unsigned int last = 0;
+  unsigned int now = SDL_GetTicks();
+  if (last != 0 && last + 12 > now)
+    {
+      st_frame_delay(10);
+      now = SDL_GetTicks();
+    }
+  last = now;
+}
+

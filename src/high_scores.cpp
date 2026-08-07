@@ -154,7 +154,7 @@ bool save_hs_frame(void)
       return false;
     }
 
-  st_frame_delay(25);
+  st_frame_pace();
   return true;
 }
 

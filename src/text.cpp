@@ -486,11 +486,10 @@ bool display_text_file_frame(void)
   if(scroll < 0)
     scroll = 0;
 
-#ifndef GP2X
-  st_frame_delay(10);
-#else
-  st_frame_delay(2);
+  /* Match title/session soft pace (was fixed 10ms / GP2X 2ms). */
+  st_frame_pace();
 #ifndef NOSOUND
+#ifdef GP2X
   updateSound();
 #endif
 #endif

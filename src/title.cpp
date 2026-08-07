@@ -547,9 +547,9 @@ if (app_loop_active())
   last_update_time = update_time;
   update_time = st_get_ticks();
 
-  /* Pause: */
   frame++;
-  st_frame_delay(25);
+  /* Match in-level soft pace (was fixed 25ms → ~40 FPS). */
+  st_frame_pace();
   return Menu::current() != 0;
 }
 

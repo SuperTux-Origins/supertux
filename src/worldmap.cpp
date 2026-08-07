@@ -1322,7 +1322,8 @@ WorldMap::frame()
   updateSound();
 #endif
 #endif
-  st_frame_delay(20);
+  /* Match in-level soft pace (was fixed 20ms → ~50 FPS). */
+  st_frame_pace();
   return !quit;
 }
 
