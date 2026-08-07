@@ -29,7 +29,6 @@ class World;
 class GameSession
 {
  private:
-  Timer fps_timer;
   Timer frame_timer;
   Timer endsequence_timer;
   /** Non-blocking intro / end / result overlays (shared by app_loop + run()). */
@@ -41,12 +40,10 @@ class GameSession
   World* world;
   int st_gl_mode;
   int levelnb;
-  float fps_fps;
   unsigned int last_update_time;
   unsigned int update_time;
   int pause_menu_frame;
   int debug_fps;
-  int fps_cnt;
 #ifdef TSCONTROL
   int old_mouse_y;
 #endif

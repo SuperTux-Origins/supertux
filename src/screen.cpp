@@ -22,6 +22,7 @@
 #include "platform.h"
 #include "screen.h"
 #include "setup.h"
+#include "text.h"
 #include "type.h"
 #ifdef USE_GLES2
 #include "gles2_renderer.h"
@@ -384,15 +385,55 @@ if(h < 0)
 }
 
 
+/* --- FPS overlay (title, worldmap, session, menus, …) --- */
+
+static void
+fps_overlay_tick_and_draw(void)
+{
+  static unsigned int window_start = 0;
+  static int frame_cnt = 0;
+  static float display_fps = 0.0f;
+
+  if (!show_fps || !white_text || !gold_text || !screen)
+    return;
+
+  /* Wall-clock present rate — independent of game-pause tick freeze. */
+  unsigned int now = SDL_GetTicks();
+  if (window_start == 0)
+    window_start = now;
+
+  ++frame_cnt;
+  unsigned int gone = now - window_start;
+  if (gone >= 1000)
+    {
+      display_fps = (1000.0f / (float)gone) * (float)frame_cnt;
+      window_start = now;
+      frame_cnt = 0;
+    }
+  else if (gone > 0)
+    {
+      /* Interim value so the counter is not stuck at 0 for the first second. */
+      display_fps = (1000.0f / (float)gone) * (float)frame_cnt;
+    }
+
+  char str[32];
+  sprintf(str, "%2.1f", display_fps);
+  /* Same placement as the old in-session HUD (right side under coins). */
+  white_text->draw("FPS", screen->h, 40, 1);
+  gold_text->draw(str, screen->h + 60, 40, 1);
+}
+
 /* --- UPDATE SCREEN --- */
 
 void updatescreen(void)
 {
+  fps_overlay_tick_and_draw();
   platform_present(false);
 }
 
 void flipscreen(void)
 {
+  fps_overlay_tick_and_draw();
   platform_present(true);
 }
 

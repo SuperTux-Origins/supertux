@@ -50,13 +50,11 @@ GameSession::GameSession(const std::string& subset_, int levelnb_, int mode)
     overlay(OVERLAY_NONE), overlay_min_ms(0), pending_exit(ES_NONE),
     subset(subset_)
 {
-  fps_cnt = 0;
   current_ = this;
   
   global_frame_counter = 0;
   game_pause = false;
 
-  fps_timer.init(true);            
   frame_timer.init(true);
   overlay_timer.init(true);
 
@@ -74,7 +72,6 @@ GameSession::restart_level()
   exit_status  = ES_NONE;
   end_sequence = NO_ENDSEQUENCE;
 
-  fps_timer.init(true);
   frame_timer.init(true);
 
   float old_x_pos = -1;
@@ -1012,7 +1009,6 @@ GameSession::begin_run()
   Menu::set_current(0);
   current_ = this;
 
-  fps_cnt = 0;
   /* Preserve ES_LEVEL_ABORT from a failed restart_level() in the ctor. */
   if (exit_status != ES_LEVEL_ABORT)
     exit_status = ES_NONE;
@@ -1225,18 +1221,7 @@ GameSession::frame()
     }
 
 #endif
-  /* Calculate frames per second */
-  if(show_fps)
-    {
-      ++fps_cnt;
-      fps_fps = (1000.0 / (float)fps_timer.get_gone()) * (float)fps_cnt;
-
-      if(!fps_timer.check())
-        {
-          fps_timer.start(1000);
-          fps_cnt = 0;
-        }
-    }
+  /* FPS overlay is drawn globally in flipscreen/updatescreen (screen.cpp). */
 #ifndef NOSOUND
 #ifdef GP2X
   updateSound();
@@ -1311,14 +1296,7 @@ GameSession::drawstatus()
       for(int i= 0; i < player_status.lives; ++i)
         tux_life->draw(565+(18*i)/xdiv,20);
     }
-
-  if(show_fps)
-    {
-      sprintf(str, "%2.1f", fps_fps);
-      white_text->draw("FPS", screen->h, 40, 1);
-      gold_text->draw(str, screen->h + 60, 40, 1);
-    }
-//    updateSound();
+  /* FPS is drawn in flipscreen/updatescreen so it covers title/worldmap too. */
 }
 
 void
