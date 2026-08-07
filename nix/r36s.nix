@@ -313,14 +313,18 @@ let
         "-DENABLE_RES320X240=OFF"
         "-DENABLE_SOUND=${if enableSound then "ON" else "OFF"}"
         "-DCMAKE_BUILD_TYPE=Release"
-        "-DDATA_PREFIX=${placeholder "out"}/share/supertux-milestone1"
+        # Relative path next to the binary on device (PortMaster layout:
+        # …/supertux-milestone1/{binary,data/}). Avoid baking /nix/store.
+        "-DDATA_PREFIX=data"
         "-DPROJECT_VERSION_FULL=${version}"
         "-DARKOS_SYSROOT=${arkosSysroot}"
       ];
 
-      # Do not let nix stdenv rewrite RUNPATH to modern glibc / gcc-15 libs.
+      # Do not let nix stdenv rewrite RUNPATH to modern glibc / gcc-15 libs,
+      # or shebangs on helper scripts to /nix/store/.../bash.
       dontPatchELF = true;
       dontStrip = true;
+      dontPatchShebangs = true;
 
       preConfigure = ''
         # Prevent stdenv from injecting -rpath to modern nixpkgs glibc/gcc.
@@ -369,6 +373,17 @@ Binary: bin/supertux-milestone1
   SDL2 + GLES2, linked against the ArkOS aarch64 sysroot.
 
 Deploy the binary + share/supertux-milestone1 data to the device.
+
+Controls (important)
+--------------------
+SDL2 only opens SDL GameController devices. The R36S GO-Super Gamepad is
+often joystick-only unless SDL_GAMECONTROLLERCONFIG is set.
+
+  Preferred: nix build .#supertux-milestone1-r36s-portmaster
+  and install under /roms/ports/ (launcher sources PortMaster control.txt).
+
+  Manual: export the GO-Super mapping, then run with -v and confirm
+  "[pad] … controller" (not "joystick-only"). See mk/r36s/CROSSCOMPILE.md.
 EOF_README
         cat > $out/share/supertux-milestone1/supertux-milestone1.sh << 'LAUNCH'
 #!/bin/bash
@@ -376,6 +391,8 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 BIN="$DIR/../bin/supertux-milestone1"
 if [ ! -x "$BIN" ]; then BIN="$DIR/supertux-milestone1"; fi
+# Without PortMaster control.txt, set SDL_GAMECONTROLLERCONFIG for GO-Super
+# or the pad stays joystick-only (see mk/r36s/CROSSCOMPILE.md).
 exec "$BIN" --fullscreen "$@"
 LAUNCH
         chmod +x $out/share/supertux-milestone1/supertux-milestone1.sh
@@ -406,6 +423,10 @@ LAUNCH
       dontUnpack = true;
       dontConfigure = true;
       dontBuild = true;
+      # Device must run the launcher with ArkOS /bin/bash — never rewrite
+      # shebangs to a nix store path (causes "bad interpreter" on R36S).
+      dontPatchShebangs = true;
+      dontFixup = true;
 
       # Binary is already cross-built; this is only packaging.
       nativeBuildInputs = [ ];
@@ -476,9 +497,13 @@ GAMEDIR="/$directory/ports/supertux-milestone1"
 CONFDIR="$GAMEDIR/conf"
 
 mkdir -p "$CONFDIR"
+# SD/FAT copies can leave files non-writable for user "ark"
+chmod -R u+rwX "$GAMEDIR" 2>/dev/null || true
 cd "$GAMEDIR" || exit 1
 
-> "$GAMEDIR/log.txt" && exec > >(tee "$GAMEDIR/log.txt") 2>&1
+if [ -w "$GAMEDIR" ]; then
+  > "$GAMEDIR/log.txt" 2>/dev/null && exec > >(tee -a "$GAMEDIR/log.txt") 2>&1 || true
+fi
 
 export XDG_DATA_HOME="$CONFDIR"
 export XDG_CONFIG_HOME="$CONFDIR"
@@ -487,7 +512,12 @@ export SDL_GAMECONTROLLERCONFIG="$sdl_controllerconfig"
 # Native aarch64 SDL2 gamecontroller input — no gptokeyb needed.
 pm_platform_helper "$GAMEDIR/supertux-milestone1" 2>/dev/null || true
 
-./supertux-milestone1 --fullscreen "$@"
+# Force on-device data + config dirs (do not use any baked-in install prefix).
+./supertux-milestone1 \
+  --datadir "$GAMEDIR/data" \
+  --userdir "$CONFDIR" \
+  --fullscreen \
+  "$@"
 pm_finish 2>/dev/null || true
 EOF_LAUNCH
         chmod +x "$root/${scriptName}"
@@ -544,9 +574,24 @@ Native **aarch64** build linked against the ArkOS sysroot (SDL2 + GLES2).
 1. Copy `SuperTux Milestone 1.sh` and the `supertux-milestone1/` directory to `/roms/ports/` on the device, **or**
 2. Zip this folder and place the zip in `ports/PortMaster/autoinstall/`, then open PortMaster once.
 
-### Controls
+### Controls (required)
 
-Uses PortMaster `control.txt` / `SDL_GAMECONTROLLERCONFIG` (GO-Super Gamepad on R36S). In-game: D-pad/stick move, A jump, B run/fire, Start menu.
+This build uses **SDL2 GameController** only. The R36S built-in **GO-Super
+Gamepad** does not expose a mapping by default when the binary is started
+outside PortMaster; you will see:
+
+    Warning: Joystick(s) present but none have a gamecontroller mapping.
+
+**This PortMaster launcher** sources `control.txt` (`get_controls`) so
+`SDL_GAMECONTROLLERCONFIG` is set for the device. Launch via EmulationStation
+**Ports** (or the `.sh` script), not by running the binary alone over SSH
+without that env.
+
+If you must run the binary directly, export a GO-Super mapping first (see
+`mk/r36s/CROSSCOMPILE.md`) and use `-v` until the log shows
+`[pad] … controller "GO-Super Gamepad"`.
+
+In-game defaults: D-pad / left stick move, **A** jump, **B** run/fire, **Start** menu.
 
 ### Credits
 

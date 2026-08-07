@@ -71,6 +71,18 @@ nix run .#install-android-supertux-milestone1   # adb install -r
 
 Target baseline is roughly **Fire OS 5 / API 22** (`armeabi-v7a` + `arm64-v8a`), with GLES2 as the default renderer.
 
+## R36S / ArkOS (PortMaster)
+
+```bash
+nix build .#supertux-milestone1-r36s              # aarch64 binary (ArkOS sysroot)
+nix build .#supertux-milestone1-r36s-portmaster   # Ports tree for /roms/ports/
+```
+
+**Controls:** the SDL2 build needs an **SDL GameController** mapping. On the
+R36S, launch via the PortMaster `.sh` (sources `control.txt`) or export
+`SDL_GAMECONTROLLERCONFIG` for the GO-Super Gamepad — otherwise the pad stays
+joystick-only and input will not work. Details: `mk/r36s/CROSSCOMPILE.md`.
+
 ## CMake (without Nix)
 
 ```bash

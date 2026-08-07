@@ -807,19 +807,17 @@ void st_directory_setup(void)
       else
         {
           std::string exedir = std::string(dirname(exe_file)) + "/";
-          
-          datadir = exedir + "../data"; // SuperTux run from source dir
+
+          /* Prefer data/ next to the binary (PortMaster / handheld layout). */
+          datadir = exedir + "data";
           if (access(datadir.c_str(), F_OK) != 0)
             {
-              datadir = exedir + "../share/supertux-milestone1"; // SuperTux run from PATH
-              if (access(datadir.c_str(), F_OK) != 0) 
-                { // If all fails, fall back to compiled path
-        	  datadir = exedir + "./data"; // SuperTux run with data in same path as executable
-        	    if (access(datadir.c_str(), F_OK) != 0)
-        	    {
-			 // If all fails, fall back to compiled path
-                	datadir = DATA_PREFIX; 
-		    }
+              datadir = exedir + "../data"; /* run from build/ with data at source root */
+              if (access(datadir.c_str(), F_OK) != 0)
+                {
+                  datadir = exedir + "../share/supertux-milestone1"; /* install prefix */
+                  if (access(datadir.c_str(), F_OK) != 0)
+                    datadir = DATA_PREFIX; /* compiled fallback (often "data") */
                 }
             }
         }

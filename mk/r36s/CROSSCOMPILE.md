@@ -116,17 +116,19 @@ the correct `sha256-…` — paste it into `arkosSysrootSrc.hash` and rebuild.
 The resulting binary uses the **sysroot’s glibc/SDL2/GLES**, not nixpkgs Mesa,
 so it should not look for `/run/opengl-driver`.
 
-### E. Nix flake pkgsCross only (newer glibc — qemu/CI)
-
-
+### E. Nix flake (sysroot-linked — preferred for stock ArkOS)
 
 ```bash
 nix build .#supertux-milestone1-r36s
-# → result/bin/supertux-milestone1 (aarch64, SDL2+GLES2)
-# Test: qemu-aarch64 -L <sysroot> result/bin/supertux-milestone1
+# → result/bin/supertux-milestone1 (aarch64, SDL2+GLES2, ArkOS sysroot)
+
+# PortMaster-ready tree (launcher + data + metadata):
+nix build .#supertux-milestone1-r36s-portmaster
+# → result/SuperTux Milestone 1.sh , result/supertux-milestone1/ , …
+#    cp -a result/* /roms/ports/   # or zip for PortMaster autoinstall
 ```
 
-This uses nixpkgs `pkgsCross.aarch64-multiplatform` and **will not** run on stock ArkOS without a private library set or a newer userspace (Arch-R, Rocknix, etc.).
+The binary is linked against the **ArkOS sysroot** (not modern nixpkgs glibc), so it runs on stock ArkOS when device SDL2/GLES are present.
 
 ---
 
@@ -164,25 +166,50 @@ Both expect:
 
 ## Deploy sketch (PortMaster / ES)
 
-```text
-/roms/ports/supertux-milestone1/
-  supertux-milestone1          # binary
-  data/                        # game data
-  supertux-milestone1.sh       # launcher (optional)
-```
-
-Example launcher:
+Preferred: build and install the PortMaster package:
 
 ```bash
-#!/bin/bash
-cd "$(dirname "$0")"
-export SDL_GAMECONTROLLERCONFIG="${SDL_GAMECONTROLLERCONFIG}"
-# Optional if you ship private libs built against device glibc:
-# export LD_LIBRARY_PATH="$PWD/libs:$LD_LIBRARY_PATH"
-./supertux-milestone1 --fullscreen
+nix build .#supertux-milestone1-r36s-portmaster
+cp -a result/"SuperTux Milestone 1.sh" result/supertux-milestone1 /roms/ports/
 ```
 
-Map the built-in gamepad via SDL2 gamecontroller (ArkOS already installs a controller database for many pads).
+Manual layout:
+
+```text
+/roms/ports/
+  SuperTux Milestone 1.sh      # launcher (must source PortMaster control.txt)
+  supertux-milestone1/
+    supertux-milestone1        # binary
+    data/                      # game data
+```
+
+### Controls (required)
+
+The SDL2 build only accepts **SDL GameController** devices, not raw joysticks.
+The R36S built-in pad (**GO-Super Gamepad**, vendor `0x484b` / product `0x1100`)
+often appears as *joystick-only* unless a mapping is provided. Without one you get:
+
+```text
+Warning: Joystick(s) present but none have a gamecontroller mapping.
+```
+
+**PortMaster path (recommended):** the packaged launcher sources
+`control.txt` via `get_controls`, which sets `SDL_GAMECONTROLLERCONFIG` for
+the current CFW/device (including GO-Super on R36S).
+
+**Manual / SSH launch:** export a mapping before starting the binary, e.g.:
+
+```bash
+export SDL_GAMECONTROLLERCONFIG="190000004b4800000011000000010000,GO-Super Gamepad,a:b0,b:b1,back:b12,dpdown:b9,dpleft:b10,dpright:b11,dpup:b8,guide:b16,leftshoulder:b4,leftstick:b14,lefttrigger:b6,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b15,righttrigger:b7,rightx:a2,righty:a3,start:b13,x:b3,y:b2,platform:Linux,"
+./supertux-milestone1 --fullscreen -v
+```
+
+Confirm with `-v`: look for `[pad] … controller "GO-Super Gamepad"` (not
+`joystick-only`). Defaults: A jump, B run/fire, Start menu, D-pad/stick move.
+
+Do **not** rely on the system `gamecontrollerdb` alone when launching outside
+PortMaster — many ArkOS sessions only inject the mapping through PortMaster’s
+`control.txt`.
 
 ---
 
