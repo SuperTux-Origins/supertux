@@ -33,7 +33,7 @@ Direction string_to_dir(std::string const& dir_str);
 
 /** std::format support (logmich uses std::vformat). */
 template<>
-struct std::formatter<Direction> : std::formatter<std::string_view>
+struct std::formatter<Direction, char> : std::formatter<std::string_view>
 {
   auto format(Direction dir, auto& ctx) const
   {

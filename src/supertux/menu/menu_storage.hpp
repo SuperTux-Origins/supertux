@@ -76,7 +76,7 @@ private:
 };
 
 template<>
-struct std::formatter<MenuStorage::MenuId> : std::formatter<int>
+struct std::formatter<MenuStorage::MenuId, char> : std::formatter<int>
 {
   auto format(MenuStorage::MenuId id, auto& ctx) const
   {

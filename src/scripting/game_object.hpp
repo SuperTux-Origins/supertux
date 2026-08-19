@@ -58,7 +58,7 @@
 #define SCRIPT_GUARD_DEFAULT_T(OBJECT)                                  \
   auto object_ptr = GameObject<::OBJECT>::get_object_ptr();             \
   if (object_ptr == nullptr) {                                          \
-    log_fatal("script is accessing a dead object: ", GameObject<::OBJECT>::m_uid); \
+    log_fatal("script is accessing a dead object: {}", GameObject<::OBJECT>::m_uid); \
     return {};                                                          \
   }                                                                     \
   auto& object = *object_ptr

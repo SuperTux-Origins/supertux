@@ -829,3 +829,18 @@ The project icon lives at `data/images/engine/icons/supertux.png`, not
 `data/images/engine/supertux.png`. Wrong path fails flake eval with
 "Path … does not exist in Git repository".
 
+### Android: std::formatter must be formatter<T, char>
+
+NDK r26 libc++ `std::format` / `make_format_args` does not pick up
+single-parameter `formatter<T>` specializations reliably; `__determine_arg_t`
+falls through and treats the type as a string-like object (looks for
+`.data()` / `.size()`). Use the two-parameter form:
+
+```cpp
+template<>
+struct std::formatter<UID, char> { ... };
+```
+
+UID was the failure in `scripting/dispenser.cpp` via
+`log_fatal("...{}", m_uid)`.
+

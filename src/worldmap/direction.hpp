@@ -35,7 +35,7 @@ std::string direction_to_string(Direction direction);
 } // namespace worldmap
 
 template<>
-struct std::formatter<worldmap::Direction> : std::formatter<std::string_view>
+struct std::formatter<worldmap::Direction, char> : std::formatter<std::string_view>
 {
   auto format(worldmap::Direction dir, auto& ctx) const
   {

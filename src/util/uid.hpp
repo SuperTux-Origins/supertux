@@ -40,7 +40,7 @@ class UID
   friend class UIDGenerator;
   friend std::ostream& operator<<(std::ostream& os, UID const& uid);
   friend size_t std::hash<UID>::operator()(UID const&) const;
-  friend struct std::formatter<UID>;
+  friend struct std::formatter<UID, char>;
 
 public:
   using Magic = uint8_t;
@@ -85,13 +85,13 @@ protected:
 std::ostream& operator<<(std::ostream& os, UID const& uid);
 
 template<>
-struct std::formatter<UID>
+struct std::formatter<UID, char>
 {
   constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
   auto format(UID const& uid, std::format_context& ctx) const
   {
-    return std::format_to(ctx.out(), "{}", uid.m_value);
+    return std::format_to(ctx.out(), "{}", uid.get_value());
   }
 };
 

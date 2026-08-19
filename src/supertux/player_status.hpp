@@ -37,7 +37,7 @@ enum BonusType {
 };
 
 template<>
-struct std::formatter<BonusType> : std::formatter<int>
+struct std::formatter<BonusType, char> : std::formatter<int>
 {
   auto format(BonusType b, auto& ctx) const
   {
