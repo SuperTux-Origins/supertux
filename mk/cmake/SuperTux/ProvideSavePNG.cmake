@@ -1,5 +1,4 @@
-# SDL_SavePNG needs libpng. On Emscripten use the official ports (-sUSE_LIBPNG /
-# -sUSE_ZLIB) instead of system find_package (no host zlib/png under emcmake).
+# SDL_SavePNG needs libpng (+ zlib).
 
 if(EMSCRIPTEN)
   message(STATUS "Emscripten: LibSavePNG via -sUSE_LIBPNG=1 -sUSE_ZLIB=1 ports")
@@ -7,21 +6,75 @@ if(EMSCRIPTEN)
     external/SDL_SavePNG/savepng.c)
   add_library(LibSavePNG STATIC ${SAVEPNG_SOURCES_CXX})
   target_include_directories(LibSavePNG SYSTEM PUBLIC external/SDL_SavePNG)
-  # Ports inject headers on the em++ include path; no separate PNG::PNG target.
   target_link_libraries(LibSavePNG PUBLIC LibSDL2)
-  # Ensure link line pulls the ports (also added to global USE_FLAGS).
   target_link_options(LibSavePNG INTERFACE "SHELL:-sUSE_LIBPNG=1" "SHELL:-sUSE_ZLIB=1")
-else()
-  find_package(PNG REQUIRED)
-  find_package(ZLIB REQUIRED)
+  return()
+endif()
 
-  file(GLOB SAVEPNG_SOURCES_CXX RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    external/SDL_SavePNG/savepng.c)
-  add_library(LibSavePNG STATIC ${SAVEPNG_SOURCES_CXX})
-  target_include_directories(LibSavePNG SYSTEM PUBLIC
-    ${PNG_INCLUDE_DIRS}
-    external/SDL_SavePNG)
+find_package(PNG QUIET)
+find_package(ZLIB QUIET)
+
+if(NOT PNG_FOUND)
+  # R36S / constrained sysroots: FIND_ROOT may hide config packages.
+  find_path(PNG_PNG_INCLUDE_DIR png.h
+    PATHS
+      ${CMAKE_SYSROOT}/usr/include
+      ${CMAKE_SYSROOT}/usr/include/libpng16
+      ${CMAKE_SYSROOT}/usr/include/libpng12
+    NO_DEFAULT_PATH)
+  find_library(PNG_LIBRARY
+    NAMES png png16 png12
+    PATHS
+      ${CMAKE_SYSROOT}/usr/lib
+      ${CMAKE_SYSROOT}/usr/lib/aarch64-linux-gnu
+      ${CMAKE_SYSROOT}/lib
+      ${CMAKE_SYSROOT}/lib/aarch64-linux-gnu
+    NO_DEFAULT_PATH)
+  if(PNG_PNG_INCLUDE_DIR AND PNG_LIBRARY)
+    set(PNG_FOUND TRUE)
+    set(PNG_INCLUDE_DIRS "${PNG_PNG_INCLUDE_DIR}")
+    set(PNG_LIBRARIES "${PNG_LIBRARY}")
+    message(STATUS "Found PNG (sysroot): ${PNG_LIBRARY}")
+  endif()
+endif()
+
+if(NOT ZLIB_FOUND)
+  find_path(ZLIB_INCLUDE_DIR zlib.h
+    PATHS ${CMAKE_SYSROOT}/usr/include NO_DEFAULT_PATH)
+  find_library(ZLIB_LIBRARY
+    NAMES z
+    PATHS
+      ${CMAKE_SYSROOT}/usr/lib
+      ${CMAKE_SYSROOT}/usr/lib/aarch64-linux-gnu
+    NO_DEFAULT_PATH)
+  if(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
+    set(ZLIB_FOUND TRUE)
+    if(NOT TARGET ZLIB::ZLIB)
+      add_library(ZLIB::ZLIB UNKNOWN IMPORTED)
+      set_target_properties(ZLIB::ZLIB PROPERTIES
+        IMPORTED_LOCATION "${ZLIB_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${ZLIB_INCLUDE_DIR}")
+    endif()
+    message(STATUS "Found ZLIB (sysroot): ${ZLIB_LIBRARY}")
+  endif()
+endif()
+
+if(NOT PNG_FOUND)
+  message(FATAL_ERROR
+    "Could NOT find PNG (libpng).\n"
+    "  For R36S: install libpng-dev into the ArkOS sysroot, or set PNG_LIBRARY / PNG_PNG_INCLUDE_DIR.")
+endif()
+
+file(GLOB SAVEPNG_SOURCES_CXX RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  external/SDL_SavePNG/savepng.c)
+add_library(LibSavePNG STATIC ${SAVEPNG_SOURCES_CXX})
+target_include_directories(LibSavePNG SYSTEM PUBLIC
+  ${PNG_INCLUDE_DIRS}
+  external/SDL_SavePNG)
+if(TARGET ZLIB::ZLIB)
   target_link_libraries(LibSavePNG PUBLIC LibSDL2 ${PNG_LIBRARIES} ZLIB::ZLIB)
+else()
+  target_link_libraries(LibSavePNG PUBLIC LibSDL2 ${PNG_LIBRARIES})
 endif()
 
 # EOF #

@@ -46,7 +46,10 @@ else()
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     # Do not forward parent emscripten USE_FLAGS into squirrel.
     -DCMAKE_C_FLAGS=
-    -DCMAKE_CXX_FLAGS=)
+    -DCMAKE_CXX_FLAGS=
+    -DDISABLE_DYNAMIC=ON
+    -DDISABLE_EXECUTABLES=ON
+    -DBUILD_SHARED_LIBS=OFF)
 
   if(WIN32)
     add_library(LibSquirrel SHARED IMPORTED)

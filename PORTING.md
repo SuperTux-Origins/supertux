@@ -596,3 +596,20 @@ inherit broken flags and old cmake_minimum_required needs
 Pass `-DSDL2_TTF_SOURCE_DIR` from flake input `sdl2-ttf-src`. ProvideSDL2_ttf
 builds a shared lib into the build prefix when system/pkg-config search fails.
 
+
+### R36S: libpng for SavePNG
+
+ArkOS sysroot may lack CMake PNG config; ProvideSavePNG searches
+`${CMAKE_SYSROOT}/usr/...` for `png.h` / `libpng.so` explicitly.
+
+### wasm: squirrel static-only under ExternalProject
+
+Upstream squirrel builds shared libs + `sq` by default; emscripten then
+fails linking `sq.js` against `libsquirrel.so`. Pass
+`-DDISABLE_DYNAMIC=ON -DDISABLE_EXECUTABLES=ON -DBUILD_SHARED_LIBS=OFF`.
+
+### Android placeholder logging
+
+`placeholder.cpp` now SDL_Inits, creates a window, logs display mode via
+`__android_log_print`, and stays up ~3s so logcat is readable.
+
