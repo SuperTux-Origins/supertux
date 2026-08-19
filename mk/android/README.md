@@ -21,3 +21,12 @@ Scaffolding adapted from [Pingus](https://github.com/Pingus/pingus) `mk/android/
 
 Until the app tree exists, `nix/android.nix` remains a reusable library of
 helpers imported by the flake, not a complete APK derivation.
+
+## Current skeleton
+
+`app/AndroidManifest.xml` — SDLActivity, singleTask, landscape, GLES2 feature  
+`app/jni/Android.mk` — prebuilt SDL2/SDL2_image stubs + placeholder `main`  
+`app/jni/Application.mk` — c++_shared, armeabi-v7a + arm64-v8a, API 22  
+
+Next: expand `LOCAL_SRC_FILES` for SuperTux, add physfs/squirrel/wstsound,
+stage stb_image if needed, wire `nix/android.nix` `mkApk`.

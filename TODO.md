@@ -81,3 +81,7 @@
 - 2026-08-19 (batch): mk/android + mk/r36s scaffolding from Pingus; SuperTux
   renames in nix/android.nix and nix/r36s.nix; PORTS.md; flake exposes r36s
   helpers (sysroot URL still placeholder); platform READMEs.
+
+- 2026-08-19 (batch 2): SUPERTUX_R36S cmake + 640x480 defaults; Android app
+  skeleton; EMSCRIPTEN LibSDL2_ttf INTERFACE; SuperTux.sh launcher; r36s
+  cmakeFlags include SUPERTUX_R36S.

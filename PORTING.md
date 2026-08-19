@@ -227,3 +227,22 @@ under `mk/` or `nix/` and adapt rather than inventing a second stack.
 - `nix/wasm-pingus-reference.nix` keeps the full Pingus static-SDL approach
   for when we need offline ports instead of `-sUSE_SDL=2`.
 - `mk/wasm/scripts/build-app.sh` defaults renamed to `supertux-origins`.
+
+### R36S handheld defaults (Origins)
+
+- CMake option `-DSUPERTUX_R36S=ON` defines `SUPERTUX_R36S`, forces
+  `ENABLE_OPENGLES2`, and is passed from `nix/r36s.nix`.
+- `gameconfig.cpp`: default window 640×480, non-resizable, fullscreen.
+- `main.cpp`: skips window icon under `SUPERTUX_R36S` (already).
+- Launcher: `mk/r36s/scripts/SuperTux.sh` (`--fullscreen --geometry 640x480`).
+
+### EMSCRIPTEN SDL2_ttf
+
+- `ProvideSDL2_ttf.cmake` creates an INTERFACE `LibSDL2_ttf` under EMSCRIPTEN
+  so configure succeeds when FreeType comes from `-sUSE_FREETYPE=2`.
+
+### Android app skeleton
+
+- `mk/android/app/` has AndroidManifest (SDLActivity singleTask, GLES2),
+  jni/Android.mk + Application.mk + placeholder main. Full source list and
+  static deps still TODO.
