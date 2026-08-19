@@ -37,11 +37,21 @@
 
 namespace fs = std::filesystem;
 
+namespace {
+
+/** UTF-8 path from std::string (replaces deprecated fs::u8path). */
+fs::path path_from_utf8(std::string const& s)
+{
+  return fs::path(std::u8string(s.begin(), s.end()));
+}
+
+} // namespace
+
 namespace FileSystem {
 
 bool exists(std::string const& path)
 {
-  fs::path location = fs::u8path(path);
+  fs::path location = path_from_utf8(path);
   // If we get an error (such as "Permission denied"), then ignore it
   // and pretend that the path doesn't exist.
   return fs::exists(location);
@@ -49,13 +59,13 @@ bool exists(std::string const& path)
 
 bool is_directory(std::string const& path)
 {
-  fs::path location = fs::u8path(path);
+  fs::path location = path_from_utf8(path);
   return fs::is_directory(location);
 }
 
 void mkdir(std::string const& directory)
 {
-  fs::path location = fs::u8path(directory);
+  fs::path location = path_from_utf8(directory);
   if (!fs::create_directory(location))
   {
     throw std::runtime_error("failed to create directory: "  + directory);
