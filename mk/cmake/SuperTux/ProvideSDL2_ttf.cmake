@@ -1,9 +1,58 @@
-# SDL2_ttf — Emscripten uses FreeType port. R36S/desktop prefer system package;
-# if missing, build from SDL2_TTF_SOURCE_DIR (flake input sdl2-ttf-src).
+# SDL2_ttf — Emscripten: build real SDL_ttf + FreeType when SOURCE_DIRs given;
+# otherwise offline stub. Desktop/R36S: system package or SDL2_TTF_SOURCE_DIR.
 
 if(EMSCRIPTEN)
-  # Offline: do not use -sUSE_FREETYPE / emscripten fakesdl SDL_ttf.h.
-  message(STATUS "Emscripten: offline SDL_ttf stub (mk/emscripten/)")
+  if(SDL2_TTF_SOURCE_DIR AND FREETYPE_SOURCE_DIR
+      AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c"
+      AND EXISTS "${FREETYPE_SOURCE_DIR}/include/ft2build.h")
+    message(STATUS "Emscripten: building SDL_ttf from ${SDL2_TTF_SOURCE_DIR} + FreeType")
+
+    # Minimal FreeType static lib (TrueType + smooth raster).
+    set(_ft_srcs
+      ${FREETYPE_SOURCE_DIR}/src/autofit/autofit.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftbase.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftbbox.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftbitmap.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftdebug.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftglyph.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftinit.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftstroke.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftsystem.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftfstype.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftgasp.c
+      ${FREETYPE_SOURCE_DIR}/src/base/ftmm.c
+      ${FREETYPE_SOURCE_DIR}/src/base/fttype1.c
+      ${FREETYPE_SOURCE_DIR}/src/cff/cff.c
+      ${FREETYPE_SOURCE_DIR}/src/pshinter/pshinter.c
+      ${FREETYPE_SOURCE_DIR}/src/psnames/psnames.c
+      ${FREETYPE_SOURCE_DIR}/src/psaux/psaux.c
+      ${FREETYPE_SOURCE_DIR}/src/raster/raster.c
+      ${FREETYPE_SOURCE_DIR}/src/sfnt/sfnt.c
+      ${FREETYPE_SOURCE_DIR}/src/smooth/smooth.c
+      ${FREETYPE_SOURCE_DIR}/src/truetype/truetype.c
+    )
+    add_library(supertux_freetype_wasm STATIC ${_ft_srcs})
+    target_include_directories(supertux_freetype_wasm PUBLIC
+      "${FREETYPE_SOURCE_DIR}/include")
+    target_compile_definitions(supertux_freetype_wasm PRIVATE
+      FT2_BUILD_LIBRARY DARWIN_NO_CARBON)
+    # FreeType unit files include peers via relative paths.
+    target_include_directories(supertux_freetype_wasm PRIVATE
+      "${FREETYPE_SOURCE_DIR}/src")
+
+    add_library(LibSDL2_ttf STATIC "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
+    target_include_directories(LibSDL2_ttf PUBLIC
+      "${SDL2_TTF_SOURCE_DIR}"
+      "${FREETYPE_SOURCE_DIR}/include")
+    target_compile_definitions(LibSDL2_ttf PRIVATE TTF_USE_HARFBUZZ=0)
+    target_link_libraries(LibSDL2_ttf PUBLIC supertux_freetype_wasm)
+    if(TARGET LibSDL2)
+      target_link_libraries(LibSDL2_ttf PUBLIC LibSDL2)
+    endif()
+    return()
+  endif()
+
+  message(STATUS "Emscripten: offline SDL_ttf stub (set SDL2_TTF_SOURCE_DIR + FREETYPE_SOURCE_DIR for real fonts)")
   add_library(LibSDL2_ttf STATIC "${CMAKE_SOURCE_DIR}/mk/emscripten/sdl_ttf_stub.c")
   target_include_directories(LibSDL2_ttf PUBLIC "${CMAKE_SOURCE_DIR}/mk/emscripten")
   if(TARGET LibSDL2)
@@ -58,50 +107,24 @@ if(SDL2_TTF_INCLUDE_DIR AND SDL2_TTF_LIBRARY)
   return()
 endif()
 
-# Build from source (R36S when sysroot lacks libSDL2_ttf).
-set(SDL2_TTF_SOURCE_DIR "" CACHE PATH "Path to SDL2_ttf sources")
-if(NOT SDL2_TTF_SOURCE_DIR OR NOT EXISTS "${SDL2_TTF_SOURCE_DIR}/CMakeLists.txt")
-  message(FATAL_ERROR
-    "Could NOT find SDL2_ttf and SDL2_TTF_SOURCE_DIR is unset/invalid.\n"
-    "  Pass -DSDL2_TTF_SOURCE_DIR=… (flake: sdl2-ttf-src) or install libsdl2-ttf into the sysroot.")
+# Build from source when provided (R36S / offline desktop).
+if(SDL2_TTF_SOURCE_DIR AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
+  message(STATUS "Building SDL2_ttf from SDL2_TTF_SOURCE_DIR=${SDL2_TTF_SOURCE_DIR}")
+  add_library(LibSDL2_ttf STATIC "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
+  target_include_directories(LibSDL2_ttf PUBLIC "${SDL2_TTF_SOURCE_DIR}")
+  find_package(Freetype QUIET)
+  if(Freetype_FOUND OR FREETYPE_FOUND)
+    target_link_libraries(LibSDL2_ttf PUBLIC Freetype::Freetype)
+  elseif(FREETYPE_INCLUDE_DIRS AND FREETYPE_LIBRARIES)
+    target_include_directories(LibSDL2_ttf PUBLIC ${FREETYPE_INCLUDE_DIRS})
+    target_link_libraries(LibSDL2_ttf PUBLIC ${FREETYPE_LIBRARIES})
+  else()
+    message(WARNING "SDL2_ttf from source needs FreeType")
+  endif()
+  if(TARGET LibSDL2)
+    target_link_libraries(LibSDL2_ttf PUBLIC LibSDL2)
+  endif()
+  return()
 endif()
 
-message(STATUS "Building SDL2_ttf from ${SDL2_TTF_SOURCE_DIR}")
-include(ExternalProject)
-set(SDL2_TTF_PREFIX "${CMAKE_BINARY_DIR}/sdl2_ttf")
-# Resolve SDL2 / FreeType from sysroot for the ExternalProject.
-set(_sdl2_ttf_cmake_args
-  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-  -DCMAKE_SYSROOT=${CMAKE_SYSROOT}
-  -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}
-  -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
-  -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
-  -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
-  -DCMAKE_INSTALL_PREFIX=${SDL2_TTF_PREFIX}
-  # Force lib/ not lib64/ so IMPORTED_LOCATION matches install layout on aarch64.
-  -DCMAKE_INSTALL_LIBDIR=lib
-  -DCMAKE_BUILD_TYPE=Release
-  -DSDL2TTF_SAMPLES=OFF
-  -DSDL2TTF_VENDORED=ON
-  -DBUILD_SHARED_LIBS=ON
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-)
-ExternalProject_Add(sdl2_ttf_project
-  SOURCE_DIR "${SDL2_TTF_SOURCE_DIR}"
-  CMAKE_ARGS ${_sdl2_ttf_cmake_args}
-  BUILD_BYPRODUCTS
-    "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so"
-    "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so.0"
-    "${SDL2_TTF_PREFIX}/lib64/libSDL2_ttf.so"
-)
-
-file(MAKE_DIRECTORY "${SDL2_TTF_PREFIX}/include/SDL2")
-add_library(LibSDL2_ttf SHARED IMPORTED)
-# Prefer lib/ (forced above); fall back to lib64 for older builds.
-set_target_properties(LibSDL2_ttf PROPERTIES
-  IMPORTED_LOCATION "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so"
-  INTERFACE_INCLUDE_DIRECTORIES "${SDL2_TTF_PREFIX}/include/SDL2;${SDL2_TTF_PREFIX}/include")
-add_dependencies(LibSDL2_ttf sdl2_ttf_project)
-
-# EOF #
+message(FATAL_ERROR "SDL2_ttf not found (install libsdl2-ttf-dev or set SDL2_TTF_SOURCE_DIR)")

@@ -20,6 +20,8 @@
 , squirrel-src ? null
 , sdlSrc ? null
 , sdlVersion ? "2.30.3"
+, freetypeSrc ? null
+, sdl2TtfSrc ? null
 }:
 
 let
@@ -277,6 +279,10 @@ in
       "-DUSE_SYSTEM_SQUIRREL=OFF"
       "-DPROJECT_VERSION_FULL=${version}"
       "-DSUPERTUX_WASM_SHELL=${wasmShell}"
+    ] ++ lib.optionals (sdl2TtfSrc != null) [
+      "-DSDL2_TTF_SOURCE_DIR=${sdl2TtfSrc}"
+    ] ++ lib.optionals (freetypeSrc != null) [
+      "-DFREETYPE_SOURCE_DIR=${freetypeSrc}"
     ];
 
     preBuild = ''

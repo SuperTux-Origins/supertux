@@ -1123,3 +1123,13 @@ makefile. Staging under `jni/` alone never matches the wildcards.
   off). Stock SuperTux music is mostly Ogg — expect silent BGM until Vorbis is
   enabled for those targets.
 
+### WASM: images and fonts were offline stubs
+
+Runtime failed with `SDL_ttf stub: font rendering not implemented offline` and
+`IMG_Load_RW` returning null (SDL_GetError showed unrelated noise).
+
+- `mk/emscripten/sdl_image_stub.c` now decodes via **stb_image**
+  (`mk/emscripten/stb_image.h`).
+- `ProvideSDL2_ttf.cmake` builds real **SDL_ttf + FreeType** when
+  `-DSDL2_TTF_SOURCE_DIR=` and `-DFREETYPE_SOURCE_DIR=` are set (flake inputs).
+
