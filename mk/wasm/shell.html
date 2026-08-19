@@ -434,6 +434,11 @@
     var Module = {
       arguments: stArgv,
       preRun: [function() {
+        // preRun IDBFS: parent path for Origins userdir (main also mounts IDBFS).
+        try {
+          if (typeof FS !== 'undefined' && FS.mkdirTree)
+            FS.mkdirTree('/home/web_user/.local/share/supertux-origins');
+        } catch (e) {}
         if (stQuery.verbose || stQuery.debug) {
           console.log('[supertux-shell] Module.arguments =', Module.arguments);
           console.log('[supertux-shell] canvas size', Module.canvas && Module.canvas.width, Module.canvas && Module.canvas.height);

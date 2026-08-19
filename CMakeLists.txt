@@ -103,7 +103,7 @@ if(EMSCRIPTEN)
   # Preload the *source* data tree (BUILD_DATA_DIR), not BUILD_CONFIG_DATA_DIR
   # (CMAKE_BINARY_DIR/data) which is never populated — file_packager then fails
   # with "build/data@/data does not exist". Runtime mounts the VFS path /data.
-  set(USE_LINK_FLAGS " -sFULL_ES2=1 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js -fexceptions -lGL")
+  set(USE_LINK_FLAGS " -sFULL_ES2=1 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sERROR_ON_UNDEFINED_SYMBOLS=1 -lidbfs.js -fexceptions -lGL -lopenal")
   if(SUPERTUX_WASM_SHELL)
     set(USE_LINK_FLAGS "${USE_LINK_FLAGS} --shell-file ${SUPERTUX_WASM_SHELL}")
     message(STATUS "Emscripten HTML shell: ${SUPERTUX_WASM_SHELL}")

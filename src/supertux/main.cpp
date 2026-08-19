@@ -185,9 +185,14 @@ void PhysfsSubsystem::find_datadir() const
   {
     datadir = *m_forced_datadir;
   }
-  else if (char const* env_datadir = getenv("SUPERTUX_ORIGNS_DATA_DIR"))
+  else if (char const* env_datadir = getenv("SUPERTUX_ORIGINS_DATA_DIR"))
   {
     datadir = env_datadir;
+  }
+  else if (char const* env_datadir_legacy = getenv("SUPERTUX_ORIGNS_DATA_DIR"))
+  {
+    // Legacy typo alias (missing 'I').
+    datadir = env_datadir_legacy;
   }
   else if (char const* env_datadir3 = getenv("ANDROID_MY_OWN_APP_FILE"))
   {
@@ -301,9 +306,14 @@ void PhysfsSubsystem::find_userdir() const
   {
     userdir = *m_forced_userdir;
   }
-  else if (char const* env_userdir = getenv("SUPERTUX_ORIGNS_USER_DIR"))
+  else if (char const* env_userdir = getenv("SUPERTUX_ORIGINS_USER_DIR"))
   {
     userdir = env_userdir;
+  }
+  else if (char const* env_userdir_legacy = getenv("SUPERTUX_ORIGNS_USER_DIR"))
+  {
+    // Legacy typo alias (missing 'I').
+    userdir = env_userdir_legacy;
   }
   else
   {

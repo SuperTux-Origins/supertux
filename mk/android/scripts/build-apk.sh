@@ -475,6 +475,10 @@ echo "==> packing assets/data.zip for PhysFS"
 rm -f src/assets/data.zip
 ( cd src/assets && zip -r -0 data.zip . -x 'data.zip' -x 'android-asset-index.txt' )
 echo "assets/data.zip size: $(du -h src/assets/data.zip | awk '{print $1}')"
+# Avoid double-shipping: APK keeps assets/data.zip (+ index) only. PhysFS mounts
+# the zip as the data root; loose duplicates only bloated the package.
+echo "==> pruning loose assets (keep data.zip + index only)"
+find src/assets -mindepth 1 -maxdepth 1 ! -name 'data.zip' ! -name 'android-asset-index.txt' -exec rm -rf {} +
 
 cp "$KEYSTORE" debug.keystore
 
@@ -489,7 +493,13 @@ echo "==> staged C/C++ sources: $(find src/jni/src \( -name '*.cpp' -o -name '*.
 "$NDK/ndk-build" \
   NDK_PROJECT_PATH="$PWD/src" \
   APP_BUILD_SCRIPT="$PWD/src/jni/Android.mk" \
-  NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
+  
+# Diagnostics: module LOCAL_PATH is jni/src — TTF/FreeType must live there.
+echo "==> TTF/FreeType stage check (jni/src):"
+ls -la src/jni/src/SDL_ttf.c src/jni/src/sdl_ttf_stub.c src/jni/src/freetype/include/ft2build.h \
+  src/jni/src/freetype_Android.mk 2>&1 | sed 's/^/  /' || true
+
+NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
   SUPERTUX_VERSION="$SUPERTUX_VERSION" \
   PINGUS_VERSION="$SUPERTUX_VERSION" \
   ENABLE_ANDROID_SOUND="${ENABLE_ANDROID_SOUND:-0}" \

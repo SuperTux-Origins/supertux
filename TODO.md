@@ -97,3 +97,7 @@ adapted from Pingus and Windstille.
 - [x] external/ priocpp, logmich, sexpcpp, strutcpp, argpp, geomcpp,
       tinygettext, squirrel, wstsound, miniswig, xdgcpp, tinycmmc.
 - [x] emscriptenStdenv CMake force; Android NDK C++ flags; R36S stubs.
+
+## Audio
+- [ ] Enable Vorbis (libogg/libvorbis) for Android + WASM so stock `.ogg` music plays
+- [ ] Confirm OpenAL link on WASM (`-lopenal`) at runtime

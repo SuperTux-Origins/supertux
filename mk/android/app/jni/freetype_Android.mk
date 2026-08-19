@@ -5,8 +5,6 @@
 include $(CLEAR_VARS)
 LOCAL_MODULE := freetype
 LOCAL_CFLAGS := -DFT2_BUILD_LIBRARY -DDARWIN_NO_CARBON
-# Avoid optional compressors that pull extra libs.
-LOCAL_CFLAGS += -DFT_CONFIG_OPTION_DISABLE_STREAM_SUPPORT
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/src

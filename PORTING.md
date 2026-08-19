@@ -1111,3 +1111,15 @@ not `jni/`. FreeType/SDL_ttf must be staged under `jni/src/freetype` and
 `jni/src/SDL_ttf.c`, and `freetype_Android.mk` copied next to the module
 makefile. Staging under `jni/` alone never matches the wildcards.
 
+### Audit follow-ups (bundle 011)
+
+- WASM link: `-lopenal`, `-sERROR_ON_UNDEFINED_SYMBOLS=1` (was 0).
+- Android APK: after packing `assets/data.zip`, prune loose asset files so the
+  APK does not double-ship the data tree.
+- Env: `SUPERTUX_ORIGINS_DATA_DIR` / `SUPERTUX_ORIGINS_USER_DIR` preferred;
+  legacy typo `SUPERTUX_ORIGNS_*` still accepted.
+- FreeType: dropped non-standard `FT_CONFIG_OPTION_DISABLE_STREAM_SUPPORT`.
+- Music: Android/WASM/R36S still force **modplug only** (vorbis/opus/mpg123
+  off). Stock SuperTux music is mostly Ogg — expect silent BGM until Vorbis is
+  enabled for those targets.
+
