@@ -421,3 +421,9 @@ branch of https://github.com/Grumbel/argpp (not master).
 Also vendored for the same Android staging loop: `geomcpp`, `tinygettext`.
 
 WASM package attribute: `packages.supertux-wasm` (not `supertux-origins-wasm`).
+
+### EmscriptenStdenv + CMake
+
+`pkgs.emscriptenStdenv` defaults to autotools (`emconfigure ./configure`).
+SuperTux and its CMake deps must set `dontConfigure = true` and run
+`emcmake cmake …` in `preBuild` (see `nix/wasm.nix` `mkWasmCmake`).

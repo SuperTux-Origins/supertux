@@ -35,6 +35,7 @@ EOFC
   '';
 
   # Build a simple cmake project from external/ under emscriptenStdenv.
+  # Important: emscriptenStdenv defaults to autotools (./configure). Force CMake.
   mkWasmCmake = { pname, srcPath, cmakeFlags ? [], buildInputs ? [] }:
     est.mkDerivation {
       inherit pname;
@@ -42,17 +43,20 @@ EOFC
       src = lib.cleanSource srcPath;
       nativeBuildInputs = [ pkgs.buildPackages.cmake emscripten ];
       inherit buildInputs;
-      cmakeFlags = [
-        "-DCMAKE_BUILD_TYPE=Release"
-        "-DBUILD_TESTS=OFF"
-        "-DWARNINGS=OFF"
-        "-DWERROR=OFF"
-      ] ++ cmakeFlags;
-      preConfigure = ''
+      dontUseCmakeConfigure = true;
+      dontConfigure = true;
+      preBuild = ''
         export EM_CACHE="''${TMPDIR:-/tmp}/emcache-${pname}"
         mkdir -p "$EM_CACHE"
+        # emcmake drives cmake with the emscripten toolchain
+        emcmake cmake -S . -B build           -DCMAKE_BUILD_TYPE=Release           -DCMAKE_INSTALL_PREFIX=$out           -DBUILD_TESTS=OFF           -DWARNINGS=OFF           -DWERROR=OFF           ${lib.concatStringsSep " " cmakeFlags}
+        cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
+        cmake --install build
       '';
-      # emscriptenStdenv sets the toolchain; install as usual
+      # Skip default phases that expect autotools/cmake hooks
+      buildPhase = "runHook preBuild; runHook postBuild";
+      installPhase = "runHook preInstall; runHook postInstall";
+      dontStrip = true;
     };
 
   logmichWasm = mkWasmCmake {
@@ -86,6 +90,9 @@ in
 
     src = lib.cleanSource self;
 
+    # emscriptenStdenv defaults to ./configure; SuperTux is CMake-only.
+    dontConfigure = true;
+
     nativeBuildInputs = [
       pkgs.buildPackages.cmake
       pkgs.buildPackages.pkg-config
@@ -118,12 +125,16 @@ in
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"
     ];
 
-    preConfigure = ''
+    preBuild = ''
       export EM_CACHE="''${TMPDIR:-/tmp}/emcache-supertux"
       mkdir -p "$EM_CACHE"
       export EM_PORTS="''${TMPDIR:-/tmp}/emports-supertux"
       mkdir -p "$EM_PORTS"
+      emcmake cmake -S . -B build         -DCMAKE_BUILD_TYPE=Release         -DCMAKE_INSTALL_PREFIX=$out         ${lib.concatStringsSep " " cmakeFlags}
+      cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
     '';
+    buildPhase = "runHook preBuild; runHook postBuild";
+    # installPhase already custom below
 
     dontStrip = true;
 
