@@ -545,3 +545,20 @@ back to sources. `external/physfs` is empty in-tree; pass
 installed. Re-copy `APP_DIR/jni/Android.mk` afterward so a stray file cannot
 restore an old PREBUILT SDL2 stanza.
 
+
+### Android launcher icon
+
+`aapt` failed with missing `@mipmap/ic_launcher`. Added mdpi–xxxhdpi
+`ic_launcher.png` under `mk/android/app/res/` (temporary assets from the
+Pingus Android scaffold; replace with SuperTux branding later).
+
+### wasm: ProvideSavePNG needs libpng/zlib ports
+
+`find_package(PNG REQUIRED)` fails under emcmake. Use `-sUSE_LIBPNG=1
+-sUSE_ZLIB=1` in USE_FLAGS and build LibSavePNG without system PNG.
+
+### R36S: curl not in ArkOS sysroot
+
+`ProvideCurl.cmake` skipped for `SUPERTUX_R36S` (same as EMSCRIPTEN);
+`HAVE_LIBCURL` stays false and the LibCurl link is gated on that flag.
+

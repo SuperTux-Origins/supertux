@@ -95,7 +95,7 @@ if(EMSCRIPTEN)
   # - GROWABLE_ARRAYBUFFERS=0 avoids TextDecoder issues with resizable buffers
   # - FORCE_FILESYSTEM + idbfs for persistent storage
   # - preload data directory at /data
-  set(USE_FLAGS " -sUSE_SDL=2 -sFULL_ES2=1 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=2 -sUSE_PTHREADS=1 -sDISABLE_EXCEPTION_CATCHING=0 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_CONFIG_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sSDL2_IMAGE_FORMATS='[\"png\",\"jpg\"]' --use-preload-plugins")
+  set(USE_FLAGS " -sUSE_SDL=2 -sFULL_ES2=1 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=2 -sUSE_LIBPNG=1 -sUSE_ZLIB=1 -sUSE_PTHREADS=1 -sDISABLE_EXCEPTION_CATCHING=0 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_CONFIG_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sSDL2_IMAGE_FORMATS='[\"png\",\"jpg\"]' --use-preload-plugins")
   if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(USE_FLAGS "${USE_FLAGS} -fsanitize=undefined -sSAFE_HEAP=1 -sASSERTIONS=1 -sDEMANGLE_SUPPORT=1")
   endif()
@@ -329,7 +329,7 @@ if(HAVE_OPENGL)
   target_link_libraries(supertux-origins_lib PUBLIC LibOpenGL)
 endif()
 
-if(NOT EMSCRIPTEN)
+if(HAVE_LIBCURL)
   target_link_libraries(supertux-origins_lib PUBLIC LibCurl)
 endif()
 
