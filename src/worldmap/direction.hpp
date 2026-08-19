@@ -17,8 +17,10 @@
 #ifndef HEADER_SUPERTUX_WORLDMAP_DIRECTION_HPP
 #define HEADER_SUPERTUX_WORLDMAP_DIRECTION_HPP
 
+#include <format>
 #include <memory>
 #include <string>
+#include <string_view>
 
 class ObjectOption;
 
@@ -31,6 +33,25 @@ Direction string_to_direction(std::string const& directory);
 std::string direction_to_string(Direction direction);
 
 } // namespace worldmap
+
+template<>
+struct std::formatter<worldmap::Direction> : std::formatter<std::string_view>
+{
+  auto format(worldmap::Direction dir, auto& ctx) const
+  {
+    using worldmap::Direction;
+    std::string_view s;
+    switch (dir) {
+      case Direction::WEST:  s = "west";  break;
+      case Direction::EAST:  s = "east";  break;
+      case Direction::NORTH: s = "north"; break;
+      case Direction::SOUTH: s = "south"; break;
+      case Direction::NONE:  s = "none";  break;
+      default:               s = "unknown"; break;
+    }
+    return std::formatter<std::string_view>::format(s, ctx);
+  }
+};
 
 #endif
 

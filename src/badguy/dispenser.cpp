@@ -71,7 +71,7 @@ Dispenser::Cannon_Direction_to_string(Direction direction)
       return "right";
     default:
       if (direction != Direction::AUTO)
-        log_warning("Direction \"{}\" not valid for cannon. Switching to \"auto\".", direction);
+        log_warning("Direction \"{}\" not valid for cannon. Switching to \"auto\".", dir_to_string(direction));
       return "center";
   }
 }

@@ -17,7 +17,10 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_DIRECTION_HPP
 #define HEADER_SUPERTUX_SUPERTUX_DIRECTION_HPP
 
+#include <format>
 #include <iostream>
+#include <string>
+#include <string_view>
 
 class ObjectOption;
 
@@ -27,6 +30,25 @@ std::ostream& operator<<(std::ostream& o, Direction const& dir);
 
 std::string dir_to_string(Direction const& dir);
 Direction string_to_dir(std::string const& dir_str);
+
+/** std::format support (logmich uses std::vformat). */
+template<>
+struct std::formatter<Direction> : std::formatter<std::string_view>
+{
+  auto format(Direction dir, auto& ctx) const
+  {
+    std::string_view s;
+    switch (dir) {
+      case Direction::LEFT:  s = "left";  break;
+      case Direction::RIGHT: s = "right"; break;
+      case Direction::UP:    s = "up";    break;
+      case Direction::DOWN:  s = "down";  break;
+      case Direction::AUTO:  s = "auto";  break;
+      default:               s = "unknown"; break;
+    }
+    return std::formatter<std::string_view>::format(s, ctx);
+  }
+};
 
 #endif
 
