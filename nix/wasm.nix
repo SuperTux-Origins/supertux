@@ -17,6 +17,7 @@
 , wstsound
 , squirrel
 , physfs-src ? null
+, squirrel-src ? null
 }:
 
 let
@@ -209,6 +210,9 @@ in
     ] ++ modplugCmakeFlags
       ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"
+    ] ++ lib.optionals (squirrel-src != null) [
+      "-DSQUIRREL_SOURCE_DIR=${squirrel-src}"
+      "-DUSE_SYSTEM_SQUIRREL=OFF"
     ];
 
     preBuild = ''

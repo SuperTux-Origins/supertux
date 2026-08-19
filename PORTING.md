@@ -510,3 +510,24 @@ VERSION argument leaves `PROJECT_VERSION` defined but empty, so
 (`CMAKE_SOURCE_DIR != CMAKE_CURRENT_SOURCE_DIR`), and guard the
 write_basic call against an empty version string.
 
+
+### external/squirrel is packaging-only
+
+**Problem.** `external/squirrel` contains only a nested flake pointing at
+`github:albertodemichelis/squirrel`; there is no `CMakeLists.txt` in-tree.
+`ProvideSquirrel.cmake` expects sources at `SQUIRREL_SOURCE_DIR`.
+
+**Solution.** Flake input `squirrel-src` fetches the upstream tree; wasm (and
+later R36S) pass `-DSQUIRREL_SOURCE_DIR=${squirrel-src}` /
+`-DUSE_SYSTEM_SQUIRREL=OFF`.
+
+### Android: do not redeclare SDL2 under jni/src
+
+**Problem.** App `jni/Android.mk` listed `LOCAL_SRC_FILES := SDL2/lib/$(ABI)/…`
+relative to `jni/src/`, while prebuilts are provided by sibling `jni/SDL/`
+(absolute store path from `sdlPrebuiltAndroidMk`). ndk-build looked for
+`jni/src/SDL2/lib/...` and aborted.
+
+**Solution.** Match Pingus: only `LOCAL_SHARED_LIBRARIES := SDL2` in the
+game module; SDL2 prebuilt lives solely in `jni/SDL/Android.mk`.
+

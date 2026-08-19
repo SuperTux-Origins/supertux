@@ -1,44 +1,72 @@
-# SuperTux Origins — jni Android.mk (WIP).
-# SDL2 prebuilts expected under jni/SDL2 and jni/SDL2_image (see
-# mk/android/scripts/install-sdl-libs.sh).
-#
-# Full source list is in supertux_sources.mk (376 files).  Until static
-# deps (physfs, squirrel, tinycmmc, wstsound, …) are staged as prebuilts
-# or built in-tree, keep LOCAL_SRC_FILES minimal so ndk-build validates.
+# SuperTux Origins — jni module Android.mk
+# SDL2 prebuilts live in sibling jni/SDL/ (see nix/android.nix sdlPrebuiltAndroidMk).
+# Do not redeclare PREBUILT SDL2 here with relative paths under jni/src/ — that
+# is what made ndk-build look for jni/src/SDL2/lib/... and fail.
 
 LOCAL_PATH := $(call my-dir)
 
-# --- prebuilt SDL2 ----------------------------------------------------------
-include $(CLEAR_VARS)
-LOCAL_MODULE := SDL2
-LOCAL_SRC_FILES := SDL2/lib/$(TARGET_ARCH_ABI)/libSDL2.so
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/SDL2/include
-include $(PREBUILT_SHARED_LIBRARY)
+# ---------------------------------------------------------------------------
+# Prebuilt OpenAL Soft + libmodplug (per-ABI static libs from AUDIO_ANDROID_LIBS)
+# ---------------------------------------------------------------------------
+ifeq ($(ENABLE_ANDROID_SOUND),1)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := SDL2_image
-LOCAL_SRC_FILES := SDL2_image/lib/$(TARGET_ARCH_ABI)/libSDL2_image.so
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/SDL2_image/include
-LOCAL_SHARED_LIBRARIES := SDL2
-include $(PREBUILT_SHARED_LIBRARY)
+LOCAL_MODULE := openal
+LOCAL_SRC_FILES := ../audio/$(TARGET_ARCH_ABI)/lib/libopenal.a
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../audio/include $(LOCAL_PATH)/../audio/include/AL
+include $(PREBUILT_STATIC_LIBRARY)
 
-# Optional: include full source list once deps are ready
-# include $(LOCAL_PATH)/supertux_sources.mk
-
-# --- game shared library ----------------------------------------------------
 include $(CLEAR_VARS)
+LOCAL_MODULE := modplug
+LOCAL_SRC_FILES := ../audio/$(TARGET_ARCH_ABI)/lib/libmodplug.a
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../audio/include
+include $(PREBUILT_STATIC_LIBRARY)
+
+endif
+
+# ---------------------------------------------------------------------------
+# libmain — placeholder until full SUPERTUX_SOURCES + deps are wired
+# ---------------------------------------------------------------------------
+include $(CLEAR_VARS)
+
 LOCAL_MODULE := main
-# Placeholder until SUPERTUX_SOURCES + deps are wired:
+
+# Placeholder so ndk-build validates the prebuilt / packaging pipeline.
+# When ready, switch to RWILDCARD over this tree (game + deps/*) like Pingus.
+ifneq ($(wildcard $(LOCAL_PATH)/placeholder.cpp),)
 LOCAL_SRC_FILES := placeholder.cpp
-# When ready:
-# LOCAL_SRC_FILES := $(SUPERTUX_SOURCES)
+else
+# Collect any staged .cpp (deps + game) once sources are copied in.
+RWILDCARD = $(foreach d,$(wildcard $1*),$(call RWILDCARD,$d/,$2) $(filter $(subst *,%,$2),$d))
+LOCAL_SRC_FILES := $(patsubst $(LOCAL_PATH)/%,%,$(call RWILDCARD,$(LOCAL_PATH)/,%.cpp))
+LOCAL_SRC_FILES += $(patsubst $(LOCAL_PATH)/%,%,$(wildcard $(LOCAL_PATH)/*.c))
+LOCAL_SRC_FILES := $(filter-out %/win32/% win32/%,$(LOCAL_SRC_FILES))
+LOCAL_SRC_FILES := $(filter-out %/json_reader_impl.cpp %/json_writer_impl.cpp %/jsonpretty_writer_impl.cpp,$(LOCAL_SRC_FILES))
+endif
+
 LOCAL_C_INCLUDES := \
-  $(LOCAL_PATH)/SDL2/include \
-  $(LOCAL_PATH)/SDL2_image/include \
-  $(LOCAL_PATH)/../../../../src \
-  $(LOCAL_PATH)/../../../../external
-LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image
-LOCAL_LDLIBS := -lGLESv2 -llog -landroid -lEGL
-LOCAL_CPPFLAGS := -std=c++17 -frtti -fexceptions -DANDROID -DUSE_OPENGLES2
-LOCAL_CFLAGS := -DANDROID -DUSE_OPENGLES2
+	$(LOCAL_PATH)/../SDL/include \
+	$(LOCAL_PATH)/../SDL/include/SDL2 \
+	$(LOCAL_PATH) \
+	$(LOCAL_PATH)/../external_includes \
+	$(LOCAL_PATH)/deps
+
+ifeq ($(ENABLE_ANDROID_SOUND),1)
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../audio/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../audio/include/AL
+endif
+
+LOCAL_SHARED_LIBRARIES := SDL2
+
+LOCAL_LDLIBS := -llog -landroid -lz -lGLESv2 -lEGL
+
+ifeq ($(ENABLE_ANDROID_SOUND),1)
+LOCAL_WHOLE_STATIC_LIBRARIES := openal
+LOCAL_STATIC_LIBRARIES := modplug
+LOCAL_LDLIBS += -lOpenSLES
+endif
+
+LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions -DANDROID -DUSE_OPENGLES2 -DUSE_SDL2
+LOCAL_CFLAGS := -DANDROID -DUSE_OPENGLES2 -DUSE_SDL2
+
 include $(BUILD_SHARED_LIBRARY)

@@ -66,6 +66,10 @@ mkdir -p src/jni/src src/jni/SDL
 cp "$APPLICATION_MK" src/jni/Application.mk
 cp "$TOP_ANDROID_MK" src/jni/Android.mk
 cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
+# Placeholder TU so ndk-build has a source before full game sources are wired.
+if [ -f "$APP_DIR/jni/placeholder.cpp" ]; then
+  cp "$APP_DIR/jni/placeholder.cpp" src/jni/src/placeholder.cpp
+fi
 cp "$APP_DIR/AndroidManifest.xml" src/AndroidManifest.xml
 cp -r "$APP_DIR/res" src/res
 

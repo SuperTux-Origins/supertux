@@ -91,6 +91,12 @@
       flake = false;
     };
 
+    # Squirrel language sources (external/squirrel is only a packaging flake).
+    squirrel-src = {
+      url = "github:albertodemichelis/squirrel?rev=f77074bdd6152d230609146a3d424c6f49e3770f";
+      flake = false;
+    };
+
     # Android: SDL2 sources for ndk-build prebuilts
     sdl2-src = {
       url = "https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz";
@@ -106,7 +112,7 @@
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, curl-win32, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
-              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, sdl2-src, sdl2-image-src }:
+              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, squirrel-src, sdl2-src, sdl2-image-src }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {
@@ -204,7 +210,7 @@
           # See nix/wasm.nix and PORTING.md.
           supertux-wasm = (import ./nix/wasm.nix {
             inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
-                    wstsound squirrel physfs-src;
+                    wstsound squirrel physfs-src squirrel-src;
           }).supertux-wasm;
           # Alias for discoverability
           supertux-origins-wasm = supertux-wasm;
