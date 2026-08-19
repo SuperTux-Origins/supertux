@@ -21,7 +21,7 @@
 #include <assert.h>
 #include <sstream>
 
-#if defined(WSTSOUND_WITH_EFX)
+#if WSTSOUND_WITH_EFX
 #  include <AL/efx.h>
 #endif
 
@@ -84,7 +84,7 @@ OpenALDevice::is_extension_present(std::string const& ext) const
 int
 OpenALDevice::max_auxiliary_sends() const
 {
-#if defined(WSTSOUND_WITH_EFX)
+#if WSTSOUND_WITH_EFX
   ALint sends = 0;
   alcGetIntegerv(m_device, ALC_MAX_AUXILIARY_SENDS, 1, &sends);
   return sends;
