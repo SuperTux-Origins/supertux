@@ -217,6 +217,15 @@ function(build_dependencies)
     add_subdirectory(external/wstsound/ EXCLUDE_FROM_ALL)
   endif()
 endfunction()
+# wstsound: force mobile/wasm codec set before subdirectory option() runs
+if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
+  set(WSTSOUND_WITH_MPG123 OFF CACHE BOOL "Decode MP3 via mpg123" FORCE)
+  set(WSTSOUND_WITH_VORBIS OFF CACHE BOOL "Decode Ogg Vorbis" FORCE)
+  set(WSTSOUND_WITH_OPUS OFF CACHE BOOL "Decode Opus" FORCE)
+  set(WSTSOUND_WITH_EFX OFF CACHE BOOL "OpenAL EFX effects API" FORCE)
+  set(WSTSOUND_WITH_LOOPBACK OFF CACHE BOOL "OpenAL-soft loopback device" FORCE)
+  set(WSTSOUND_WITH_MODPLUG ON CACHE BOOL "Decode module formats via libmodplug" FORCE)
+endif()
 build_dependencies()
 
 ## Add lots of dependencies to compiler switches

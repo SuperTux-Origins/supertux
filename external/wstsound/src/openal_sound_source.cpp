@@ -21,7 +21,7 @@
 #include <assert.h>
 #include <iostream>
 
-#if defined(WSTSOUND_WITH_EFX)
+#if WSTSOUND_WITH_EFX
 #  define AL_ALEXT_PROTOTYPES
 #  include <AL/efx.h>
 #  include "effect_slot.hpp"
@@ -220,7 +220,7 @@ OpenALSoundSource::update(float delta)
 void
 OpenALSoundSource::set_direct_filter(FilterPtr const& filter)
 {
-#if defined(WSTSOUND_WITH_EFX)
+#if WSTSOUND_WITH_EFX
   m_direct_filter = filter;
 
   if (!filter) {
@@ -237,7 +237,7 @@ OpenALSoundSource::set_direct_filter(FilterPtr const& filter)
 void
 OpenALSoundSource::set_effect_slot(EffectSlotPtr const& slot, FilterPtr const& filter)
 {
-#if defined(WSTSOUND_WITH_EFX)
+#if WSTSOUND_WITH_EFX
   m_effect_slot = slot;
   m_filter = filter;
   ALint const auxiliary_send = 0; // can have more than one!

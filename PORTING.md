@@ -657,3 +657,13 @@ Synced SuperTux `external/wstsound` sources with Windstille so that:
 CMake forces these OFF for `EMSCRIPTEN | ANDROID | SUPERTUX_R36S`. Do not
 reinvent — keep in lockstep with Windstille’s wstsound.
 
+
+### wstsound: why MPG123 still compiled after "OFF"
+
+1. SuperTux sources lacked `#if WSTSOUND_WITH_*` around includes (fixed from Windstille).
+2. CMake `option()` can reset -D values under CMP0077 OLD — set normal vars
+   *before* `option()` and FORCE CACHE before `add_subdirectory(wstsound)`.
+3. Prefer `#if WSTSOUND_WITH_FOO` over `#if defined(WSTSOUND_WITH_FOO)` so that
+   a leaked `-DWSTSOUND_WITH_FOO=0` still disables the include.
+
+Look for `wstsound codecs: ... MPG123=OFF EFX=OFF` in the configure log.

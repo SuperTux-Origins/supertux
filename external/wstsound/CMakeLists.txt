@@ -54,6 +54,18 @@ include(MaximumWarnings)
 
 option(BUILD_EXTRA "Build extra stuff" OFF)
 
+# Pre-seed codec toggles BEFORE option() so CMP0077 NEW keeps them
+# (parent may also pass -DWSTSOUND_WITH_*=OFF from nix).
+if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
+  set(WSTSOUND_WITH_MPG123 OFF)
+  set(WSTSOUND_WITH_VORBIS OFF)
+  set(WSTSOUND_WITH_OPUS OFF)
+  set(WSTSOUND_WITH_EFX OFF)
+  set(WSTSOUND_WITH_LOOPBACK OFF)
+  set(WSTSOUND_WITH_MODPLUG ON)
+endif()
+
+
 # Codec / feature toggles. Desktop defaults keep the full set; Emscripten
 # defaults match Pingus in-tree assets (WAV + module music via ModPlug).
 option(WSTSOUND_WITH_MODPLUG "Decode module formats via libmodplug (.it/.s3m/…)" ON)
@@ -113,6 +125,10 @@ if(WSTSOUND_WITH_MODPLUG)
   list(APPEND WSTSOUND_CODEC_LIBS ModPlug::modplug)
 endif()
 
+message(STATUS "wstsound codecs: MODPLUG=${WSTSOUND_WITH_MODPLUG} "
+    "VORBIS=${WSTSOUND_WITH_VORBIS} OPUS=${WSTSOUND_WITH_OPUS} "
+    "MPG123=${WSTSOUND_WITH_MPG123} EFX=${WSTSOUND_WITH_EFX} "
+    "LOOPBACK=${WSTSOUND_WITH_LOOPBACK}")
 file(GLOB WSTSOUND_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   include/wstsound/*.hpp)
 file(GLOB WSTSOUND_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}

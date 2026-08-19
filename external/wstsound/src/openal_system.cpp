@@ -24,7 +24,7 @@
 
 #include "openal_buffer.hpp"
 #include "openal_device.hpp"
-#if defined(WSTSOUND_WITH_LOOPBACK)
+#if WSTSOUND_WITH_LOOPBACK
 #  include "openal_loopback_device.hpp"
 #endif
 #include "openal_real_device.hpp"
@@ -96,7 +96,7 @@ OpenALSystem::open_real_device()
 OpenALLoopbackDevice&
 OpenALSystem::open_loopback_device(int frequency, int channels)
 {
-#if defined(WSTSOUND_WITH_LOOPBACK)
+#if WSTSOUND_WITH_LOOPBACK
   std::unique_ptr<OpenALLoopbackDevice> loopback_device = std::make_unique<OpenALLoopbackDevice>(*this, frequency, channels);
   OpenALLoopbackDevice& loopback_device_ref = *loopback_device;
   m_device = std::move(loopback_device);
