@@ -27,6 +27,7 @@
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
+#include <cstdio>
 
 namespace {
   /* Maximum movement speed in pixels per LOGICAL_FPS */

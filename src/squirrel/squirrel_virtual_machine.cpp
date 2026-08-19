@@ -30,6 +30,7 @@
 #include "supertux/console.hpp"
 #include "supertux/globals.hpp"
 #include "util/log.hpp"
+#include <cstdio>
 
 #ifdef ENABLE_SQDBG
 #  include "../../external/squirrel/sqdbg/sqrdbg.h"

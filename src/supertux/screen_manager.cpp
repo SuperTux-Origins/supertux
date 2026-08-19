@@ -34,6 +34,7 @@
 #include "supertux/screen_fade.hpp"
 #include "supertux/sector.hpp"
 #include "video/compositor.hpp"
+#include <cstdio>
 
 
 #ifdef __EMSCRIPTEN__

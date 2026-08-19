@@ -101,3 +101,21 @@
 
 - 2026-08-19: strtok cstring fix; flake outputs supertux-android + android-sdl-libs
   (broken until jni links external deps).
+
+## Progress (2026-08-19)
+
+Desktop (fmt→std::format):
+- [x] Formatters: Direction, Vector, Size, UID, Control, Color, MenuId, BonusType, sexp::Value
+- [x] cstring/cstdio includes for GCC 15
+- [x] priocpp external, JSON tests gated
+- [ ] Full desktop link/run verified by user
+
+Android:
+- [x] flake packages.supertux-android + android-sdl-libs
+- [x] keystore, manifest, ndk-build scaffold
+- [ ] jni links physfs/squirrel/wstsound/external stack
+- [ ] remove meta.broken
+
+R36S / WASM:
+- [x] stubs / packages present
+- [ ] real sysroot URL; static wasm deps

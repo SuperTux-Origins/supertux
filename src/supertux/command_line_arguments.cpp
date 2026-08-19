@@ -23,6 +23,7 @@
 #include "util/format.hpp"
 #include "util/gettext.hpp"
 #include "version.h"
+#include <cstring>
 
 CommandLineArguments::CommandLineArguments() :
   m_action(NO_ACTION),

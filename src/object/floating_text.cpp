@@ -19,6 +19,7 @@
 
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"
+#include <cstdio>
 
 FloatingText::FloatingText(Vector const& pos, std::string const& text_) :
   position(pos),

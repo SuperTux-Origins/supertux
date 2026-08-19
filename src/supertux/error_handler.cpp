@@ -24,6 +24,7 @@
 #ifdef __GLIBC__
 #include <execinfo.h>
 #include <signal.h>
+#include <cstdio>
 #endif
 
 bool ErrorHandler::m_handing_error = false;

@@ -24,6 +24,7 @@
 #include "supertux/game_session.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/sector.hpp"
+#include <cstdio>
 
 GameSessionRecorder::GameSessionRecorder() :
   m_capture_file(),

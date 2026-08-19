@@ -15,6 +15,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "squirrel/squirrel_util.hpp"
+#include <cstdio>
 
 
 
