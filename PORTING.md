@@ -965,6 +965,24 @@ sites.
 
 
 
+
+### Android: SDL_ttf stub / FreeType
+
+Title screen failed with:
+
+```
+Couldn't load TTFFont: fonts/SuperTux-Medium.ttf: SDL_ttf stub (FreeType not linked)
+```
+
+`build-apk.sh` only staged `SDL_ttf.h` + a stub. Real path:
+
+- Flake inputs `sdl2-ttf-src` + `freetype-src`
+- Stage FreeType under `jni/freetype/` and `SDL_ttf.c` under `jni/`
+- `freetype_Android.mk` + static `SDL2_ttf_static` linked into `libmain`
+- Stub only if sources are missing
+
+Default Android log level is DEBUG (tag SuperTux).
+
 ### Android: black screen / no logcat output
 
 `logmich` writes to `std::cerr`. On Android that often appears under the

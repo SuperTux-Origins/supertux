@@ -98,20 +98,38 @@ for hdr in config.h version.h SDL_image.h; do
   fi
 done
 
-# SDL2_ttf: stage header only. Compiling SDL_ttf.c needs FreeType (ft2build.h);
-# until FreeType is staged as an Android dep, provide a stub implementation.
+# SDL2_ttf + FreeType: real font path (TTF_OpenFontRW via PhysFS).
 TTF_SRC="${SDL2_TTF_SOURCE_DIR:-}"
-if [ -n "$TTF_SRC" ] && [ -d "$TTF_SRC" ]; then
-  if [ -f "$TTF_SRC/SDL_ttf.h" ]; then
+FT_SRC="${FREETYPE_SOURCE_DIR:-}"
+HAVE_REAL_TTF=0
+if [ -n "$TTF_SRC" ] && [ -d "$TTF_SRC" ] && [ -n "$FT_SRC" ] && [ -d "$FT_SRC" ]; then
+  if [ -f "$TTF_SRC/SDL_ttf.h" ] && [ -f "$TTF_SRC/SDL_ttf.c" ] \
+     && [ -f "$FT_SRC/include/ft2build.h" ]; then
+    mkdir -p src/jni/freetype
+    # FreeType tree (headers + src) for freetype_Android.mk
+    cp -a "$FT_SRC/include" src/jni/freetype/
+    cp -a "$FT_SRC/src" src/jni/freetype/
+    # Some releases keep ft2build.h under include/freetype2 — normalize.
+    if [ ! -f src/jni/freetype/include/ft2build.h ]; then
+      if [ -f src/jni/freetype/include/freetype2/ft2build.h ]; then
+        ln -sf freetype2/ft2build.h src/jni/freetype/include/ft2build.h
+      fi
+    fi
+    cp -a "$TTF_SRC/SDL_ttf.h" src/jni/
+    cp -a "$TTF_SRC/SDL_ttf.h" src/jni/src/
+    cp -a "$TTF_SRC/SDL_ttf.c" src/jni/SDL_ttf.c
+    chmod -R u+rwX src/jni/freetype src/jni/SDL_ttf.c
+    HAVE_REAL_TTF=1
+    echo "==> staged FreeType from $FT_SRC and SDL_ttf.c from $TTF_SRC"
+  fi
+fi
+if [ "$HAVE_REAL_TTF" != 1 ]; then
+  echo "warning: FreeType+SDL_ttf sources incomplete — using stub (fonts will fail)" >&2
+  if [ -n "$TTF_SRC" ] && [ -f "$TTF_SRC/SDL_ttf.h" ]; then
     cp -a "$TTF_SRC/SDL_ttf.h" src/jni/src/
     cp -a "$TTF_SRC/SDL_ttf.h" src/jni/ 2>/dev/null || true
   fi
-  echo "==> staged SDL_ttf.h from $TTF_SRC (no SDL_ttf.c — needs FreeType)"
-else
-  echo "warning: SDL2_TTF_SOURCE_DIR not set — ttf_font.cpp will fail" >&2
-fi
-# Minimal stub so the APK links until FreeType+SDL_ttf are properly ported.
-cat > src/jni/src/sdl_ttf_stub.c <<'STUB'
+  cat > src/jni/src/sdl_ttf_stub.c <<'STUB'
 #include "SDL_ttf.h"
 #include <stdio.h>
 int TTF_Init(void) { return 0; }
@@ -125,7 +143,8 @@ TTF_Font *TTF_OpenFontIndex(const char *file, int ptsize, long index) {
   (void)file; (void)ptsize; (void)index; return NULL;
 }
 TTF_Font *TTF_OpenFontRW(SDL_RWops *src, int freesrc, int ptsize) {
-  (void)src; (void)freesrc; (void)ptsize; return NULL;
+  if (src && freesrc) SDL_RWclose(src);
+  (void)ptsize; return NULL;
 }
 void TTF_CloseFont(TTF_Font *font) { (void)font; }
 int TTF_GetFontStyle(const TTF_Font *font) { (void)font; return 0; }
@@ -145,7 +164,8 @@ SDL_Surface *TTF_RenderUTF8_Solid(TTF_Font *font, const char *text, SDL_Color fg
 }
 const char *TTF_GetError(void) { return "SDL_ttf stub (FreeType not linked)"; }
 STUB
-echo "==> wrote sdl_ttf_stub.c"
+  echo "==> wrote sdl_ttf_stub.c"
+fi
 
 # Stage monorepo external/ headers + sources.
 # Under Nix, GAME_SRC_DIR is a filtered ./src store path — parent is NOT the

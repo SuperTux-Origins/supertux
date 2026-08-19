@@ -22,6 +22,28 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 endif
 
+
+# ---------------------------------------------------------------------------
+# FreeType + SDL2_ttf (real font path; replaces sdl_ttf_stub.c when staged)
+# ---------------------------------------------------------------------------
+ifneq ($(wildcard $(LOCAL_PATH)/freetype/include/ft2build.h),)
+  FREETYPE_SAVE_PATH := $(LOCAL_PATH)
+  LOCAL_PATH := $(FREETYPE_SAVE_PATH)/freetype
+  include $(FREETYPE_SAVE_PATH)/freetype_Android.mk
+  LOCAL_PATH := $(FREETYPE_SAVE_PATH)
+
+  include $(CLEAR_VARS)
+  LOCAL_MODULE := SDL2_ttf_static
+  LOCAL_SRC_FILES := SDL_ttf.c
+  LOCAL_C_INCLUDES := $(LOCAL_PATH) $(LOCAL_PATH)/freetype/include
+  LOCAL_CFLAGS += -DTTF_USE_HARFBUZZ=0
+  LOCAL_STATIC_LIBRARIES := freetype
+  LOCAL_SHARED_LIBRARIES := SDL2
+  include $(BUILD_STATIC_LIBRARY)
+
+  SUPERTUX_HAVE_SDL_TTF := 1
+endif
+
 # ---------------------------------------------------------------------------
 # libmain — full game + staged deps (build-apk.sh copies src/ + external into here)
 # ---------------------------------------------------------------------------
@@ -47,6 +69,13 @@ LOCAL_SRC_FILES := $(filter-out %/sqstdlib/%/sqstdlib.cpp,$(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES := $(filter-out %/physfs_platform_windows.c %/physfs_platform_winrt.cpp \
 	%/physfs_platform_os2.c %/physfs_platform_qnx.c %/physfs_platform_haiku.cpp \
 	%/physfs_platform_unix.c %/physfs_platform_apple.m,$(LOCAL_SRC_FILES))
+# FreeType sources live under jni/freetype (built as static lib); never into main.
+LOCAL_SRC_FILES := $(filter-out freetype/% %/freetype/%,$(LOCAL_SRC_FILES))
+# Real SDL_ttf is a static module; drop the stub when present.
+ifdef SUPERTUX_HAVE_SDL_TTF
+LOCAL_SRC_FILES := $(filter-out %/sdl_ttf_stub.c sdl_ttf_stub.c,$(LOCAL_SRC_FILES))
+LOCAL_SRC_FILES := $(filter-out SDL_ttf.c %/SDL_ttf.c,$(LOCAL_SRC_FILES))
+endif
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../SDL/include \
@@ -83,8 +112,13 @@ LOCAL_LDLIBS := -llog -landroid -lz -lGLESv2 -lEGL
 
 ifeq ($(ENABLE_ANDROID_SOUND),1)
 LOCAL_WHOLE_STATIC_LIBRARIES := openal
-LOCAL_STATIC_LIBRARIES := modplug
+LOCAL_STATIC_LIBRARIES += modplug
 LOCAL_LDLIBS += -lOpenSLES
+endif
+
+ifdef SUPERTUX_HAVE_SDL_TTF
+LOCAL_STATIC_LIBRARIES += SDL2_ttf_static freetype
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/freetype/include
 endif
 
 LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library \

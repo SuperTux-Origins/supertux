@@ -38,7 +38,7 @@ TTFFont::TTFFont(std::string const& filename, int font_size, float line_spacing,
   if (!m_font)
   {
     std::ostringstream msg;
-    msg << "Couldn't load TTFFont: " << m_filename << ": " << SDL_GetError();
+    msg << "Couldn't load TTFFont: " << m_filename << ": " << TTF_GetError();
     throw std::runtime_error(msg.str());
   }
 }

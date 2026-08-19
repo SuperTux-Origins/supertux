@@ -190,7 +190,8 @@ let
     gameVersion ? "0.6.3-dev",
     squirrelSrc ? null,
     physfsSrc ? null,
-    sdl2TtfSrc ? null,
+    sdl2TtfSrc ? null
+  , freetypeSrc ? null,
   }:
     pkgs.stdenvNoCC.mkDerivation {
       pname = appName;
@@ -241,6 +242,8 @@ let
         PHYSFS_SOURCE_DIR = "${physfsSrc}";
       } // pkgs.lib.optionalAttrs (sdl2TtfSrc != null) {
         SDL2_TTF_SOURCE_DIR = "${sdl2TtfSrc}";
+      } // pkgs.lib.optionalAttrs (freetypeSrc != null) {
+        FREETYPE_SOURCE_DIR = "${freetypeSrc}";
       };
 
       buildPhase = ''

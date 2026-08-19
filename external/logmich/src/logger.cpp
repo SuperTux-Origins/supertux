@@ -48,7 +48,7 @@ std::string_view log_pretty_print(std::string_view str)
 Logger::Logger() :
 #if defined(__ANDROID__)
   // stderr often invisible under adb logcat -s SDL:*; INFO + SuperTux tag.
-  m_log_level(LogLevel::INFO)
+  m_log_level(LogLevel::DEBUG)
 #else
   m_log_level(LogLevel::WARNING)
 #endif

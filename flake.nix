@@ -97,9 +97,15 @@
       flake = false;
     };
 
-    # SDL2_ttf sources for R36S when ArkOS sysroot lacks libSDL2_ttf.
+    # SDL2_ttf sources for R36S / Android when system SDL2_ttf is absent.
     sdl2-ttf-src = {
-      url = "https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.22.0/SDL2_ttf-2.22.0.tar.gz";
+      url = "https://github.com/libsdl-org/SDL_ttf/archive/refs/tags/release-2.22.0.tar.gz";
+      flake = false;
+    };
+
+    # FreeType for Android SDL2_ttf (and offline targets without system FT).
+    freetype-src = {
+      url = "https://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz";
       flake = false;
     };
 
@@ -118,7 +124,7 @@
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, curl-win32, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
-              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, squirrel-src, sdl2-ttf-src, sdl2-src, sdl2-image-src }:
+              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, squirrel-src, sdl2-ttf-src, freetype-src, sdl2-src, sdl2-image-src }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       rec {
@@ -274,6 +280,7 @@
               squirrelSrc = squirrel-src;
               physfsSrc = physfs-src;
               sdl2TtfSrc = sdl2-ttf-src;
+              freetypeSrc = freetype-src;
             };
           in {
             android-sdl-libs = android.sdlAndroidLibs;
