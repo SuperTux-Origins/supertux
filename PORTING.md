@@ -582,3 +582,17 @@ The APK currently links `placeholder.cpp` only (`SDL_main` returns 0), so
 the activity starts and stops at once. Full game sources must be wired via
 `supertux_sources.mk` / deps before a playable build.
 
+
+### wasm: USE_FREETYPE must be boolean on Emscripten 4+/6+
+
+`-sUSE_FREETYPE=2` fails with "expects bool but got int". Use
+`-sUSE_FREETYPE=1`. Do not forward parent `CMAKE_C_FLAGS` containing
+emscripten port flags into ExternalProject (physfs/squirrel) — they
+inherit broken flags and old cmake_minimum_required needs
+`-DCMAKE_POLICY_VERSION_MINIMUM=3.5`.
+
+### R36S: build SDL2_ttf from source when sysroot lacks it
+
+Pass `-DSDL2_TTF_SOURCE_DIR` from flake input `sdl2-ttf-src`. ProvideSDL2_ttf
+builds a shared lib into the build prefix when system/pkg-config search fails.
+

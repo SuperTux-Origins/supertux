@@ -338,6 +338,7 @@ let
   , enableSound ? true
   , physfsSrc ? null
   , squirrelSrc ? null
+  , sdl2TtfSrc ? null
   }:
     let
       wrappers = mkWrappers arkosSysroot;
@@ -418,6 +419,8 @@ let
       ] ++ lib.optionals (squirrelSrc != null) [
         "-DSQUIRREL_SOURCE_DIR=${squirrelSrc}"
         "-DUSE_SYSTEM_SQUIRREL=OFF"
+      ] ++ lib.optionals (sdl2TtfSrc != null) [
+        "-DSDL2_TTF_SOURCE_DIR=${sdl2TtfSrc}"
       ];
 
       # Do not let nix stdenv rewrite RUNPATH to modern glibc / gcc-15 libs,

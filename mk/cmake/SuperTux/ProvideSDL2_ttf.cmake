@@ -1,6 +1,5 @@
-# SDL2_ttf — under Emscripten FreeType comes from -sUSE_FREETYPE=2.
-# R36S/ArkOS: prefer pkg-config / explicit sysroot search (FIND_ROOT ONLY
-# often hides config packages). Desktop uses find_package as usual.
+# SDL2_ttf — Emscripten uses FreeType port. R36S/desktop prefer system package;
+# if missing, build from SDL2_TTF_SOURCE_DIR (flake input sdl2-ttf-src).
 
 if(EMSCRIPTEN)
   message(STATUS "Emscripten: SDL2_ttf via FreeType port (-sUSE_FREETYPE); LibSDL2_ttf is INTERFACE")
@@ -20,7 +19,6 @@ elseif(TARGET SDL2_ttf)
   return()
 endif()
 
-# pkg-config (works with PKG_CONFIG_SYSROOT_DIR on R36S)
 find_package(PkgConfig QUIET)
 if(PKG_CONFIG_FOUND)
   pkg_check_modules(PC_SDL2_TTF QUIET SDL2_ttf)
@@ -52,15 +50,49 @@ if(SDL2_TTF_INCLUDE_DIR AND SDL2_TTF_LIBRARY)
   set_target_properties(LibSDL2_ttf PROPERTIES
     IMPORTED_LOCATION "${SDL2_TTF_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${SDL2_TTF_INCLUDE_DIR}")
-  if(PC_SDL2_TTF_CFLAGS_OTHER)
-    set_property(TARGET LibSDL2_ttf APPEND PROPERTY
-      INTERFACE_COMPILE_OPTIONS "${PC_SDL2_TTF_CFLAGS_OTHER}")
-  endif()
-else()
-  message(FATAL_ERROR
-    "Could NOT find SDL2_ttf (headers+library).\n"
-    "  For R36S: install libsdl2-ttf-dev into the ArkOS sysroot, or extend\n"
-    "  the sysroot tarball. Looked under CMAKE_SYSROOT=${CMAKE_SYSROOT}")
+  return()
 endif()
+
+# Build from source (R36S when sysroot lacks libSDL2_ttf).
+set(SDL2_TTF_SOURCE_DIR "" CACHE PATH "Path to SDL2_ttf sources")
+if(NOT SDL2_TTF_SOURCE_DIR OR NOT EXISTS "${SDL2_TTF_SOURCE_DIR}/CMakeLists.txt")
+  message(FATAL_ERROR
+    "Could NOT find SDL2_ttf and SDL2_TTF_SOURCE_DIR is unset/invalid.\n"
+    "  Pass -DSDL2_TTF_SOURCE_DIR=… (flake: sdl2-ttf-src) or install libsdl2-ttf into the sysroot.")
+endif()
+
+message(STATUS "Building SDL2_ttf from ${SDL2_TTF_SOURCE_DIR}")
+include(ExternalProject)
+set(SDL2_TTF_PREFIX "${CMAKE_BINARY_DIR}/sdl2_ttf")
+# Resolve SDL2 / FreeType from sysroot for the ExternalProject.
+set(_sdl2_ttf_cmake_args
+  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+  -DCMAKE_SYSROOT=${CMAKE_SYSROOT}
+  -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}
+  -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
+  -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
+  -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
+  -DCMAKE_INSTALL_PREFIX=${SDL2_TTF_PREFIX}
+  -DCMAKE_BUILD_TYPE=Release
+  -DSDL2TTF_SAMPLES=OFF
+  -DSDL2TTF_VENDORED=OFF
+  -DBUILD_SHARED_LIBS=ON
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+)
+ExternalProject_Add(sdl2_ttf_project
+  SOURCE_DIR "${SDL2_TTF_SOURCE_DIR}"
+  CMAKE_ARGS ${_sdl2_ttf_cmake_args}
+  BUILD_BYPRODUCTS
+    "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so"
+    "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so.0"
+)
+
+file(MAKE_DIRECTORY "${SDL2_TTF_PREFIX}/include/SDL2")
+add_library(LibSDL2_ttf SHARED IMPORTED)
+set_target_properties(LibSDL2_ttf PROPERTIES
+  IMPORTED_LOCATION "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so"
+  INTERFACE_INCLUDE_DIRECTORIES "${SDL2_TTF_PREFIX}/include/SDL2;${SDL2_TTF_PREFIX}/include")
+add_dependencies(LibSDL2_ttf sdl2_ttf_project)
 
 # EOF #
