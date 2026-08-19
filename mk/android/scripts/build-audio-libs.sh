@@ -138,7 +138,65 @@ EOF
     mkdir -p "$idir/include/libmodplug"
     cp -a "$MODPLUG_SRC/src/libmodplug/modplug.h" "$idir/include/libmodplug/modplug.h"
   fi
+
+  # --- libogg + libvorbis/vorbisfile (stock SuperTux .ogg music) ---
+  if [ -n "${OGG_SRC:-}" ] && [ -d "${OGG_SRC:-}" ] && [ -n "${VORBIS_SRC:-}" ] && [ -d "${VORBIS_SRC:-}" ]; then
+    echo "==> libogg + libvorbis ($abi)"
+    ovdir="$OUT_DIR/build-oggvorbis-$abi"
+    mkdir -p "$ovdir"
+    cat > "$ovdir/CMakeLists.txt" <<'EOF'
+cmake_minimum_required(VERSION 3.15)
+project(oggvorbis C)
+set(OGG_ROOT "" CACHE PATH "")
+set(VORBIS_ROOT "" CACHE PATH "")
+# --- ogg ---
+add_library(ogg STATIC
+  ${OGG_ROOT}/src/bitwise.c
+  ${OGG_ROOT}/src/framing.c)
+target_include_directories(ogg PUBLIC ${OGG_ROOT}/include)
+# Generate a minimal config_types.h if missing (some tarballs need configure).
+if(NOT EXISTS "${OGG_ROOT}/include/ogg/config_types.h")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ogg/config_types.h"
+"#ifndef __CONFIG_TYPES_H__
+#define __CONFIG_TYPES_H__
+#include <stdint.h>
+typedef int16_t ogg_int16_t;
+typedef uint16_t ogg_uint16_t;
+typedef int32_t ogg_int32_t;
+typedef uint32_t ogg_uint32_t;
+typedef int64_t ogg_int64_t;
+#endif
+")
+  target_include_directories(ogg PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+# --- vorbis + vorbisfile ---
+file(GLOB VORBIS_LIB_SRC ${VORBIS_ROOT}/lib/*.c)
+# Exclude windows-only / unused
+list(FILTER VORBIS_LIB_SRC EXCLUDE REGEX ".*/psytune\.c$")
+list(FILTER VORBIS_LIB_SRC EXCLUDE REGEX ".*/tone\.c$")
+list(FILTER VORBIS_LIB_SRC EXCLUDE REGEX ".*/barkmel\.c$")
+add_library(vorbis STATIC ${VORBIS_LIB_SRC})
+target_include_directories(vorbis PUBLIC ${VORBIS_ROOT}/include ${OGG_ROOT}/include)
+target_link_libraries(vorbis PUBLIC ogg)
+add_library(vorbisfile STATIC ${VORBIS_ROOT}/lib/vorbisfile.c)
+target_include_directories(vorbisfile PUBLIC ${VORBIS_ROOT}/include ${OGG_ROOT}/include)
+target_link_libraries(vorbisfile PUBLIC vorbis ogg)
+install(TARGETS ogg vorbis vorbisfile ARCHIVE DESTINATION lib)
+install(DIRECTORY ${OGG_ROOT}/include/ogg DESTINATION include)
+install(DIRECTORY ${VORBIS_ROOT}/include/vorbis DESTINATION include)
+EOF
+    cmake -S "$ovdir" -B "$ovdir/build"       -G "Unix Makefiles"       -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"       -DANDROID_ABI="$abi"       -DANDROID_PLATFORM="android-${PACKAGE_PLATFORM}"       -DANDROID_STL=c++_shared       -DCMAKE_BUILD_TYPE=Release       -DCMAKE_INSTALL_PREFIX="$idir"       -DCMAKE_POLICY_VERSION_MINIMUM=3.5       -DOGG_ROOT="$OGG_SRC"       -DVORBIS_ROOT="$VORBIS_SRC"
+    cmake --build "$ovdir/build" -j"${NIX_BUILD_CORES:-$(nproc)}"
+    cmake --install "$ovdir/build"
+    # Ensure config_types.h is installed for consumers
+    if [ -f "$ovdir/build/ogg/config_types.h" ]; then
+      mkdir -p "$idir/include/ogg"
+      cp -a "$ovdir/build/ogg/config_types.h" "$idir/include/ogg/" 2>/dev/null || true
+    fi
+  else
+    echo "==> OGG_SRC/VORBIS_SRC unset — Vorbis not built for $abi"
+  fi
 done
 
 echo "==> audio libs installed under $OUT_DIR/{abi}/"
-find "$OUT_DIR" -name 'libopenal*' -o -name 'libmodplug*' | head -40
+find "$OUT_DIR" -name 'libopenal*' -o -name 'libmodplug*' -o -name 'libogg*' -o -name 'libvorbis*' | head -60

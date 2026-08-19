@@ -99,5 +99,5 @@ adapted from Pingus and Windstille.
 - [x] emscriptenStdenv CMake force; Android NDK C++ flags; R36S stubs.
 
 ## Audio
-- [ ] Enable Vorbis (libogg/libvorbis) for Android + WASM so stock `.ogg` music plays
+- [x] Enable Vorbis (libogg/libvorbis) for Android + WASM so stock `.ogg` music plays
 - [ ] Confirm OpenAL link on WASM (`-lopenal`) at runtime

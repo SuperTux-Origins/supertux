@@ -120,15 +120,30 @@ let
       PACKAGE_PLATFORM = packagePlatform;
       OPENAL_SRC = "${openalSrc}";
       MODPLUG_SRC = "${modplugSrc}";
+      OGG_SRC = "${pkgs.libogg.src}";
+      VORBIS_SRC = "${pkgs.libvorbis.src}";
     };
     buildPhase = ''
       runHook preBuild
       export ANDROID_HOME=${androidSdk}/libexec/android-sdk
-      mkdir -p "$TMPDIR/modplug-src" "$TMPDIR/openal-src"
+      mkdir -p "$TMPDIR/modplug-src" "$TMPDIR/openal-src" "$TMPDIR/ogg-src" "$TMPDIR/vorbis-src"
       tar -xzf "$MODPLUG_SRC" -C "$TMPDIR/modplug-src" --strip-components=1
       tar -xzf "$OPENAL_SRC" -C "$TMPDIR/openal-src" --strip-components=1
+      # libogg / libvorbis may be .tar.gz or .tar.xz
+      if tar -tf "$OGG_SRC" >/dev/null 2>&1; then
+        tar -xf "$OGG_SRC" -C "$TMPDIR/ogg-src" --strip-components=1
+      else
+        cp -a "$OGG_SRC"/. "$TMPDIR/ogg-src/" 2>/dev/null || tar -xf "$OGG_SRC" -C "$TMPDIR/ogg-src" --strip-components=1
+      fi
+      if tar -tf "$VORBIS_SRC" >/dev/null 2>&1; then
+        tar -xf "$VORBIS_SRC" -C "$TMPDIR/vorbis-src" --strip-components=1
+      else
+        cp -a "$VORBIS_SRC"/. "$TMPDIR/vorbis-src/" 2>/dev/null || tar -xf "$VORBIS_SRC" -C "$TMPDIR/vorbis-src" --strip-components=1
+      fi
       export MODPLUG_SRC="$TMPDIR/modplug-src"
       export OPENAL_SRC="$TMPDIR/openal-src"
+      export OGG_SRC="$TMPDIR/ogg-src"
+      export VORBIS_SRC="$TMPDIR/vorbis-src"
       export TARGET_ABIS=${pkgs.lib.escapeShellArg targetAbisStr}
       export PACKAGE_PLATFORM=${packagePlatform}
       export OUT_DIR="$PWD/audio-out"

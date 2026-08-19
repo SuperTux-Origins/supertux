@@ -221,6 +221,80 @@ EOF
     };
 
 
+
+  # libogg + libvorbis (+ vorbisfile) for stock SuperTux .ogg music on wasm.
+  oggWasm = pkgs.stdenv.mkDerivation rec {
+    pname = "libogg-wasm";
+    version = pkgs.libogg.version;
+    src = pkgs.libogg.src;
+    nativeBuildInputs = [ emscripten pkgs.python3 ];
+    dontConfigure = true;
+    buildPhase = ''
+      runHook preBuild
+      export EM_CACHE="''${TMPDIR:-/tmp}/emcache-ogg"
+      mkdir -p "$EM_CACHE" "$PWD/prefix"
+      emconfigure ./configure \
+        --prefix="$PWD/prefix" \
+        --host=wasm32-unknown-emscripten \
+        --disable-shared \
+        --enable-static \
+        --disable-dependency-tracking
+      emmake make -j''${NIX_BUILD_CORES:-2}
+      emmake make install
+      runHook postBuild
+    '';
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -a prefix/. $out/
+      runHook postInstall
+    '';
+    meta = with lib; {
+      description = "Static libogg for wasm32-emscripten";
+      platforms = platforms.linux;
+    };
+  };
+
+  vorbisWasm = pkgs.stdenv.mkDerivation rec {
+    pname = "libvorbis-wasm";
+    version = pkgs.libvorbis.version;
+    src = pkgs.libvorbis.src;
+    nativeBuildInputs = [ emscripten pkgs.python3 ];
+    dontConfigure = true;
+    # libogg headers/libs from oggWasm
+    buildInputs = [ oggWasm ];
+    buildPhase = ''
+      runHook preBuild
+      export EM_CACHE="''${TMPDIR:-/tmp}/emcache-vorbis"
+      mkdir -p "$EM_CACHE" "$PWD/prefix"
+      export CPPFLAGS="-I${oggWasm}/include"
+      export LDFLAGS="-L${oggWasm}/lib"
+      export PKG_CONFIG_PATH="${oggWasm}/lib/pkgconfig"
+      emconfigure ./configure \
+        --prefix="$PWD/prefix" \
+        --host=wasm32-unknown-emscripten \
+        --disable-shared \
+        --enable-static \
+        --disable-dependency-tracking \
+        --with-ogg="${oggWasm}"
+      emmake make -j''${NIX_BUILD_CORES:-2}
+      emmake make install
+      runHook postBuild
+    '';
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -a prefix/. $out/
+      # Re-export ogg into the same prefix for a single CMAKE_PREFIX_PATH entry.
+      cp -a ${oggWasm}/. $out/ || true
+      runHook postInstall
+    '';
+    meta = with lib; {
+      description = "Static libvorbis/vorbisfile for wasm32-emscripten";
+      platforms = platforms.linux;
+    };
+  };
+
   # Windstille-style FreeType for wasm (full cmake build, not a hand-picked .c list).
   freetypeWasm =
     if freetypeSrc == null then null
@@ -265,7 +339,7 @@ EOF
 
 in
 {
-  inherit logmichWasm sexpcppWasm strutcppWasm modplugWasm freetypeWasm;
+  inherit logmichWasm sexpcppWasm strutcppWasm modplugWasm freetypeWasm oggWasm vorbisWasm;
 
 
   supertux-wasm = est.mkDerivation rec {
@@ -296,6 +370,8 @@ in
       strutcppWasm
       tinycmmcNative
       modplugWasm
+      oggWasm
+      vorbisWasm
     ] ++ lib.optional (sdl2WasmLibs != null) sdl2WasmLibs;
 
     # Offline SDL2: do NOT put -sUSE_SDL=2 on CMAKE_C/CXX_FLAGS (triggers
@@ -311,11 +387,14 @@ in
       "-Dglm_DIR=${glmPrefix}/lib/cmake/glm"
       "-DPRIO_USE_JSONCPP=OFF"
       # Point CMake at static modplug so external/wstsound configures.
-      "-DCMAKE_PREFIX_PATH=${modplugWasm}${lib.optionalString (sdl2WasmLibs != null) ";${sdl2WasmLibs}"}"
+      "-DCMAKE_PREFIX_PATH=${modplugWasm};${vorbisWasm}${lib.optionalString (sdl2WasmLibs != null) ";${sdl2WasmLibs}"}"
       "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH"
       "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH"
       "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH"
-    ] ++ modplugCmakeFlags
+    ] ++ modplugCmakeFlags ++ [
+      "-DOGG_DIR=${oggWasm}"
+      "-DVORBISFILE_DIR=${vorbisWasm}"
+    ]
       ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"
     ] ++ [
@@ -340,7 +419,7 @@ in
         echo "error: source data/ tree missing or incomplete (need data/credits.stxt)" >&2
         exit 1
       fi
-      export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig:${vorbisWasm}/lib/pkgconfig:${oggWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
       export CMAKE_PREFIX_PATH="${modplugWasm}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
 ${lib.optionalString (sdl2WasmLibs != null) ''
       # Offline static SDL2 (no emscripten port download).

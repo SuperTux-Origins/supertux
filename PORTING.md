@@ -1141,3 +1141,13 @@ Runtime failed with `SDL_ttf stub: font rendering not implemented offline` and
 - Image errors: prefer `IMG_GetError()` over stale `SDL_GetError()`.
 - Link flags: `MIN_WEBGL_VERSION`/`MAX_WEBGL_VERSION`, `EXIT_RUNTIME=0` (Pingus).
 
+### Vorbis on Android / WASM (bundle 014)
+
+Stock SuperTux music is mostly `.ogg`. Enable `WSTSOUND_WITH_VORBIS`:
+
+- **WASM:** `oggWasm` + `vorbisWasm` (emconfigure), `OGG_DIR` / `VORBISFILE_DIR`,
+  `WSTSOUND_WITH_VORBIS=ON`.
+- **Android:** `build-audio-libs.sh` builds static ogg/vorbis/vorbisfile per ABI;
+  `Android.mk` prebuilts + `-DWSTSOUND_WITH_VORBIS=1` when `.a` present.
+- **R36S:** still OFF until sysroot has vorbis.
+

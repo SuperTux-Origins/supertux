@@ -235,7 +235,13 @@ endfunction()
 # wstsound: force mobile/wasm codec set before subdirectory option() runs
 if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
   set(WSTSOUND_WITH_MPG123 OFF CACHE BOOL "Decode MP3 via mpg123" FORCE)
-  set(WSTSOUND_WITH_VORBIS OFF CACHE BOOL "Decode Ogg Vorbis" FORCE)
+  # SuperTux ships mostly .ogg music — enable Vorbis on Android/WASM.
+  # R36S sysroot may lack libvorbis; keep OFF there until confirmed.
+  if(SUPERTUX_R36S AND NOT ANDROID AND NOT EMSCRIPTEN)
+    set(WSTSOUND_WITH_VORBIS OFF CACHE BOOL "Decode Ogg Vorbis" FORCE)
+  else()
+    set(WSTSOUND_WITH_VORBIS ON CACHE BOOL "Decode Ogg Vorbis" FORCE)
+  endif()
   set(WSTSOUND_WITH_OPUS OFF CACHE BOOL "Decode Opus" FORCE)
   set(WSTSOUND_WITH_EFX OFF CACHE BOOL "OpenAL EFX effects API" FORCE)
   set(WSTSOUND_WITH_LOOPBACK OFF CACHE BOOL "OpenAL-soft loopback device" FORCE)

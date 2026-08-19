@@ -20,6 +20,31 @@ LOCAL_SRC_FILES := ../audio/$(TARGET_ARCH_ABI)/lib/libmodplug.a
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../audio/include
 include $(PREBUILT_STATIC_LIBRARY)
 
+# Optional Vorbis (stock .ogg music)
+ifneq ($(wildcard $(LOCAL_PATH)/../audio/$(TARGET_ARCH_ABI)/lib/libvorbisfile.a),)
+include $(CLEAR_VARS)
+LOCAL_MODULE := ogg
+LOCAL_SRC_FILES := ../audio/$(TARGET_ARCH_ABI)/lib/libogg.a
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../audio/include
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := vorbis
+LOCAL_SRC_FILES := ../audio/$(TARGET_ARCH_ABI)/lib/libvorbis.a
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../audio/include
+LOCAL_STATIC_LIBRARIES := ogg
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := vorbisfile
+LOCAL_SRC_FILES := ../audio/$(TARGET_ARCH_ABI)/lib/libvorbisfile.a
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../audio/include
+LOCAL_STATIC_LIBRARIES := vorbis ogg
+include $(PREBUILT_STATIC_LIBRARY)
+
+SUPERTUX_HAVE_VORBIS := 1
+endif
+
 endif
 
 
@@ -72,6 +97,10 @@ LOCAL_SRC_FILES := $(filter-out %/physfs_platform_windows.c %/physfs_platform_wi
 	%/physfs_platform_os2.c %/physfs_platform_qnx.c %/physfs_platform_haiku.cpp \
 	%/physfs_platform_unix.c %/physfs_platform_apple.m,$(LOCAL_SRC_FILES))
 # FreeType sources live under jni/freetype (built as static lib); never into main.
+# Skip ogg decoder TU when Vorbis libs were not staged.
+ifndef SUPERTUX_HAVE_VORBIS
+LOCAL_SRC_FILES := $(filter-out %/ogg_sound_file.cpp,$(LOCAL_SRC_FILES))
+endif
 LOCAL_SRC_FILES := $(filter-out freetype/% %/freetype/%,$(LOCAL_SRC_FILES))
 # Real SDL_ttf is a static module; drop the stub when present.
 # Always provide TTF symbols: real SDL_ttf.c or explicit stub path.
@@ -123,6 +152,9 @@ ifeq ($(ENABLE_ANDROID_SOUND),1)
 LOCAL_WHOLE_STATIC_LIBRARIES += openal
 LOCAL_STATIC_LIBRARIES += modplug
 LOCAL_LDLIBS += -lOpenSLES
+ifdef SUPERTUX_HAVE_VORBIS
+LOCAL_STATIC_LIBRARIES += vorbisfile vorbis ogg
+endif
 endif
 
 ifdef SUPERTUX_HAVE_SDL_TTF
@@ -135,11 +167,18 @@ LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library \
 	-DGLM_ENABLE_EXPERIMENTAL \
 	-DWSTSOUND_WITH_MODPLUG=1 \
 	-DWSTSOUND_WITH_MPG123=0 \
-	-DWSTSOUND_WITH_VORBIS=0 \
 	-DWSTSOUND_WITH_OPUS=0 \
 	-DWSTSOUND_WITH_EFX=0 \
 	-DPRIO_USE_SEXPCPP=1 \
 	-DTINYGETTEXT_WITH_SDL=1
+
+ifdef SUPERTUX_HAVE_VORBIS
+LOCAL_CPPFLAGS += -DWSTSOUND_WITH_VORBIS=1
+LOCAL_CFLAGS += -DWSTSOUND_WITH_VORBIS=1
+else
+LOCAL_CPPFLAGS += -DWSTSOUND_WITH_VORBIS=0
+LOCAL_CFLAGS += -DWSTSOUND_WITH_VORBIS=0
+endif
 
 LOCAL_CFLAGS := -DANDROID -DUSE_OPENGLES2 -DUSE_SDL2 \
 	-DGLM_ENABLE_EXPERIMENTAL \
