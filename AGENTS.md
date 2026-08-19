@@ -2,7 +2,7 @@
 
 ## Project goal
 
-Port SuperTux (SuperTux-Origins fork at commit 856a932f513ec69ffbd7132a1a60fd89c79442dc)
+Port SuperTux (SuperTux-Origins fork at tip a1fd30f11 (and later porting commits))
 to:
 
 - **Desktop Linux** (OpenGL 3.3 + GLEW)
@@ -18,11 +18,11 @@ High-level packaging and flake outputs should mirror the structure used by
 
 ## Key reference documents
 
-- **PORTING.md** — platform-specific quirks, workarounds, and lessons learned
+- **PORTING.md** — platform-specific quirks, workarounds, library breakdown,
+  and lessons learned while porting (image codecs, GLES vs desktop GL,
+  controller input, R36S sysroot, Emscripten flags, Android NDK macros,
+  flake check surface, etc.). Read this before inventing new solutions.
 - **PORTS.md** — high-level packaging map and flake outputs.
-  while porting (image codecs, GLES vs desktop GL, controller input, R36S
-  sysroot, Emscripten flags, Android NDK macros, flake check surface, etc.).
-  Read this before inventing new solutions.
 - **TODO.md** — open tasks and progress tracking.
 - Recipes adapted from Pingus / Windstille `mk/` and `nix/`.
 
@@ -51,7 +51,6 @@ High-level packaging and flake outputs should mirror the structure used by
 | Windows MinGW     | OpenGL (desktop path) |
 
 ## Library overlap summary (see PORTING.md for detail)
-- **PORTS.md** — high-level packaging map and flake outputs.
 
 **Common across SuperTux / Pingus / Windstille**
 
