@@ -89,3 +89,6 @@
 - 2026-08-19 (batch 3): ProvidePhysfs PHYSFS_SOURCE_DIR + skip system on
   EMSCRIPTEN/Android; ProvideOpenGL skip glesv2 pkg on Android; physfs-src
   flake input; document controller defaults (already GC-first, deadzone 8000).
+
+- 2026-08-19 (batch 4): GLES default pixel format; physfs-src → wasm cmake;
+  SQUIRREL_SOURCE_DIR; Windows meta.platforms; Android forces GLES2.

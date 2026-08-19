@@ -115,4 +115,14 @@ EOF
     gtest
   ]
   ++ (lib.optional (!stdenv.targetPlatform.isWindows) xdgcpp);
+
+  meta = with lib; {
+    description = "SuperTux (Origins) — 2D platform game";
+    homepage = "https://github.com/SuperTux-Origins/supertux";
+    license = licenses.gpl3Plus;
+    platforms = if stdenv.targetPlatform.isWindows
+                then [ "x86_64-windows" ]
+                else platforms.linux;
+    mainProgram = "supertux-origins";
+  };
 }

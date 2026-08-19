@@ -139,6 +139,14 @@ if(SUPERTUX_R36S)
   message(STATUS "SUPERTUX_R36S: enabling handheld defaults (640x480, GLES2)")
 endif()
 
+# Android NDK builds: always GLES2 (SDL provides the loader).
+if(ANDROID OR DEFINED ANDROID)
+  if(NOT ENABLE_OPENGLES2)
+    set(ENABLE_OPENGLES2 ON CACHE BOOL "Enable OpenGLES2 support" FORCE)
+  endif()
+  message(STATUS "Android: forcing ENABLE_OPENGLES2")
+endif()
+
 if(WIN32)
   include(SuperTux/Win32)
 endif()

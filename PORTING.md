@@ -271,3 +271,15 @@ the user config / in-game joystick menu.
 
 - `ProvideOpenGL.cmake` does not `pkg_check_modules(glesv2)` on Android /
   Emscripten (SDL/NDK provide GLES). Desktop GLES2 and R36S still use pkg-config.
+
+### GLES window attributes (Origins)
+
+`GLVideoSystem::create_gl_window()` under `USE_OPENGLES2` only sets ES 2.0
+profile + double-buffer. Color/depth sizes are left to the driver — avoids
+EGL surface creation failures on ArkOS (Windstille PORTING.md lesson).
+
+### Squirrel cross builds
+
+`-DSQUIRREL_SOURCE_DIR=` mirrors PhysFS: build from a source tree when
+`external/squirrel` is not checked out. Toolchain file is forwarded to
+ExternalProject.
