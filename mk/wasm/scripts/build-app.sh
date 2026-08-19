@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
-# Cross-compiles Pingus to wasm32 + HTML via emcmake.
-# Expects (set by nix/wasm.nix):
-#   APP_NAME         - binary/html basename (e.g. pingus)
+# Cross-compiles SuperTux (Origins) to wasm32 + HTML via emcmake.
+# Adapted from Pingus mk/wasm/scripts/build-app.sh.
+#
+# Expects (set by nix/wasm.nix or the environment):
+#   APP_NAME         - binary/html basename (default: supertux-origins)
 #   SRC_DIR          - repo root (contains CMakeLists.txt + src/)
-#   SDL_WASM_LIBS    - prebuilt SDL2 (+ image) prefix (include/ + lib/)
-#   ZLIB_WASM_LIBS   - prebuilt static zlib prefix (libz.a + zlib.h)
+#   SDL_WASM_LIBS    - optional prebuilt SDL2 (+ image) prefix (include/ + lib/)
+#                      When unset, CMake relies on Emscripten -sUSE_SDL=2 ports.
+#   ZLIB_WASM_LIBS   - optional prebuilt static zlib prefix (libz.a + zlib.h)
 #   DATA_DIR         - optional path to data/ for --preload-file (may be absent)
-#   ENABLE_SOUND     - 0|1 (default 0; ON → wstsound via Emscripten OpenAL + libmodplug)
+#   ENABLE_SOUND     - 0|1 (default 1; ON → OpenAL / wstsound)
 #   ENABLE_GLES2     - 0|1 (default 1 — WebGL via GLES2 path)
 #   CMAKE_VERBOSE    - if 1, pass --verbose to cmake --build
-#   PROJECT_VERSION_FULL - e.g. 0.1.5-dev+gabc1234 (CMake PINGUS_VERSION)
+#   PROJECT_VERSION_FULL - stamped into version.cmake / HTML when present
 #   GIT_REV / SOURCE_URL - stamped into the HTML shell footer when present
+#
+# Note: Origins CMakeLists.txt already injects the bulk of the Emscripten
+# USE_FLAGS (FULL_ES2, exceptions, GROWABLE_ARRAYBUFFERS=0, FORCE_FILESYSTEM,
+# preload @/data). This script supplies the outer emcmake / link orchestration.
 set -euo pipefail
 
 export EM_CACHE="${TMPDIR:-/tmp}/emcache"
@@ -25,8 +32,8 @@ else
   ZLIB_PREFIX=""
 fi
 
-APP_NAME="${APP_NAME:-pingus}"
-ENABLE_SOUND="${ENABLE_SOUND:-0}"
+APP_NAME="${APP_NAME:-supertux-origins}"
+ENABLE_SOUND="${ENABLE_SOUND:-1}"
 ENABLE_GLES2="${ENABLE_GLES2:-1}"
 
 # ASYNCIFY: optional safety net for residual nested waits (fade/wait_for_event).

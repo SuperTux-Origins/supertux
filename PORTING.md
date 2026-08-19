@@ -213,3 +213,17 @@ pulling ffmpeg-heavy openal from nixpkgs cross. Packaging: flat exe + DLLs
 
 When in doubt, compare with the corresponding Pingus or Windstille file
 under `mk/` or `nix/` and adapt rather than inventing a second stack.
+
+### WASM packaging (Origins)
+
+- CMake already detects `EMSCRIPTEN` and injects USE_FLAGS (updated in the
+  first porting commit). Prefer those over duplicating every `-s` flag in
+  the outer nix derivation.
+- `mk/emscripten/template.html.in` is the SuperTux shell; Pingus
+  `mk/wasm/shell.html` remains as a secondary reference.
+- `nix/wasm.nix` builds under `emscriptenStdenv` with `ENABLE_OPENGLES2=ON`.
+  Package is marked `broken = true` until physfs / squirrel / wstsound /
+  tinycmmc-family have static wasm builds (or CMake soft-disables them).
+- `nix/wasm-pingus-reference.nix` keeps the full Pingus static-SDL approach
+  for when we need offline ports instead of `-sUSE_SDL=2`.
+- `mk/wasm/scripts/build-app.sh` defaults renamed to `supertux-origins`.

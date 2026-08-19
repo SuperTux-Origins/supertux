@@ -73,3 +73,7 @@
 ## Done
 
 - [x] Initial AGENTS.md / TODO.md / PORTING.md (library breakdown + shared themes).
+
+- 2026-08-19: SuperTux-specific `nix/wasm.nix` + flake `packages.supertux-wasm`
+  (marked broken pending static wasm deps). build-app.sh adapted for
+  SuperTux naming. Pingus wasm.nix kept as wasm-pingus-reference.nix.

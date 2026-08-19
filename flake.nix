@@ -175,6 +175,15 @@
               $out/SuperTux-${supertux-origins.version}-${pkgs.system}.zip \
               .
           '';
+
+          # WebAssembly (Emscripten).  Currently marked broken until static
+          # wasm builds of physfs / squirrel / wstsound / tinycmmc stack land;
+          # CMake EMSCRIPTEN path and mk/emscripten/template.html.in are ready.
+          # See nix/wasm.nix and PORTING.md.
+          supertux-wasm = (import ./nix/wasm.nix {
+            inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
+                    wstsound squirrel priocpp;
+          }).supertux-wasm;
         };
       }
     );
