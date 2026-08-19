@@ -886,3 +886,15 @@ Always launch via `SuperTux.sh` (sets `--datadir`, `--userdir`, env) or:
 ./supertux-origins --datadir ./data --userdir ./conf --fullscreen
 ```
 
+### WASM: use __EMSCRIPTEN__, not EMSCRIPTEN
+
+Modern emscripten marks the bare `EMSCRIPTEN` macro deprecated. Prefer
+`__EMSCRIPTEN__` in all source guards. Origins has no `VIDEO_SDL` backend —
+WASM uses `VIDEO_AUTO` → GLES2/WebGL. Include `port/emscripten.hpp` for
+`init_emscripten()`.
+
+### WASM: sstream includes
+
+libc++ under emscripten needs an explicit `#include <sstream>` for
+`std::ostringstream` (menus: debug, contrib_levelset, joystick).
+

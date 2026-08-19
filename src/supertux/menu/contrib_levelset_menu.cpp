@@ -16,6 +16,8 @@
 
 #include "supertux/menu/contrib_levelset_menu.hpp"
 
+#include <sstream>
+
 
 #include "audio/sound_manager.hpp"
 #include "gui/item_action.hpp"

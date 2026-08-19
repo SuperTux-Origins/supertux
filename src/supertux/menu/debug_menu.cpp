@@ -16,6 +16,8 @@
 
 #include "supertux/menu/debug_menu.hpp"
 
+#include <sstream>
+
 
 #include "gui/item_stringselect.hpp"
 #include "supertux/debug.hpp"

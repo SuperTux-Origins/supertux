@@ -21,6 +21,7 @@
 
 #ifdef __EMSCRIPTEN__
 #  include <emscripten.h>
+#  include "port/emscripten.hpp"
 #endif
 #include <physfs.h>
 
@@ -28,7 +29,7 @@
 #  include <unistd.h>
 #endif
 
-#if !defined(WIN32) && !defined(EMSCRIPTEN)
+#if !defined(WIN32) && !defined(__EMSCRIPTEN__)
 #  include <xdgcpp/xdg.h>
 #endif
 
@@ -240,7 +241,7 @@ void PhysfsSubsystem::find_userdir() const
   {
 #if defined(WIN32)
     userdir = PHYSFS_getPrefDir("SuperTux","supertux-origins");
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
     userdir = "/home/web_user/.local/share/supertux-origins/";
 #else
     userdir = xdg::config().home() / "supertux-origins";
@@ -253,7 +254,7 @@ void PhysfsSubsystem::find_userdir() const
     log_info("Created SuperTux userdir: {}", userdir);
   }
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
   EM_ASM({
     try {
       FS.mount(IDBFS, {}, "/home/web_user/.local/share/supertux-origins/");
@@ -330,7 +331,7 @@ Main::init_video()
   // Window icons are unreliable on some GLES / handheld stacks (missing PNG
   // path or unloadable surface can throw into a broken unwind). Skip on
   // Emscripten, Android, and when SUPERTUX_R36S is defined (see PORTING.md).
-#if !defined(EMSCRIPTEN) && !defined(ANDROID) && !defined(__ANDROID__) && !defined(SUPERTUX_R36S)
+#if !defined(__EMSCRIPTEN__) && !defined(ANDROID) && !defined(__ANDROID__) && !defined(SUPERTUX_R36S)
   try {
     char const* icon_fname = "images/engine/icons/supertux-256x256.png";
     SDLSurfacePtr icon = SDLSurface::from_file(icon_fname);
@@ -361,14 +362,15 @@ Main::launch_game(CommandLineArguments const& args)
 
   s_timelog.log("commandline");
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
   auto video = g_config->video;
   s_timelog.log("video");
 
   m_video_system = VideoSystem::create(video);
 #else
-  // Force SDL for WASM builds, as OpenGL is reportedly slow on some devices
-  m_video_system = VideoSystem::create(VideoSystem::VIDEO_SDL);
+  // Origins has no VIDEO_SDL; use auto → GLES2 / WebGL under USE_OPENGLES2.
+  s_timelog.log("video");
+  m_video_system = VideoSystem::create(VideoSystem::VIDEO_AUTO);
 #endif
   init_video();
 
