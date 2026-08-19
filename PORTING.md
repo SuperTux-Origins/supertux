@@ -497,3 +497,16 @@ to `mk/android/app/AndroidManifest.xml` (match Pingus / packagePlatform).
 **Solution.** Prefer `SUPERTUX_VERSION`, keep `PINGUS_VERSION` as an alias for
 shared script compatibility.
 
+
+### R36S: priocpp PROJECT_VERSION empty under add_subdirectory
+
+**Problem.** SuperTux passes `-DPROJECT_VERSION_FULL=<game version>`.  When
+`external/priocpp` is added as a subdirectory, `project(prio)` without a
+VERSION argument leaves `PROJECT_VERSION` defined but empty, so
+`write_basic_package_version_file()` errors with "No VERSION specified".
+
+**Solution.** In `external/priocpp/CMakeLists.txt`, always read the local
+`VERSION` file for package metadata when embedded
+(`CMAKE_SOURCE_DIR != CMAKE_CURRENT_SOURCE_DIR`), and guard the
+write_basic call against an empty version string.
+

@@ -17,16 +17,30 @@
 cmake_minimum_required(VERSION 3.15)
 project(prio)
 
-# Source of truth: top-level VERSION file (e.g. "0.1.0-dev"), or
-# -DPROJECT_VERSION_FULL=... from the packaging (Nix flake appends +g<rev>).
-if(NOT DEFINED PROJECT_VERSION_FULL)
-  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL LIMIT_COUNT 1)
+# Package version always comes from this tree's VERSION file.
+# When embedded via add_subdirectory() from SuperTux/Pingus, the parent may
+# pass -DPROJECT_VERSION_FULL=<game version>.  project() without VERSION also
+# leaves PROJECT_VERSION defined-but-empty, which makes
+# write_basic_package_version_file() fail with "No VERSION specified".
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" _prio_version_file LIMIT_COUNT 1)
+if(NOT _prio_version_file)
+  set(_prio_version_file "0.0.0")
+endif()
+string(REGEX REPLACE "\\+g.*" "" _prio_version_pkg "${_prio_version_file}")
+
+# Always use the local VERSION for CMake package metadata when we are not
+# the top-level project (subdirectory / EXCLUDE_FROM_ALL embed).
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR
+   OR NOT PROJECT_VERSION OR PROJECT_VERSION STREQUAL "")
+  set(PROJECT_VERSION "${_prio_version_pkg}")
 endif()
 
-# PROJECT_VERSION is used by write_basic_package_version_file; keep it
-# free of the optional +g<rev> suffix that packaging may append.
-if(NOT DEFINED PROJECT_VERSION)
-  string(REGEX REPLACE "\\+g.*" "" PROJECT_VERSION "${PROJECT_VERSION_FULL}")
+# Compile-time PRIO_VERSION string: local file when embedded; allow override
+# only for a standalone prio packaging build.
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  set(PROJECT_VERSION_FULL "${_prio_version_file}")
+elseif(NOT DEFINED PROJECT_VERSION_FULL OR PROJECT_VERSION_FULL STREQUAL "")
+  set(PROJECT_VERSION_FULL "${_prio_version_file}")
 endif()
 
 message(STATUS "Project Name: ${PROJECT_NAME}")
@@ -307,6 +321,9 @@ configure_package_config_file(
   ${CMAKE_CURRENT_BINARY_DIR}/prio-config.cmake
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/prio)
 
+if(NOT PROJECT_VERSION OR PROJECT_VERSION STREQUAL "")
+  set(PROJECT_VERSION "0.0.0")
+endif()
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/prio-config-version.cmake
   VERSION "${PROJECT_VERSION}"

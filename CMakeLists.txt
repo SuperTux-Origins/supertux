@@ -171,7 +171,9 @@ endif()
 
 # Build dependencies
 function(build_dependencies)
-  set(BUILD_TESTS OFF)
+  # Force cache so subdirectory option(BUILD_TESTS) does not clear a normal
+  # variable under CMP0077 OLD (CMake 4 warning / empty-option behaviour).
+  set(BUILD_TESTS OFF CACHE BOOL "Build test cases" FORCE)
 
   # Order matters: priocpp needs sexp::sexp + logmich::logmich as existing
   # targets (its own external/ submodules are not present in the monorepo
