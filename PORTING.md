@@ -342,3 +342,9 @@ After dropping libfmt, types passed to logmich (`std::vformat`) need
 
 If the build fails with `basic_format_arg` / no conversion from `SomeType`,
 add a formatter (or pass `.x`/`.y`/string conversion at the call site).
+
+Additional formatters (scripting / math / input):
+
+- `UID` (`src/util/uid.hpp`) — used by `SCRIPT_GUARD` dead-object logs
+- `Sizef`, `Rect`, `Rectf`
+- `Control` (`src/control/controller.hpp`)

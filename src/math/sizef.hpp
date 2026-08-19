@@ -17,6 +17,7 @@
 #ifndef HEADER_SUPERTUX_MATH_SIZEF_HPP
 #define HEADER_SUPERTUX_MATH_SIZEF_HPP
 
+#include <format>
 #include <iosfwd>
 
 #include "math/vector.hpp"
@@ -130,6 +131,16 @@ inline bool operator!=(Sizef const& lhs, Sizef const& rhs)
 }
 
 std::ostream& operator<<(std::ostream& s, Sizef const& size);
+
+template<>
+struct std::formatter<Sizef>
+{
+  constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+  auto format(Sizef const& s, std::format_context& ctx) const
+  {
+    return std::format_to(ctx.out(), "{}x{}", s.width, s.height);
+  }
+};
 
 #endif
 

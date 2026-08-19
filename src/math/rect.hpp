@@ -17,6 +17,7 @@
 #ifndef HEADER_SUPERTUX_MATH_RECT_HPP
 #define HEADER_SUPERTUX_MATH_RECT_HPP
 
+#include <format>
 #include <iosfwd>
 
 #include <SDL.h>
@@ -152,6 +153,16 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& out, Rect const& rect);
+
+template<>
+struct std::formatter<Rect>
+{
+  constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+  auto format(Rect const& r, std::format_context& ctx) const
+  {
+    return std::format_to(ctx.out(), "({}, {}, {}, {})", r.left, r.top, r.right, r.bottom);
+  }
+};
 
 #endif
 

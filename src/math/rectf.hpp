@@ -18,6 +18,7 @@
 #define HEADER_SUPERTUX_MATH_RECTF_HPP
 
 #include <assert.h>
+#include <format>
 #include <iosfwd>
 
 #include "math/anchor_point.hpp"
@@ -163,6 +164,16 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, Rectf const& rect);
+
+template<>
+struct std::formatter<Rectf>
+{
+  constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+  auto format(Rectf const& r, std::format_context& ctx) const
+  {
+    return std::format_to(ctx.out(), "({}, {}, {}, {})", r.get_left(), r.get_top(), r.get_right(), r.get_bottom());
+  }
+};
 
 #endif
 

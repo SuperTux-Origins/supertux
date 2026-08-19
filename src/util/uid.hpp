@@ -18,6 +18,7 @@
 #define HEADER_SUPERTUX_UTIL_UID_HPP
 
 #include <assert.h>
+#include <format>
 #include <functional>
 #include <iosfwd>
 #include <stdint.h>
@@ -39,6 +40,7 @@ class UID
   friend class UIDGenerator;
   friend std::ostream& operator<<(std::ostream& os, UID const& uid);
   friend size_t std::hash<UID>::operator()(UID const&) const;
+  friend struct std::formatter<UID>;
 
 public:
   using Magic = uint8_t;
@@ -73,11 +75,25 @@ public:
 
   inline Magic get_magic() const { return static_cast<Magic>((m_value & 0xffff0000u) >> 16); }
 
+  /** Underlying id value (0 = invalid). For logging / std::format. */
+  inline uint32_t get_value() const { return m_value; }
+
 protected:
   uint32_t m_value;
 };
 
 std::ostream& operator<<(std::ostream& os, UID const& uid);
+
+template<>
+struct std::formatter<UID>
+{
+  constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+  auto format(UID const& uid, std::format_context& ctx) const
+  {
+    return std::format_to(ctx.out(), "{}", uid.m_value);
+  }
+};
 
 #endif
 

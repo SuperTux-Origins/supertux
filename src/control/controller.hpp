@@ -17,6 +17,7 @@
 #ifndef HEADER_SUPERTUX_CONTROL_CONTROLLER_HPP
 #define HEADER_SUPERTUX_CONTROL_CONTROLLER_HPP
 
+#include <format>
 #include <iosfwd>
 #include <optional>
 #include <string>
@@ -53,6 +54,15 @@ std::ostream& operator<<(std::ostream& os, Control control);
 
 std::string Control_to_string(Control control);
 std::optional<Control> Control_from_string(std::string const& text);
+
+template<>
+struct std::formatter<Control> : std::formatter<std::string>
+{
+  auto format(Control c, auto& ctx) const
+  {
+    return std::formatter<std::string>::format(Control_to_string(c), ctx);
+  }
+};
 
 class Controller
 {
