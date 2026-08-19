@@ -271,6 +271,7 @@
               gameVersion = "0.6.3-dev";
               squirrelSrc = squirrel-src;
               physfsSrc = physfs-src;
+              sdl2TtfSrc = sdl2-ttf-src;
             };
           in {
             android-sdl-libs = android.sdlAndroidLibs;
