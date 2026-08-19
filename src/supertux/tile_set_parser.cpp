@@ -32,6 +32,7 @@
 #include "util/reader_iterator.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/surface.hpp"
+#include <sstream>
 
 TileSetParser::TileSetParser(TileSet& tileset, std::string const& filename) :
   m_tileset(tileset),

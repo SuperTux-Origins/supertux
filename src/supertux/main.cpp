@@ -49,6 +49,7 @@
 #include "video/sdl_surface.hpp"
 #include "worldmap/worldmap.hpp"
 #include "worldmap/worldmap_screen.hpp"
+#include <sstream>
 
 static Timelog s_timelog;
 

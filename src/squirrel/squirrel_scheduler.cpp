@@ -21,6 +21,7 @@
 #include "squirrel/squirrel_util.hpp"
 #include "supertux/level.hpp"
 #include "util/log.hpp"
+#include <sstream>
 
 SquirrelScheduler::SquirrelScheduler(SquirrelVM& vm) :
   m_vm(vm),

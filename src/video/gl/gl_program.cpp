@@ -19,6 +19,7 @@
 
 #include "util/log.hpp"
 #include "video/glutil.hpp"
+#include <sstream>
 
 GLProgram::GLProgram() :
   m_program(glCreateProgram()),

@@ -28,6 +28,7 @@
 #include "supertux/menu/menu_storage.hpp"
 #include "util/gettext.hpp"
 #include "util/log.hpp"
+#include <sstream>
 
 #ifdef __EMSCRIPTEN__
 #endif

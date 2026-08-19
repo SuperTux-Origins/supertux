@@ -27,6 +27,7 @@
 #include "video/sdl_surface.hpp"
 #include "video/texture_manager.hpp"
 #include <cstring>
+#include <sstream>
 
 GLVideoSystem::GLVideoSystem() :
   m_texture_manager(),

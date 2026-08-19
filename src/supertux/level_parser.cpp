@@ -25,6 +25,7 @@
 #include "util/log.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
+#include <sstream>
 
 std::string
 LevelParser::get_level_name(std::string const& filename)

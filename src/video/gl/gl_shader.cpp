@@ -19,6 +19,7 @@
 
 #include "physfs/ifile_stream.hpp"
 #include "video/glutil.hpp"
+#include <sstream>
 
 std::unique_ptr<GLShader>
 GLShader::from_file(GLenum type, std::string const& filename)

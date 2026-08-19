@@ -20,6 +20,7 @@
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 #include "video/texture_manager.hpp"
+#include <sstream>
 
 SurfacePtr
 Surface::from_reader(ReaderMapping const& mapping, std::optional<Rect> const& rect, std::string const& filename)

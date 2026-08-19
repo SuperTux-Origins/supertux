@@ -36,6 +36,7 @@
 #include "supertux/sector.hpp"
 #include "trigger/climbable.hpp"
 #include "video/surface.hpp"
+#include <sstream>
 
 #define SWIMMING
 

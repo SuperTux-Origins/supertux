@@ -28,6 +28,7 @@
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 #include "worldmap/worldmap.hpp"
+#include <sstream>
 
 namespace {
 

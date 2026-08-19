@@ -16,6 +16,7 @@
 
 #include "squirrel/squirrel_util.hpp"
 #include <cstdio>
+#include <sstream>
 
 
 

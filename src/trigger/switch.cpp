@@ -22,6 +22,7 @@
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
+#include <sstream>
 
 namespace {
 const std::string SWITCH_SOUND = "sounds/switch.ogg";

@@ -19,6 +19,7 @@
 
 
 #include "squirrel/squirrel_util.hpp"
+#include <sstream>
 
 SquirrelVM::SquirrelVM() :
   m_vm()

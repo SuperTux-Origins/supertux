@@ -128,6 +128,7 @@
 #include "trigger/text_area.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
+#include <sstream>
 
 GameObjectFactory&
 GameObjectFactory::instance()

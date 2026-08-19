@@ -23,6 +23,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/sdl_surface.hpp"
 #include "video/video_system.hpp"
+#include <sstream>
 
 namespace {
 

@@ -24,6 +24,7 @@
 #include "supertux/resources.hpp"
 #include "util/log.hpp"
 #include "video/surface.hpp"
+#include <sstream>
 
 /// speed (pixels/s) the console closes
 static const float FADE_SPEED = 1;

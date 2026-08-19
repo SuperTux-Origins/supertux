@@ -36,6 +36,7 @@
 #include "worldmap/sprite_change.hpp"
 #include "worldmap/teleporter.hpp"
 #include "worldmap/worldmap.hpp"
+#include <sstream>
 
 namespace worldmap {
 

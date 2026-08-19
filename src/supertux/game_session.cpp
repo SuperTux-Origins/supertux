@@ -39,6 +39,7 @@
 #include "video/compositor.hpp"
 #include "video/surface.hpp"
 #include "worldmap/worldmap.hpp"
+#include <sstream>
 
 GameSession::GameSession(std::string const& levelfile_, Savegame& savegame, Statistics* statistics) :
   GameSessionRecorder(),

@@ -27,6 +27,7 @@
 #include "video/compositor.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
+#include <sstream>
 
 namespace {
 

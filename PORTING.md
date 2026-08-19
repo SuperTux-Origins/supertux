@@ -962,3 +962,9 @@ NDK libc++ rejects custom `formatter<Size, char>` in `make_format_args`
 (same class as UID). Expand `Size` to `.width`/`.height` ints at log call
 sites.
 
+### Missing <sstream> on NDK / emscripten
+
+libstdc++ often pulls  transitively; NDK libc++ and emscripten
+do not. Any TU using  needs .
+Batch-fixed across src/ for Android and WASM.
+

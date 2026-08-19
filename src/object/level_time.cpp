@@ -24,6 +24,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
+#include <sstream>
 
 /** When to alert player they're low on time! */
 static const float TIME_WARNING = 20;

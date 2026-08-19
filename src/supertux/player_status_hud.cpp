@@ -22,6 +22,7 @@
 #include "supertux/resources.hpp"
 #include "video/drawing_context.hpp"
 #include "video/surface.hpp"
+#include <sstream>
 
 static const int DISPLAYED_COINS_UNSET = -1;
 

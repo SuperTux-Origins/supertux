@@ -30,6 +30,7 @@
 #include "supertux/sector.hpp"
 #include "util/log.hpp"
 #include "video/compositor.hpp"
+#include <sstream>
 
 // TODO: Display all players on the intro scene
 LevelIntro::LevelIntro(Level const& level, Statistics const* best_level_statistics, PlayerStatus const& player_status) :

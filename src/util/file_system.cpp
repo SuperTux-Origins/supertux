@@ -34,6 +34,7 @@
 #include <SDL.h>
 
 #include "util/log.hpp"
+#include <sstream>
 
 namespace fs = std::filesystem;
 

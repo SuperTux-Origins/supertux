@@ -22,6 +22,7 @@
 #include "supertux/game_object.hpp"
 #include "supertux/globals.hpp"
 #include "util/log.hpp"
+#include <sstream>
 
 SquirrelEnvironment::SquirrelEnvironment(SquirrelVM& vm, std::string const& name) :
   m_vm(vm),

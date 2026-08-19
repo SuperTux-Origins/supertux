@@ -26,6 +26,7 @@
 #include "util/reader_document.hpp"
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
+#include <sstream>
 
 std::unique_ptr<World>
 World::from_directory(std::string const& directory)

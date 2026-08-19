@@ -27,6 +27,7 @@
 #include "video/drawing_request.hpp"
 #include "video/sdl_surface.hpp"
 #include "video/surface.hpp"
+#include <sstream>
 
 namespace {
 

@@ -29,6 +29,7 @@
 #include "video/surface.hpp"
 #include "video/video_system.hpp"
 #include "video/viewport.hpp"
+#include <sstream>
 
 Statistics::Statistics() :
   m_status(INVALID),
