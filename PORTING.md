@@ -691,3 +691,18 @@ but the header include still requires `AL/efx.h`. Match Windstille.
 After `cp -a $SQUIRREL_SOURCE_DIR/include` the staged tree is still 0555.
 Further `cp` into that include/ fails with Permission denied. Always
 `chmod -R u+rwX` immediately after each store copy before writing more.
+
+### Android: config.h, GLM_ENABLE_EXPERIMENTAL, SDL_image
+
+CMake writes `config.h` into the build dir; NDK has no cmake step, so
+`mk/android/app/jni/config.h` is staged into `jni/src/`.
+
+`GLM_ENABLE_EXPERIMENTAL` is required for glm/gtx/* (vector.hpp).
+
+SDL2_image is not in the Android prebuilts yet — `img_stb_min.c` + a
+minimal `SDL_image.h` provide `IMG_Load_RW` via stb_image.
+
+### WASM: SavePNG stub must not include SDL.h
+
+Emscripten's fake `SDL.h` errors without `-sUSE_SDL=2` on that TU.
+Use opaque struct declarations in the stub.

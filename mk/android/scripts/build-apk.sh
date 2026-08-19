@@ -76,6 +76,12 @@ chmod -R u+rwX src/jni/src
 # Re-assert module Android.mk after the source tree copy so a stray file
 # under GAME_SRC_DIR can never replace it (SDL2 prebuilts live in jni/SDL/).
 cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
+# Generated/config headers (cmake would write these into the build dir).
+for hdr in config.h version.h SDL_image.h; do
+  if [ -f "$APP_DIR/jni/$hdr" ]; then
+    cp "$APP_DIR/jni/$hdr" "src/jni/src/$hdr"
+  fi
+done
 
 # Stage monorepo external/ headers + sources.
 # Under Nix, GAME_SRC_DIR is a filtered ./src store path — parent is NOT the

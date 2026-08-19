@@ -42,20 +42,24 @@ endif()
 
 if(EMSCRIPTEN OR (NOT PNG_FOUND AND SUPERTUX_R36S))
   message(STATUS "LibSavePNG: stub (EMSCRIPTEN or R36S without libpng) — screenshots disabled")
+  # Avoid #include <SDL.h> here: on Emscripten that pulls the fake SDL
+  # header which errors unless -sUSE_SDL=2 is on every compile unit.
+  # Opaque struct decls are enough for the linker stub.
   file(WRITE "${CMAKE_BINARY_DIR}/savepng_stub.c"
-"#include <SDL.h>\n"
-"/* savepng.h defines SDL_SavePNG as a macro; only implement SDL_SavePNG_RW. */\n"
+"#include <stddef.h>\n"
+"typedef struct SDL_Surface SDL_Surface;\n"
+"typedef struct SDL_RWops SDL_RWops;\n"
 "int SDL_SavePNG_RW(SDL_Surface *surface, SDL_RWops *dst, int freedst) {\n"
-"  (void)surface;\n"
-"  if (dst && freedst) SDL_RWclose(dst);\n"
-"  SDL_SetError(\"SDL_SavePNG stub: libpng not linked\");\n"
+"  (void)surface; (void)dst; (void)freedst;\n"
 "  return -1;\n"
 "}\n"
 "SDL_Surface *SDL_PNGFormatAlpha(SDL_Surface *src) { (void)src; return NULL; }\n"
 )
   add_library(LibSavePNG STATIC "${CMAKE_BINARY_DIR}/savepng_stub.c")
   target_include_directories(LibSavePNG SYSTEM PUBLIC external/SDL_SavePNG)
-  target_link_libraries(LibSavePNG PUBLIC LibSDL2)
+  if(TARGET LibSDL2)
+    target_link_libraries(LibSavePNG PUBLIC LibSDL2)
+  endif()
   return()
 endif()
 
