@@ -128,6 +128,12 @@ GLVideoSystem::create_gl_context()
 
   if (g_config->try_vsync) {
     // we want vsync for smooth scrolling
+#ifdef __EMSCRIPTEN__
+    // Adaptive (-1) is unsupported in WebGL and leaves a sticky SDL error;
+    // requestAnimationFrame already provides pacing — interval 1 is enough.
+    if (SDL_GL_SetSwapInterval(1) != 0)
+      log_info("no support for vsync: {}", SDL_GetError());
+#else
     if (SDL_GL_SetSwapInterval(-1) != 0)
     {
       log_info("no support for late swap tearing vsync: {}", SDL_GetError());
@@ -136,6 +142,7 @@ GLVideoSystem::create_gl_context()
         log_info("no support for vsync: {}", SDL_GetError());
       }
     }
+#endif
   }
 
   assert_gl();

@@ -67,11 +67,20 @@ inline void check_gl_error(char const* filename, int line)
   }
 }
 
-#define assert_gl() check_gl_error(__FILE__, __LINE__)
+#if defined(__EMSCRIPTEN__) && !defined(SUPERTUX_GL_DEBUG)
+#  define assert_gl() ((void)0)
+#else
+#  define assert_gl() check_gl_error(__FILE__, __LINE__)
+#endif
 
 inline bool gl_needs_power_of_two()
 {
-#if defined(USE_OPENGLES2)
+#if defined(__EMSCRIPTEN__)
+  // WebGL1 allows NPOT with CLAMP_TO_EDGE and non-mipmap filters (our path).
+  // Forcing POT blew textures up to 2×–4× GPU memory and upload cost.
+  return false;
+#elif defined(USE_OPENGLES2)
+  // Conservative for old GLES2 mobile; revisit per-device if needed.
   return true;
 #else
   return !GLEW_ARB_texture_non_power_of_two;

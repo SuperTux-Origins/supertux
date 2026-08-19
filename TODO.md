@@ -128,3 +128,9 @@ adapted from Pingus and Windstille.
 - [ ] Add optional `packages.supertux-origins-gles2` with `-DENABLE_OPENGLES2=ON`
       once desktop GLES2 context creation is verified (SDL_GL_CONTEXT_PROFILE_ES).
 
+## WASM performance (investigation)
+
+See PORTING.md "WASM performance analysis". Mitigations in bundle 026:
+NPOT on WebGL, assert_gl no-op, no SDL_Delay in rAF loop.
+Still open: lightmap cost, draw-call batching, exception overhead, audio.
+

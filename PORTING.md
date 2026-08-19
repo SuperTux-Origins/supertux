@@ -1215,3 +1215,27 @@ missing path. Keep the staged file; filter only when no libvorbisfile.
 Shell called Pingus `_st_emscripten_canvas_resize`; Origins exports
 `_set_resolution`. Wire that + postRun resize notify.
 
+### WASM performance analysis (bundle 026)
+
+Likely contributors to "incredible slow" + 100% CPU:
+
+1. **Forced POT textures on GLES2** (`gl_needs_power_of_two() == true`) —
+   every upload padded to next power-of-two with expensive CPU blits.
+   WebGL does not need this for our clamp/non-mipmap path → **disabled on
+   `__EMSCRIPTEN__`**.
+
+2. **`assert_gl()` → `glGetError()` after many GL calls** — forces pipeline
+   flush; very expensive on WebGL. **No-op on Emscripten** unless
+   `SUPERTUX_GL_DEBUG`.
+
+3. **`SDL_Delay` inside `loop_iter`** while using `emscripten_set_main_loop`
+   (rAF). Redundant and can fight the browser scheduler → **skipped on
+   Emscripten**.
+
+4. **Structural costs still present**: lightmap full-scene pass, many small
+   draw calls, `-fexceptions`, OpenAL stream refill, large data preload.
+   Profile with browser Performance tab after (1)–(3).
+
+5. **GL_NEAREST appearance**: default sampler is LINEAR; some assets may
+   request nearest; stretched canvas (pre-resize fix) also looks blocky.
+

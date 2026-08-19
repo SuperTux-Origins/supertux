@@ -560,9 +560,12 @@ void ScreenManager::loop_iter()
   }
 
   if (elapsed_ticks < ms_per_step && !g_debug.draw_redundant_frames) {
-    // Sleep a bit because not enough time has passed since the previous
-    // logical game step
+    // Not enough time for another logical step — wait.
+    // Under Emscripten the browser paces via requestAnimationFrame; SDL_Delay
+    // here only burns the remaining frame budget or fights the main loop.
+#ifndef __EMSCRIPTEN__
     SDL_Delay(ms_per_step - elapsed_ticks);
+#endif
     return;
   }
 
