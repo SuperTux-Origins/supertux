@@ -6,8 +6,8 @@
 #
 # Usage:
 #   nix build .#arkos-sysroot
-#   nix build .#pingus-r36s
-#   nix build .#pingus-r36s-portmaster   # PortMaster tree for /roms/ports
+#   nix build .#supertux-r36s
+#   nix build .#supertux-r36s-portmaster   # PortMaster tree for /roms/ports
 #
 { lib
 , stdenv
@@ -131,7 +131,7 @@ let
   #   - compile with modern headers + _GLIBCXX_USE_CXX11_ABI=0 (old ABI)
   #   - -nostdlib++ so g++ does not force its libstdc++; link sysroot -lstdc++
   #   - -static-libgcc (libgcc.a / libgcc_eh.a have no versioned GLIBC_2.3x deps)
-  #   - -fexceptions: Pingus/tinygettext/prio use try/catch (unlike SuperTux M1)
+  #   - -fexceptions: SuperTux/tinygettext/prio use try/catch (unlike SuperTux M1)
   #   - --allow-shlib-undefined for DT_NEEDED of sysroot libs (e.g. opusfile
   #     from SDL2_mixer) that exist on the device at runtime
   mkWrappers = sysroot: let
@@ -147,7 +147,7 @@ let
     libgccLib = "${gccLibOut}/lib";
     libgccLibTarget = "${gccLibOut}/${tp}/lib";
     # Compile-only flags (safe with -c). No -L/-B lib paths that pull Scrt1.o.
-    # -fexceptions: tinygettext / prio / Pingus use C++ exceptions; pair with
+    # -fexceptions: SuperTux / tinygettext / prio use C++ exceptions; pair with
     # -static-libgcc so libgcc_eh is not the shared GCC 15 copy (GLIBC_2.35).
     commonCompile = ''
       -nostdinc \
@@ -326,12 +326,12 @@ let
     '';
   };
 
-  mkPingusR36s = {
+  mkSuperTuxR36s = {
     src
   , version
-  , pname ? "pingus-r36s"
+  , pname ? "supertux-r36s"
   # Requires libopenal (+ optional libmodplug) in the published ArkOS sysroot.
-  # PortMaster ships copies under pingus/libs/ so stock images without apt work.
+  # PortMaster ships copies under supertux/libs/ so stock images without apt work.
   , enableSound ? true
   }:
     let
@@ -377,15 +377,15 @@ let
         "-DWARNINGS=OFF"
         "-DWERROR=OFF"
         # R36S is GLES2-only (Mali/Panfrost); desktop OpenGL is not in the sysroot.
-        "-DPINGUS_USE_GLES=ON"
+        "-DENABLE_OPENGLES2=ON"
+        "-DENABLE_OPENGL=ON"
         # ArkOS sysroot has neither libsigc++ nor glm cmake config.
-        "-DPINGUS_SIGC_POLYFILL_DIR=${../mk/android/app/jni}"
-        "-DPINGUS_GLM_INCLUDE_DIR=${glm}/include"
+        "-Dglm_DIR=${glm}/lib/cmake/glm"
         # Forced cross-compiler cannot try_compile pthread; ArkOS glibc has it.
         "-DCMAKE_HAVE_LIBC_PTHREAD=1"
         "-DCMAKE_THREAD_LIBS_INIT=-pthread"
         "-DPTHREAD_LIBRARY=pthread"
-        "-DPINGUS_ENABLE_SOUND=${if enableSound then "ON" else "OFF"}"
+        # sound via wstsound / OpenAL when available
         # Slim codec set (same as Android/wasm): WAV + modplug modules only.
         "-DWSTSOUND_WITH_MPG123=OFF"
         "-DWSTSOUND_WITH_VORBIS=OFF"
@@ -393,9 +393,11 @@ let
         "-DWSTSOUND_WITH_MODPLUG=${if enableSound then "ON" else "OFF"}"
         "-DWSTSOUND_WITH_EFX=OFF"
         # No xdgcpp / jsoncpp in the published ArkOS sysroot (desktop helpers).
-        "-DPINGUS_NO_XDGCPP=ON"
+        "-DINSTALL_SUBDIR_BIN=bin"
+        "-DINSTALL_SUBDIR_SHARE=data"
+        "-DBUILD_TESTS=OFF"
         # GCC 15 headers vs ArkOS libstdc++: shim missing ABI symbols.
-        "-DPINGUS_CXXABI_SHIM=${../mk/r36s/cxxabi_shim.cpp}"
+        # cxxabi shim linked separately if needed
         # Relative data next to the binary on device (PortMaster layout).
         "-DPROJECT_VERSION_FULL=${version}"
       ];
@@ -453,11 +455,11 @@ let
           exit 1
         fi
         cmakeFlagsArray+=(
-          "-DPINGUS_GLESV2_LIB=$GLESV2_LIB"
+          
         )
         if [ -n "$EGL_LIB" ]; then
           cmakeFlagsArray+=(
-            "-DPINGUS_EGL_LIB=$EGL_LIB"
+            
           )
         fi
 
@@ -523,12 +525,12 @@ let
       '';
 
       postInstall = ''
-        mkdir -p $out/share/pingus $out/lib/pingus
+        mkdir -p $out/share/supertux-origins $out/lib/supertux-origins
         # CMake may have installed data/ as non-writable; ensure we can add files.
-        chmod -R u+w $out/share/pingus || true
+        chmod -R u+w $out/share/supertux-origins || true
         if [ -d "$src/data" ]; then
-          cp -a "$src/data/." $out/share/pingus/ || true
-          chmod -R u+w $out/share/pingus || true
+          cp -a "$src/data/." $out/share/supertux-origins/ || true
+          chmod -R u+w $out/share/supertux-origins || true
         fi
 
         # Ship OpenAL Soft + libmodplug next to the port so stock ArkOS
@@ -544,7 +546,7 @@ let
             do
               for f in "$dir"/$pattern; do
                 if [ -e "$f" ]; then
-                  cp -a "$f" "$out/lib/pingus/"
+                  cp -a "$f" "$out/lib/supertux-origins/"
                   found=1
                 fi
               done
@@ -555,66 +557,66 @@ let
             fi
           done
           # Prefer real .so files over broken relative symlinks in the copy.
-          chmod -R u+w "$out/lib/pingus" || true
-          ls -la "$out/lib/pingus" || true
+          chmod -R u+w "$out/lib/supertux-origins" || true
+          ls -la "$out/lib/supertux-origins" || true
         fi
-        cat > $out/share/pingus/README-R36S.txt << EOF_README
-Pingus — R36S / ArkOS (sysroot-linked)
+        cat > $out/share/supertux-origins/README-R36S.txt << EOF_README
+SuperTux — R36S / ArkOS (sysroot-linked)
 ====================================================
 
-Binary: bin/pingus
+Binary: bin/supertux-origins
   Linked against the ArkOS aarch64 sysroot (SDL2 + OpenGL/GLES as available).
 
-Deploy the binary + share/pingus data to the device.
+Deploy the binary + share/supertux-origins data to the device.
 
 Controls (important)
 --------------------
-Pingus uses the SDL Joystick API (raw indices). PortMaster still exports
+SuperTux uses the SDL Joystick API (raw indices). PortMaster still exports
 SDL_GAMECONTROLLERCONFIG for other ports and for a future GameController path.
 
-  Preferred: nix build .#pingus-r36s-portmaster
+  Preferred: nix build .#supertux-r36s-portmaster
   and install under /roms/ports/ (launcher sources PortMaster control.txt).
 
   Manual SSH runs need no mapping for basic joystick input. See
   mk/r36s/CROSSCOMPILE.md for GLES env tips and exit-hotkey helpers..
 EOF_README
-        cat > $out/share/pingus/pingus.sh << 'LAUNCH'
+        cat > $out/share/supertux-origins/supertux.sh << 'LAUNCH'
 #!/bin/bash
 DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
-BIN="$DIR/../bin/pingus"
-if [ ! -x "$BIN" ]; then BIN="$DIR/pingus"; fi
+BIN="$DIR/../bin/supertux-origins"
+if [ ! -x "$BIN" ]; then BIN="$DIR/supertux-origins"; fi
 # Without PortMaster control.txt, set SDL_GAMECONTROLLERCONFIG for GO-Super
 # or the pad stays joystick-only (see mk/r36s/CROSSCOMPILE.md).
 if [ -d "$DIR/libs" ]; then
   export LD_LIBRARY_PATH="$DIR/libs''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-elif [ -d "$DIR/../lib/pingus" ]; then
-  export LD_LIBRARY_PATH="$DIR/../lib/pingus''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+elif [ -d "$DIR/../lib/supertux-origins" ]; then
+  export LD_LIBRARY_PATH="$DIR/../lib/supertux-origins''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 fi
 exec "$BIN" --software-cursor --controller "$DIR/data/controller/r36s.scm" --fullscreen "$@"
 LAUNCH
-        chmod +x $out/share/pingus/pingus.sh
+        chmod +x $out/share/supertux-origins/supertux.sh
       '';
 
       meta = with lib; {
-        description = "Pingus for R36S/ArkOS (sysroot-linked aarch64)";
+        description = "SuperTux for R36S/ArkOS (sysroot-linked aarch64)";
         license = licenses.gpl3Plus;
         platforms = platforms.linux;
         hydraPlatforms = [];
       };
     };
 
-  # Wrap a mkPingusR36s result as a PortMaster-ready tree:
-  #   Pingus.sh + pingus/ + metadata
+  # Wrap a mkSuperTuxR36s result as a PortMaster-ready tree:
+  #   SuperTux.sh + supertux/ + metadata
   # Copy into /roms/ports/ or zip for PortMaster autoinstall.
-  mkPingusR36sPortMaster = {
+  mkSuperTuxR36sPortMaster = {
     r36sPkg
   , version
-  , pname ? "pingus-r36s-portmaster"
-  , title ? "Pingus"
-  , scriptName ? "Pingus.sh"
-  , portDirName ? "pingus"
-  , screenshotSrc ? ../data/icons/hicolor/128x128/apps/pingus.png
+  , pname ? "supertux-r36s-portmaster"
+  , title ? "SuperTux"
+  , scriptName ? "SuperTux.sh"
+  , portDirName ? "supertux"
+  , screenshotSrc ? ../data/images/engine/supertux.png
   }:
     stdenvNoCC.mkDerivation {
       inherit pname version;
@@ -635,30 +637,30 @@ LAUNCH
         gamedir="$root/${portDirName}"
         mkdir -p "$gamedir/data" "$gamedir/licenses" "$gamedir/conf"
 
-        # Real ELF in bin/ (PINGUS_DEFAULT_DATADIR is baked in; PortMaster passes --datadir).
-        if [ -x "${r36sPkg}/bin/pingus" ]; then
-          install -m755 "${r36sPkg}/bin/pingus" "$gamedir/pingus"
+        # Real ELF in bin/; PortMaster passes --datadir / data path.
+        if [ -x "${r36sPkg}/bin/supertux-origins" ]; then
+          install -m755 "${r36sPkg}/bin/supertux-origins" "$gamedir/supertux-origins"
         else
-          echo "portmaster: no pingus binary under ${r36sPkg}/bin" >&2
+          echo "portmaster: no supertux-origins binary under ${r36sPkg}/bin" >&2
           ls -la "${r36sPkg}/bin" 2>/dev/null || true
-          head -3 "${r36sPkg}/bin/pingus" 2>/dev/null || true
+          head -3 "${r36sPkg}/bin/supertux-origins" 2>/dev/null || true
           exit 1
         fi
 
         # Bundled OpenAL / modplug (from r36s package, originally sysroot).
-        if [ -d "${r36sPkg}/lib/pingus" ]; then
+        if [ -d "${r36sPkg}/lib/supertux-origins" ]; then
           mkdir -p "$gamedir/libs"
-          cp -a "${r36sPkg}/lib/pingus/." "$gamedir/libs/"
+          cp -a "${r36sPkg}/lib/supertux-origins/." "$gamedir/libs/"
           chmod -R u+w "$gamedir/libs" || true
         fi
 
-        # Game data (CMake DATA_PREFIX was share/pingus).
+        # Game data (CMake DATA_PREFIX was share/supertux-origins).
         # Store paths are mode 444/555; make writable so we can drop helpers.
-        if [ -d "${r36sPkg}/share/pingus" ]; then
-          cp -a "${r36sPkg}/share/pingus/." "$gamedir/data/"
+        if [ -d "${r36sPkg}/share/supertux-origins" ]; then
+          cp -a "${r36sPkg}/share/supertux-origins/." "$gamedir/data/"
           chmod -R u+w "$gamedir/data"
           # Keep only game assets under data/; drop packaging helpers
-          rm -f "$gamedir/data/pingus.sh" \
+          rm -f "$gamedir/data/supertux.sh" \
                 "$gamedir/data/README-R36S.txt"
         fi
 
@@ -681,14 +683,14 @@ LAUNCH
           cp -a "${r36sPkg}/share/licenses/." "$gamedir/licenses/" || true
         fi
         cat > "$gamedir/licenses/README.txt" << 'EOF_LIC'
-Pingus — see upstream GPL-3.0-or-later and LICENSES/ in the source tree.
+SuperTux — see upstream GPL-3.0-or-later and LICENSES/ in the source tree.
 This PortMaster package redistributes the game binary and data for ArkOS/R36S.
 EOF_LIC
 
         # PortMaster launch script (sources control.txt → SDL_GAMECONTROLLERCONFIG)
         cat > "$root/${scriptName}" << 'EOF_LAUNCH'
 #!/bin/bash
-# Pingus — PortMaster launcher for R36S / ArkOS
+# SuperTux — PortMaster launcher for R36S / ArkOS
 
 XDG_DATA_HOME=''${XDG_DATA_HOME:-$HOME/.local/share}
 
@@ -706,7 +708,7 @@ source "$controlfolder/control.txt"
 [ -f "''${controlfolder}/mod_''${CFW_NAME}.txt" ] && source "''${controlfolder}/mod_''${CFW_NAME}.txt"
 get_controls
 
-GAMEDIR="/$directory/ports/pingus"
+GAMEDIR="/$directory/ports/supertux"
 CONFDIR="$GAMEDIR/conf"
 
 mkdir -p "$CONFDIR"
@@ -727,12 +729,12 @@ if [ -d "$GAMEDIR/libs" ]; then
 fi
 
 # Native aarch64 SDL2 joystick input; gptokeyb optional for exit hotkey.
-pm_platform_helper "$GAMEDIR/pingus" 2>/dev/null || true
+pm_platform_helper "$GAMEDIR/supertux-origins" 2>/dev/null || true
 
 # Force on-device data + config dirs (do not use any baked-in install prefix).
 # Prefer --renderer opengl (GLES) on R36S; --renderer sdl is a software fallback.
 # Software cursor: no mouse; pad via SDL joystick.
-./pingus \
+./supertux-origins \
   --datadir "$GAMEDIR/data" \
   --userdir "$CONFDIR" \
   --renderer sdl \
@@ -748,7 +750,7 @@ EOF_LAUNCH
         cat > "$root/port.json" << EOF_JSON
 {
   "version": 2,
-  "name": "pingus.zip",
+  "name": "supertux.zip",
   "items": [
     "${scriptName}",
     "${portDirName}"
@@ -756,10 +758,10 @@ EOF_LAUNCH
   "items_opt": null,
   "attr": {
     "title": "${title}",
-    "desc": "Classic Pingus (SDL2 + GLES2) for ArkOS / R36S. Free jump-and-run platformer starring Tux.",
-    "inst": "Ready to run. Copy Pingus.sh and the pingus/ folder into /roms/ports/ (or install the zip via PortMaster autoinstall).",
+    "desc": "SuperTux (SDL2 + GLES2) for ArkOS / R36S. Jump-and-run platformer starring Tux.",
+    "inst": "Ready to run. Copy SuperTux.sh and the supertux/ folder into /roms/ports/ (or install the zip via PortMaster autoinstall).",
     "genres": ["platform", "action"],
-    "porter": ["Pingus-Origins"],
+    "porter": ["SuperTux-Origins"],
     "image": {},
     "rtr": true,
     "runtime": null,
@@ -776,10 +778,10 @@ EOF_JSON
   <game>
     <path>./${scriptName}</path>
     <name>${title}</name>
-    <desc>Classic Pingus — free jump-and-run platformer starring Tux. SDL2 + GLES2 build for ArkOS / R36S.</desc>
+    <desc>SuperTux — jump-and-run platformer starring Tux. SDL2 + GLES2 build for ArkOS / R36S.</desc>
     <releasedate>20040511T000000</releasedate>
-    <developer>Pingus Team</developer>
-    <publisher>Pingus-Origins</publisher>
+    <developer>SuperTux Team</developer>
+    <publisher>SuperTux-Origins</publisher>
     <genre>Platform</genre>
     <image>./${portDirName}/cover.png</image>
   </game>
@@ -787,38 +789,38 @@ EOF_JSON
 EOF_XML
 
         cat > "$root/README.md" << 'EOF_README'
-## Pingus (R36S / ArkOS)
+## SuperTux (R36S / ArkOS)
 
 Native **aarch64** build linked against the ArkOS sysroot (SDL2 + GLES2).
 
 ### Install
 
-1. Copy `Pingus.sh` and the `pingus/` directory to `/roms/ports/` on the device, **or**
+1. Copy `SuperTux.sh` and the `supertux/` directory to `/roms/ports/` on the device, **or**
 2. Zip this folder and place the zip in `ports/PortMaster/autoinstall/`, then open PortMaster once.
 
 ### Controls (required)
 
-Pingus reads the pad via the **SDL Joystick API** (raw button/axis indices).
+SuperTux reads the pad via SDL (prefer GameController; see PORTING.md) (raw button/axis indices).
 `SDL_GAMECONTROLLERCONFIG` is still exported by this launcher for consistency
-with other PortMaster ports; it does not remap Pingus’s joystick bindings.
+with other PortMaster ports; controller profiles should use SDL_GameControllerButton layout.
 
 **This PortMaster launcher** sources `control.txt` (`get_controls`). Prefer
 launching via EmulationStation **Ports** (or the `.sh` script). Select+Start
 exit is handled by gptokeyb/oga_controls when the launcher starts them — not
-by Pingus itself.
+by SuperTux itself.
 
 In-game: D-pad / left stick move; face buttons follow the device’s joystick
 indices (see `mk/r36s/CROSSCOMPILE.md`).
 
 ### Credits
 
-Thanks to the Pingus developers and the PortMaster / ArkOS communities.
+Thanks to the SuperTux developers and the PortMaster / ArkOS communities.
 EOF_README
 
         '';
 
       meta = with lib; {
-        description = "PortMaster package of Pingus for R36S/ArkOS";
+        description = "PortMaster package of SuperTux for R36S/ArkOS";
         license = licenses.gpl3Plus;
         platforms = platforms.linux;
         hydraPlatforms = [];
@@ -827,11 +829,11 @@ EOF_README
 
   # Zip of the PortMaster tree for autoinstall (ports/PortMaster/autoinstall/).
   # Flat archive: launcher + port dir + metadata at zip root (matches port.json).
-  mkPingusR36sPortMasterZip = {
+  mkSuperTuxR36sPortMasterZip = {
     portMasterPkg
   , version
-  , pname ? "pingus-r36s-portmaster-zip"
-  , zipName ? "pingus.zip"
+  , pname ? "supertux-r36s-portmaster-zip"
+  , zipName ? "supertux.zip"
   }:
     stdenvNoCC.mkDerivation {
       inherit pname version;
@@ -850,7 +852,7 @@ EOF_README
       '';
 
       meta = with lib; {
-        description = "PortMaster autoinstall zip of Pingus for R36S/ArkOS";
+        description = "PortMaster autoinstall zip of SuperTux for R36S/ArkOS";
         license = licenses.gpl3Plus;
         platforms = platforms.linux;
         hydraPlatforms = [];
@@ -859,5 +861,5 @@ EOF_README
 
 in
 {
-  inherit arkosSysroot mkPingusR36s mkPingusR36sPortMaster mkPingusR36sPortMasterZip;
+  inherit arkosSysroot mkSuperTuxR36s mkSuperTuxR36sPortMaster mkSuperTuxR36sPortMasterZip;
 }

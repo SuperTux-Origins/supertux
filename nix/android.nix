@@ -103,7 +103,7 @@ let
   };
 
   audioAndroidLibs = pkgs.stdenvNoCC.mkDerivation {
-    pname = "pingus-android-audio-libs";
+    pname = "supertux-android-audio-libs";
     version = "openal-1.23.1+modplug-0.8.9.0";
     # Sources are tarballs referenced via env; unpack inside buildPhase.
     # cmake is only used by build-audio-libs.sh — do not run the generic
@@ -172,7 +172,7 @@ let
     appDir,
     outApkName,
     keystore,
-    # Pingus (and similar): C++ sources live outside appDir.
+    # SuperTux (and similar): C++ sources live outside appDir.
     gameSrcDir ? null,
     # Repo external/ (geomcpp, priocpp, …). Required under Nix — GAME_SRC_DIR
     # is only ./src and its parent is not the monorepo root.
@@ -224,7 +224,7 @@ let
         SDL2_IMAGE_SRC = "${sdl2ImageSrc}";
       } // (
         if gameDataDir == null then
-          throw "mkApk: gameDataDir is required for Pingus Android APK"
+          throw "mkApk: gameDataDir is required for SuperTux Android APK"
         else {
           GAME_DATA_DIR = "${gameDataDir}";
         }
