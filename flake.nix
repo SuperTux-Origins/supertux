@@ -102,12 +102,17 @@
       url = "https://github.com/icculus/physfs/archive/refs/tags/release-3.2.0.tar.gz";
       flake = false;
     };
+
+    fmt-src = {
+      url = "https://github.com/fmtlib/fmt/archive/refs/tags/8.1.1.tar.gz";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, curl-win32, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
-              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, priocpp, physfs-src }:
+              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, priocpp, physfs-src, fmt-src }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {

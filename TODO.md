@@ -92,3 +92,7 @@
 
 - 2026-08-19 (batch 4): GLES default pixel format; physfs-src → wasm cmake;
   SQUIRREL_SOURCE_DIR; Windows meta.platforms; Android forces GLES2.
+
+- 2026-08-19 (batch 5): Android source list (376 cpp) + generator script;
+  EMSCRIPTEN forces in-tree physfs/squirrel/fmt; FMT_SOURCE_DIR; fmt-src
+  flake input.

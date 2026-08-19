@@ -103,6 +103,10 @@ if(EMSCRIPTEN)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS} -sERROR_ON_UNDEFINED_SYMBOLS=0")
   set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${USE_FLAGS} -fexceptions -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${USE_FLAGS} -fexceptions -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js")
+  # Prefer in-tree / SOURCE_DIR builds for deps the emscripten ports do not provide.
+  set(USE_SYSTEM_PHYSFS OFF CACHE BOOL "Use preinstalled physfs" FORCE)
+  set(USE_SYSTEM_SQUIRREL OFF CACHE BOOL "Use preinstalled squirrel" FORCE)
+  set(USE_SYSTEM_FMT OFF CACHE BOOL "Use preinstalled fmt" FORCE)
 endif()
 
 # TODO: Add " OR ANDROID OR IOS" to this

@@ -283,3 +283,14 @@ EGL surface creation failures on ArkOS (Windstille PORTING.md lesson).
 `-DSQUIRREL_SOURCE_DIR=` mirrors PhysFS: build from a source tree when
 `external/squirrel` is not checked out. Toolchain file is forwarded to
 ExternalProject.
+
+### EMSCRIPTEN system-package overrides
+
+Under `if(EMSCRIPTEN)`, CMake forces:
+
+- `USE_SYSTEM_PHYSFS=OFF`
+- `USE_SYSTEM_SQUIRREL=OFF`
+- `USE_SYSTEM_FMT=OFF`
+
+so packaging must supply `PHYSFS_SOURCE_DIR` / `SQUIRREL_SOURCE_DIR` /
+`FMT_SOURCE_DIR` (flake inputs `physfs-src`, `fmt-src`).
