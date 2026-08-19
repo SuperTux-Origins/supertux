@@ -306,3 +306,26 @@ fmt was removed in favour of C++20 `std::format` / `std::vformat`:
   libstdc++ `std::format` on older ArkOS libstdc++ (from Pingus)
 
 Require C++20 (`<format>`). NDK r27+ and modern desktop toolchains OK.
+
+### Vendored flake dependencies (`external/`)
+
+C++ libraries used by the game are vendored under `external/` via
+`git subtree --squash` so they can be patched in-tree:
+
+| Directory | Upstream |
+|-----------|----------|
+| tinycmmc | github:grumbel/tinycmmc |
+| logmich | github:logmich/logmich |
+| sexpcpp | github:lispparser/sexp-cpp |
+| strutcpp | github:grumbel/strutcpp |
+| priocpp | github:grumbel/priocpp |
+| xdgcpp | github:grumbel/xdgcpp |
+| miniswig | github:WindstilleTeam/miniswig |
+| wstsound | github:WindstilleTeam/wstsound |
+| squirrel | github:grumnix/squirrel |
+
+Win32 prebuilt packages remain flake inputs (grumnix/*-win32).
+
+**priocpp + jsoncpp:** SuperTux does not need JSON. Build with
+`-DPRIO_USE_JSONCPP=OFF`. ReaderDocument tests only instantiate `.json`
+params when `PRIO_USE_JSONCPP` is enabled.
