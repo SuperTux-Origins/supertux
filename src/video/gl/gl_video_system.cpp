@@ -83,26 +83,25 @@ GLVideoSystem::get_name() const
 void
 GLVideoSystem::create_gl_window()
 {
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-  // FIXME: why are we requesting a 16bit context?
-  SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   5);
-  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
-  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  5);
-
 #if defined(USE_OPENGLES2)
-  log_info("Requesting OpenGLES2 context");
+  // GLES stacks (Android, R36S, WebGL): prefer driver defaults for color/
+  // depth/stencil. Hand-tuned sizes have caused "Could not create EGL window
+  // surface" on ArkOS (see PORTING.md). Only request ES 2.0 profile.
+  log_info("Requesting OpenGLES2 context (default pixel format)");
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #else
-    log_info("Requesting OpenGL 3.3 Core context");
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  log_info("Requesting OpenGL 3.3 Core context");
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  // Desktop: request a modest color buffer (historical SuperTux defaults).
+  SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   5);
+  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  5);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 #endif
 
   create_sdl_window(SDL_WINDOW_OPENGL);
