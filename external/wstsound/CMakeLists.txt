@@ -58,7 +58,7 @@ option(BUILD_EXTRA "Build extra stuff" OFF)
 # (parent may also pass -DWSTSOUND_WITH_*=OFF from nix).
 if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
   set(WSTSOUND_WITH_MPG123 OFF)
-  set(WSTSOUND_WITH_VORBIS OFF)
+  # SuperTux Origins ships .ogg music — do not pre-seed VORBIS OFF.
   set(WSTSOUND_WITH_OPUS OFF)
   set(WSTSOUND_WITH_EFX OFF)
   set(WSTSOUND_WITH_LOOPBACK OFF)
@@ -78,7 +78,7 @@ option(WSTSOUND_WITH_LOOPBACK "OpenAL-soft loopback device (needs alext.h)" ON)
 # Mobile / wasm: stock Pingus data is WAV SFX + .it/.s3m modules only.
 if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
   set(WSTSOUND_WITH_MPG123 OFF CACHE BOOL "Decode MP3 via mpg123" FORCE)
-  set(WSTSOUND_WITH_VORBIS OFF CACHE BOOL "Decode Ogg Vorbis" FORCE)
+  # Keep Vorbis ON for SuperTux stock .ogg (parent may still force OFF).
   set(WSTSOUND_WITH_OPUS OFF CACHE BOOL "Decode Opus" FORCE)
   set(WSTSOUND_WITH_MODPLUG ON CACHE BOOL "Decode module formats via libmodplug" FORCE)
   set(WSTSOUND_WITH_EFX OFF CACHE BOOL "OpenAL EFX effects API" FORCE)

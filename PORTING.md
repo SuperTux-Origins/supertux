@@ -1198,3 +1198,20 @@ When Vorbis prebuilts exist, force `deps/wstsound/ogg_sound_file.cpp` onto
 `packages.supertux-origins-gles2` with `useGLES2 = true`. Runtime `--renderer`
 cannot select GLES2 independently of that compile flag.
 
+### WASM music "Unknown file format" (bundle 022)
+
+`external/wstsound/CMakeLists.txt` forced `WSTSOUND_WITH_VORBIS=OFF` under
+EMSCRIPTEN/ANDROID (Pingus-style). SuperTux needs Vorbis. Removed that force.
+Also accept any `OggS` page as Vorbis when Opus is not matched (packet offset
+for "vorbis" is not fixed at +29).
+
+### Android ogg_sound_file path
+
+`build-apk.sh` was deleting `ogg_sound_file.cpp` then Android.mk force-added a
+missing path. Keep the staged file; filter only when no libvorbisfile.
+
+### Canvas resize
+
+Shell called Pingus `_st_emscripten_canvas_resize`; Origins exports
+`_set_resolution`. Wire that + postRun resize notify.
+

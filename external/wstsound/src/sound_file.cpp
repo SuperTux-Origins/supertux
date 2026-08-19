@@ -66,8 +66,9 @@ SoundFile::from_stream(std::unique_ptr<std::istream> istream)
       return std::make_unique<OpusSoundFile>(std::move(istream));
 #endif
 #if WSTSOUND_WITH_VORBIS
-    } else if (strncmp(reinterpret_cast<char*>(magic), "OggS", 4) == 0 &&
-               strncmp(reinterpret_cast<char*>(magic) + 29, "vorbis", 4) == 0) {
+    } else if (strncmp(reinterpret_cast<char*>(magic), "OggS", 4) == 0) {
+      // First-page packet offset varies; treat remaining OggS as Vorbis when
+      // Opus was not matched above. ov_open_callbacks validates the stream.
       return std::make_unique<OggSoundFile>(std::move(istream));
 #endif
 #if WSTSOUND_WITH_MODPLUG
