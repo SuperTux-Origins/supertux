@@ -249,6 +249,8 @@ EOF
       cp -a prefix/. $out/
       # configure embeds the build-time $PWD/prefix into *.pc — rewrite to $out.
       if [ -d "$out/lib/pkgconfig" ]; then
+        # cp -a from the nix store leaves *.pc mode 444; sed -i needs write.
+        chmod -R u+w "$out/lib/pkgconfig"
         for pc in "$out/lib/pkgconfig"/*.pc; do
           [ -f "$pc" ] || continue
           sed -i "s|^prefix=.*|prefix=$out|" "$pc"
@@ -298,6 +300,8 @@ EOF
       # Re-export ogg into the same prefix for a single CMAKE_PREFIX_PATH entry.
       cp -a ${oggWasm}/. $out/ || true
       if [ -d "$out/lib/pkgconfig" ]; then
+        # cp -a from the nix store leaves *.pc mode 444; sed -i needs write.
+        chmod -R u+w "$out/lib/pkgconfig"
         for pc in "$out/lib/pkgconfig"/*.pc; do
           [ -f "$pc" ] || continue
           sed -i "s|^prefix=.*|prefix=$out|" "$pc"
