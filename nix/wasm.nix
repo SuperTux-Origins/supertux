@@ -1,12 +1,8 @@
 # SuperTux WebAssembly (Emscripten) packaging
 #
-# Origins already has first-class EMSCRIPTEN support in CMakeLists.txt and
-# mk/emscripten/template.html.in.  This module builds under emscriptenStdenv.
-#
-# Remaining blockers for a green link (see PORTING.md / TODO.md):
-#   - static wasm builds of squirrel / wstsound / tinycmmc family, OR
-#   - further CMake soft-disables under EMSCRIPTEN
-# PhysFS can be supplied via physfs-src + PHYSFS_SOURCE_DIR.
+# Builds under emscriptenStdenv. Vendored external/ deps are compiled with the
+# same stdenv so they are actually wasm-compatible (flake input packages are
+# usually native x86_64).
 
 { pkgs
 , self
@@ -17,13 +13,13 @@
 , miniswig
 , wstsound
 , squirrel
-
 , physfs-src ? null
 }:
 
 let
   lib = pkgs.lib;
   emscripten = pkgs.emscripten;
+  est = pkgs.emscriptenStdenv;
 
   glmPrefix = pkgs.runCommand "glm-headers-wasm" { } ''
     mkdir -p $out/include $out/lib/cmake/glm
@@ -38,11 +34,53 @@ set(glm_FOUND TRUE)
 EOFC
   '';
 
+  # Build a simple cmake project from external/ under emscriptenStdenv.
+  mkWasmCmake = { pname, srcPath, cmakeFlags ? [], buildInputs ? [] }:
+    est.mkDerivation {
+      inherit pname;
+      version = "0.0.0-wasm";
+      src = lib.cleanSource srcPath;
+      nativeBuildInputs = [ pkgs.buildPackages.cmake emscripten ];
+      inherit buildInputs;
+      cmakeFlags = [
+        "-DCMAKE_BUILD_TYPE=Release"
+        "-DBUILD_TESTS=OFF"
+        "-DWARNINGS=OFF"
+        "-DWERROR=OFF"
+      ] ++ cmakeFlags;
+      preConfigure = ''
+        export EM_CACHE="''${TMPDIR:-/tmp}/emcache-${pname}"
+        mkdir -p "$EM_CACHE"
+      '';
+      # emscriptenStdenv sets the toolchain; install as usual
+    };
+
+  logmichWasm = mkWasmCmake {
+    pname = "logmich-wasm";
+    srcPath = ../external/logmich;
+  };
+
+  sexpcppWasm = mkWasmCmake {
+    pname = "sexpcpp-wasm";
+    srcPath = ../external/sexpcpp;
+  };
+
+  strutcppWasm = mkWasmCmake {
+    pname = "strutcpp-wasm";
+    srcPath = ../external/strutcpp;
+  };
+
+  # tinycmmc is mostly CMake modules — use native flake package for the module path
+  tinycmmcNative = tinycmmc.packages.${pkgs.system}.default;
+
+  # PhysFS from source tree if provided
   physfsSrcPath = if physfs-src != null then physfs-src else null;
 
 in
 {
-  supertux-wasm = pkgs.emscriptenStdenv.mkDerivation rec {
+  inherit logmichWasm sexpcppWasm strutcppWasm;
+
+  supertux-wasm = est.mkDerivation rec {
     pname = "supertux-origins-wasm";
     version = "0.6.3-wasm";
 
@@ -57,10 +95,11 @@ in
 
     buildInputs = [
       glmPrefix
-      tinycmmc.packages.${pkgs.system}.default
-      sexpcpp.packages.${pkgs.system}.default
-      logmich.packages.${pkgs.system}.default
-      strutcpp.packages.${pkgs.system}.default
+      logmichWasm
+      sexpcppWasm
+      strutcppWasm
+      tinycmmcNative
+      # squirrel / wstsound still from flake until wasm static builds exist
       squirrel.packages.${pkgs.system}.default
       wstsound.packages.${pkgs.system}.default
     ];
@@ -74,6 +113,7 @@ in
       "-DINSTALL_SUBDIR_BIN=bin"
       "-DINSTALL_SUBDIR_SHARE=data"
       "-Dglm_DIR=${glmPrefix}/lib/cmake/glm"
+      "-DPRIO_USE_JSONCPP=OFF"
     ] ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"
     ];
@@ -90,13 +130,7 @@ in
     installPhase = ''
       runHook preInstall
       mkdir -p $out/share/supertux-origins-wasm $out/bin
-      for f in supertux-origins.html supertux-origins.js supertux-origins.wasm \
-               supertux-origins.data supertux-origins.worker.js; do
-        if [ -f "$f" ]; then
-          cp -v "$f" $out/share/supertux-origins-wasm/
-        fi
-      done
-      find . -maxdepth 2 \( -name '*.html' -o -name '*.wasm' -o -name '*.js' -o -name '*.data' \) \
+      find . -maxdepth 3 \( -name '*.html' -o -name '*.wasm' -o -name '*.js' -o -name '*.data' \) \
         -exec cp -v {} $out/share/supertux-origins-wasm/ \; || true
       if [ -f ${../mk/wasm/scripts/serve.sh} ]; then
         cp ${../mk/wasm/scripts/serve.sh} $out/bin/supertux-wasm-serve
@@ -108,8 +142,6 @@ in
     meta = with lib; {
       description = "SuperTux (Origins) WebAssembly build";
       platforms = [ "x86_64-linux" "aarch64-linux" ];
-      # Still broken until squirrel/wstsound/tinycmmc static wasm land.
-      broken = true;
     };
   };
 }

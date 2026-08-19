@@ -381,3 +381,14 @@ Debug keystore: `mk/android/keystore/debug.keystore` (store/key pass: android).
 
 Android NDK: `mk/android/scripts/build-external-static.sh` builds one
 `external/` CMake project for a given ABI.
+
+### Unblocking wasm / android evaluation (2026-08-19)
+
+`meta.broken` was removed from `supertux-wasm` and `supertux-android` so
+`nix build .#supertux-wasm` and `nix build .#supertux-android` report real
+builder errors instead of evaluation refusal.
+
+WASM deps: `logmich`, `sexpcpp`, `strutcpp` are built under `emscriptenStdenv`
+from `external/`. Squirrel and wstsound still use native flake packages until
+static wasm builds exist — expect link or wrong-arch errors; that is the next
+porting step.

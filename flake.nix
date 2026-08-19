@@ -200,9 +200,7 @@
               .
           '';
 
-          # WebAssembly (Emscripten).  Currently marked broken until static
-          # wasm builds of physfs / squirrel / wstsound / tinycmmc stack land;
-          # CMake EMSCRIPTEN path and mk/emscripten/template.html.in are ready.
+          # WebAssembly (Emscripten). CMake path ready; may fail at dep/link stage.
           # See nix/wasm.nix and PORTING.md.
           supertux-wasm = (import ./nix/wasm.nix {
             inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
@@ -213,7 +211,7 @@
           # Android (requires allowUnfree + android_sdk.accept_license)
           #   nix build .#supertux-android
           #   nix build .#android-sdl-libs
-          # Still broken until jni links full game deps from external/.
+          # Expect failures until jni links full game deps from external/.
           # ---------------------------------------------------------------
         } // (
           let
@@ -262,8 +260,7 @@
             android-sdl-libs = android.sdlAndroidLibs;
             supertux-android = apk.overrideAttrs (old: {
               meta = (old.meta or {}) // {
-                description = "SuperTux Origins Android APK (WIP)";
-                broken = true;
+                description = "SuperTux Origins Android APK (WIP — expect link errors until jni deps land)";
               };
             });
           }
