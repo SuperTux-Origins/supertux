@@ -49,7 +49,10 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../SDL/include/SDL2 \
 	$(LOCAL_PATH) \
 	$(LOCAL_PATH)/../external_includes \
+	$(LOCAL_PATH)/../external_includes/argpp \
+	$(LOCAL_PATH)/../external_includes/strut \
 	$(LOCAL_PATH)/deps \
+	$(LOCAL_PATH)/deps/argpp \
 	$(LOCAL_PATH)/deps/squirrel/include \
 	$(LOCAL_PATH)/deps/physfs/src \
 	$(LOCAL_PATH)/deps/SDL_SavePNG \

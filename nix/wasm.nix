@@ -117,7 +117,7 @@ EOFPC
           -DBUILD_TESTS=OFF \
           -DWARNINGS=OFF \
           -DWERROR=OFF \
-          ${lib.concatStringsSep " " cmakeFlags}
+          ${lib.escapeShellArgs cmakeFlags}
         cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
         cmake --install build
       '';
@@ -199,7 +199,7 @@ in
 
     # Compile-time ports: without these, emscripten's fakesdl/*.h #error on include.
     # Must be on CMAKE_C/CXX_FLAGS (every TU), not only the final link line.
-    emPortsCflags = "-sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=1 -sFULL_ES2=1";
+    # Each element is one argv; values with spaces must stay in a single string.
     cmakeFlags = [
       "-DENABLE_OPENGL=ON"
       "-DENABLE_OPENGLES2=ON"
@@ -215,8 +215,8 @@ in
       "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH"
       "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH"
       "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH"
-      "-DCMAKE_C_FLAGS=${emPortsCflags}"
-      "-DCMAKE_CXX_FLAGS=${emPortsCflags}"
+      "-DCMAKE_C_FLAGS=-sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=1 -sFULL_ES2=1"
+      "-DCMAKE_CXX_FLAGS=-sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=1 -sFULL_ES2=1"
     ] ++ modplugCmakeFlags
       ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"
@@ -236,7 +236,7 @@ in
       emcmake cmake -S . -B build \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$out \
-        ${lib.concatStringsSep " " cmakeFlags}
+        ${lib.escapeShellArgs cmakeFlags}
       cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
     '';
     buildPhase = "runHook preBuild; runHook postBuild";

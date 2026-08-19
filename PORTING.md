@@ -742,3 +742,16 @@ Emscripten `fakesdl/*.h` #error unless every TU is compiled with
 
 Do not compile upstream `SDL_ttf.c` without FreeType. Stage header + a
 minimal stub until FreeType is packaged for NDK.
+
+### WASM: cmakeFlags with spaces
+
+`-DCMAKE_C_FLAGS=-sUSE_SDL=2 -sUSE_…` must be a single argv. Use
+`lib.escapeShellArgs cmakeFlags` when expanding into the emcmake
+command line, not `concatStringsSep " "`.
+
+### Android: argpp private includes
+
+argpp sources `#include "argpp.hpp"` which lives under
+`include/argpp/`. Stage public headers into `external_includes/argpp/`
+and add that path (plus `deps/argpp` for prettyprinter.hpp) to
+`LOCAL_C_INCLUDES`.
