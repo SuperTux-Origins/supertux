@@ -18,6 +18,7 @@
 
 
 #include "util/log.hpp"
+#include <cstring>
 
 namespace {
 

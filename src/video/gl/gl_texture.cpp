@@ -19,6 +19,7 @@
 
 #include "video/glutil.hpp"
 #include "video/sdl_surface.hpp"
+#include <cstring>
 
 GLTexture::GLTexture(int width, int height, std::optional<Color> fill_color) :
   m_handle(),

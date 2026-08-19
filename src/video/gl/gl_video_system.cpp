@@ -26,6 +26,7 @@
 #include "video/glutil.hpp"
 #include "video/sdl_surface.hpp"
 #include "video/texture_manager.hpp"
+#include <cstring>
 
 GLVideoSystem::GLVideoSystem() :
   m_texture_manager(),
