@@ -143,7 +143,8 @@ let
     '';
   };
 
-    # Prebuilt SDL2 + SDL2_mixer for the app's ndk-build tree.
+    # Prebuilt SDL2 (+ optional SDL2_mixer) for the app's ndk-build tree.
+  # SuperTux uses OpenAL/wstsound — mixer is only present when sdlMixerSrc != null.
   sdlPrebuiltAndroidMk = pkgs.writeTextFile {
     name = "SDL2-prebuilt-Android.mk";
     text = ''
@@ -152,12 +153,13 @@ let
       LOCAL_MODULE := SDL2
       LOCAL_SRC_FILES := ${sdlAndroidLibs}/lib/$(TARGET_ARCH_ABI)/libSDL2.so
       include $(PREBUILT_SHARED_LIBRARY)
+    '' + (if sdlMixerSrc != null then ''
 
       include $(CLEAR_VARS)
       LOCAL_MODULE := SDL2_mixer
       LOCAL_SRC_FILES := ${sdlAndroidLibs}/lib/$(TARGET_ARCH_ABI)/libSDL2_mixer.so
       include $(PREBUILT_SHARED_LIBRARY)
-    '';
+    '' else "");
   };
 
   # ---------------------------------------------------------------

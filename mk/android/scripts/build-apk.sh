@@ -234,11 +234,11 @@ fi
 
 cp "$SDL_PREBUILT_MK" src/jni/SDL/Android.mk
 cp -r "$SDL_ANDROID_LIBS/include" src/jni/SDL/include
-# SDL2_mixer headers (SDL_mixer.h) live next to SDL headers when present.
+# SDL2_mixer is optional for SuperTux (sound is OpenAL + wstsound/modplug).
 if [ -f src/jni/SDL/include/SDL_mixer.h ] || [ -f src/jni/SDL/include/SDL2/SDL_mixer.h ]; then
   echo "SDL2_mixer headers present"
 else
-  echo "warning: SDL_mixer.h not found under SDL include — sound build may fail" >&2
+  echo "==> no SDL_mixer.h (expected when sdlMixerSrc is null; OpenAL path used)"
 fi
 
 # Game data → APK assets/ (AssetManager root).
@@ -274,15 +274,18 @@ done
 
 cp "$KEYSTORE" debug.keystore
 
-# Bake VERSION+g<rev> into PINGUS_VERSION (see jni/Android.mk).
-PINGUS_VERSION="${PINGUS_VERSION:-0.8.0-dev}"
-echo "==> PINGUS_VERSION=$PINGUS_VERSION"
+# Bake VERSION+g<rev> into the game version macro (see jni/Android.mk).
+# nix/android.mkApk exports SUPERTUX_VERSION; accept PINGUS_VERSION as alias.
+SUPERTUX_VERSION="${SUPERTUX_VERSION:-${PINGUS_VERSION:-0.6.3-dev}}"
+PINGUS_VERSION="$SUPERTUX_VERSION"
+echo "==> SUPERTUX_VERSION=$SUPERTUX_VERSION"
 
 "$NDK/ndk-build" \
   NDK_PROJECT_PATH="$PWD/src" \
   APP_BUILD_SCRIPT="$PWD/src/jni/Android.mk" \
   NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
-  PINGUS_VERSION="$PINGUS_VERSION" \
+  SUPERTUX_VERSION="$SUPERTUX_VERSION" \
+  PINGUS_VERSION="$SUPERTUX_VERSION" \
   ENABLE_ANDROID_SOUND="${ENABLE_ANDROID_SOUND:-0}" \
   -j"${NIX_BUILD_CORES:-${JOBS:-$(nproc)}}"
 
