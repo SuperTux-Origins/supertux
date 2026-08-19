@@ -273,7 +273,7 @@ in
     preBuild = ''
       export EM_CACHE="''${TMPDIR:-/tmp}/emcache-supertux"
       mkdir -p "$EM_CACHE"
-      # CMake preloads ${BUILD_DATA_DIR}@/data — fail early if the tree is missing.
+      # CMake preloads source data/ at VFS /data — fail early if the tree is missing.
       if [ ! -d data ] || [ ! -f data/credits.stxt ]; then
         echo "error: source data/ tree missing or incomplete (need data/credits.stxt)" >&2
         exit 1
