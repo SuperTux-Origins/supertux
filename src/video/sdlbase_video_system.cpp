@@ -23,6 +23,7 @@
 #include "util/log.hpp"
 
 #ifdef __EMSCRIPTEN__
+#  include <emscripten.h>
 #endif
 
 SDLBaseVideoSystem::SDLBaseVideoSystem() :
