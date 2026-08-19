@@ -67,9 +67,12 @@ bool is_directory(std::string const& path)
 void mkdir(std::string const& directory)
 {
   fs::path location = path_from_utf8(directory);
-  if (!fs::create_directory(location))
+  // create_directories: parents may be missing (e.g. Emscripten
+  // /home/web_user/.local/share/supertux-origins/ before IDBFS mount).
+  std::error_code ec;
+  if (!fs::create_directories(location, ec) && ec)
   {
-    throw std::runtime_error("failed to create directory: "  + directory);
+    throw std::runtime_error("failed to create directory: " + directory + ": " + ec.message());
   }
 }
 

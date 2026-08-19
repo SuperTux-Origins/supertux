@@ -1086,3 +1086,14 @@ NDK 26 with `-fexperimental-library` compiles `std::format` but
 vtable, destructor). Provide `mk/android/app/jni/format_error_stub.cpp`
 (picked up by Android.mk RWILDCARD).
 
+### WASM: userdir create_directory fails
+
+`FileSystem::mkdir` used `create_directory` (single level). Emscripten VFS
+lacked `/home/web_user/.local/share/` → exception on userdir setup.
+Use `create_directories` and `FS.mkdirTree` before IDBFS mount.
+
+### Android: undefined TTF_* at link
+
+Separate `SDL2_ttf_static` was not pulled into `libmain` (NDK GC). Compile
+`SDL_ttf.c` into `main` and link FreeType with `LOCAL_WHOLE_STATIC_LIBRARIES`.
+

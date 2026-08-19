@@ -322,6 +322,15 @@ void PhysfsSubsystem::find_userdir() const
 #endif
   }
 
+#ifdef __EMSCRIPTEN__
+  // Ensure parent path exists in the VFS before create_directories / IDBFS mount.
+  EM_ASM({
+    try {
+      FS.mkdirTree('/home/web_user/.local/share/supertux-origins');
+    } catch (e) {}
+  }, 0);
+#endif
+
   if (!FileSystem::is_directory(userdir))
   {
     FileSystem::mkdir(userdir);

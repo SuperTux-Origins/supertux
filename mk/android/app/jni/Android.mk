@@ -24,23 +24,13 @@ endif
 
 
 # ---------------------------------------------------------------------------
-# FreeType + SDL2_ttf (real font path; replaces sdl_ttf_stub.c when staged)
+# FreeType (static) + SDL_ttf.c compiled into libmain when staged
 # ---------------------------------------------------------------------------
 ifneq ($(wildcard $(LOCAL_PATH)/freetype/include/ft2build.h),)
   FREETYPE_SAVE_PATH := $(LOCAL_PATH)
   LOCAL_PATH := $(FREETYPE_SAVE_PATH)/freetype
   include $(FREETYPE_SAVE_PATH)/freetype_Android.mk
   LOCAL_PATH := $(FREETYPE_SAVE_PATH)
-
-  include $(CLEAR_VARS)
-  LOCAL_MODULE := SDL2_ttf_static
-  LOCAL_SRC_FILES := SDL_ttf.c
-  LOCAL_C_INCLUDES := $(LOCAL_PATH) $(LOCAL_PATH)/freetype/include
-  LOCAL_CFLAGS += -DTTF_USE_HARFBUZZ=0
-  LOCAL_STATIC_LIBRARIES := freetype
-  LOCAL_SHARED_LIBRARIES := SDL2
-  include $(BUILD_STATIC_LIBRARY)
-
   SUPERTUX_HAVE_SDL_TTF := 1
 endif
 
@@ -74,7 +64,10 @@ LOCAL_SRC_FILES := $(filter-out freetype/% %/freetype/%,$(LOCAL_SRC_FILES))
 # Real SDL_ttf is a static module; drop the stub when present.
 ifdef SUPERTUX_HAVE_SDL_TTF
 LOCAL_SRC_FILES := $(filter-out %/sdl_ttf_stub.c sdl_ttf_stub.c,$(LOCAL_SRC_FILES))
-LOCAL_SRC_FILES := $(filter-out SDL_ttf.c %/SDL_ttf.c,$(LOCAL_SRC_FILES))
+# Compile SDL_ttf.c directly into libmain (avoids NDK static-lib GC dropping TTF_*).
+LOCAL_SRC_FILES += SDL_ttf.c
+LOCAL_CFLAGS += -DTTF_USE_HARFBUZZ=0
+LOCAL_CPPFLAGS += -DTTF_USE_HARFBUZZ=0
 endif
 
 LOCAL_C_INCLUDES := \
@@ -111,14 +104,15 @@ LOCAL_SHARED_LIBRARIES := SDL2
 LOCAL_LDLIBS := -llog -landroid -lz -lGLESv2 -lEGL
 
 ifeq ($(ENABLE_ANDROID_SOUND),1)
-LOCAL_WHOLE_STATIC_LIBRARIES := openal
+LOCAL_WHOLE_STATIC_LIBRARIES += openal
 LOCAL_STATIC_LIBRARIES += modplug
 LOCAL_LDLIBS += -lOpenSLES
 endif
 
 ifdef SUPERTUX_HAVE_SDL_TTF
-LOCAL_STATIC_LIBRARIES += SDL2_ttf_static freetype
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/freetype/include
+# WHOLE: prevent --gc-sections from dropping TTF/FT objects before main refs them.
+LOCAL_WHOLE_STATIC_LIBRARIES += freetype
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/freetype/include $(LOCAL_PATH)
 endif
 
 LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library \
