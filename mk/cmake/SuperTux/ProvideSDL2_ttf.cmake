@@ -74,6 +74,8 @@ set(_sdl2_ttf_cmake_args
   -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
   -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
   -DCMAKE_INSTALL_PREFIX=${SDL2_TTF_PREFIX}
+  # Force lib/ not lib64/ so IMPORTED_LOCATION matches install layout on aarch64.
+  -DCMAKE_INSTALL_LIBDIR=lib
   -DCMAKE_BUILD_TYPE=Release
   -DSDL2TTF_SAMPLES=OFF
   -DSDL2TTF_VENDORED=ON
@@ -86,10 +88,12 @@ ExternalProject_Add(sdl2_ttf_project
   BUILD_BYPRODUCTS
     "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so"
     "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so.0"
+    "${SDL2_TTF_PREFIX}/lib64/libSDL2_ttf.so"
 )
 
 file(MAKE_DIRECTORY "${SDL2_TTF_PREFIX}/include/SDL2")
 add_library(LibSDL2_ttf SHARED IMPORTED)
+# Prefer lib/ (forced above); fall back to lib64 for older builds.
 set_target_properties(LibSDL2_ttf PROPERTIES
   IMPORTED_LOCATION "${SDL2_TTF_PREFIX}/lib/libSDL2_ttf.so"
   INTERFACE_INCLUDE_DIRECTORIES "${SDL2_TTF_PREFIX}/include/SDL2;${SDL2_TTF_PREFIX}/include")

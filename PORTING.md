@@ -725,3 +725,20 @@ even with `-std=c++20`.
 In-tree xdgcpp has `include/xdg.h` but SuperTux includes `<xdgcpp/xdg.h>`.
 CMake copies the header to `$build/xdg_inc/xdgcpp/xdg.h` and adds that
 include path. strut is exposed via `external/strutcpp/include`.
+
+### R36S: SDL2_ttf installs to lib64/
+
+On aarch64 CMake defaults `CMAKE_INSTALL_LIBDIR` to `lib64`. The imported
+`LibSDL2_ttf` target expected `lib/libSDL2_ttf.so`. Force
+`-DCMAKE_INSTALL_LIBDIR=lib` in ProvideSDL2_ttf.cmake.
+
+### WASM: -sUSE_SDL=2 must be compile flags
+
+Emscripten `fakesdl/*.h` #error unless every TU is compiled with
+`-sUSE_SDL=2` (and image/freetype/ES2 ports). Put them on
+`CMAKE_C_FLAGS` / `CMAKE_CXX_FLAGS`, not only the final link line.
+
+### Android: SDL_ttf needs FreeType
+
+Do not compile upstream `SDL_ttf.c` without FreeType. Stage header + a
+minimal stub until FreeType is packaged for NDK.

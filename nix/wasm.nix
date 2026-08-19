@@ -197,6 +197,9 @@ in
       modplugWasm
     ];
 
+    # Compile-time ports: without these, emscripten's fakesdl/*.h #error on include.
+    # Must be on CMAKE_C/CXX_FLAGS (every TU), not only the final link line.
+    emPortsCflags = "-sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=1 -sFULL_ES2=1";
     cmakeFlags = [
       "-DENABLE_OPENGL=ON"
       "-DENABLE_OPENGLES2=ON"
@@ -212,6 +215,8 @@ in
       "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH"
       "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH"
       "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH"
+      "-DCMAKE_C_FLAGS=${emPortsCflags}"
+      "-DCMAKE_CXX_FLAGS=${emPortsCflags}"
     ] ++ modplugCmakeFlags
       ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"

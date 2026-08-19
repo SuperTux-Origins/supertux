@@ -22,8 +22,13 @@
 #include <string>
 #include <vector>
 
-#include <al.h>
-#include <alc.h>
+#if defined(__EMSCRIPTEN__)
+#  include <AL/al.h>
+#  include <AL/alc.h>
+#else
+#  include <al.h>
+#  include <alc.h>
+#endif
 
 #include <wstsound/sound_manager.hpp>
 
