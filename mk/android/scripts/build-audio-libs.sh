@@ -171,18 +171,28 @@ typedef uint64_t ogg_uint64_t;
   target_include_directories(ogg PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 # --- vorbis + vorbisfile ---
+# modes/*.h and books/*.h are included as "modes/..." relative to lib/.
 file(GLOB VORBIS_LIB_SRC ${VORBIS_ROOT}/lib/*.c)
-# Exclude windows-only / unused
 list(FILTER VORBIS_LIB_SRC EXCLUDE REGEX ".*/psytune\.c$")
 list(FILTER VORBIS_LIB_SRC EXCLUDE REGEX ".*/tone\.c$")
 list(FILTER VORBIS_LIB_SRC EXCLUDE REGEX ".*/barkmel\.c$")
+# Built as separate targets below (and vorbisfile is not part of libvorbis.a).
+list(FILTER VORBIS_LIB_SRC EXCLUDE REGEX ".*/vorbisfile\.c$")
+list(FILTER VORBIS_LIB_SRC EXCLUDE REGEX ".*/vorbisenc\.c$")
 add_library(vorbis STATIC ${VORBIS_LIB_SRC})
 target_include_directories(vorbis PUBLIC ${VORBIS_ROOT}/include ${OGG_ROOT}/include)
+target_include_directories(vorbis PRIVATE ${VORBIS_ROOT}/lib)
 target_link_libraries(vorbis PUBLIC ogg)
+# Encoder is optional for playback-only, but harmless if linked.
+add_library(vorbisenc STATIC ${VORBIS_ROOT}/lib/vorbisenc.c)
+target_include_directories(vorbisenc PUBLIC ${VORBIS_ROOT}/include ${OGG_ROOT}/include)
+target_include_directories(vorbisenc PRIVATE ${VORBIS_ROOT}/lib)
+target_link_libraries(vorbisenc PUBLIC vorbis ogg)
 add_library(vorbisfile STATIC ${VORBIS_ROOT}/lib/vorbisfile.c)
 target_include_directories(vorbisfile PUBLIC ${VORBIS_ROOT}/include ${OGG_ROOT}/include)
+target_include_directories(vorbisfile PRIVATE ${VORBIS_ROOT}/lib)
 target_link_libraries(vorbisfile PUBLIC vorbis ogg)
-install(TARGETS ogg vorbis vorbisfile ARCHIVE DESTINATION lib)
+install(TARGETS ogg vorbis vorbisenc vorbisfile ARCHIVE DESTINATION lib)
 install(DIRECTORY ${OGG_ROOT}/include/ogg DESTINATION include)
 install(DIRECTORY ${VORBIS_ROOT}/include/vorbis DESTINATION include)
 EOF
