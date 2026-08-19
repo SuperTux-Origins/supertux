@@ -185,19 +185,15 @@
                     wstsound squirrel priocpp;
           }).supertux-wasm;
 
-          # R36S / ArkOS hybrid toolchain helpers.  Sysroot URL is a localhost
-          # placeholder until a permanent tarball is published (see PORTING.md).
-          # Import exposes mkSuperTuxR36s / arkosSysroot / PortMaster wrappers.
-          r36s = import ./nix/r36s.nix {
-            inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config
-              pkgsCross writeShellScript zip glm;
-          };
         };
 
         # Keep helper functions off `packages` so `nix flake check` only sees
-        # derivations (Pingus/Windstille hygiene).  Apps can call r36s.* later.
+        # derivations (Pingus/Windstille hygiene).
+        # R36S: import ./nix/r36s.nix { inherit (pkgs) lib stdenv ... glm; }
+        #   exposes mkSuperTuxR36s / arkosSysroot / PortMaster wrappers.
+        #   Sysroot URL is still a localhost placeholder (PORTING.md).
         # Android: import ./nix/android.nix { inherit pkgs; ... } once SDL
-        # source inputs and mk/android/app/ exist — see PORTS.md.
+        #   source inputs and mk/android/app/ exist — see PORTS.md / TODO.md.
       }
     );
 }

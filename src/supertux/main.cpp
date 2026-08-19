@@ -297,10 +297,18 @@ Main::init_video()
 {
   VideoSystem::current()->set_title("SuperTux " PACKAGE_VERSION);
 
-  char const* icon_fname = "images/engine/icons/supertux-256x256.png";
-
-  SDLSurfacePtr icon = SDLSurface::from_file(icon_fname);
-  VideoSystem::current()->set_icon(*icon);
+  // Window icons are unreliable on some GLES / handheld stacks (missing PNG
+  // path or unloadable surface can throw into a broken unwind). Skip on
+  // Emscripten, Android, and when SUPERTUX_R36S is defined (see PORTING.md).
+#if !defined(EMSCRIPTEN) && !defined(ANDROID) && !defined(__ANDROID__) && !defined(SUPERTUX_R36S)
+  try {
+    char const* icon_fname = "images/engine/icons/supertux-256x256.png";
+    SDLSurfacePtr icon = SDLSurface::from_file(icon_fname);
+    VideoSystem::current()->set_icon(*icon);
+  } catch (std::exception const& e) {
+    log_warning("could not set window icon: {}", e.what());
+  }
+#endif
 
   SDL_ShowCursor(g_config->custom_mouse_cursor ? 0 : 1);
 
