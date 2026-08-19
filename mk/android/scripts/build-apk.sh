@@ -85,6 +85,11 @@ for hdr in config.h version.h SDL_image.h; do
     echo "warning: missing $APP_DIR/jni/$hdr" >&2
   fi
 done
+# NDK format_error key functions missing from libc++_shared — compile in stub.
+if [ -f "$APP_DIR/jni/format_error_stub.cpp" ]; then
+  cp "$APP_DIR/jni/format_error_stub.cpp" src/jni/src/format_error_stub.cpp
+  echo "==> staged format_error_stub.cpp into jni/src/"
+fi
 # NDK also searches LOCAL_PATH parent includes; keep a copy under jni/
 mkdir -p src/jni
 for hdr in config.h version.h SDL_image.h; do

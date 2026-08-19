@@ -968,3 +968,10 @@ libstdc++ often pulls  transitively; NDK libc++ and emscripten
 do not. Any TU using  needs .
 Batch-fixed across src/ for Android and WASM.
 
+### Android: undefined format_error (linker)
+
+NDK 26 with `-fexperimental-library` compiles `std::format` but
+`libc++_shared` may lack `std::format_error` key functions (typeinfo,
+vtable, destructor). Provide `mk/android/app/jni/format_error_stub.cpp`
+(picked up by Android.mk RWILDCARD).
+
