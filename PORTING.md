@@ -1002,6 +1002,21 @@ Fix in `PhysfsSubsystem`:
 
 
 
+
+### WASM: nix run / website packaging
+
+`nix run .#supertux-wasm` failed because the derivation had no
+`bin/` mainProgram (emscripten outputs lived only under
+`share/…`). Match Pingus:
+
+- Install `supertux-origins.{html,js,wasm,data}` at `$out/`
+- `$out/bin/supertux-wasm` runs `mk/wasm/scripts/serve.sh` (local HTTP +
+  browser, no-store cache headers)
+- `meta.mainProgram = "supertux-wasm"`
+- Optional HTML shell via `-DSUPERTUX_WASM_SHELL=` (mk/wasm/shell.html)
+
+Serve env: `SUPERTUX_WASM_PORT` (default 8765), `APP_NAME`, `PKG`.
+
 ### WASM: file_packager preload path
 
 `--preload-file ${BUILD_CONFIG_DATA_DIR}@/data` pointed at

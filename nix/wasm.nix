@@ -27,6 +27,14 @@ let
   emscripten = pkgs.emscripten;
   est = pkgs.emscriptenStdenv;
 
+  # HTML shell (Pingus-style) with SuperTux branding / placeholders.
+  wasmShell = pkgs.replaceVars ../mk/wasm/shell.html {
+    versionFull = "0.6.3-wasm";
+    gitRev = "dirty";
+    sourceUrl = "https://github.com/SuperTux-Origins/supertux";
+    revUrl = "https://github.com/SuperTux-Origins/supertux";
+  };
+
   glmPrefix = pkgs.runCommand "glm-headers-wasm" { } ''
     mkdir -p $out/include $out/lib/cmake/glm
     cp -a ${pkgs.glm}/include/. $out/include/
@@ -268,6 +276,7 @@ in
       "-DSQUIRREL_SOURCE_DIR=${squirrelSrcPath}"
       "-DUSE_SYSTEM_SQUIRREL=OFF"
       "-DPROJECT_VERSION_FULL=${version}"
+      "-DSUPERTUX_WASM_SHELL=${wasmShell}"
     ];
 
     preBuild = ''
@@ -298,19 +307,62 @@ ${lib.optionalString (sdl2WasmLibs != null) ''
 
     installPhase = ''
       runHook preInstall
-      mkdir -p $out/share/supertux-origins-wasm $out/bin
-      find . -maxdepth 3 \( -name '*.html' -o -name '*.wasm' -o -name '*.js' -o -name '*.data' \) \
-        -exec cp -v {} $out/share/supertux-origins-wasm/ \; || true
-      if [ -f ${../mk/wasm/scripts/serve.sh} ]; then
-        cp ${../mk/wasm/scripts/serve.sh} $out/bin/supertux-wasm-serve
-        chmod +x $out/bin/supertux-wasm-serve
+      # Layout matches Pingus: artifacts at $out/ root so serve.sh can cd $PKG.
+      mkdir -p $out/bin
+      # cmake -B build writes supertux-origins.{html,js,wasm,data} under build/
+      for f in build/supertux-origins.html build/supertux-origins.js \
+               build/supertux-origins.wasm build/supertux-origins.data; do
+        if [ -f "$f" ]; then cp -v "$f" "$out/"; fi
+      done
+      # Fallback: any emscripten outputs nearby
+      find . -maxdepth 4 \( -name '*.html' -o -name '*.wasm' -o -name '*.js' -o -name '*.data' \) \
+        -exec cp -n -v {} "$out/" \; 2>/dev/null || true
+      ls -la "$out" || true
+      if [ ! -f "$out/supertux-origins.html" ] && ! ls "$out"/*.html >/dev/null 2>&1; then
+        echo "error: no wasm HTML output found to install" >&2
+        find . -maxdepth 4 \( -name '*.html' -o -name '*.wasm' \) 2>/dev/null || true
+        exit 1
       fi
+      # nix run .#supertux-wasm → local HTTP server + browser (Pingus pattern).
+      cat > "$out/bin/supertux-wasm" <<'WRAP'
+#!/usr/bin/env bash
+set -euo pipefail
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
+export PKG="''${PKG:-$HERE}"
+export APP_NAME="''${APP_NAME:-supertux-origins}"
+export PATH="@python@/bin:@xdg@/bin:$PATH"
+exec bash "@serve@" "$@"
+WRAP
+      substituteInPlace "$out/bin/supertux-wasm" \
+        --replace-fail '@python@' '${pkgs.python3}' \
+        --replace-fail '@xdg@' '${pkgs.xdg-utils}' \
+        --replace-fail '@serve@' '${../mk/wasm/scripts/serve.sh}'
+      chmod +x "$out/bin/supertux-wasm"
+      ln -sf supertux-wasm "$out/bin/supertux-wasm-serve"
       runHook postInstall
     '';
 
     meta = with lib; {
       description = "SuperTux (Origins) WebAssembly build";
       platforms = [ "x86_64-linux" "aarch64-linux" ];
+      mainProgram = "supertux-wasm";
     };
+  };
+
+  # Flake apps helper (Pingus mkOpenBrowserApp pattern).
+  mkOpenBrowserApp = {
+    pkg
+  , appName ? "supertux-origins"
+  , description ? "Serve and open the SuperTux wasm build in a browser"
+  }: {
+    type = "app";
+    program = toString (pkgs.writeShellScript "serve-${appName}-wasm" ''
+      set -euo pipefail
+      export PKG=${pkg}
+      export APP_NAME=${appName}
+      export PATH=${pkgs.python3}/bin:${pkgs.xdg-utils}/bin:$PATH
+      exec bash ${../mk/wasm/scripts/serve.sh} "$@"
+    '');
+    meta.description = description;
   };
 }

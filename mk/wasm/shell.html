@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
-  <title>Pingus @versionFull@</title>
+  <title>SuperTux @versionFull@</title>
   <style>
     html, body {
       margin: 0; padding: 0; height: 100%;
@@ -136,7 +136,7 @@
       return { verbose: on('verbose'), debug: on('debug') };
     })();
     if (stQuery.verbose || stQuery.debug) {
-      console.log('[pingus-shell] query flags', stQuery, 'search=', window.location.search);
+      console.log('[supertux-shell] query flags', stQuery, 'search=', window.location.search);
     }
 
     /* User data root (matches C++ System::find_userdir for Emscripten). */
@@ -384,12 +384,12 @@
       arguments: stArgv,
       preRun: [function() {
         if (stQuery.verbose || stQuery.debug) {
-          console.log('[pingus-shell] Module.arguments =', Module.arguments);
-          console.log('[pingus-shell] canvas size', Module.canvas && Module.canvas.width, Module.canvas && Module.canvas.height);
+          console.log('[supertux-shell] Module.arguments =', Module.arguments);
+          console.log('[supertux-shell] canvas size', Module.canvas && Module.canvas.width, Module.canvas && Module.canvas.height);
         }
       }],
       postRun: [function() {
-        console.log('[pingus-shell] postRun (main returned; main loop may still be active)');
+        console.log('[supertux-shell] postRun (main returned; main loop may still be active)');
         stEnableDisplayButtons(); stEnablePauseControls(); stEnableBackupButtons();
       }],
       print: function(text) {

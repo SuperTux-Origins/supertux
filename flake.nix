@@ -121,7 +121,7 @@
               strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, squirrel-src, sdl2-ttf-src, sdl2-src, sdl2-image-src }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
-      {
+      rec {
         packages = rec {
           default = supertux-origins;
 
@@ -323,6 +323,15 @@
 
 
         apps = {
+          # Serve wasm build + open browser (Pingus pattern).
+          #   nix run .#supertux-wasm
+          #   nix run .#supertux-wasm -- --debug
+          # Package also has meta.mainProgram = "supertux-wasm".
+          supertux-wasm = {
+            type = "app";
+            program = "${packages.supertux-wasm}/bin/supertux-wasm";
+            meta.description = "Serve and open SuperTux wasm in a browser";
+          };
           # adb install helper once APK builds
           # install-android-supertux = ...
         };
