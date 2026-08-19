@@ -89,14 +89,20 @@ if(EMSCRIPTEN)
   set(CMAKE_EXECUTABLE_SUFFIX .html)
   set(IS_EMSCRIPTEN_BUILD ON)
 
-  set(USE_FLAGS " -sUSE_SDL=2 -sFULL_ES2=1 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=2 -sUSE_PTHREADS=1 -sDISABLE_EXCEPTION_CATCHING=0 --preload-file ${BUILD_CONFIG_DATA_DIR} -sTOTAL_MEMORY=67108864 -sALLOW_MEMORY_GROWTH=1 -sSDL2_IMAGE_FORMATS='[\"png\",\"jpg\"]' --use-preload-plugins")
+  # Emscripten flags (aligned with Windstille/Pingus PORTING.md lessons):
+  # - FULL_ES2 + WebGL for GLES2-style client code
+  # - exceptions enabled (level load / other try-catch paths)
+  # - GROWABLE_ARRAYBUFFERS=0 avoids TextDecoder issues with resizable buffers
+  # - FORCE_FILESYSTEM + idbfs for persistent storage
+  # - preload data directory at /data
+  set(USE_FLAGS " -sUSE_SDL=2 -sFULL_ES2=1 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=2 -sUSE_PTHREADS=1 -sDISABLE_EXCEPTION_CATCHING=0 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_CONFIG_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sSDL2_IMAGE_FORMATS='[\"png\",\"jpg\"]' --use-preload-plugins")
   if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(USE_FLAGS "${USE_FLAGS} -fsanitize=undefined -sSAFE_HEAP=1 -sASSERTIONS=1 -sDEMANGLE_SUPPORT=1")
   endif()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS} -sERROR_ON_UNDEFINED_SYMBOLS=0")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS} -fexceptions -sERROR_ON_UNDEFINED_SYMBOLS=0")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS} -sERROR_ON_UNDEFINED_SYMBOLS=0")
-  set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${USE_FLAGS} -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${USE_FLAGS} -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js")
+  set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${USE_FLAGS} -fexceptions -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${USE_FLAGS} -fexceptions -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js")
 endif()
 
 # TODO: Add " OR ANDROID OR IOS" to this

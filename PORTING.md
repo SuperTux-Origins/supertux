@@ -1,0 +1,215 @@
+# Porting quirks and workarounds — SuperTux
+
+This document records **platform-specific problems** encountered while
+porting SuperTux (SuperTux-Origins) to desktop Linux, GLES2, WebAssembly,
+Android, Windows (MinGW), and R36S/ArkOS — and **what we changed** to make
+them work.
+
+High-level packaging lives in the flake and [PORTS.md](PORTS.md) (to be
+added). Open tasks are in [TODO.md](TODO.md). Recipes are adapted from
+[Pingus](https://github.com/Pingus/pingus) and
+[Windstille](https://github.com/WindstilleTeam/windstille) (`mk/`, `nix/`).
+
+See also [AGENTS.md](AGENTS.md) for project standards and the library
+overlap summary.
+
+---
+
+## Library breakdown and overlap
+
+### SuperTux (Origins / upstream)
+
+| Category        | Libraries / components |
+|-----------------|------------------------|
+| Window / input  | SDL2, SDL2_image, SDL2_ttf |
+| Graphics        | OpenGL 3.3 + GLEW (desktop); GLES2 (Android / planned handheld) |
+| Audio           | OpenAL, libogg, libvorbis |
+| Filesystem      | PhysFS |
+| Network         | libcurl (add-ons) |
+| Text / fonts    | FreeType, (libraqm / harfbuzz / fribidi for complex scripts) |
+| Math            | GLM |
+| Compression     | zlib, libpng |
+| Scripting       | squirrel (+ sqstdlib) |
+| Bundled         | tinygettext, sexp-cpp / sexpcpp, SDL_SavePNG, partio_zip, obstack |
+| Build helpers   | tinycmmc, logmich, strutcpp, priocpp, miniswig, wstsound, xdgcpp (Origins flake) |
+| Windows cross   | grumnix prebuilts: SDL2, SDL2_image, freetype, SDL2_ttf, physfs, curl, glew |
+
+### Pingus
+
+- SDL2, OpenAL, FreeType, GLM, ogg/vorbis, GLEW or GLES2
+- tinycmmc family, sexpcpp, logmich, …
+- Explicit `mk/{android,wasm,r36s}` and `nix/{android,wasm,r36s}.nix`
+- stb_image path for constrained targets
+- Same controller / EGL / hybrid-toolchain lessons as Windstille
+
+### Windstille
+
+- Full monorepo of tinycmmc-based libs: surfcpp (stb_image by default),
+  wstdisplay (desktop GL or GLES2), wstinput, wstsound (OpenAL + opus/
+  vorbis/modplug/mpg123), wstgui, argpp, geomcpp, babyxml, …
+- SDL2, GLEW/libGL or libglvnd+GLES, FreeType, GLM, squirrel
+- Identical packaging surface (flake, mk/, nix/) and documented PORTING.md
+  that this file inherits from.
+
+### Overlap and porting strategy
+
+- **High overlap**: SDL2, OpenAL, OpenGL/GLES, FreeType, GLM, zlib, squirrel,
+  sexpcpp/tinycmmc ecosystem.
+- **SuperTux extras**: PhysFS, curl, SDL2_ttf/image, richer text stack.
+- **Portable path preferred by Pingus/Windstille**: header-only stb_image
+  instead of system libjpeg/libpng on Android / R36S / wasm; explicit GLES2
+  CMake switches; GameController-first input; hybrid R36S toolchain;
+  Emscripten exception + ArrayBuffer flags.
+
+Do **not** invent a second packaging stack. Copy `mk/` and `nix/` from
+Pingus/Windstille, then adjust CMake flags, data install paths, and
+controller profiles for SuperTux.
+
+---
+
+## Shared themes (inherited from Windstille PORTING.md)
+
+### Image codecs: prefer `stb_image` on constrained targets
+
+**Problem.** Cross sysroots (ArkOS, Android NDK, Emscripten) often lack
+usable libjpeg/libpng, or shipping static wasm copies is slow and fragile.
+
+**Solution.** For Android / R36S / wasm builds of SuperTux, enable a
+stb_image path (or ensure SDL2_image is built with stb / minimal deps).
+Keep system JPEG/PNG optional for desktop. Any exported CMake config must
+not unconditionally `find_dependency(JPEG|PNG)`.
+
+### GLES vs desktop OpenGL
+
+**Problem.** Ports need OpenGL ES 2.0 / WebGL; SuperTux historically uses
+desktop OpenGL + GLEW.
+
+**Solution.** Introduce / honour `ENABLE_OPENGLES2` (already present in
+upstream SuperTux CMake) and ensure the GLES2 code path does not pull
+desktop libGL/GLEW. Target OpenGL 3.3 on desktop, GLES2 on Android/R36S,
+WebGL on wasm.
+
+### Controller input: GameController first
+
+**Problem.** Menus often listen only to DPAD buttons, not stick axes.
+R36S profiles may map D-pad to hat axes; SDL_GameController exposes DPAD
+as buttons 11–14. Duplicate JOY*/HAT events cause double steps. Deadzone 0
+fires on noise. Loading multiple controller scm files stacks bindings.
+
+**Solution.**
+
+- Profiles use **SDL_GameControllerButton** layout (A=0 … DPAD=11–14).
+- Prefer GameController; ignore raw `JOYAXIS` / `JOYBUTTON` / `JOYHAT` when
+  the instance is owned by a GameController.
+- Pure-joystick hats can synthesize DPAD button indices 11–14.
+- Stick drives movement only, not menu navigation.
+- Raise axis deadzone (e.g. 8000).
+- SDL init must include `JOYSTICK` + `GAMECONTROLLER`.
+- Do not load a secondary gamepad scm when a primary controller file is set.
+
+---
+
+## R36S / ArkOS (to implement)
+
+### Hybrid toolchain: modern GCC + old sysroot
+
+Same pattern as Windstille/Pingus:
+
+| Piece            | Source                                      |
+|------------------|---------------------------------------------|
+| Compiler         | nixpkgs cross GCC (modern)                  |
+| C++ headers      | same GCC (C++20 / format if used)           |
+| libc headers     | ArkOS sysroot only                          |
+| libstdc++.so     | ArkOS (absolute; `-nostdlib++`)             |
+| libgcc           | static from toolchain (`-static-libgcc`) or matching shared |
+| Dynamic linker   | `/lib/ld-linux-aarch64.so.1`                |
+
+Wrappers enforce include order and `--sysroot`. Do not put GCC
+`include-fixed` ahead of the sysroot (pthread / jmp_buf_tag mismatch).
+
+### C++ exceptions
+
+Match libgcc / libstdc++ ages so throw/catch works on device. Prefer
+`RelWithDebInfo` for readable on-device gdb.
+
+### EGL window creation
+
+Drop hand-tuned `SDL_GL_*` color/buffer/stencil/MSAA attributes; defaults
+work better on the handheld GLES stack.
+
+### Other
+
+- Skip fragile set_icon / texture paths that throw into broken unwind.
+- stb_image (or minimal image loader).
+- Launcher with valid SuperTux options only; force 640×480 / non-resizable
+  for the handheld profile.
+
+---
+
+## WebAssembly (Emscripten) (to implement)
+
+- FreeType may need `-lz` at final link even if ZLIB_ROOT was set at configure.
+- stb_image / minimal image path; avoid heavy static jpeg/png.
+- Exceptions: `-fexceptions -sDISABLE_EXCEPTION_CATCHING=0 -sEXCEPTION_STACK_TRACES=1`.
+- `-sGROWABLE_ARRAYBUFFERS=0` (TextDecoder vs growable buffers).
+- `-sFULL_ES2=1`, WebGL range, `-sFORCE_FILESYSTEM=1`, optional preload of data/.
+- OpenAL when sound enabled.
+
+---
+
+## Android (to implement)
+
+- NDK r27+ for solid `std::format` / modern STL if used.
+- do/while error macros must be semicolon-safe under NDK clang.
+- GLES2; stb_image or SDL2_image with limited deps.
+- Lifecycle on SDLActivity singleTask; controller mappings for touch/pad.
+
+---
+
+## Desktop Linux / flake hygiene
+
+- `packages` and `checks` must contain only derivations (no helper functions
+  or string attributes).
+- Cross packages (Windows) need correct `meta.platforms`.
+- Conditional JPEG/PNG find_dependency after any stb switch.
+
+---
+
+## Windows (MinGW)
+
+Origins already pulls many grumnix win32 packages. Prefer those over
+pulling ffmpeg-heavy openal from nixpkgs cross. Packaging: flat exe + DLLs
++ data zip. Full external graph under pkgsCross.mingwW64 remains WIP.
+
+---
+
+## Quick reference: where fixes will live
+
+| Area                    | Primary locations (to adapt)              |
+|-------------------------|-------------------------------------------|
+| stb_image / codec policy| CMakeLists / external image helpers, flake |
+| R36S toolchain + sysroot| `nix/r36s.nix`, `mk/r36s/`                |
+| R36S runtime guards     | main / video code, `RelWithDebInfo`       |
+| GL attributes           | video / OpenGL window setup               |
+| GameController / menu   | controller profiles, input code           |
+| wasm link / flags       | `mk/wasm/scripts/build-app.sh`, `nix/wasm.nix` |
+| Android NDK / APK       | `nix/android.nix`, `mk/android/`          |
+| Flake check surface     | `flake.nix` packages / checks             |
+
+---
+
+## Principles that keep working
+
+1. **Match the device ABI** (sysroot, linker, libstdc++) even if the compiler
+   is newer — then narrow the compiler if exceptions still disagree.
+2. **One input path** for pads (GameController); do not stack joystick + GC
+   events or duplicate scm profiles.
+3. **Header-only codecs** for constrained targets; keep optional system
+   JPEG/PNG for desktop.
+4. **Flake outputs that CI evaluates must be derivations**; keep functions
+   under `apps` or private `let` bindings.
+5. Prefer **clean defaults** (EGL attributes, resolution) over clever
+   platform-specific GL/window setup unless a device proves it necessary.
+
+When in doubt, compare with the corresponding Pingus or Windstille file
+under `mk/` or `nix/` and adapt rather than inventing a second stack.
