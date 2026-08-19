@@ -613,3 +613,20 @@ fails linking `sq.js` against `libsquirrel.so`. Pass
 `placeholder.cpp` now SDL_Inits, creates a window, logs display mode via
 `__android_log_print`, and stays up ~3s so logcat is readable.
 
+
+### wasm: no network for emscripten ports in nix sandbox
+
+`-sSDL2_IMAGE_FORMATS='["jpg"]'` forces a libjpeg port download at compile
+time → `Temporary failure in name resolution` under the sandbox. Use **png
+only**. Split `USE_COMPILE_FLAGS` vs `USE_LINK_FLAGS` so linker-only
+settings are not passed to every compile step.
+
+### R36S: SavePNG stub without libpng
+
+If libpng is absent from the sysroot, ProvideSavePNG installs a no-op stub
+so configure can finish (screenshots return -1).
+
+### Android: SDL_Log for placeholder
+
+logcat filter `SDL` should show `supertux:` lines; window stays open 15s.
+

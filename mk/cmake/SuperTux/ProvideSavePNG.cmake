@@ -15,7 +15,6 @@ find_package(PNG QUIET)
 find_package(ZLIB QUIET)
 
 if(NOT PNG_FOUND)
-  # R36S / constrained sysroots: FIND_ROOT may hide config packages.
   find_path(PNG_PNG_INCLUDE_DIR png.h
     PATHS
       ${CMAKE_SYSROOT}/usr/include
@@ -59,10 +58,27 @@ if(NOT ZLIB_FOUND)
   endif()
 endif()
 
+if(NOT PNG_FOUND AND SUPERTUX_R36S)
+  # Screenshots disabled until libpng is in the ArkOS sysroot.
+  message(WARNING "R36S: libpng missing — LibSavePNG is a no-op stub (screenshots disabled)")
+  file(WRITE "${CMAKE_BINARY_DIR}/savepng_stub.c"
+"#include <SDL.h>
+#include \"savepng.h\"
+int SDL_SavePNG(SDL_Surface *surface, const char *file) { (void)surface; (void)file; return -1; }
+int SDL_SavePNG_RW(SDL_Surface *surface, SDL_RWops *dst, int freedst) {
+  (void)surface; (void)dst; if (freedst) SDL_RWclose(dst); return -1;
+}
+")
+  add_library(LibSavePNG STATIC "${CMAKE_BINARY_DIR}/savepng_stub.c")
+  target_include_directories(LibSavePNG SYSTEM PUBLIC external/SDL_SavePNG)
+  target_link_libraries(LibSavePNG PUBLIC LibSDL2)
+  return()
+endif()
+
 if(NOT PNG_FOUND)
   message(FATAL_ERROR
     "Could NOT find PNG (libpng).\n"
-    "  For R36S: install libpng-dev into the ArkOS sysroot, or set PNG_LIBRARY / PNG_PNG_INCLUDE_DIR.")
+    "  For R36S: install libpng-dev into the ArkOS sysroot.")
 endif()
 
 file(GLOB SAVEPNG_SOURCES_CXX RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
