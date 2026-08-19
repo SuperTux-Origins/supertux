@@ -184,7 +184,20 @@
             inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
                     wstsound squirrel priocpp;
           }).supertux-wasm;
+
+          # R36S / ArkOS hybrid toolchain helpers.  Sysroot URL is a localhost
+          # placeholder until a permanent tarball is published (see PORTING.md).
+          # Import exposes mkSuperTuxR36s / arkosSysroot / PortMaster wrappers.
+          r36s = import ./nix/r36s.nix {
+            inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config
+              pkgsCross writeShellScript zip glm;
+          };
         };
+
+        # Keep helper functions off `packages` so `nix flake check` only sees
+        # derivations (Pingus/Windstille hygiene).  Apps can call r36s.* later.
+        # Android: import ./nix/android.nix { inherit pkgs; ... } once SDL
+        # source inputs and mk/android/app/ exist — see PORTS.md.
       }
     );
 }

@@ -77,3 +77,7 @@
 - 2026-08-19: SuperTux-specific `nix/wasm.nix` + flake `packages.supertux-wasm`
   (marked broken pending static wasm deps). build-app.sh adapted for
   SuperTux naming. Pingus wasm.nix kept as wasm-pingus-reference.nix.
+
+- 2026-08-19 (batch): mk/android + mk/r36s scaffolding from Pingus; SuperTux
+  renames in nix/android.nix and nix/r36s.nix; PORTS.md; flake exposes r36s
+  helpers (sysroot URL still placeholder); platform READMEs.

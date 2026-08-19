@@ -19,6 +19,7 @@ High-level packaging and flake outputs should mirror the structure used by
 ## Key reference documents
 
 - **PORTING.md** — platform-specific quirks, workarounds, and lessons learned
+- **PORTS.md** — high-level packaging map and flake outputs.
   while porting (image codecs, GLES vs desktop GL, controller input, R36S
   sysroot, Emscripten flags, Android NDK macros, flake check surface, etc.).
   Read this before inventing new solutions.
@@ -50,6 +51,7 @@ High-level packaging and flake outputs should mirror the structure used by
 | Windows MinGW     | OpenGL (desktop path) |
 
 ## Library overlap summary (see PORTING.md for detail)
+- **PORTS.md** — high-level packaging map and flake outputs.
 
 **Common across SuperTux / Pingus / Windstille**
 
@@ -88,6 +90,7 @@ derivations under `packages`/`checks`.
 ## Working practices
 
 1. Keep PORTING.md updated with every non-obvious fix.
+- **PORTS.md** — high-level packaging map and flake outputs.
 2. Keep TODO.md current.
 3. After each logical unit of work, produce a numbered git bundle.
 4. Compare CMake options, data install paths, and controller profiles with

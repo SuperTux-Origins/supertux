@@ -1,9 +1,26 @@
-# WebAssembly packaging
+# WebAssembly packaging (SuperTux Origins)
 
-- **`shell.html`** — Emscripten HTML shell (`{{{ SCRIPT }}}`, `@versionFull@` …).
-- **`scripts/build-sdl2.sh`**, **`build-sdl2-image.sh`**, **`build-sdl2-mixer.sh`** — static deps (project-agnostic).
-- **`scripts/build-zlib.sh`**, **`build-app.sh`**, **`serve.sh`**.
+Origins already has:
 
-Nix glue: `nix/wasm.nix`.
+- `if(EMSCRIPTEN)` USE_FLAGS in `CMakeLists.txt` (FULL_ES2, exceptions,
+  GROWABLE_ARRAYBUFFERS=0, FORCE_FILESYSTEM, preload `@/data`)
+- `mk/emscripten/template.html.in` shell
 
-Preferred: `nix build .#pingus-wasm`
+This directory adds Pingus-style helper scripts for optional offline static
+SDL builds and a simple static file server.
+
+## Primary path
+
+```bash
+nix build .#supertux-wasm
+```
+
+Uses `emscriptenStdenv` + CMake EMSCRIPTEN path. Currently marked broken
+until static wasm builds of physfs / squirrel / wstsound / tinycmmc land
+(or CMake soft-disables them under EMSCRIPTEN).
+
+## Scripts
+
+- `scripts/build-app.sh` — emcmake orchestration (defaults: `supertux-origins`)
+- `scripts/build-sdl2*.sh` / `build-zlib.sh` — offline static ports
+- `scripts/serve.sh` — local HTTP server for the HTML/JS/WASM output
