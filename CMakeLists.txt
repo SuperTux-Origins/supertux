@@ -95,18 +95,20 @@ if(EMSCRIPTEN)
   # - GROWABLE_ARRAYBUFFERS=0 avoids TextDecoder issues with resizable buffers
   # - FORCE_FILESYSTEM + idbfs for persistent storage
   # - preload data directory at /data
-    # Compile-time ports only (must not need network at compile in the nix sandbox).
-  # jpg omitted so emscripten does not fetch the libjpeg port.
-  set(USE_COMPILE_FLAGS " -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=1 -sUSE_LIBPNG=1 -sUSE_ZLIB=1 -sUSE_PTHREADS=1 -sDISABLE_EXCEPTION_CATCHING=0 -sSDL2_IMAGE_FORMATS='[\"png\"]'")
-  # Linker-only settings (preload, memory, filesystem, GLES).
-  set(USE_LINK_FLAGS " -sFULL_ES2=1 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_CONFIG_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js -fexceptions")
+    # Do NOT put -sUSE_* port flags on global CMAKE_C/CXX_FLAGS: every
+  # translation unit would trigger emscripten port downloads (zlib/libpng/
+  # freetype/…) which fail offline in the nix sandbox.
+  # Ports belong only on the final executable link line.
+  set(USE_COMPILE_FLAGS " -sDISABLE_EXCEPTION_CATCHING=0 -fexceptions")
+  set(USE_LINK_FLAGS " -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=1 -sUSE_PTHREADS=1 -sFULL_ES2=1 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_CONFIG_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sERROR_ON_UNDEFINED_SYMBOLS=0 -sSDL2_IMAGE_FORMATS='[\"png\"]' -lidbfs.js -fexceptions")
   if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(USE_COMPILE_FLAGS "${USE_COMPILE_FLAGS} -fsanitize=undefined -sSAFE_HEAP=1 -sASSERTIONS=1 -sDEMANGLE_SUPPORT=1")
   endif()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_COMPILE_FLAGS} -fexceptions")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_COMPILE_FLAGS}")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_COMPILE_FLAGS}")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_COMPILE_FLAGS} ${USE_LINK_FLAGS}")
-  set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${USE_COMPILE_FLAGS} ${USE_LINK_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_LINK_FLAGS}")
+  # Keep a copy for target_link_options on supertux-origins below.
+  set(SUPERTUX_EMSCRIPTEN_LINK_FLAGS ${USE_LINK_FLAGS})
   # Prefer in-tree / SOURCE_DIR builds for deps the emscripten ports do not provide.
   set(USE_SYSTEM_PHYSFS OFF CACHE BOOL "Use preinstalled physfs" FORCE)
   set(USE_SYSTEM_SQUIRREL OFF CACHE BOOL "Use preinstalled squirrel" FORCE)

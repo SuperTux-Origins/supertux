@@ -630,3 +630,18 @@ so configure can finish (screenshots return -1).
 
 logcat filter `SDL` should show `supertux:` lines; window stays open 15s.
 
+
+### wasm: ports only on final link (nix sandbox)
+
+Any `-sUSE_LIBPNG` / `-sUSE_ZLIB` / `-sUSE_FREETYPE` on **global**
+`CMAKE_C_FLAGS` makes every object compile try to download ports → DNS
+failure. Keep those flags on `CMAKE_EXE_LINKER_FLAGS` only. Intermediate
+targets (prio, wstsound, SavePNG stub) compile without ports.
+
+### Android: placeholder only (not the game)
+
+`mk/android/app/jni/Android.mk` uses `placeholder.cpp` when present.
+ndk-build finishes in seconds because the full `src/` tree is **not** in
+`LOCAL_SRC_FILES`. Wiring `supertux_sources.mk` + deps is the next large
+Android task.
+
