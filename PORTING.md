@@ -645,3 +645,15 @@ ndk-build finishes in seconds because the full `src/` tree is **not** in
 `LOCAL_SRC_FILES`. Wiring `supertux_sources.mk` + deps is the next large
 Android task.
 
+
+### wstsound: MPG123 / EFX / LOOPBACK (WASM + R36S)
+
+Synced SuperTux `external/wstsound` sources with Windstille so that:
+
+- `sound_file.cpp` only includes `mp3_sound_file.hpp` under `WSTSOUND_WITH_MPG123`
+- `openal_sound_source.cpp` only includes `<AL/efx.h>` under `WSTSOUND_WITH_EFX`
+- `openal_system.cpp` only includes `<alext.h>` under `WSTSOUND_WITH_LOOPBACK`
+
+CMake forces these OFF for `EMSCRIPTEN | ANDROID | SUPERTUX_R36S`. Do not
+reinvent — keep in lockstep with Windstille’s wstsound.
+

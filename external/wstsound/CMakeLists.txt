@@ -15,6 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 cmake_minimum_required(VERSION 3.15)
+if(POLICY CMP0077)
+  cmake_policy(SET CMP0077 NEW)
+endif()
 project(wstsound VERSION 0.3.0)
 
 # Prefer regular libraries over frameworks, so openal-soft is used
@@ -58,6 +61,7 @@ option(WSTSOUND_WITH_VORBIS "Decode Ogg Vorbis" ON)
 option(WSTSOUND_WITH_OPUS "Decode Opus" ON)
 option(WSTSOUND_WITH_MPG123 "Decode MP3 via mpg123" ON)
 option(WSTSOUND_WITH_EFX "OpenAL EFX effects API (not on Emscripten OpenAL)" ON)
+option(WSTSOUND_WITH_LOOPBACK "OpenAL-soft loopback device (needs alext.h)" ON)
 
 # Mobile / wasm: stock Pingus data is WAV SFX + .it/.s3m modules only.
 if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
@@ -66,6 +70,10 @@ if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
   set(WSTSOUND_WITH_OPUS OFF CACHE BOOL "Decode Opus" FORCE)
   set(WSTSOUND_WITH_MODPLUG ON CACHE BOOL "Decode module formats via libmodplug" FORCE)
   set(WSTSOUND_WITH_EFX OFF CACHE BOOL "OpenAL EFX effects API" FORCE)
+endif()
+if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
+  # Emscripten OpenAL has no alext.h; mobile/handheld builds skip loopback too.
+  set(WSTSOUND_WITH_LOOPBACK OFF CACHE BOOL "OpenAL-soft loopback device" FORCE)
 endif()
 
 if(EMSCRIPTEN)
@@ -126,8 +134,7 @@ if(NOT WSTSOUND_WITH_EFX)
   list(FILTER WSTSOUND_SOURCES EXCLUDE REGEX ".*/effect(_slot)?\\.cpp$")
   list(FILTER WSTSOUND_SOURCES EXCLUDE REGEX ".*/filter\\.cpp$")
 endif()
-if(EMSCRIPTEN)
-  # Soft-only loopback device API
+if(NOT WSTSOUND_WITH_LOOPBACK)
   list(FILTER WSTSOUND_SOURCES EXCLUDE REGEX ".*/openal_loopback_device\\.cpp$")
 endif()
 
@@ -153,6 +160,9 @@ if(WSTSOUND_WITH_MPG123)
 endif()
 if(WSTSOUND_WITH_EFX)
   target_compile_definitions(wstsound PUBLIC WSTSOUND_WITH_EFX=1)
+endif()
+if(WSTSOUND_WITH_LOOPBACK)
+  target_compile_definitions(wstsound PUBLIC WSTSOUND_WITH_LOOPBACK=1)
 endif()
 
 if(OPENAL_INCLUDE_DIR)
