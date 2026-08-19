@@ -923,3 +923,18 @@ NDK r26 libc++ still rejects `std::make_format_args(UID&)` even with
 now log `m_uid.get_value()` (uint32_t). The formatter remains for desktop
 paths and inherits `formatter<uint32_t>`.
 
+### R36S: broken texture paths (`file.sprite/image.png`)
+
+Symptom: hundreds of
+`Couldn't load texture '/images/.../foo.sprite/bar.png': not found`
+(and `tiles.stts/...`). The game runs with dummy textures.
+
+Cause: `prio::ReaderDocument::get_directory()` used
+`std::filesystem::path(filename).parent_path()`. Under the R36S ABI mix
+(GCC 15 headers, `_GLIBCXX_USE_CXX11_ABI=0`, ArkOS libstdc++ ~9),
+`parent_path` can fail to strip the leaf, so joins become
+`dir/file.sprite/image.png`. Not a GLES2 NPOT/mipmap issue.
+
+Fix: string-based dirname in `get_directory()` (same approach as
+`FileSystem::dirname`).
+

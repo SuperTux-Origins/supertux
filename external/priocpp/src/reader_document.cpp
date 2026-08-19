@@ -225,10 +225,19 @@ ReaderDocument::get_directory() const
   if (!m_impl) { return {}; }
 
   if (!m_impl->get_filename()) {
-    return std::filesystem::path("/").string();
-  } else {
-    return std::filesystem::path(*m_impl->get_filename()).parent_path().string();
+    return "/";
   }
+
+  // Pure string dirname — do not use std::filesystem::path::parent_path().
+  // On R36S (GCC 15 headers + _GLIBCXX_USE_CXX11_ABI=0 + ArkOS libstdc++),
+  // path::parent_path can fail to strip the filename, producing broken joins
+  // like "images/engine/menu/mousecursor.sprite/mousecursor.png".
+  std::string const& filename = *m_impl->get_filename();
+  auto p = filename.find_last_of("/\\");
+  if (p == std::string::npos) {
+    return ".";
+  }
+  return filename.substr(0, p);
 }
 
 } // namespace prio
