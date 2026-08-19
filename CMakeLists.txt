@@ -426,3 +426,10 @@ mark_as_advanced(
   )
 
 # EOF #
+
+# R36S: weak _dl_find_object for glibc < 2.35 when using static libgcc_eh.
+if(SUPERTUX_R36S)
+  if(TARGET supertux-origins)
+    target_sources(supertux-origins PRIVATE "${CMAKE_SOURCE_DIR}/mk/r36s/dl_find_object_stub.c")
+  endif()
+endif()

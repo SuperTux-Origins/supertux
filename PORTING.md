@@ -782,3 +782,16 @@ SDL release-2.32.10.zip at eval/build of that derivation; preBuild copies it
 into `$EM_CACHE/ports/` and `$EM_CACHE/downloads/` so emscripten ports/sdl2.py
 does not call urlopen.
 
+
+### R36S: static libstdc++ + _dl_find_object stub
+
+Compiling with GCC 15 libstdc++ headers emits references to symbols not present
+in ArkOS's older libstdc++.so (`std::to_chars` for floats via std::format,
+`std::__throw_bad_array_new_length`, `__cxa_call_terminate`). Linking the
+sysroot libstdc++ therefore fails at the final executable link.
+
+Fix: `-static-libstdc++ -static-libgcc` from the cross toolchain so those
+symbols come from GCC 15 archives. Static libgcc_eh still wants `_dl_find_object`
+(glibc 2.35+); provide a weak stub in `mk/r36s/dl_find_object_stub.c` that
+returns -1 (fallback unwind path).
+

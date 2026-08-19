@@ -128,15 +128,14 @@ let
   # That avoids __attr_dealloc_free errors from mixing glibc 2.30 cdefs with
   # modern stdlib.h, and keeps #include_next <stdlib.h> working.
   #
-  # Link is different: GCC 15's libstdc++/libgcc_s need GLIBC_2.32–2.38, but
-  # ArkOS is ~2.30. g++ also injects an absolute path to its own libstdc++.so,
-  # so -L order alone is ignored. We therefore:
-  #   - compile with modern headers + _GLIBCXX_USE_CXX11_ABI=0 (old ABI)
-  #   - -nostdlib++ so g++ does not force its libstdc++; link sysroot -lstdc++
-  #   - -static-libgcc (libgcc.a / libgcc_eh.a have no versioned GLIBC_2.3x deps)
-  #   - -fexceptions: SuperTux/tinygettext/prio use try/catch (unlike SuperTux M1)
-  #   - --allow-shlib-undefined for DT_NEEDED of sysroot libs (e.g. opusfile
-  #     from SDL2_mixer) that exist on the device at runtime
+  # Link: GCC 15 headers need matching libstdc++ symbols (to_chars,
+  # __throw_bad_array_new_length, __cxa_call_terminate). ArkOS libstdc++.so is
+  # too old, so we statically link GCC 15's libstdc++ and libgcc:
+  #   - compile with modern headers + _GLIBCXX_USE_CXX11_ABI=0
+  #   - -static-libstdc++ / -static-libgcc (no shared GLIBC_2.35 from libgcc_s)
+  #   - weak _dl_find_object stub (mk/r36s/dl_find_object_stub.c) for glibc < 2.35
+  #   - -fexceptions for try/catch in SuperTux / tinygettext / prio
+  #   - --allow-shlib-undefined for DT_NEEDED of sysroot libs at runtime
   mkWrappers = sysroot: let
     gcc = crossCc.cc;
     tp = lib.removeSuffix "-" targetPrefix; # aarch64-unknown-linux-gnu
@@ -181,10 +180,8 @@ let
       -march=armv8-a \
       -mtune=cortex-a35 \
     '';
-    # Link flags: sysroot first for libc/SDL; add modern gcc -L so
-    # -static-libgcc can find libgcc.a / libgcc_eh.a (stdc++ is still the
-    # absolute sysroot path in the cxx wrapper — not -lstdc++).
-    # Explicit dynamic linker so the binary runs on ArkOS (not /nix/store/.../ld).
+    # Link flags: sysroot first for libc/SDL; modern gcc -L for static
+    # libgcc / libstdc++ archives. Explicit dynamic linker for ArkOS.
     commonLink = ''
       --sysroot=${sysroot} \
       -Wl,--sysroot=${sysroot} \
@@ -199,6 +196,7 @@ let
       -L${libgccLib} \
       -L${libgccLibTarget} \
       -static-libgcc \
+      -static-libstdc++ \
       -Wl,-Bdynamic \
       -l:libpthread.so.0 \
       -lm \
@@ -250,21 +248,9 @@ let
           ${commonCompileCxx} \
           "$@"
       else
-        stdcpp=
-        for cand in \
-          "${libdir}/libstdc++.so" \
-          "${libdir}/libstdc++.so.6" \
-          "${sysroot}/usr/lib/libstdc++.so" \
-          "${sysroot}/usr/lib/libstdc++.so.6" \
-          "${sysroot}/lib/aarch64-linux-gnu/libstdc++.so" \
-          "${sysroot}/lib/aarch64-linux-gnu/libstdc++.so.6"
-        do
-          if [ -e "$cand" ]; then stdcpp="$cand"; break; fi
-        done
-        if [ -z "$stdcpp" ]; then
-          echo "aarch64-arkos-g++: no libstdc++ in sysroot" >&2
-          exit 1
-        fi
+        # Static libstdc++ from GCC 15 (via commonLink -static-libstdc++).
+        # Do not link ArkOS libstdc++.so — headers are GCC 15 and need matching
+        # symbols (to_chars, __throw_bad_array_new_length, __cxa_call_terminate).
         sdl2=
         sdl2image=
         for cand in \
@@ -319,10 +305,9 @@ let
         exec ${gcc}/bin/${targetPrefix}g++ \
           -B${crossCc.bintools}/bin \
           ${commonCompileCxx} \
-          -nostdlib++ \
           ${commonLink} \
           "$@" \
-          -Wl,--no-as-needed "$stdcpp" "$sdl2image" "$sdl2" $extra_audio \
+          -Wl,--no-as-needed "$sdl2image" "$sdl2" $extra_audio \
           -Wl,-Bdynamic -l:libpthread.so.0 -lm \
           -Wl,--as-needed
       fi
