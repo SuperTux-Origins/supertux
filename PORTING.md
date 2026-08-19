@@ -980,6 +980,15 @@ Fix in `PhysfsSubsystem`:
   `images/`, `levels/`, … without an `assets/` prefix.
 - `build-apk.sh` packs `assets/data.zip` from the data tree for that mount.
 
+
+### WASM: EXTRA_EXPORTED_RUNTIME_METHODS removed
+
+Modern emscripten rejects `-sEXTRA_EXPORTED_RUNTIME_METHODS=...` ("No longer
+supported, use EXPORTED_RUNTIME_METHODS"). Keep only
+`-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']` (and EXPORTED_FUNCTIONS) on the
+`supertux-origins` link line in CMakeLists.txt. Prefer `SHELL:-s...` form so
+CMake does not mangle the brackets.
+
 ### WASM / cross: squirrel ExternalProject multiarch path
 
 `ProvideSquirrel.cmake` used `CMAKE_LIBRARY_ARCHITECTURE` (e.g.

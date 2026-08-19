@@ -318,7 +318,10 @@ target_link_libraries(supertux-origins supertux-origins_lib)
 set_target_properties(supertux-origins_lib PROPERTIES OUTPUT_NAME supertux-origins_lib)
 set_target_properties(supertux-origins_lib PROPERTIES COMPILE_FLAGS "${SUPERTUX-ORIGINS_EXTRA_WARNING_FLAGS}")
 if(EMSCRIPTEN)
-  target_link_options(supertux-origins PUBLIC -sEXPORTED_FUNCTIONS=['_main','_set_resolution','_save_config','_onDownloadProgress','_onDownloadFinished','_onDownloadError','_onDownloadAborted','_getExceptionMessage'] PUBLIC -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] PUBLIC -sEXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'])
+  # EXTRA_EXPORTED_RUNTIME_METHODS was removed in modern emscripten; use EXPORTED_RUNTIME_METHODS only.
+  target_link_options(supertux-origins PUBLIC
+    "SHELL:-sEXPORTED_FUNCTIONS=['_main','_set_resolution','_save_config','_onDownloadProgress','_onDownloadFinished','_onDownloadError','_onDownloadAborted','_getExceptionMessage']"
+    "SHELL:-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']")
 endif()
 
 if(WIN32 AND NOT VCPKG_BUILD AND NOT MINGW)
