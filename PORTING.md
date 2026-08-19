@@ -354,3 +354,18 @@ Additional formatters (scripting / math / input):
 `src/util/stream_format.hpp` provides `supertux::stream_str(value)` for types
 that only implement `operator<<` and are not yet given a `std::formatter`.
 Use at call sites as a last resort: `log_info("{}", stream_str(x))`.
+
+### strtok / glibc headers (GCC 15)
+
+`squirrel_virtual_machine.cpp` must `#include <cstring>` for `strtok`.
+Newer libstdc++ / C++ modes no longer pull it in transitively.
+
+### Android flake outputs
+
+```
+nix build .#supertux-android   # APK (meta.broken until full jni link)
+nix build .#android-sdl-libs   # SDL2 .so prebuilts only
+```
+
+Requires `nixpkgs.config.allowUnfree` and `android_sdk.accept_license = true`.
+Debug keystore: `mk/android/keystore/debug.keystore` (store/key pass: android).

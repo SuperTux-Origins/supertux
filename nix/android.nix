@@ -45,7 +45,7 @@ let
       APP_ABI := ${targetAbisStr}
       APP_PLATFORM := android-${packagePlatform}
       # C++23 (std::format, std::print when available). Needs a recent NDK libc++.
-      APP_CPPFLAGS := -std=c++23 -D_LIBCPP_ENABLE_EXPERIMENTAL=1
+      APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -DUSE_OPENGLES2 -DANDROID
     '';
   };
 
@@ -184,8 +184,8 @@ let
     # Optional game data directory packaged as APK assets.
     gameDataDir ? null,
     stbImageH ? null,
-    # Full version for PINGUS_VERSION (e.g. 0.8.0-dev+gabc1234).
-    gameVersion ? "0.8.0-dev",
+    # Full version for SUPERTUX_VERSION (e.g. 0.8.0-dev+gabc1234).
+    gameVersion ? "0.6.3-dev",
   }:
     pkgs.stdenvNoCC.mkDerivation {
       pname = appName;
@@ -205,7 +205,7 @@ let
         SDL_ANDROID_LIBS = sdlAndroidLibs;
         AUDIO_ANDROID_LIBS = audioAndroidLibs;
         KEYSTORE = "${keystore}";
-        PINGUS_VERSION = gameVersion;
+        SUPERTUX_VERSION = gameVersion;
       } // pkgs.lib.optionalAttrs (gameSrcDir != null) {
         GAME_SRC_DIR = "${gameSrcDir}";
       } // (

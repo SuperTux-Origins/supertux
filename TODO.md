@@ -98,3 +98,6 @@
   flake input.
 
 - 2026-08-19: Removed libfmt; use std::format + format_rt + print polyfill.
+
+- 2026-08-19: strtok cstring fix; flake outputs supertux-android + android-sdl-libs
+  (broken until jni links external deps).

@@ -91,12 +91,22 @@
       flake = false;
     };
 
+    # Android: SDL2 sources for ndk-build prebuilts
+    sdl2-src = {
+      url = "https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz";
+      flake = false;
+    };
+    sdl2-image-src = {
+      url = "https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.2/SDL2_image-2.8.2.tar.gz";
+      flake = false;
+    };
+
   };
 
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, curl-win32, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
-              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src }:
+              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, sdl2-src, sdl2-image-src }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {
@@ -188,15 +198,70 @@
                     wstsound squirrel physfs-src;
           }).supertux-wasm;
 
-        };
+          # ---------------------------------------------------------------
+          # Android (requires allowUnfree + android_sdk.accept_license)
+          #   nix build .#supertux-android
+          #   nix build .#android-sdl-libs
+          # Still broken until jni links full game deps from external/.
+          # ---------------------------------------------------------------
+        } // (
+          let
+            androidPkgs = import nixpkgs {
+              system = pkgs.stdenv.hostPlatform.system;
+              config.allowUnfree = true;
+              config.android_sdk.accept_license = true;
+            };
+            buildToolsVersion = "34.0.0";
+            packagePlatform = "22";
+            compilePlatform = "34";
+            targetAbis = [ "armeabi-v7a" "arm64-v8a" ];
+            androidSdk = (androidPkgs.androidenv.composeAndroidPackages {
+              platformVersions = [ packagePlatform compilePlatform ];
+              buildToolsVersions = [ buildToolsVersion ];
+              includeNDK = true;
+              ndkVersion = "26.1.10909125";
+            }).androidsdk;
+            android = import ./nix/android.nix {
+              pkgs = androidPkgs;
+              sdlSrc = sdl2-src;
+              sdlVersion = "2.30.3";
+              sdlMixerSrc = null;
+              sdlMixerVersion = "2.8.0";
+              libxmpSrc = null;
+              inherit androidSdk buildToolsVersion packagePlatform compilePlatform targetAbis;
+            };
+            androidApkName = "supertux-origins.apk";
+            stbImageH = androidPkgs.fetchurl {
+              url = "https://raw.githubusercontent.com/nothings/stb/refs/heads/master/stb_image.h";
+              sha256 = "sha256-WUwv411JSItDgtv67I+YNm3vyoGdkWrJW+zz519CALM=";
+            };
+            apk = android.mkApk {
+              appName = "supertux-origins";
+              appDir = ./mk/android/app;
+              outApkName = androidApkName;
+              keystore = ./mk/android/keystore/debug.keystore;
+              gameSrcDir = ./src;
+              gameExternalDir = ./external;
+              glmIncludeDir = "${androidPkgs.glm}/include";
+              gameDataDir = ./data;
+              inherit stbImageH;
+              gameVersion = "0.6.3-dev";
+            };
+          in {
+            android-sdl-libs = android.sdlAndroidLibs;
+            supertux-android = apk.overrideAttrs (old: {
+              meta = (old.meta or {}) // {
+                description = "SuperTux Origins Android APK (WIP)";
+                broken = true;
+              };
+            });
+          }
+        );
 
-        # Keep helper functions off `packages` so `nix flake check` only sees
-        # derivations (Pingus/Windstille hygiene).
-        # R36S: import ./nix/r36s.nix { inherit (pkgs) lib stdenv ... glm; }
-        #   exposes mkSuperTuxR36s / arkosSysroot / PortMaster wrappers.
-        #   Sysroot URL is still a localhost placeholder (PORTING.md).
-        # Android: import ./nix/android.nix { inherit pkgs; ... } once SDL
-        #   source inputs and mk/android/app/ exist — see PORTS.md / TODO.md.
+        apps = {
+          # adb install helper once APK builds
+          # install-android-supertux = ...
+        };
       }
     );
 }

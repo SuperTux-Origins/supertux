@@ -20,6 +20,7 @@
 #include <sqstdblob.h>
 #include <sqstdmath.h>
 #include <sqstdstring.h>
+#include <cstring>
 #include <stdarg.h>
 
 #include "physfs/ifile_stream.hpp"
