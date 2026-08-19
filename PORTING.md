@@ -667,3 +667,9 @@ reinvent — keep in lockstep with Windstille’s wstsound.
    a leaked `-DWSTSOUND_WITH_FOO=0` still disables the include.
 
 Look for `wstsound codecs: ... MPG123=OFF EFX=OFF` in the configure log.
+
+### Android: build-apk.sh aborted at source listing
+
+`set -euo pipefail` + `find … | head -20` → find gets SIGPIPE and exits
+non-zero → whole script aborts before `ndk-build`. Never pipe find into
+head under pipefail; use `wc -l` only (or `head … || true`).

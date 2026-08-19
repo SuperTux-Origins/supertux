@@ -42,10 +42,7 @@ resolve_ndk() {
       return
     fi
   fi
-  echo "error: no echo "==> Counting staged sources under jni/src..."
-find src/jni/src -name '*.cpp' -o -name '*.c' | wc -l
-find src/jni/src -name '*.cpp' | head -20
-ndk-build under ANDROID_HOME=$ANDROID_HOME (tried ndk-bundle and ndk/*)" >&2
+  echo "error: no ndk-build under ANDROID_HOME=$ANDROID_HOME (tried ndk-bundle and ndk/*)" >&2
   exit 1
 }
 
@@ -133,10 +130,7 @@ echo "==> staged external headers into jni/external_includes"
 # to it even on Android. Always drop the Windows shim from the stage tree.
 rm -f src/jni/external_includes/tinygettext/dirent.h
 
-# Compile external .cpp into libmain (echo "==> Counting staged sources under jni/src..."
-find src/jni/src -name '*.cpp' -o -name '*.c' | wc -l
-find src/jni/src -name '*.cpp' | head -20
-ndk-build RWILDCARD under jni/src/).
+# Compile external .cpp into libmain (ndk-build RWILDCARD under jni/src/).
 # Skip tests/benchmarks; skip priocpp JSON (no jsoncpp on Android).
 mkdir -p src/jni/src/deps
 stage_lib_src() {
@@ -363,6 +357,8 @@ cp "$KEYSTORE" debug.keystore
 SUPERTUX_VERSION="${SUPERTUX_VERSION:-${PINGUS_VERSION:-0.6.3-dev}}"
 PINGUS_VERSION="$SUPERTUX_VERSION"
 echo "==> SUPERTUX_VERSION=$SUPERTUX_VERSION"
+# Count only — never pipe find into head under set -o pipefail (SIGPIPE aborts).
+echo "==> staged C/C++ sources: $(find src/jni/src \( -name '*.cpp' -o -name '*.c' \) | wc -l)"
 
 "$NDK/ndk-build" \
   NDK_PROJECT_PATH="$PWD/src" \
