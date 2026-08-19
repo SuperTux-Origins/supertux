@@ -95,6 +95,13 @@
     priocpp.inputs.tinycmmc.follows = "tinycmmc";
     priocpp.inputs.logmich.follows = "logmich";
     priocpp.inputs.sexpcpp.follows = "sexpcpp";
+
+    # PhysFS sources for EMSCRIPTEN / Android / R36S when system PhysFS is absent
+    # and external/physfs submodule is not checked out.
+    physfs-src = {
+      url = "https://github.com/icculus/physfs/archive/refs/tags/release-3.2.0.tar.gz";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, flake-utils,

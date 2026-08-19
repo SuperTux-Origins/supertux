@@ -246,3 +246,28 @@ under `mk/` or `nix/` and adapt rather than inventing a second stack.
 - `mk/android/app/` has AndroidManifest (SDLActivity singleTask, GLES2),
   jni/Android.mk + Application.mk + placeholder main. Full source list and
   static deps still TODO.
+
+### Controller input (Origins status)
+
+SuperTux already matches the Windstille/Pingus GameController-first policy:
+
+- `JoystickConfig::m_use_game_controller` defaults to **true**
+- When GC mode is on, raw `JOYAXIS` / `JOYBUTTON` / `JOYHAT` are ignored
+- Axis deadzone is **8000** in both `GameControllerManager` and `JoystickConfig`
+- SDL init includes `SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER`
+
+No separate `*.scm` controller profiles (unlike Windstille); bindings live in
+the user config / in-game joystick menu.
+
+### PhysFS on constrained targets
+
+- Prefer system PhysFS with `PHYSFS_getPrefDir` on desktop.
+- Under EMSCRIPTEN / Android, system PhysFS is skipped; build from
+  `external/physfs` or `-DPHYSFS_SOURCE_DIR=…`.
+- Flake input `physfs-src` (icculus physfs 3.2.0) is available for packaging
+  to pass as `PHYSFS_SOURCE_DIR` on cross builds.
+
+### OpenGL ES on Android
+
+- `ProvideOpenGL.cmake` does not `pkg_check_modules(glesv2)` on Android /
+  Emscripten (SDL/NDK provide GLES). Desktop GLES2 and R36S still use pkg-config.

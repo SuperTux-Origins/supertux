@@ -85,3 +85,7 @@
 - 2026-08-19 (batch 2): SUPERTUX_R36S cmake + 640x480 defaults; Android app
   skeleton; EMSCRIPTEN LibSDL2_ttf INTERFACE; SuperTux.sh launcher; r36s
   cmakeFlags include SUPERTUX_R36S.
+
+- 2026-08-19 (batch 3): ProvidePhysfs PHYSFS_SOURCE_DIR + skip system on
+  EMSCRIPTEN/Android; ProvideOpenGL skip glesv2 pkg on Android; physfs-src
+  flake input; document controller defaults (already GC-first, deadzone 8000).
