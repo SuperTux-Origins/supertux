@@ -294,3 +294,15 @@ Under `if(EMSCRIPTEN)`, CMake forces:
 
 so packaging must supply `PHYSFS_SOURCE_DIR` / `SQUIRREL_SOURCE_DIR` /
 `FMT_SOURCE_DIR` (flake inputs `physfs-src`, `fmt-src`).
+
+### libfmt → std::format
+
+fmt was removed in favour of C++20 `std::format` / `std::vformat`:
+
+- `src/util/format.hpp` — `supertux::format` (compile-time) and
+  `supertux::format_rt` (runtime / gettext strings)
+- `src/util/print.hpp` — C++23 `std::print` or format+fwrite polyfill (Pingus)
+- R36S: `mk/r36s/cxxabi_shim.cpp` provides floating `std::to_chars` used by
+  libstdc++ `std::format` on older ArkOS libstdc++ (from Pingus)
+
+Require C++20 (`<format>`). NDK r27+ and modern desktop toolchains OK.

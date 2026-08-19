@@ -106,7 +106,6 @@ if(EMSCRIPTEN)
   # Prefer in-tree / SOURCE_DIR builds for deps the emscripten ports do not provide.
   set(USE_SYSTEM_PHYSFS OFF CACHE BOOL "Use preinstalled physfs" FORCE)
   set(USE_SYSTEM_SQUIRREL OFF CACHE BOOL "Use preinstalled squirrel" FORCE)
-  set(USE_SYSTEM_FMT OFF CACHE BOOL "Use preinstalled fmt" FORCE)
 endif()
 
 # TODO: Add " OR ANDROID OR IOS" to this
@@ -186,7 +185,6 @@ build_dependencies()
 
 ## Add lots of dependencies to compiler switches
 include(SuperTux/ProvideGlm)
-include(SuperTux/ProvideFmt)
 include(SuperTux/ProvideSDL2)
 # include(SuperTux/ProvideOpenAL)
 include(SuperTux/ProvidePhysfs)
@@ -287,7 +285,6 @@ target_link_libraries(supertux-origins_lib PUBLIC LibSqstdlib)
 target_link_libraries(supertux-origins_lib PUBLIC LibSexp)
 target_link_libraries(supertux-origins_lib PUBLIC LibSavePNG)
 target_link_libraries(supertux-origins_lib PUBLIC LibGlm)
-target_link_libraries(supertux-origins_lib PUBLIC LibFmt)
 target_link_libraries(supertux-origins_lib PUBLIC LibPhysfs)
 target_link_libraries(supertux-origins_lib PUBLIC wstsound::wstsound)
 target_link_libraries(supertux-origins_lib PUBLIC prio::prio)

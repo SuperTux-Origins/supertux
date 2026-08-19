@@ -10,7 +10,7 @@
 , SDL2_image
 , SDL2_ttf
 , curl
-, fmt_8
+
 , freetype
 , glew
 , glm
@@ -78,7 +78,6 @@ EOF
        ln -sfv ${SDL2_ttf}/bin/*.dll $out/bin/
        ln -sfv ${SDL2}/bin/*.dll $out/bin/
        ln -sfv ${curl}/bin/*.dll $out/bin/
-       ln -sfv ${fmt_8}/bin/*.dll $out/bin/
        ln -sfv ${glew}/bin/*.dll $out/bin/
        ln -sfv ${physfs}/bin/*.dll $out/bin/
        ln -sfv ${squirrel}/bin/*.dll $out/bin/
@@ -99,7 +98,6 @@ EOF
     SDL2_image
     SDL2_ttf
     curl
-    fmt_8
     glew
     glm
     libpng
