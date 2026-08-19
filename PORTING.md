@@ -1163,3 +1163,14 @@ adds `-lvorbisfile -lvorbis -logg` so static archives resolve under
 Generated `config_types.h` must define `ogg_uint64_t` (and the usual
 int16/32/64 types). Missing `ogg_uint64_t` breaks `framing.c` on NDK.
 
+### WASM TTF_GetError + win32 packaging (bundle 018)
+
+- **TTF_GetError**: real SDL_ttf defines it as `SDL_GetError` macro. Putting
+  `mk/emscripten/SDL_ttf.h` on the global include path made the compiler emit
+  calls to a non-existent `TTF_GetError` symbol. Stub header moved to
+  `SDL_ttf_stub.h`; only the offline stub target exposes a shim `SDL_ttf.h`.
+- **win32**: `supertux-origins-win32` must not package the native Linux build.
+  Flat package now depends on a MinGW cross build (`supertux-origins-mingw64`).
+  Marked `meta.broken` until the full Windows dep graph (sexpcpp/wstsound/…)
+  links cleanly — better than shipping a Linux binary renamed as `.exe`.
+

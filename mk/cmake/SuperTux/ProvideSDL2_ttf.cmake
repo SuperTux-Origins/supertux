@@ -70,8 +70,15 @@ if(EMSCRIPTEN)
   endif()
 
   message(STATUS "Emscripten: offline SDL_ttf stub (need SDL2_TTF_SOURCE_DIR + FreeType)")
+  # Publish as SDL_ttf.h so #include <SDL_ttf.h> works without shadowing real SDL_ttf.
+  configure_file(
+    "${CMAKE_SOURCE_DIR}/mk/emscripten/SDL_ttf_stub.h"
+    "${CMAKE_BINARY_DIR}/supertux_sdl_ttf_stub/SDL_ttf.h"
+    COPYONLY)
   add_library(LibSDL2_ttf STATIC "${CMAKE_SOURCE_DIR}/mk/emscripten/sdl_ttf_stub.c")
-  target_include_directories(LibSDL2_ttf PUBLIC "${CMAKE_SOURCE_DIR}/mk/emscripten")
+  target_include_directories(LibSDL2_ttf PUBLIC
+    "${CMAKE_BINARY_DIR}/supertux_sdl_ttf_stub"
+    "${CMAKE_SOURCE_DIR}/mk/emscripten")
   if(TARGET LibSDL2)
     target_link_libraries(LibSDL2_ttf PUBLIC LibSDL2)
   endif()

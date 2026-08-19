@@ -308,7 +308,9 @@ add_library(supertux-origins_c OBJECT ${SUPERTUX_SOURCES_C})
 add_library(supertux-origins_lib STATIC ${CMAKE_BINARY_DIR}/version.h ${SUPERTUX_SOURCES_CXX} ${SUPERTUX_RESOURCES} $<TARGET_OBJECTS:supertux-origins_c>)
 target_include_directories(supertux-origins_lib PUBLIC ${CMAKE_BINARY_DIR} src/)
 if(EMSCRIPTEN)
-  # Prefer offline stubs over emscripten fakesdl that require -sUSE_SDL_IMAGE.
+  # Prefer offline image stub over emscripten fakesdl (-sUSE_SDL_IMAGE).
+  # Do not put mk/emscripten ahead of real SDL_ttf headers: SDL_ttf.h there is
+  # only for the offline stub library. Real LibSDL2_ttf PUBLIC includes win.
   target_include_directories(supertux-origins_lib PUBLIC ${CMAKE_SOURCE_DIR}/mk/emscripten)
   if(NOT TARGET LibSDL2_image_stub)
     add_library(LibSDL2_image_stub STATIC ${CMAKE_SOURCE_DIR}/mk/emscripten/sdl_image_stub.c)

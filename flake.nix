@@ -195,27 +195,78 @@
             gtest = pkgs.gtest;
           };
 
-          supertux-origins-win32 = pkgs.runCommand "supertux-origins-win32" {} ''
-            mkdir -p $out
-            mkdir -p $out/data/
+          # Windows packages require a MinGW cross build, not the native Linux package.
+          # When evaluating on Linux, build with pkgsCross.mingwW64 (or mingw32).
+          # When already on Windows, the native package is the Windows binary.
+          supertux-origins-mingw64 =
+            if pkgs.stdenv.hostPlatform.isWindows then
+              supertux-origins
+            else
+              let
+                pkgsW = pkgs.pkgsCross.mingwW64;
+              in
+              # Re-enter this flake's package set for the mingw64 system when possible;
+              # fallback: callPackage with cross pkgs (deps must be Windows-capable).
+              (pkgsW.callPackage ./supertux-origins.nix {
+                inherit self;
+                SDL2_ttf = SDL2_ttf-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
+                           SDL2_ttf-win32.packages.x86_64-linux.default;
+                sexpcpp = sexpcpp-pkg; # may still be host — WIP; prefer win-capable inputs
+                squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
+                tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
+                strutcpp = strutcpp-pkg;
+                miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
+                wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
+                priocpp = priocpp-pkg;
+                logmich = logmich-pkg;
+                physfs = physfs-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
+                         physfs-win32.packages.x86_64-linux.default;
+                curl = curl-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
+                       curl-win32.packages.x86_64-linux.default;
+                glew = glew-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
+                       glew-win32.packages.x86_64-linux.default;
+                glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
+                SDL2 = SDL2-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
+                       SDL2-win32.packages.x86_64-linux.default;
+                SDL2_image = SDL2_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
+                             SDL2_image-win32.packages.x86_64-linux.default;
+                xdgcpp = null;
+                mcfgthreads = pkgsW.windows.mcfgthreads or pkgs.windows.mcfgthreads;
+                gtest = null;
+              });
 
-            cp --verbose --recursive ${supertux-origins}/bin/supertux-origins.exe $out/
-            cp --verbose --recursive --dereference --no-preserve=all ${supertux-origins}/bin/*.dll $out/
-            cp --verbose --recursive ${supertux-origins}/data/. $out/data/
+          # Flat layout for redistribution (exe + dlls + data). Only valid after a
+          # successful MinGW build that installs supertux-origins.exe.
+          supertux-origins-win32 = pkgs.runCommand "supertux-origins-win32" {
+            meta = {
+              description = "SuperTux Origins Windows (MinGW) flat package";
+              # Mark broken until the full cross graph (sexpcpp/wstsound/…) is Windows-ready.
+              # Remove broken= when nix build .#supertux-origins-mingw64 succeeds.
+              broken = true;
+            };
+          } ''
+            mkdir -p $out/data
+            if [ ! -f ${supertux-origins-mingw64}/bin/supertux-origins.exe ]; then
+              echo "error: MinGW build did not produce bin/supertux-origins.exe" >&2
+              echo "contents of mingw package:" >&2
+              find ${supertux-origins-mingw64} -maxdepth 3 -type f >&2 || true
+              exit 1
+            fi
+            cp -v ${supertux-origins-mingw64}/bin/supertux-origins.exe $out/
+            cp -v --dereference --no-preserve=all ${supertux-origins-mingw64}/bin/*.dll $out/ 2>/dev/null || true
+            if [ -d ${supertux-origins-mingw64}/data ]; then
+              cp -a ${supertux-origins-mingw64}/data/. $out/data/
+            fi
           '';
 
-          supertux-origins-win32-zip = pkgs.runCommand "supertux-origins-win32-zip" {} ''
+          supertux-origins-win32-zip = pkgs.runCommand "supertux-origins-win32-zip" {
+            meta.broken = true;
+          } ''
             mkdir -p $out
             WORKDIR=$(mktemp -d)
-
-            cp --no-preserve mode,ownership --verbose --recursive \
-              ${supertux-origins-win32}/. "$WORKDIR"
-
+            cp --no-preserve mode,ownership -a ${supertux-origins-win32}/. "$WORKDIR"
             cd "$WORKDIR"
-            ${nixpkgs.legacyPackages.x86_64-linux.zip}/bin/zip \
-              -r \
-              $out/SuperTux-${supertux-origins.version}-${pkgs.stdenv.hostPlatform.system}.zip \
-              .
+            ${pkgs.zip}/bin/zip -r $out/SuperTux-Origins-win64.zip .
           '';
 
           # WebAssembly (Emscripten). CMake path ready; may fail at dep/link stage.

@@ -25,7 +25,9 @@ int TTF_FontLineSkip(const TTF_Font *font);
 SDL_Surface *TTF_RenderUTF8_Blended(TTF_Font *font, const char *text, SDL_Color fg);
 SDL_Surface *TTF_RenderUTF8_Solid(TTF_Font *font, const char *text, SDL_Color fg);
 SDL_Surface *TTF_RenderUTF8_Shaded(TTF_Font *font, const char *text, SDL_Color fg, SDL_Color bg);
-const char *TTF_GetError(void);
+/* Match real SDL_ttf: these are macros, not separate symbols. */
+#define TTF_GetError   SDL_GetError
+#define TTF_SetError   SDL_SetError
 
 #ifdef __cplusplus
 }

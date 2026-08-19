@@ -1,5 +1,5 @@
 /* Offline SDL_ttf stub implementation for Emscripten. */
-#include "SDL_ttf.h"
+#include "SDL_ttf_stub.h"
 #include <stddef.h>
 
 int TTF_Init(void) { return 0; }
@@ -52,7 +52,3 @@ SDL_Surface *TTF_RenderUTF8_Shaded(TTF_Font *font, const char *text, SDL_Color f
   return NULL;
 }
 
-const char *TTF_GetError(void)
-{
-  return "SDL_ttf stub: font rendering not implemented offline";
-}
