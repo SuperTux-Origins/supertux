@@ -153,8 +153,8 @@ GLVideoSystem::create_gl_context()
   glGetError();
 
   // log_info("OpenGL 3.3: {}", GLEW_VERSION_3_3);
-  log_info("OpenGL: {}", glGetString(GL_VERSION));
-  log_info("Using GLEW {}", glewGetString(GLEW_VERSION));
+  log_info("OpenGL: {}", reinterpret_cast<char const*>(glGetString(GL_VERSION)));
+  log_info("Using GLEW {}", reinterpret_cast<char const*>(glewGetString(GLEW_VERSION)));
   log_info("GLEW_ARB_texture_non_power_of_two: {}", static_cast<int>(GLEW_ARB_texture_non_power_of_two));
 #endif
 

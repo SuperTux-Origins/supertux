@@ -26,6 +26,7 @@
 #include "supertux/tile_set.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
+#include "util/stream_format.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_document.hpp"
 #include "util/reader_iterator.hpp"
@@ -355,7 +356,7 @@ TileSetParser::parse_imagespecs(ReaderMapping const& images_mapping,
       auto const& arr = sx.as_array();
       if (arr.size() != 6)
       {
-        log_warning("(region X Y WIDTH HEIGHT) tag malformed: {}", sx);
+        log_warning("(region X Y WIDTH HEIGHT) tag malformed: {}", supertux::stream_str(sx));
       }
       else
       {
