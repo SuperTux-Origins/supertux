@@ -24,14 +24,26 @@ endif
 
 
 # ---------------------------------------------------------------------------
-# FreeType (static) + SDL_ttf.c compiled into libmain when staged
+# FreeType + SDL_ttf
+# ndk-build loads this file as jni/src/Android.mk → LOCAL_PATH = jni/src.
+# Stage FreeType at jni/src/freetype/ and SDL_ttf.c next to this Makefile.
 # ---------------------------------------------------------------------------
 ifneq ($(wildcard $(LOCAL_PATH)/freetype/include/ft2build.h),)
   FREETYPE_SAVE_PATH := $(LOCAL_PATH)
   LOCAL_PATH := $(FREETYPE_SAVE_PATH)/freetype
   include $(FREETYPE_SAVE_PATH)/freetype_Android.mk
   LOCAL_PATH := $(FREETYPE_SAVE_PATH)
-  SUPERTUX_HAVE_SDL_TTF := 1
+  SUPERTUX_HAVE_FREETYPE := 1
+endif
+
+ifneq ($(wildcard $(LOCAL_PATH)/SDL_ttf.c),)
+  SUPERTUX_SDL_TTF_SRC := SDL_ttf.c
+endif
+
+ifdef SUPERTUX_SDL_TTF_SRC
+  ifdef SUPERTUX_HAVE_FREETYPE
+    SUPERTUX_HAVE_SDL_TTF := 1
+  endif
 endif
 
 # ---------------------------------------------------------------------------
@@ -62,12 +74,16 @@ LOCAL_SRC_FILES := $(filter-out %/physfs_platform_windows.c %/physfs_platform_wi
 # FreeType sources live under jni/freetype (built as static lib); never into main.
 LOCAL_SRC_FILES := $(filter-out freetype/% %/freetype/%,$(LOCAL_SRC_FILES))
 # Real SDL_ttf is a static module; drop the stub when present.
+# Always provide TTF symbols: real SDL_ttf.c or explicit stub path.
 ifdef SUPERTUX_HAVE_SDL_TTF
 LOCAL_SRC_FILES := $(filter-out %/sdl_ttf_stub.c sdl_ttf_stub.c,$(LOCAL_SRC_FILES))
-# Compile SDL_ttf.c directly into libmain (avoids NDK static-lib GC dropping TTF_*).
-LOCAL_SRC_FILES += SDL_ttf.c
+LOCAL_SRC_FILES += $(SUPERTUX_SDL_TTF_SRC)
 LOCAL_CFLAGS += -DTTF_USE_HARFBUZZ=0
 LOCAL_CPPFLAGS += -DTTF_USE_HARFBUZZ=0
+else
+# Permanent fallback next to Android.mk (also may exist under src/ from build-apk).
+LOCAL_SRC_FILES := $(filter-out %/sdl_ttf_stub.c sdl_ttf_stub.c,$(LOCAL_SRC_FILES))
+LOCAL_SRC_FILES += sdl_ttf_stub.c
 endif
 
 LOCAL_C_INCLUDES := \
@@ -110,9 +126,8 @@ LOCAL_LDLIBS += -lOpenSLES
 endif
 
 ifdef SUPERTUX_HAVE_SDL_TTF
-# WHOLE: prevent --gc-sections from dropping TTF/FT objects before main refs them.
 LOCAL_WHOLE_STATIC_LIBRARIES += freetype
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/freetype/include $(LOCAL_PATH)
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/freetype/include
 endif
 
 LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library \

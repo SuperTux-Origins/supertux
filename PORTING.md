@@ -1097,3 +1097,17 @@ Use `create_directories` and `FS.mkdirTree` before IDBFS mount.
 Separate `SDL2_ttf_static` was not pulled into `libmain` (NDK GC). Compile
 `SDL_ttf.c` into `main` and link FreeType with `LOCAL_WHOLE_STATIC_LIBRARIES`.
 
+### WASM: supertux_loadFiles is not defined
+
+C++ calls `supertux_loadFiles` / `supertux_syncfs` via EM_ASM (config load /
+frame loop). Custom `mk/wasm/shell.html` must define them (Origins userdir +
+localStorage config mirror). Upstream template is under
+`mk/emscripten/template.html.in`.
+
+### Android: TTF symbols still undefined after FreeType staging
+
+Module Android.mk is loaded as **jni/src/Android.mk** (`LOCAL_PATH=jni/src`),
+not `jni/`. FreeType/SDL_ttf must be staged under `jni/src/freetype` and
+`jni/src/SDL_ttf.c`, and `freetype_Android.mk` copied next to the module
+makefile. Staging under `jni/` alone never matches the wildcards.
+

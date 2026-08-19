@@ -122,7 +122,58 @@
       <a href="@revUrl@" target="_blank" rel="noopener">Revision @gitRev@</a>
     </div>
   </div>
-  <script type='text/javascript'>
+  
+  <script type="text/javascript">
+    // SuperTux WASM persistence (see upstream mk/emscripten/template.html.in).
+    // Userdir is /home/web_user/.local/share/supertux-origins/ (Origins naming).
+    var supertux_userdir = "/home/web_user/.local/share/supertux-origins/";
+    var supertux_autofit = true;
+
+    window.supertux_setAutofit = function(newAutofit) {
+      supertux_autofit = !!newAutofit;
+      try {
+        if (typeof document !== 'undefined' && document.body)
+          document.body.style.overflow = supertux_autofit ? "hidden" : "initial";
+      } catch (e) {}
+      return 1;
+    };
+
+    // Populate MEMFS from localStorage config keys (IndexedDB may lag on close).
+    window.supertux_loadFiles = function() {
+      try {
+        for (var key of Object.keys(localStorage)) {
+          if (key !== "supertux_origins_config" && key !== "supertux2_config")
+            continue;
+          var keyfilename = key.replace(/^supertux_origins_/, "").replace(/^supertux2_/, "");
+          try { FS.mkdirTree(supertux_userdir); } catch (e) {}
+          try {
+            FS.writeFile(supertux_userdir + keyfilename, localStorage.getItem(key));
+          } catch (e) { console.warn("supertux_loadFiles write", e); }
+        }
+      } catch (e) { console.warn("supertux_loadFiles", e); }
+    };
+
+    window.supertux_saveFiles = function() {
+      try { FS.syncfs(false, function(err) { if (err) console.warn(err); }); } catch (err) { console.warn(err); }
+      try {
+        var data = FS.readFile(supertux_userdir + "config", { encoding: "utf8" });
+        localStorage.setItem("supertux_origins_config", data);
+      } catch (e) { /* no config yet */ }
+    };
+
+    // Called every frame from ScreenManager::loop_iter — persist IDBFS (async).
+    window.supertux_syncfs = function() {
+      try {
+        FS.syncfs(false, function(err) { if (err) console.warn("supertux_syncfs", err); });
+      } catch (e) { console.warn("supertux_syncfs", e); }
+    };
+
+    window.addEventListener("beforeunload", function() {
+      try { window.supertux_saveFiles(); } catch (e) {}
+    });
+  </script>
+
+<script type='text/javascript'>
     var statusElement = document.getElementById('status');
     var progressBar = document.getElementById('progress-bar');
 

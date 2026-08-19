@@ -66,6 +66,17 @@ mkdir -p src/jni/src src/jni/SDL
 cp "$APPLICATION_MK" src/jni/Application.mk
 cp "$TOP_ANDROID_MK" src/jni/Android.mk
 cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
+# Companion files for the module Android.mk (LOCAL_PATH = jni/src).
+if [ -f "$APP_DIR/jni/freetype_Android.mk" ]; then
+  cp "$APP_DIR/jni/freetype_Android.mk" src/jni/src/freetype_Android.mk
+fi
+if [ -f "$APP_DIR/jni/sdl_ttf_stub.c" ]; then
+  cp "$APP_DIR/jni/sdl_ttf_stub.c" src/jni/src/sdl_ttf_stub.c
+fi
+if [ -f "$APP_DIR/jni/SDL_ttf.h" ]; then
+  cp "$APP_DIR/jni/SDL_ttf.h" src/jni/src/SDL_ttf.h
+  cp "$APP_DIR/jni/SDL_ttf.h" src/jni/SDL_ttf.h 2>/dev/null || true
+fi
 # placeholder.cpp intentionally not staged — full game sources are used.
 cp "$APP_DIR/AndroidManifest.xml" src/AndroidManifest.xml
 cp -r "$APP_DIR/res" src/res
@@ -76,6 +87,17 @@ chmod -R u+rwX src/jni/src
 # Re-assert module Android.mk after the source tree copy so a stray file
 # under GAME_SRC_DIR can never replace it (SDL2 prebuilts live in jni/SDL/).
 cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
+# Companion files for the module Android.mk (LOCAL_PATH = jni/src).
+if [ -f "$APP_DIR/jni/freetype_Android.mk" ]; then
+  cp "$APP_DIR/jni/freetype_Android.mk" src/jni/src/freetype_Android.mk
+fi
+if [ -f "$APP_DIR/jni/sdl_ttf_stub.c" ]; then
+  cp "$APP_DIR/jni/sdl_ttf_stub.c" src/jni/src/sdl_ttf_stub.c
+fi
+if [ -f "$APP_DIR/jni/SDL_ttf.h" ]; then
+  cp "$APP_DIR/jni/SDL_ttf.h" src/jni/src/SDL_ttf.h
+  cp "$APP_DIR/jni/SDL_ttf.h" src/jni/SDL_ttf.h 2>/dev/null || true
+fi
 # Generated/config headers (cmake would write these into the build dir).
 for hdr in config.h version.h SDL_image.h; do
   if [ -f "$APP_DIR/jni/$hdr" ]; then
@@ -105,20 +127,21 @@ HAVE_REAL_TTF=0
 if [ -n "$TTF_SRC" ] && [ -d "$TTF_SRC" ] && [ -n "$FT_SRC" ] && [ -d "$FT_SRC" ]; then
   if [ -f "$TTF_SRC/SDL_ttf.h" ] && [ -f "$TTF_SRC/SDL_ttf.c" ] \
      && [ -f "$FT_SRC/include/ft2build.h" ]; then
-    mkdir -p src/jni/freetype
-    # FreeType tree (headers + src) for freetype_Android.mk
-    cp -a "$FT_SRC/include" src/jni/freetype/
-    cp -a "$FT_SRC/src" src/jni/freetype/
-    # Some releases keep ft2build.h under include/freetype2 — normalize.
-    if [ ! -f src/jni/freetype/include/ft2build.h ]; then
-      if [ -f src/jni/freetype/include/freetype2/ft2build.h ]; then
-        ln -sf freetype2/ft2build.h src/jni/freetype/include/ft2build.h
+    # LOCAL_PATH for module is jni/src — stage FreeType and SDL_ttf there.
+    mkdir -p src/jni/src/freetype
+    cp -a "$FT_SRC/include" src/jni/src/freetype/
+    cp -a "$FT_SRC/src" src/jni/src/freetype/
+    if [ ! -f src/jni/src/freetype/include/ft2build.h ]; then
+      if [ -f src/jni/src/freetype/include/freetype2/ft2build.h ]; then
+        ln -sf freetype2/ft2build.h src/jni/src/freetype/include/ft2build.h
       fi
     fi
-    cp -a "$TTF_SRC/SDL_ttf.h" src/jni/
     cp -a "$TTF_SRC/SDL_ttf.h" src/jni/src/
-    cp -a "$TTF_SRC/SDL_ttf.c" src/jni/SDL_ttf.c
-    chmod -R u+rwX src/jni/freetype src/jni/SDL_ttf.c
+    cp -a "$TTF_SRC/SDL_ttf.h" src/jni/ 2>/dev/null || true
+    cp -a "$TTF_SRC/SDL_ttf.c" src/jni/src/SDL_ttf.c
+    chmod -R u+rwX src/jni/src/freetype src/jni/src/SDL_ttf.c
+    # Drop stub so only real SDL_ttf is compiled when FreeType is present.
+    rm -f src/jni/src/sdl_ttf_stub.c
     HAVE_REAL_TTF=1
     echo "==> staged FreeType from $FT_SRC and SDL_ttf.c from $TTF_SRC"
   fi
