@@ -755,3 +755,10 @@ argpp sources `#include "argpp.hpp"` which lives under
 `include/argpp/`. Stage public headers into `external_includes/argpp/`
 and add that path (plus `deps/argpp` for prettyprinter.hpp) to
 `LOCAL_C_INCLUDES`.
+
+### R36S: physfs ExternalProject libdir
+
+Same as SDL2_ttf: aarch64 CMake may install to lib64/. Force
+`-DCMAKE_INSTALL_LIBDIR=lib` and `-DLIB_SUFFIX=` so
+`physfs/lib/libphysfs.a` matches BUILD_BYPRODUCTS / IMPORTED_LOCATION.
+
