@@ -844,3 +844,22 @@ struct std::formatter<UID, char> { ... };
 UID was the failure in `scripting/dispenser.cpp` via
 `log_fatal("...{}", m_uid)`.
 
+### WASM: EMSCRIPTEN vs __EMSCRIPTEN__
+
+emcc always defines `__EMSCRIPTEN__`. Source that uses bare `EMSCRIPTEN`
+(e.g. `#if !defined(EMSCRIPTEN)` for xdgcpp) needs either that macro as a
+compile definition or `__EMSCRIPTEN__` in the source. CMakeLists now does
+`add_compile_definitions(EMSCRIPTEN=1)` under `if(EMSCRIPTEN)`.
+
+### WASM: EM_ASM needs emscripten.h
+
+`Config::load` / `Main` use `EM_ASM({...})`. Without `#include <emscripten.h>`
+the preprocessor leaves the block as raw C and `supertux_loadFiles` is an
+undeclared identifier.
+
+### WASM: offline SDL_ttf stub
+
+emscripten's `fakesdl/SDL_ttf.h` `#error`s unless `-sUSE_SDL=2` (network port).
+Use `mk/emscripten/SDL_ttf.h` + `sdl_ttf_stub.c` instead of the FreeType port
+until a full offline SDL2_ttf+freetype build is wired.
+

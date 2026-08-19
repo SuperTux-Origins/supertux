@@ -88,6 +88,8 @@ endif()
 if(EMSCRIPTEN)
   set(CMAKE_EXECUTABLE_SUFFIX .html)
   set(IS_EMSCRIPTEN_BUILD ON)
+  # emcc defines __EMSCRIPTEN__; sources also use EMSCRIPTEN without underscores.
+  add_compile_definitions(EMSCRIPTEN=1)
 
   # Emscripten flags (aligned with Windstille/Pingus PORTING.md lessons):
   # - FULL_ES2 + WebGL for GLES2-style client code

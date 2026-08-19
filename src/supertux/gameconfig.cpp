@@ -26,6 +26,7 @@
 #include "util/writer.hpp"
 
 #ifdef __EMSCRIPTEN__
+#  include <emscripten.h>
 #endif
 
 Config::Config() :

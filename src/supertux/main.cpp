@@ -18,6 +18,10 @@
 
 
 #include <SDL_ttf.h>
+
+#ifdef __EMSCRIPTEN__
+#  include <emscripten.h>
+#endif
 #include <physfs.h>
 
 #ifdef __ANDROID__

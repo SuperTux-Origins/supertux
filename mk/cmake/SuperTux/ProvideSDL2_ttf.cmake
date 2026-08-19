@@ -2,8 +2,13 @@
 # if missing, build from SDL2_TTF_SOURCE_DIR (flake input sdl2-ttf-src).
 
 if(EMSCRIPTEN)
-  message(STATUS "Emscripten: SDL2_ttf via FreeType port (-sUSE_FREETYPE); LibSDL2_ttf is INTERFACE")
-  add_library(LibSDL2_ttf INTERFACE)
+  # Offline: do not use -sUSE_FREETYPE / emscripten fakesdl SDL_ttf.h.
+  message(STATUS "Emscripten: offline SDL_ttf stub (mk/emscripten/)")
+  add_library(LibSDL2_ttf STATIC "${CMAKE_SOURCE_DIR}/mk/emscripten/sdl_ttf_stub.c")
+  target_include_directories(LibSDL2_ttf PUBLIC "${CMAKE_SOURCE_DIR}/mk/emscripten")
+  if(TARGET LibSDL2)
+    target_link_libraries(LibSDL2_ttf PUBLIC LibSDL2)
+  endif()
   return()
 endif()
 
