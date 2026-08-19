@@ -269,6 +269,8 @@
               gameDataDir = ./data;
               inherit stbImageH;
               gameVersion = "0.6.3-dev";
+              squirrelSrc = squirrel-src;
+              physfsSrc = physfs-src;
             };
           in {
             android-sdl-libs = android.sdlAndroidLibs;

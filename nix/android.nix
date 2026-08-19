@@ -188,6 +188,8 @@ let
     stbImageH ? null,
     # Full version for SUPERTUX_VERSION (e.g. 0.8.0-dev+gabc1234).
     gameVersion ? "0.6.3-dev",
+    squirrelSrc ? null,
+    physfsSrc ? null,
   }:
     pkgs.stdenvNoCC.mkDerivation {
       pname = appName;
@@ -232,6 +234,10 @@ let
         }
       ) // pkgs.lib.optionalAttrs (stbImageH != null) {
         STB_IMAGE_H = "${stbImageH}";
+      } // pkgs.lib.optionalAttrs (squirrelSrc != null) {
+        SQUIRREL_SOURCE_DIR = "${squirrelSrc}";
+      } // pkgs.lib.optionalAttrs (physfsSrc != null) {
+        PHYSFS_SOURCE_DIR = "${physfsSrc}";
       };
 
       buildPhase = ''
