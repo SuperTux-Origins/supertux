@@ -105,7 +105,10 @@ LOCAL_SRC_FILES := $(filter-out freetype/% %/freetype/%,$(LOCAL_SRC_FILES))
 # Real SDL_ttf is a static module; drop the stub when present.
 # Always provide TTF symbols: real SDL_ttf.c or explicit stub path.
 ifdef SUPERTUX_HAVE_SDL_TTF
-LOCAL_SRC_FILES := $(filter-out %/sdl_ttf_stub.c sdl_ttf_stub.c,$(LOCAL_SRC_FILES))
+# RWILDCARD already picked up SDL_ttf.c — drop it before the explicit add
+# so the object is not linked twice (duplicate TTF_* symbols).
+LOCAL_SRC_FILES := $(filter-out %/sdl_ttf_stub.c sdl_ttf_stub.c \
+	%/SDL_ttf.c SDL_ttf.c,$(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES += $(SUPERTUX_SDL_TTF_SRC)
 LOCAL_CFLAGS += -DTTF_USE_HARFBUZZ=0
 LOCAL_CPPFLAGS += -DTTF_USE_HARFBUZZ=0
