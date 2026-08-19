@@ -111,23 +111,19 @@ EOFPC
       doCheck = false;
       checkPhase = "echo skip-emscripten-check";
       preBuild = ''
-      export EM_CACHE="''${TMPDIR:-/tmp}/emcache-supertux"
-      mkdir -p "$EM_CACHE"
-      export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-      export CMAKE_PREFIX_PATH="${modplugWasm}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
-${lib.optionalString (sdl2WasmLibs != null) ''
-      # Offline static SDL2 (no emscripten port download).
-      export PKG_CONFIG_PATH="${sdl2WasmLibs}/lib/pkgconfig:$PKG_CONFIG_PATH"
-      export CMAKE_PREFIX_PATH="${sdl2WasmLibs}:$CMAKE_PREFIX_PATH"
-      export SDL2_DIR="${sdl2WasmLibs}"
-''}
-      emcmake cmake -S . -B build \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=$out \
-        ${lib.escapeShellArgs cmakeFlags}
-      cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
-    '';
-    buildPhase = "runHook preBuild; runHook postBuild";
+        export EM_CACHE="''${TMPDIR:-/tmp}/emcache-${pname}"
+        mkdir -p "$EM_CACHE"
+        emcmake cmake -S . -B build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=$out \
+          -DBUILD_TESTS=OFF \
+          -DWARNINGS=OFF \
+          -DWERROR=OFF \
+          ${lib.escapeShellArgs cmakeFlags}
+        cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
+        cmake --install build
+      '';
+      buildPhase = "runHook preBuild; runHook postBuild";
       installPhase = "runHook preInstall; runHook postInstall";
       dontStrip = true;
     };
@@ -276,21 +272,15 @@ in
 
     preBuild = ''
       export EM_CACHE="''${TMPDIR:-/tmp}/emcache-supertux"
-      mkdir -p "$EM_CACHE" "$EM_CACHE/ports" "$EM_CACHE/downloads"
-      export EM_PORTS="''${TMPDIR:-/tmp}/emports-supertux"
-      mkdir -p "$EM_PORTS"
-      # Seed SDL2 port so emscripten does not hit the network (nix sandbox).
-      # ports/sdl2.py requests name=sdl2 → typically $EM_CACHE/ports/sdl2.zip
-      # or the URL basename release-2.32.10.zip under downloads/.
-      cp -f ${sdl2PortZip} "$EM_CACHE/ports/sdl2.zip"
-      cp -f ${sdl2PortZip} "$EM_CACHE/ports/release-2.32.10.zip"
-      cp -f ${sdl2PortZip} "$EM_CACHE/downloads/release-2.32.10.zip"
-      cp -f ${sdl2PortZip} "$EM_CACHE/downloads/sdl2.zip"
-      # Also place under EM_PORTS tree (some emscripten layouts).
-      cp -f ${sdl2PortZip} "$EM_PORTS/sdl2.zip"
-      cp -f ${sdl2PortZip} "$EM_PORTS/release-2.32.10.zip"
+      mkdir -p "$EM_CACHE"
       export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
       export CMAKE_PREFIX_PATH="${modplugWasm}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
+${lib.optionalString (sdl2WasmLibs != null) ''
+      # Offline static SDL2 (no emscripten port download).
+      export PKG_CONFIG_PATH="${sdl2WasmLibs}/lib/pkgconfig:$PKG_CONFIG_PATH"
+      export CMAKE_PREFIX_PATH="${sdl2WasmLibs}:$CMAKE_PREFIX_PATH"
+      export SDL2_DIR="${sdl2WasmLibs}"
+''}
       emcmake cmake -S . -B build \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$out \
