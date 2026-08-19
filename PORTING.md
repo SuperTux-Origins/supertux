@@ -369,3 +369,15 @@ nix build .#android-sdl-libs   # SDL2 .so prebuilts only
 
 Requires `nixpkgs.config.allowUnfree` and `android_sdk.accept_license = true`.
 Debug keystore: `mk/android/keystore/debug.keystore` (store/key pass: android).
+
+### Flake package aliases for vendored deps
+
+| Attribute | Source |
+|-----------|--------|
+| logmich-pkg | external/logmich |
+| sexpcpp-pkg | external/sexpcpp |
+| strutcpp-pkg | external/strutcpp |
+| priocpp-pkg | external/priocpp (JSON off) |
+
+Android NDK: `mk/android/scripts/build-external-static.sh` builds one
+`external/` CMake project for a given ABI.

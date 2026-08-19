@@ -113,6 +113,24 @@
         packages = rec {
           default = supertux-origins;
 
+          # Vendored C++ deps from external/ (patchable; no remote flake needed).
+          logmich-pkg = pkgs.callPackage ./external/logmich/logmich.nix { };
+          sexpcpp-pkg = (pkgs.callPackage ./external/sexpcpp/sexpcpp.nix { }).overrideAttrs (o: {
+            doCheck = false;
+            cmakeFlags = [ "-DBUILD_TESTS=OFF" "-DWARNINGS=OFF" "-DWERROR=OFF" ];
+          });
+          strutcpp-pkg = (pkgs.callPackage ./external/strutcpp/strutcpp.nix { }).overrideAttrs (o: {
+            doCheck = false;
+            cmakeFlags = [ "-DBUILD_TESTS=OFF" "-DWARNINGS=OFF" "-DWERROR=OFF" ];
+          });
+          priocpp-pkg = pkgs.callPackage ./external/priocpp/priocpp.nix {
+            inherit self;
+            logmich = logmich-pkg;
+            sexpcpp = sexpcpp-pkg;
+            withJsoncpp = false;
+            withSexpcpp = true;
+          };
+
           supertux-origins = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
 
@@ -120,21 +138,14 @@
                        then SDL2_ttf-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                        else pkgs.SDL2_ttf;
 
-            sexpcpp = sexpcpp.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            sexpcpp = sexpcpp-pkg;
             squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
             tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
-            strutcpp = strutcpp.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            strutcpp = strutcpp-pkg;
             miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
             wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
-            # Vendored external/priocpp (sexp-only; JSON tests gated when off)
-            priocpp = pkgs.callPackage ./external/priocpp/priocpp.nix {
-              inherit self;
-              logmich = pkgs.callPackage ./external/logmich/logmich.nix { };
-              sexpcpp = sexpcpp.packages.${pkgs.stdenv.hostPlatform.system}.default;
-              withJsoncpp = false;
-              withSexpcpp = true;
-            };
-            logmich = pkgs.callPackage ./external/logmich/logmich.nix { };
+            priocpp = priocpp-pkg;
+            logmich = logmich-pkg;
 
             physfs = if pkgs.stdenv.hostPlatform.isWindows
                      then physfs-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -256,7 +267,22 @@
               };
             });
           }
+        ) // (
+          # R36S / ArkOS — sysroot URL is still a localhost placeholder (PORTING.md).
+          let
+            r36s = import ./nix/r36s.nix {
+              inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config writeShellScript zip glm;
+              pkgsCross = pkgs.pkgsCross;
+            };
+          in {
+            arkos-sysroot = r36s.arkosSysroot.overrideAttrs (o: {
+              meta = (o.meta or {}) // { broken = true; };
+            });
+            # Full game cross-build needs a published sysroot; keep broken.
+            # supertux-r36s = r36s.mkSuperTuxR36s { ... };
+          }
         );
+
 
         apps = {
           # adb install helper once APK builds

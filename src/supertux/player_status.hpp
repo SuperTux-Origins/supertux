@@ -19,6 +19,7 @@
 #define HEADER_SUPERTUX_SUPERTUX_PLAYER_STATUS_HPP
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <vector>
@@ -33,6 +34,15 @@ static const float BORDER_Y = 10;
 
 enum BonusType {
   NO_BONUS = 0, GROWUP_BONUS, FIRE_BONUS, ICE_BONUS, AIR_BONUS, EARTH_BONUS
+};
+
+template<>
+struct std::formatter<BonusType> : std::formatter<int>
+{
+  auto format(BonusType b, auto& ctx) const
+  {
+    return std::formatter<int>::format(static_cast<int>(b), ctx);
+  }
 };
 
 /** This class keeps player status between different game sessions (for
