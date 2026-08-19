@@ -643,7 +643,7 @@ LAUNCH
   , title ? "SuperTux"
   , scriptName ? "SuperTux.sh"
   , portDirName ? "supertux"
-  , screenshotSrc ? ../data/images/engine/supertux.png
+  , screenshotSrc ? ../data/images/engine/icons/supertux.png
   }:
     stdenvNoCC.mkDerivation {
       inherit pname version;

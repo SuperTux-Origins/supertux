@@ -16,6 +16,8 @@
 
 #include "math/anchor_point.hpp"
 
+#include <sstream>
+
 
 
 #include "math/rectf.hpp"

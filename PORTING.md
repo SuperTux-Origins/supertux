@@ -810,3 +810,22 @@ makes `#ifdef` true, so `<json/reader.h>` is included and NDK fails.
 Leave the macro **undefined** on Android (CMake only defines it when the
 option is ON). JSON source files are already filtered out of the NDK build.
 
+### Android: TINYGETTEXT_WITH_SDL (no libc iconv)
+
+Android NDK has no `<iconv.h>`. tinygettext's iconv.hpp inline wrappers call
+`::iconv_open` when neither TINYGETTEXT_WITH_SDL nor TINYGETTEXT_UTF8_ONLY is
+set; those names then resolve to the wrappers themselves → compile error.
+Define `-DTINYGETTEXT_WITH_SDL=1` so conversion goes through SDL_iconv.
+
+### WASM: sstream includes
+
+libc++ under emscripten does not transitively pull `<sstream>` via other
+headers; translation units that use `std::ostringstream` need an explicit
+`#include <sstream>` (e.g. src/math/anchor_point.cpp).
+
+### R36S PortMaster screenshot path
+
+The project icon lives at `data/images/engine/icons/supertux.png`, not
+`data/images/engine/supertux.png`. Wrong path fails flake eval with
+"Path … does not exist in Git repository".
+
