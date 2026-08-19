@@ -41,10 +41,15 @@ TEST_P(ReaderDocumentTest, from_file__fail)
 TEST(ReaderDocumentTest, from_file__format)
 {
   EXPECT_NO_THROW(ReaderDocument::from_file(Format::SEXPR, "test/data/data.sexp"));
+
 #if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
   EXPECT_THROW(ReaderDocument::from_file(Format::JSON, "test/data/data.sexp"), ReaderError);
   EXPECT_THROW(ReaderDocument::from_file(Format::SEXPR, "test/data/data.json"), ReaderError);
   EXPECT_NO_THROW(ReaderDocument::from_file(Format::JSON, "test/data/data.json"));
+#else
+  // JSON backend not compiled in — Format::JSON must reject.
+  EXPECT_THROW(ReaderDocument::from_file(Format::JSON, "test/data/data.json"), std::invalid_argument);
+  EXPECT_THROW(ReaderDocument::from_file(Format::JSON, "test/data/data.sexp"), std::invalid_argument);
 #endif
 }
 
@@ -66,12 +71,14 @@ TEST_P(ReaderDocumentTest, get_root)
   EXPECT_EQ(doc.get_root().get_name(), "test-document");
 }
 
+// SuperTux builds without jsoncpp by default. Only instantiate formats that
+// the library was actually compiled with.
 #if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
-INSTANTIATE_TEST_CASE_P(ParamReaderDocumentTest, ReaderDocumentTest,
-                        ::testing::Values(".sexp", ".json"));
+INSTANTIATE_TEST_SUITE_P(ParamReaderDocumentTest, ReaderDocumentTest,
+                         ::testing::Values(".sexp", ".json"));
 #else
-INSTANTIATE_TEST_CASE_P(ParamReaderDocumentTest, ReaderDocumentTest,
-                        ::testing::Values(".sexp"));
+INSTANTIATE_TEST_SUITE_P(ParamReaderDocumentTest, ReaderDocumentTest,
+                         ::testing::Values(".sexp"));
 #endif
 
 /* EOF */

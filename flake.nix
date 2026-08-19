@@ -84,12 +84,6 @@
     glew-win32.inputs.nixpkgs.follows = "nixpkgs";
     glew-win32.inputs.tinycmmc.follows = "tinycmmc";
 
-    priocpp.url = "github:grumbel/priocpp";
-    priocpp.inputs.nixpkgs.follows = "nixpkgs";
-    priocpp.inputs.flake-utils.follows = "flake-utils";
-    priocpp.inputs.logmich.follows = "logmich";
-    priocpp.inputs.sexpcpp.follows = "sexpcpp";
-
     # PhysFS sources for EMSCRIPTEN / Android / R36S when system PhysFS is absent
     # and external/physfs submodule is not checked out.
     physfs-src = {
@@ -102,7 +96,7 @@
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, curl-win32, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
-              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, priocpp, physfs-src }:
+              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {
@@ -122,7 +116,14 @@
             strutcpp = strutcpp.packages.${pkgs.stdenv.hostPlatform.system}.default;
             miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
             wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
-            priocpp = priocpp.packages.${pkgs.stdenv.hostPlatform.system}.priocpp-sexp;
+            # Vendored external/priocpp (sexp-only; JSON tests gated when off)
+            priocpp = pkgs.callPackage ./external/priocpp/priocpp.nix {
+              inherit self;
+              logmich = logmich.packages.${pkgs.stdenv.hostPlatform.system}.default;
+              sexpcpp = sexpcpp.packages.${pkgs.stdenv.hostPlatform.system}.default;
+              withJsoncpp = false;
+              withSexpcpp = true;
+            };
             logmich = logmich.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
             physfs = if pkgs.stdenv.hostPlatform.isWindows
@@ -184,7 +185,7 @@
           # See nix/wasm.nix and PORTING.md.
           supertux-wasm = (import ./nix/wasm.nix {
             inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
-                    wstsound squirrel priocpp physfs-src;
+                    wstsound squirrel physfs-src;
           }).supertux-wasm;
 
         };

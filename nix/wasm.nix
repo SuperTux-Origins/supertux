@@ -17,7 +17,7 @@
 , miniswig
 , wstsound
 , squirrel
-, priocpp
+
 , physfs-src ? null
 }:
 
@@ -63,7 +63,6 @@ in
       strutcpp.packages.${pkgs.system}.default
       squirrel.packages.${pkgs.system}.default
       wstsound.packages.${pkgs.system}.default
-      priocpp.packages.${pkgs.system}.priocpp-sexp
     ];
 
     cmakeFlags = [

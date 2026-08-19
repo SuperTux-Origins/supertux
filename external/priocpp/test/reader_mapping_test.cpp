@@ -400,11 +400,11 @@ TEST_P(ReaderMappingTest, read_wrong)
 }
 
 #if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
-INSTANTIATE_TEST_CASE_P(ParamReaderMappingTest, ReaderMappingTest,
-                        ::testing::Values(".sexp", ".json"));
+INSTANTIATE_TEST_SUITE_P(ParamReaderMappingTest, ReaderMappingTest,
+                         ::testing::Values(".sexp", ".json"));
 #else
-INSTANTIATE_TEST_CASE_P(ParamReaderMappingTest, ReaderMappingTest,
-                        ::testing::Values(".sexp"));
+INSTANTIATE_TEST_SUITE_P(ParamReaderMappingTest, ReaderMappingTest,
+                         ::testing::Values(".sexp"));
 #endif
 
 /* EOF */

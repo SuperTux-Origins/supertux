@@ -43,3 +43,11 @@ Regenerate after adding sources:
 Uncomment `include …/supertux_sources.mk` and set `LOCAL_SRC_FILES` in
 `Android.mk` once physfs/squirrel/wstsound/tinycmmc are available as NDK
 modules or prebuilts.
+
+## Toolchain notes
+
+- `Application.mk` targets API 22+, C++20, GLES2 defines.
+- Prebuilt SDL2 / SDL2_image: `scripts/build-sdl-libs.sh` then `install-sdl-libs.sh`.
+- Full game binary still needs physfs, squirrel, logmich, sexpcpp, priocpp
+  (sexp), wstsound, tinycmmc as NDK static/shared modules or prebuilts under
+  `app/jni/`. Prefer building those from `external/` with the NDK toolchain.
