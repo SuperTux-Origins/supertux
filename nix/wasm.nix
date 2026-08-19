@@ -18,6 +18,8 @@
 , squirrel
 , physfs-src ? null
 , squirrel-src ? null
+, sdlSrc ? null
+, sdlVersion ? "2.30.3"
 }:
 
 let
@@ -109,19 +111,23 @@ EOFPC
       doCheck = false;
       checkPhase = "echo skip-emscripten-check";
       preBuild = ''
-        export EM_CACHE="''${TMPDIR:-/tmp}/emcache-${pname}"
-        mkdir -p "$EM_CACHE"
-        emcmake cmake -S . -B build \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=$out \
-          -DBUILD_TESTS=OFF \
-          -DWARNINGS=OFF \
-          -DWERROR=OFF \
-          ${lib.escapeShellArgs cmakeFlags}
-        cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
-        cmake --install build
-      '';
-      buildPhase = "runHook preBuild; runHook postBuild";
+      export EM_CACHE="''${TMPDIR:-/tmp}/emcache-supertux"
+      mkdir -p "$EM_CACHE"
+      export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      export CMAKE_PREFIX_PATH="${modplugWasm}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
+${lib.optionalString (sdl2WasmLibs != null) ''
+      # Offline static SDL2 (no emscripten port download).
+      export PKG_CONFIG_PATH="${sdl2WasmLibs}/lib/pkgconfig:$PKG_CONFIG_PATH"
+      export CMAKE_PREFIX_PATH="${sdl2WasmLibs}:$CMAKE_PREFIX_PATH"
+      export SDL2_DIR="${sdl2WasmLibs}"
+''}
+      emcmake cmake -S . -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=$out \
+        ${lib.escapeShellArgs cmakeFlags}
+      cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
+    '';
+    buildPhase = "runHook preBuild; runHook postBuild";
       installPhase = "runHook preInstall; runHook postInstall";
       dontStrip = true;
     };
@@ -163,13 +169,50 @@ EOFPC
     "-DWSTSOUND_WITH_EFX=OFF"
   ];
 
-  # Offline emscripten SDL2 port (build sandbox has no network).
-  # Must live in `let` (not the returned attrset) so ${sdl2PortZip} is in
-  # scope inside supertux-wasm's preBuild string.
-  sdl2PortZip = pkgs.fetchurl {
-    url = "https://github.com/libsdl-org/SDL/archive/release-2.32.10.zip";
-    hash = "sha256-ejwge4UJ7cSH1ljfNXrXZM2FLWj+JI0weyXAdB1S/fA=";
-  };
+  # Offline static SDL2 for wasm (Pingus pattern). Avoids -sUSE_SDL=2 which
+  # downloads the emscripten port at compile/link time (nix sandbox has no net).
+  sdl2WasmLibs =
+    if sdlSrc == null then null
+    else pkgs.stdenv.mkDerivation {
+      pname = "sdl2-wasm";
+      version = sdlVersion;
+      dontUnpack = true;
+      dontConfigure = true;
+      dontUseCmakeConfigure = true;
+      nativeBuildInputs = [ emscripten pkgs.cmake pkgs.python3 ];
+      env = {
+        SDL_SRC = "${sdlSrc}";
+      };
+      buildPhase = ''
+        runHook preBuild
+        bash ${../mk/wasm/scripts/build-sdl2.sh}
+        runHook postBuild
+      '';
+      installPhase = ''
+        runHook preInstall
+        mkdir -p $out
+        if [ -d prefix ]; then
+          cp -a prefix/. $out/
+        else
+          mkdir -p $out/lib $out/include
+          find . -name 'libSDL2.a' -exec cp {} $out/lib/ \; || true
+          if [ -d SDL2-src/include ]; then cp -a SDL2-src/include/. $out/include/; fi
+        fi
+        mkdir -p $out/lib/pkgconfig
+        cat > $out/lib/pkgconfig/sdl2.pc <<EOF
+prefix=$out
+exec_prefix=\''${prefix}
+libdir=\''${prefix}/lib
+includedir=\''${prefix}/include
+Name: sdl2
+Description: SDL2 (wasm static)
+Version: ${sdlVersion}
+Libs: -L\''${libdir} -lSDL2
+Cflags: -I\''${includedir} -I\''${includedir}/SDL2
+EOF
+        runHook postInstall
+      '';
+    };
 
 in
 {
@@ -203,11 +246,10 @@ in
       strutcppWasm
       tinycmmcNative
       modplugWasm
-    ];
+    ] ++ lib.optional (sdl2WasmLibs != null) sdl2WasmLibs;
 
-    # Compile-time ports: without these, emscripten's fakesdl/*.h #error on include.
-    # Must be on CMAKE_C/CXX_FLAGS (every TU), not only the final link line.
-    # Each element is one argv; values with spaces must stay in a single string.
+    # Offline SDL2: do NOT put -sUSE_SDL=2 on CMAKE_C/CXX_FLAGS (triggers
+    # emscripten port download per TU). Headers come from sdl2WasmLibs.
     cmakeFlags = [
       "-DENABLE_OPENGL=ON"
       "-DENABLE_OPENGLES2=ON"
@@ -219,12 +261,10 @@ in
       "-Dglm_DIR=${glmPrefix}/lib/cmake/glm"
       "-DPRIO_USE_JSONCPP=OFF"
       # Point CMake at static modplug so external/wstsound configures.
-      "-DCMAKE_PREFIX_PATH=${modplugWasm}"
+      "-DCMAKE_PREFIX_PATH=${modplugWasm}${lib.optionalString (sdl2WasmLibs != null) ";${sdl2WasmLibs}"}"
       "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH"
       "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH"
       "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH"
-      "-DCMAKE_C_FLAGS=-sUSE_SDL=2"
-      "-DCMAKE_CXX_FLAGS=-sUSE_SDL=2"
     ] ++ modplugCmakeFlags
       ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"

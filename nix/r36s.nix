@@ -128,12 +128,15 @@ let
   # That avoids __attr_dealloc_free errors from mixing glibc 2.30 cdefs with
   # modern stdlib.h, and keeps #include_next <stdlib.h> working.
   #
-  # Link: GCC 15 headers need matching libstdc++ symbols (to_chars,
-  # __throw_bad_array_new_length, __cxa_call_terminate). ArkOS libstdc++.so is
-  # too old, so we statically link GCC 15's libstdc++ and libgcc:
+  # Link: GCC 15 headers need a few symbols absent from ArkOS libstdc++
+  # (to_chars, __throw_bad_array_new_length, __cxa_call_terminate). Statically
+  # linking GCC 15's libstdc++ pulls in modern glibc symbols (__isoc23_strtoul,
+  # __libc_single_threaded, arc4random) that ArkOS glibc ~2.30 does not export.
+  # Match Pingus: link sysroot libstdc++.so by absolute path + cxxabi_shim.cpp,
+  # and -static-libgcc only (not -static-libstdc++):
   #   - compile with modern headers + _GLIBCXX_USE_CXX11_ABI=0
-  #   - -static-libstdc++ / -static-libgcc (no shared GLIBC_2.35 from libgcc_s)
-  #   - weak _dl_find_object stub (mk/r36s/dl_find_object_stub.c) for glibc < 2.35
+  #   - -nostdlib++ so g++ does not force its libstdc++
+  #   - cxxabi_shim.cpp (mk/r36s/) supplies missing ABI symbols + _dl_find_object
   #   - -fexceptions for try/catch in SuperTux / tinygettext / prio
   #   - --allow-shlib-undefined for DT_NEEDED of sysroot libs at runtime
   mkWrappers = sysroot: let
@@ -180,8 +183,9 @@ let
       -march=armv8-a \
       -mtune=cortex-a35 \
     '';
-    # Link flags: sysroot first for libc/SDL; modern gcc -L for static
-    # libgcc / libstdc++ archives. Explicit dynamic linker for ArkOS.
+    # Link flags: sysroot first for libc/SDL; modern gcc -L so
+    # -static-libgcc can find libgcc.a / libgcc_eh.a (stdc++ is the
+    # absolute sysroot path in the cxx wrapper — not -lstdc++).
     commonLink = ''
       --sysroot=${sysroot} \
       -Wl,--sysroot=${sysroot} \
@@ -196,7 +200,6 @@ let
       -L${libgccLib} \
       -L${libgccLibTarget} \
       -static-libgcc \
-      -static-libstdc++ \
       -Wl,-Bdynamic \
       -l:libpthread.so.0 \
       -lm \
@@ -248,9 +251,24 @@ let
           ${commonCompileCxx} \
           "$@"
       else
-        # Static libstdc++ from GCC 15 (via commonLink -static-libstdc++).
-        # Do not link ArkOS libstdc++.so — headers are GCC 15 and need matching
-        # symbols (to_chars, __throw_bad_array_new_length, __cxa_call_terminate).
+        # Link sysroot libstdc++ by absolute path so g++ cannot pick GCC 15's
+        # (which requires GLIBCXX_3.4.32 / modern glibc not present on ArkOS).
+        # Missing ABI symbols are provided by mk/r36s/cxxabi_shim.cpp.
+        stdcpp=
+        for cand in \
+          "${libdir}/libstdc++.so" \
+          "${libdir}/libstdc++.so.6" \
+          "${sysroot}/usr/lib/libstdc++.so" \
+          "${sysroot}/usr/lib/libstdc++.so.6" \
+          "${sysroot}/lib/aarch64-linux-gnu/libstdc++.so" \
+          "${sysroot}/lib/aarch64-linux-gnu/libstdc++.so.6"
+        do
+          if [ -e "$cand" ]; then stdcpp="$cand"; break; fi
+        done
+        if [ -z "$stdcpp" ]; then
+          echo "aarch64-arkos-g++: no libstdc++ in sysroot" >&2
+          exit 1
+        fi
         sdl2=
         sdl2image=
         for cand in \
@@ -305,9 +323,10 @@ let
         exec ${gcc}/bin/${targetPrefix}g++ \
           -B${crossCc.bintools}/bin \
           ${commonCompileCxx} \
+          -nostdlib++ \
           ${commonLink} \
           "$@" \
-          -Wl,--no-as-needed "$sdl2image" "$sdl2" $extra_audio \
+          -Wl,--no-as-needed "$stdcpp" "$sdl2image" "$sdl2" $extra_audio \
           -Wl,-Bdynamic -l:libpthread.so.0 -lm \
           -Wl,--as-needed
       fi
@@ -371,6 +390,8 @@ let
         "-DENABLE_OPENGLES2=ON"
         "-DENABLE_OPENGL=ON"
         "-DSUPERTUX_R36S=ON"
+        # GCC 15 headers vs ArkOS libstdc++: shim missing ABI symbols.
+        "-DSUPERTUX_CXXABI_SHIM=${../mk/r36s/cxxabi_shim.cpp}"
         # ArkOS sysroot has neither libsigc++ nor glm cmake config.
         # FIND_ROOT_PATH_MODE_PACKAGE=ONLY hides host glmConfig; pass include
         # dir explicitly (see ProvideGlm.cmake / Pingus PINGUS_GLM_INCLUDE_DIR).

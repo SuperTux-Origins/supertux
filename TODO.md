@@ -1,6 +1,6 @@
 # TODO — SuperTux multi-platform port
 
-Tip is at a1fd30f11 (Update flake.lock). Library breakdown lives in
+Tip continues from 09bc574; next bundle after Android include / R36S link / WASM offline SDL2 fixes. Library breakdown lives in
 PORTING.md / AGENTS.md. Packaging surface (mk/, nix/, flake outputs)
 adapted from Pingus and Windstille.
 

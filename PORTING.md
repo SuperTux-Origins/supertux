@@ -769,29 +769,36 @@ NDK libc++ needs `#include <sstream>` for `std::ostringstream`. Custom
 `std::formatter` specializations must use the two-parameter form
 `formatter<T, char>` or make_format_args rejects the type.
 
-### WASM: no USE_SDL_IMAGE under nix sandbox
+### WASM: offline static SDL2 (no emscripten ports)
 
-`-sUSE_SDL_IMAGE=2` pulls the zlib emscripten port from the network
-(DNS fails offline). Compile with `-sUSE_SDL=2` only and ship
-`mk/emscripten/SDL_image.h` as a minimal stub include.
+`-sUSE_SDL=2` / `-sUSE_SDL_IMAGE=2` / `-sUSE_FREETYPE=1` trigger emscripten
+port downloads at **compile** time when those flags are on CMAKE_C/CXX_FLAGS.
+Nix sandbox has no DNS → `Temporary failure in name resolution`.
 
-### WASM: seed EM_CACHE with SDL2 port zip
+Match Pingus: build static SDL2 offline via `mk/wasm/scripts/build-sdl2.sh`
+from the `sdl2-src` flake input, expose it through pkg-config / CMAKE_PREFIX_PATH,
+and do **not** pass `-sUSE_SDL*` on compile or link flags. SDL_image is provided
+by `mk/emscripten/SDL_image.h` + `sdl_image_stub.c` (IMG_* return NULL until
+stb_image is wired).
 
-Nix build sandbox has no network. `pkgs.fetchurl` (fixed-output) downloads
-SDL release-2.32.10.zip at eval/build of that derivation; preBuild copies it
-into `$EM_CACHE/ports/` and `$EM_CACHE/downloads/` so emscripten ports/sdl2.py
-does not call urlopen.
+### Android: priocpp / strut flat includes
 
+priocpp and strutcpp sources use `#include "reader_collection.hpp"` (no
+`prio/` prefix) because CMake adds `include/prio/` as a private include dir.
+NDK Android.mk must list `external_includes/prio`, `external_includes/strut`,
+`deps/priocpp`, `deps/strutcpp`, `deps/wstsound`, etc. under LOCAL_C_INCLUDES
+or the staged sources fail with "file not found".
 
-### R36S: static libstdc++ + _dl_find_object stub
+### R36S: sysroot libstdc++ + cxxabi_shim (not static GCC libstdc++)
 
 Compiling with GCC 15 libstdc++ headers emits references to symbols not present
-in ArkOS's older libstdc++.so (`std::to_chars` for floats via std::format,
-`std::__throw_bad_array_new_length`, `__cxa_call_terminate`). Linking the
-sysroot libstdc++ therefore fails at the final executable link.
+in ArkOS's older libstdc++.so (`std::to_chars` for floats, `__throw_bad_array_new_length`,
+`__cxa_call_terminate`). Statically linking GCC 15's libstdc++ **also** fails:
+the archive pulls modern glibc symbols (`__isoc23_strtoul`, `__libc_single_threaded`,
+`arc4random`) absent from ArkOS glibc ~2.30.
 
-Fix: `-static-libstdc++ -static-libgcc` from the cross toolchain so those
-symbols come from GCC 15 archives. Static libgcc_eh still wants `_dl_find_object`
-(glibc 2.35+); provide a weak stub in `mk/r36s/dl_find_object_stub.c` that
-returns -1 (fallback unwind path).
+Match Pingus: `-nostdlib++`, link sysroot `libstdc++.so` by absolute path, and
+compile `mk/r36s/cxxabi_shim.cpp` into the executable (`-DSUPERTUX_CXXABI_SHIM=…`)
+to supply the missing ABI symbols plus `_dl_find_object`. Keep `-static-libgcc`
+only (for libgcc_eh without shared GLIBC_2.35 from libgcc_s).
 

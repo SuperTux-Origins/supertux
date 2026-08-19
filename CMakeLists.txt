@@ -100,7 +100,7 @@ if(EMSCRIPTEN)
   # freetype/…) which fail offline in the nix sandbox.
   # Ports belong only on the final executable link line.
   set(USE_COMPILE_FLAGS " -sDISABLE_EXCEPTION_CATCHING=0 -fexceptions")
-  set(USE_LINK_FLAGS " -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_FREETYPE=1 -sUSE_PTHREADS=1 -sFULL_ES2=1 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_CONFIG_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sERROR_ON_UNDEFINED_SYMBOLS=0 -sSDL2_IMAGE_FORMATS='[\"png\"]' -lidbfs.js -fexceptions")
+  set(USE_LINK_FLAGS " -sFULL_ES2=1 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_CONFIG_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js -fexceptions -lGL")
   if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(USE_COMPILE_FLAGS "${USE_COMPILE_FLAGS} -fsanitize=undefined -sSAFE_HEAP=1 -sASSERTIONS=1 -sDEMANGLE_SUPPORT=1")
   endif()
@@ -297,6 +297,13 @@ target_include_directories(supertux-origins_lib PUBLIC ${CMAKE_BINARY_DIR} src/)
 if(EMSCRIPTEN)
   # Prefer offline stubs over emscripten fakesdl that require -sUSE_SDL_IMAGE.
   target_include_directories(supertux-origins_lib PUBLIC ${CMAKE_SOURCE_DIR}/mk/emscripten)
+  if(NOT TARGET LibSDL2_image_stub)
+    add_library(LibSDL2_image_stub STATIC ${CMAKE_SOURCE_DIR}/mk/emscripten/sdl_image_stub.c)
+    target_include_directories(LibSDL2_image_stub PUBLIC ${CMAKE_SOURCE_DIR}/mk/emscripten)
+    if(TARGET LibSDL2)
+      target_link_libraries(LibSDL2_image_stub PUBLIC LibSDL2)
+    endif()
+  endif()
 endif()
 
 
@@ -333,7 +340,9 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc.*")
 endif()
 
 ## Link supertux binary with squirrel and other libraries
-if(NOT EMSCRIPTEN)
+if(EMSCRIPTEN)
+  target_link_libraries(supertux-origins_lib PUBLIC LibSDL2 LibSDL2_image_stub)
+else()
   target_link_libraries(supertux-origins_lib PUBLIC LibSDL2 LibSDL2_image)
 endif()
 
@@ -427,8 +436,13 @@ mark_as_advanced(
 
 # EOF #
 
-# R36S: weak _dl_find_object for glibc < 2.35 when using static libgcc_eh.
-if(SUPERTUX_R36S)
+# R36S / ArkOS: ABI shims when linking GCC 15 headers against older sysroot
+# libstdc++ (to_chars, __throw_bad_array_new_length, _dl_find_object, …).
+if(SUPERTUX_CXXABI_SHIM)
+  if(TARGET supertux-origins)
+    target_sources(supertux-origins PRIVATE "${SUPERTUX_CXXABI_SHIM}")
+  endif()
+elseif(SUPERTUX_R36S)
   if(TARGET supertux-origins)
     target_sources(supertux-origins PRIVATE "${CMAKE_SOURCE_DIR}/mk/r36s/dl_find_object_stub.c")
   endif()

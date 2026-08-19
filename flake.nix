@@ -217,6 +217,8 @@
           supertux-wasm = (import ./nix/wasm.nix {
             inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
                     wstsound squirrel physfs-src squirrel-src;
+            sdlSrc = sdl2-src;
+            sdlVersion = "2.30.3";
           }).supertux-wasm;
           # Alias for discoverability
           supertux-origins-wasm = supertux-wasm;
