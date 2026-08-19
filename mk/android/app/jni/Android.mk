@@ -1,12 +1,10 @@
 # SuperTux Origins — jni module Android.mk
 # SDL2 prebuilts live in sibling jni/SDL/ (see nix/android.nix sdlPrebuiltAndroidMk).
-# Do not redeclare PREBUILT SDL2 here with relative paths under jni/src/ — that
-# is what made ndk-build look for jni/src/SDL2/lib/... and fail.
 
 LOCAL_PATH := $(call my-dir)
 
 # ---------------------------------------------------------------------------
-# Prebuilt OpenAL Soft + libmodplug (per-ABI static libs from AUDIO_ANDROID_LIBS)
+# Prebuilt OpenAL Soft + libmodplug
 # ---------------------------------------------------------------------------
 ifeq ($(ENABLE_ANDROID_SOUND),1)
 
@@ -25,31 +23,37 @@ include $(PREBUILT_STATIC_LIBRARY)
 endif
 
 # ---------------------------------------------------------------------------
-# libmain — placeholder until full SUPERTUX_SOURCES + deps are wired
+# libmain — full game + staged deps (build-apk.sh copies src/ + external into here)
 # ---------------------------------------------------------------------------
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := main
 
-# Placeholder so ndk-build validates the prebuilt / packaging pipeline.
-# When ready, switch to RWILDCARD over this tree (game + deps/*) like Pingus.
-ifneq ($(wildcard $(LOCAL_PATH)/placeholder.cpp),)
-LOCAL_SRC_FILES := placeholder.cpp
-else
-# Collect any staged .cpp (deps + game) once sources are copied in.
+# Recursive collect of staged .cpp/.c under jni/src (game tree + deps/*).
 RWILDCARD = $(foreach d,$(wildcard $1*),$(call RWILDCARD,$d/,$2) $(filter $(subst *,%,$2),$d))
 LOCAL_SRC_FILES := $(patsubst $(LOCAL_PATH)/%,%,$(call RWILDCARD,$(LOCAL_PATH)/,%.cpp))
-LOCAL_SRC_FILES += $(patsubst $(LOCAL_PATH)/%,%,$(wildcard $(LOCAL_PATH)/*.c))
+LOCAL_SRC_FILES += $(patsubst $(LOCAL_PATH)/%,%,$(call RWILDCARD,$(LOCAL_PATH)/,%.c))
+
+# Never ship the Android scaffold placeholder once real sources are present.
+LOCAL_SRC_FILES := $(filter-out placeholder.cpp,$(LOCAL_SRC_FILES))
+# Platform / optional backends not built on Android.
 LOCAL_SRC_FILES := $(filter-out %/win32/% win32/%,$(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES := $(filter-out %/json_reader_impl.cpp %/json_writer_impl.cpp %/jsonpretty_writer_impl.cpp,$(LOCAL_SRC_FILES))
-endif
+# squirrel ships an interpreter tool we do not need.
+LOCAL_SRC_FILES := $(filter-out %/sq/sq.c %/sq/sq.cpp deps/squirrel/sq/%,$(LOCAL_SRC_FILES))
+# Prefer static squirrel objects only (exclude shared-only stubs if any).
+LOCAL_SRC_FILES := $(filter-out %/sqstdlib/%/sqstdlib.cpp,$(LOCAL_SRC_FILES))
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../SDL/include \
 	$(LOCAL_PATH)/../SDL/include/SDL2 \
 	$(LOCAL_PATH) \
 	$(LOCAL_PATH)/../external_includes \
-	$(LOCAL_PATH)/deps
+	$(LOCAL_PATH)/deps \
+	$(LOCAL_PATH)/deps/squirrel/include \
+	$(LOCAL_PATH)/deps/physfs/src \
+	$(LOCAL_PATH)/deps/SDL_SavePNG \
+	$(LOCAL_PATH)/deps/obstack
 
 ifeq ($(ENABLE_ANDROID_SOUND),1)
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../audio/include
@@ -66,7 +70,18 @@ LOCAL_STATIC_LIBRARIES := modplug
 LOCAL_LDLIBS += -lOpenSLES
 endif
 
-LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions -DANDROID -DUSE_OPENGLES2 -DUSE_SDL2
-LOCAL_CFLAGS := -DANDROID -DUSE_OPENGLES2 -DUSE_SDL2
+LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions \
+	-DANDROID -DUSE_OPENGLES2 -DUSE_SDL2 \
+	-DWSTSOUND_WITH_MODPLUG=1 \
+	-DWSTSOUND_WITH_MPG123=0 \
+	-DWSTSOUND_WITH_VORBIS=0 \
+	-DWSTSOUND_WITH_OPUS=0 \
+	-DWSTSOUND_WITH_EFX=0 \
+	-DPRIO_USE_JSONCPP=0
+
+LOCAL_CFLAGS := -DANDROID -DUSE_OPENGLES2 -DUSE_SDL2 \
+	-DWSTSOUND_WITH_MODPLUG=1 \
+	-DWSTSOUND_WITH_MPG123=0 \
+	-DPRIO_USE_JSONCPP=0
 
 include $(BUILD_SHARED_LIBRARY)

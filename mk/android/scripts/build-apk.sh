@@ -42,7 +42,10 @@ resolve_ndk() {
       return
     fi
   fi
-  echo "error: no ndk-build under ANDROID_HOME=$ANDROID_HOME (tried ndk-bundle and ndk/*)" >&2
+  echo "error: no echo "==> Counting staged sources under jni/src..."
+find src/jni/src -name '*.cpp' -o -name '*.c' | wc -l
+find src/jni/src -name '*.cpp' | head -20
+ndk-build under ANDROID_HOME=$ANDROID_HOME (tried ndk-bundle and ndk/*)" >&2
   exit 1
 }
 
@@ -66,10 +69,7 @@ mkdir -p src/jni/src src/jni/SDL
 cp "$APPLICATION_MK" src/jni/Application.mk
 cp "$TOP_ANDROID_MK" src/jni/Android.mk
 cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
-# Placeholder TU so ndk-build has a source before full game sources are wired.
-if [ -f "$APP_DIR/jni/placeholder.cpp" ]; then
-  cp "$APP_DIR/jni/placeholder.cpp" src/jni/src/placeholder.cpp
-fi
+# placeholder.cpp intentionally not staged — full game sources are used.
 cp "$APP_DIR/AndroidManifest.xml" src/AndroidManifest.xml
 cp -r "$APP_DIR/res" src/res
 
@@ -79,9 +79,6 @@ chmod -R u+rwX src/jni/src
 # Re-assert module Android.mk after the source tree copy so a stray file
 # under GAME_SRC_DIR can never replace it (SDL2 prebuilts live in jni/SDL/).
 cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
-if [ -f "$APP_DIR/jni/placeholder.cpp" ]; then
-  cp "$APP_DIR/jni/placeholder.cpp" src/jni/src/placeholder.cpp
-fi
 
 # Stage monorepo external/ headers + sources.
 # Under Nix, GAME_SRC_DIR is a filtered ./src store path — parent is NOT the
@@ -136,7 +133,10 @@ echo "==> staged external headers into jni/external_includes"
 # to it even on Android. Always drop the Windows shim from the stage tree.
 rm -f src/jni/external_includes/tinygettext/dirent.h
 
-# Compile external .cpp into libmain (ndk-build RWILDCARD under jni/src/).
+# Compile external .cpp into libmain (echo "==> Counting staged sources under jni/src..."
+find src/jni/src -name '*.cpp' -o -name '*.c' | wc -l
+find src/jni/src -name '*.cpp' | head -20
+ndk-build RWILDCARD under jni/src/).
 # Skip tests/benchmarks; skip priocpp JSON (no jsoncpp on Android).
 mkdir -p src/jni/src/deps
 stage_lib_src() {
@@ -158,6 +158,80 @@ stage_lib_src sexpcpp
 stage_lib_src strutcpp
 stage_lib_src priocpp
 stage_lib_src tinygettext
+
+# --- Upstream sources that are packaging-only under external/ ---
+# Squirrel (scripting): flake input squirrel-src or SQUIRREL_SOURCE_DIR
+SQUIRREL_SRC="${SQUIRREL_SOURCE_DIR:-}"
+if [ -n "$SQUIRREL_SRC" ] && [ -d "$SQUIRREL_SRC" ]; then
+  mkdir -p src/jni/src/deps/squirrel
+  # squirrel core + sqstdlib (static objects)
+  for sub in squirrel sqstdlib include; do
+    if [ -d "$SQUIRREL_SRC/$sub" ]; then
+      cp -a "$SQUIRREL_SRC/$sub" src/jni/src/deps/squirrel/
+    fi
+  done
+  # top-level headers
+  for h in squirrel.h sqconfig.h sqstdblob.h sqstdio.h sqstdmath.h sqstdstring.h sqstdsystem.h sqstdaux.h; do
+    [ -f "$SQUIRREL_SRC/$h" ] && cp -a "$SQUIRREL_SRC/$h" src/jni/src/deps/squirrel/include/ 2>/dev/null || true
+    [ -f "$SQUIRREL_SRC/include/$h" ] && mkdir -p src/jni/src/deps/squirrel/include && cp -a "$SQUIRREL_SRC/include/$h" src/jni/src/deps/squirrel/include/
+  done
+  chmod -R u+rwX src/jni/src/deps/squirrel
+  echo "==> staged squirrel from $SQUIRREL_SRC"
+else
+  echo "warning: SQUIRREL_SOURCE_DIR not set — scripting will fail to link" >&2
+fi
+
+# PhysFS
+PHYSFS_SRC="${PHYSFS_SOURCE_DIR:-}"
+if [ -n "$PHYSFS_SRC" ] && [ -d "$PHYSFS_SRC" ]; then
+  mkdir -p src/jni/src/deps/physfs
+  # PhysFS is mostly C under src/
+  if [ -d "$PHYSFS_SRC/src" ]; then
+    cp -a "$PHYSFS_SRC/src" src/jni/src/deps/physfs/
+  else
+    find "$PHYSFS_SRC" -maxdepth 1 -name '*.c' -exec cp -a {} src/jni/src/deps/physfs/ \;
+  fi
+  # public header
+  if [ -f "$PHYSFS_SRC/src/physfs.h" ]; then
+    mkdir -p src/jni/external_includes
+    cp -a "$PHYSFS_SRC/src/physfs.h" src/jni/external_includes/
+  elif [ -f "$PHYSFS_SRC/physfs.h" ]; then
+    mkdir -p src/jni/external_includes
+    cp -a "$PHYSFS_SRC/physfs.h" src/jni/external_includes/
+  fi
+  chmod -R u+rwX src/jni/src/deps/physfs
+  echo "==> staged physfs from $PHYSFS_SRC"
+else
+  echo "warning: PHYSFS_SOURCE_DIR not set — PhysFS will fail to link" >&2
+fi
+
+# obstack (C helper used by SuperTux)
+if [ -d "$EXTERNAL_DIR/obstack" ]; then
+  mkdir -p src/jni/src/deps/obstack
+  find "$EXTERNAL_DIR/obstack" -name '*.c' -o -name '*.h' | while read -r f; do
+    cp -a "$f" src/jni/src/deps/obstack/
+  done
+  chmod -R u+rwX src/jni/src/deps/obstack
+  echo "==> staged obstack"
+fi
+
+# SavePNG stub (no libpng on NDK path for now)
+mkdir -p src/jni/src/deps/SDL_SavePNG
+cat > src/jni/src/deps/SDL_SavePNG/savepng_stub.c << 'STUBEOF'
+#include <SDL.h>
+int SDL_SavePNG_RW(SDL_Surface *surface, SDL_RWops *dst, int freedst) {
+  (void)surface;
+  if (dst && freedst) SDL_RWclose(dst);
+  SDL_SetError("SDL_SavePNG stub: libpng not linked on Android");
+  return -1;
+}
+SDL_Surface *SDL_PNGFormatAlpha(SDL_Surface *src) { (void)src; return NULL; }
+STUBEOF
+if [ -f "$EXTERNAL_DIR/SDL_SavePNG/savepng.h" ]; then
+  cp -a "$EXTERNAL_DIR/SDL_SavePNG/savepng.h" src/jni/src/deps/SDL_SavePNG/
+fi
+echo "==> staged SavePNG stub"
+
 # Drop JSON backends (PRIO_USE_JSONCPP is off).
 rm -f src/jni/src/deps/priocpp/json_*.cpp \
       src/jni/src/deps/priocpp/jsonpretty_*.cpp
