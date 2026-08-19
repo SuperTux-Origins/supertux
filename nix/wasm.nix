@@ -247,6 +247,16 @@ EOF
       runHook preInstall
       mkdir -p $out
       cp -a prefix/. $out/
+      # configure embeds the build-time $PWD/prefix into *.pc — rewrite to $out.
+      if [ -d "$out/lib/pkgconfig" ]; then
+        for pc in "$out/lib/pkgconfig"/*.pc; do
+          [ -f "$pc" ] || continue
+          sed -i "s|^prefix=.*|prefix=$out|" "$pc"
+          sed -i "s|^exec_prefix=.*|exec_prefix=\${prefix}|" "$pc"
+          sed -i "s|^libdir=.*|libdir=\${prefix}/lib|" "$pc"
+          sed -i "s|^includedir=.*|includedir=\${prefix}/include|" "$pc"
+        done
+      fi
       runHook postInstall
     '';
     meta = with lib; {
@@ -287,6 +297,15 @@ EOF
       cp -a prefix/. $out/
       # Re-export ogg into the same prefix for a single CMAKE_PREFIX_PATH entry.
       cp -a ${oggWasm}/. $out/ || true
+      if [ -d "$out/lib/pkgconfig" ]; then
+        for pc in "$out/lib/pkgconfig"/*.pc; do
+          [ -f "$pc" ] || continue
+          sed -i "s|^prefix=.*|prefix=$out|" "$pc"
+          sed -i "s|^exec_prefix=.*|exec_prefix=\${prefix}|" "$pc"
+          sed -i "s|^libdir=.*|libdir=\${prefix}/lib|" "$pc"
+          sed -i "s|^includedir=.*|includedir=\${prefix}/include|" "$pc"
+        done
+      fi
       runHook postInstall
     '';
     meta = with lib; {
@@ -393,7 +412,12 @@ in
       "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH"
     ] ++ modplugCmakeFlags ++ [
       "-DOGG_DIR=${oggWasm}"
+      "-DOGG_INCLUDE_DIRECTORY=${oggWasm}/include"
+      "-DOGG_LIBRARY=${oggWasm}/lib/libogg.a"
       "-DVORBISFILE_DIR=${vorbisWasm}"
+      "-DVORBISFILE_INCLUDE_DIRECTORY=${vorbisWasm}/include"
+      "-DVORBISFILE_LIBRARY=${vorbisWasm}/lib/libvorbisfile.a"
+      "-DVORBIS_LIBRARY=${vorbisWasm}/lib/libvorbis.a"
     ]
       ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"
