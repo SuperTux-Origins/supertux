@@ -220,9 +220,53 @@ EOF
       '';
     };
 
+
+  # Windstille-style FreeType for wasm (full cmake build, not a hand-picked .c list).
+  freetypeWasm =
+    if freetypeSrc == null then null
+    else pkgs.stdenv.mkDerivation {
+      pname = "freetype-wasm";
+      version = "2.13.2-wasm";
+      src = freetypeSrc;
+      nativeBuildInputs = [ emscripten pkgs.python3 pkgs.buildPackages.cmake ];
+      dontConfigure = true;
+      buildPhase = ''
+        runHook preBuild
+        export EM_CACHE="''${TMPDIR:-/tmp}/emcache-freetype"
+        mkdir -p "$EM_CACHE" "$PWD/prefix" build
+        (
+          cd build
+          emcmake cmake .. \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/../prefix" \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DFT_DISABLE_HARFBUZZ=TRUE \
+            -DFT_DISABLE_BZIP2=TRUE \
+            -DFT_DISABLE_BROTLI=TRUE \
+            -DFT_DISABLE_PNG=TRUE \
+            -DFT_DISABLE_ZLIB=TRUE
+          emmake make -j''${NIX_BUILD_CORES:-2}
+          emmake make install
+        )
+        runHook postBuild
+      '';
+      installPhase = ''
+        runHook preInstall
+        mkdir -p $out
+        cp -a prefix/. $out/
+        runHook postInstall
+      '';
+      meta = with lib; {
+        description = "Static FreeType for wasm32-emscripten (SuperTux / Windstille-style)";
+        platforms = platforms.linux;
+      };
+    };
+
 in
 {
-  inherit logmichWasm sexpcppWasm strutcppWasm modplugWasm;
+  inherit logmichWasm sexpcppWasm strutcppWasm modplugWasm freetypeWasm;
+
 
   supertux-wasm = est.mkDerivation rec {
     pname = "supertux-origins-wasm";
@@ -283,6 +327,9 @@ in
       "-DSDL2_TTF_SOURCE_DIR=${sdl2TtfSrc}"
     ] ++ lib.optionals (freetypeSrc != null) [
       "-DFREETYPE_SOURCE_DIR=${freetypeSrc}"
+    ] ++ lib.optionals (freetypeWasm != null) [
+      "-DFREETYPE_INCLUDE_DIRS=${freetypeWasm}/include;${freetypeWasm}/include/freetype2"
+      "-DFREETYPE_LIBRARY=${freetypeWasm}/lib/libfreetype.a"
     ];
 
     preBuild = ''

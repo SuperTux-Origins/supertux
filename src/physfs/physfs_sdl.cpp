@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <physfs.h>
 #include <sstream>
+#include <string>
 
 #include "util/log.hpp"
 
@@ -110,7 +111,12 @@ SDL_RWops* get_physfs_SDLRWops(std::string const& filename)
     throw std::runtime_error("Couldn't open file: empty filename");
   }
 
-  PHYSFS_file* file = static_cast<PHYSFS_file*>(PHYSFS_openRead(filename.c_str()));
+  // PhysFS paths are relative to mount points; a leading '/' makes lookups fail.
+  std::string path = filename;
+  while (!path.empty() && path[0] == '/')
+    path.erase(path.begin());
+
+  PHYSFS_file* file = static_cast<PHYSFS_file*>(PHYSFS_openRead(path.c_str()));
   if (!file) {
     std::stringstream msg;
     msg << "Couldn't open '" << filename << "': "

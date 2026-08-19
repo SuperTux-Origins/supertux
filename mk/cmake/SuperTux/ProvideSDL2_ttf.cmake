@@ -1,13 +1,32 @@
-# SDL2_ttf — Emscripten: build real SDL_ttf + FreeType when SOURCE_DIRs given;
-# otherwise offline stub. Desktop/R36S: system package or SDL2_TTF_SOURCE_DIR.
+# SDL2_ttf — Emscripten: prefer FREETYPE_* from nix (Windstille-style freetypeWasm);
+# else hand-built FreeType from FREETYPE_SOURCE_DIR; else offline stub.
+# Desktop/R36S: system package or SDL2_TTF_SOURCE_DIR.
 
 if(EMSCRIPTEN)
-  if(SDL2_TTF_SOURCE_DIR AND FREETYPE_SOURCE_DIR
-      AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c"
-      AND EXISTS "${FREETYPE_SOURCE_DIR}/include/ft2build.h")
-    message(STATUS "Emscripten: building SDL_ttf from ${SDL2_TTF_SOURCE_DIR} + FreeType")
+  set(_st_have_ttf_src FALSE)
+  if(SDL2_TTF_SOURCE_DIR AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
+    set(_st_have_ttf_src TRUE)
+  endif()
 
-    # Minimal FreeType static lib (TrueType + smooth raster).
+  # 1) Prebuilt FreeType (nix freetypeWasm): FREETYPE_INCLUDE_DIRS + FREETYPE_LIBRARY
+  if(_st_have_ttf_src AND FREETYPE_INCLUDE_DIRS AND FREETYPE_LIBRARY)
+    message(STATUS "Emscripten: SDL_ttf + prebuilt FreeType (${FREETYPE_LIBRARY})")
+    add_library(LibSDL2_ttf STATIC "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
+    target_include_directories(LibSDL2_ttf PUBLIC
+      "${SDL2_TTF_SOURCE_DIR}"
+      ${FREETYPE_INCLUDE_DIRS})
+    target_compile_definitions(LibSDL2_ttf PRIVATE TTF_USE_HARFBUZZ=0)
+    target_link_libraries(LibSDL2_ttf PUBLIC ${FREETYPE_LIBRARY})
+    if(TARGET LibSDL2)
+      target_link_libraries(LibSDL2_ttf PUBLIC LibSDL2)
+    endif()
+    return()
+  endif()
+
+  # 2) Fallback: compile a minimal FreeType set from FREETYPE_SOURCE_DIR
+  if(_st_have_ttf_src AND FREETYPE_SOURCE_DIR
+      AND EXISTS "${FREETYPE_SOURCE_DIR}/include/ft2build.h")
+    message(STATUS "Emscripten: SDL_ttf + in-tree FreeType sources (${FREETYPE_SOURCE_DIR})")
     set(_ft_srcs
       ${FREETYPE_SOURCE_DIR}/src/autofit/autofit.c
       ${FREETYPE_SOURCE_DIR}/src/base/ftbase.c
@@ -36,10 +55,8 @@ if(EMSCRIPTEN)
       "${FREETYPE_SOURCE_DIR}/include")
     target_compile_definitions(supertux_freetype_wasm PRIVATE
       FT2_BUILD_LIBRARY DARWIN_NO_CARBON)
-    # FreeType unit files include peers via relative paths.
     target_include_directories(supertux_freetype_wasm PRIVATE
       "${FREETYPE_SOURCE_DIR}/src")
-
     add_library(LibSDL2_ttf STATIC "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
     target_include_directories(LibSDL2_ttf PUBLIC
       "${SDL2_TTF_SOURCE_DIR}"
@@ -52,7 +69,7 @@ if(EMSCRIPTEN)
     return()
   endif()
 
-  message(STATUS "Emscripten: offline SDL_ttf stub (set SDL2_TTF_SOURCE_DIR + FREETYPE_SOURCE_DIR for real fonts)")
+  message(STATUS "Emscripten: offline SDL_ttf stub (need SDL2_TTF_SOURCE_DIR + FreeType)")
   add_library(LibSDL2_ttf STATIC "${CMAKE_SOURCE_DIR}/mk/emscripten/sdl_ttf_stub.c")
   target_include_directories(LibSDL2_ttf PUBLIC "${CMAKE_SOURCE_DIR}/mk/emscripten")
   if(TARGET LibSDL2)
@@ -107,13 +124,12 @@ if(SDL2_TTF_INCLUDE_DIR AND SDL2_TTF_LIBRARY)
   return()
 endif()
 
-# Build from source when provided (R36S / offline desktop).
 if(SDL2_TTF_SOURCE_DIR AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
   message(STATUS "Building SDL2_ttf from SDL2_TTF_SOURCE_DIR=${SDL2_TTF_SOURCE_DIR}")
   add_library(LibSDL2_ttf STATIC "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
   target_include_directories(LibSDL2_ttf PUBLIC "${SDL2_TTF_SOURCE_DIR}")
   find_package(Freetype QUIET)
-  if(Freetype_FOUND OR FREETYPE_FOUND)
+  if(TARGET Freetype::Freetype)
     target_link_libraries(LibSDL2_ttf PUBLIC Freetype::Freetype)
   elseif(FREETYPE_INCLUDE_DIRS AND FREETYPE_LIBRARIES)
     target_include_directories(LibSDL2_ttf PUBLIC ${FREETYPE_INCLUDE_DIRS})

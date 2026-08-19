@@ -1133,3 +1133,11 @@ Runtime failed with `SDL_ttf stub: font rendering not implemented offline` and
 - `ProvideSDL2_ttf.cmake` builds real **SDL_ttf + FreeType** when
   `-DSDL2_TTF_SOURCE_DIR=` and `-DFREETYPE_SOURCE_DIR=` are set (flake inputs).
 
+### Follow-up vs Pingus/Windstille (bundle 013)
+
+- **freetypeWasm**: Windstille-style `emcmake` FreeType in `nix/wasm.nix`
+  (`FT_DISABLE_*`), passed as `FREETYPE_INCLUDE_DIRS` / `FREETYPE_LIBRARY`.
+- PhysFS: strip leading `/` in `get_physfs_SDLRWops`.
+- Image errors: prefer `IMG_GetError()` over stale `SDL_GetError()`.
+- Link flags: `MIN_WEBGL_VERSION`/`MAX_WEBGL_VERSION`, `EXIT_RUNTIME=0` (Pingus).
+

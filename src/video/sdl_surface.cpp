@@ -80,7 +80,10 @@ SDLSurface::from_file(std::string const& filename)
   if (!surface)
   {
     std::ostringstream msg;
-    msg << "Couldn't load image '" << filename << "' :" << SDL_GetError();
+    const char* img_err = IMG_GetError();
+    const char* sdl_err = SDL_GetError();
+    msg << "Couldn't load image '" << filename << "': "
+        << (img_err && img_err[0] ? img_err : (sdl_err && sdl_err[0] ? sdl_err : "unknown"));
     throw std::runtime_error(msg.str());
   }
   else
@@ -88,6 +91,7 @@ SDLSurface::from_file(std::string const& filename)
     return surface;
   }
 }
+
 
 int
 SDLSurface::save_png(SDL_Surface const& surface, std::string const& filename)
