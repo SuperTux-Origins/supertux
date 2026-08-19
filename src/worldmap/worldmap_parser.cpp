@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "util/format.hpp"
 #include "worldmap/worldmap_parser.hpp"
 
 #include <physfs.h>
@@ -102,7 +103,7 @@ WorldMapParser::load_worldmap(std::string const& filename)
               } else if (obj.get_name() == "ambient-light") {
                 m_worldmap.add<AmbientLight>(obj.get_mapping());
               } else {
-                throw std::runtime_error(fmt::format("unknown worldmap object: '{}'", obj.get_name()));
+                throw std::runtime_error(supertux::format("unknown worldmap object: '{}'", obj.get_name()));
               }
             }
           }

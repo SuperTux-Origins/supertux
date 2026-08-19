@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "util/format.hpp"
 #include "supertux/menu/multiplayer_players_menu.hpp"
 
 
@@ -32,7 +33,7 @@ MultiplayerPlayersMenu::MultiplayerPlayersMenu()
 
   for (int i = 0; i < InputManager::current()->get_num_users(); i++)
   {
-    add_entry(fmt::format(fmt::runtime(_("Player %d")), i + 1), [i] {
+    add_entry(supertux::format_rt(_("Player {}"), i + 1), [i] {
       MenuManager::instance().push_menu(std::make_unique<MultiplayerPlayerMenu>(i));
     });
   }

@@ -19,6 +19,7 @@
 #include <physfs.h>
 
 #include "supertux/level.hpp"
+#include "util/format.hpp"
 #include "supertux/sector.hpp"
 #include "supertux/sector_parser.hpp"
 #include "util/log.hpp"
@@ -150,7 +151,7 @@ LevelParser::load(ReaderDocument const& doc)
   int version = 1;
   level.read("version", version);
   if (version != 4) {
-    throw std::runtime_error(fmt::format("{}: level format version {} is not supported",
+    throw std::runtime_error(supertux::format("{}: level format version {} is not supported",
                                          doc.get_filename(), version));
   } else {
     level.read("tileset", m_level.m_tileset);

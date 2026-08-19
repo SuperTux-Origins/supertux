@@ -20,6 +20,7 @@
 
 #include "physfs/ifile_stream.hpp"
 #include "supertux/gameconfig.hpp"
+#include "util/format.hpp"
 #include "util/gettext.hpp"
 #include "version.h"
 
@@ -88,7 +89,7 @@ void
 CommandLineArguments::print_help(char const* arg0) const
 {
   std::cerr
-    << fmt::format(fmt::runtime(_("Usage: {} [OPTIONS] [LEVELFILE]")), arg0) << "\n" << "\n"
+    << supertux::format_rt(_("Usage: {} [OPTIONS] [LEVELFILE]"), arg0) << "\n" << "\n"
     << _("General Options:") << "\n"
     << _("  -h, --help                   Show this help message and quit") << "\n"
     << _("  -v, --version                Show SuperTux version and quit") << "\n"
@@ -398,7 +399,7 @@ CommandLineArguments::parse_args(int argc, char** argv)
     }
     else
     {
-      throw std::runtime_error(fmt::format("Unknown option '{}''. Use --help to see a list of options", arg));
+      throw std::runtime_error(supertux::format("Unknown option '{}'. Use --help to see a list of options", arg));
     }
   }
 

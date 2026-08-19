@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "util/format.hpp"
 #include "supertux/menu/multiplayer_player_menu.hpp"
 
 
@@ -29,7 +30,7 @@
 
 MultiplayerPlayerMenu::MultiplayerPlayerMenu(int player_id)
 {
-  add_label(fmt::format(fmt::runtime(_("Player %d")), player_id + 1));
+  add_label(supertux::format_rt(_("Player {}"), player_id + 1));
   add_hl();
 
   add_toggle(-1, _("Play with the keyboard"), &InputManager::current()->m_uses_keyboard[player_id]);

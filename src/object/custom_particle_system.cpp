@@ -149,9 +149,9 @@ CustomParticleSystem::CustomParticleSystem(ReaderMapping const& reader) :
         props.scale = Vector(scale_x, scale_y);
         m_textures.push_back(props);
       } catch (prio::ReaderError const& err) {
-        log_warning("{}", fmt::format("{}: failed to read texture, skipping: {}",
-                                   texture_obj.get_document().get_filename(),
-                                   err.what()));
+        log_warning("{}: failed to read texture, skipping: {}",
+                     texture_obj.get_document().get_filename(),
+                     err.what());
       }
     }
   }

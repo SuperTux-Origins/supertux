@@ -16,7 +16,7 @@
 
 #include "supertux/levelintro.hpp"
 
-#include <fmt/format.h>
+#include "util/format.hpp"
 
 #include "math/random.hpp"
 #include "sprite/sprite.hpp"
@@ -136,7 +136,7 @@ LevelIntro::draw(Compositor& compositor)
 
   std::string author = m_level.get_author();
   if ((!author.empty()) && (author != "SuperTux Team")) {
-    std::string author_text = fmt::format(fmt::runtime(_("contributed by {}")), author);
+    std::string author_text = supertux::format_rt(_("contributed by {}"), author);
     context.color().draw_center_text(Resources::small_font, author_text, Vector(0, static_cast<float>(py)), LAYER_FOREGROUND1, s_author_color);
     py += static_cast<int>(Resources::small_font->get_height());
   }

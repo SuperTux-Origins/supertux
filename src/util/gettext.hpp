@@ -21,36 +21,27 @@
 
 /*
  * If you need to do a nontrivial substitution of values into a pattern, use
- * fmt::format rather than an ad-hoc concatenation.  That way, translators can
- * translate the format string as a whole (and even rearrange the values if
- * necessary with "%1$s"-style codes) instead of multiple pieces.  Patterns like
- * "Label: {}" with only one string piece are a borderline case where
- * fmt::format is not really necessary.
- *
- * http://www.mihai-nita.net/article.php?artID=20060430a
- * https://fmt.dev/latest/syntax.html
+ * supertux::format_rt (runtime / gettext) or std::format (compile-time) rather
+ * than ad-hoc concatenation.  That way, translators can translate the format
+ * string as a whole (and rearrange values if needed) instead of multiple pieces.
  *
  * Bad:
  *     std::string greeting = _("Hello ") + name + _("!");
- *     std::cout << _("Hello ") << name << _("!");
  * Good:
- *     #include <fmt/format.h>
- *     std::string greeting = fmt::format(fmt::runtime(_("Hello {}!")), name);
- *     std::cout << fmt::format(fmt::runtime(_("Hello {}!")), name);
+ *     #include "util/format.hpp"
+ *     std::string greeting = supertux::format_rt(_("Hello {}!"), name);
  *
- * If you need singular and plural forms use __ instead of _ and fmt::format
- * if necessary.
- *
+ * Plural forms: use __ instead of _ with supertux::format_rt when needed.
  * https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html
  *
  * Bad:
  *     std::cout << _("You collected ") << num << _(" coins");
  * Good:
- *     #include <fmt/format.h>
- *     std::cout << fmt::format(fmt::runtime(__("You collected {} coin",
- *                                              "You collected {} coins", num)),
- *                              num));
+ *     #include "util/format.hpp"
+ *     std::cout << supertux::format_rt(__("You collected {} coin",
+ *                                         "You collected {} coins", num), num);
  */
+
 
 static inline std::string _(std::string const& message)
 {
