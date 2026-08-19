@@ -21,13 +21,23 @@
 
 #include "supertux/main.hpp"
 
+#if defined(__ANDROID__)
+#  include <android/log.h>
+#  define ST_ALOG(...) __android_log_print(ANDROID_LOG_INFO, "SuperTux", __VA_ARGS__)
+#else
+#  define ST_ALOG(...) do {} while (0)
+#endif
+
 static std::unique_ptr<Main> g_main;
 
 int main(int argc, char** argv)
 {
+  ST_ALOG("main() enter argc=%d", argc);
   g_main = std::make_unique<Main>();
+  ST_ALOG("Main constructed, calling run()");
 
   int ret = g_main->run(argc, argv);
+  ST_ALOG("Main::run returned %d", ret);
 
 #if !defined(__EMSCRIPTEN__)
   // Manually destroy, as atexit() functions are called before global

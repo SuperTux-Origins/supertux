@@ -20,6 +20,11 @@
 #include "logmich/log.hpp"
 
 #include <iostream>
+#include <string>
+
+#if defined(__ANDROID__)
+#  include <android/log.h>
+#endif
 
 namespace logmich {
 namespace detail {
@@ -41,7 +46,12 @@ std::string_view log_pretty_print(std::string_view str)
 } // namespace detail
 
 Logger::Logger() :
+#if defined(__ANDROID__)
+  // stderr often invisible under adb logcat -s SDL:*; INFO + SuperTux tag.
+  m_log_level(LogLevel::INFO)
+#else
   m_log_level(LogLevel::WARNING)
+#endif
 {}
 
 void
@@ -95,6 +105,26 @@ Logger::append(std::ostream& out,
   } else {
     out << file << ":" << line << ": " << msg << std::endl;
   }
+#if defined(__ANDROID__)
+  {
+    int prio = ANDROID_LOG_INFO;
+    switch (level) {
+      case LogLevel::FATAL:
+      case LogLevel::ERROR:   prio = ANDROID_LOG_ERROR; break;
+      case LogLevel::WARNING: prio = ANDROID_LOG_WARN;  break;
+      case LogLevel::DEBUG:
+      case LogLevel::TRACE:   prio = ANDROID_LOG_DEBUG; break;
+      default: break;
+    }
+    std::string composed;
+    if (msg.empty()) {
+      composed = std::string(file) + ":" + std::to_string(line) + ": -";
+    } else {
+      composed = std::string(file) + ":" + std::to_string(line) + ": " + std::string(msg);
+    }
+    __android_log_write(prio, "SuperTux", composed.c_str());
+  }
+#endif
 }
 
 } // namespace logmich

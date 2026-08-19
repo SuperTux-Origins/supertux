@@ -147,8 +147,10 @@ PhysfsSubsystem::PhysfsSubsystem(char const* argv0,
   // allow symbolic links
   PHYSFS_permitSymbolicLinks(1);
 
+  log_warn("PhysFS initialized");
   find_userdir();
   find_datadir();
+  log_warn("PhysFS userdir/datadir setup done");
 }
 
 void PhysfsSubsystem::find_datadir() const
@@ -349,12 +351,13 @@ void PhysfsSubsystem::find_userdir() const
 void PhysfsSubsystem::print_search_path()
 {
   char const* writedir = PHYSFS_getWriteDir();
-  log_info("PhysfsWriteDir: {}", (writedir ? writedir : "(null)"));
-  log_info("PhysfsSearchPath:");
+  // log_warn: visible on Android even before args raise the log level.
+  log_warn("PhysfsWriteDir: {}", (writedir ? writedir : "(null)"));
+  log_warn("PhysfsSearchPath:");
   char** searchpath = PHYSFS_getSearchPath();
   for (char** i = searchpath; *i != nullptr; ++i)
   {
-    log_info("  {}", *i);
+    log_warn("  {}", *i);
   }
   PHYSFS_freeList(searchpath);
 }

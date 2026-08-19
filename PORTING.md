@@ -964,6 +964,26 @@ sites.
 
 
 
+
+### Android: black screen / no logcat output
+
+`logmich` writes to `std::cerr`. On Android that often appears under the
+`SDL/stderr` tag (not `SDL`), so `adb logcat -s SDL:*` shows lifecycle only.
+
+- Mirror all logmich lines to `__android_log_write(..., "SuperTux", ...)`.
+- Default log level on Android is INFO.
+- Early `main()` markers via the `SuperTux` tag.
+- PhysFS search path is logged at WARN so it is always visible.
+
+Useful filter:
+
+```
+adb logcat -s SuperTux:V SDL:V DEBUG:V
+```
+
+If the search path has no data archive, shaders/images fail and the frame
+stays black — ensure `build-apk.sh` packaged `assets/data.zip`.
+
 ### Android: PHYSFS_init crash (PHYSFS_AndroidInit)
 
 On Android, `PHYSFS_init(argv0)` does **not** take a C-string path. PhysFS

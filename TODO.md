@@ -43,6 +43,8 @@ adapted from Pingus and Windstille.
 
 ## Android
 
+- [x] logmich → logcat tag SuperTux; boot/PhysFS diagnostics.
+
 - [x] PHYSFS_init via PHYSFS_AndroidInit (JNIEnv + Activity); assets/data.zip mount.
 
 
