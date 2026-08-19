@@ -101,3 +101,30 @@ adapted from Pingus and Windstille.
 ## Audio
 - [x] Enable Vorbis (libogg/libvorbis) for Android + WASM so stock `.ogg` music plays
 - [x] Link `-lopenal` on WASM (runtime confirmation pending)
+
+## WASM performance / IDBFS (needs cleanup)
+
+- [ ] **IDBFS sync strategy** — was calling `FS.syncfs` every frame (severe
+      slowdown + "operations in flight" spam). Mitigated in bundle 020 with
+      ~10s C++ throttle + JS single-flight/8s debounce. Still needs a proper
+      design: dirty-bit on writes only, coalesce on level exit / options save,
+      optional disable during gameplay. See PORTING.md.
+
+## WASM audio
+
+- [ ] **Confirm OpenAL + Vorbis at runtime** — link includes `-lopenal`,
+      `WSTSOUND_WITH_VORBIS=ON`, modplug. Browser autoplay policy may require a
+      user gesture before audio starts; check console for OpenAL device errors.
+      If silent after click/key, dig into `OpenALSystem` init and sample rates.
+
+## Desktop GLES2 validation
+
+- SuperTux Origins selects GLES2 via **compile-time** `USE_OPENGLES2`
+  (`ENABLE_OPENGLES2`), not a separate runtime `--renderer gles2`.
+  `--renderer` is only `auto` / `opengl` / `null` (opengl33 core path).
+- A dedicated `.#supertux-origins-gles2` package is useful to **validate the
+  mobile shader path on desktop** (Windstille/Pingus style), not required for
+  players who only use OpenGL 3.3.
+- [ ] Add optional `packages.supertux-origins-gles2` with `-DENABLE_OPENGLES2=ON`
+      once desktop GLES2 context creation is verified (SDL_GL_CONTEXT_PROFILE_ES).
+

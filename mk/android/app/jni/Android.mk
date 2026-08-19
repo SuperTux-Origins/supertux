@@ -100,6 +100,11 @@ LOCAL_SRC_FILES := $(filter-out %/physfs_platform_windows.c %/physfs_platform_wi
 # Skip ogg decoder TU when Vorbis libs were not staged.
 ifndef SUPERTUX_HAVE_VORBIS
 LOCAL_SRC_FILES := $(filter-out %/ogg_sound_file.cpp,$(LOCAL_SRC_FILES))
+else
+# Ensure decoder TU is linked (RWILDCARD can miss nested paths in some NDK setups).
+ifeq ($(filter %ogg_sound_file.cpp,$(LOCAL_SRC_FILES)),)
+LOCAL_SRC_FILES += deps/wstsound/ogg_sound_file.cpp
+endif
 endif
 LOCAL_SRC_FILES := $(filter-out freetype/% %/freetype/%,$(LOCAL_SRC_FILES))
 # Real SDL_ttf is a static module; drop the stub when present.

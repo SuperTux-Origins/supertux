@@ -5,10 +5,17 @@
 include $(CLEAR_VARS)
 LOCAL_MODULE := freetype
 LOCAL_CFLAGS := -DFT2_BUILD_LIBRARY -DDARWIN_NO_CARBON
+LOCAL_CFLAGS += -DFT_CONFIG_OPTION_SYSTEM_ZLIB
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/src
 LOCAL_SRC_FILES := \
+	src/gzip/ftgzip.c \
+	src/lzw/ftlzw.c \
+	src/sdf/ftsdf.c \
+	src/sdf/ftsdfrend.c \
+	src/sdf/ftsdfcommon.c \
+	src/svg/ftsvg.c \
 	src/autofit/autofit.c \
 	src/base/ftbase.c \
 	src/base/ftbbox.c \

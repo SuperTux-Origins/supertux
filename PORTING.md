@@ -1181,3 +1181,20 @@ overlapping `FS.syncfs` (IndexedDB) work → "N FS.syncfs operations in flight"
 and severe slowdown. Now: C++ at most ~every 10s; JS single-flight + 8s
 throttle; force sync on save / hide / unload only.
 
+### Android FreeType missing modules (bundle 021)
+
+Link needed `FT_Gzip_Uncompress` / `FT_Stream_OpenGzip|LZW` and sdf/svg
+renderer classes. `freetype_Android.mk` now builds gzip/lzw/sdf/svg units and
+uses `FT_CONFIG_OPTION_SYSTEM_ZLIB` (main already links `-lz`).
+
+### OggSoundFile on Android
+
+When Vorbis prebuilts exist, force `deps/wstsound/ogg_sound_file.cpp` onto
+`LOCAL_SRC_FILES` if the recursive wildcard missed it.
+
+### Desktop GLES2 package
+
+`supertux-origins.nix` already supports `useGLES2 ? false`. Flake exposes
+`packages.supertux-origins-gles2` with `useGLES2 = true`. Runtime `--renderer`
+cannot select GLES2 independently of that compile flag.
+

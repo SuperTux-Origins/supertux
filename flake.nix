@@ -195,6 +195,33 @@
             gtest = pkgs.gtest;
           };
 
+          # Desktop GLES2 validation (compile-time USE_OPENGLES2). Not a
+          # --renderer switch — Origins has no runtime VIDEO_GLES enum.
+          supertux-origins-gles2 = pkgs.callPackage ./supertux-origins.nix {
+            inherit self;
+            SDL2_ttf = pkgs.SDL2_ttf;
+            sexpcpp = sexpcpp-pkg;
+            squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            strutcpp = strutcpp-pkg;
+            miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            priocpp = priocpp-pkg;
+            logmich = logmich-pkg;
+            physfs = pkgs.physfs;
+            curl = pkgs.curl;
+            glew = pkgs.glew;
+            glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
+            SDL2 = pkgs.SDL2;
+            SDL2_image = pkgs.SDL2_image;
+            xdgcpp = if !pkgs.stdenv.hostPlatform.isWindows
+                     then xdgcpp.packages.${pkgs.stdenv.hostPlatform.system}.default
+                     else null;
+            mcfgthreads = pkgs.windows.mcfgthreads;
+            gtest = pkgs.gtest;
+            useGLES2 = true;
+          };
+
           # Windows packages require a MinGW cross build, not the native Linux package.
           # When evaluating on Linux, build with pkgsCross.mingwW64 (or mingw32).
           # When already on Windows, the native package is the Windows binary.
