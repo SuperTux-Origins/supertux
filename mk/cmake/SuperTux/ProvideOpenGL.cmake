@@ -8,7 +8,9 @@ if(ENABLE_OPENGL)
     set(HAVE_OPENGL TRUE)
     list(APPEND OPENGL_COMPILE_DEFINITIONS "USE_OPENGLES2")
 
-    if(NOT EMSCRIPTEN)
+    # Emscripten: WebGL via FULL_ES2.  Android: GLES comes with SDL / NDK.
+    # Desktop GLES2 (or R36S with sysroot pkg-config): link glesv2 explicitly.
+    if(NOT EMSCRIPTEN AND NOT ANDROID AND NOT DEFINED ANDROID)
       pkg_check_modules(GLESV2 REQUIRED glesv2)
       list(APPEND OPENGL_INCLUDE_DIRECTORIES "${GLESV2_INCLUDE_DIRS}")
       list(APPEND OPENGL_LINK_LIBRARIES "${GLESV2_LIBRARIES}")
