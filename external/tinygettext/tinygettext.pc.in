@@ -1,0 +1,16 @@
+# Unfortunately, since this project is built with cmake,
+# these variables can't properly be set.
+
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=@LIBDIR_FOR_PC_FILE@
+includedir=@INCLUDEDIR_FOR_PC_FILE@
+
+Name: @PROJECT_NAME@
+Description: tiny, minimal gettext replacement
+Version: @PROJECT_VERSION@
+URL: https://github.com/tinygettext/tinygettext
+Requires:
+Libs: -L${libdir} -ltinygettext
+Libs.private:
+Cflags: -I${includedir}

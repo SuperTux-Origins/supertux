@@ -412,3 +412,12 @@ Until a permanent sysroot tarball is hosted, either:
    and pack it (`tar czf arkos-sysroot4.tar.gz -C /opt/arkos-sysroot .`).
 
 `SUPERTUX_R36S=ON` forces GLES2, 640×480 defaults, and skips fragile icon load.
+
+### Vendored external/argpp (stable)
+
+Android packaging stages `external/argpp/include`. The tree is the **stable**
+branch of https://github.com/Grumbel/argpp (not master).
+
+Also vendored for the same Android staging loop: `geomcpp`, `tinygettext`.
+
+WASM package attribute: `packages.supertux-wasm` (not `supertux-origins-wasm`).

@@ -206,6 +206,8 @@
             inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
                     wstsound squirrel physfs-src;
           }).supertux-wasm;
+          # Alias for discoverability
+          supertux-origins-wasm = supertux-wasm;
 
           # ---------------------------------------------------------------
           # Android (requires allowUnfree + android_sdk.accept_license)
