@@ -107,7 +107,7 @@
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, curl-win32, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
-              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, priocpp }:
+              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, priocpp, physfs-src }:
 
     tinycmmc.lib.eachSystemWithPkgs (pkgs:
       {
