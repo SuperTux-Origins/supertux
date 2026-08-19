@@ -17,6 +17,8 @@
 #ifndef HEADER_SUPERTUX_UTIL_GETTEXT_HPP
 #define HEADER_SUPERTUX_UTIL_GETTEXT_HPP
 
+#include <string>
+
 #include <memory>
 
 /*

@@ -31,6 +31,8 @@
 #include <sstream>
 
 #ifdef __EMSCRIPTEN__
+#  include <emscripten.h>
+#  include "gui/dialog.hpp"
 #endif
 
 namespace {
