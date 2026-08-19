@@ -619,9 +619,15 @@ void ScreenManager::loop_iter()
   handle_screen_switch();
 
 #ifdef __EMSCRIPTEN__
-  EM_ASM({
-    supertux_syncfs();
-  }, 0); // EM_ASM is a variadic macro and Clang requires at least 1 value for the variadic argument
+  // IDBFS sync is expensive (IndexedDB). Do not call every frame — shell
+  // debounces and persists on save / visibility / unload.
+  {
+    static int sync_counter = 0;
+    if (++sync_counter >= 600) { // ~10s at 60fps
+      sync_counter = 0;
+      EM_ASM({ if (typeof supertux_syncfs === 'function') supertux_syncfs(); }, 0);
+    }
+  }
 #endif
 }
 

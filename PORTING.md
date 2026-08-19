@@ -1174,3 +1174,10 @@ int16/32/64 types). Missing `ogg_uint64_t` breaks `framing.c` on NDK.
   Marked `meta.broken` until the full Windows dep graph (sexpcpp/wstsound/…)
   links cleanly — better than shipping a Linux binary renamed as `.exe`.
 
+### WASM IDBFS sync spam (bundle 020)
+
+`ScreenManager::loop_iter` called `supertux_syncfs()` **every frame**, starting
+overlapping `FS.syncfs` (IndexedDB) work → "N FS.syncfs operations in flight"
+and severe slowdown. Now: C++ at most ~every 10s; JS single-flight + 8s
+throttle; force sync on save / hide / unload only.
+

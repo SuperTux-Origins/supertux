@@ -153,23 +153,63 @@
       } catch (e) { console.warn("supertux_loadFiles", e); }
     };
 
+    // IDBFS: never start overlapping syncfs (causes "N operations in flight"
+    // spam and can stall the main thread). Throttle + single-flight.
+    var stSyncInFlight = false;
+    var stSyncQueued = false;
+    var stLastSyncMs = 0;
+    var ST_SYNC_MIN_MS = 8000; // at most one successful sync per 8s unless force
+
+    function stDoSyncfs(force) {
+      if (typeof FS === 'undefined' || typeof FS.syncfs !== 'function') return;
+      var now = Date.now();
+      if (!force && (now - stLastSyncMs) < ST_SYNC_MIN_MS) {
+        stSyncQueued = true;
+        return;
+      }
+      if (stSyncInFlight) {
+        stSyncQueued = true;
+        return;
+      }
+      stSyncInFlight = true;
+      stSyncQueued = false;
+      try {
+        FS.syncfs(false, function(err) {
+          stSyncInFlight = false;
+          stLastSyncMs = Date.now();
+          if (err) console.warn("supertux_syncfs", err);
+          if (stSyncQueued) {
+            stSyncQueued = false;
+            // Coalesce queued requests into one delayed flush.
+            setTimeout(function() { stDoSyncfs(false); }, ST_SYNC_MIN_MS);
+          }
+        });
+      } catch (e) {
+        stSyncInFlight = false;
+        console.warn("supertux_syncfs", e);
+      }
+    }
+
     window.supertux_saveFiles = function() {
-      try { FS.syncfs(false, function(err) { if (err) console.warn(err); }); } catch (err) { console.warn(err); }
       try {
         var data = FS.readFile(supertux_userdir + "config", { encoding: "utf8" });
         localStorage.setItem("supertux_origins_config", data);
       } catch (e) { /* no config yet */ }
+      stDoSyncfs(true); // force after explicit save
     };
 
-    // Called every frame from ScreenManager::loop_iter — persist IDBFS (async).
+    // Periodic / opportunistic persist (throttled, single-flight).
     window.supertux_syncfs = function() {
-      try {
-        FS.syncfs(false, function(err) { if (err) console.warn("supertux_syncfs", err); });
-      } catch (e) { console.warn("supertux_syncfs", e); }
+      stDoSyncfs(false);
     };
 
     window.addEventListener("beforeunload", function() {
       try { window.supertux_saveFiles(); } catch (e) {}
+    });
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden) {
+        try { stDoSyncfs(true); } catch (e) {}
+      }
     });
   </script>
 

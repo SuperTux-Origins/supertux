@@ -351,7 +351,7 @@ void PhysfsSubsystem::find_userdir() const
   EM_ASM({
     try {
       FS.mount(IDBFS, {}, "/home/web_user/.local/share/supertux-origins/");
-      FS.syncfs(true, (err) => { console.log(err); });
+      FS.syncfs(true, (err) => { if (err) console.warn("IDBFS populate", err); });
     } catch(err) {}
   }, 0); // EM_ASM is a variadic macro and Clang requires at least 1 value for the variadic argument
 #endif
