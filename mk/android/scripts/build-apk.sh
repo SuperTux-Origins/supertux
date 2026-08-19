@@ -80,6 +80,16 @@ cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
 for hdr in config.h version.h SDL_image.h; do
   if [ -f "$APP_DIR/jni/$hdr" ]; then
     cp "$APP_DIR/jni/$hdr" "src/jni/src/$hdr"
+    echo "==> staged $hdr into jni/src/"
+  else
+    echo "warning: missing $APP_DIR/jni/$hdr" >&2
+  fi
+done
+# NDK also searches LOCAL_PATH parent includes; keep a copy under jni/
+mkdir -p src/jni
+for hdr in config.h version.h SDL_image.h; do
+  if [ -f "src/jni/src/$hdr" ]; then
+    cp "src/jni/src/$hdr" "src/jni/$hdr"
   fi
 done
 

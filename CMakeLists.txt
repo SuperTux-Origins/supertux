@@ -216,6 +216,14 @@ function(build_dependencies)
   if(NOT TARGET wstsound::wstsound)
     add_subdirectory(external/wstsound/ EXCLUDE_FROM_ALL)
   endif()
+
+  # Header-only-ish string utils (levelset.cpp needs strut/numeric_less.hpp).
+  find_package(strut QUIET)
+  if(NOT TARGET strut::strut)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/strutcpp/CMakeLists.txt")
+      add_subdirectory(external/strutcpp EXCLUDE_FROM_ALL)
+    endif()
+  endif()
 endfunction()
 # wstsound: force mobile/wasm codec set before subdirectory option() runs
 if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
@@ -335,9 +343,25 @@ target_link_libraries(supertux-origins_lib PUBLIC wstsound::wstsound)
 target_link_libraries(supertux-origins_lib PUBLIC prio::prio)
 target_link_libraries(supertux-origins_lib PUBLIC logmich::logmich)
 
+if(TARGET strut::strut)
+  target_link_libraries(supertux-origins_lib PUBLIC strut::strut)
+elseif(TARGET strut)
+  target_link_libraries(supertux-origins_lib PUBLIC strut)
+endif()
+
+# xdgcpp: desktop path helpers. Not on Windows/Emscripten; R36S/Android still
+# compile the main.cpp include, so provide the in-tree library when missing.
 if(NOT EMSCRIPTEN AND NOT WIN32)
-  find_package(xdgcpp CONFIG)
-  target_link_libraries(supertux-origins_lib PUBLIC xdgcpp)
+  find_package(xdgcpp CONFIG QUIET)
+  if(NOT TARGET xdgcpp)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/xdgcpp/CMakeLists.txt")
+      set(XDG_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+      add_subdirectory(external/xdgcpp EXCLUDE_FROM_ALL)
+    endif()
+  endif()
+  if(TARGET xdgcpp)
+    target_link_libraries(supertux-origins_lib PUBLIC xdgcpp)
+  endif()
 endif()
 
 if(HAVE_OPENGL)

@@ -706,3 +706,10 @@ minimal `SDL_image.h` provide `IMG_Load_RW` via stb_image.
 
 Emscripten's fake `SDL.h` errors without `-sUSE_SDL=2` on that TU.
 Use opaque struct declarations in the stub.
+
+### R36S: strut + xdgcpp
+
+ArkOS sysroot has neither. `build_dependencies()` now falls back to
+`external/strutcpp` and `external/xdgcpp` when `find_package` misses them.
+`strut/numeric_less.hpp` is required by `levelset.cpp`; `xdgcpp/xdg.h` by
+`main.cpp` (not guarded for R36S).
