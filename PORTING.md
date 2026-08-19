@@ -1158,3 +1158,8 @@ Stock SuperTux music is mostly `.ogg`. Enable `WSTSOUND_WITH_VORBIS`:
 adds `-lvorbisfile -lvorbis -logg` so static archives resolve under
 `ERROR_ON_UNDEFINED_SYMBOLS=1`.
 
+### Android libogg config_types.h (bundle 016)
+
+Generated `config_types.h` must define `ogg_uint64_t` (and the usual
+int16/32/64 types). Missing `ogg_uint64_t` breaks `framing.c` on NDK.
+
