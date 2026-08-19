@@ -109,6 +109,31 @@ fires on noise. Loading multiple controller scm files stacks bindings.
 
 ---
 
+### libmodplug required under EMSCRIPTEN
+
+**Problem.** `external/wstsound/CMakeLists.txt` forces
+`WSTSOUND_WITH_MODPLUG=ON` when `EMSCRIPTEN OR ANDROID`. Configure then
+runs `find_package(ModPlug REQUIRED)` and fails if libmodplug is absent.
+
+**Solution.** Build static `libmodplug-wasm` (same recipe as Pingus
+`nix/wasm.nix`) and pass:
+
+- `-DMODPLUG_DIR=…` / `-DMODPLUG_INCLUDE_DIRECTORY=…` / `-DMODPLUG_LIBRARY=…`
+- `-DWSTSOUND_WITH_VORBIS=OFF` `-DWSTSOUND_WITH_OPUS=OFF`
+  `-DWSTSOUND_WITH_MPG123=OFF` `-DWSTSOUND_WITH_EFX=OFF`
+- `PKG_CONFIG_PATH` / `CMAKE_PREFIX_PATH` pointing at the modplug prefix
+
+Do **not** put native (x86_64) flake-input `wstsound` / `squirrel` packages
+into the emscripten derivation `buildInputs` — wrong architecture and
+confuses `find_package`. Prefer in-tree `external/` under `emcmake`.
+
+### tinycmmc under emscripten
+
+`find_package(tinycmmc)` may miss the flake package; SuperTux falls back to
+`external/tinycmmc/modules/` (message: "tinycmmc module path: …"). That is
+acceptable for wasm.
+
+
 ## R36S / ArkOS (to implement)
 
 ### Hybrid toolchain: modern GCC + old sysroot
@@ -427,3 +452,31 @@ WASM package attribute: `packages.supertux-wasm` (not `supertux-origins-wasm`).
 `pkgs.emscriptenStdenv` defaults to autotools (`emconfigure ./configure`).
 SuperTux and its CMake deps must set `dontConfigure = true` and run
 `emcmake cmake …` in `preBuild` (see `nix/wasm.nix` `mkWasmCmake`).
+
+
+### Android: no SDL2_mixer for SuperTux
+
+**Problem.** `nix/android.nix` generated a prebuilt `jni/SDL/Android.mk` that
+always listed `libSDL2_mixer.so`. SuperTux sets `sdlMixerSrc = null` (sound is
+OpenAL + wstsound/modplug), so ndk-build aborted on the missing `.so`.
+
+**Solution.** Only emit the `SDL2_mixer` prebuilt stanza when
+`sdlMixerSrc != null`. Soften the build-apk.sh warning about missing
+`SDL_mixer.h` (expected without mixer).
+
+### Android: minSdkVersion vs APP_PLATFORM
+
+**Problem.** NDK warned that `APP_PLATFORM android-22` was higher than
+`android:minSdkVersion 1` in the manifest.
+
+**Solution.** Add `<uses-sdk android:minSdkVersion="22" android:targetSdkVersion="22" />`
+to `mk/android/app/AndroidManifest.xml` (match Pingus / packagePlatform).
+
+### Android: version env name
+
+**Problem.** `build-apk.sh` still echoed/exported `PINGUS_VERSION` while
+`mkApk` sets `SUPERTUX_VERSION`.
+
+**Solution.** Prefer `SUPERTUX_VERSION`, keep `PINGUS_VERSION` as an alias for
+shared script compatibility.
+

@@ -30,22 +30,24 @@ adapted from Pingus and Windstille.
 ## WebAssembly (Emscripten)
 
 - [x] Skeleton `nix/wasm.nix` under emscriptenStdenv; skip checkPhase.
-- [ ] Expand wasm deps: build SDL2 / SDL2_image / zlib / OpenAL under
-      emscripten (see Pingus `mk/wasm/scripts/build-*.sh` and full
-      `nix/wasm.nix`).
+- [x] libmodplug-wasm + cmake flags so in-tree wstsound configures under EMSCRIPTEN.
+- [ ] Expand wasm deps further: SDL2 / SDL2_image / zlib static builds
+      (see Pingus `mk/wasm/scripts/build-*.sh`).
 - [ ] CMake / link flags: `-fexceptions`, `-sDISABLE_EXCEPTION_CATCHING=0`,
       `-sGROWABLE_ARRAYBUFFERS=0`, `-sFULL_ES2=1`, `-sFORCE_FILESYSTEM=1`,
       OpenAL, preload data.
 - [ ] Prefer stb_image (or existing image path) over system jpeg/png.
 - [ ] Produce complete `packages.x86_64-linux.supertux-wasm` and serve app.
-- [ ] Fix any remaining native flake-input deps that are not wasm-built
-      (squirrel, wstsound currently still native).
+- [x] Drop native wstsound/squirrel from wasm buildInputs (in-tree + modplug).
+- [ ] Build squirrel under emscripten if in-tree path still fails.
 
 ## Android
 
 - [x] Adapt `mk/android/` and `nix/android.nix` from Pingus (SDLActivity,
       jni, keystore, NDK scaffold).
 - [x] flake packages.supertux-android + android-sdl-libs.
+- [x] Conditional SDL2_mixer prebuilt Android.mk (null mixer for SuperTux).
+- [x] uses-sdk minSdkVersion=22; SUPERTUX_VERSION env in build-apk.sh.
 - [ ] GLES2 only; GameController / touch via controller scm or Android maps.
 - [ ] Macro hygiene for do/while error helpers (NDK clang).
 - [ ] stb_image staging into jni include path if needed.

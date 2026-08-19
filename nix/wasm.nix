@@ -3,6 +3,9 @@
 # Builds under emscriptenStdenv. Vendored external/ deps are compiled with the
 # same stdenv so they are actually wasm-compatible (flake input packages are
 # usually native x86_64).
+#
+# Sound path matches Pingus: static libmodplug + in-tree wstsound (WAV + modules).
+# See mk/wasm/scripts/ and PORTING.md.
 
 { pkgs
 , self
@@ -34,6 +37,62 @@ set(glm_FOUND TRUE)
 EOFC
   '';
 
+  # --- libmodplug static for wasm (Pingus recipe) ----------------------------
+  # SuperTux / wstsound force WSTSOUND_WITH_MODPLUG=ON under EMSCRIPTEN.
+  modplugWasm = pkgs.stdenv.mkDerivation rec {
+    pname = "libmodplug-wasm";
+    version = "0.8.9.0";
+    src = pkgs.fetchurl {
+      url = "https://downloads.sourceforge.net/project/modplug-xmms/libmodplug/${version}/libmodplug-${version}.tar.gz";
+      hash = "sha256-RXylpsF5ZW1mwBUFwNlfr66tQym526oPmX0Ao1CK2d4=";
+    };
+    nativeBuildInputs = [ emscripten pkgs.python3 ];
+    dontConfigure = true;
+    buildPhase = ''
+      runHook preBuild
+      export EM_CACHE="''${TMPDIR:-/tmp}/emcache-modplug"
+      mkdir -p "$EM_CACHE"
+      mkdir -p "$PWD/prefix"
+      # libmodplug 0.8.9 still uses the C++ `register` keyword; em++ defaults
+      # to C++17 where that is an error. Force C++14 for this ancient tree.
+      export CXXFLAGS="-std=gnu++14 -Wno-register ''${CXXFLAGS:-}"
+      export CFLAGS="-Wno-register ''${CFLAGS:-}"
+      emconfigure ./configure \
+        --prefix="$PWD/prefix" \
+        --host=wasm32-unknown-emscripten \
+        --disable-shared \
+        --enable-static \
+        --disable-dependency-tracking
+      emmake make -j''${NIX_BUILD_CORES:-2}
+      emmake make install
+      runHook postBuild
+    '';
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -a prefix/. $out/
+      mkdir -p $out/lib/pkgconfig
+      cat > $out/lib/pkgconfig/libmodplug.pc <<EOFPC
+prefix=$out
+exec_prefix=\''${prefix}
+libdir=\''${exec_prefix}/lib
+includedir=\''${prefix}/include
+
+Name: libmodplug
+Description: modplug module music decoder (wasm32-emscripten)
+Version: ${version}
+Libs: -L\''${libdir} -lmodplug
+Cflags: -I\''${includedir}
+EOFPC
+      runHook postInstall
+    '';
+    meta = with lib; {
+      description = "Static libmodplug for wasm32-emscripten";
+      license = licenses.publicDomain;
+      platforms = platforms.linux;
+    };
+  };
+
   # Build a simple cmake project from external/ under emscriptenStdenv.
   # Important: emscriptenStdenv defaults to autotools (./configure). Force CMake.
   mkWasmCmake = { pname, srcPath, cmakeFlags ? [], buildInputs ? [] }:
@@ -41,7 +100,7 @@ EOFC
       inherit pname;
       version = "0.0.1-wasm";
       src = lib.cleanSource srcPath;
-      nativeBuildInputs = [ pkgs.buildPackages.cmake emscripten ];
+      nativeBuildInputs = [ pkgs.buildPackages.cmake emscripten pkgs.pkg-config ];
       inherit buildInputs;
       dontUseCmakeConfigure = true;
       dontConfigure = true;
@@ -51,12 +110,16 @@ EOFC
       preBuild = ''
         export EM_CACHE="''${TMPDIR:-/tmp}/emcache-${pname}"
         mkdir -p "$EM_CACHE"
-        # emcmake drives cmake with the emscripten toolchain
-        emcmake cmake -S . -B build           -DCMAKE_BUILD_TYPE=Release           -DCMAKE_INSTALL_PREFIX=$out           -DBUILD_TESTS=OFF           -DWARNINGS=OFF           -DWERROR=OFF           ${lib.concatStringsSep " " cmakeFlags}
+        emcmake cmake -S . -B build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=$out \
+          -DBUILD_TESTS=OFF \
+          -DWARNINGS=OFF \
+          -DWERROR=OFF \
+          ${lib.concatStringsSep " " cmakeFlags}
         cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
         cmake --install build
       '';
-      # Skip default phases that expect autotools/cmake hooks
       buildPhase = "runHook preBuild; runHook postBuild";
       installPhase = "runHook preInstall; runHook postInstall";
       dontStrip = true;
@@ -83,9 +146,20 @@ EOFC
   # PhysFS from source tree if provided
   physfsSrcPath = if physfs-src != null then physfs-src else null;
 
+  modplugCmakeFlags = [
+    "-DMODPLUG_DIR=${modplugWasm}"
+    "-DMODPLUG_INCLUDE_DIRECTORY=${modplugWasm}/include"
+    "-DMODPLUG_LIBRARY=${modplugWasm}/lib/libmodplug.a"
+    "-DWSTSOUND_WITH_MODPLUG=ON"
+    "-DWSTSOUND_WITH_VORBIS=OFF"
+    "-DWSTSOUND_WITH_OPUS=OFF"
+    "-DWSTSOUND_WITH_MPG123=OFF"
+    "-DWSTSOUND_WITH_EFX=OFF"
+  ];
+
 in
 {
-  inherit logmichWasm sexpcppWasm strutcppWasm;
+  inherit logmichWasm sexpcppWasm strutcppWasm modplugWasm;
 
   supertux-wasm = est.mkDerivation rec {
     pname = "supertux-origins-wasm";
@@ -105,15 +179,16 @@ in
       miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
 
+    # Do NOT put native (x86_64) wstsound/squirrel from flake inputs here —
+    # they break find_package / are wrong arch. Prefer in-tree external/ under
+    # emcmake, with modplug provided via CMAKE flags.
     buildInputs = [
       glmPrefix
       logmichWasm
       sexpcppWasm
       strutcppWasm
       tinycmmcNative
-      # squirrel / wstsound still from flake until wasm static builds exist
-      squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default
-      wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default
+      modplugWasm
     ];
 
     cmakeFlags = [
@@ -126,7 +201,13 @@ in
       "-DINSTALL_SUBDIR_SHARE=data"
       "-Dglm_DIR=${glmPrefix}/lib/cmake/glm"
       "-DPRIO_USE_JSONCPP=OFF"
-    ] ++ lib.optionals (physfsSrcPath != null) [
+      # Point CMake at static modplug so external/wstsound configures.
+      "-DCMAKE_PREFIX_PATH=${modplugWasm}"
+      "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH"
+      "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH"
+      "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH"
+    ] ++ modplugCmakeFlags
+      ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"
     ];
 
@@ -135,11 +216,15 @@ in
       mkdir -p "$EM_CACHE"
       export EM_PORTS="''${TMPDIR:-/tmp}/emports-supertux"
       mkdir -p "$EM_PORTS"
-      emcmake cmake -S . -B build         -DCMAKE_BUILD_TYPE=Release         -DCMAKE_INSTALL_PREFIX=$out         ${lib.concatStringsSep " " cmakeFlags}
+      export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      export CMAKE_PREFIX_PATH="${modplugWasm}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
+      emcmake cmake -S . -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=$out \
+        ${lib.concatStringsSep " " cmakeFlags}
       cmake --build build -j''${NIX_BUILD_CORES:-$(nproc)}
     '';
     buildPhase = "runHook preBuild; runHook postBuild";
-    # installPhase already custom below
 
     dontStrip = true;
 
