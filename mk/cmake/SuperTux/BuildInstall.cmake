@@ -56,8 +56,8 @@ endif()
 
 if(EMSCRIPTEN)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mk/emscripten/template.html.in ${CMAKE_CURRENT_BINARY_DIR}/template.html)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mk/emscripten/supertux-origins.png ${CMAKE_CURRENT_BINARY_DIR}/supertux-origins.png COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mk/emscripten/supertux-origins_bkg.png ${CMAKE_CURRENT_BINARY_DIR}/supertux-origins_bkg.png COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mk/emscripten/supertux.png ${CMAKE_CURRENT_BINARY_DIR}/supertux-origins.png COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mk/emscripten/supertux_bkg.png ${CMAKE_CURRENT_BINARY_DIR}/supertux-origins_bkg.png COPYONLY)
 endif()
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/README.md ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt ${CMAKE_CURRENT_SOURCE_DIR}/NEWS.md DESTINATION ${INSTALL_SUBDIR_DOC})

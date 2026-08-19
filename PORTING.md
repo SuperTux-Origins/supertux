@@ -562,3 +562,23 @@ Pingus Android scaffold; replace with SuperTux branding later).
 `ProvideCurl.cmake` skipped for `SUPERTUX_R36S` (same as EMSCRIPTEN);
 `HAVE_LIBCURL` stays false and the LibCurl link is gated on that flag.
 
+
+### R36S: SDL2_ttf required in sysroot
+
+ProvideSDL2_ttf now searches via pkg-config and explicit
+`${CMAKE_SYSROOT}/usr/...` paths. If ArkOS sysroot was built without
+`libsdl2-ttf-dev`, configure still fails — extend the sysroot tarball.
+
+### wasm: version.cmake + emscripten asset names
+
+`lib.cleanSource` drops `.git`, so BuildVersion cannot git-describe.
+It now synthesizes `version.cmake` from `-DPROJECT_VERSION_FULL`.
+BuildInstall copies `mk/emscripten/supertux.png` and `supertux_bkg.png`
+(not the old `supertux-origins_*.png` names).
+
+### Android: placeholder main exits immediately
+
+The APK currently links `placeholder.cpp` only (`SDL_main` returns 0), so
+the activity starts and stops at once. Full game sources must be wired via
+`supertux_sources.mk` / deps before a playable build.
+

@@ -218,6 +218,7 @@ in
     ] ++ [
       "-DSQUIRREL_SOURCE_DIR=${squirrelSrcPath}"
       "-DUSE_SYSTEM_SQUIRREL=OFF"
+      "-DPROJECT_VERSION_FULL=${version}"
     ];
 
     preBuild = ''
