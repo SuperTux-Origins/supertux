@@ -33,15 +33,22 @@ Config::Config() :
   profiles(),
   fullscreen_size(0, 0),
   fullscreen_refresh_rate(0),
+  // R36S / handheld: fixed 640×480, non-resizable (PORTING.md).
+  // Desktop default remains 1280×800.
+#if defined(SUPERTUX_R36S)
+  window_size(640, 480),
+  window_resizable(false),
+#else
   window_size(1280, 800),
   window_resizable(true),
+#endif
   aspect_size(0, 0), // auto detect
 #ifdef __EMSCRIPTEN__
   fit_window(true),
 #endif
   magnification(0.0f),
-  // Ubuntu Touch supports windowed apps
-#ifdef __ANDROID__
+  // Ubuntu Touch supports windowed apps; Android / R36S prefer fullscreen
+#if defined(__ANDROID__) || defined(SUPERTUX_R36S)
   use_fullscreen(true),
 #else
   use_fullscreen(false),
