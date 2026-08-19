@@ -620,7 +620,7 @@ if [ -d "$DIR/libs" ]; then
 elif [ -d "$DIR/../lib/supertux-origins" ]; then
   export LD_LIBRARY_PATH="$DIR/../lib/supertux-origins''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 fi
-exec "$BIN" --software-cursor --controller "$DIR/data/controller/r36s.scm" --fullscreen "$@"
+exec "$BIN" --datadir "$DIR" --userdir "$DIR/conf" --fullscreen --geometry 640x480 "$@"
 LAUNCH
         chmod +x $out/share/supertux-origins/supertux.sh
       '';
@@ -759,15 +759,13 @@ fi
 pm_platform_helper "$GAMEDIR/supertux-origins" 2>/dev/null || true
 
 # Force on-device data + config dirs (do not use any baked-in install prefix).
-# Prefer --renderer opengl (GLES) on R36S; --renderer sdl is a software fallback.
+# Origins has no software SDL renderer — VIDEO_AUTO → GLES2 under SUPERTUX_R36S.
 # Software cursor: no mouse; pad via SDL joystick.
 ./supertux-origins \
   --datadir "$GAMEDIR/data" \
   --userdir "$CONFDIR" \
-  --renderer sdl \
-  --software-cursor \
-  --controller "$GAMEDIR/data/controller/r36s.scm" \
   --fullscreen \
+  --geometry 640x480 \
   "$@"
 pm_finish 2>/dev/null || true
 EOF_LAUNCH

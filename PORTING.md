@@ -863,3 +863,26 @@ emscripten's `fakesdl/SDL_ttf.h` `#error`s unless `-sUSE_SDL=2` (network port).
 Use `mk/emscripten/SDL_ttf.h` + `sdl_ttf_stub.c` instead of the FreeType port
 until a full offline SDL2_ttf+freetype build is wired.
 
+### R36S: SIGABRT on bare `./supertux-origins`
+
+Seen as `Error: signal 6` from ErrorHandler. Common causes:
+
+1. **GLES context creation fails**, then `assert_gl()` / `glGetError()` runs
+   without a context and the Mali driver aborts (same class of bug Pingus
+   fixed by not asserting on failed `set_video_mode`). SuperTux now throws
+   if `SDL_GL_CreateContext` returns null and sets `SDL_HINT_OPENGL_ES_DRIVER`.
+
+2. **`std::filesystem::canonical(datadir)` throws** when the computed datadir
+   does not exist (baked install prefix / wrong cwd). Uncaught + fragile
+   exception unwind → `std::terminate` → abort. Prefer `./data` next to the
+   binary; only `canonical` existing paths.
+
+3. **PortMaster launcher must not pass `--renderer sdl`**: Origins has no
+   `VIDEO_SDL` backend (only auto/opengl/null). Invalid renderer throws at
+   startup. Use default auto (GLES2 when built with `USE_OPENGLES2`).
+
+Always launch via `SuperTux.sh` (sets `--datadir`, `--userdir`, env) or:
+```
+./supertux-origins --datadir ./data --userdir ./conf --fullscreen
+```
+

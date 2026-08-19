@@ -175,21 +175,47 @@ void PhysfsSubsystem::find_datadir() const
     {
       datadir = BUILD_DATA_DIR;
       // Add config dir for supplemental files
-      PHYSFS_mount(std::filesystem::canonical(BUILD_CONFIG_DATA_DIR).string().c_str(), nullptr, 1);
+      if (FileSystem::exists(BUILD_CONFIG_DATA_DIR))
+        PHYSFS_mount(std::filesystem::canonical(BUILD_CONFIG_DATA_DIR).string().c_str(), nullptr, 1);
     }
     else
     {
-      // if the game is not run from the source directory, try to find
-      // the global install location
-      datadir = basepath.substr(0, basepath.rfind(INSTALL_SUBDIR_BIN));
-      datadir = FileSystem::join(datadir, INSTALL_SUBDIR_SHARE);
+      // PortMaster / handheld: data/ next to the binary (do this before
+      // install-prefix logic which may point at a non-existent nix path).
+      std::string beside = FileSystem::join(basepath, "data");
+      if (FileSystem::exists(FileSystem::join(beside, "credits.stxt")))
+      {
+        datadir = beside;
+      }
+      else
+      {
+        // Global install location relative to the binary path.
+        auto pos = basepath.rfind(INSTALL_SUBDIR_BIN);
+        if (pos != std::string::npos)
+          datadir = FileSystem::join(basepath.substr(0, pos), INSTALL_SUBDIR_SHARE);
+        else
+          datadir = FileSystem::join(basepath, INSTALL_SUBDIR_SHARE);
+      }
     }
   }
 
-  // An additional .string() call is necessary as Windows returns const wchar_t* for .c_str()
-  if (!PHYSFS_mount(std::filesystem::canonical(datadir).string().c_str(), nullptr, 1))
+  // canonical() throws if the path does not exist — avoid abort-on-exception
+  // on R36S when datadir is wrong (broken libstdc++ unwind can turn that into
+  // SIGABRT via terminate).
+  if (FileSystem::exists(datadir))
   {
-    log_warning("Couldn't add '{}' to physfs searchpath: {}", datadir, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+    if (!PHYSFS_mount(std::filesystem::canonical(datadir).string().c_str(), nullptr, 1))
+    {
+      log_warning("Couldn't add '{}' to physfs searchpath: {}", datadir, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+    }
+  }
+  else
+  {
+    log_warning("Datadir '{}' does not exist; pass --datadir", datadir);
+    if (!PHYSFS_mount(datadir.c_str(), nullptr, 1))
+    {
+      log_warning("Couldn't add '{}' to physfs searchpath: {}", datadir, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+    }
   }
 #else
   if (!PHYSFS_mount(BUILD_CONFIG_DATA_DIR, nullptr, 1))

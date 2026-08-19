@@ -89,6 +89,8 @@ GLVideoSystem::create_gl_window()
   // depth/stencil. Hand-tuned sizes have caused "Could not create EGL window
   // surface" on ArkOS (see PORTING.md). Only request ES 2.0 profile.
   log_info("Requesting OpenGLES2 context (default pixel format)");
+  // Help SDL pick the EGL/GLES path on Mali (ArkOS / R36S).
+  SDL_SetHint(SDL_HINT_OPENGL_ES_DRIVER, "1");
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -113,6 +115,13 @@ void
 GLVideoSystem::create_gl_context()
 {
   m_glcontext = SDL_GL_CreateContext(m_sdl_window.get());
+  if (!m_glcontext)
+  {
+    // Calling glGetError() without a context aborts on some Mali/ArkOS stacks
+    // (Pingus PORTING: failed GLES context → assert/abort). Throw cleanly.
+    throw std::runtime_error(
+      std::string("SDL_GL_CreateContext failed: ") + SDL_GetError());
+  }
 
   assert_gl();
 

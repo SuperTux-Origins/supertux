@@ -82,7 +82,8 @@ SDLBaseVideoSystem::on_resize(int w, int h)
 void
 SDLBaseVideoSystem::create_sdl_window(Uint32 flags)
 {
-  flags |= SDL_WINDOW_RESIZABLE;
+  if (g_config->window_resizable)
+    flags |= SDL_WINDOW_RESIZABLE;
 
   Size size;
   if (g_config->use_fullscreen)
