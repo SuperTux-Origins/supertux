@@ -84,14 +84,14 @@ protected:
 
 std::ostream& operator<<(std::ostream& os, UID const& uid);
 
+// Inherit formatter<uint32_t> so NDK libc++ formattable concepts accept UID
+// (custom formatter alone is not enough for make_format_args on NDK r26).
 template<>
-struct std::formatter<UID, char>
+struct std::formatter<UID, char> : std::formatter<uint32_t>
 {
-  constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
-
   auto format(UID const& uid, std::format_context& ctx) const
   {
-    return std::format_to(ctx.out(), "{}", uid.get_value());
+    return std::formatter<uint32_t>::format(uid.get_value(), ctx);
   }
 };
 

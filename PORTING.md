@@ -916,3 +916,10 @@ of bug as Windstille; fix is to drop `-static-libgcc` and rely on device
 `libgcc_s.so.1` (already present on ArkOS). Keep `-fexceptions` and the
 cxxabi_shim for missing `to_chars` symbols.
 
+### Android: format UID via get_value() in SCRIPT_GUARD
+
+NDK r26 libc++ still rejects `std::make_format_args(UID&)` even with
+`formatter<UID, char>` (`__determine_arg_t` deleted). SCRIPT_GUARD macros
+now log `m_uid.get_value()` (uint32_t). The formatter remains for desktop
+paths and inherits `formatter<uint32_t>`.
+

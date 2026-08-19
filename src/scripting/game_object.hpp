@@ -26,7 +26,7 @@
 #define SCRIPT_GUARD_VOID                                               \
   auto object_ptr = get_object_ptr();                                   \
   if (object_ptr == nullptr) {                                          \
-    log_fatal("script is accessing a dead object: {} ", m_uid);         \
+    log_fatal("script is accessing a dead object: {}", m_uid.get_value());         \
     return;                                                             \
   }                                                                     \
   auto& object = *object_ptr
@@ -34,7 +34,7 @@
 #define SCRIPT_GUARD_DEFAULT                                            \
   auto object_ptr = get_object_ptr();                                   \
   if (object_ptr == nullptr) {                                          \
-    log_fatal("script is accessing a dead object: {}", m_uid);          \
+    log_fatal("script is accessing a dead object: {}", m_uid.get_value());          \
     return {};                                                          \
   }                                                                     \
   auto& object = *object_ptr
@@ -42,7 +42,7 @@
 #define SCRIPT_GUARD_RETURN(x)                                          \
   auto object_ptr = get_object_ptr();                                   \
   if (object_ptr == nullptr) {                                          \
-    log_fatal("script is accessing a dead object: {}" , m_uid);         \
+    log_fatal("script is accessing a dead object: {}", m_uid.get_value());         \
     return x;                                                           \
   }                                                                     \
   auto& object = *object_ptr
@@ -50,7 +50,7 @@
 #define SCRIPT_GUARD_VOID_T(OBJECT)                                     \
   auto object_ptr = GameObject<::OBJECT>::get_object_ptr();             \
   if (object_ptr == nullptr) {                                          \
-    log_fatal("script is accessing a dead object: {}", GameObject<::OBJECT>::m_uid); \
+    log_fatal("script is accessing a dead object: {}", GameObject<::OBJECT>::m_uid.get_value()); \
     return;                                                             \
   }                                                                     \
   auto& object = *object_ptr
@@ -58,7 +58,7 @@
 #define SCRIPT_GUARD_DEFAULT_T(OBJECT)                                  \
   auto object_ptr = GameObject<::OBJECT>::get_object_ptr();             \
   if (object_ptr == nullptr) {                                          \
-    log_fatal("script is accessing a dead object: {}", GameObject<::OBJECT>::m_uid); \
+    log_fatal("script is accessing a dead object: {}", GameObject<::OBJECT>::m_uid.get_value()); \
     return {};                                                          \
   }                                                                     \
   auto& object = *object_ptr
@@ -66,7 +66,7 @@
 #define SCRIPT_GUARD_RETURN_T(OBJECT, x)                                \
   auto object_ptr = GameObject<::OBJECT>::get_object_ptr();             \
   if (object_ptr == nullptr) {                                          \
-    log_fatal("script is accessing a dead object: {}", GameObject<::OBJECT>::m_uid); \
+    log_fatal("script is accessing a dead object: {}", GameObject<::OBJECT>::m_uid.get_value()); \
     return x;                                                           \
   }                                                                     \
   auto& object = *object_ptr
