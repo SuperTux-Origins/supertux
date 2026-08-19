@@ -10,7 +10,6 @@
 , SDL2_image
 , SDL2_ttf
 , curl
-
 , freetype
 , glew
 , glm
@@ -65,12 +64,7 @@ EOF
   lib.optional useGLES2 "-DENABLE_OPENGLES2=ON";
 
   postFixup =
-    (lib.optionalString stdenv.targetPlatform.isLinux ''
-       wrapProgram $out/bin/supertux-origins \
-         --prefix LIBGL_DRIVERS_PATH ":" "${mesa.drivers}/lib/dri" \
-         --prefix LD_LIBRARY_PATH ":" "${mesa.drivers}/lib"
-    '')
-  + (lib.optionalString stdenv.targetPlatform.isWindows ''
+    (lib.optionalString stdenv.hostPlatform.isWindows ''
        mkdir -p $out/bin/
        find ${mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
        find ${stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
@@ -91,7 +85,7 @@ EOF
 
     miniswig
   ]
-  ++ (lib.optional stdenv.targetPlatform.isLinux makeWrapper);
+  ++ (lib.optional stdenv.hostPlatform.isLinux makeWrapper);
 
   buildInputs = [
     SDL2
@@ -112,13 +106,13 @@ EOF
     # checkInputs
     gtest
   ]
-  ++ (lib.optional (!stdenv.targetPlatform.isWindows) xdgcpp);
+  ++ (lib.optional (!stdenv.hostPlatform.isWindows) xdgcpp);
 
   meta = with lib; {
     description = "SuperTux (Origins) — 2D platform game";
     homepage = "https://github.com/SuperTux-Origins/supertux";
     license = licenses.gpl3Plus;
-    platforms = if stdenv.targetPlatform.isWindows
+    platforms = if stdenv.hostPlatform.isWindows
                 then [ "x86_64-windows" ]
                 else platforms.linux;
     mainProgram = "supertux-origins";

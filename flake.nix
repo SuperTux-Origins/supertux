@@ -24,7 +24,7 @@
   description = "A 2D platform game featuring Tux the penguin";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
 
     tinycmmc.url = "github:grumbel/tinycmmc";
@@ -34,11 +34,9 @@
     sexpcpp.url = "github:lispparser/sexp-cpp";
     sexpcpp.inputs.nixpkgs.follows = "nixpkgs";
     sexpcpp.inputs.flake-utils.follows = "flake-utils";
-    sexpcpp.inputs.tinycmmc.follows = "tinycmmc";
 
     logmich.url = "github:logmich/logmich";
     logmich.inputs.nixpkgs.follows = "nixpkgs";
-    logmich.inputs.tinycmmc.follows = "tinycmmc";
 
     curl-win32.url = "github:grumnix/curl-win32";
     curl-win32.inputs.nixpkgs.follows = "nixpkgs";
@@ -50,11 +48,9 @@
 
     SDL2-win32.url = "github:grumnix/SDL2-win32";
     SDL2-win32.inputs.nixpkgs.follows = "nixpkgs";
-    SDL2-win32.inputs.tinycmmc.follows = "tinycmmc";
 
     SDL2_image-win32.url = "github:grumnix/SDL2_image-win32";
     SDL2_image-win32.inputs.nixpkgs.follows = "nixpkgs";
-    SDL2_image-win32.inputs.tinycmmc.follows = "tinycmmc";
 
     freetype-win32.url = "github:grumnix/freetype-win32";
     freetype-win32.inputs.nixpkgs.follows = "nixpkgs";
@@ -66,7 +62,6 @@
 
     strutcpp.url = "github:grumbel/strutcpp";
     strutcpp.inputs.nixpkgs.follows = "nixpkgs";
-    strutcpp.inputs.tinycmmc.follows = "tinycmmc";
 
     miniswig.url = "github:WindstilleTeam/miniswig";
     miniswig.inputs.nixpkgs.follows = "nixpkgs";
@@ -92,7 +87,6 @@
     priocpp.url = "github:grumbel/priocpp";
     priocpp.inputs.nixpkgs.follows = "nixpkgs";
     priocpp.inputs.flake-utils.follows = "flake-utils";
-    priocpp.inputs.tinycmmc.follows = "tinycmmc";
     priocpp.inputs.logmich.follows = "logmich";
     priocpp.inputs.sexpcpp.follows = "sexpcpp";
 
@@ -118,43 +112,43 @@
           supertux-origins = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
 
-            SDL2_ttf = if pkgs.targetPlatform.isWindows
-                       then SDL2_ttf-win32.packages.${pkgs.system}.default
+            SDL2_ttf = if pkgs.stdenv.hostPlatform.isWindows
+                       then SDL2_ttf-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                        else pkgs.SDL2_ttf;
 
-            sexpcpp = sexpcpp.packages.${pkgs.system}.default;
-            squirrel = squirrel.packages.${pkgs.system}.default;
-            tinycmmc = tinycmmc.packages.${pkgs.system}.default;
-            strutcpp = strutcpp.packages.${pkgs.system}.default;
-            miniswig = miniswig.packages.${pkgs.system}.default;
-            wstsound = wstsound.packages.${pkgs.system}.default;
-            priocpp = priocpp.packages.${pkgs.system}.priocpp-sexp;
-            logmich = logmich.packages.${pkgs.system}.default;
+            sexpcpp = sexpcpp.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            strutcpp = strutcpp.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            priocpp = priocpp.packages.${pkgs.stdenv.hostPlatform.system}.priocpp-sexp;
+            logmich = logmich.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
-            physfs = if pkgs.targetPlatform.isWindows
-                     then physfs-win32.packages.${pkgs.system}.default
+            physfs = if pkgs.stdenv.hostPlatform.isWindows
+                     then physfs-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                      else pkgs.physfs;
 
-            curl = if pkgs.targetPlatform.isWindows
-                   then curl-win32.packages.${pkgs.system}.default
+            curl = if pkgs.stdenv.hostPlatform.isWindows
+                   then curl-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                    else pkgs.curl;
 
-            glew = if pkgs.targetPlatform.isWindows
-                   then glew-win32.packages.${pkgs.system}.default
+            glew = if pkgs.stdenv.hostPlatform.isWindows
+                   then glew-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                    else pkgs.glew;
 
             glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
 
-            SDL2 = if pkgs.targetPlatform.isWindows
-                   then SDL2-win32.packages.${pkgs.system}.default
+            SDL2 = if pkgs.stdenv.hostPlatform.isWindows
+                   then SDL2-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                    else pkgs.SDL2;
 
-            SDL2_image = if pkgs.targetPlatform.isWindows
-                         then SDL2_image-win32.packages.${pkgs.system}.default
+            SDL2_image = if pkgs.stdenv.hostPlatform.isWindows
+                         then SDL2_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                          else pkgs.SDL2_image;
 
-            xdgcpp = if !pkgs.targetPlatform.isWindows
-                     then xdgcpp.packages.${pkgs.system}.default
+            xdgcpp = if !pkgs.stdenv.hostPlatform.isWindows
+                     then xdgcpp.packages.${pkgs.stdenv.hostPlatform.system}.default
                      else null;
 
             mcfgthreads = pkgs.windows.mcfgthreads;
@@ -180,7 +174,7 @@
             cd "$WORKDIR"
             ${nixpkgs.legacyPackages.x86_64-linux.zip}/bin/zip \
               -r \
-              $out/SuperTux-${supertux-origins.version}-${pkgs.system}.zip \
+              $out/SuperTux-${supertux-origins.version}-${pkgs.stdenv.hostPlatform.system}.zip \
               .
           '';
 
