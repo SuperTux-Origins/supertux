@@ -51,3 +51,15 @@ modules or prebuilts.
 - Full game binary still needs physfs, squirrel, logmich, sexpcpp, priocpp
   (sexp), wstsound, tinycmmc as NDK static/shared modules or prebuilts under
   `app/jni/`. Prefer building those from `external/` with the NDK toolchain.
+
+## Building against `external/`
+
+Once SDL prebuilts are in place, the next dependencies to stage under
+`app/jni/` (static `.a` or shared `.so` per ABI) are, in order:
+
+1. logmich, sexpcpp, strutcpp, tinycmmc headers
+2. priocpp (`-DPRIO_USE_JSONCPP=OFF -DPRIO_USE_SEXPCPP=ON`)
+3. physfs, squirrel, wstsound
+
+Use the NDK standalone toolchain / cmake with
+`-DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake`.

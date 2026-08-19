@@ -17,6 +17,7 @@
 #ifndef HEADER_SUPERTUX_MATH_VECTOR_HPP
 #define HEADER_SUPERTUX_MATH_VECTOR_HPP
 
+#include <format>
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/io.hpp>
@@ -43,6 +44,18 @@ inline Vector at_angle(Vector const& v, float angle)
 }
 
 } // namespace math
+
+/** std::format support for Vector (glm::vec2) — used by logmich. */
+template<>
+struct std::formatter<glm::vec2>
+{
+  constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+  auto format(glm::vec2 const& v, std::format_context& ctx) const
+  {
+    return std::format_to(ctx.out(), "({}, {})", v.x, v.y);
+  }
+};
 
 #endif
 

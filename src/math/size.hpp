@@ -17,6 +17,7 @@
 #ifndef HEADER_SUPERTUX_MATH_SIZE_HPP
 #define HEADER_SUPERTUX_MATH_SIZE_HPP
 
+#include <format>
 #include <iosfwd>
 
 class Sizef;
@@ -118,6 +119,17 @@ inline bool operator!=(Size const& lhs, Size const& rhs)
 }
 
 std::ostream& operator<<(std::ostream& s, Size const& size);
+
+template<>
+struct std::formatter<Size>
+{
+  constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+  auto format(Size const& s, std::format_context& ctx) const
+  {
+    return std::format_to(ctx.out(), "{}x{}", s.width, s.height);
+  }
+};
 
 #endif
 

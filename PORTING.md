@@ -329,3 +329,16 @@ Win32 prebuilt packages remain flake inputs (grumnix/*-win32).
 **priocpp + jsoncpp:** SuperTux does not need JSON. Build with
 `-DPRIO_USE_JSONCPP=OFF`. ReaderDocument tests only instantiate `.json`
 params when `PRIO_USE_JSONCPP` is enabled.
+
+### std::format formatters for game types
+
+After dropping libfmt, types passed to logmich (`std::vformat`) need
+`std::formatter` specializations. Added for:
+
+- `Direction` (`src/supertux/direction.hpp`)
+- `worldmap::Direction` (`src/worldmap/direction.hpp`)
+- `Vector` / `glm::vec2` (`src/math/vector.hpp`)
+- `Size` (`src/math/size.hpp`)
+
+If the build fails with `basic_format_arg` / no conversion from `SomeType`,
+add a formatter (or pass `.x`/`.y`/string conversion at the call site).
