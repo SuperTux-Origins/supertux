@@ -694,35 +694,6 @@
         "url": "https://icculus.org/physfs/downloads/physfs-3.0.2.tar.bz2"
       }
     },
-    "priocpp": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "logmich": [
-          "logmich"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "sexpcpp": [
-          "sexpcpp"
-        ]
-      },
-      "locked": {
-        "lastModified": 1786363576,
-        "narHash": "sha256-K0jlMh7Ew8eUQCA7YLbQHnk3k+xRuK5MlPjQOYoUJsA=",
-        "owner": "grumbel",
-        "repo": "priocpp",
-        "rev": "d7752766ea986065810a89ed811cfdd6c42b4b5a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "grumbel",
-        "repo": "priocpp",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "SDL2-win32": "SDL2-win32",
@@ -737,13 +708,40 @@
         "nixpkgs": "nixpkgs",
         "physfs-src": "physfs-src",
         "physfs-win32": "physfs-win32",
-        "priocpp": "priocpp",
+        "sdl2-image-src": "sdl2-image-src",
+        "sdl2-src": "sdl2-src",
         "sexpcpp": "sexpcpp",
         "squirrel": "squirrel_2",
         "strutcpp": "strutcpp",
         "tinycmmc": "tinycmmc",
         "wstsound": "wstsound",
         "xdgcpp": "xdgcpp"
+      }
+    },
+    "sdl2-image-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1704144931,
+        "narHash": "sha256-zEE5Uk77xD0dYAJIPuhmidH51huxtmr+OmlrCcXoYRg=",
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.2/SDL2_image-2.8.2.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.2/SDL2_image-2.8.2.tar.gz"
+      }
+    },
+    "sdl2-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1714580206,
+        "narHash": "sha256-49TNuKx5ec+rEK49rKjqrKStQzuhk8zdu8mRe/amUBk=",
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz"
       }
     },
     "sexpcpp": {
