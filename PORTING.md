@@ -938,3 +938,14 @@ Cause: `prio::ReaderDocument::get_directory()` used
 Fix: string-based dirname in `get_directory()` (same approach as
 `FileSystem::dirname`).
 
+### WASM: port/emscripten.hpp without AddonManager
+
+Origins has no `src/addon/`. Stub the download callbacks in
+`port/emscripten.hpp` instead of including `addon/addon_manager.hpp`.
+
+### Android/R36S: skip xdgcpp
+
+`#include <xdgcpp/xdg.h>` must be excluded for Android and R36S (no xdgcpp
+in the NDK / ArkOS sysroot). Guard with `ANDROID` / `__ANDROID__` /
+`SUPERTUX_R36S` as well as `__EMSCRIPTEN__` and `WIN32`.
+

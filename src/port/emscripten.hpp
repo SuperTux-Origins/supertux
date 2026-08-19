@@ -21,7 +21,6 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
-#include "addon/addon_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
@@ -56,25 +55,25 @@ save_config()
 void
 onDownloadProgress(int id, int loaded, int total)
 {
-  AddonManager::current()->onDownloadProgress(id, loaded, total);
+  (void)id; (void)loaded; (void)total; /* Origins: no AddonManager */
 }
 
 void
 onDownloadFinished(int id)
 {
-  AddonManager::current()->onDownloadFinished(id);
+  (void)id; /* Origins: no AddonManager */
 }
 
 void
 onDownloadError(int id)
 {
-  AddonManager::current()->onDownloadError(id);
+  (void)id; /* Origins: no AddonManager */
 }
 
 void
 onDownloadAborted(int id)
 {
-  AddonManager::current()->onDownloadAborted(id);
+  (void)id; /* Origins: no AddonManager */
 }
 
 char const*

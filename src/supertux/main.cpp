@@ -29,7 +29,7 @@
 #  include <unistd.h>
 #endif
 
-#if !defined(WIN32) && !defined(__EMSCRIPTEN__)
+#if !defined(WIN32) && !defined(__EMSCRIPTEN__) && !defined(ANDROID) && !defined(__ANDROID__) && !defined(SUPERTUX_R36S)
 #  include <xdgcpp/xdg.h>
 #endif
 
@@ -243,6 +243,12 @@ void PhysfsSubsystem::find_userdir() const
     userdir = PHYSFS_getPrefDir("SuperTux","supertux-origins");
 #elif defined(__EMSCRIPTEN__)
     userdir = "/home/web_user/.local/share/supertux-origins/";
+#elif defined(ANDROID) || defined(__ANDROID__)
+    // Prefer --userdir / env; fall back to PHYSFS pref dir on device storage.
+    userdir = PHYSFS_getPrefDir("SuperTux", "supertux-origins");
+#elif defined(SUPERTUX_R36S)
+    // PortMaster sets --userdir; this is only a last-resort default.
+    userdir = PHYSFS_getPrefDir("SuperTux", "supertux-origins");
 #else
     userdir = xdg::config().home() / "supertux-origins";
 #endif
