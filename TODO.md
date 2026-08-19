@@ -43,6 +43,9 @@ adapted from Pingus and Windstille.
 
 ## Android
 
+- [x] PHYSFS_init via PHYSFS_AndroidInit (JNIEnv + Activity); assets/data.zip mount.
+
+
 - [x] Adapt `mk/android/` and `nix/android.nix` from Pingus (SDLActivity,
       jni, keystore, NDK scaffold).
 - [x] flake packages.supertux-android + android-sdl-libs.

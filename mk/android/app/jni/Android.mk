@@ -43,6 +43,10 @@ LOCAL_SRC_FILES := $(filter-out %/json_reader_impl.cpp %/json_writer_impl.cpp %/
 LOCAL_SRC_FILES := $(filter-out %/sq/sq.c %/sq/sq.cpp deps/squirrel/sq/%,$(LOCAL_SRC_FILES))
 # Prefer static squirrel objects only (exclude shared-only stubs if any).
 LOCAL_SRC_FILES := $(filter-out %/sqstdlib/%/sqstdlib.cpp,$(LOCAL_SRC_FILES))
+# PhysFS: only Android + POSIX platform backends (others are empty or fail).
+LOCAL_SRC_FILES := $(filter-out %/physfs_platform_windows.c %/physfs_platform_winrt.cpp \
+	%/physfs_platform_os2.c %/physfs_platform_qnx.c %/physfs_platform_haiku.cpp \
+	%/physfs_platform_unix.c %/physfs_platform_apple.m,$(LOCAL_SRC_FILES))
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../SDL/include \

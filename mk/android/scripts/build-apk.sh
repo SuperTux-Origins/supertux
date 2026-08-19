@@ -425,6 +425,14 @@ do
   fi
 done
 
+# Nested zip so PhysFS can mount assets/data.zip as the data root (paths
+# images/, levels/, … without an assets/ prefix). See PHYSFS_AndroidInit
+# handling in PhysfsSubsystem::find_datadir().
+echo "==> packing assets/data.zip for PhysFS"
+rm -f src/assets/data.zip
+( cd src/assets && zip -r -0 data.zip . -x 'data.zip' -x 'android-asset-index.txt' )
+echo "assets/data.zip size: $(du -h src/assets/data.zip | awk '{print $1}')"
+
 cp "$KEYSTORE" debug.keystore
 
 # Bake VERSION+g<rev> into the game version macro (see jni/Android.mk).

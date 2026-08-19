@@ -27,6 +27,8 @@
 
 #ifdef __ANDROID__
 #  include <unistd.h>
+#  include <jni.h>
+#  include <SDL_system.h>
 #endif
 
 #if !defined(WIN32) && !defined(__EMSCRIPTEN__) && !defined(ANDROID) && !defined(__ANDROID__) && !defined(SUPERTUX_R36S)
@@ -110,20 +112,43 @@ PhysfsSubsystem::PhysfsSubsystem(char const* argv0,
   m_forced_datadir(std::move(forced_datadir)),
   m_forced_userdir(std::move(forced_userdir))
 {
-  if (!PHYSFS_init(argv0))
+  // On Android, PHYSFS_init expects argv0 to be a PHYSFS_AndroidInit* (JNIEnv +
+  // Context), not a C-string. Passing argv[0] crashes inside
+  // __PHYSFS_platformCalcBaseDir when it casts the pointer and calls JNI.
+#if defined(__ANDROID__)
+  PHYSFS_AndroidInit ainit;
+  ainit.jnienv = static_cast<void*>(SDL_AndroidGetJNIEnv());
+  ainit.context = static_cast<void*>(SDL_AndroidGetActivity());
+  if (ainit.jnienv == nullptr || ainit.context == nullptr)
+  {
+    throw std::runtime_error(
+      "Couldn't initialize physfs: SDL_AndroidGetJNIEnv/Activity returned null");
+  }
+  char const* physfs_argv0 = reinterpret_cast<char const*>(&ainit);
+#else
+  char const* physfs_argv0 = argv0;
+#endif
+
+  if (!PHYSFS_init(physfs_argv0))
   {
     std::stringstream msg;
     msg << "Couldn't initialize physfs: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     throw std::runtime_error(msg.str());
   }
-  else
-  {
-    // allow symbolic links
-    PHYSFS_permitSymbolicLinks(1);
 
-    find_userdir();
-    find_datadir();
+#if defined(__ANDROID__)
+  // PhysicsFS does not retain the Activity local ref past PHYSFS_init().
+  {
+    JNIEnv* env = static_cast<JNIEnv*>(ainit.jnienv);
+    env->DeleteLocalRef(static_cast<jobject>(ainit.context));
   }
+#endif
+
+  // allow symbolic links
+  PHYSFS_permitSymbolicLinks(1);
+
+  find_userdir();
+  find_datadir();
 }
 
 void PhysfsSubsystem::find_datadir() const
@@ -166,6 +191,42 @@ void PhysfsSubsystem::find_datadir() const
   {
     datadir = env_datadir3;
   }
+#if defined(__ANDROID__)
+  else
+  {
+    // PHYSFS_AndroidInit made getBaseDir() the APK path (a zip). Mount it,
+    // then prefer assets/data.zip (packaged by build-apk.sh) so game paths
+    // are images/, levels/, … without an assets/ prefix.
+    char const* basedir = PHYSFS_getBaseDir();
+    if (basedir && basedir[0])
+    {
+      if (!PHYSFS_mount(basedir, nullptr, 1))
+      {
+        log_warning("Couldn't mount APK '{}' as physfs archive: {}", basedir,
+                    PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+      }
+      else
+      {
+        PHYSFS_File* data_zip = PHYSFS_openRead("assets/data.zip");
+        if (data_zip)
+        {
+          if (!PHYSFS_mountHandle(data_zip, "assets/data.zip", nullptr, 1))
+          {
+            log_warning("Couldn't mount assets/data.zip inside APK: {}",
+                        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+            PHYSFS_close(data_zip);
+          }
+        }
+        else
+        {
+          // Fallback: assets/ tree is visible under "assets/" prefix only.
+          log_warning("assets/data.zip not found in APK; data may need an assets/ prefix");
+        }
+      }
+    }
+    return;
+  }
+#else
   else
   {
     // check if we run from source dir
@@ -200,6 +261,7 @@ void PhysfsSubsystem::find_datadir() const
       }
     }
   }
+#endif /* !__ANDROID__ */
 
   // canonical() throws if the path does not exist — avoid abort-on-exception
   // on R36S when datadir is wrong (broken libstdc++ unwind can turn that into

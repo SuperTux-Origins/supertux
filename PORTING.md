@@ -963,6 +963,23 @@ NDK libc++ rejects custom `formatter<Size, char>` in `make_format_args`
 sites.
 
 
+
+### Android: PHYSFS_init crash (PHYSFS_AndroidInit)
+
+On Android, `PHYSFS_init(argv0)` does **not** take a C-string path. PhysFS
+treats `argv0` as a `PHYSFS_AndroidInit*` (`jnienv` + `context`). Passing
+`argv[0]` crashes inside `__PHYSFS_platformCalcBaseDir` when it casts the
+pointer and calls JNI methods on garbage.
+
+Fix in `PhysfsSubsystem`:
+- Fill `PHYSFS_AndroidInit` via `SDL_AndroidGetJNIEnv()` / `SDL_AndroidGetActivity()`
+  (valid once `SDL_main` is entered from `SDLActivity.nativeRunMain`, even before
+  `SDL_Init`).
+- Pass that struct to `PHYSFS_init`, then `DeleteLocalRef` the Activity.
+- Mount `PHYSFS_getBaseDir()` (APK path) and `assets/data.zip` so data paths are
+  `images/`, `levels/`, … without an `assets/` prefix.
+- `build-apk.sh` packs `assets/data.zip` from the data tree for that mount.
+
 ### WASM / cross: squirrel ExternalProject multiarch path
 
 `ProvideSquirrel.cmake` used `CMAKE_LIBRARY_ARCHITECTURE` (e.g.
