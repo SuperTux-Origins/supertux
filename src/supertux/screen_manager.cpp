@@ -38,6 +38,7 @@
 
 
 #ifdef __EMSCRIPTEN__
+#  include <emscripten.h>
 #endif
 
 struct ScreenManager::FPS_Stats
