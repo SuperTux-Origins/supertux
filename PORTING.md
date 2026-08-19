@@ -962,6 +962,22 @@ NDK libc++ rejects custom `formatter<Size, char>` in `make_format_args`
 (same class as UID). Expand `Size` to `.width`/`.height` ints at log call
 sites.
 
+
+### WASM / cross: squirrel ExternalProject multiarch path
+
+`ProvideSquirrel.cmake` used `CMAKE_LIBRARY_ARCHITECTURE` (e.g.
+`wasm32-emscripten`) under `CMAKE_CROSSCOMPILING` for
+`IMPORTED_LOCATION` / `BUILD_BYPRODUCTS`. The ExternalProject always
+passes `-DCMAKE_INSTALL_LIBDIR=lib`, so squirrel installs to
+`squirrel/ex/lib/libsquirrel_static.a` (no multiarch subdir). Result:
+
+```
+No rule to make target 'squirrel/ex/lib/wasm32-emscripten/libsquirrel_static.a'
+```
+
+Fix: force `SQUIRREL_MULTIARCH_DIR` empty while `CMAKE_INSTALL_LIBDIR=lib`
+is set. Same issue would hit Android / R36S cross builds.
+
 ### Missing <sstream> on NDK / emscripten
 
 libstdc++ often pulls  transitively; NDK libc++ and emscripten

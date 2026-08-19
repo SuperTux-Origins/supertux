@@ -22,7 +22,13 @@ else()
       "  Checkout external/squirrel or pass -DSQUIRREL_SOURCE_DIR=/path/to/squirrel")
   endif()
 
-  if(CMAKE_CROSSCOMPILING)
+  # ExternalProject forces -DCMAKE_INSTALL_LIBDIR=lib, so GNUInstallDirs will
+  # not place archives under lib/<multiarch>/. Using CMAKE_LIBRARY_ARCHITECTURE
+  # here (e.g. wasm32-emscripten under Emscripten) makes IMPORTED_LOCATION and
+  # BUILD_BYPRODUCTS point at a path that never exists → "No rule to make
+  # target .../lib/wasm32-emscripten/libsquirrel_static.a".
+  # Keep multiarch only if we stop forcing CMAKE_INSTALL_LIBDIR.
+  if(FALSE AND CMAKE_CROSSCOMPILING)
     set(SQUIRREL_MULTIARCH_DIR "${CMAKE_LIBRARY_ARCHITECTURE}/")
   else()
     set(SQUIRREL_MULTIARCH_DIR "")
@@ -48,7 +54,7 @@ else()
     -DCMAKE_C_FLAGS=
     -DCMAKE_CXX_FLAGS=
     -DDISABLE_DYNAMIC=ON
-    -DDISABLE_EXECUTABLES=ON
+    -DSQ_DISABLE_INTERPRETER=ON
     -DBUILD_SHARED_LIBS=OFF)
 
   if(WIN32)

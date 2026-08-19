@@ -39,7 +39,7 @@ adapted from Pingus and Windstille.
 - [ ] Prefer stb_image (or existing image path) over system jpeg/png.
 - [ ] Produce complete `packages.x86_64-linux.supertux-wasm` and serve app.
 - [x] Drop native wstsound/squirrel from wasm buildInputs (in-tree + modplug).
-- [ ] Build squirrel under emscripten if in-tree path still fails.
+- [x] Build squirrel under emscripten: fix multiarch IMPORTED path (ProvideSquirrel).
 
 ## Android
 
