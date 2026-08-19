@@ -328,7 +328,7 @@ Tux::try_continue_walking(float dt_sec)
   }
   //SpriteChange* last_sprite = m_worldmap->at_sprite_change(tile_pos);
   if (sprite_change != nullptr && next_sprite != nullptr) {
-    log_debug("Old: {} New: {}", m_tile_pos, next_tile);
+    log_debug("Old: ({}, {}) New: ({}, {})", m_tile_pos.x, m_tile_pos.y, next_tile.x, next_tile.y);
     sprite_change->set_stay_action();
   }
 

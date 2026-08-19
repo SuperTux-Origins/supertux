@@ -38,12 +38,12 @@ SpawnPoint::SpawnPoint(ReaderMapping const& mapping) :
 
   if (m_name.empty())
   {
-    log_warning("Spawn point at location '{}' does not have a name", m_pos);
+    log_warning("Spawn point at location '({}, {})' does not have a name", m_pos.x, m_pos.y);
   }
 
   if (m_pos.x < 0 || m_pos.y < 0)
   {
-    log_warning("Spawn point '{}' has invalid coordinates: {}", m_name, m_pos);
+    log_warning("Spawn point '{}' has invalid coordinates: ({}, {})", m_name, m_pos.x, m_pos.y);
   }
 }
 
