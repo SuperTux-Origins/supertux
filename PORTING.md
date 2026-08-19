@@ -802,3 +802,11 @@ compile `mk/r36s/cxxabi_shim.cpp` into the executable (`-DSUPERTUX_CXXABI_SHIM=â
 to supply the missing ABI symbols plus `_dl_find_object`. Keep `-static-libgcc`
 only (for libgcc_eh without shared GLIBC_2.35 from libgcc_s).
 
+### Android: do not define PRIO_USE_JSONCPP=0
+
+priocpp gates JSON with `#ifdef PRIO_USE_JSONCPP` (now also
+`#if defined(...) && PRIO_USE_JSONCPP`). Defining the macro to `0` still
+makes `#ifdef` true, so `<json/reader.h>` is included and NDK fails.
+Leave the macro **undefined** on Android (CMake only defines it when the
+option is ON). JSON source files are already filtered out of the NDK build.
+

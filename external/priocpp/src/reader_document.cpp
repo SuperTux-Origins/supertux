@@ -23,7 +23,7 @@
 
 #include <logmich/log.hpp>
 
-#ifdef PRIO_USE_JSONCPP
+#if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
 #  include <json/reader.h>
 #  include "json_reader_impl.hpp"
 #endif
@@ -82,7 +82,7 @@ ReaderDocument::from_stream(Format format,
       }
     }
 
-#ifdef PRIO_USE_JSONCPP
+#if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
     case Format::FASTJSON:
     case Format::JSON: {
       Json::CharReaderBuilder builder;

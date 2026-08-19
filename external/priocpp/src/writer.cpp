@@ -26,7 +26,7 @@
 #include <utility>
 #include <cstring>
 
-#ifdef PRIO_USE_JSONCPP
+#if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
 #  include "json_writer_impl.hpp"
 #  include "jsonpretty_writer_impl.hpp"
 #endif
@@ -62,7 +62,7 @@ Writer
 Writer::from_stream(Format format, std::ostream& out)
 {
   switch (format) {
-#ifdef PRIO_USE_JSONCPP
+#if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
 #ifndef PRIO_USE_SEXPCPP
     case Format::AUTO:
 #endif
