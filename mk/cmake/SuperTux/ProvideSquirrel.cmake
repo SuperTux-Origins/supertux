@@ -14,8 +14,12 @@ else()
     message(STATUS "Could NOT find squirrel, using external/squirrel fallback")
   endif()
 
-  if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/external/squirrel/CMakeLists.txt)
-    message(FATAL_ERROR "squirrel submodule is not checked out or ${CMAKE_CURRENT_SOURCE_DIR}/external/squirrel/CMakeLists.txt is missing")
+  set(SQUIRREL_SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/squirrel" CACHE PATH
+      "Path to squirrel sources (CMakeLists.txt)")
+  if(NOT EXISTS "${SQUIRREL_SOURCE_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR
+      "squirrel sources not found at SQUIRREL_SOURCE_DIR=${SQUIRREL_SOURCE_DIR}.\n"
+      "  Checkout external/squirrel or pass -DSQUIRREL_SOURCE_DIR=/path/to/squirrel")
   endif()
 
   if(CMAKE_CROSSCOMPILING)
@@ -26,7 +30,7 @@ else()
 
   set(SQUIRREL_PREFIX ${CMAKE_BINARY_DIR}/squirrel/ex)
   ExternalProject_Add(squirrel_project
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/squirrel/"
+    SOURCE_DIR "${SQUIRREL_SOURCE_DIR}"
     BUILD_BYPRODUCTS
     "${SQUIRREL_PREFIX}/lib/${SQUIRREL_MULTIARCH_DIR}${CMAKE_STATIC_LIBRARY_PREFIX}sqstdlib_static${CMAKE_STATIC_LIBRARY_SUFFIX}"
     "${SQUIRREL_PREFIX}/lib/${SQUIRREL_MULTIARCH_DIR}${CMAKE_STATIC_LIBRARY_PREFIX}squirrel_static${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -39,7 +43,8 @@ else()
     -DCMAKE_INSTALL_PREFIX=${SQUIRREL_PREFIX}
     -DCMAKE_INSTALL_LIBDIR=lib
     -DINSTALL_INC_DIR=include
-    -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
 
   if(WIN32)
     add_library(LibSquirrel SHARED IMPORTED)
