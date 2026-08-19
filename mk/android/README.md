@@ -30,3 +30,16 @@ helpers imported by the flake, not a complete APK derivation.
 
 Next: expand `LOCAL_SRC_FILES` for SuperTux, add physfs/squirrel/wstsound,
 stage stb_image if needed, wire `nix/android.nix` `mkApk`.
+
+## Source list
+
+`app/jni/supertux_sources.list` / `.mk` list all 376 `src/**/*.cpp` files.
+Regenerate after adding sources:
+
+```bash
+./mk/android/scripts/generate-source-list.sh
+```
+
+Uncomment `include …/supertux_sources.mk` and set `LOCAL_SRC_FILES` in
+`Android.mk` once physfs/squirrel/wstsound/tinycmmc are available as NDK
+modules or prebuilts.
