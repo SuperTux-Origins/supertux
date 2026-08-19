@@ -121,7 +121,7 @@ inline bool operator!=(Size const& lhs, Size const& rhs)
 std::ostream& operator<<(std::ostream& s, Size const& size);
 
 template<>
-struct std::formatter<Size>
+struct std::formatter<Size, char>
 {
   constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 

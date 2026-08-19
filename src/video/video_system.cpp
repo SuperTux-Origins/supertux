@@ -15,6 +15,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "video/video_system.hpp"
+#include <sstream>
 
 #include <optional>
 #include <physfs.h>

@@ -150,7 +150,7 @@ public:
 };
 
 template<>
-struct std::formatter<Color> : std::formatter<std::string>
+struct std::formatter<Color, char> : std::formatter<std::string>
 {
   auto format(Color const& c, auto& ctx) const
   {

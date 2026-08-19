@@ -15,6 +15,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "video/sdlbase_video_system.hpp"
+#include <sstream>
 
 
 #include "supertux/gameconfig.hpp"

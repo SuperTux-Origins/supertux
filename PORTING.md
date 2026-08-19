@@ -762,3 +762,15 @@ Same as SDL2_ttf: aarch64 CMake may install to lib64/. Force
 `-DCMAKE_INSTALL_LIBDIR=lib` and `-DLIB_SUFFIX=` so
 `physfs/lib/libphysfs.a` matches BUILD_BYPRODUCTS / IMPORTED_LOCATION.
 
+
+### Android: sstream + formatter<T, char>
+
+NDK libc++ needs `#include <sstream>` for `std::ostringstream`. Custom
+`std::formatter` specializations must use the two-parameter form
+`formatter<T, char>` or make_format_args rejects the type.
+
+### WASM: no USE_SDL_IMAGE under nix sandbox
+
+`-sUSE_SDL_IMAGE=2` pulls the zlib emscripten port from the network
+(DNS fails offline). Compile with `-sUSE_SDL=2` only and ship
+`mk/emscripten/SDL_image.h` as a minimal stub include.

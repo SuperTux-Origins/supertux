@@ -155,7 +155,7 @@ public:
 std::ostream& operator<<(std::ostream& out, Rect const& rect);
 
 template<>
-struct std::formatter<Rect>
+struct std::formatter<Rect, char>
 {
   constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
   auto format(Rect const& r, std::format_context& ctx) const

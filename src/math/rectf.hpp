@@ -166,7 +166,7 @@ private:
 std::ostream& operator<<(std::ostream& out, Rectf const& rect);
 
 template<>
-struct std::formatter<Rectf>
+struct std::formatter<Rectf, char>
 {
   constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
   auto format(Rectf const& r, std::format_context& ctx) const

@@ -56,7 +56,7 @@ std::string Control_to_string(Control control);
 std::optional<Control> Control_from_string(std::string const& text);
 
 template<>
-struct std::formatter<Control> : std::formatter<std::string>
+struct std::formatter<Control, char> : std::formatter<std::string>
 {
   auto format(Control c, auto& ctx) const
   {

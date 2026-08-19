@@ -133,7 +133,7 @@ inline bool operator!=(Sizef const& lhs, Sizef const& rhs)
 std::ostream& operator<<(std::ostream& s, Sizef const& size);
 
 template<>
-struct std::formatter<Sizef>
+struct std::formatter<Sizef, char>
 {
   constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
   auto format(Sizef const& s, std::format_context& ctx) const

@@ -294,6 +294,11 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 add_library(supertux-origins_c OBJECT ${SUPERTUX_SOURCES_C})
 add_library(supertux-origins_lib STATIC ${CMAKE_BINARY_DIR}/version.h ${SUPERTUX_SOURCES_CXX} ${SUPERTUX_RESOURCES} $<TARGET_OBJECTS:supertux-origins_c>)
 target_include_directories(supertux-origins_lib PUBLIC ${CMAKE_BINARY_DIR} src/)
+if(EMSCRIPTEN)
+  # Prefer offline stubs over emscripten fakesdl that require -sUSE_SDL_IMAGE.
+  target_include_directories(supertux-origins_lib PUBLIC ${CMAKE_SOURCE_DIR}/mk/emscripten)
+endif()
+
 
 if(WIN32)
   add_executable(supertux-origins WIN32 src/main.cpp ${CMAKE_CURRENT_SOURCE_DIR}/data/images/engine/icons/supertux.rc)

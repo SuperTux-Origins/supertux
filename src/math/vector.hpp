@@ -47,7 +47,7 @@ inline Vector at_angle(Vector const& v, float angle)
 
 /** std::format support for Vector (glm::vec2) — used by logmich. */
 template<>
-struct std::formatter<glm::vec2>
+struct std::formatter<glm::vec2, char>
 {
   constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
