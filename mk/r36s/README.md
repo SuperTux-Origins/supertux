@@ -30,3 +30,15 @@ See `CROSSCOMPILE.md` and `nix/r36s.nix`. Summary:
 - `arkos-sysroot` — unpacked sysroot derivation
 - `supertux-r36s` — game binary linked against sysroot
 - `supertux-r36s-portmaster` — PortMaster layout under `/roms/ports`
+
+## Flake outputs
+
+| Attribute | Description |
+|-----------|-------------|
+| `arkos-sysroot` | Unpacked sysroot derivation |
+| `supertux-r36s` | Cross-built game binary |
+| `supertux-r36s-portmaster` | PortMaster tree |
+| `supertux-r36s-portmaster-zip` | Zip for autoinstall |
+
+Override the sysroot tarball by setting `sysrootSrc` when importing
+`nix/r36s.nix` from `flake.nix` (see PORTING.md).

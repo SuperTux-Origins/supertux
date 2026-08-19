@@ -392,3 +392,23 @@ WASM deps: `logmich`, `sexpcpp`, `strutcpp` are built under `emscriptenStdenv`
 from `external/`. Squirrel and wstsound still use native flake packages until
 static wasm builds exist — expect link or wrong-arch errors; that is the next
 porting step.
+
+### R36S package outputs
+
+```
+nix build .#arkos-sysroot              # needs real sysroot URL or sysrootSrc=
+nix build .#supertux-r36s
+nix build .#supertux-r36s-portmaster
+nix build .#supertux-r36s-portmaster-zip
+```
+
+Until a permanent sysroot tarball is hosted, either:
+
+1. Replace `url` / `hash` in `nix/r36s.nix`, or
+2. Pass `sysrootSrc = /path/to/arkos-sysroot4.tar.gz;` into the
+   `import ./nix/r36s.nix { ... }` call in `flake.nix`, or
+3. Build a Buster sysroot with
+   `sudo mk/r36s/scripts/make-sysroot-debootstrap.sh /opt/arkos-sysroot arm64`
+   and pack it (`tar czf arkos-sysroot4.tar.gz -C /opt/arkos-sysroot .`).
+
+`SUPERTUX_R36S=ON` forces GLES2, 640×480 defaults, and skips fragile icon load.

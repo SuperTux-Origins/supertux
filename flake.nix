@@ -265,18 +265,37 @@
             });
           }
         ) // (
-          # R36S / ArkOS — sysroot URL is still a localhost placeholder (PORTING.md).
+          # R36S / ArkOS hybrid cross (modern GCC + ArkOS glibc/SDL2/GLES sysroot).
+          # Sysroot tarball URL is still a placeholder — pass a local path:
+          #   nix build .#supertux-r36s \
+          #     edit nix/r36s.nix: sysrootSrc = /path/to/arkos-sysroot4.tar.gz;
+          # or replace the URL in nix/r36s.nix after `nix store prefetch-file`.
+          # Local sysroot: mk/r36s/scripts/make-sysroot-debootstrap.sh
           let
             r36s = import ./nix/r36s.nix {
               inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config writeShellScript zip glm;
               pkgsCross = pkgs.pkgsCross;
             };
+            gitDate = self.lastModifiedDate or "19700101";
+            gitRev = self.shortRev or self.dirtyShortRev or "dirty";
+            r36sVersion = "0.6.3-${builtins.substring 0 8 gitDate}-${gitRev}";
+            game = r36s.mkSuperTuxR36s {
+              src = self;
+              version = r36sVersion;
+              enableSound = true;
+            };
+            portMaster = r36s.mkSuperTuxR36sPortMaster {
+              r36sPkg = game;
+              version = r36sVersion;
+            };
           in {
-            arkos-sysroot = r36s.arkosSysroot.overrideAttrs (o: {
-              meta = (o.meta or {}) // { broken = true; };
-            });
-            # Full game cross-build needs a published sysroot; keep broken.
-            # supertux-r36s = r36s.mkSuperTuxR36s { ... };
+            arkos-sysroot = r36s.arkosSysroot;
+            supertux-r36s = game;
+            supertux-r36s-portmaster = portMaster;
+            supertux-r36s-portmaster-zip = r36s.mkSuperTuxR36sPortMasterZip {
+              portMasterPkg = portMaster;
+              version = r36sVersion;
+            };
           }
         );
 
