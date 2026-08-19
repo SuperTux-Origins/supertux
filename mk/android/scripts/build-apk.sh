@@ -215,16 +215,21 @@ export ENABLE_ANDROID_SOUND
 
 # SuperTux does not use libsigc++ (Pingus polyfill omitted).
 
-# IMG_* shim + headers.
-cp "$APP_DIR/jni/img_stb_min.c" src/jni/src/img_stb_min.c
-cp "$APP_DIR/jni/android_SDL_image.h" src/jni/src/SDL_image.h
+# Optional IMG_* / stb shim (Pingus-style). SuperTux links SDL2_image when
+# prebuilt; only stage if the files exist under APP_DIR/jni.
+if [ -f "$APP_DIR/jni/img_stb_min.c" ]; then
+  cp "$APP_DIR/jni/img_stb_min.c" src/jni/src/img_stb_min.c
+  echo "==> staged img_stb_min.c"
+fi
+if [ -f "$APP_DIR/jni/android_SDL_image.h" ]; then
+  cp "$APP_DIR/jni/android_SDL_image.h" src/jni/src/SDL_image.h
+fi
 if [ -n "${STB_IMAGE_H:-}" ] && [ -f "$STB_IMAGE_H" ]; then
   cp "$STB_IMAGE_H" src/jni/src/stb_image.h
 elif [ -f "$APP_DIR/jni/stb_image.h" ]; then
   cp "$APP_DIR/jni/stb_image.h" src/jni/src/stb_image.h
 else
-  echo "error: need STB_IMAGE_H or android/jni/stb_image.h (upstream stb)" >&2
-  exit 1
+  echo "==> no stb_image.h staged (SDL2_image prebuilt expected)"
 fi
 
 cp "$SDL_PREBUILT_MK" src/jni/SDL/Android.mk

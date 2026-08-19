@@ -45,6 +45,7 @@ EOFC
       inherit buildInputs;
       dontUseCmakeConfigure = true;
       dontConfigure = true;
+      doCheck = false; # emscriptenStdenv checkPhase requires a custom test
       preBuild = ''
         export EM_CACHE="''${TMPDIR:-/tmp}/emcache-${pname}"
         mkdir -p "$EM_CACHE"
@@ -92,6 +93,7 @@ in
 
     # emscriptenStdenv defaults to ./configure; SuperTux is CMake-only.
     dontConfigure = true;
+    doCheck = false;
 
     nativeBuildInputs = [
       pkgs.buildPackages.cmake
