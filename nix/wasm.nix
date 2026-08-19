@@ -252,9 +252,9 @@ EOF
         for pc in "$out/lib/pkgconfig"/*.pc; do
           [ -f "$pc" ] || continue
           sed -i "s|^prefix=.*|prefix=$out|" "$pc"
-          sed -i "s|^exec_prefix=.*|exec_prefix=\${prefix}|" "$pc"
-          sed -i "s|^libdir=.*|libdir=\${prefix}/lib|" "$pc"
-          sed -i "s|^includedir=.*|includedir=\${prefix}/include|" "$pc"
+          sed -i "s|^exec_prefix=.*|exec_prefix=$out|" "$pc"
+          sed -i "s|^libdir=.*|libdir=$out/lib|" "$pc"
+          sed -i "s|^includedir=.*|includedir=$out/include|" "$pc"
         done
       fi
       runHook postInstall
@@ -301,9 +301,9 @@ EOF
         for pc in "$out/lib/pkgconfig"/*.pc; do
           [ -f "$pc" ] || continue
           sed -i "s|^prefix=.*|prefix=$out|" "$pc"
-          sed -i "s|^exec_prefix=.*|exec_prefix=\${prefix}|" "$pc"
-          sed -i "s|^libdir=.*|libdir=\${prefix}/lib|" "$pc"
-          sed -i "s|^includedir=.*|includedir=\${prefix}/include|" "$pc"
+          sed -i "s|^exec_prefix=.*|exec_prefix=$out|" "$pc"
+          sed -i "s|^libdir=.*|libdir=$out/lib|" "$pc"
+          sed -i "s|^includedir=.*|includedir=$out/include|" "$pc"
         done
       fi
       runHook postInstall
