@@ -349,7 +349,7 @@ Main::init_video()
 
   SDL_ShowCursor(g_config->custom_mouse_cursor ? 0 : 1);
 
-  log_info("{} Window: {} Fullscreen: {}@{} Area: {}", (g_config->use_fullscreen?"fullscreen ":"window "), g_config->window_size, g_config->fullscreen_size, g_config->fullscreen_refresh_rate, g_config->aspect_size);
+  log_info("{} Window: {}x{} Fullscreen: {}x{}@{} Area: {}x{}", (g_config->use_fullscreen?"fullscreen ":"window "), g_config->window_size.width, g_config->window_size.height, g_config->fullscreen_size.width, g_config->fullscreen_size.height, g_config->fullscreen_refresh_rate, g_config->aspect_size.width, g_config->aspect_size.height);
 }
 
 void

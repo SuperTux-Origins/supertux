@@ -949,3 +949,16 @@ Origins has no `src/addon/`. Stub the download callbacks in
 in the NDK / ArkOS sysroot). Guard with `ANDROID` / `__ANDROID__` /
 `SUPERTUX_R36S` as well as `__EMSCRIPTEN__` and `WIN32`.
 
+### prio get_directory: copy optional string
+
+`ReaderDocumentImpl::get_filename()` returns `std::optional<std::string>` **by
+value**. Binding `std::string const&` to `*get_filename()` dangles and
+segfaults in `test_prio` (`get_directory/0`). Always copy into a local
+`std::string`.
+
+### Android: Size in log_info / make_format_args
+
+NDK libc++ rejects custom `formatter<Size, char>` in `make_format_args`
+(same class as UID). Expand `Size` to `.width`/`.height` ints at log call
+sites.
+

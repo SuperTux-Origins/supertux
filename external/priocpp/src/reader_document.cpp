@@ -232,7 +232,9 @@ ReaderDocument::get_directory() const
   // On R36S (GCC 15 headers + _GLIBCXX_USE_CXX11_ABI=0 + ArkOS libstdc++),
   // path::parent_path can fail to strip the filename, producing broken joins
   // like "images/engine/menu/mousecursor.sprite/mousecursor.png".
-  std::string const& filename = *m_impl->get_filename();
+  // get_filename() returns optional by value — copy, do not bind a reference
+  // to the temporary (dangling → segfault in tests / R36S).
+  std::string const filename = *m_impl->get_filename();
   auto p = filename.find_last_of("/\\");
   if (p == std::string::npos) {
     return ".";
