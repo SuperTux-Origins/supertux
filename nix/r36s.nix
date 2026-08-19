@@ -132,12 +132,14 @@ let
   # (to_chars, __throw_bad_array_new_length, __cxa_call_terminate). Statically
   # linking GCC 15's libstdc++ pulls in modern glibc symbols (__isoc23_strtoul,
   # __libc_single_threaded, arc4random) that ArkOS glibc ~2.30 does not export.
-  # Match Pingus: link sysroot libstdc++.so by absolute path + cxxabi_shim.cpp,
-  # and -static-libgcc only (not -static-libstdc++):
+  # Match Pingus / Windstille:
   #   - compile with modern headers + _GLIBCXX_USE_CXX11_ABI=0
   #   - -nostdlib++ so g++ does not force its libstdc++
-  #   - cxxabi_shim.cpp (mk/r36s/) supplies missing ABI symbols + _dl_find_object
-  #   - -fexceptions for try/catch in SuperTux / tinygettext / prio
+  #   - sysroot libstdc++.so by absolute path + cxxabi_shim.cpp for missing ABI
+  #   - -fexceptions for try/catch (SuperTux / tinygettext / prio)
+  #   - DO NOT use : static libgcc_eh + shared sysroot libstdc++
+  #     breaks exception unwind (uw_init_context_1 → SIGABRT). Windstille
+  #     fixed the same class of crash by dropping .
   #   - --allow-shlib-undefined for DT_NEEDED of sysroot libs at runtime
   mkWrappers = sysroot: let
     gcc = crossCc.cc;
@@ -152,8 +154,9 @@ let
     libgccLib = "${gccLibOut}/lib";
     libgccLibTarget = "${gccLibOut}/${tp}/lib";
     # Compile-only flags (safe with -c). No -L/-B lib paths that pull Scrt1.o.
-    # -fexceptions: SuperTux / tinygettext / prio use C++ exceptions; pair with
-    # -static-libgcc so libgcc_eh is not the shared GCC 15 copy (GLIBC_2.35).
+    # -fexceptions: SuperTux / tinygettext / prio use C++ exceptions. Use the
+    # shared libgcc_s from the device (not ) so unwind matches
+    # the shared sysroot libstdc++.
     commonCompile = ''
       -nostdinc \
       --sysroot=${sysroot} \
@@ -183,9 +186,9 @@ let
       -march=armv8-a \
       -mtune=cortex-a35 \
     '';
-    # Link flags: sysroot first for libc/SDL; modern gcc -L so
-    # -static-libgcc can find libgcc.a / libgcc_eh.a (stdc++ is the
-    # absolute sysroot path in the cxx wrapper — not -lstdc++).
+    # Link flags: sysroot first for libc/SDL; modern gcc -L for libgcc_s
+    # search path (shared, not static). stdc++ is the absolute sysroot path
+    # in the cxx wrapper — not -lstdc++.
     commonLink = ''
       --sysroot=${sysroot} \
       -Wl,--sysroot=${sysroot} \
@@ -199,7 +202,6 @@ let
       -L${libgccDir} \
       -L${libgccLib} \
       -L${libgccLibTarget} \
-      -static-libgcc \
       -Wl,-Bdynamic \
       -l:libpthread.so.0 \
       -lm \

@@ -898,3 +898,21 @@ WASM uses `VIDEO_AUTO` → GLES2/WebGL. Include `port/emscripten.hpp` for
 libc++ under emscripten needs an explicit `#include <sstream>` for
 `std::ostringstream` (menus: debug, contrib_levelset, joystick).
 
+### R36S: never -static-libgcc with shared libstdc++
+
+GDB on device showed:
+
+```
+#2 uw_init_context_1 ()
+#3 _Unwind_Resume ()
+#4 IFileStreambuf::IFileStreambuf(...)
+#5 Config::load()
+```
+
+`Config::load()` throws when the config file is missing; the throw should be
+caught higher up. With `-static-libgcc`, static `libgcc_eh` cannot unwind
+through the **shared** ArkOS `libstdc++.so` → `abort` / signal 6. Same class
+of bug as Windstille; fix is to drop `-static-libgcc` and rely on device
+`libgcc_s.so.1` (already present on ArkOS). Keep `-fexceptions` and the
+cxxabi_shim for missing `to_chars` symbols.
+
