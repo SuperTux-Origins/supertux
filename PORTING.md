@@ -673,3 +673,15 @@ Look for `wstsound codecs: ... MPG123=OFF EFX=OFF` in the configure log.
 `set -euo pipefail` + `find … | head -20` → find gets SIGPIPE and exits
 non-zero → whole script aborts before `ndk-build`. Never pipe find into
 head under pipefail; use `wc -l` only (or `head … || true`).
+
+### R36S: STDERR_FILENO in error_handler.cpp
+
+`backtrace_symbols_fd(..., STDERR_FILENO)` needs `<unistd.h>`. Desktop
+glibc often pulls it transitively; ArkOS sysroot does not. Guard stays
+under `__GLIBC__`.
+
+### WASM: effect.hpp still pulled in
+
+`sound_manager.cpp` must only `#include "effect.hpp"` under
+`WSTSOUND_WITH_EFX`. The effect.cpp sources are filtered out by CMake,
+but the header include still requires `AL/efx.h`. Match Windstille.

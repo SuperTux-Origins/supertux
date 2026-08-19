@@ -25,6 +25,7 @@
 #include <execinfo.h>
 #include <signal.h>
 #include <cstdio>
+#include <unistd.h>  /* STDERR_FILENO — needed on non-desktop glibc (e.g. ArkOS sysroot) */
 #endif
 
 bool ErrorHandler::m_handing_error = false;
