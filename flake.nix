@@ -189,7 +189,7 @@
           # See nix/wasm.nix and PORTING.md.
           supertux-wasm = (import ./nix/wasm.nix {
             inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
-                    wstsound squirrel priocpp;
+                    wstsound squirrel priocpp physfs-src;
           }).supertux-wasm;
 
         };
