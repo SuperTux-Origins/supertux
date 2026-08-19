@@ -1,121 +1,92 @@
 # TODO — SuperTux multi-platform port
 
-## Immediate
+Tip is at a1fd30f11 (Update flake.lock). Library breakdown lives in
+PORTING.md / AGENTS.md. Packaging surface (mk/, nix/, flake outputs)
+adapted from Pingus and Windstille.
 
-- [ ] Finish obtaining a complete, usable source tree at
-      856a932f513ec69ffbd7132a1a60fd89c79442dc (fuse FS / large data/ makes
-      clone+checkout extremely slow; tarball extract also partial).
-- [ ] Library dependency matrix written (done in PORTING.md / AGENTS.md).
-- [x] Create AGENTS.md and PORTING.md skeleton documenting process and
+## Immediate / hygiene
+
+- [x] Library dependency matrix written (PORTING.md / AGENTS.md).
+- [x] Create AGENTS.md and PORTING.md documenting process and
       Windstille/Pingus lessons.
-- [ ] Audit existing SuperTux-Origins `flake.nix` against current Pingus /
-      Windstille flake patterns (stb_image, GLES packages, linuxPorts hygiene,
-      R36S/Android/wasm outputs).
-- [ ] Inventory `mk/` and `nix/` that already exist in Origins vs what must be
-      copied/adapted from Pingus/Windstille.
+- [x] Formatters for Direction, Vector, Size, UID, Control, Color,
+      MenuId, BonusType, sexp::Value (std::format / logmich).
+- [x] cstring/cstdio includes for GCC 15; strtok fix.
+- [x] priocpp external, JSON tests gated; PRIO_USE_JSONCPP default OFF.
+- [x] Vendor argpp, geomcpp, tinygettext into external/.
+- [x] Wire R36S / Android / wasm flake package stubs.
+- [ ] Audit flake.nix against current Pingus / Windstille patterns
+      (stb_image, GLES packages, linuxPorts hygiene, full outputs).
+- [ ] Inventory remaining gaps in mk/ and nix/ vs Pingus/Windstille
+      (wasm.nix still shorter; SDL static builds incomplete).
+- [ ] Continuous numbered git bundles (`supertux-001-…`).
 
 ## Desktop Linux
 
 - [ ] Ensure OpenGL 3.3 + GLEW path builds and runs under the flake.
-- [ ] Flake `packages` / `checks` only contain derivations.
+- [ ] Flake `packages` / `checks` only contain derivations (no attrs of attrs).
 - [ ] Optional: desktop GLES2 validation build (like Windstille `windstille-gles2`).
 
 ## WebAssembly (Emscripten)
 
-- [ ] Adapt `mk/wasm/` scripts from Pingus/Windstille (build-app.sh, SDL
-      static builds, zlib, shell.html).
+- [x] Skeleton `nix/wasm.nix` under emscriptenStdenv; skip checkPhase.
+- [ ] Expand wasm deps: build SDL2 / SDL2_image / zlib / OpenAL under
+      emscripten (see Pingus `mk/wasm/scripts/build-*.sh` and full
+      `nix/wasm.nix`).
 - [ ] CMake / link flags: `-fexceptions`, `-sDISABLE_EXCEPTION_CATCHING=0`,
       `-sGROWABLE_ARRAYBUFFERS=0`, `-sFULL_ES2=1`, `-sFORCE_FILESYSTEM=1`,
       OpenAL, preload data.
 - [ ] Prefer stb_image (or existing image path) over system jpeg/png.
-- [ ] Produce `packages.x86_64-linux.supertux-wasm` (or equivalent) and a
-      simple serve target.
+- [ ] Produce complete `packages.x86_64-linux.supertux-wasm` and serve app.
+- [ ] Fix any remaining native flake-input deps that are not wasm-built
+      (squirrel, wstsound currently still native).
 
 ## Android
 
-- [ ] Adapt `mk/android/` (SDLActivity, jni, build-apk.sh, NDK r27+).
-- [ ] GLES2 only; GameController / touch via existing controller scm or
-      Android mappings.
+- [x] Adapt `mk/android/` and `nix/android.nix` from Pingus (SDLActivity,
+      jni, keystore, NDK scaffold).
+- [x] flake packages.supertux-android + android-sdl-libs.
+- [ ] GLES2 only; GameController / touch via controller scm or Android maps.
 - [ ] Macro hygiene for do/while error helpers (NDK clang).
 - [ ] stb_image staging into jni include path if needed.
-- [ ] APK packaging under flake.
+- [ ] jni links physfs / squirrel / wstsound / full external stack.
+- [ ] APK packaging verified (user feedback).
 
 ## R36S / ArkOS
 
-- [ ] Hybrid toolchain: modern aarch64 GCC + ArkOS sysroot (see
-      `nix/r36s.nix`, `mk/r36s/` from Pingus/Windstille).
-- [ ] `-nostdlib++` + ArkOS libstdc++, static libgcc where required;
-      exceptions working on device.
+- [x] Hybrid toolchain skeleton in `nix/r36s.nix` and `mk/r36s/`.
+- [x] flake packages.supertux-r36s + portMaster + arkos-sysroot.
+- [ ] `-nostdlib++` + ArkOS libstdc++, static libgcc; exceptions on device.
 - [ ] Drop custom SDL_GL_* attributes that break EGL surface creation.
 - [ ] Force 640×480 / non-resizable handheld profile; controller profile
       using SDL_GameControllerButton layout (DPAD 11–14).
 - [ ] stb_image; skip set_icon paths that throw into broken unwind.
 - [ ] Launcher script with valid SuperTux flags only.
+- [ ] Optional sysrootSrc override documented and tested.
 
 ## Windows (MinGW)
 
-- [ ] Extend existing grumnix / win32 inputs already present in Origins flake.
-- [ ] Flat `exe` + DLL layout; zip packaging.
-- [ ] Full external graph under `pkgsCross.mingwW64` still WIP — prefer
-      prebuilt MinGW SDL2 / OpenAL / etc. over heavy nixpkgs cross.
+- [x] grumnix / win32 inputs present in flake (SDL2, image, ttf, freetype,
+      physfs, curl, glew).
+- [x] Flat `exe` + DLL layout and zip packaging (supertux-origins-win32*).
+- [ ] Full external graph under `pkgsCross.mingwW64` still WIP.
 - [ ] `meta.platforms = [ "x86_64-windows" ]` for cross packages.
+- [ ] Verify runtime (user feedback).
 
 ## Cross-cutting
 
 - [ ] Controller input: GameController first; ignore raw JOY* when GC owns
-      the instance; raise axis deadzone; do not stack duplicate scm profiles.
-- [ ] Image codecs: document and implement stb_image preference for
-      constrained targets; keep system JPEG/PNG optional for desktop.
-- [ ] CMake: conditional find_dependency for JPEG/PNG in any exported config.
+      the instance; DPAD as buttons 11–14; deadzone ~8000.
+- [ ] Image codecs: stb_image preference for Android / R36S / wasm.
+- [ ] CMake: conditional find_dependency for JPEG/PNG in exported config.
 - [ ] Keep PORTING.md updated with every platform quirk.
-- [ ] Continuous numbered git bundles (`supertux-001-…`).
+- [ ] Document all flake outputs in PORTS.md.
 
-## Done
+## Done in prior batches (reference)
 
-- [x] Initial AGENTS.md / TODO.md / PORTING.md (library breakdown + shared themes).
-
-- 2026-08-19: SuperTux-specific `nix/wasm.nix` + flake `packages.supertux-wasm`
-  (marked broken pending static wasm deps). build-app.sh adapted for
-  SuperTux naming. Pingus wasm.nix kept as wasm-pingus-reference.nix.
-
-- 2026-08-19 (batch): mk/android + mk/r36s scaffolding from Pingus; SuperTux
-  renames in nix/android.nix and nix/r36s.nix; PORTS.md; flake exposes r36s
-  helpers (sysroot URL still placeholder); platform READMEs.
-
-- 2026-08-19 (batch 2): SUPERTUX_R36S cmake + 640x480 defaults; Android app
-  skeleton; EMSCRIPTEN LibSDL2_ttf INTERFACE; SuperTux.sh launcher; r36s
-  cmakeFlags include SUPERTUX_R36S.
-
-- 2026-08-19 (batch 3): ProvidePhysfs PHYSFS_SOURCE_DIR + skip system on
-  EMSCRIPTEN/Android; ProvideOpenGL skip glesv2 pkg on Android; physfs-src
-  flake input; document controller defaults (already GC-first, deadzone 8000).
-
-- 2026-08-19 (batch 4): GLES default pixel format; physfs-src → wasm cmake;
-  SQUIRREL_SOURCE_DIR; Windows meta.platforms; Android forces GLES2.
-
-- 2026-08-19 (batch 5): Android source list (376 cpp) + generator script;
-  EMSCRIPTEN forces in-tree physfs/squirrel/fmt; FMT_SOURCE_DIR; fmt-src
-  flake input.
-
-- 2026-08-19: Removed libfmt; use std::format + format_rt + print polyfill.
-
-- 2026-08-19: strtok cstring fix; flake outputs supertux-android + android-sdl-libs
-  (broken until jni links external deps).
-
-## Progress (2026-08-19)
-
-Desktop (fmt→std::format):
-- [x] Formatters: Direction, Vector, Size, UID, Control, Color, MenuId, BonusType, sexp::Value
-- [x] cstring/cstdio includes for GCC 15
-- [x] priocpp external, JSON tests gated
-- [ ] Full desktop link/run verified by user
-
-Android:
-- [x] flake packages.supertux-android + android-sdl-libs
-- [x] keystore, manifest, ndk-build scaffold
-- [ ] jni links physfs/squirrel/wstsound/external stack
-- [ ] remove meta.broken
-
-R36S / WASM:
-- [x] stubs / packages present
-- [ ] real sysroot URL; static wasm deps
+- [x] Initial AGENTS.md / TODO.md / PORTING.md.
+- [x] std::formatter suite for game types.
+- [x] GCC 15 include hygiene.
+- [x] external/ priocpp, logmich, sexpcpp, strutcpp, argpp, geomcpp,
+      tinygettext, squirrel, wstsound, miniswig, xdgcpp, tinycmmc.
+- [x] emscriptenStdenv CMake force; Android NDK C++ flags; R36S stubs.

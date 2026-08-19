@@ -47,7 +47,6 @@ EOFC
       dontConfigure = true;
       # emscriptenStdenv injects a failing default checkPhase; override fully.
       doCheck = false;
-    checkPhase = "echo skip-emscripten-check";
       checkPhase = "echo skip-emscripten-check";
       preBuild = ''
         export EM_CACHE="''${TMPDIR:-/tmp}/emcache-${pname}"
