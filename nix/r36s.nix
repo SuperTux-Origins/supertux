@@ -379,6 +379,7 @@ let
         # R36S is GLES2-only (Mali/Panfrost); desktop OpenGL is not in the sysroot.
         "-DENABLE_OPENGLES2=ON"
         "-DENABLE_OPENGL=ON"
+        "-DSUPERTUX_R36S=ON"
         # ArkOS sysroot has neither libsigc++ nor glm cmake config.
         "-Dglm_DIR=${glm}/lib/cmake/glm"
         # Forced cross-compiler cannot try_compile pthread; ArkOS glibc has it.

@@ -114,6 +114,7 @@ endif()
 
 option(STEAM_BUILD "Prepare build for Steam" OFF)
 option(IS_SUPERTUX_RELEASE "Build as official SuperTux release" OFF)
+option(SUPERTUX_R36S "Build for R36S / ArkOS handheld (640x480, GLES2, skip fragile icon paths)" OFF)
 
 set(SUPERTUX_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 set(VCPKG_BUILD OFF CACHE BOOL "Use dependencies installed via vcpkg (not dependency package)")
@@ -123,10 +124,19 @@ set(VCPKG_APPLOCAL_DEPS ${VCPKG_BUILD} BOOL)
 option(UBUNTU_TOUCH "Compile the project for an Ubuntu Touch target" OFF)
 
 # Mobile builds
-if(UBUNTU_TOUCH OR ANDROID)
+if(UBUNTU_TOUCH OR ANDROID OR SUPERTUX_R36S)
   option(HIDE_NONMOBILE_OPTIONS "Hide options that are impractical on mobile devices (e. g. changing screen resolution)" ON)
 else()
   option(HIDE_NONMOBILE_OPTIONS "Hide options that are impractical on mobile devices (e. g. changing screen resolution)" OFF)
+endif()
+
+if(SUPERTUX_R36S)
+  add_compile_definitions(SUPERTUX_R36S=1)
+  # Handheld path implies GLES2 unless the caller already set it.
+  if(NOT ENABLE_OPENGLES2)
+    set(ENABLE_OPENGLES2 ON CACHE BOOL "Enable OpenGLES2 support" FORCE)
+  endif()
+  message(STATUS "SUPERTUX_R36S: enabling handheld defaults (640x480, GLES2)")
 endif()
 
 if(WIN32)
