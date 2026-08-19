@@ -348,3 +348,9 @@ Additional formatters (scripting / math / input):
 - `UID` (`src/util/uid.hpp`) — used by `SCRIPT_GUARD` dead-object logs
 - `Sizef`, `Rect`, `Rectf`
 - `Control` (`src/control/controller.hpp`)
+
+### stream_str helper
+
+`src/util/stream_format.hpp` provides `supertux::stream_str(value)` for types
+that only implement `operator<<` and are not yet given a `std::formatter`.
+Use at call sites as a last resort: `log_info("{}", stream_str(x))`.

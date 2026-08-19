@@ -119,12 +119,12 @@
             # Vendored external/priocpp (sexp-only; JSON tests gated when off)
             priocpp = pkgs.callPackage ./external/priocpp/priocpp.nix {
               inherit self;
-              logmich = logmich.packages.${pkgs.stdenv.hostPlatform.system}.default;
+              logmich = pkgs.callPackage ./external/logmich/logmich.nix { };
               sexpcpp = sexpcpp.packages.${pkgs.stdenv.hostPlatform.system}.default;
               withJsoncpp = false;
               withSexpcpp = true;
             };
-            logmich = logmich.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            logmich = pkgs.callPackage ./external/logmich/logmich.nix { };
 
             physfs = if pkgs.stdenv.hostPlatform.isWindows
                      then physfs-win32.packages.${pkgs.stdenv.hostPlatform.system}.default

@@ -57,7 +57,7 @@ if [ -z "${GAME_SRC_DIR:-}" ] || [ ! -d "$GAME_SRC_DIR" ]; then
 fi
 
 if [ -z "${GAME_DATA_DIR:-}" ] || [ ! -d "$GAME_DATA_DIR" ]; then
-  echo "error: GAME_DATA_DIR must point at the Pingus data/ tree" >&2
+  echo "error: GAME_DATA_DIR must point at the SuperTux data/ tree" >&2
   echo "       (expected images/, levels/, levelsets/, music/, … under that path)" >&2
   exit 1
 fi
@@ -261,12 +261,12 @@ if [ "$ASSET_COUNT" -lt 10 ]; then
   ls -la src/assets >&2 || true
   exit 1
 fi
-# Probe well-known Pingus data paths (not SuperTux Milestone 1 leftovers).
+# Probe well-known SuperTux data paths (not SuperTux Milestone 1 leftovers).
 for probe in   images/fonts/chalk-40px.font   images/fonts/chalk-40px.png   levelsets   levels   music   sounds
 do
   if [ ! -e "src/assets/$probe" ]; then
     echo "error: missing src/assets/$probe" >&2
-    echo "       is GAME_DATA_DIR a full Pingus data/ tree?" >&2
+    echo "       is GAME_DATA_DIR a full SuperTux data/ tree?" >&2
     exit 1
   fi
 done

@@ -17,6 +17,7 @@
 #ifndef HEADER_SUPERTUX_VIDEO_COLOR_HPP
 #define HEADER_SUPERTUX_VIDEO_COLOR_HPP
 
+#include <format>
 #include <math.h>
 #include <string>
 #include <vector>
@@ -146,6 +147,15 @@ public:
 
 public:
   float red, green, blue, alpha;
+};
+
+template<>
+struct std::formatter<Color> : std::formatter<std::string>
+{
+  auto format(Color const& c, auto& ctx) const
+  {
+    return std::formatter<std::string>::format(c.to_string(), ctx);
+  }
 };
 
 #endif
