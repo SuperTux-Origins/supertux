@@ -134,7 +134,24 @@ confuses `find_package`. Prefer in-tree `external/` under `emcmake`.
 acceptable for wasm.
 
 
-## R36S / ArkOS (to implement)
+## R36S / ArkOS
+
+### R36S: glm and prio/logmich under FIND_ROOT ONLY
+
+**Problem.** `CMAKE_FIND_ROOT_PATH_MODE_{INCLUDE,PACKAGE}=ONLY` hides host
+nixpkgs glm; `ProvideGlm.cmake` then fatal-errors. `find_package(prio)` /
+`logmich` also miss and there was no `external/` fallback (unlike wstsound).
+
+**Solution.**
+
+- Pass `-DSUPERTUX_GLM_INCLUDE_DIR=${glm}/include` (and `GLM_ROOT_DIR`);
+  `ProvideGlm.cmake` honours that path first (Pingus-style).
+- `build_dependencies()` now adds `external/sexpcpp`, `external/logmich`,
+  `external/priocpp` when the imported targets are missing (order: sexp →
+  logmich → prio so priocpp sees existing targets).
+- `-DPRIO_USE_JSONCPP=OFF` for R36S (no jsoncpp in sysroot).
+
+ (to implement)
 
 ### Hybrid toolchain: modern GCC + old sysroot
 

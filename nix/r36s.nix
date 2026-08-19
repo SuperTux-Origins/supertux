@@ -384,7 +384,11 @@ let
         "-DENABLE_OPENGL=ON"
         "-DSUPERTUX_R36S=ON"
         # ArkOS sysroot has neither libsigc++ nor glm cmake config.
+        # FIND_ROOT_PATH_MODE_PACKAGE=ONLY hides host glmConfig; pass include
+        # dir explicitly (see ProvideGlm.cmake / Pingus PINGUS_GLM_INCLUDE_DIR).
+        "-DSUPERTUX_GLM_INCLUDE_DIR=${glm}/include"
         "-Dglm_DIR=${glm}/lib/cmake/glm"
+        "-DGLM_ROOT_DIR=${glm}"
         # Forced cross-compiler cannot try_compile pthread; ArkOS glibc has it.
         "-DCMAKE_HAVE_LIBC_PTHREAD=1"
         "-DCMAKE_THREAD_LIBS_INIT=-pthread"
@@ -396,6 +400,8 @@ let
         "-DWSTSOUND_WITH_OPUS=OFF"
         "-DWSTSOUND_WITH_MODPLUG=${if enableSound then "ON" else "OFF"}"
         "-DWSTSOUND_WITH_EFX=OFF"
+        # priocpp: SuperTux does not need JSON; sysroot has no jsoncpp.
+        "-DPRIO_USE_JSONCPP=OFF"
         # No xdgcpp / jsoncpp in the published ArkOS sysroot (desktop helpers).
         "-DINSTALL_SUBDIR_BIN=bin"
         "-DINSTALL_SUBDIR_SHARE=data"

@@ -173,13 +173,41 @@ endif()
 function(build_dependencies)
   set(BUILD_TESTS OFF)
 
-  find_package(wstsound)
+  # Order matters: priocpp needs sexp::sexp + logmich::logmich as existing
+  # targets (its own external/ submodules are not present in the monorepo
+  # layout). Cross sysroots (R36S / Android / wasm) rarely provide these.
+  find_package(sexp QUIET)
+  if(NOT TARGET sexp::sexp)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/sexpcpp/CMakeLists.txt")
+      add_subdirectory(external/sexpcpp EXCLUDE_FROM_ALL)
+    elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/sexp-cpp/CMakeLists.txt")
+      add_subdirectory(external/sexp-cpp EXCLUDE_FROM_ALL)
+    endif()
+  endif()
+
+  find_package(logmich QUIET)
+  if(NOT TARGET logmich::logmich)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/logmich/CMakeLists.txt")
+      add_subdirectory(external/logmich EXCLUDE_FROM_ALL)
+    else()
+      message(FATAL_ERROR "logmich not found and external/logmich missing")
+    endif()
+  endif()
+
+  find_package(prio QUIET)
+  if(NOT TARGET prio::prio)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/priocpp/CMakeLists.txt")
+      set(PRIO_USE_JSONCPP OFF CACHE BOOL "" FORCE)
+      add_subdirectory(external/priocpp EXCLUDE_FROM_ALL)
+    else()
+      message(FATAL_ERROR "prio not found and external/priocpp missing")
+    endif()
+  endif()
+
+  find_package(wstsound QUIET)
   if(NOT TARGET wstsound::wstsound)
     add_subdirectory(external/wstsound/ EXCLUDE_FROM_ALL)
   endif()
-
-  find_package(logmich)
-  find_package(prio)
 endfunction()
 build_dependencies()
 
