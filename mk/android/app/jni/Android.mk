@@ -70,7 +70,7 @@ LOCAL_STATIC_LIBRARIES := modplug
 LOCAL_LDLIBS += -lOpenSLES
 endif
 
-LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions \
+LOCAL_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library \
 	-DANDROID -DUSE_OPENGLES2 -DUSE_SDL2 \
 	-DGLM_ENABLE_EXPERIMENTAL \
 	-DWSTSOUND_WITH_MODPLUG=1 \

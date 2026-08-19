@@ -343,14 +343,20 @@ target_link_libraries(supertux-origins_lib PUBLIC wstsound::wstsound)
 target_link_libraries(supertux-origins_lib PUBLIC prio::prio)
 target_link_libraries(supertux-origins_lib PUBLIC logmich::logmich)
 
+# Monorepo headers: always expose in-tree paths so cross builds (R36S) that
+# cannot find_package host packages still compile.
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/strutcpp/include")
+  target_include_directories(supertux-origins_lib SYSTEM PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/strutcpp/include")
+endif()
 if(TARGET strut::strut)
   target_link_libraries(supertux-origins_lib PUBLIC strut::strut)
 elseif(TARGET strut)
   target_link_libraries(supertux-origins_lib PUBLIC strut)
 endif()
 
-# xdgcpp: desktop path helpers. Not on Windows/Emscripten; R36S/Android still
-# compile the main.cpp include, so provide the in-tree library when missing.
+# xdgcpp ships include/xdg.h but consumers use #include <xdgcpp/xdg.h>
+# (install layout). Mirror that under the build dir for in-tree builds.
 if(NOT EMSCRIPTEN AND NOT WIN32)
   find_package(xdgcpp CONFIG QUIET)
   if(NOT TARGET xdgcpp)
@@ -358,6 +364,15 @@ if(NOT EMSCRIPTEN AND NOT WIN32)
       set(XDG_BUILD_TESTS OFF CACHE BOOL "" FORCE)
       add_subdirectory(external/xdgcpp EXCLUDE_FROM_ALL)
     endif()
+  endif()
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/xdgcpp/include/xdg.h")
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/xdg_inc/xdgcpp")
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/external/xdgcpp/include/xdg.h"
+      "${CMAKE_CURRENT_BINARY_DIR}/xdg_inc/xdgcpp/xdg.h"
+      COPYONLY)
+    target_include_directories(supertux-origins_lib SYSTEM PUBLIC
+      "${CMAKE_CURRENT_BINARY_DIR}/xdg_inc")
   endif()
   if(TARGET xdgcpp)
     target_link_libraries(supertux-origins_lib PUBLIC xdgcpp)

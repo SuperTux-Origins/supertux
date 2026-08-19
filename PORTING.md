@@ -713,3 +713,15 @@ ArkOS sysroot has neither. `build_dependencies()` now falls back to
 `external/strutcpp` and `external/xdgcpp` when `find_package` misses them.
 `strut/numeric_less.hpp` is required by `levelset.cpp`; `xdgcpp/xdg.h` by
 `main.cpp` (not guarded for R36S).
+
+### Android: std::format needs -fexperimental-library
+
+NDK r26 libc++ still treats parts of `<format>` as experimental. Without
+`-fexperimental-library`, `std::vformat` / `std::formatter` are missing
+even with `-std=c++20`.
+
+### R36S: xdgcpp include layout
+
+In-tree xdgcpp has `include/xdg.h` but SuperTux includes `<xdgcpp/xdg.h>`.
+CMake copies the header to `$build/xdg_inc/xdgcpp/xdg.h` and adds that
+include path. strut is exposed via `external/strutcpp/include`.

@@ -93,6 +93,22 @@ for hdr in config.h version.h SDL_image.h; do
   fi
 done
 
+# SDL2_ttf headers (+ sources compiled into libmain when SDL2_TTF_SOURCE_DIR set)
+TTF_SRC="${SDL2_TTF_SOURCE_DIR:-}"
+if [ -n "$TTF_SRC" ] && [ -d "$TTF_SRC" ]; then
+  if [ -f "$TTF_SRC/SDL_ttf.h" ]; then
+    cp -a "$TTF_SRC/SDL_ttf.h" src/jni/src/
+    cp -a "$TTF_SRC/SDL_ttf.h" src/jni/ 2>/dev/null || true
+  fi
+  # Compile a subset of SDL_ttf into libmain (needs freetype — stage later if needed)
+  if [ -f "$TTF_SRC/SDL_ttf.c" ]; then
+    cp -a "$TTF_SRC/SDL_ttf.c" src/jni/src/
+  fi
+  echo "==> staged SDL_ttf from $TTF_SRC"
+else
+  echo "warning: SDL2_TTF_SOURCE_DIR not set — ttf_font.cpp will fail" >&2
+fi
+
 # Stage monorepo external/ headers + sources.
 # Under Nix, GAME_SRC_DIR is a filtered ./src store path — parent is NOT the
 # repo. Pass GAME_EXTERNAL_DIR (flake: ./external) and optional GLM_INCLUDE_DIR.

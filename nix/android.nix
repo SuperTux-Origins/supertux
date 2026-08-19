@@ -45,7 +45,7 @@ let
       APP_ABI := ${targetAbisStr}
       APP_PLATFORM := android-${packagePlatform}
       # C++23 (std::format, std::print when available). Needs a recent NDK libc++.
-      APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -DUSE_OPENGLES2 -DANDROID -DGLM_ENABLE_EXPERIMENTAL
+      APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library -DUSE_OPENGLES2 -DANDROID -DGLM_ENABLE_EXPERIMENTAL
     '';
   };
 
@@ -190,6 +190,7 @@ let
     gameVersion ? "0.6.3-dev",
     squirrelSrc ? null,
     physfsSrc ? null,
+    sdl2TtfSrc ? null,
   }:
     pkgs.stdenvNoCC.mkDerivation {
       pname = appName;
@@ -238,6 +239,8 @@ let
         SQUIRREL_SOURCE_DIR = "${squirrelSrc}";
       } // pkgs.lib.optionalAttrs (physfsSrc != null) {
         PHYSFS_SOURCE_DIR = "${physfsSrc}";
+      } // pkgs.lib.optionalAttrs (sdl2TtfSrc != null) {
+        SDL2_TTF_SOURCE_DIR = "${sdl2TtfSrc}";
       };
 
       buildPhase = ''
