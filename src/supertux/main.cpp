@@ -282,9 +282,12 @@ void PhysfsSubsystem::find_datadir() const
     }
   }
 #else
-  if (!PHYSFS_mount(BUILD_CONFIG_DATA_DIR, nullptr, 1))
+  // Emscripten: --preload-file <src-data>@/data puts assets at VFS /data.
+  // Do not use BUILD_CONFIG_DATA_DIR (host cmake binary path; missing in browser).
+  if (!PHYSFS_mount("/data", nullptr, 1))
   {
-    log_warning("Couldn't add '{}' to physfs searchpath: {}", BUILD_CONFIG_DATA_DIR, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+    log_warning("Couldn't add '/data' to physfs searchpath: {}",
+                PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 #endif
 }

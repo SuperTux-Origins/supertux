@@ -100,7 +100,10 @@ if(EMSCRIPTEN)
   # freetype/…) which fail offline in the nix sandbox.
   # Ports belong only on the final executable link line.
   set(USE_COMPILE_FLAGS " -sDISABLE_EXCEPTION_CATCHING=0 -fexceptions")
-  set(USE_LINK_FLAGS " -sFULL_ES2=1 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_CONFIG_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js -fexceptions -lGL")
+  # Preload the *source* data tree (BUILD_DATA_DIR), not BUILD_CONFIG_DATA_DIR
+  # (CMAKE_BINARY_DIR/data) which is never populated — file_packager then fails
+  # with "build/data@/data does not exist". Runtime mounts the VFS path /data.
+  set(USE_LINK_FLAGS " -sFULL_ES2=1 -sEXCEPTION_STACK_TRACES=1 -sGROWABLE_ARRAYBUFFERS=0 -sFORCE_FILESYSTEM=1 --preload-file ${BUILD_DATA_DIR}@/data -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sERROR_ON_UNDEFINED_SYMBOLS=0 -lidbfs.js -fexceptions -lGL")
   if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(USE_COMPILE_FLAGS "${USE_COMPILE_FLAGS} -fsanitize=undefined -sSAFE_HEAP=1 -sASSERTIONS=1 -sDEMANGLE_SUPPORT=1")
   endif()

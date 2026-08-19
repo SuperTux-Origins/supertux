@@ -981,6 +981,22 @@ Fix in `PhysfsSubsystem`:
 - `build-apk.sh` packs `assets/data.zip` from the data tree for that mount.
 
 
+
+### WASM: file_packager preload path
+
+`--preload-file ${BUILD_CONFIG_DATA_DIR}@/data` pointed at
+`CMAKE_BINARY_DIR/data`, which is never populated →
+
+```
+file_packager: error: …/build/data@/data does not exist
+```
+
+Use `${BUILD_DATA_DIR}` (source `data/`) for the preload, and at runtime
+mount the VFS path `/data` (not the host cmake binary path).
+
+Also mark all JS-exported helpers in `src/port/emscripten.hpp` with
+`EMSCRIPTEN_KEEPALIVE` so EXPORTED_FUNCTIONS resolve under LTO / GC.
+
 ### WASM: EXTRA_EXPORTED_RUNTIME_METHODS removed
 
 Modern emscripten rejects `-sEXTRA_EXPORTED_RUNTIME_METHODS=...` ("No longer

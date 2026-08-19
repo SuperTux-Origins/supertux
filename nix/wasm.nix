@@ -273,6 +273,11 @@ in
     preBuild = ''
       export EM_CACHE="''${TMPDIR:-/tmp}/emcache-supertux"
       mkdir -p "$EM_CACHE"
+      # CMake preloads ${BUILD_DATA_DIR}@/data — fail early if the tree is missing.
+      if [ ! -d data ] || [ ! -f data/credits.stxt ]; then
+        echo "error: source data/ tree missing or incomplete (need data/credits.stxt)" >&2
+        exit 1
+      fi
       export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
       export CMAKE_PREFIX_PATH="${modplugWasm}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
 ${lib.optionalString (sdl2WasmLibs != null) ''

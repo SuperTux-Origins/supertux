@@ -52,30 +52,35 @@ save_config()
   g_config->save();
 }
 
+EMSCRIPTEN_KEEPALIVE
 void
 onDownloadProgress(int id, int loaded, int total)
 {
   (void)id; (void)loaded; (void)total; /* Origins: no AddonManager */
 }
 
+EMSCRIPTEN_KEEPALIVE
 void
 onDownloadFinished(int id)
 {
   (void)id; /* Origins: no AddonManager */
 }
 
+EMSCRIPTEN_KEEPALIVE
 void
 onDownloadError(int id)
 {
   (void)id; /* Origins: no AddonManager */
 }
 
+EMSCRIPTEN_KEEPALIVE
 void
 onDownloadAborted(int id)
 {
   (void)id; /* Origins: no AddonManager */
 }
 
+EMSCRIPTEN_KEEPALIVE
 char const*
 getExceptionMessage(intptr_t address)
 {
