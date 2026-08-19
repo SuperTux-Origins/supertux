@@ -1151,3 +1151,10 @@ Stock SuperTux music is mostly `.ogg`. Enable `WSTSOUND_WITH_VORBIS`:
   `Android.mk` prebuilts + `-DWSTSOUND_WITH_VORBIS=1` when `.a` present.
 - **R36S:** still OFF until sysroot has vorbis.
 
+### Vorbis static link order (bundle 015)
+
+`FindVorbisfile.cmake` now also resolves `libvorbis` and `libogg` into
+`Vorbisfile::vorbisfile` INTERFACE_LINK_LIBRARIES. Emscripten `USE_LINK_FLAGS`
+adds `-lvorbisfile -lvorbis -logg` so static archives resolve under
+`ERROR_ON_UNDEFINED_SYMBOLS=1`.
+

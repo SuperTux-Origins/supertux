@@ -420,6 +420,8 @@ in
         exit 1
       fi
       export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig:${vorbisWasm}/lib/pkgconfig:${oggWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      export LIBRARY_PATH="${vorbisWasm}/lib:${oggWasm}/lib:${modplugWasm}/lib''${LIBRARY_PATH:+:$LIBRARY_PATH}"
+      export LDFLAGS="-L${vorbisWasm}/lib -L${oggWasm}/lib -L${modplugWasm}/lib ''${LDFLAGS:-}"
       export CMAKE_PREFIX_PATH="${modplugWasm}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
 ${lib.optionalString (sdl2WasmLibs != null) ''
       # Offline static SDL2 (no emscripten port download).

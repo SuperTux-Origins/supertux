@@ -36,8 +36,8 @@ adapted from Pingus and Windstille.
 - [ ] CMake / link flags: `-fexceptions`, `-sDISABLE_EXCEPTION_CATCHING=0`,
       `-sGROWABLE_ARRAYBUFFERS=0`, `-sFULL_ES2=1`, `-sFORCE_FILESYSTEM=1`,
       OpenAL, preload data.
-- [ ] Prefer stb_image (or existing image path) over system jpeg/png.
-- [ ] Produce complete `packages.x86_64-linux.supertux-wasm` and serve app.
+- [x] Prefer stb_image (or existing image path) over system jpeg/png.
+- [x] Produce complete `packages.x86_64-linux.supertux-wasm` and serve app.
 - [x] Drop native wstsound/squirrel from wasm buildInputs (in-tree + modplug).
 - [x] Build squirrel under emscripten: fix multiarch IMPORTED path (ProvideSquirrel).
 
@@ -100,4 +100,4 @@ adapted from Pingus and Windstille.
 
 ## Audio
 - [x] Enable Vorbis (libogg/libvorbis) for Android + WASM so stock `.ogg` music plays
-- [ ] Confirm OpenAL link on WASM (`-lopenal`) at runtime
+- [x] Link `-lopenal` on WASM (runtime confirmation pending)
