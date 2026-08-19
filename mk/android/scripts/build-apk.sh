@@ -155,19 +155,23 @@ stage_lib_src tinygettext
 
 # --- Upstream sources that are packaging-only under external/ ---
 # Squirrel (scripting): flake input squirrel-src or SQUIRREL_SOURCE_DIR
+# Nix store trees are 0555/0444 — chmod after every cp -a before writing more.
 SQUIRREL_SRC="${SQUIRREL_SOURCE_DIR:-}"
 if [ -n "$SQUIRREL_SRC" ] && [ -d "$SQUIRREL_SRC" ]; then
   mkdir -p src/jni/src/deps/squirrel
-  # squirrel core + sqstdlib (static objects)
   for sub in squirrel sqstdlib include; do
     if [ -d "$SQUIRREL_SRC/$sub" ]; then
       cp -a "$SQUIRREL_SRC/$sub" src/jni/src/deps/squirrel/
     fi
   done
-  # top-level headers
+  chmod -R u+rwX src/jni/src/deps/squirrel
+  mkdir -p src/jni/src/deps/squirrel/include
   for h in squirrel.h sqconfig.h sqstdblob.h sqstdio.h sqstdmath.h sqstdstring.h sqstdsystem.h sqstdaux.h; do
-    [ -f "$SQUIRREL_SRC/$h" ] && cp -a "$SQUIRREL_SRC/$h" src/jni/src/deps/squirrel/include/ 2>/dev/null || true
-    [ -f "$SQUIRREL_SRC/include/$h" ] && mkdir -p src/jni/src/deps/squirrel/include && cp -a "$SQUIRREL_SRC/include/$h" src/jni/src/deps/squirrel/include/
+    if [ -f "$SQUIRREL_SRC/$h" ]; then
+      cp -a "$SQUIRREL_SRC/$h" src/jni/src/deps/squirrel/include/
+    elif [ -f "$SQUIRREL_SRC/include/$h" ]; then
+      cp -a "$SQUIRREL_SRC/include/$h" src/jni/src/deps/squirrel/include/
+    fi
   done
   chmod -R u+rwX src/jni/src/deps/squirrel
   echo "==> staged squirrel from $SQUIRREL_SRC"
@@ -179,13 +183,13 @@ fi
 PHYSFS_SRC="${PHYSFS_SOURCE_DIR:-}"
 if [ -n "$PHYSFS_SRC" ] && [ -d "$PHYSFS_SRC" ]; then
   mkdir -p src/jni/src/deps/physfs
-  # PhysFS is mostly C under src/
   if [ -d "$PHYSFS_SRC/src" ]; then
     cp -a "$PHYSFS_SRC/src" src/jni/src/deps/physfs/
   else
     find "$PHYSFS_SRC" -maxdepth 1 -name '*.c' -exec cp -a {} src/jni/src/deps/physfs/ \;
   fi
-  # public header
+  chmod -R u+rwX src/jni/src/deps/physfs
+  # public header into writable external_includes (already chmod'd earlier)
   if [ -f "$PHYSFS_SRC/src/physfs.h" ]; then
     mkdir -p src/jni/external_includes
     cp -a "$PHYSFS_SRC/src/physfs.h" src/jni/external_includes/
@@ -193,6 +197,7 @@ if [ -n "$PHYSFS_SRC" ] && [ -d "$PHYSFS_SRC" ]; then
     mkdir -p src/jni/external_includes
     cp -a "$PHYSFS_SRC/physfs.h" src/jni/external_includes/
   fi
+  chmod -R u+rwX src/jni/external_includes 2>/dev/null || true
   chmod -R u+rwX src/jni/src/deps/physfs
   echo "==> staged physfs from $PHYSFS_SRC"
 else

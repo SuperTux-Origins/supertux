@@ -685,3 +685,9 @@ under `__GLIBC__`.
 `sound_manager.cpp` must only `#include "effect.hpp"` under
 `WSTSOUND_WITH_EFX`. The effect.cpp sources are filtered out by CMake,
 but the header include still requires `AL/efx.h`. Match Windstille.
+
+### Android: cp -a from nix store stays read-only
+
+After `cp -a $SQUIRREL_SOURCE_DIR/include` the staged tree is still 0555.
+Further `cp` into that include/ fails with Permission denied. Always
+`chmod -R u+rwX` immediately after each store copy before writing more.
