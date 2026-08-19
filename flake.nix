@@ -291,6 +291,8 @@
               src = self;
               version = r36sVersion;
               enableSound = true;
+              physfsSrc = physfs-src;
+              squirrelSrc = squirrel-src;
             };
             portMaster = r36s.mkSuperTuxR36sPortMaster {
               r36sPkg = game;

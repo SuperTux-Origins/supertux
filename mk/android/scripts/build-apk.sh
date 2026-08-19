@@ -76,6 +76,12 @@ cp -r "$APP_DIR/res" src/res
 # Game C++ sources next to the module Android.mk.
 cp -r "$GAME_SRC_DIR"/. src/jni/src/
 chmod -R u+rwX src/jni/src
+# Re-assert module Android.mk after the source tree copy so a stray file
+# under GAME_SRC_DIR can never replace it (SDL2 prebuilts live in jni/SDL/).
+cp "$APP_DIR/jni/Android.mk" src/jni/src/Android.mk
+if [ -f "$APP_DIR/jni/placeholder.cpp" ]; then
+  cp "$APP_DIR/jni/placeholder.cpp" src/jni/src/placeholder.cpp
+fi
 
 # Stage monorepo external/ headers + sources.
 # Under Nix, GAME_SRC_DIR is a filtered ./src store path — parent is NOT the

@@ -336,6 +336,8 @@ let
   # Requires libopenal (+ optional libmodplug) in the published ArkOS sysroot.
   # PortMaster ships copies under supertux/libs/ so stock images without apt work.
   , enableSound ? true
+  , physfsSrc ? null
+  , squirrelSrc ? null
   }:
     let
       wrappers = mkWrappers arkosSysroot;
@@ -410,6 +412,12 @@ let
         # cxxabi shim linked separately if needed
         # Relative data next to the binary on device (PortMaster layout).
         "-DPROJECT_VERSION_FULL=${version}"
+      ] ++ lib.optionals (physfsSrc != null) [
+        "-DPHYSFS_SOURCE_DIR=${physfsSrc}"
+        "-DUSE_SYSTEM_PHYSFS=OFF"
+      ] ++ lib.optionals (squirrelSrc != null) [
+        "-DSQUIRREL_SOURCE_DIR=${squirrelSrc}"
+        "-DUSE_SYSTEM_SQUIRREL=OFF"
       ];
 
       # Do not let nix stdenv rewrite RUNPATH to modern glibc / gcc-15 libs,

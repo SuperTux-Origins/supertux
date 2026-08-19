@@ -531,3 +531,17 @@ relative to `jni/src/`, while prebuilts are provided by sibling `jni/SDL/`
 **Solution.** Match Pingus: only `LOCAL_SHARED_LIBRARIES := SDL2` in the
 game module; SDL2 prebuilt lives solely in `jni/SDL/Android.mk`.
 
+
+### R36S: PhysFS / squirrel sources same as wasm
+
+ArkOS system PhysFS may lack `PHYSFS_getPrefDir`, so ProvidePhysfs falls
+back to sources. `external/physfs` is empty in-tree; pass
+`-DPHYSFS_SOURCE_DIR` from flake input `physfs-src`. Same for squirrel via
+`squirrel-src`.
+
+### Android: re-copy Android.mk after GAME_SRC_DIR
+
+`cp -r "$GAME_SRC_DIR"/. src/jni/src/` runs after the module Android.mk is
+installed. Re-copy `APP_DIR/jni/Android.mk` afterward so a stray file cannot
+restore an old PREBUILT SDL2 stanza.
+

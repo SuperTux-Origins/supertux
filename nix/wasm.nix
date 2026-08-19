@@ -147,6 +147,11 @@ EOFPC
   # PhysFS from source tree if provided
   physfsSrcPath = if physfs-src != null then physfs-src else null;
 
+  # external/squirrel is packaging-only (no CMakeLists). Require flake input.
+  squirrelSrcPath =
+    if squirrel-src != null then squirrel-src
+    else throw "nix/wasm.nix: squirrel-src flake input is required (external/squirrel has no sources). Run: nix flake lock --update-input squirrel-src";
+
   modplugCmakeFlags = [
     "-DMODPLUG_DIR=${modplugWasm}"
     "-DMODPLUG_INCLUDE_DIRECTORY=${modplugWasm}/include"
@@ -210,8 +215,8 @@ in
     ] ++ modplugCmakeFlags
       ++ lib.optionals (physfsSrcPath != null) [
       "-DPHYSFS_SOURCE_DIR=${physfsSrcPath}"
-    ] ++ lib.optionals (squirrel-src != null) [
-      "-DSQUIRREL_SOURCE_DIR=${squirrel-src}"
+    ] ++ [
+      "-DSQUIRREL_SOURCE_DIR=${squirrelSrcPath}"
       "-DUSE_SYSTEM_SQUIRREL=OFF"
     ];
 
