@@ -17,6 +17,7 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_MENU_MENU_STORAGE_HPP
 #define HEADER_SUPERTUX_SUPERTUX_MENU_MENU_STORAGE_HPP
 
+#include <format>
 #include <memory>
 
 class JoystickMenu;
@@ -72,6 +73,15 @@ public:
 private:
   MenuStorage(MenuStorage const&) = delete;
   MenuStorage& operator=(MenuStorage const&) = delete;
+};
+
+template<>
+struct std::formatter<MenuStorage::MenuId> : std::formatter<int>
+{
+  auto format(MenuStorage::MenuId id, auto& ctx) const
+  {
+    return std::formatter<int>::format(static_cast<int>(id), ctx);
+  }
 };
 
 #endif
