@@ -774,3 +774,11 @@ NDK libc++ needs `#include <sstream>` for `std::ostringstream`. Custom
 `-sUSE_SDL_IMAGE=2` pulls the zlib emscripten port from the network
 (DNS fails offline). Compile with `-sUSE_SDL=2` only and ship
 `mk/emscripten/SDL_image.h` as a minimal stub include.
+
+### WASM: seed EM_CACHE with SDL2 port zip
+
+Nix build sandbox has no network. `pkgs.fetchurl` (fixed-output) downloads
+SDL release-2.32.10.zip at eval/build of that derivation; preBuild copies it
+into `$EM_CACHE/ports/` and `$EM_CACHE/downloads/` so emscripten ports/sdl2.py
+does not call urlopen.
+

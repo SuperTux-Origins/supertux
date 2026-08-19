@@ -167,6 +167,12 @@ in
 {
   inherit logmichWasm sexpcppWasm strutcppWasm modplugWasm;
 
+  # Offline emscripten SDL2 port (build sandbox has no network).
+  sdl2PortZip = pkgs.fetchurl {
+    url = "https://github.com/libsdl-org/SDL/archive/release-2.32.10.zip";
+    hash = "sha256-ejwge4UJ7cSH1ljfNXrXZM2FLWj+JI0weyXAdB1S/fA=";
+  };
+
   supertux-wasm = est.mkDerivation rec {
     pname = "supertux-origins-wasm";
     version = "0.6.3-wasm";
@@ -228,9 +234,19 @@ in
 
     preBuild = ''
       export EM_CACHE="''${TMPDIR:-/tmp}/emcache-supertux"
-      mkdir -p "$EM_CACHE"
+      mkdir -p "$EM_CACHE" "$EM_CACHE/ports" "$EM_CACHE/downloads"
       export EM_PORTS="''${TMPDIR:-/tmp}/emports-supertux"
       mkdir -p "$EM_PORTS"
+      # Seed SDL2 port so emscripten does not hit the network (nix sandbox).
+      # ports/sdl2.py requests name=sdl2 → typically $EM_CACHE/ports/sdl2.zip
+      # or the URL basename release-2.32.10.zip under downloads/.
+      cp -f ${sdl2PortZip} "$EM_CACHE/ports/sdl2.zip"
+      cp -f ${sdl2PortZip} "$EM_CACHE/ports/release-2.32.10.zip"
+      cp -f ${sdl2PortZip} "$EM_CACHE/downloads/release-2.32.10.zip"
+      cp -f ${sdl2PortZip} "$EM_CACHE/downloads/sdl2.zip"
+      # Also place under EM_PORTS tree (some emscripten layouts).
+      cp -f ${sdl2PortZip} "$EM_PORTS/sdl2.zip"
+      cp -f ${sdl2PortZip} "$EM_PORTS/release-2.32.10.zip"
       export PKG_CONFIG_PATH="${modplugWasm}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
       export CMAKE_PREFIX_PATH="${modplugWasm}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
       emcmake cmake -S . -B build \
