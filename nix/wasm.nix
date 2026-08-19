@@ -39,13 +39,16 @@ EOFC
   mkWasmCmake = { pname, srcPath, cmakeFlags ? [], buildInputs ? [] }:
     est.mkDerivation {
       inherit pname;
-      version = "0.0.0-wasm";
+      version = "0.0.1-wasm";
       src = lib.cleanSource srcPath;
       nativeBuildInputs = [ pkgs.buildPackages.cmake emscripten ];
       inherit buildInputs;
       dontUseCmakeConfigure = true;
       dontConfigure = true;
-      doCheck = false; # emscriptenStdenv checkPhase requires a custom test
+      # emscriptenStdenv injects a failing default checkPhase; override fully.
+      doCheck = false;
+    checkPhase = "echo skip-emscripten-check";
+      checkPhase = "echo skip-emscripten-check";
       preBuild = ''
         export EM_CACHE="''${TMPDIR:-/tmp}/emcache-${pname}"
         mkdir -p "$EM_CACHE"
@@ -76,7 +79,7 @@ EOFC
   };
 
   # tinycmmc is mostly CMake modules — use native flake package for the module path
-  tinycmmcNative = tinycmmc.packages.${pkgs.system}.default;
+  tinycmmcNative = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
   # PhysFS from source tree if provided
   physfsSrcPath = if physfs-src != null then physfs-src else null;
@@ -94,12 +97,13 @@ in
     # emscriptenStdenv defaults to ./configure; SuperTux is CMake-only.
     dontConfigure = true;
     doCheck = false;
+    checkPhase = "echo skip-emscripten-check";
 
     nativeBuildInputs = [
       pkgs.buildPackages.cmake
       pkgs.buildPackages.pkg-config
       emscripten
-      miniswig.packages.${pkgs.system}.default
+      miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
 
     buildInputs = [
@@ -109,8 +113,8 @@ in
       strutcppWasm
       tinycmmcNative
       # squirrel / wstsound still from flake until wasm static builds exist
-      squirrel.packages.${pkgs.system}.default
-      wstsound.packages.${pkgs.system}.default
+      squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default
+      wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
 
     cmakeFlags = [

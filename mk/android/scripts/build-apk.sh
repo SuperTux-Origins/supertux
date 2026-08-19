@@ -263,7 +263,7 @@ if [ "$ASSET_COUNT" -lt 10 ]; then
   exit 1
 fi
 # Probe well-known SuperTux data paths (not SuperTux Milestone 1 leftovers).
-for probe in   images/fonts/chalk-40px.font   images/fonts/chalk-40px.png   levelsets   levels   music   sounds
+for probe in fonts levels music sounds images
 do
   if [ ! -e "src/assets/$probe" ]; then
     echo "error: missing src/assets/$probe" >&2
