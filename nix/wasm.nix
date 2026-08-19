@@ -163,15 +163,17 @@ EOFPC
     "-DWSTSOUND_WITH_EFX=OFF"
   ];
 
-in
-{
-  inherit logmichWasm sexpcppWasm strutcppWasm modplugWasm;
-
   # Offline emscripten SDL2 port (build sandbox has no network).
+  # Must live in `let` (not the returned attrset) so ${sdl2PortZip} is in
+  # scope inside supertux-wasm's preBuild string.
   sdl2PortZip = pkgs.fetchurl {
     url = "https://github.com/libsdl-org/SDL/archive/release-2.32.10.zip";
     hash = "sha256-ejwge4UJ7cSH1ljfNXrXZM2FLWj+JI0weyXAdB1S/fA=";
   };
+
+in
+{
+  inherit logmichWasm sexpcppWasm strutcppWasm modplugWasm;
 
   supertux-wasm = est.mkDerivation rec {
     pname = "supertux-origins-wasm";
