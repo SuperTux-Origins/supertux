@@ -1663,3 +1663,13 @@ nix run .#supertux-mingw64          # store layout (bin/*.exe)
 
 Uses `wineWow64Packages.stable`, fresh `WINEPREFIX`, `WINEARCH=win64`, and
 native SDL2* DLL overrides so the bundled MinGW DLLs are preferred.
+
+## FreeType minimal build: ftmodule.h + ftgzip
+
+Linking in-tree FreeType failed with undefined `t1_driver_class`,
+`pcf_driver_class`, `FT_Gzip_Uncompress`, etc. Default
+`include/freetype/config/ftmodule.h` registers every driver; we only
+compile TTF/CFF/smooth/raster sources.
+
+Fix: `mk/cmake/SuperTux/ftmodule_min.h` + `-DFT_CONFIG_MODULES_H="…"` and
+add `src/gzip/ftgzip.c` for `FT_Gzip_Uncompress` (sfnt compressed tables).

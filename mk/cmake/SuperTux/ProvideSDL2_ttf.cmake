@@ -27,6 +27,8 @@ if(EMSCRIPTEN)
   if(_st_have_ttf_src AND FREETYPE_SOURCE_DIR
       AND EXISTS "${FREETYPE_SOURCE_DIR}/include/ft2build.h")
     message(STATUS "Emscripten: SDL_ttf + in-tree FreeType sources (${FREETYPE_SOURCE_DIR})")
+    # TTF/OTF only — pair with mk/cmake/SuperTux/ftmodule_min.h so ftinit does
+    # not reference Type1/CID/PCF/BDF/SDF/SVG drivers we do not compile.
     set(_ft_srcs
       ${FREETYPE_SOURCE_DIR}/src/autofit/autofit.c
       ${FREETYPE_SOURCE_DIR}/src/base/ftbase.c
@@ -42,6 +44,7 @@ if(EMSCRIPTEN)
       ${FREETYPE_SOURCE_DIR}/src/base/ftmm.c
       ${FREETYPE_SOURCE_DIR}/src/base/fttype1.c
       ${FREETYPE_SOURCE_DIR}/src/cff/cff.c
+      ${FREETYPE_SOURCE_DIR}/src/gzip/ftgzip.c
       ${FREETYPE_SOURCE_DIR}/src/pshinter/pshinter.c
       ${FREETYPE_SOURCE_DIR}/src/psnames/psnames.c
       ${FREETYPE_SOURCE_DIR}/src/psaux/psaux.c
@@ -50,11 +53,15 @@ if(EMSCRIPTEN)
       ${FREETYPE_SOURCE_DIR}/src/smooth/smooth.c
       ${FREETYPE_SOURCE_DIR}/src/truetype/truetype.c
     )
+    set(_ft_module_h "${CMAKE_SOURCE_DIR}/mk/cmake/SuperTux/ftmodule_min.h")
     add_library(supertux_freetype_wasm STATIC ${_ft_srcs})
     target_include_directories(supertux_freetype_wasm PUBLIC
       "${FREETYPE_SOURCE_DIR}/include")
     target_compile_definitions(supertux_freetype_wasm PRIVATE
-      FT2_BUILD_LIBRARY DARWIN_NO_CARBON)
+      FT2_BUILD_LIBRARY
+      DARWIN_NO_CARBON
+      FT_CONFIG_OPTION_SYSTEM_ZLIB
+      "FT_CONFIG_MODULES_H=\"${_ft_module_h}\"")
     target_compile_options(supertux_freetype_wasm PRIVATE
       -UFT_CONFIG_OPTION_USE_HARFBUZZ
       -UFT_CONFIG_OPTION_USE_PNG
@@ -198,6 +205,8 @@ if(SDL2_TTF_SOURCE_DIR AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
   if(NOT _st_ft_ok AND FREETYPE_SOURCE_DIR
       AND EXISTS "${FREETYPE_SOURCE_DIR}/include/ft2build.h")
     message(STATUS "SDL2_ttf: compiling FreeType from FREETYPE_SOURCE_DIR=${FREETYPE_SOURCE_DIR}")
+    # TTF/OTF only — pair with mk/cmake/SuperTux/ftmodule_min.h so ftinit does
+    # not reference Type1/CID/PCF/BDF/SDF/SVG drivers we do not compile.
     set(_ft_srcs
       ${FREETYPE_SOURCE_DIR}/src/autofit/autofit.c
       ${FREETYPE_SOURCE_DIR}/src/base/ftbase.c
@@ -213,6 +222,7 @@ if(SDL2_TTF_SOURCE_DIR AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
       ${FREETYPE_SOURCE_DIR}/src/base/ftmm.c
       ${FREETYPE_SOURCE_DIR}/src/base/fttype1.c
       ${FREETYPE_SOURCE_DIR}/src/cff/cff.c
+      ${FREETYPE_SOURCE_DIR}/src/gzip/ftgzip.c
       ${FREETYPE_SOURCE_DIR}/src/pshinter/pshinter.c
       ${FREETYPE_SOURCE_DIR}/src/psnames/psnames.c
       ${FREETYPE_SOURCE_DIR}/src/psaux/psaux.c
@@ -221,6 +231,7 @@ if(SDL2_TTF_SOURCE_DIR AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
       ${FREETYPE_SOURCE_DIR}/src/smooth/smooth.c
       ${FREETYPE_SOURCE_DIR}/src/truetype/truetype.c
     )
+    set(_ft_module_h "${CMAKE_SOURCE_DIR}/mk/cmake/SuperTux/ftmodule_min.h")
     add_library(supertux_freetype_static STATIC ${_ft_srcs})
     target_include_directories(supertux_freetype_static PUBLIC
       "${FREETYPE_SOURCE_DIR}/include")
@@ -228,7 +239,8 @@ if(SDL2_TTF_SOURCE_DIR AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
     # the feature (e.g. ft-hb.h → <hb.h>). Force-undef instead.
     target_compile_definitions(supertux_freetype_static PRIVATE
       FT2_BUILD_LIBRARY
-      FT_CONFIG_OPTION_SYSTEM_ZLIB)
+      FT_CONFIG_OPTION_SYSTEM_ZLIB
+      "FT_CONFIG_MODULES_H=\"${_ft_module_h}\"")
     target_compile_options(supertux_freetype_static PRIVATE
       -UFT_CONFIG_OPTION_USE_HARFBUZZ
       -UFT_CONFIG_OPTION_USE_PNG
