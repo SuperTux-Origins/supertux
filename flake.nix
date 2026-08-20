@@ -330,17 +330,26 @@
                 modplugw = pickWinFlakePkg libmodplug-win32 [ "libmodplug-win64" "default" ];
 
                 # Build C++ deps with the *cross* stdenv (not host Linux .so).
-                logmichW = pkgsW.callPackage ./external/logmich/logmich.nix { };
-                sexpcppW = (pkgsW.callPackage ./external/sexpcpp/sexpcpp.nix { }).overrideAttrs (o: {
+                # Force Linux cmake into nativeBuildInputs via callPackage args.
+                bpCmake = pkgs.buildPackages.cmake;
+                logmichW = pkgsW.callPackage ./external/logmich/logmich.nix {
+                  cmake = bpCmake;
+                };
+                sexpcppW = (pkgsW.callPackage ./external/sexpcpp/sexpcpp.nix {
+                  cmake = bpCmake;
+                }).overrideAttrs (o: {
                   doCheck = false;
                   cmakeFlags = [ "-DBUILD_TESTS=OFF" "-DWARNINGS=OFF" "-DWERROR=OFF" ];
                 });
-                strutcppW = (pkgsW.callPackage ./external/strutcpp/strutcpp.nix { }).overrideAttrs (o: {
+                strutcppW = (pkgsW.callPackage ./external/strutcpp/strutcpp.nix {
+                  cmake = bpCmake;
+                }).overrideAttrs (o: {
                   doCheck = false;
                   cmakeFlags = [ "-DBUILD_TESTS=OFF" "-DWARNINGS=OFF" "-DWERROR=OFF" ];
                 });
                 priocppW = pkgsW.callPackage ./external/priocpp/priocpp.nix {
                   inherit self;
+                  cmake = bpCmake;
                   logmich = logmichW;
                   sexpcpp = sexpcppW;
                   withJsoncpp = false;
@@ -348,12 +357,12 @@
                 };
                 tinycmmcW = tinycmmc.packages.${system}.default; # cmake modules; host ok
                 wstsoundW = (pkgsW.callPackage ./external/wstsound/wstsound.nix {
+                  cmake = bpCmake;
                   mcfgthreads = pkgsW.windows.mcfgthreads;
                   openal = openalw;
                   libmodplug = modplugw;
                   tinycmmc = tinycmmcW;
                   gtest = null;
-                  # ogg/vorbis/mpg123/opus: pkgsCross where available
                 }).overrideAttrs (o: {
                   doCheck = false;
                   cmakeFlags = [
@@ -364,19 +373,22 @@
               in
               (pkgsW.callPackage ./supertux-origins.nix {
                 inherit self;
+                # Build-time tools must come from buildPackages (Linux), never the
+                # MinGW target package set — otherwise evaluation can demand
+                # bash for hostPlatform=x86_64-windows.
+                cmake = pkgs.buildPackages.cmake;
+                pkg-config = pkgs.buildPackages.pkg-config;
                 SDL2 = sdl2w;
                 SDL2_image = sdl2imgw;
                 SDL2_ttf = sdl2ttfw;
                 physfs = physfsw;
                 glew = null;
                 sexpcpp = sexpcppW;
-                # Host squirrel package lacks proper IMPORTED_IMPLIB for MinGW
-                # (and is not cross-built). Force in-tree ExternalProject like
-                # R36S / Android / wasm.
+                # Host squirrel lacks IMPORTED_IMPLIB for MinGW; in-tree like R36S.
                 squirrel = null;
                 tinycmmc = tinycmmcW;
                 strutcpp = strutcppW;
-                miniswig = miniswig.packages.${system}.default; # native tool, host ok
+                miniswig = miniswig.packages.${system}.default; # native tool
                 wstsound = wstsoundW;
                 priocpp = priocppW;
                 logmich = logmichW;
@@ -387,13 +399,15 @@
                 libGL = null;
                 mcfgthreads = pkgsW.windows.mcfgthreads;
                 gtest = null;
+                makeWrapper = null;
               }).overrideAttrs (o: {
+                strictDeps = true;
                 cmakeFlags = (o.cmakeFlags or []) ++ [
                   "-DUSE_SYSTEM_SQUIRREL=OFF"
                   "-DSQUIRREL_SOURCE_DIR=${squirrel-src}"
                 ];
-                # Null squirrel must not appear in buildInputs
                 buildInputs = builtins.filter (x: x != null) (o.buildInputs or []);
+                nativeBuildInputs = builtins.filter (x: x != null) (o.nativeBuildInputs or []);
               });
 
           # Flat layout for redistribution (exe + dlls + data). Only valid after a
@@ -428,7 +442,7 @@
 
           # WebAssembly (Emscripten). CMake path ready; may fail at dep/link stage.
           # See nix/wasm.nix and PORTING.md.
-          supertux-wasm = (import ./nix/wasm.nix {
+          supertux-origins-wasm = (import ./nix/wasm.nix {
             inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
                     wstsound squirrel physfs-src squirrel-src;
             sdlSrc = sdl2-src;
@@ -436,8 +450,8 @@
             freetypeSrc = freetype-src;
             sdl2TtfSrc = sdl2-ttf-src;
           }).supertux-wasm;
-          # Alias for discoverability
-          supertux-origins-wasm = supertux-wasm;
+          # Short alias
+          supertux-wasm = supertux-origins-wasm;
 
           # ---------------------------------------------------------------
           # Android (requires allowUnfree + android_sdk.accept_license)
@@ -557,31 +571,28 @@
 
 
         apps = {
-          # Serve wasm build + open browser (Pingus pattern).
+          #   nix run .#supertux-origins-wasm
           #   nix run .#supertux-wasm
-          #   nix run .#supertux-wasm -- --debug
-          # Package also has meta.mainProgram = "supertux-wasm".
+          supertux-origins-wasm = {
+            type = "app";
+            program = "${packages.supertux-origins-wasm}/bin/supertux-wasm";
+            meta.description = "Serve and open SuperTux Origins wasm in a browser";
+          };
           supertux-wasm = {
             type = "app";
-            program = "${packages.supertux-wasm}/bin/supertux-wasm";
-            meta.description = "Serve and open SuperTux wasm in a browser";
+            program = "${packages.supertux-origins-wasm}/bin/supertux-wasm";
+            meta.description = "Serve and open SuperTux Origins wasm in a browser";
           };
         } // lib.optionalAttrs wineAppsEnabled {
-          # MinGW flat package under Wine (Pingus mkWineApp pattern).
-          # Linux flake system only; wrapper via buildPackages.writeShellScript.
-          #   nix run .#supertux-win32
-          #   nix run .#supertux-origins-win32-wine
-          # Prefer *-wine app names so they never clash with packages.* on a
-          # hypothetical x86_64-windows flake system.
-          supertux-win32 = mkWineApp packages.supertux-origins-win32 "supertux-win32"
-            "SuperTux Origins (MinGW x86_64) via Wine";
-          supertux-origins-win32-wine = mkWineApp packages.supertux-origins-win32 "supertux-origins-win32-wine"
-            "SuperTux Origins (MinGW x86_64) via Wine";
-          # Alias kept for convenience (same as supertux-win32).
+          # MinGW flat package under Wine (Linux x86_64 flake system only).
+          #   nix run .#supertux-origins-win32
           supertux-origins-win32 = mkWineApp packages.supertux-origins-win32 "supertux-origins-win32"
             "SuperTux Origins (MinGW x86_64) via Wine";
-          supertux-mingw64 = mkWineApp packages.supertux-origins-mingw64 "supertux-mingw64"
+          supertux-origins-mingw64 = mkWineApp packages.supertux-origins-mingw64 "supertux-origins-mingw64"
             "SuperTux Origins MinGW store package via Wine (bin/)";
+          # Short aliases
+          supertux-win32 = mkWineApp packages.supertux-origins-win32 "supertux-win32"
+            "SuperTux Origins (MinGW x86_64) via Wine";
         };
       }
     );

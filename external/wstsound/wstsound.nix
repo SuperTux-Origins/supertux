@@ -46,10 +46,10 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     cmake
+    tinycmmc
   ];
 
   buildInputs = [
-    tinycmmc
   ] ++ lib.optional (gtest != null) gtest;
 
   propagatedBuildInputs = [

@@ -4,7 +4,7 @@
 
 , cmake
 , pkg-config
-, makeWrapper
+, makeWrapper ? null
 , libGL ? null
 , libsm ? null
 , libice ? null
@@ -13,13 +13,11 @@
 , SDL2_image
 , SDL2_ttf
 
-, freetype
 
 , glew ? null
 , glm
 , libpng
-, mcfgthreads
-, mesa
+, mcfgthreads ? null
 , physfs
 , logmich
 , sexpcpp
@@ -60,6 +58,8 @@ SET(SUPERTUX_VERSION_BUILD "${builtins.elemAt ver 4}")
 EOF
   '';
 
+  strictDeps = true;
+
   cmakeFlags = [
     "-DINSTALL_SUBDIR_BIN=bin"
     "-DUSE_SYSTEM_SDL2_TTF=ON"
@@ -70,8 +70,15 @@ EOF
   # Transitive runtime DLLs (ogg, vorbis, opus, zlib, …) live under dependency
   # store paths, not only the top-level package bin/. Scan the buildInputs
   # closure so Wine/flat packages get a complete set.
+  # Only runtime (target) deps — never nativeBuildInputs. Closing over cmake /
+  # pkg-config / miniswig under hostPlatform=x86_64-windows tries to evaluate
+  # Linux bash for the Windows host and fails flake check.
   windowsDllRoots = lib.optionals stdenv.hostPlatform.isWindows (
-    lib.closePropagation (buildInputs ++ nativeBuildInputs ++ [ mcfgthreads stdenv.cc.cc ])
+    lib.closePropagation (
+      buildInputs
+      ++ lib.optional (mcfgthreads != null) mcfgthreads
+      ++ [ stdenv.cc.cc ]
+    )
   );
 
   postFixup =

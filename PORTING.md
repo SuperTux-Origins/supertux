@@ -1706,3 +1706,14 @@ panels), no mobile floor at 1.0, and 40–80% options always listed.
 - `pickWinFlakePkg` lives in the per-system `let`, not under `packages`
   (`nix flake check` requires every packages.* to be a derivation).
 - Wine apps only on `x86_64-linux` (wineWow64).
+
+## MinGW flake check: bash on hostPlatform=x86_64-windows
+
+`windowsDllRoots` used `lib.closePropagation` over `nativeBuildInputs`
+(cmake, pkg-config, miniswig). Walking those under the MinGW *target*
+hostPlatform tries to evaluate Linux-only bash for Windows and fails
+`nix flake check`. Only close over target `buildInputs` + runtime DLL
+roots. Force `pkgs.buildPackages.cmake` / `pkg-config` into MinGW
+`callPackage` args; enable `strictDeps`.
+
+Flake outputs prefer the `supertux-origins-*` prefix (game name).
