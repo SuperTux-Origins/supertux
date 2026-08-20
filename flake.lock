@@ -593,18 +593,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1786345348,
-        "narHash": "sha256-dpvTjt3Z8m9z6/KandNFY+QvREnEW+kEiL8YeW/IYGM=",
-        "owner": "grumbel",
-        "repo": "tinycmmc",
-        "rev": "50c49bf8a45f7c5ddb0c5f838a0fd6a00845a04d",
-        "type": "github"
+        "path": "./external/tinycmmc",
+        "type": "path"
       },
       "original": {
-        "owner": "grumbel",
-        "repo": "tinycmmc",
-        "type": "github"
-      }
+        "path": "./external/tinycmmc",
+        "type": "path"
+      },
+      "parent": []
     },
     "xdgcpp": {
       "inputs": {
