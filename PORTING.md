@@ -1506,3 +1506,11 @@ the window exists. `ENABLE_TOUCHSCREEN_SUPPORT` is set in the NDK flags so
 the ANDROID_TV opt-out path compiles. Existing config files that already
 saved `mobile_controls #f` keep that until the user toggles Options.
 
+
+## Desktop GL: GLEW replaced by GLAD
+
+Desktop OpenGL 3.3 uses vendored GLAD (`external/glad`, core 3.3 only).
+`glewInit` → `gladLoadGL(SDL_GL_GetProcAddress)`. GLEW is no longer linked,
+so the game binary should not pick up GLEW's forced `-lX11`. SDL may still
+use X11 at runtime for the window; that is independent of the GL loader.
+

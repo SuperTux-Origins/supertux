@@ -16,20 +16,40 @@ if(ENABLE_OPENGL)
       list(APPEND OPENGL_LINK_LIBRARIES "${GLESV2_LIBRARIES}")
     endif()
   else()
-    message(STATUS "Checking for OpenGL")
+    message(STATUS "Checking for OpenGL (GLAD loader, no GLEW)")
 
-    set(OpenGL_GL_PREFERENCE "LEGACY")
-    find_package(OpenGL)
+    set(HAVE_OPENGL TRUE)
 
-    if(OPENGL_FOUND)
-      set(HAVE_OPENGL TRUE)
+    # Vendored GLAD (OpenGL 3.3 core). Loads entry points via SDL_GL_GetProcAddress
+    # — no GLEW and no GLEW-propagated -lX11 on our link line.
+    set(GLAD_DIR "${CMAKE_SOURCE_DIR}/external/glad")
+    if(NOT EXISTS "${GLAD_DIR}/src/gl.c")
+      message(FATAL_ERROR "GLAD sources missing at ${GLAD_DIR} (expected src/gl.c)")
+    endif()
 
-      list(APPEND OPENGL_LINK_LIBRARIES "${OPENGL_LIBRARIES}")
-      list(APPEND OPENGL_INCLUDE_DIRECTORIES "${OPENGL_INCLUDE_DIR}")
+    add_library(glad STATIC "${GLAD_DIR}/src/gl.c")
+    target_include_directories(glad PUBLIC "${GLAD_DIR}/include")
+    # glad is pure C; silence noisy warnings from generated code if any
+    set_target_properties(glad PROPERTIES C_STANDARD 99)
 
-      find_package(GLEW REQUIRED)
-      list(APPEND OPENGL_LINK_LIBRARIES GLEW::glew)
-      list(APPEND OPENGL_INCLUDE_DIRECTORIES "${GLEW_INCLUDE_DIR}")
+    list(APPEND OPENGL_LINK_LIBRARIES glad)
+    list(APPEND OPENGL_INCLUDE_DIRECTORIES "${GLAD_DIR}/include")
+
+    # Platform GL library (symbols / ICD). Prefer CMake's OpenGL::GL when present
+    # but do not use GLEW. Linking OpenGL::GL may still pull GLX transitively on
+    # some systems; the game talks to GL only through GLAD + SDL context.
+    if(WIN32)
+      list(APPEND OPENGL_LINK_LIBRARIES opengl32)
+    else()
+      set(OpenGL_GL_PREFERENCE "GLVND")
+      find_package(OpenGL)
+      if(TARGET OpenGL::GL)
+        list(APPEND OPENGL_LINK_LIBRARIES OpenGL::GL)
+      elseif(OPENGL_opengl_LIBRARY)
+        list(APPEND OPENGL_LINK_LIBRARIES ${OPENGL_opengl_LIBRARY})
+      elseif(OPENGL_gl_LIBRARY)
+        list(APPEND OPENGL_LINK_LIBRARIES ${OPENGL_gl_LIBRARY})
+      endif()
     endif()
   endif()
 
@@ -48,10 +68,5 @@ if(ENABLE_OPENGL)
     message(STATUS "  OPENGL_COMPILE_DEFINITIONS: ${OPENGL_COMPILE_DEFINITIONS}")
   endif()
 endif()
-
-mark_as_advanced(
-  GLEW_INCLUDE_DIR
-  GLEW_LIBRARY
-  )
 
 # EOF #

@@ -22,7 +22,7 @@
 #if defined(USE_OPENGLES2)
 #  include <SDL_opengles2.h>
 #else
-#  include <GL/glew.h>
+#  include <glad/gl.h>
 #  define GL_NONE_BIT 0
 #endif
 

@@ -83,7 +83,8 @@ inline bool gl_needs_power_of_two()
   // Conservative for old GLES2 mobile; revisit per-device if needed.
   return true;
 #else
-  return !GLEW_ARB_texture_non_power_of_two;
+  // OpenGL 3.3 core (and GLES2) support non-power-of-two textures.
+  return false;
 #endif
 }
 

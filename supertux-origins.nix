@@ -13,7 +13,8 @@
 , SDL2_ttf
 , curl
 , freetype
-, glew
+
+, glew ? null
 , glm
 , libpng
 , mcfgthreads
@@ -74,7 +75,6 @@ EOF
        ln -sfv ${SDL2_ttf}/bin/*.dll $out/bin/
        ln -sfv ${SDL2}/bin/*.dll $out/bin/
        ln -sfv ${curl}/bin/*.dll $out/bin/
-       ln -sfv ${glew}/bin/*.dll $out/bin/
        ln -sfv ${physfs}/bin/*.dll $out/bin/
        ln -sfv ${squirrel}/bin/*.dll $out/bin/
        ln -sfv ${strutcpp}/bin/*.dll $out/bin/
@@ -87,7 +87,7 @@ EOF
        # closure via LD_LIBRARY_PATH. This is not raw X11 usage by SuperTux.
        wrapProgram $out/bin/supertux-origins \
          --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([
-           SDL2 SDL2_image SDL2_ttf curl glew libGL physfs
+           SDL2 SDL2_image SDL2_ttf curl libGL physfs
            # SDL2 X11 video backend (see libSM.so.6 runtime error without these)
            xorg.libSM xorg.libICE
          ] ++ lib.optional (xdgcpp != null) xdgcpp)}
@@ -107,7 +107,6 @@ EOF
     SDL2_image
     SDL2_ttf
     curl
-    glew
     glm
     libpng
     physfs

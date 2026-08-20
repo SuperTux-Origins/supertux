@@ -150,29 +150,13 @@ GLVideoSystem::create_gl_context()
 #if defined(USE_OPENGLES2)
   // nothing to do
 #else
-  GLenum err = glewInit();
-
-  // Glew can't open glx display when it's running on wayland session
-  // and thus returns an error. But glXGetProcAddress is fully usable
-  // on wayland, so we can just ignore the "no glx display" error.
-  if (err == GLEW_ERROR_NO_GLX_DISPLAY)
+  // Load GL 3.3 core entry points through the current SDL context (no GLEW/X11 link).
+  if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress)))
   {
-    log_info("GLEW couldn't open GLX display");
+    throw std::runtime_error("GLVideoSystem: gladLoadGL failed (no GL context or loader?)");
   }
-  else if (err != GLEW_OK)
-  {
-    std::ostringstream out;
-    out << "GLVideoSystem: GlewError: " << glewGetErrorString(err);
-    throw std::runtime_error(out.str());
-  }
-
-  // older GLEW throws 'invalid enum' error in OpenGL3.3Core, thus we eat up the error code here
-  glGetError();
-
-  // log_info("OpenGL 3.3: {}", GLEW_VERSION_3_3);
   log_info("OpenGL: {}", reinterpret_cast<char const*>(glGetString(GL_VERSION)));
-  log_info("Using GLEW {}", reinterpret_cast<char const*>(glewGetString(GLEW_VERSION)));
-  log_info("GLEW_ARB_texture_non_power_of_two: {}", static_cast<int>(GLEW_ARB_texture_non_power_of_two));
+  log_info("GLAD: OpenGL 3.3 core loader ready");
 #endif
 
   assert_gl();
