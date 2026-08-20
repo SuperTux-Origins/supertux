@@ -22,7 +22,8 @@
 
 #include <math.h>
 
-#include <glm/ext.hpp>
+// Avoid <glm/ext.hpp>: GLM 1.0+ packing.inl pulls <endian.h> (missing on MinGW).
+#include <glm/glm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "rect.hpp"

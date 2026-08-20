@@ -1576,3 +1576,19 @@ Fix (aligned with R36S / Android / wasm):
    when null, guard the postFixup `*.dll` symlink.
 
 Static linking means no squirrel DLL to ship in the flat win32 package.
+
+## Windows: GLM endian.h / packing.inl (2026-08)
+
+MinGW build fails with:
+
+```
+glm/gtc/packing.inl:14:10: fatal error: endian.h: No such file or directory
+```
+
+Cause: SuperTux (and vendored geomcpp) included `<glm/ext.hpp>`, which pulls
+`gtc/packing`. GLM 1.0.x packing.inl includes Linux `<endian.h>` for
+big-endian bitfield layout. MinGW has no endian.h.
+
+Fix: include only `<glm/glm.hpp>` + `<glm/gtx/io.hpp>` (and
+`gtx/rotate_vector` in geomcpp). Core geometric ops (length, normalize,
+dot, distance) come from glm.hpp; packing is unused by SuperTux.

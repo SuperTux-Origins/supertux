@@ -25,6 +25,7 @@ adapted from Pingus and Windstille.
 
 - [x] Force in-tree squirrel for mingw (USE_SYSTEM_SQUIRREL=OFF + squirrel-src);
       ProvideSquirrel always STATIC imported targets (no missing IMPORTED_IMPLIB).
+- [x] Drop glm/ext.hpp (packing.inl → endian.h) for MinGW; use glm.hpp + gtx/io.
 - [ ] Complete cross graph for remaining C++ deps; produce .exe + DLLs.
 - [ ] Unbreak `supertux-origins-win32` / zip once mingw64 package succeeds.
 

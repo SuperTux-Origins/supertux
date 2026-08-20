@@ -18,7 +18,8 @@
 #define HEADER_SUPERTUX_MATH_VECTOR_HPP
 
 #include <format>
-#include <glm/ext.hpp>
+// Avoid <glm/ext.hpp>: GLM 1.0+ gtc/packing.inl includes <endian.h>, which
+// MinGW/Windows does not provide. Core + gtx/io is enough for SuperTux.
 #include <glm/glm.hpp>
 #include <glm/gtx/io.hpp>
 #include <iosfwd>
