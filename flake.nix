@@ -225,6 +225,31 @@
           # Windows packages require a MinGW cross build, not the native Linux package.
           # When evaluating on Linux, build with pkgsCross.mingwW64 (or mingw32).
           # When already on Windows, the native package is the Windows binary.
+          # Pick a flake's package for the current host, falling back to any
+          # available system (grumnix *-win32 flakes differ: some use
+          # flake-utils linux systems, others tinycmmc eachWin32System).
+          pickWinFlakePkg = flake:
+            let
+              all = flake.packages or {};
+              systems = builtins.attrNames all;
+              prefer = [
+                pkgs.stdenv.hostPlatform.system
+                "x86_64-linux"
+                "aarch64-linux"
+                "x86_64-windows"
+                "i686-windows"
+              ];
+              sys =
+                let matches = builtins.filter (s: builtins.elem s systems) prefer;
+                in if matches != [] then builtins.head matches
+                   else if systems != [] then builtins.head systems
+                   else throw "pickWinFlakePkg: flake has no packages";
+              set = all.${sys};
+            in
+              set.default or set.SDL2-win64 or set.SDL2_ttf or set.SDL2_image
+              or set.physfs or set.curl or set.glew
+              or throw "pickWinFlakePkg: no usable package under packages.${sys}";
+
           supertux-origins-mingw64 =
             if pkgs.stdenv.hostPlatform.isWindows then
               supertux-origins
@@ -232,13 +257,16 @@
               let
                 pkgsW = pkgs.pkgsCross.mingwW64;
               in
-              # Re-enter this flake's package set for the mingw64 system when possible;
-              # fallback: callPackage with cross pkgs (deps must be Windows-capable).
               (pkgsW.callPackage ./supertux-origins.nix {
                 inherit self;
-                SDL2_ttf = SDL2_ttf-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
-                           SDL2_ttf-win32.packages.x86_64-linux.default;
-                sexpcpp = sexpcpp-pkg; # may still be host — WIP; prefer win-capable inputs
+                SDL2 = pickWinFlakePkg SDL2-win32;
+                SDL2_image = pickWinFlakePkg SDL2_image-win32;
+                SDL2_ttf = pickWinFlakePkg SDL2_ttf-win32;
+                physfs = pickWinFlakePkg physfs-win32;
+                curl = pickWinFlakePkg curl-win32;
+                # GLEW removed from desktop Linux; Windows still uses GLAD only.
+                glew = null;
+                sexpcpp = sexpcpp-pkg; # may still be host — WIP
                 squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
                 tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
                 strutcpp = strutcpp-pkg;
@@ -246,18 +274,10 @@
                 wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
                 priocpp = priocpp-pkg;
                 logmich = logmich-pkg;
-                physfs = physfs-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
-                         physfs-win32.packages.x86_64-linux.default;
-                curl = curl-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
-                       curl-win32.packages.x86_64-linux.default;
-                glew = glew-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
-                       glew-win32.packages.x86_64-linux.default;
                 glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
-                SDL2 = SDL2-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
-                       SDL2-win32.packages.x86_64-linux.default;
-                SDL2_image = SDL2_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default or
-                             SDL2_image-win32.packages.x86_64-linux.default;
                 xdgcpp = null;
+                libsm = null;
+                libice = null;
                 mcfgthreads = pkgsW.windows.mcfgthreads or pkgs.windows.mcfgthreads;
                 gtest = null;
               });
