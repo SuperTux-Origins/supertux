@@ -1497,3 +1497,12 @@ Now:
   game paths stay `images/`, `levels/`, …
 - Legacy `assets/data.zip` still mounts if `setRoot` fails (old APKs)
 
+
+## Android on-screen controls default On
+
+`Config::mobile_controls` defaults to `true` on `__ANDROID__` (constructor
+and config-file fallback). `SDL_GetNumTouchDevices()` is unreliable before
+the window exists. `ENABLE_TOUCHSCREEN_SUPPORT` is set in the NDK flags so
+the ANDROID_TV opt-out path compiles. Existing config files that already
+saved `mobile_controls #f` keep that until the user toggles Options.
+

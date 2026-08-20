@@ -71,7 +71,13 @@ Config::Config() :
   locale(),
   keyboard_config(),
   joystick_config(),
+  // Android (and other phones): always show the virtual pad by default.
+  // SDL_GetNumTouchDevices() is often 0 this early (before video/window).
+#if defined(__ANDROID__)
+  mobile_controls(true),
+#else
   mobile_controls(SDL_GetNumTouchDevices() > 0),
+#endif
   m_mobile_controls_scale(1),
   addons(),
   developer_mode(false),
@@ -280,7 +286,11 @@ Config::load()
       joystick_config.read(joystick_mapping);
     }
 
+#if defined(__ANDROID__)
+    mobile_controls = config_control_mapping.get("mobile_controls", true);
+#else
     mobile_controls = config_control_mapping.get("mobile_controls", SDL_GetNumTouchDevices() > 0);
+#endif
     m_mobile_controls_scale = config_control_mapping.get("mobile_controls_scale", 1);
   }
 

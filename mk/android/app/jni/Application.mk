@@ -4,4 +4,4 @@ APP_STL := c++_shared
 # .#supertux-android-arm64-v8a etc.).
 APP_ABI := arm64-v8a
 APP_PLATFORM := android-22
-APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -DUSE_OPENGLES2 -DANDROID
+APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -DUSE_OPENGLES2 -DANDROID -DENABLE_TOUCHSCREEN_SUPPORT
