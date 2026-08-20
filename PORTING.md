@@ -1650,3 +1650,16 @@ Nixpkgs Windows `fixupPhase` already links runtime DLLs into `$out/bin`.
 A second `cp -L src $out/bin/` then fails with `are the same file` when the
 destination is a hardlink to the same store object. Materialize via
 temp file + `mv -f` instead.
+
+## Wine apps (nix run .#supertux-win32)
+
+Pingus-style `mkWineApp` on Linux hosts:
+
+```bash
+nix run .#supertux-win32            # flat package (exe + DLLs + data/) under Wine
+nix run .#supertux-origins-win32    # alias
+nix run .#supertux-mingw64          # store layout (bin/*.exe)
+```
+
+Uses `wineWow64Packages.stable`, fresh `WINEPREFIX`, `WINEARCH=win64`, and
+native SDL2* DLL overrides so the bundled MinGW DLLs are preferred.

@@ -94,3 +94,14 @@ derivations under `packages`/`checks`.
 3. After each logical unit of work, produce a numbered git bundle.
 4. Compare CMake options, data install paths, and controller profiles with
    the corresponding Pingus/Windstille files before inventing new ones.
+
+## Running Windows builds under Wine
+
+On a Linux host (after a successful MinGW package):
+
+```bash
+nix run .#supertux-win32
+```
+
+See `PORTING.md` (Wine apps) and Pingus `mkWineApp`.
+

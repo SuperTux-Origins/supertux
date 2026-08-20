@@ -140,6 +140,44 @@
           inherit system;
           config.allowUnfree = true;
         };
+        lib = pkgs.lib;
+        isWin = pkgs.stdenv.hostPlatform.isWindows;
+        # Wine runner for MinGW flat packages (Pingus / Windstille pattern).
+        # Linux host only; Windows is the *run* target via Wine, not flake system.
+        mkWineApp = pkg: name: description:
+          if isWin || !pkgs.stdenv.hostPlatform.isLinux then null
+          else {
+            type = "app";
+            program = toString (pkgs.writeShellScript name ''
+              set -euo pipefail
+              export WINEPREFIX=$(mktemp -d)
+              export WINEARCH=win64
+              export WINEDLLOVERRIDES="mscoree,mshtml="
+              # Prefer bundled SDL2 DLLs next to the exe over Wine's.
+              export WINEDLLOVERRIDES="SDL2,SDL2_image,SDL2_ttf=n,$WINEDLLOVERRIDES"
+              trap 'rm -rf "$WINEPREFIX"' EXIT
+              ${pkgs.wineWow64Packages.stable}/bin/wineboot --init >/dev/null 2>&1 || true
+              # Flat package: exe + dlls at root. Store mingw package: bin/*.exe.
+              if [ -d ${pkg}/bin ]; then
+                cd ${pkg}/bin
+              else
+                cd ${pkg}
+              fi
+              exe=
+              for c in supertux-origins.exe SuperTux.exe *.exe; do
+                if [ -f "$c" ]; then exe="$c"; break; fi
+              done
+              if [ -z "$exe" ]; then
+                echo "error: no .exe found under ${pkg}" >&2
+                find ${pkg} -maxdepth 3 -type f >&2 || true
+                exit 1
+              fi
+              # Flat package ships data/ next to the exe; store layout uses
+              # relative or NIX paths. Prefer cwd next to the binary for DLLs.
+              exec ${pkgs.wineWow64Packages.stable}/bin/wine "./$exe" "$@"
+            '');
+            meta.description = description;
+          };
       in
       rec {
         packages = rec {
@@ -513,8 +551,18 @@
             program = "${packages.supertux-wasm}/bin/supertux-wasm";
             meta.description = "Serve and open SuperTux wasm in a browser";
           };
-          # adb install helper once APK builds
-          # install-android-supertux = ...
+        } // lib.optionalAttrs (pkgs.stdenv.hostPlatform.isLinux && !isWin) {
+          # MinGW flat package under Wine (Pingus mkWineApp pattern).
+          #   nix run .#supertux-win32
+          #   nix run .#supertux-origins-win32
+          # Builds .#supertux-origins-win32 (exe + DLLs + data/) then runs via wine64.
+          supertux-win32 = mkWineApp packages.supertux-origins-win32 "supertux-win32"
+            "SuperTux Origins (MinGW x86_64) via Wine";
+          supertux-origins-win32 = mkWineApp packages.supertux-origins-win32 "supertux-origins-win32"
+            "SuperTux Origins (MinGW x86_64) via Wine";
+          # Also allow running the nix-store mingw layout (bin/*.exe + bin/*.dll).
+          supertux-mingw64 = mkWineApp packages.supertux-origins-mingw64 "supertux-mingw64"
+            "SuperTux Origins MinGW store package via Wine (bin/)";
         };
       }
     );
