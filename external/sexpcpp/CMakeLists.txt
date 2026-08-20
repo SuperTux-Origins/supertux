@@ -14,8 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.10)
-project(sexp VERSION 0.1.0)
+cmake_minimum_required(VERSION 3.10...4.1)
+
+# Source of truth: top-level VERSION file (e.g. "0.2.0-dev"), or
+# -DPROJECT_VERSION_FULL=... from packaging (Nix may append .<revCount>+g<rev>).
+if(NOT DEFINED PROJECT_VERSION_FULL)
+  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL LIMIT_COUNT 1)
+endif()
+
+# CMake project() VERSION expects major[.minor[.patch[.tweak]]]; strip
+# any -dev / +git suffix for the numeric project version.
+string(REGEX MATCH "^[0-9]+(\\.[0-9]+)*" _project_version_cmake "${PROJECT_VERSION_FULL}")
+
+project(sexp VERSION ${_project_version_cmake} LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -95,45 +106,50 @@ target_include_directories(sexp SYSTEM PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-add_library(sexp::sexp ALIAS sexp)
+if(NOT TARGET sexp::sexp)
+  add_library(sexp::sexp ALIAS sexp)
+endif()
 
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sexp.pc.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/sexp.pc"
-  @ONLY)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sexp.pc.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/sexp.pc"
+    @ONLY)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/sexp.pc"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/sexp.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
-install(TARGETS sexp
-  EXPORT sexp
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sexp)
+  install(TARGETS sexp
+    EXPORT sexp
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sexp)
 
-configure_package_config_file(
-  sexp-config.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/sexp-config.cmake
-  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sexp)
+  configure_package_config_file(
+    sexp-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/sexp-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sexp)
 
-write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/sexp-config-version.cmake
-  VERSION ${PROJECT_VERSION}
-  COMPATIBILITY SameMinorVersion)
+  write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/sexp-config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMinorVersion)
 
-export(EXPORT sexp
-  NAMESPACE sexp::
-  FILE ${CMAKE_CURRENT_BINARY_DIR}/sexp-targets.cmake)
+  export(EXPORT sexp
+    NAMESPACE sexp::
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/sexp-targets.cmake)
 
-install(EXPORT sexp
-  FILE sexp-targets.cmake
-  NAMESPACE sexp::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sexp)
+  install(EXPORT sexp
+    FILE sexp-targets.cmake
+    NAMESPACE sexp::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sexp)
 
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/sexp-config.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/sexp-config-version.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sexp)
+  install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/sexp-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/sexp-config-version.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sexp)
+
+endif()
 
 if(BUILD_TESTS)
   find_package(GTest REQUIRED)
