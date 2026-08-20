@@ -45,7 +45,7 @@ let
       APP_ABI := ${targetAbisStr}
       APP_PLATFORM := android-${packagePlatform}
       # C++23 (std::format, std::print when available). Needs a recent NDK libc++.
-      APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library -DUSE_OPENGLES2 -DANDROID -DENABLE_TOUCHSCREEN_SUPPORT -DGLM_ENABLE_EXPERIMENTAL
+      APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library -DUSE_OPENGLES2 -DANDROID -DENABLE_TOUCHSCREEN_SUPPORT -DGLM_ENABLE_EXPERIMENTAL -DLOGMICH_ANDROID_TAG=\"SuperTux\"
     '';
   };
 
@@ -219,7 +219,7 @@ let
         APP_STL := c++_shared
         APP_ABI := ${apkAbisStr}
         APP_PLATFORM := android-${packagePlatform}
-        APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library -DUSE_OPENGLES2 -DANDROID -DENABLE_TOUCHSCREEN_SUPPORT -DGLM_ENABLE_EXPERIMENTAL
+        APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library -DUSE_OPENGLES2 -DANDROID -DENABLE_TOUCHSCREEN_SUPPORT -DGLM_ENABLE_EXPERIMENTAL -DLOGMICH_ANDROID_TAG=\"SuperTux\"
       '';
     };
   in

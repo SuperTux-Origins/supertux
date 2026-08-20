@@ -207,6 +207,10 @@ Order for upstreaming: **tinycmmc → logmich / geomcpp / argpp / sexpcpp / xdgc
      install + multi-candidate external/ search + double-add guard). Kept
      SuperTux FindOgg/FindVorbisfile vanished-path + static-link hygiene and
      VERSION-first GetProjectVersion. Still needs real upstream repo round-trip.
+   - logmich: generalised Android logcat (LOGMICH_ANDROID_TAG compile def,
+     default "logmich"); SuperTux passes -DLOGMICH_ANDROID_TAG=\"SuperTux\"
+     from nix/android.nix. Restored top-level-only install guard + simplified
+     warnings. Ready for upstream.
 2. [ ] Resolve conflicts in favour of the most general fix; document in
    PORTING.md why a change stayed project-local.
 3. [ ] Produce one git bundle **per library** (or small dependency group)

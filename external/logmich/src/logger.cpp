@@ -24,6 +24,9 @@
 
 #if defined(__ANDROID__)
 #  include <android/log.h>
+#  ifndef LOGMICH_ANDROID_TAG
+#    define LOGMICH_ANDROID_TAG "logmich"
+#  endif
 #endif
 
 namespace logmich {
@@ -47,7 +50,8 @@ std::string_view log_pretty_print(std::string_view str)
 
 Logger::Logger() :
 #if defined(__ANDROID__)
-  // stderr often invisible under adb logcat -s SDL:*; INFO + SuperTux tag.
+  // stderr is often invisible under adb logcat; default to DEBUG so early
+  // boot messages are visible. Override with set_log_level() as needed.
   m_log_level(LogLevel::DEBUG)
 #else
   m_log_level(LogLevel::WARNING)
@@ -122,7 +126,7 @@ Logger::append(std::ostream& out,
     } else {
       composed = std::string(file) + ":" + std::to_string(line) + ": " + std::string(msg);
     }
-    __android_log_write(prio, "SuperTux", composed.c_str());
+    __android_log_write(prio, LOGMICH_ANDROID_TAG, composed.c_str());
   }
 #endif
 }

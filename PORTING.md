@@ -1786,3 +1786,24 @@ while keeping SuperTux-specific hygiene that is still general:
 These changes are library-generic and should be the basis for an upstream
 tinycmmc PR. Project-local packaging still lives in the SuperTux / Pingus /
 Windstille flakes.
+
+## logmich Android logcat (upstream prep)
+
+SuperTux previously hard-coded the logcat tag `"SuperTux"` and forced
+DEBUG level under `__ANDROID__`. Both are useful on device (stderr is
+often invisible under `adb logcat -s SDL:*`) but the tag is project-
+specific.
+
+Generalised form now in `external/logmich`:
+
+- Tag is `LOGMICH_ANDROID_TAG` (compile definition), defaulting to
+  `"logmich"` when unset. SuperTux Android builds pass
+  `-DLOGMICH_ANDROID_TAG=\"SuperTux\"` via `nix/android.nix` APP_CPPFLAGS.
+- Default level under Android remains DEBUG; desktop remains WARNING.
+  Callers can still `set_log_level()` at runtime.
+
+CMakeLists restored top-level-only install/export guard (Windstille
+style) so embedded `add_subdirectory(external/logmich)` does not pollute
+the parent install tree. Warnings simplified to `-Wall -Wextra -Wpedantic`.
+
+These changes are library-generic and ready for an upstream logmich PR.
