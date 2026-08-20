@@ -147,10 +147,10 @@ PhysfsSubsystem::PhysfsSubsystem(char const* argv0,
   // allow symbolic links
   PHYSFS_permitSymbolicLinks(1);
 
-  log_warn("PhysFS initialized");
+  log_debug("PhysFS initialized");
   find_userdir();
   find_datadir();
-  log_warn("PhysFS userdir/datadir setup done");
+  log_debug("PhysFS userdir/datadir setup done");
 }
 
 void PhysfsSubsystem::find_datadir() const
@@ -219,7 +219,7 @@ void PhysfsSubsystem::find_datadir() const
         // Preferred: single zip layer (the APK). PhysFS 3.2+.
         if (PHYSFS_setRoot(basedir, "assets"))
         {
-          log_warn("PhysFS: APK mounted with root 'assets/' (no nested data.zip)");
+          log_debug("PhysFS: APK mounted with root 'assets/' (no nested data.zip)");
         }
         else
         {
@@ -236,7 +236,7 @@ void PhysfsSubsystem::find_datadir() const
             }
             else
             {
-              log_warn("PhysFS: mounted legacy assets/data.zip (nested; slower)");
+              log_debug("PhysFS: mounted legacy assets/data.zip (nested; slower)");
             }
           }
           else
@@ -385,13 +385,12 @@ void PhysfsSubsystem::find_userdir() const
 void PhysfsSubsystem::print_search_path()
 {
   char const* writedir = PHYSFS_getWriteDir();
-  // log_warn: visible on Android even before args raise the log level.
-  log_warn("PhysfsWriteDir: {}", (writedir ? writedir : "(null)"));
-  log_warn("PhysfsSearchPath:");
+  log_debug("PhysfsWriteDir: {}", (writedir ? writedir : "(null)"));
+  log_debug("PhysfsSearchPath:");
   char** searchpath = PHYSFS_getSearchPath();
   for (char** i = searchpath; *i != nullptr; ++i)
   {
-    log_warn("  {}", *i);
+    log_debug("  {}", *i);
   }
   PHYSFS_freeList(searchpath);
 }
@@ -482,32 +481,32 @@ Main::launch_game(CommandLineArguments const& args)
   m_video_system = VideoSystem::create(VideoSystem::VIDEO_AUTO);
 #endif
   init_video();
-  log_warn("init: video ready ({})", m_video_system ? "ok" : "null");
+  log_debug("init: video ready ({})", m_video_system ? "ok" : "null");
 
   m_ttf_surface_manager.reset(new TTFSurfaceManager());
 
   s_timelog.log("audio");
-  log_warn("init: creating SoundManager…");
+  log_debug("init: creating SoundManager…");
   m_sound_manager.reset(new SoundManager());
   m_sound_manager->enable_sound(g_config->sound_enabled);
   m_sound_manager->enable_music(g_config->music_enabled);
   m_sound_manager->set_sound_volume(g_config->sound_volume);
   m_sound_manager->set_music_volume(g_config->music_volume);
-  log_warn("init: audio ready");
+  log_debug("init: audio ready");
 
   s_timelog.log("scripting");
-  log_warn("init: creating Squirrel VM…");
+  log_debug("init: creating Squirrel VM…");
   m_squirrel_virtual_machine.reset(new SquirrelVirtualMachine(g_config->enable_script_debugger));
-  log_warn("init: Squirrel VM ready");
+  log_debug("init: Squirrel VM ready");
 
   s_timelog.log("resources");
-  log_warn("init: TileManager…");
+  log_debug("init: TileManager…");
   m_tile_manager.reset(new TileManager());
-  log_warn("init: SpriteManager…");
+  log_debug("init: SpriteManager…");
   m_sprite_manager.reset(new SpriteManager());
-  log_warn("init: Resources (fonts/surfaces — can be slow on Android)…");
+  log_debug("init: Resources (fonts/surfaces — can be slow on Android)…");
   m_resources.reset(new Resources());
-  log_warn("init: Resources ready");
+  log_debug("init: Resources ready");
 
   m_console.reset(new Console(*m_console_buffer));
 
@@ -516,9 +515,9 @@ Main::launch_game(CommandLineArguments const& args)
   m_savegame = std::make_unique<Savegame>(std::string());
 
   m_game_manager.reset(new GameManager());
-  log_warn("init: ScreenManager…");
+  log_debug("init: ScreenManager…");
   m_screen_manager.reset(new ScreenManager(*m_video_system, *m_input_manager));
-  log_warn("init: ScreenManager ready");
+  log_debug("init: ScreenManager ready");
 
   if (!args.filenames.empty())
   {
@@ -580,12 +579,12 @@ Main::launch_game(CommandLineArguments const& args)
   }
   else
   {
-    log_warn("init: pushing TitleScreen…");
+    log_debug("init: pushing TitleScreen…");
     m_screen_manager->push_screen(std::make_unique<TitleScreen>(*m_savegame));
-    log_warn("init: TitleScreen pushed");
+    log_debug("init: TitleScreen pushed");
   }
 
-  log_warn("init: entering ScreenManager::run() (first frame)");
+  log_debug("init: entering ScreenManager::run() (first frame)");
   m_screen_manager->run();
 }
 

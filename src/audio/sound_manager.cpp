@@ -192,57 +192,19 @@ SoundManager::SoundManager() :
   if (m_sound_mgr.is_dummy()) {
     log_warning("SoundManager: OpenAL device unavailable — audio is disabled (dummy mode)");
   } else {
-    log_warn("SoundManager: OpenAL device opened successfully");
+    log_debug("SoundManager: OpenAL device opened successfully");
 #if defined(__EMSCRIPTEN__)
-    // Emscripten OpenAL → Web Audio. 3D inverse-distance attenuation with
+    // Emscripten OpenAL → Web Audio. Inverse-distance attenuation with
     // pixel-scale positions + listener z=-300 often yields near-silent gain
-    // in the browser implementation; use a flat model for 2D gameplay.
+    // in the browser; use a flat model for 2D gameplay (not a temporary debug
+    // switch — keep enabled).
     alDistanceModel(AL_NONE);
     alListenerf(AL_GAIN, 1.0f);
-    {
-      char const* vendor = reinterpret_cast<char const*>(alGetString(AL_VENDOR));
-      char const* version = reinterpret_cast<char const*>(alGetString(AL_VERSION));
-      char const* renderer = reinterpret_cast<char const*>(alGetString(AL_RENDERER));
-      log_warn("SoundManager: OpenAL vendor='{}' version='{}' renderer='{}'",
-               vendor ? vendor : "?", version ? version : "?", renderer ? renderer : "?");
-    }
-    log_warn("SoundManager: WASM — AL_DISTANCE_MODEL=AL_NONE; autoplay may mute until first click/tap");
-#endif
-    // PhysFS open probes (mount / path issues).
-    try {
-      auto is = std::make_unique<IFileStream>("sounds/coin.wav");
-      (void)is;
-      log_warn("SoundManager: PhysFS probe open of sounds/coin.wav succeeded");
-    } catch (std::exception const& e) {
-      log_warning("SoundManager: PhysFS probe open of sounds/coin.wav failed: {}", e.what());
-    }
-    try {
-      auto is = std::make_unique<IFileStream>("/music/misc/theme.ogg");
-      (void)is;
-      log_warn("SoundManager: PhysFS probe open of /music/misc/theme.ogg succeeded");
-    } catch (std::exception const& e) {
-      log_warning("SoundManager: PhysFS probe open of /music/misc/theme.ogg failed: {}", e.what());
-    }
-#if defined(__EMSCRIPTEN__)
-    // Decode + OpenAL buffer probe (WASM only — full decode is slow on Android).
-    try {
-      auto src = m_sound_mgr.sound().prepare("sounds/coin.wav",
-                                            wstsound::SoundSourceType::STATIC);
-      src->set_relative(true);
-      src->set_position(0.f, 0.f, 0.f);
-      src->set_gain(0.0f); // silent probe — only validates decode/buffer path
-      src->play();
-      auto st = src->get_state();
-      log_warn("SoundManager: decode probe sounds/coin.wav SourceState={} (0=Playing,1=Paused,2=Finished)",
-               static_cast<int>(st));
-      src->finish();
-    } catch (std::exception const& e) {
-      log_warning("SoundManager: decode probe sounds/coin.wav failed: {}", e.what());
-    }
+    log_debug("SoundManager: WASM AL_DISTANCE_MODEL=AL_NONE (flat 2D); autoplay may mute until first gesture");
 #endif
   }
-  log_warn("SoundManager: sound_enabled={} music_enabled={}",
-           m_sound_enabled, m_music_enabled);
+  log_debug("SoundManager: sound_enabled={} music_enabled={}",
+            m_sound_enabled, m_music_enabled);
 }
 
 void
@@ -269,9 +231,6 @@ SoundManager::play(std::string const& name, Vector const& pos, const float gain)
     source->set_gain(gain);
     // Re-assert play after gain/position (some AL paths apply attributes better pre-play).
     source->play();
-#if defined(__EMSCRIPTEN__)
-    log_warn("SoundManager::play('{}') gain={} (relative, AL_NONE distance model)", name, gain);
-#endif
     m_sources.emplace_back(std::move(source));
     log_debug("SoundManager::play('{}') gain={} pos=({},{})", name, gain, pos.x, pos.y);
   } catch (std::exception const& e) {

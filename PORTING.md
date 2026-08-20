@@ -1592,3 +1592,21 @@ big-endian bitfield layout. MinGW has no endian.h.
 Fix: include only `<glm/glm.hpp>` + `<glm/gtx/io.hpp>` (and
 `gtx/rotate_vector` in geomcpp). Core geometric ops (length, normalize,
 dot, distance) come from glm.hpp; packing is unused by SuperTux.
+
+## Debug noise cleanup (2026-08)
+
+Porting left several `log_warn` progress paths that drown real warnings:
+
+- **WASM audio** (`e81d460`): keep functional mitigations
+  (`alDistanceModel(AL_NONE)`, relative SFX at origin). Dropped per-play
+  `log_warn`, PhysFS/decode success probes, and boot vendor spam →
+  `log_debug` only. Failure paths stay `log_warning`.
+- **Android init** (`f2ad40d`): `init: …` milestones and PhysFS search-path
+  dump demoted to `log_debug` (raise log level when diagnosing boot hangs).
+- **R36S**: already `CMAKE_BUILD_TYPE=Release` in `nix/r36s.nix` — not a
+  full debug build.
+
+## MinGW: FLT_MAX / cfloat
+
+`colorspace_oklab.cpp` uses `FLT_MAX` without `<cfloat>`. Linux headers often
+pull it transitively; MinGW does not → add the include.
