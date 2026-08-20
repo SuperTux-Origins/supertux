@@ -335,7 +335,7 @@ set_target_properties(supertux-origins_lib PROPERTIES COMPILE_FLAGS "${SUPERTUX-
 if(EMSCRIPTEN)
   # EXTRA_EXPORTED_RUNTIME_METHODS was removed in modern emscripten; use EXPORTED_RUNTIME_METHODS only.
   target_link_options(supertux-origins PUBLIC
-    "SHELL:-sEXPORTED_FUNCTIONS=['_main','_set_resolution','_save_config','_onDownloadProgress','_onDownloadFinished','_onDownloadError','_onDownloadAborted','_getExceptionMessage']"
+    "SHELL:-sEXPORTED_FUNCTIONS=['_main','_set_resolution','_save_config','_onDownloadProgress','_onDownloadFinished','_onDownloadError','_onDownloadAborted','_getExceptionMessage','_st_emscripten_audio_resume','_st_emscripten_audio_pause','_emscripten_pause_main_loop','_emscripten_resume_main_loop']"
     "SHELL:-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']")
 endif()
 

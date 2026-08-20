@@ -64,7 +64,7 @@ LINK_FLAGS=(
   "SHELL:-lidbfs.js"
   # Only symbols Pingus actually provides today (+ emscripten main-loop helpers).
   # SuperTux _st_emscripten_* hooks are optional in shell.html when missing.
-  "SHELL:-sEXPORTED_FUNCTIONS=_main,_emscripten_pause_main_loop,_emscripten_resume_main_loop"
+  "SHELL:-sEXPORTED_FUNCTIONS=_main,_emscripten_pause_main_loop,_emscripten_resume_main_loop,_st_emscripten_audio_resume,_st_emscripten_audio_pause,_set_resolution,_save_config"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,FS"
 )
 if [ "${ENABLE_ASYNCIFY:-0}" = 1 ]; then

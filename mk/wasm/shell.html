@@ -405,7 +405,7 @@
           else
             throw new Error('emscripten_resume_main_loop not exported');
         }
-        /* SDL_mixer runs outside the main loop — pause/resume with it. */
+        /* OpenAL → Web Audio: suspend/resume with the main loop. */
         try {
           if (paused) {
             if (typeof Module._st_emscripten_audio_pause === 'function')
@@ -418,7 +418,7 @@
             else if (typeof Module.ccall === 'function')
               Module.ccall('st_emscripten_audio_resume', null, [], []);
           }
-        } catch (ae) { console.warn('Pingus: audio pause failed', ae); }
+        } catch (ae) { console.warn('SuperTux: audio pause/resume failed', ae); }
         stLoopPaused = paused;
         if (fromUser) stUserPaused = paused;
         var bp = document.getElementById('btn-pause');
@@ -426,7 +426,7 @@
           bp.textContent = stLoopPaused ? 'Resume' : 'Pause';
           bp.className = stLoopPaused ? 'active' : '';
         }
-      } catch (e) { console.warn('Pingus: main-loop pause failed', e); }
+      } catch (e) { console.warn('SuperTux: main-loop pause failed', e); }
     }
 
     function stEnablePauseControls() {
@@ -441,6 +441,29 @@
           /* Only auto-resume if the user did not press Pause. */
           stSetLoopPaused(false, false);
         }
+      });
+    }
+
+    /* Browser autoplay policy: AudioContext starts suspended until a user
+       gesture. Unlock on first pointer/key event so OpenAL music/SFX can play. */
+    var stAudioUnlocked = false;
+    function stUnlockAudio() {
+      if (stAudioUnlocked) return;
+      if (typeof Module === 'undefined') return;
+      try {
+        if (typeof Module._st_emscripten_audio_resume === 'function')
+          Module._st_emscripten_audio_resume();
+        else if (typeof Module.ccall === 'function')
+          Module.ccall('st_emscripten_audio_resume', null, [], []);
+        stAudioUnlocked = true;
+        console.log('SuperTux: audio unlock requested after user gesture');
+      } catch (e) {
+        console.warn('SuperTux: audio unlock failed', e);
+      }
+    }
+    function stEnableAudioUnlock() {
+      ['pointerdown', 'touchstart', 'keydown', 'mousedown'].forEach(function(ev) {
+        document.addEventListener(ev, stUnlockAudio, { once: false, passive: true });
       });
     }
 
@@ -490,7 +513,8 @@
       }],
       postRun: [function() {
         console.log('[supertux-shell] postRun (main returned; main loop may still be active)');
-        stEnableDisplayButtons(); stEnablePauseControls(); stEnableBackupButtons();
+        stEnableDisplayButtons(); stEnablePauseControls();
+      stEnableAudioUnlock(); stEnableBackupButtons();
         setTimeout(stNotifyCanvasResize, 0);
         setTimeout(stNotifyCanvasResize, 100);
       }],

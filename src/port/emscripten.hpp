@@ -31,6 +31,8 @@ extern "C" {
 void set_resolution(int w, int h);
 void save_config();
 void init_emscripten();
+void st_emscripten_audio_resume();
+void st_emscripten_audio_pause();
 void onDownloadProgress(int id, int loaded, int total);
 void onDownloadFinished(int id);
 void onDownloadError(int id);
@@ -85,6 +87,57 @@ char const*
 getExceptionMessage(intptr_t address)
 {
   return reinterpret_cast<std::exception*>(address)->what();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void
+st_emscripten_audio_resume()
+{
+  /* Emscripten OpenAL is a thin wrapper around Web Audio. Browsers start
+     AudioContext in 'suspended' until a user gesture. Resume the context
+     that emscripten's AL runtime holds (global AL.currentCtx.audioCtx). */
+  EM_ASM({
+    try {
+      if (typeof AL !== 'undefined' && AL.currentCtx && AL.currentCtx.audioCtx) {
+        var ctx = AL.currentCtx.audioCtx;
+        if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
+          ctx.resume().then(function() {
+            console.log('SuperTux: Web Audio context resumed (' + ctx.state + ')');
+          }).catch(function(e) {
+            console.warn('SuperTux: Web Audio resume failed', e);
+          });
+        } else {
+          console.log('SuperTux: Web Audio context state=' + ctx.state);
+        }
+      } else {
+        console.warn('SuperTux: no AL.currentCtx.audioCtx yet (OpenAL not open?)');
+      }
+    } catch (e) {
+      console.warn('SuperTux: st_emscripten_audio_resume error', e);
+    }
+  });
+}
+
+EMSCRIPTEN_KEEPALIVE
+void
+st_emscripten_audio_pause()
+{
+  EM_ASM({
+    try {
+      if (typeof AL !== 'undefined' && AL.currentCtx && AL.currentCtx.audioCtx) {
+        var ctx = AL.currentCtx.audioCtx;
+        if (ctx.state === 'running') {
+          ctx.suspend().then(function() {
+            console.log('SuperTux: Web Audio context suspended');
+          }).catch(function(e) {
+            console.warn('SuperTux: Web Audio suspend failed', e);
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('SuperTux: st_emscripten_audio_pause error', e);
+    }
+  });
 }
 
 } // extern "C"
