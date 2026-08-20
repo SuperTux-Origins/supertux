@@ -405,8 +405,8 @@ Newer libstdc++ / C++ modes no longer pull it in transitively.
 ### Android flake outputs
 
 ```
-nix build .#supertux-android   # APK (meta.broken until full jni link)
-nix build .#android-sdl-libs   # SDL2 .so prebuilts only
+nix build .#supertux-origins-android   # APK (meta.broken until full jni link)
+nix build .#supertux-origins-android-sdl-libs   # SDL2 .so prebuilts only
 ```
 
 Requires `nixpkgs.config.allowUnfree` and `android_sdk.accept_license = true`.
@@ -426,8 +426,8 @@ Android NDK: `mk/android/scripts/build-external-static.sh` builds one
 
 ### Unblocking wasm / android evaluation (2026-08-19)
 
-`meta.broken` was removed from `supertux-wasm` and `supertux-android` so
-`nix build .#supertux-wasm` and `nix build .#supertux-android` report real
+`meta.broken` was removed from `supertux-origins-wasm` and `supertux-origins-android` so
+`nix build .#supertux-origins-wasm` and `nix build .#supertux-origins-android` report real
 builder errors instead of evaluation refusal.
 
 WASM deps: `logmich`, `sexpcpp`, `strutcpp` are built under `emscriptenStdenv`
@@ -438,10 +438,10 @@ porting step.
 ### R36S package outputs
 
 ```
-nix build .#arkos-sysroot              # needs real sysroot URL or sysrootSrc=
-nix build .#supertux-r36s
-nix build .#supertux-r36s-portmaster
-nix build .#supertux-r36s-portmaster-zip
+nix build .#supertux-origins-arkos-sysroot              # needs real sysroot URL or sysrootSrc=
+nix build .#supertux-origins-r36s
+nix build .#supertux-origins-r36s-portmaster
+nix build .#supertux-origins-r36s-portmaster-zip
 ```
 
 Until a permanent sysroot tarball is hosted, either:
@@ -1023,7 +1023,7 @@ Fix in `PhysfsSubsystem`:
 
 ### WASM: nix run / website packaging
 
-`nix run .#supertux-wasm` failed because the derivation had no
+`nix run .#supertux-origins-wasm` failed because the derivation had no
 `bin/` mainProgram (emscripten outputs lived only under
 `share/…`). Match Pingus:
 
@@ -1428,10 +1428,10 @@ ABI (e.g. `arm64-v8a` only) in `jni/Application.mk` / nix `targetAbis`.
 
 | Attribute | APP_ABI |
 |-----------|--------|
-| `.#supertux-android` | armeabi-v7a arm64-v8a x86_64 (default / full) |
-| `.#supertux-android-arm64-v8a` | arm64-v8a only |
-| `.#supertux-android-armeabi-v7a` | armeabi-v7a only |
-| `.#supertux-android-x86_64` | x86_64 only |
+| `.#supertux-origins-android` | armeabi-v7a arm64-v8a x86_64 (default / full) |
+| `.#supertux-origins-android-arm64-v8a` | arm64-v8a only |
+| `.#supertux-origins-android-armeabi-v7a` | armeabi-v7a only |
+| `.#supertux-origins-android-x86_64` | x86_64 only |
 
 SDL/audio prebuilts are still built for **all** ABIs once; only `libmain.so`
 ndk-build is restricted. Use a single-ABI attr for day-to-day iteration.
@@ -1651,14 +1651,13 @@ A second `cp -L src $out/bin/` then fails with `are the same file` when the
 destination is a hardlink to the same store object. Materialize via
 temp file + `mv -f` instead.
 
-## Wine apps (nix run .#supertux-win32)
+## Wine apps
 
 Pingus-style `mkWineApp` on Linux hosts:
 
 ```bash
-nix run .#supertux-win32            # flat package (exe + DLLs + data/) under Wine
-nix run .#supertux-origins-win32    # alias
-nix run .#supertux-mingw64          # store layout (bin/*.exe)
+nix run .#supertux-origins-win32      # flat package (exe + DLLs + data/) under Wine
+nix run .#supertux-origins-mingw64    # store layout (bin/*.exe)
 ```
 
 Uses `wineWow64Packages.stable`, fresh `WINEPREFIX`, `WINEARCH=win64`, and

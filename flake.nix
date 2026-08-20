@@ -450,16 +450,14 @@
             freetypeSrc = freetype-src;
             sdl2TtfSrc = sdl2-ttf-src;
           }).supertux-wasm;
-          # Short alias
-          supertux-wasm = supertux-origins-wasm;
 
           # ---------------------------------------------------------------
           # Android (requires allowUnfree + android_sdk.accept_license)
-          #   nix build .#supertux-android              # all ABIs (default)
-          #   nix build .#supertux-android-arm64-v8a    # single ABI (faster)
-          #   nix build .#supertux-android-armeabi-v7a
-          #   nix build .#supertux-android-x86_64
-          #   nix build .#android-sdl-libs
+          #   nix build .#supertux-origins-android              # all ABIs (default)
+          #   nix build .#supertux-origins-android-arm64-v8a    # single ABI (faster)
+          #   nix build .#supertux-origins-android-armeabi-v7a
+          #   nix build .#supertux-origins-android-x86_64
+          #   nix build .#supertux-origins-android-sdl-libs
           # Expect failures until jni links full game deps from external/.
           # ---------------------------------------------------------------
         } // (
@@ -518,22 +516,22 @@
               };
             };
           in {
-            android-sdl-libs = android.sdlAndroidLibs;
+            supertux-origins-android-sdl-libs = android.sdlAndroidLibs;
             # Default: all ABIs in one APK (release-style, slower native compile).
-            supertux-android = (mkAndroidApk allAndroidAbis).overrideAttrs
+            supertux-origins-android = (mkAndroidApk allAndroidAbis).overrideAttrs
               (metaAndroid "SuperTux Origins Android APK (armeabi-v7a + arm64-v8a + x86_64)");
             # Fast single-ABI iteration outputs:
-            supertux-android-armeabi-v7a = (mkAndroidApk [ "armeabi-v7a" ]).overrideAttrs
+            supertux-origins-android-armeabi-v7a = (mkAndroidApk [ "armeabi-v7a" ]).overrideAttrs
               (metaAndroid "SuperTux Origins Android APK (armeabi-v7a only)");
-            supertux-android-arm64-v8a = (mkAndroidApk [ "arm64-v8a" ]).overrideAttrs
+            supertux-origins-android-arm64-v8a = (mkAndroidApk [ "arm64-v8a" ]).overrideAttrs
               (metaAndroid "SuperTux Origins Android APK (arm64-v8a only)");
-            supertux-android-x86_64 = (mkAndroidApk [ "x86_64" ]).overrideAttrs
+            supertux-origins-android-x86_64 = (mkAndroidApk [ "x86_64" ]).overrideAttrs
               (metaAndroid "SuperTux Origins Android APK (x86_64 only)");
           }
         ) // (
           # R36S / ArkOS hybrid cross (modern GCC + ArkOS glibc/SDL2/GLES sysroot).
           # Sysroot tarball URL is still a placeholder — pass a local path:
-          #   nix build .#supertux-r36s \
+          #   nix build .#supertux-origins-r36s \
           #     edit nix/r36s.nix: sysrootSrc = /path/to/arkos-sysroot4.tar.gz;
           # or replace the URL in nix/r36s.nix after `nix store prefetch-file`.
           # Local sysroot: mk/r36s/scripts/make-sysroot-debootstrap.sh
@@ -559,10 +557,10 @@
               version = r36sVersion;
             };
           in {
-            arkos-sysroot = r36s.arkosSysroot;
-            supertux-r36s = game;
-            supertux-r36s-portmaster = portMaster;
-            supertux-r36s-portmaster-zip = r36s.mkSuperTuxR36sPortMasterZip {
+            supertux-origins-arkos-sysroot = r36s.arkosSysroot;
+            supertux-origins-r36s = game;
+            supertux-origins-r36s-portmaster = portMaster;
+            supertux-origins-r36s-portmaster-zip = r36s.mkSuperTuxR36sPortMasterZip {
               portMasterPkg = portMaster;
               version = r36sVersion;
             };
@@ -572,27 +570,18 @@
 
         apps = {
           #   nix run .#supertux-origins-wasm
-          #   nix run .#supertux-wasm
           supertux-origins-wasm = {
             type = "app";
             program = "${packages.supertux-origins-wasm}/bin/supertux-wasm";
             meta.description = "Serve and open SuperTux Origins wasm in a browser";
           };
-          supertux-wasm = {
-            type = "app";
-            program = "${packages.supertux-origins-wasm}/bin/supertux-wasm";
-            meta.description = "Serve and open SuperTux Origins wasm in a browser";
-          };
         } // lib.optionalAttrs wineAppsEnabled {
-          # MinGW flat package under Wine (Linux x86_64 flake system only).
           #   nix run .#supertux-origins-win32
+          #   nix run .#supertux-origins-mingw64
           supertux-origins-win32 = mkWineApp packages.supertux-origins-win32 "supertux-origins-win32"
             "SuperTux Origins (MinGW x86_64) via Wine";
           supertux-origins-mingw64 = mkWineApp packages.supertux-origins-mingw64 "supertux-origins-mingw64"
             "SuperTux Origins MinGW store package via Wine (bin/)";
-          # Short aliases
-          supertux-win32 = mkWineApp packages.supertux-origins-win32 "supertux-win32"
-            "SuperTux Origins (MinGW x86_64) via Wine";
         };
       }
     );

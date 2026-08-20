@@ -100,7 +100,7 @@ derivations under `packages`/`checks`.
 On a Linux host (after a successful MinGW package):
 
 ```bash
-nix run .#supertux-win32
+nix run .#supertux-origins-win32
 ```
 
 See `PORTING.md` (Wine apps) and Pingus `mkWineApp`.
