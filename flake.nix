@@ -222,33 +222,34 @@
             useGLES2 = true;
           };
 
-          # Windows packages require a MinGW cross build, not the native Linux package.
-          # When evaluating on Linux, build with pkgsCross.mingwW64 (or mingw32).
-          # When already on Windows, the native package is the Windows binary.
-          # Pick a flake's package for the current host, falling back to any
-          # available system (grumnix *-win32 flakes differ: some use
-          # flake-utils linux systems, others tinycmmc eachWin32System).
-          pickWinFlakePkg = flake:
+          # Windows (MinGW-w64) — patterned after Pingus mkPingus:
+          #   SDL2* from grumnix *-win32 flakes as packages.${system}.SDL2-win64
+          #   C++ deps ideally built with pkgsCross.mingwW64 (not host Linux libs)
+          #
+          # Nix gotcha: `a or b or throw "x"` is parsed as `(a or b or throw) "x"`
+          # (function application binds tighter than `or`). Always parenthesize throw.
+          pickWinFlakePkg = flake: names:
             let
               all = flake.packages or {};
               systems = builtins.attrNames all;
               prefer = [
-                pkgs.stdenv.hostPlatform.system
+                system
                 "x86_64-linux"
                 "aarch64-linux"
                 "x86_64-windows"
                 "i686-windows"
               ];
+              matches = builtins.filter (s: builtins.elem s systems) prefer;
               sys =
-                let matches = builtins.filter (s: builtins.elem s systems) prefer;
-                in if matches != [] then builtins.head matches
-                   else if systems != [] then builtins.head systems
-                   else throw "pickWinFlakePkg: flake has no packages";
+                if matches != [] then builtins.head matches
+                else if systems != [] then builtins.head systems
+                else throw "pickWinFlakePkg: flake has no packages.*";
               set = all.${sys};
+              tryName = n: if builtins.hasAttr n set then set.${n} else null;
+              found = builtins.filter (x: x != null) (map tryName names);
             in
-              set.default or set.SDL2-win64 or set.SDL2_ttf or set.SDL2_image
-              or set.physfs or set.curl or set.glew
-              or throw "pickWinFlakePkg: no usable package under packages.${sys}";
+              if found != [] then builtins.head found
+              else throw ("pickWinFlakePkg: none of ${builtins.toString names} under packages.${sys}");
 
           supertux-origins-mingw64 =
             if pkgs.stdenv.hostPlatform.isWindows then
@@ -256,28 +257,36 @@
             else
               let
                 pkgsW = pkgs.pkgsCross.mingwW64;
+                # Same naming as Pingus: SDL2-win64 on the *host* flake packages.
+                sdl2w = pickWinFlakePkg SDL2-win32 [ "SDL2-win64" "default" ];
+                sdl2imgw = pickWinFlakePkg SDL2_image-win32 [ "SDL2_image-win64" "default" ];
+                sdl2ttfw = pickWinFlakePkg SDL2_ttf-win32 [ "SDL2_ttf" "default" ];
+                physfsw = pickWinFlakePkg physfs-win32 [ "default" "physfs" ];
+                curlw = pickWinFlakePkg curl-win32 [ "default" "curl" ];
               in
               (pkgsW.callPackage ./supertux-origins.nix {
                 inherit self;
-                SDL2 = pickWinFlakePkg SDL2-win32;
-                SDL2_image = pickWinFlakePkg SDL2_image-win32;
-                SDL2_ttf = pickWinFlakePkg SDL2_ttf-win32;
-                physfs = pickWinFlakePkg physfs-win32;
-                curl = pickWinFlakePkg curl-win32;
-                # GLEW removed from desktop Linux; Windows still uses GLAD only.
-                glew = null;
-                sexpcpp = sexpcpp-pkg; # may still be host — WIP
-                squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
-                tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
+                SDL2 = sdl2w;
+                SDL2_image = sdl2imgw;
+                SDL2_ttf = sdl2ttfw;
+                physfs = physfsw;
+                curl = curlw;
+                glew = null; # GLAD vendored; no GLEW on Windows either
+                # WIP: these are still *host* packages until each has a mingw
+                # derivation (Pingus builds the equivalent graph with pkgs').
+                sexpcpp = sexpcpp-pkg;
+                squirrel = squirrel.packages.${system}.default;
+                tinycmmc = tinycmmc.packages.${system}.default;
                 strutcpp = strutcpp-pkg;
-                miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
-                wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
+                miniswig = miniswig.packages.${system}.default;
+                wstsound = wstsound.packages.${system}.default;
                 priocpp = priocpp-pkg;
                 logmich = logmich-pkg;
                 glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
                 xdgcpp = null;
                 libsm = null;
                 libice = null;
+                libGL = null; # desktop GL via GLAD + opengl32 on Windows
                 mcfgthreads = pkgsW.windows.mcfgthreads or pkgs.windows.mcfgthreads;
                 gtest = null;
               });

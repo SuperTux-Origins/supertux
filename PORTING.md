@@ -1514,3 +1514,22 @@ Desktop OpenGL 3.3 uses vendored GLAD (`external/glad`, core 3.3 only).
 so the game binary should not pick up GLEW's forced `-lX11`. SDL may still
 use X11 at runtime for the window; that is independent of the GL loader.
 
+
+## Windows MinGW (`.#supertux-origins-mingw64`) vs Pingus
+
+Pingus pattern (`mkPingus`):
+- `pkgsCross.mingwW64.callPackage` for the game
+- SDL2/SDL2_image from `SDL2-win32.packages.${system}."SDL2-win64"`
+- C++ deps (logmich, strutcpp, wstsound, …) built with the **same** `pkgs'`
+- Flat package + zip as a separate `runCommand`
+
+SuperTux today:
+- Same SDL2-* win64 flake inputs via `pickWinFlakePkg`
+- **Still passes host Linux** sexpcpp/squirrel/wstsound/… into the cross
+  `callPackage` — that will fail at build or link until those are mingw builds
+- GLAD replaces GLEW (no glew-win32 required)
+- `supertux-origins-win32` is only a flat re-layout of the mingw result
+
+Nix note: never write `x or throw "msg"` without parentheses around
+`(throw "msg")` — application binds tighter than `or`.
+

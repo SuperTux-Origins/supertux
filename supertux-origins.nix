@@ -5,7 +5,7 @@
 , cmake
 , pkg-config
 , makeWrapper
-, libGL
+, libGL ? null
 , libsm ? null
 , libice ? null
 
@@ -88,7 +88,8 @@ EOF
        # closure via LD_LIBRARY_PATH. This is not raw X11 usage by SuperTux.
        wrapProgram $out/bin/supertux-origins \
          --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath (
-           [ SDL2 SDL2_image SDL2_ttf curl libGL physfs ]
+           [ SDL2 SDL2_image SDL2_ttf curl physfs ]
+           ++ lib.optional (libGL != null) libGL
            ++ lib.optional (libsm != null) libsm
            ++ lib.optional (libice != null) libice
            ++ lib.optional (xdgcpp != null) xdgcpp
