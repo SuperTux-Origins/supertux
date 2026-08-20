@@ -81,14 +81,18 @@ EOF
        ln -sfv ${wstsound}/bin/*.dll $out/bin/
     '')
     + (lib.optionalString stdenv.hostPlatform.isLinux ''
-       # SDL2 pulls X11 libs (libSM/libICE/…) that are not always in RPATH.
+       # The game only uses SDL. Under pure Nix, the dynamic linker still has to
+       # resolve libraries *SDL2* is linked against (X11 backend). DT_RUNPATH on
+       # our binary does not help transitive deps, so expose the usual SDL2
+       # closure via LD_LIBRARY_PATH. This is not raw X11 usage by SuperTux.
        wrapProgram $out/bin/supertux-origins \
          --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([
            SDL2 SDL2_image SDL2_ttf curl glew libGL physfs
-           xorg.libSM xorg.libICE xorg.libX11 xorg.libXext
-           xorg.libXrandr xorg.libXi xorg.libXcursor xorg.libXss
+           # SDL2 X11 video backend (see libSM.so.6 runtime error without these)
+           xorg.libSM xorg.libICE
          ] ++ lib.optional (xdgcpp != null) xdgcpp)}
     '');
+
 
   nativeBuildInputs = [
     cmake
