@@ -113,10 +113,13 @@ adapted from Pingus and Windstille.
 
 ## WASM audio
 
-- [ ] **Confirm OpenAL + Vorbis at runtime** — link includes `-lopenal`,
-      `WSTSOUND_WITH_VORBIS=ON`, modplug. Browser autoplay policy may require a
-      user gesture before audio starts; check console for OpenAL device errors.
-      If silent after click/key, dig into `OpenALSystem` init and sample rates.
+- [x] Trace path + boot probes (OpenAL dummy?, PhysFS `sounds/coin.wav` /
+      `/music/misc/theme.ogg`); log play/play_music failures.
+- [x] `st_emscripten_audio_resume` / `pause` + shell unlock on first user gesture.
+- [x] `nix/wasm.nix` `WSTSOUND_WITH_VORBIS=ON` (was OFF, conflicting with
+      CMakeLists FORCE-ON for EMSCRIPTEN).
+- [ ] **Confirm at runtime** in browser console after rebuild (user feedback).
+      Expected: OpenAL opened, PhysFS probes OK, Web Audio resumed after click.
 
 ## Desktop GLES2 validation
 
@@ -134,4 +137,5 @@ adapted from Pingus and Windstille.
 See PORTING.md "WASM performance analysis". Mitigations in bundle 026:
 NPOT on WebGL, assert_gl no-op, no SDL_Delay in rAF loop.
 Still open: lightmap cost, draw-call batching, exception overhead, audio.
+
 

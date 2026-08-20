@@ -1288,3 +1288,56 @@ other always-off codecs removed. The existing `ifndef SUPERTUX_HAVE_VORBIS`
 filter in `Android.mk` still drops the TU when Vorbis libs are not staged,
 and the compile definitions stay consistent either way.
 
+
+## WASM audio path (OpenAL → Web Audio) and silent failures
+
+### Call chain
+
+1. `main.cpp` constructs `SoundManager` after PhysFS mounts `/data`.
+2. SuperTux `SoundManager` wraps `wstsound::SoundManager` with an
+   `open_func` that opens files via `IFileStream` → PhysFS.
+3. `wstsound::SoundManager` ctor calls `OpenALSystem::open_real_device()`
+   → `alcOpenDevice(nullptr)` + context. On failure it nulls `m_openal`
+   (dummy mode) and only prints to **stderr**.
+4. SFX: `SoundManager::play` → `m_sound_mgr.sound().play(path)` →
+   `SoundChannel::prepare` → load WAV/Ogg into static buffer.
+5. Music: `play_music` → stream source from `.ogg` or `.music` descriptor.
+6. Decode: `SoundFile::from_stream` magic-detects WAV / Ogg Vorbis /
+   ModPlug (when `WSTSOUND_WITH_*` is on at compile time).
+7. Emscripten OpenAL is Web Audio under the hood (`AL.currentCtx.audioCtx`).
+
+### Why “no sound and no errors”
+
+| Cause | Symptom | Fix / probe |
+|-------|---------|-------------|
+| OpenAL device failed | dummy mode; all play() no-ops | stderr “Couldn't initialize audio device”; now also `log_warning` at boot |
+| `WSTSOUND_WITH_VORBIS=OFF` | `.ogg` music throws / dummy | `nix/wasm.nix` must pass `-DWSTSOUND_WITH_VORBIS=ON` (CMakeLists FORCE-ON for EMSCRIPTEN) |
+| PhysFS path miss | load fails | probe `sounds/coin.wav` and `/music/misc/theme.ogg` at boot |
+| Browser autoplay policy | device opens, buffers load, **still silent** until gesture | `st_emscripten_audio_resume` + shell unlock on pointer/key |
+| `sound_enabled`/`music_enabled` false | intentional mute | config; logged on `enable_*` |
+
+### Sanity checks added
+
+- Boot: log OpenAL dummy vs real; PhysFS probe open of stock SFX + theme.ogg.
+- `play` / `play_music`: log path, success, failures (not only music catch).
+- `open_func`: log PhysFS open errors before rethrow.
+- `is_audio_enabled()`: reflects dummy + enable flags (was hard-coded `true`).
+- WASM shell: first `pointerdown`/`touchstart`/`keydown`/`mousedown` calls
+  `_st_emscripten_audio_resume` (resumes `AL.currentCtx.audioCtx`).
+- Exported: `_st_emscripten_audio_resume`, `_st_emscripten_audio_pause`.
+
+### Expected console after a working load + click
+
+```
+SoundManager: OpenAL device opened successfully
+SoundManager: WASM build — browser autoplay policy may mute until first click/tap
+SoundManager: PhysFS probe open of sounds/coin.wav succeeded
+SoundManager: PhysFS probe open of /music/misc/theme.ogg succeeded
+…
+SuperTux: audio unlock requested after user gesture
+SuperTux: Web Audio context resumed (running)
+SoundManager::play_music('…') started
+```
+
+If probes fail, check `--preload-file …@/data` and `PHYSFS_mount("/data")`.
+
