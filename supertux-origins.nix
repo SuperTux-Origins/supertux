@@ -6,8 +6,8 @@
 , pkg-config
 , makeWrapper
 , libGL
-, libsm
-, libice
+, libsm ? null
+, libice ? null
 
 , SDL2
 , SDL2_image
