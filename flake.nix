@@ -233,7 +233,7 @@
               all = flake.packages or {};
               systems = builtins.attrNames all;
               prefer = [
-                system
+                pkgs.stdenv.hostPlatform.system
                 "x86_64-linux"
                 "aarch64-linux"
                 "x86_64-windows"
@@ -275,11 +275,11 @@
                 # WIP: these are still *host* packages until each has a mingw
                 # derivation (Pingus builds the equivalent graph with pkgs').
                 sexpcpp = sexpcpp-pkg;
-                squirrel = squirrel.packages.${system}.default;
-                tinycmmc = tinycmmc.packages.${system}.default;
+                squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
+                tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
                 strutcpp = strutcpp-pkg;
-                miniswig = miniswig.packages.${system}.default;
-                wstsound = wstsound.packages.${system}.default;
+                miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
+                wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
                 priocpp = priocpp-pkg;
                 logmich = logmich-pkg;
                 glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
