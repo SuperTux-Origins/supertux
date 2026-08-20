@@ -4,7 +4,7 @@
 # same stdenv so they are actually wasm-compatible (flake input packages are
 # usually native x86_64).
 #
-# Sound path matches Pingus: static libmodplug + in-tree wstsound (WAV + modules).
+# Sound path: static libmodplug + libogg/libvorbis + in-tree wstsound (WAV + .ogg + modules).
 # See mk/wasm/scripts/ and PORTING.md.
 
 { pkgs
@@ -169,7 +169,8 @@ EOFPC
     "-DMODPLUG_INCLUDE_DIRECTORY=${modplugWasm}/include"
     "-DMODPLUG_LIBRARY=${modplugWasm}/lib/libmodplug.a"
     "-DWSTSOUND_WITH_MODPLUG=ON"
-    "-DWSTSOUND_WITH_VORBIS=OFF"
+    # SuperTux ships .ogg music; CMakeLists also FORCE-ON for EMSCRIPTEN.
+    "-DWSTSOUND_WITH_VORBIS=ON"
     "-DWSTSOUND_WITH_OPUS=OFF"
     "-DWSTSOUND_WITH_MPG123=OFF"
     "-DWSTSOUND_WITH_EFX=OFF"
