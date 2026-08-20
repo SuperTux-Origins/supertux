@@ -56,7 +56,8 @@ adapted from Pingus and Windstille.
 - [ ] GLES2 only; GameController / touch via controller scm or Android maps.
 - [ ] Macro hygiene for do/while error helpers (NDK clang).
 - [ ] stb_image staging into jni include path if needed.
-- [ ] jni links physfs / squirrel / wstsound / full external stack.
+- [x] jni links physfs / squirrel / wstsound / full external stack
+      (fix FreeType SDF ftbsdf.c + keep ogg_sound_file.cpp when Vorbis staged).
 - [ ] APK packaging verified (user feedback).
 
 ## R36S / ArkOS

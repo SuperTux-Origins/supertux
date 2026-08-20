@@ -1239,3 +1239,52 @@ Likely contributors to "incredible slow" + 100% CPU:
 5. **GL_NEAREST appearance**: default sampler is LINEAR; some assets may
    request nearest; stretched canvas (pre-resize fix) also looks blocky.
 
+
+## Android linker: missing ft_bitmap_sdf_raster (FreeType SDF)
+
+**Symptom** (ndk-build, armeabi-v7a / arm64-v8a):
+
+```
+ld.lld: error: undefined symbol: ft_bitmap_sdf_raster
+>>> referenced by ftsdfrend.c
+>>> ftsdfrend.o:(ft_bitmap_sdf_renderer_class) in archive .../libfreetype.a
+```
+
+**Cause:** `mk/android/app/jni/freetype_Android.mk` listed the SDF module
+sources incompletely. FreeType’s `bsdf` (bitmap → SDF) renderer in
+`ftsdfrend.c` references `ft_bitmap_sdf_raster`, which is defined in
+`src/sdf/ftbsdf.c` (the `bsdf_raster_*` helpers). The Android.mk had
+`ftsdf.c`, `ftsdfrend.c`, and `ftsdfcommon.c` but omitted `ftbsdf.c`.
+
+**Fix:** Add `src/sdf/ftbsdf.c` to `LOCAL_SRC_FILES` in
+`freetype_Android.mk`. No other SDF files are required for the current
+FreeType version staged by the Android recipe.
+
+## Android linker: missing OggSoundFile constructor (wstsound)
+
+**Symptom:**
+
+```
+ld.lld: error: undefined symbol: wstsound::OggSoundFile::OggSoundFile(...)
+>>> referenced by .../sound_file.o (make_unique<OggSoundFile>)
+```
+
+**Cause:** Two pieces were out of sync:
+
+1. `mk/android/scripts/build-apk.sh` staged all of `external/wstsound/src/*.cpp`
+   then **unconditionally** deleted `ogg_sound_file.cpp` (along with opus/mp3/EFX
+   TUs), with a comment “wav + modplug only”.
+2. When OpenAL + modplug + libogg/libvorbis prebuilts are present,
+   `Android.mk` sets `SUPERTUX_HAVE_VORBIS := 1` and adds
+   `-DWSTSOUND_WITH_VORBIS=1`, so `sound_file.cpp` compiles the
+   `make_unique<OggSoundFile>` branch. The corresponding TU was already
+   removed from the tree, so the constructor never linked.
+
+SuperTux Origins ships `.ogg` music; the in-tree wstsound CMake already
+keeps `WSTSOUND_WITH_VORBIS` on for Android (unlike Opus/MP3).
+
+**Fix:** Stop deleting `ogg_sound_file.cpp` in `build-apk.sh`. Leave the
+other always-off codecs removed. The existing `ifndef SUPERTUX_HAVE_VORBIS`
+filter in `Android.mk` still drops the TU when Vorbis libs are not staged,
+and the compile definitions stay consistent either way.
+
