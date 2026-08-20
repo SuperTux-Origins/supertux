@@ -492,20 +492,24 @@ echo "==> SUPERTUX_VERSION=$SUPERTUX_VERSION"
 # Count only — never pipe find into head under set -o pipefail (SIGPIPE aborts).
 echo "==> staged C/C++ sources: $(find src/jni/src \( -name '*.cpp' -o -name '*.c' \) | wc -l)"
 
-"$NDK/ndk-build" \
-  NDK_PROJECT_PATH="$PWD/src" \
-  APP_BUILD_SCRIPT="$PWD/src/jni/Android.mk" \
-  
 # Diagnostics: module LOCAL_PATH is jni/src — TTF/FreeType must live there.
 echo "==> TTF/FreeType stage check (jni/src):"
 ls -la src/jni/src/SDL_ttf.c src/jni/src/sdl_ttf_stub.c src/jni/src/freetype/include/ft2build.h \
   src/jni/src/freetype_Android.mk 2>&1 | sed 's/^/  /' || true
 
-NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
+# One continuous ndk-build invocation. A blank line after a trailing \ used to
+# split this in two: ndk-build ran without -j / Application.mk (serial compile
+# across APP_ABI), then a stray "NDK_APPLICATION_MK=… -jN" was not part of it.
+JOBS="${NIX_BUILD_CORES:-${JOBS:-$(nproc)}}"
+echo "==> ndk-build -j${JOBS} (APP_ABI from Application.mk)"
+"$NDK/ndk-build" \
+  NDK_PROJECT_PATH="$PWD/src" \
+  APP_BUILD_SCRIPT="$PWD/src/jni/Android.mk" \
+  NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
   SUPERTUX_VERSION="$SUPERTUX_VERSION" \
   PINGUS_VERSION="$SUPERTUX_VERSION" \
   ENABLE_ANDROID_SOUND="${ENABLE_ANDROID_SOUND:-0}" \
-  -j"${NIX_BUILD_CORES:-${JOBS:-$(nproc)}}"
+  -j"${JOBS}"
 
 mkdir -p out
 

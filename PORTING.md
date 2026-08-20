@@ -1360,3 +1360,28 @@ abort `parse_args` before `SoundManager` is constructed — which looked like
 Default log level is WARNING. Audio boot probes use `log_warn` so they show
 without query flags; `play`/`play_music` detail stays at info/debug.
 
+
+## Android ndk-build was effectively serial (`-j` dropped)
+
+**Symptom:** APK native build took forever despite `NIX_BUILD_CORES` being set.
+
+**Cause:** In `mk/android/scripts/build-apk.sh` the `ndk-build` command was
+broken across a blank line after a trailing `\`. Bash treated that as end of
+the command, so the real invocation was only:
+
+```bash
+ndk-build NDK_PROJECT_PATH=… APP_BUILD_SCRIPT=…
+```
+
+without `NDK_APPLICATION_MK` and without `-j${NIX_BUILD_CORES}`. The following
+lines (`NDK_APPLICATION_MK=… -jN`) were a separate statement, not arguments to
+ndk-build. Result: single-job compile of the whole tree (and three ABIs in
+`Application.mk`: armeabi-v7a, arm64-v8a, x86_64).
+
+**Fix:** Run diagnostics first, then one continuous `ndk-build` line including
+`-j${NIX_BUILD_CORES:-$(nproc)}`.
+
+**Note:** ndk-build still walks ABIs one after another; `-j` parallelizes
+within each ABI. For faster iteration, temporarily set `APP_ABI` to a single
+ABI (e.g. `arm64-v8a` only) in `jni/Application.mk` / nix `targetAbis`.
+
