@@ -38,9 +38,6 @@
     logmich.url = "github:logmich/logmich";
     logmich.inputs.nixpkgs.follows = "nixpkgs";
 
-    curl-win32.url = "github:grumnix/curl-win32";
-    curl-win32.inputs.nixpkgs.follows = "nixpkgs";
-    curl-win32.inputs.tinycmmc.follows = "tinycmmc";
 
     physfs-win32.url = "github:grumnix/physfs-win32";
     physfs-win32.inputs.nixpkgs.follows = "nixpkgs";
@@ -122,11 +119,17 @@
   };
 
   outputs = { self, nixpkgs, flake-utils,
-              tinycmmc, sexpcpp, curl-win32, logmich,
+              tinycmmc, sexpcpp, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
               strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, squirrel-src, sdl2-ttf-src, freetype-src, sdl2-src, sdl2-image-src }:
 
-    tinycmmc.lib.eachSystemWithPkgs (pkgs:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
+      in
       rec {
         packages = rec {
           default = supertux-origins;
@@ -169,9 +172,6 @@
                      then physfs-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                      else pkgs.physfs;
 
-            curl = if pkgs.stdenv.hostPlatform.isWindows
-                   then curl-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
-                   else pkgs.curl;
 
             glew = if pkgs.stdenv.hostPlatform.isWindows
                    then glew-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -209,7 +209,6 @@
             priocpp = priocpp-pkg;
             logmich = logmich-pkg;
             physfs = pkgs.physfs;
-            curl = pkgs.curl;
             glew = pkgs.glew;
             glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
             SDL2 = pkgs.SDL2;
@@ -262,7 +261,6 @@
                 sdl2imgw = pickWinFlakePkg SDL2_image-win32 [ "SDL2_image-win64" "default" ];
                 sdl2ttfw = pickWinFlakePkg SDL2_ttf-win32 [ "SDL2_ttf" "default" ];
                 physfsw = pickWinFlakePkg physfs-win32 [ "default" "physfs" ];
-                curlw = pickWinFlakePkg curl-win32 [ "default" "curl" ];
               in
               (pkgsW.callPackage ./supertux-origins.nix {
                 inherit self;
@@ -270,7 +268,6 @@
                 SDL2_image = sdl2imgw;
                 SDL2_ttf = sdl2ttfw;
                 physfs = physfsw;
-                curl = curlw;
                 glew = null; # GLAD vendored; no GLEW on Windows either
                 # WIP: these are still *host* packages until each has a mingw
                 # derivation (Pingus builds the equivalent graph with pkgs').

@@ -12,7 +12,7 @@
 , SDL2
 , SDL2_image
 , SDL2_ttf
-, curl
+
 , freetype
 
 , glew ? null
@@ -75,7 +75,6 @@ EOF
        ln -sfv ${SDL2_image}/bin/*.dll $out/bin/
        ln -sfv ${SDL2_ttf}/bin/*.dll $out/bin/
        ln -sfv ${SDL2}/bin/*.dll $out/bin/
-       ln -sfv ${curl}/bin/*.dll $out/bin/
        ln -sfv ${physfs}/bin/*.dll $out/bin/
        ln -sfv ${squirrel}/bin/*.dll $out/bin/
        ln -sfv ${strutcpp}/bin/*.dll $out/bin/
@@ -88,7 +87,7 @@ EOF
        # closure via LD_LIBRARY_PATH. This is not raw X11 usage by SuperTux.
        wrapProgram $out/bin/supertux-origins \
          --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath (
-           [ SDL2 SDL2_image SDL2_ttf curl physfs ]
+           [ SDL2 SDL2_image SDL2_ttf physfs ]
            ++ lib.optional (libGL != null) libGL
            ++ lib.optional (libsm != null) libsm
            ++ lib.optional (libice != null) libice
@@ -109,7 +108,6 @@ EOF
     SDL2
     SDL2_image
     SDL2_ttf
-    curl
     glm
     libpng
     physfs

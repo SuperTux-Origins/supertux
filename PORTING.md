@@ -1533,3 +1533,9 @@ SuperTux today:
 Nix note: never write `x or throw "msg"` without parentheses around
 `(throw "msg")` — application binds tighter than `or`.
 
+
+## Flake: no tinycmmc eachSystemWithPkgs; no libcurl
+
+- Outputs use `flake-utils.lib.eachDefaultSystem` + explicit `pkgs = import nixpkgs { inherit system; … }` so system/pkgs are under our control (no bare `system` surprises).
+- libcurl removed: unused in src; ProvideCurl always sets HAVE_LIBCURL false; curl-win32 input dropped (avoids broken MinGW curl build).
+
