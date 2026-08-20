@@ -1728,3 +1728,25 @@ Single source of truth: top-level `VERSION` (currently `0.6.4-dev`).
 - Shown via `--version`, window title, and title-screen copyright text
   (`PACKAGE_VERSION` from `version.h`)
 - Win32 zip / APK filenames include the full version string
+
+## Flake inputs vs vendored deps / .gitattributes NAR hashes
+
+Git `export-subst` in `.gitattributes` (e.g. `/VERSION export-subst`) changes
+file contents depending on how the tree is archived, which breaks flake NAR
+hashes.
+
+**Vendored `external/` with `.gitattributes` (removed):** priocpp, geomcpp,
+sexpcpp, miniswig, wstsound — local copies; attributes deleted so `self`
+hashes stay stable.
+
+**Flake inputs that had `.gitattributes`:**
+- `lispparser/sexp-cpp` — **removed** (use `external/sexpcpp`)
+- `WindstilleTeam/wstsound` — **removed** (use `external/wstsound`)
+
+**Obsolete flake inputs removed:**
+- `sexpcpp`, `logmich`, `strutcpp` — fully vendored
+- `glew-win32` — OpenGL uses in-tree GLAD (`ProvideOpenGL.cmake`), not GLEW
+- `freetype-win32` — unused (SDL2_ttf-win32 / source builds cover FreeType)
+
+**Still flake inputs (needed):** tinycmmc, miniswig, xdgcpp, squirrel (packaging),
+SDL2*-win32, physfs-win32, openal-soft-win32, libmodplug-win32, *-src tarballs.

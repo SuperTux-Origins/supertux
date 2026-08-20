@@ -31,14 +31,6 @@
     tinycmmc.inputs.nixpkgs.follows = "nixpkgs";
     tinycmmc.inputs.flake-utils.follows = "flake-utils";
 
-    sexpcpp.url = "github:lispparser/sexp-cpp";
-    sexpcpp.inputs.nixpkgs.follows = "nixpkgs";
-    sexpcpp.inputs.flake-utils.follows = "flake-utils";
-
-    logmich.url = "github:logmich/logmich";
-    logmich.inputs.nixpkgs.follows = "nixpkgs";
-
-
     physfs-win32.url = "github:grumnix/physfs-win32";
     physfs-win32.inputs.nixpkgs.follows = "nixpkgs";
     physfs-win32.inputs.tinycmmc.follows = "tinycmmc";
@@ -48,10 +40,6 @@
 
     SDL2_image-win32.url = "github:grumnix/SDL2_image-win32";
     SDL2_image-win32.inputs.nixpkgs.follows = "nixpkgs";
-
-    freetype-win32.url = "github:grumnix/freetype-win32";
-    freetype-win32.inputs.nixpkgs.follows = "nixpkgs";
-    freetype-win32.inputs.tinycmmc.follows = "tinycmmc";
 
     SDL2_ttf-win32.url = "github:grumnix/SDL2_ttf-win32";
     SDL2_ttf-win32.inputs.nixpkgs.follows = "nixpkgs";
@@ -67,9 +55,6 @@
     libmodplug-win32.inputs.nixpkgs.follows = "nixpkgs";
     libmodplug-win32.inputs.flake-utils.follows = "flake-utils";
 
-    strutcpp.url = "github:grumbel/strutcpp";
-    strutcpp.inputs.nixpkgs.follows = "nixpkgs";
-
     miniswig.url = "github:WindstilleTeam/miniswig";
     miniswig.inputs.nixpkgs.follows = "nixpkgs";
     miniswig.inputs.tinycmmc.follows = "tinycmmc";
@@ -78,18 +63,9 @@
     xdgcpp.inputs.nixpkgs.follows = "nixpkgs";
     xdgcpp.inputs.flake-utils.follows = "flake-utils";
 
-    wstsound.url = "github:WindstilleTeam/wstsound";
-    wstsound.inputs.nixpkgs.follows = "nixpkgs";
-    wstsound.inputs.flake-utils.follows = "flake-utils";
-    wstsound.inputs.tinycmmc.follows = "tinycmmc";
-
     squirrel.url = "github:grumnix/squirrel";
     squirrel.inputs.nixpkgs.follows = "nixpkgs";
     squirrel.inputs.tinycmmc.follows = "tinycmmc";
-
-    glew-win32.url = "github:grumnix/glew-win32";
-    glew-win32.inputs.nixpkgs.follows = "nixpkgs";
-    glew-win32.inputs.tinycmmc.follows = "tinycmmc";
 
     # PhysFS sources for EMSCRIPTEN / Android / R36S when system PhysFS is absent
     # and external/physfs submodule is not checked out.
@@ -129,10 +105,10 @@
   };
 
   outputs = { self, nixpkgs, flake-utils,
-              tinycmmc, sexpcpp, logmich,
-              SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
+              tinycmmc,
+              SDL2-win32, SDL2_image-win32, physfs-win32, SDL2_ttf-win32,
               openal-soft-win32, libmodplug-win32,
-              strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, squirrel-src, sdl2-ttf-src, freetype-src, sdl2-src, sdl2-image-src }:
+              miniswig, xdgcpp, squirrel, physfs-src, squirrel-src, sdl2-ttf-src, freetype-src, sdl2-src, sdl2-image-src }:
 
     # Linux only — no Darwin (nixpkgs 26.11 dropped x86_64-darwin; we do not
     # target macOS). Windows is a *cross* target via pkgsCross.mingwW64, not a
@@ -248,6 +224,18 @@
             doCheck = false;
             cmakeFlags = [ "-DBUILD_TESTS=OFF" "-DWARNINGS=OFF" "-DWERROR=OFF" ];
           });
+          # Vendored wstsound (avoid flake input with .gitattributes export-subst).
+          wstsound-pkg = (pkgs.callPackage ./external/wstsound/wstsound.nix {
+            mcfgthreads = pkgs.windows.mcfgthreads;
+            tinycmmc = tinycmmc.packages.${system}.default;
+            gtest = null;
+          }).overrideAttrs (o: {
+            doCheck = false;
+            cmakeFlags = [
+              "-DWARNINGS=OFF" "-DWERROR=OFF"
+              "-DBUILD_TESTS=OFF" "-DBUILD_EXTRA=OFF"
+            ];
+          });
           priocpp-pkg = pkgs.callPackage ./external/priocpp/priocpp.nix {
             inherit self;
             logmich = logmich-pkg;
@@ -269,7 +257,7 @@
             tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
             strutcpp = strutcpp-pkg;
             miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
-            wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            wstsound = wstsound-pkg;
             priocpp = priocpp-pkg;
             logmich = logmich-pkg;
 
@@ -278,9 +266,7 @@
                      else pkgs.physfs;
 
 
-            glew = if pkgs.stdenv.hostPlatform.isWindows
-                   then glew-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
-                   else pkgs.glew;
+            glew = null; # GLAD in-tree; no GLEW
 
             glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
 
@@ -311,11 +297,11 @@
             tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
             strutcpp = strutcpp-pkg;
             miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
-            wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            wstsound = wstsound-pkg;
             priocpp = priocpp-pkg;
             logmich = logmich-pkg;
             physfs = pkgs.physfs;
-            glew = pkgs.glew;
+            glew = null; # GLAD in-tree; no GLEW
             glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
             SDL2 = pkgs.SDL2;
             SDL2_image = pkgs.SDL2_image;
@@ -456,8 +442,7 @@
           # WebAssembly (Emscripten). CMake path ready; may fail at dep/link stage.
           # See nix/wasm.nix and PORTING.md.
           supertux-origins-wasm = (import ./nix/wasm.nix {
-            inherit pkgs self tinycmmc sexpcpp logmich strutcpp miniswig
-                    wstsound squirrel physfs-src squirrel-src;
+            inherit pkgs self tinycmmc miniswig squirrel physfs-src squirrel-src;
             sdlSrc = sdl2-src;
             sdlVersion = "2.30.3";
             freetypeSrc = freetype-src;

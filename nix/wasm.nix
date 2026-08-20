@@ -10,11 +10,7 @@
 { pkgs
 , self
 , tinycmmc
-, sexpcpp
-, logmich
-, strutcpp
 , miniswig
-, wstsound
 , squirrel
 , physfs-src ? null
 , squirrel-src ? null
