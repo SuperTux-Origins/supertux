@@ -356,9 +356,11 @@ if [ -d "$EXTERNAL_DIR/wstsound/src" ]; then
   mkdir -p src/jni/src/deps/wstsound
   find "$EXTERNAL_DIR/wstsound/src" -maxdepth 1 -name '*.cpp' -exec cp -a {} src/jni/src/deps/wstsound/ \;
   find "$EXTERNAL_DIR/wstsound/src" -maxdepth 1 \( -name '*.hpp' -o -name '*.h' \) -exec cp -a {} src/jni/src/deps/wstsound/ \;
-  # Drop codecs / EFX not used on Android
-  rm -f src/jni/src/deps/wstsound/ogg_sound_file.cpp \
-        src/jni/src/deps/wstsound/opus_sound_file.cpp \
+  # Drop codecs / EFX not used on Android.
+  # Keep ogg_sound_file.cpp: SuperTux ships .ogg music and Android.mk enables
+  # WSTSOUND_WITH_VORBIS + links vorbis when the prebuilts are staged. The
+  # ndk-build filter still drops the TU if SUPERTUX_HAVE_VORBIS is unset.
+  rm -f src/jni/src/deps/wstsound/opus_sound_file.cpp \
         src/jni/src/deps/wstsound/mp3_sound_file.cpp \
         src/jni/src/deps/wstsound/effect.cpp \
         src/jni/src/deps/wstsound/effect_slot.cpp \
@@ -370,7 +372,7 @@ if [ -d "$EXTERNAL_DIR/wstsound/src" ]; then
     cp -a "$EXTERNAL_DIR/wstsound/include/wstsound/." src/jni/external_includes/wstsound/
   fi
   chmod -R u+rwX src/jni/src/deps/wstsound src/jni/external_includes/wstsound 2>/dev/null || true
-  echo "==> staged wstsound (wav+modplug) into jni/src/deps/wstsound"
+  echo "==> staged wstsound (wav+modplug+ogg) into jni/src/deps/wstsound"
 fi
 
 # Prebuilt OpenAL Soft + libmodplug (from nix audioAndroidLibs)
