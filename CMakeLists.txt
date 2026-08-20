@@ -41,8 +41,17 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0048 NEW)
 endif()
 
-## Project name to use as command prefix.
-project(SUPERTUX VERSION 0.6.2)
+# Source of truth: top-level VERSION file (e.g. "0.6.4-dev"), or
+# -DPROJECT_VERSION_FULL=... from packaging (Nix flake appends
+# .<revCount>+g<rev>).
+if(NOT DEFINED PROJECT_VERSION_FULL OR PROJECT_VERSION_FULL STREQUAL "")
+  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL LIMIT_COUNT 1)
+endif()
+string(STRIP "${PROJECT_VERSION_FULL}" PROJECT_VERSION_FULL)
+# CMake project() VERSION must be numeric major[.minor[.patch[.tweak]]]
+string(REGEX REPLACE "[-+].*" "" _PROJECT_VERSION_NUMERIC "${PROJECT_VERSION_FULL}")
+project(SUPERTUX VERSION "${_PROJECT_VERSION_NUMERIC}")
+set(PROJECT_VERSION_FULL "${PROJECT_VERSION_FULL}")
 
 # FIXME: This is for FindOpusfile and some other stuff, could just
 # copy them over or integrate better into wstsound

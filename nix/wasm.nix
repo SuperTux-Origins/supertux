@@ -22,17 +22,21 @@
 , sdlVersion ? "2.30.3"
 , freetypeSrc ? null
 , sdl2TtfSrc ? null
+, version ? null
 }:
 
 let
   lib = pkgs.lib;
   emscripten = pkgs.emscripten;
   est = pkgs.emscriptenStdenv;
+  versionResolved =
+    if version != null then version
+    else lib.strings.removeSuffix "\n" (builtins.readFile ../VERSION);
 
   # HTML shell (Pingus-style) with SuperTux branding / placeholders.
   wasmShell = pkgs.replaceVars ../mk/wasm/shell.html {
-    versionFull = "0.6.3-wasm";
-    gitRev = "dirty";
+    versionFull = versionResolved;
+    gitRev = self.shortRev or self.dirtyShortRev or "dirty";
     sourceUrl = "https://github.com/SuperTux-Origins/supertux";
     revUrl = "https://github.com/SuperTux-Origins/supertux";
   };
@@ -368,7 +372,7 @@ in
 
   supertux-wasm = est.mkDerivation rec {
     pname = "supertux-origins-wasm";
-    version = "0.6.3-wasm";
+    version = versionResolved;
 
     src = lib.cleanSource self;
 

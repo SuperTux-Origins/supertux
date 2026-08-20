@@ -31,31 +31,22 @@
 , gtest
 
 , useGLES2 ? false
+, versionFull ? null
 }:
 
 stdenv.mkDerivation rec {
   pname = "supertux-origins";
-  # FIXME: Should use `git describe` to get the version
-  # number or leave it to cmake, but the .git/ directory
-  # isn't included in the Nix store.
-  version = "0.6.3-${lib.substring 0 8 self.lastModifiedDate}-${self.shortRev or "dirty"}";
+  # Prefer flake-supplied version (VERSION + revCount + hash). Fallback reads
+  # VERSION at build time via CMake if null.
+  version =
+    if versionFull != null then versionFull
+    else lib.strings.removeSuffix "\n" (builtins.readFile ./VERSION);
 
   src = lib.cleanSource ./.;
 
-  patchPhase = let
-    ver = builtins.splitVersion version;
-  in ''
+  patchPhase = ''
     substituteInPlace config.h.cmake \
        --replace "#define _SQ64" ""
-
-     cat > version.cmake <<EOF
-SET(SUPERTUX_VERSION_MAJOR ${builtins.elemAt ver 0})
-SET(SUPERTUX_VERSION_MINOR ${builtins.elemAt ver 1})
-SET(SUPERTUX_VERSION_PATCH ${builtins.elemAt ver 2})
-SET(SUPERTUX_VERSION_TWEAK ${builtins.elemAt ver 3})
-SET(SUPERTUX_VERSION_STRING "v${version}")
-SET(SUPERTUX_VERSION_BUILD "${builtins.elemAt ver 4}")
-EOF
   '';
 
   strictDeps = true;
@@ -64,6 +55,7 @@ EOF
     "-DINSTALL_SUBDIR_BIN=bin"
     "-DUSE_SYSTEM_SDL2_TTF=ON"
     "-DBUILD_TESTS=ON"
+    "-DPROJECT_VERSION_FULL=${version}"
   ] ++
   lib.optional useGLES2 "-DENABLE_OPENGLES2=ON";
 

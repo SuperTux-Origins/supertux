@@ -105,3 +105,8 @@ nix run .#supertux-origins-win32
 
 See `PORTING.md` (Wine apps) and Pingus `mkWineApp`.
 
+## Version
+
+Top-level `VERSION` is the only source of truth. Flake appends
+`.<revCount>+g<hash>` for `-dev` builds. See PORTING.md.
+

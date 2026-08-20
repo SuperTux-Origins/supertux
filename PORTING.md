@@ -1716,3 +1716,15 @@ roots. Force `pkgs.buildPackages.cmake` / `pkg-config` into MinGW
 `callPackage` args; enable `strictDeps`.
 
 Flake outputs prefer the `supertux-origins-*` prefix (game name).
+
+## Version numbering (VERSION file)
+
+Single source of truth: top-level `VERSION` (currently `0.6.4-dev`).
+
+- In-tree / packaging: CMake reads `VERSION` or `-DPROJECT_VERSION_FULL=...`
+- Nix flake: base from `VERSION`; if it contains `-dev`, append
+  `.<revCount>+g<shortRev>` (e.g. `0.6.4-dev.1615+gf1fb306`)
+- Release: strip `-dev` from `VERSION`, tag `v` + VERSION (no rev suffix)
+- Shown via `--version`, window title, and title-screen copyright text
+  (`PACKAGE_VERSION` from `version.h`)
+- Win32 zip / APK filenames include the full version string

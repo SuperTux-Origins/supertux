@@ -144,6 +144,16 @@
           config.allowUnfree = true;
         };
         lib = pkgs.lib;
+        # VERSION file is the only source of truth (see PORTING.md / VERSION).
+        versionBase = lib.strings.removeSuffix "\n" (builtins.readFile ./VERSION);
+        gitRev = self.shortRev or self.dirtyShortRev or "dirty";
+        # Dev builds: 0.6.4-dev.<revCount>+g<hash>[-dirty]
+        # Releases (no -dev): plain VERSION contents.
+        version =
+          if lib.hasInfix "-dev" versionBase then
+            "${versionBase}.${toString (self.revCount or 0)}+g${gitRev}"
+          else
+            versionBase;
         isWin = pkgs.stdenv.hostPlatform.isWindows;
         # Wine apps only make sense when *evaluating* a Linux flake system.
         # Use buildPackages for the wrapper script so we never pull host bash
@@ -248,6 +258,7 @@
 
           supertux-origins = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
+            versionFull = version;
 
             SDL2_ttf = if pkgs.stdenv.hostPlatform.isWindows
                        then SDL2_ttf-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -293,6 +304,7 @@
           # --renderer switch — Origins has no runtime VIDEO_GLES enum.
           supertux-origins-gles2 = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
+            versionFull = version;
             SDL2_ttf = pkgs.SDL2_ttf;
             sexpcpp = sexpcpp-pkg;
             squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -373,6 +385,7 @@
               in
               (pkgsW.callPackage ./supertux-origins.nix {
                 inherit self;
+                versionFull = version;
                 # Build-time tools must come from buildPackages (Linux), never the
                 # MinGW target package set — otherwise evaluation can demand
                 # bash for hostPlatform=x86_64-windows.
@@ -431,13 +444,13 @@
             fi
           '';
 
-          supertux-origins-win32-zip = pkgs.runCommand "supertux-origins-win32-zip" {
+          supertux-origins-win32-zip = pkgs.runCommand "supertux-origins-win32-zip-${version}" {
           } ''
             mkdir -p $out
             WORKDIR=$(mktemp -d)
             cp --no-preserve mode,ownership -a ${supertux-origins-win32}/. "$WORKDIR"
             cd "$WORKDIR"
-            ${pkgs.zip}/bin/zip -r $out/SuperTux-Origins-win64.zip .
+            ${pkgs.zip}/bin/zip -r $out/SuperTux-Origins-${version}-win64.zip .
           '';
 
           # WebAssembly (Emscripten). CMake path ready; may fail at dep/link stage.
@@ -449,6 +462,7 @@
             sdlVersion = "2.30.3";
             freetypeSrc = freetype-src;
             sdl2TtfSrc = sdl2-ttf-src;
+            inherit version;
           }).supertux-wasm;
 
           # ---------------------------------------------------------------
@@ -488,7 +502,7 @@
               libxmpSrc = null;
               inherit androidSdk buildToolsVersion packagePlatform compilePlatform targetAbis;
             };
-            androidApkName = "supertux-origins.apk";
+            androidApkName = "supertux-origins-${version}.apk";
             stbImageH = androidPkgs.fetchurl {
               url = "https://raw.githubusercontent.com/nothings/stb/refs/heads/master/stb_image.h";
               sha256 = "sha256-WUwv411JSItDgtv67I+YNm3vyoGdkWrJW+zz519CALM=";
@@ -503,7 +517,7 @@
               glmIncludeDir = "${androidPkgs.glm}/include";
               gameDataDir = ./data;
               inherit stbImageH;
-              gameVersion = "0.6.3-dev";
+              gameVersion = version;
               squirrelSrc = squirrel-src;
               physfsSrc = physfs-src;
               sdl2TtfSrc = sdl2-ttf-src;
@@ -542,7 +556,7 @@
             };
             gitDate = self.lastModifiedDate or "19700101";
             gitRev = self.shortRev or self.dirtyShortRev or "dirty";
-            r36sVersion = "0.6.3-${builtins.substring 0 8 gitDate}-${gitRev}";
+            r36sVersion = version;
             game = r36s.mkSuperTuxR36s {
               src = self;
               version = r36sVersion;
@@ -582,6 +596,33 @@
             "SuperTux Origins (MinGW x86_64) via Wine";
           supertux-origins-mingw64 = mkWineApp packages.supertux-origins-mingw64 "supertux-origins-mingw64"
             "SuperTux Origins MinGW store package via Wine (bin/)";
+        };
+
+        # `nix flake check` builds these (major ports). Android/R36S need SDK
+        # or sysroot and are checked for evaluation only via packages.*.
+        checks = {
+          supertux-origins = packages.supertux-origins;
+          supertux-origins-gles2 = packages.supertux-origins-gles2;
+          supertux-origins-mingw64 = packages.supertux-origins-mingw64;
+          supertux-origins-win32 = packages.supertux-origins-win32;
+          supertux-origins-win32-zip = packages.supertux-origins-win32-zip;
+          supertux-origins-wasm = packages.supertux-origins-wasm;
+          version-file = pkgs.runCommand "supertux-origins-version-check" {
+            inherit version versionBase;
+          } ''
+            echo "versionBase=$versionBase"
+            echo "version=$version"
+            echo "$version" | grep -q -E '^[0-9]+\.[0-9]+\.[0-9]+'
+            mkdir -p $out
+            echo "$version" > $out/version
+          '';
+        } // lib.optionalAttrs wineAppsEnabled {
+          app-supertux-origins-win32 = pkgs.runCommand "check-app-win32" {
+          } ''
+            test -x ${apps.supertux-origins-win32.program}
+            mkdir -p $out
+            touch $out/ok
+          '';
         };
       }
     );
