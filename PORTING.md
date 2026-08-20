@@ -1807,3 +1807,21 @@ style) so embedded `add_subdirectory(external/logmich)` does not pollute
 the parent install tree. Warnings simplified to `-Wall -Wextra -Wpedantic`.
 
 These changes are library-generic and ready for an upstream logmich PR.
+
+## argpp exception types + tinycmmc discovery
+
+Windstille changed option-parsing errors from `std::runtime_error` to
+`std::invalid_argument` (more precise for bad argv). Also added the
+missing `<iostream>` / `<cstdlib>` includes. Applied the same to SuperTux
+`external/argpp`.
+
+argpp's tinycmmc module-path discovery was outdated (hard-coded relative
+path); aligned with Windstille's QUIET find_package + external/tinycmmc
+fallback so it works both standalone and as a subdirectory under SuperTux.
+
+## geomcpp MinGW GLM include
+
+SuperTux already avoids `#include <glm/ext.hpp>` (GLM 1.0+ packing.inl
+pulls `<endian.h>`, missing on MinGW) in favour of `<glm/glm.hpp>` +
+explicit gtx headers. This is library-generic and should be upstreamed;
+Pingus/Windstille still use the old include.

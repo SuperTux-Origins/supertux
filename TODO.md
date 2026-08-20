@@ -211,6 +211,10 @@ Order for upstreaming: **tinycmmc → logmich / geomcpp / argpp / sexpcpp / xdgc
      default "logmich"); SuperTux passes -DLOGMICH_ANDROID_TAG=\"SuperTux\"
      from nix/android.nix. Restored top-level-only install guard + simplified
      warnings. Ready for upstream.
+   - argpp: std::invalid_argument for option errors + includes (from
+     Windstille); flexible tinycmmc discovery.
+   - geomcpp: MinGW-safe GLM include already present; noted for upstream to
+     the other projects.
 2. [ ] Resolve conflicts in favour of the most general fix; document in
    PORTING.md why a change stayed project-local.
 3. [ ] Produce one git bundle **per library** (or small dependency group)
