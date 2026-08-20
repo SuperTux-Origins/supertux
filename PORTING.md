@@ -1439,3 +1439,18 @@ ndk-build is restricted. Use a single-ABI attr for day-to-day iteration.
 `ndk-build` is invoked via a bash array so `-j${NIX_BUILD_CORES}` cannot
 detach into a separate command (`-j12: command not found`).
 
+
+## WASM silent audio despite OpenAL "opened" and play() logs
+
+Observed: device opens, PhysFS probes OK, Web Audio state=running after
+click, SoundManager::play logs — still no sound.
+
+Likely causes:
+
+1. 3D distance model — wstsound inverse distance (ref=128), SFX in pixel
+   coords, listener at (camera, z=-300). Emscripten OpenAL attenuation can
+   collapse gain. Mitigation: alDistanceModel(AL_NONE) + relative SFX at origin.
+2. Decode path returns DummySoundSource (SoundChannel catches load errors).
+3. Must link Emscripten -lopenal (Web Audio). Log AL_VENDOR/VERSION/RENDERER.
+4. Autoplay — context running before alSourcePlay (st_emscripten_audio_resume).
+
