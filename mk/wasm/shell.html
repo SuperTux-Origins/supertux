@@ -116,7 +116,7 @@
       <input type="file" id="file-upload-backup" accept=".json,application/json">
     </div>
     <div id="meta">
-      Pingus <strong>@versionFull@</strong><br>
+      SuperTux Origins <strong>@versionFull@</strong><br>
       <a href="@sourceUrl@" target="_blank" rel="noopener">Source</a>
       ·
       <a href="@revUrl@" target="_blank" rel="noopener">Revision @gitRev@</a>
@@ -290,7 +290,7 @@
         return;
       }
       var payload = JSON.stringify({
-        format: 'pingus-backup',
+        format: 'supertux-backup',
         version: 1,
         root: ST_USER_ROOT,
         files: files
@@ -298,7 +298,7 @@
       var blob = new Blob([payload], { type: 'application/json' });
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'pingus-backup.json';
+      a.download = 'supertux-backup.json';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -314,8 +314,8 @@
       reader.onload = function() {
         try {
           var obj = JSON.parse(reader.result);
-          if (!obj || obj.format !== 'pingus-backup' || !obj.files) {
-            alert('Not a Pingus backup file.');
+          if (!obj || (obj.format !== 'supertux-backup' && obj.format !== 'pingus-backup') || !obj.files) {
+            alert('Not a SuperTux backup file.');
             return;
           }
           var keys = Object.keys(obj.files);
@@ -341,7 +341,7 @@
     }
 
 
-    /* Canvas always tracks the layout box; Pingus resizes its framebuffer to match. */
+    /* Canvas always tracks the layout box; SuperTux resizes its framebuffer to match. */
     function stNotifyCanvasResize() {
       var c = document.getElementById('canvas');
       if (!c) return;

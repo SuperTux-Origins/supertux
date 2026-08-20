@@ -487,7 +487,6 @@ cp "$KEYSTORE" debug.keystore
 # Bake VERSION+g<rev> into the game version macro (see jni/Android.mk).
 # nix/android.mkApk exports SUPERTUX_VERSION; accept PINGUS_VERSION as alias.
 SUPERTUX_VERSION="${SUPERTUX_VERSION:-${PINGUS_VERSION:-0.6.3-dev}}"
-PINGUS_VERSION="$SUPERTUX_VERSION"
 echo "==> SUPERTUX_VERSION=$SUPERTUX_VERSION"
 # Count only — never pipe find into head under set -o pipefail (SIGPIPE aborts).
 echo "==> staged C/C++ sources: $(find src/jni/src \( -name '*.cpp' -o -name '*.c' \) | wc -l)"
@@ -507,7 +506,6 @@ echo "==> ndk-build -j${JOBS} (APP_ABI from Application.mk)"
   APP_BUILD_SCRIPT="$PWD/src/jni/Android.mk" \
   NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
   SUPERTUX_VERSION="$SUPERTUX_VERSION" \
-  PINGUS_VERSION="$SUPERTUX_VERSION" \
   ENABLE_ANDROID_SOUND="${ENABLE_ANDROID_SOUND:-0}" \
   -j"${JOBS}"
 

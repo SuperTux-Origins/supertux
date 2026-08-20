@@ -1385,3 +1385,41 @@ ndk-build. Result: single-job compile of the whole tree (and three ABIs in
 within each ABI. For faster iteration, temporarily set `APP_ABI` to a single
 ABI (e.g. `arm64-v8a` only) in `jni/Application.mk` / nix `targetAbis`.
 
+
+## Build-system audit (2026-08-20)
+
+### Functional Pingus leftovers fixed
+
+| Location | Issue | Fix |
+|----------|--------|-----|
+| `mk/wasm/scripts/build-app.sh` | `-DPINGUS_USE_GLES` / `-DPINGUS_ENABLE_SOUND` / `-DDATA_PREFIX` no-ops for SuperTux | `-DENABLE_OPENGLES2=…`; drop dead flags |
+| same | `-DEMSCRIPTEN_LINK_FLAGS=…` never read by CMakeLists | Removed; link flags come from `if(EMSCRIPTEN)` `USE_LINK_FLAGS` |
+| `mk/r36s/toolchain-arkos-aarch64.cmake` | Forced `PINGUS_USE_GLES` / `PINGUS_ENABLE_SOUND` | `ENABLE_OPENGLES2` + `SUPERTUX_R36S` |
+| `mk/wasm/shell.html` | Footer “Pingus”, `pingus-backup` JSON | SuperTux Origins + `supertux-backup` (still accepts old format) |
+| `CMakeLists.txt` | EMSCRIPTEN did not force GLES2 option | Force `ENABLE_OPENGLES2` like Android |
+| `mk/android/scripts/build-apk.sh` | Passed unused `PINGUS_VERSION` into ndk-build | Dropped (alias only for env default) |
+
+### Intentional remaining references
+
+- **flake inputs** `WindstilleTeam/*` — real upstream of tinycmmc family / wstsound.
+- **Comments** “adapted from Pingus/Windstille” in scripts/docs — attribution.
+- **`PORTS.md` / `AGENTS.md` / `PORTING.md`** — design notes.
+- **`src/util/*` copyright headers** copied with code (line_iterator, currenton).
+- **`serve.sh`**: `PINGUS_WASM_PORT` as env alias for port number — harmless fallback.
+- **`?debug=1` still accepts legacy backup format `pingus-backup`** for old files.
+
+### Quoting / shell pitfalls (watch list)
+
+1. **Nix `''${…}`** — correct escape for `${` inside `''` strings; do not “simplify” to `$` or the outer Nix interpolates.
+2. **`lib.escapeShellArgs cmakeFlags`** in `nix/wasm.nix` — prefer this over hand-joined strings when flags contain spaces.
+3. **Bash `array[*]` vs `[@]`** — `"${arr[@]}"` preserves words; `"${arr[*]}"` joins with first char of IFS (was used for dead EMSCRIPTEN_LINK_FLAGS).
+4. **Line continuations** — never leave a blank line after `\`; that already cost Android `-j` (see above).
+5. **CMake `SHELL:-s…`** options must be separate `target_link_options` entries or carefully spaced in `CMAKE_EXE_LINKER_FLAGS`; nested quotes in `EXPORTED_FUNCTIONS=['_a','_b']` are fragile — keep the existing single-quoted form.
+
+### Other obvious issues (not all fixed here)
+
+- **Triple APP_ABI** on Android still multiplies compile time (parallel within ABI only).
+- **`build-app.sh` LINK_FLAGS / PRELOAD arrays** are largely redundant with CMakeLists EMSCRIPTEN block when using the nix path (`nix/wasm.nix` calls `emcmake` directly).
+- **R36S `arkos-sysroot` URL** is still `localhost:8888` placeholder — expected until a permanent host exists.
+- **Default log level WARNING** — use `?verbose=1` / `?debug=1` (long options only).
+

@@ -1,10 +1,10 @@
-# CMake toolchain: aarch64 Pingus → R36S / ArkOS
+# CMake toolchain: aarch64 SuperTux → R36S / ArkOS
 #
 # Usage:
 #   export ARKOS_SYSROOT=/path/to/aarch64-rootfs
 #   cmake -S . -B build-r36s \
 #     -DCMAKE_TOOLCHAIN_FILE=mk/r36s/toolchain-arkos-aarch64.cmake \
-#     -DPINGUS_USE_GLES=ON -DPINGUS_ENABLE_SOUND=ON
+#     -DSUPERTUX_R36S=ON -DENABLE_OPENGLES2=ON
 #
 # See mk/r36s/CROSSCOMPILE.md
 
@@ -46,6 +46,5 @@ set(CMAKE_C_FLAGS_INIT   "-march=armv8-a -mtune=cortex-a35")
 set(CMAKE_CXX_FLAGS_INIT "-march=armv8-a -mtune=cortex-a35")
 
 # Defaults for this handheld (callers may still override on the command line).
-set(PINGUS_USE_GLES      ON  CACHE BOOL "OpenGL ES 2.0 (Mali-G31 / KMSDRM)" FORCE)
-set(PINGUS_ENABLE_SOUND  ON  CACHE BOOL "wstsound audio" FORCE)
-set(PINGUS_NO_XDGCPP     ON  CACHE BOOL "No xdgcpp on embedded CFW" FORCE)
+set(ENABLE_OPENGLES2 ON CACHE BOOL "OpenGL ES 2.0 (Mali-G31 / KMSDRM)" FORCE)
+set(SUPERTUX_R36S    ON CACHE BOOL "R36S / ArkOS handheld profile" FORCE)

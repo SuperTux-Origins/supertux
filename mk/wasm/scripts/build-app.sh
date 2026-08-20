@@ -43,9 +43,8 @@ LINK_FLAGS=(
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
   # StreamSoundSource used to put 64KiB on the stack; keep headroom for other frames.
   "SHELL:-sSTACK_SIZE=1048576"
-  # Levelset loading uses try/catch around PingusLevel::load (multi-line
-  # description fields throw ReaderError). Without catch support, ___cxa_throw
-  # aborts the whole runtime when opening Levelsets.
+  # SuperTux uses exceptions (level load / ReaderError, etc.). Without catch
+  # support, ___cxa_throw aborts the whole runtime.
   "-fexceptions"
   "SHELL:-sDISABLE_EXCEPTION_CATCHING=0"
   # Emscripten 6.x defaults GROWABLE_ARRAYBUFFERS=1 so WASM memory is a resizable
@@ -62,8 +61,7 @@ LINK_FLAGS=(
   "SHELL:-sFORCE_FILESYSTEM=1"
   "SHELL:-sEXIT_RUNTIME=0"
   "SHELL:-lidbfs.js"
-  # Only symbols Pingus actually provides today (+ emscripten main-loop helpers).
-  # SuperTux _st_emscripten_* hooks are optional in shell.html when missing.
+  # Export main-loop helpers + SuperTux shell hooks (resolution, audio unlock).
   "SHELL:-sEXPORTED_FUNCTIONS=_main,_emscripten_pause_main_loop,_emscripten_resume_main_loop,_st_emscripten_audio_resume,_st_emscripten_audio_pause,_set_resolution,_save_config"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,FS"
 )
@@ -107,12 +105,14 @@ cmake_args=(
   -DBUILD_EXTRA=OFF
   -DWARNINGS=OFF
   -DWERROR=OFF
-  -DPINGUS_USE_GLES="$( [ "$ENABLE_GLES2" = 1 ] && echo ON || echo OFF )"
+  -DENABLE_OPENGLES2="$( [ "$ENABLE_GLES2" = 1 ] && echo ON || echo OFF )"
   -DPRIO_USE_JSONCPP=OFF
-  -DPINGUS_ENABLE_SOUND="$( [ "$ENABLE_SOUND" = 1 ] && echo ON || echo OFF )"
-  -DDATA_PREFIX="/data"
+  # Sound is OpenAL/wstsound (always linked when available); no PINGUS_ENABLE_SOUND.
+  # DATA_PREFIX is unused by SuperTux (PhysFS mounts /data from preload).
   -DSDL2_ROOT="$SDL_WASM_LIBS"
-  -DEMSCRIPTEN_LINK_FLAGS="${LINK_FLAGS[*]} ${PRELOAD[*]}"
+  # Note: SuperTux CMakeLists sets CMAKE_EXE_LINKER_FLAGS for EMSCRIPTEN itself
+  # (FULL_ES2, openal, vorbis, --preload-file data@/data). Do not pass a dead
+  # -DEMSCRIPTEN_LINK_FLAGS; extra SHELL flags belong on target_link_options.
 )
 # Prebuilt glm / libsigc++ (and friends) live outside the emscripten sysroot.
 if [ -n "${EXTRA_PREFIX_PATH:-}" ]; then
@@ -158,7 +158,7 @@ fi
 echo "==> cmake --build"
 cmake --build build --parallel "${NIX_BUILD_CORES:-${JOBS:-$(nproc)}}" "${verbose[@]}"
 
-# Emscripten names the outputs after the CMake target (pingus).
+# Emscripten names the outputs after the CMake target (supertux-origins).
 out_base="build/${APP_NAME}"
 for ext in html js wasm data; do
   if [ -f "${out_base}.${ext}" ]; then

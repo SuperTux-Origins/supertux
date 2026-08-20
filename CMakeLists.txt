@@ -163,6 +163,14 @@ if(ANDROID OR DEFINED ANDROID)
   message(STATUS "Android: forcing ENABLE_OPENGLES2")
 endif()
 
+# Emscripten WebGL path is GLES2-style (FULL_ES2); match Android/R36S defaults.
+if(EMSCRIPTEN)
+  if(NOT ENABLE_OPENGLES2)
+    set(ENABLE_OPENGLES2 ON CACHE BOOL "Enable OpenGLES2 support" FORCE)
+  endif()
+  message(STATUS "Emscripten: forcing ENABLE_OPENGLES2")
+endif()
+
 if(WIN32)
   include(SuperTux/Win32)
 endif()
