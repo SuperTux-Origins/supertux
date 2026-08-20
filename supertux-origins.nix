@@ -23,7 +23,7 @@
 , physfs
 , logmich
 , sexpcpp
-, squirrel
+, squirrel ? null
 , tinycmmc
 , strutcpp
 , miniswig
@@ -76,7 +76,7 @@ EOF
        ln -sfv ${SDL2_ttf}/bin/*.dll $out/bin/
        ln -sfv ${SDL2}/bin/*.dll $out/bin/
        ln -sfv ${physfs}/bin/*.dll $out/bin/
-       ln -sfv ${squirrel}/bin/*.dll $out/bin/
+       ${lib.optionalString (squirrel != null) "ln -sfv ${squirrel}/bin/*.dll $out/bin/"}
        ln -sfv ${strutcpp}/bin/*.dll $out/bin/
        ln -sfv ${wstsound}/bin/*.dll $out/bin/
     '')
@@ -113,7 +113,6 @@ EOF
     physfs
     logmich
     sexpcpp
-    squirrel
     tinycmmc
     strutcpp
     wstsound
@@ -121,6 +120,7 @@ EOF
     # checkInputs
     gtest
   ]
+  ++ lib.optional (squirrel != null) squirrel
   ++ (lib.optional (!stdenv.hostPlatform.isWindows) xdgcpp);
 
   meta = with lib; {

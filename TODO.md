@@ -21,6 +21,13 @@ adapted from Pingus and Windstille.
       (wasm.nix still shorter; SDL static builds incomplete).
 - [ ] Continuous numbered git bundles (`supertux-001-…`).
 
+## Windows (MinGW)
+
+- [x] Force in-tree squirrel for mingw (USE_SYSTEM_SQUIRREL=OFF + squirrel-src);
+      ProvideSquirrel always STATIC imported targets (no missing IMPORTED_IMPLIB).
+- [ ] Complete cross graph for remaining C++ deps; produce .exe + DLLs.
+- [ ] Unbreak `supertux-origins-win32` / zip once mingw64 package succeeds.
+
 ## Desktop Linux
 
 - [ ] Ensure OpenGL 3.3 + GLEW path builds and runs under the flake.

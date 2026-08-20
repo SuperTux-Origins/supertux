@@ -57,31 +57,22 @@ else()
     -DSQ_DISABLE_INTERPRETER=ON
     -DBUILD_SHARED_LIBS=OFF)
 
+  # Always use static imported targets: ExternalProject is configured with
+  # -DDISABLE_DYNAMIC=ON -DBUILD_SHARED_LIBS=OFF. Shared/DLL + IMPORTED_IMPLIB
+  # paths only apply when building squirrel as shared (MSVC legacy path).
+  add_library(LibSquirrel STATIC IMPORTED)
+  set_target_properties(LibSquirrel PROPERTIES
+    IMPORTED_LOCATION "${SQUIRREL_PREFIX}/lib/${SQUIRREL_MULTIARCH_DIR}${CMAKE_STATIC_LIBRARY_PREFIX}squirrel_static${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    INTERFACE_INCLUDE_DIRECTORIES "${SQUIRREL_PREFIX}/include")
+
+  add_library(LibSqstdlib STATIC IMPORTED)
+  set_target_properties(LibSqstdlib PROPERTIES
+    IMPORTED_LOCATION "${SQUIRREL_PREFIX}/lib/${SQUIRREL_MULTIARCH_DIR}${CMAKE_STATIC_LIBRARY_PREFIX}sqstdlib_static${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    INTERFACE_INCLUDE_DIRECTORIES "${SQUIRREL_PREFIX}/include")
+
   if(WIN32)
-    add_library(LibSquirrel SHARED IMPORTED)
-    set_target_properties(LibSquirrel PROPERTIES
-      IMPORTED_LOCATION "${SQUIRREL_PREFIX}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}squirrel${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      IMPORTED_IMPLIB "${SQUIRREL_PREFIX}/lib/squirrel${CMAKE_LINK_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${SQUIRREL_PREFIX}/include")
-
-    add_library(LibSqstdlib SHARED IMPORTED)
-    set_target_properties(LibSqstdlib PROPERTIES
-      IMPORTED_LOCATION "${SQUIRREL_PREFIX}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}sqstdlib${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      IMPORTED_IMPLIB "${SQUIRREL_PREFIX}/lib/sqstdlib${CMAKE_LINK_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${SQUIRREL_PREFIX}/include")
-
-    #For debug run purposes
+    # For debug run purposes (MSVC / local MinGW)
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mk/msvc/run_supertux.bat.in" "${CMAKE_CURRENT_BINARY_DIR}/run_supertux.bat")
-  else()
-    add_library(LibSquirrel STATIC IMPORTED)
-    set_target_properties(LibSquirrel PROPERTIES
-      IMPORTED_LOCATION "${SQUIRREL_PREFIX}/lib/${SQUIRREL_MULTIARCH_DIR}${CMAKE_STATIC_LIBRARY_PREFIX}squirrel_static${CMAKE_STATIC_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${SQUIRREL_PREFIX}/include")
-
-    add_library(LibSqstdlib STATIC IMPORTED)
-    set_target_properties(LibSqstdlib PROPERTIES
-      IMPORTED_LOCATION "${SQUIRREL_PREFIX}/lib/${SQUIRREL_MULTIARCH_DIR}${CMAKE_STATIC_LIBRARY_PREFIX}sqstdlib_static${CMAKE_STATIC_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${SQUIRREL_PREFIX}/include")
   endif()
 
   # Pre-create directory so that cmake doesn't complain about its non-existance
@@ -90,11 +81,7 @@ else()
   add_dependencies(LibSquirrel squirrel_project)
   add_dependencies(LibSqstdlib squirrel_project)
 
-  if(WIN32)
-    get_property(SQUIRREL_LIB_PATH TARGET LibSquirrel PROPERTY IMPORTED_LOCATION)
-    get_property(SQSTDLIB_LIB_PATH TARGET LibSqstdlib PROPERTY IMPORTED_LOCATION)
-    install(FILES ${SQUIRREL_LIB_PATH} ${SQSTDLIB_LIB_PATH} DESTINATION "${INSTALL_SUBDIR_BIN}")
-  endif()
+  # Static libs are linked into the executable; no separate install of squirrel DLLs.
 endif()
 
 # EOF #

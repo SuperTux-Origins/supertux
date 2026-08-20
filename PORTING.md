@@ -1548,3 +1548,31 @@ libmodplug come from `openal-soft-win32` / `libmodplug-win32` as
 `openal-soft-win64` / `libmodplug-win64`. C++ deps (logmich, sexpcpp,
 strutcpp, priocpp) are also cross-built for mingw64.
 
+
+## Windows: squirrel IMPORTED_IMPLIB / static in-tree (2026-08)
+
+CMake error under `pkgsCross.mingwW64`:
+
+```
+IMPORTED_IMPLIB not set for imported target "squirrel::sqstdlib"
+configuration "Release".
+```
+
+Root cause: flake passed `squirrel.packages.${system}.default` (host Linux
+grumnix/squirrel) into the MinGW `callPackage`. That package's cmake
+config exports `squirrel::squirrel` / `squirrel::sqstdlib` without
+Windows import-lib properties.
+
+Fix (aligned with R36S / Android / wasm):
+
+1. Pass `squirrel = null` for the mingw package.
+2. `cmakeFlags += [ "-DUSE_SYSTEM_SQUIRREL=OFF" "-DSQUIRREL_SOURCE_DIR=${squirrel-src}" ]`
+3. `ProvideSquirrel.cmake`: always create **STATIC** imported targets
+   (`LibSquirrel` / `LibSqstdlib`) because ExternalProject is forced with
+   `-DDISABLE_DYNAMIC=ON -DBUILD_SHARED_LIBS=OFF`. The old WIN32 branch
+   assumed shared DLLs + `IMPORTED_IMPLIB` and pointed at non-existent
+   paths under that configuration.
+4. `supertux-origins.nix`: `squirrel ? null`, omit from `buildInputs`
+   when null, guard the postFixup `*.dll` symlink.
+
+Static linking means no squirrel DLL to ship in the flat win32 package.

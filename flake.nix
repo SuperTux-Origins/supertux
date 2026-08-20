@@ -317,7 +317,10 @@
                 physfs = physfsw;
                 glew = null;
                 sexpcpp = sexpcppW;
-                squirrel = squirrel.packages.${system}.default; # may still be host WIP
+                # Host squirrel package lacks proper IMPORTED_IMPLIB for MinGW
+                # (and is not cross-built). Force in-tree ExternalProject like
+                # R36S / Android / wasm.
+                squirrel = null;
                 tinycmmc = tinycmmcW;
                 strutcpp = strutcppW;
                 miniswig = miniswig.packages.${system}.default; # native tool, host ok
@@ -331,6 +334,13 @@
                 libGL = null;
                 mcfgthreads = pkgsW.windows.mcfgthreads;
                 gtest = null;
+              }).overrideAttrs (o: {
+                cmakeFlags = (o.cmakeFlags or []) ++ [
+                  "-DUSE_SYSTEM_SQUIRREL=OFF"
+                  "-DSQUIRREL_SOURCE_DIR=${squirrel-src}"
+                ];
+                # Null squirrel must not appear in buildInputs
+                buildInputs = builtins.filter (x: x != null) (o.buildInputs or []);
               });
 
           # Flat layout for redistribution (exe + dlls + data). Only valid after a
