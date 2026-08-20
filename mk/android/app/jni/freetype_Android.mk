@@ -15,6 +15,7 @@ LOCAL_SRC_FILES := \
 	src/sdf/ftsdf.c \
 	src/sdf/ftsdfrend.c \
 	src/sdf/ftsdfcommon.c \
+	src/sdf/ftbsdf.c \
 	src/svg/ftsvg.c \
 	src/autofit/autofit.c \
 	src/base/ftbase.c \
