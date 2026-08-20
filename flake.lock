@@ -107,29 +107,6 @@
         "url": "https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.22.0/SDL2_ttf-devel-2.22.0-mingw.tar.gz"
       }
     },
-    "curl-win32": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "tinycmmc": [
-          "tinycmmc"
-        ]
-      },
-      "locked": {
-        "lastModified": 1716834117,
-        "narHash": "sha256-RSBc7rXKy80YhtRciqlXwGVp5I1tixviv0chtpJodh8=",
-        "owner": "grumnix",
-        "repo": "curl-win32",
-        "rev": "ef6dcd2181a779ea95adcf1eb70b0c152c8f758b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "grumnix",
-        "repo": "curl-win32",
-        "type": "github"
-      }
-    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -309,7 +286,31 @@
     },
     "libmodplug-win32": {
       "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
         "libmodplug_src": "libmodplug_src",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786297750,
+        "narHash": "sha256-2rVVQHF0JM+/FUGGIC+0PcxomHqEM9+AUDyHXeyYOVI=",
+        "ref": "refs/heads/master",
+        "rev": "b53c8590136c24da645bd06a6c60b9c596162d49",
+        "revCount": 7,
+        "type": "git",
+        "url": "https://github.com/grumnix/libmodplug-win32.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://github.com/grumnix/libmodplug-win32.git"
+      }
+    },
+    "libmodplug-win32_2": {
+      "inputs": {
+        "libmodplug_src": "libmodplug_src_2",
         "nixpkgs": [
           "wstsound",
           "nixpkgs"
@@ -334,6 +335,19 @@
       }
     },
     "libmodplug_src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1493040202,
+        "narHash": "sha256-jNHspgIcrv5AUEgq2MB4TSqbj//tTCXiOoSqYjShGkw=",
+        "type": "tarball",
+        "url": "https://downloads.sourceforge.net/project/modplug-xmms/libmodplug/0.8.9.0/libmodplug-0.8.9.0.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://downloads.sourceforge.net/project/modplug-xmms/libmodplug/0.8.9.0/libmodplug-0.8.9.0.tar.gz"
+      }
+    },
+    "libmodplug_src_2": {
       "flake": false,
       "locked": {
         "lastModified": 1493040202,
@@ -530,11 +544,35 @@
     },
     "openal-soft-win32": {
       "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "openal-soft_src": "openal-soft_src"
+      },
+      "locked": {
+        "lastModified": 1786297480,
+        "narHash": "sha256-aKmyS5P1n3flEAn6HH28w0SxcZhvbf3zJWB1Zj56n68=",
+        "ref": "refs/heads/master",
+        "rev": "a7924949a9ee8e9e9f7a33cd50f96672f4b9c84c",
+        "revCount": 9,
+        "type": "git",
+        "url": "https://github.com/grumnix/openal-soft-win32.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://github.com/grumnix/openal-soft-win32.git"
+      }
+    },
+    "openal-soft-win32_2": {
+      "inputs": {
         "nixpkgs": [
           "wstsound",
           "nixpkgs"
         ],
-        "openal-soft_src": "openal-soft_src",
+        "openal-soft_src": "openal-soft_src_2",
         "tinycmmc": [
           "wstsound",
           "tinycmmc"
@@ -555,6 +593,23 @@
       }
     },
     "openal-soft_src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1743221304,
+        "narHash": "sha256-VQa3FD9NyvDv/+VbU+5lmV0LteiioJHpRkr1lnCn1g4=",
+        "owner": "kcat",
+        "repo": "openal-soft",
+        "rev": "dc7d7054a5b4f3bec1dc23a42fd616a0847af948",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kcat",
+        "ref": "1.24.3",
+        "repo": "openal-soft",
+        "type": "github"
+      }
+    },
+    "openal-soft_src_2": {
       "flake": false,
       "locked": {
         "lastModified": 1743221304,
@@ -712,14 +767,15 @@
         "SDL2-win32": "SDL2-win32",
         "SDL2_image-win32": "SDL2_image-win32",
         "SDL2_ttf-win32": "SDL2_ttf-win32",
-        "curl-win32": "curl-win32",
         "flake-utils": "flake-utils_3",
         "freetype-src": "freetype-src",
         "freetype-win32": "freetype-win32",
         "glew-win32": "glew-win32",
+        "libmodplug-win32": "libmodplug-win32",
         "logmich": "logmich",
         "miniswig": "miniswig",
         "nixpkgs": "nixpkgs",
+        "openal-soft-win32": "openal-soft-win32",
         "physfs-src": "physfs-src",
         "physfs-win32": "physfs-win32",
         "sdl2-image-src": "sdl2-image-src",
@@ -1021,14 +1077,14 @@
         "flake-utils": [
           "flake-utils"
         ],
-        "libmodplug-win32": "libmodplug-win32",
+        "libmodplug-win32": "libmodplug-win32_2",
         "libogg-win32": "libogg-win32",
         "libvorbis-win32": "libvorbis-win32",
         "mpg123-win32": "mpg123-win32",
         "nixpkgs": [
           "nixpkgs"
         ],
-        "openal-soft-win32": "openal-soft-win32",
+        "openal-soft-win32": "openal-soft-win32_2",
         "opus-win32": "opus-win32",
         "opusfile-win32": "opusfile-win32",
         "tinycmmc": [
