@@ -16,9 +16,12 @@
 
 #include "audio/sound_manager.hpp"
 
+#include <wstsound/sound_source_type.hpp>
+
 
 
 #include "audio/sound_source.hpp"
+#include "physfs/ifile_stream.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/reader_document.hpp"
@@ -173,7 +176,12 @@ MusicFile load_music_file(std::string const& filename_original)
 
 SoundManager::SoundManager() :
   m_sound_mgr([](std::filesystem::path const& filename){
-    return std::make_unique<IFileStream>(filename.string());
+    try {
+      return std::make_unique<IFileStream>(filename.string());
+    } catch (std::exception const& e) {
+      log_warning("audio open_func: failed to open '{}': {}", filename.string(), e.what());
+      throw;
+    }
   }),
   m_sound_enabled(true),
   m_music_enabled(true),
@@ -181,15 +189,58 @@ SoundManager::SoundManager() :
   m_music_source(),
   m_current_music()
 {
+  if (m_sound_mgr.is_dummy()) {
+    log_warning("SoundManager: OpenAL device unavailable — audio is disabled (dummy mode)");
+  } else {
+    log_info("SoundManager: OpenAL device opened successfully");
+#if defined(__EMSCRIPTEN__)
+    // Emscripten OpenAL wraps Web Audio; state may be 'suspended' until a
+    // user gesture resumes the AudioContext (see st_emscripten_audio_resume).
+    log_info("SoundManager: WASM build — browser autoplay policy may mute until first click/tap");
+#endif
+    // Probe PhysFS open of a stock SFX so missing mounts / wrong VFS roots
+    // show up at boot (SoundChannel::prepare swallows load errors into Dummy).
+    try {
+      auto is = std::make_unique<IFileStream>("sounds/coin.wav");
+      (void)is;
+      log_info("SoundManager: PhysFS probe open of sounds/coin.wav succeeded");
+    } catch (std::exception const& e) {
+      log_warning("SoundManager: PhysFS probe open of sounds/coin.wav failed: {}", e.what());
+    }
+    // Also try a common absolute-style music path used by the game.
+    try {
+      auto is = std::make_unique<IFileStream>("/music/misc/theme.ogg");
+      (void)is;
+      log_info("SoundManager: PhysFS probe open of /music/misc/theme.ogg succeeded");
+    } catch (std::exception const& e) {
+      log_warning("SoundManager: PhysFS probe open of /music/misc/theme.ogg failed: {}", e.what());
+    }
+  }
+  log_info("SoundManager: sound_enabled={} music_enabled={}",
+           m_sound_enabled, m_music_enabled);
 }
 
 void
 SoundManager::play(std::string const& name, Vector const& pos, const float gain)
 {
-  auto source = m_sound_mgr.sound().play(name);
-  source->set_position(pos.x, pos.y, 0.0f);
-  source->set_gain(gain);
-  m_sources.emplace_back(std::move(source));
+  if (!m_sound_enabled) {
+    log_debug("SoundManager::play('{}') skipped (sound disabled)", name);
+    return;
+  }
+  if (m_sound_mgr.is_dummy()) {
+    log_debug("SoundManager::play('{}') skipped (OpenAL dummy)", name);
+    return;
+  }
+
+  try {
+    auto source = m_sound_mgr.sound().play(name);
+    source->set_position(pos.x, pos.y, 0.0f);
+    source->set_gain(gain);
+    m_sources.emplace_back(std::move(source));
+    log_debug("SoundManager::play('{}') gain={} pos=({},{})", name, gain, pos.x, pos.y);
+  } catch (std::exception const& e) {
+    log_warning("SoundManager::play('{}') failed: {}", name, e.what());
+  }
 }
 
 void
@@ -232,9 +283,17 @@ SoundManager::play_music(std::string const& filename, float fadetime)
     return;
   }
 
+  if (m_sound_mgr.is_dummy()) {
+    log_warning("SoundManager::play_music('{}') skipped (OpenAL dummy)", filename);
+    return;
+  }
+
   try {
+    log_info("SoundManager::play_music('{}') fadetime={}", filename, fadetime);
     if (filename.ends_with(".music")) {
       auto music_file = load_music_file(filename);
+      log_info("SoundManager: .music resolved to '{}' loop=[{}, {}]",
+               music_file.file, music_file.loop_begin, music_file.loop_at);
       m_music_source = m_sound_mgr.music().prepare(music_file.file, wstsound::SoundSourceType::STREAM);
       m_music_source->set_loop(m_music_source->sec_to_sample(music_file.loop_begin),
                                m_music_source->sec_to_sample(music_file.loop_at));
@@ -249,6 +308,7 @@ SoundManager::play_music(std::string const& filename, float fadetime)
 
     m_music_source->set_relative(true);
     m_music_source->play();
+    log_info("SoundManager::play_music('{}') started", filename);
   } catch(std::exception& e) {
     log_warning("Couldn't play music file '{}': {}", filename, e.what());
   }
@@ -361,12 +421,14 @@ SoundManager::manage_source(std::unique_ptr<SoundSource> source)
 void
 SoundManager::enable_sound(bool sound_enabled)
 {
+  log_info("SoundManager::enable_sound({})", sound_enabled);
   m_sound_enabled = sound_enabled;
 }
 
 void
 SoundManager::enable_music(bool music_enabled)
 {
+  log_info("SoundManager::enable_music({})", music_enabled);
   m_music_enabled = music_enabled;
 }
 
@@ -385,7 +447,7 @@ SoundManager::set_sound_volume(int volume)
 bool
 SoundManager::is_audio_enabled() const
 {
-  return true;
+  return !m_sound_mgr.is_dummy() && (m_sound_enabled || m_music_enabled);
 }
 
 /* EOF */
