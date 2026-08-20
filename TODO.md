@@ -154,3 +154,75 @@ NPOT on WebGL, assert_gl no-op, no SDL_Delay in rAF loop.
 Still open: lightmap cost, draw-call batching, exception overhead, audio.
 
 
+
+## Upstream external/ changes (multi-step)
+
+Goal: collect, merge, and upstream the porting-related fixes that landed in
+`external/` across SuperTux-Origins, Pingus and Windstille so that the
+individual library repositories (and ultimately a cleaned `external/` tree)
+benefit. Project-specific hacks should be generalised or moved into the
+consuming project's CMake / flake; only library-generic changes go upstream.
+
+### Inventory of shared externals
+
+| Library      | Present in          | Upstream (approx.)                  | Deps (minimal first) |
+|--------------|---------------------|-------------------------------------|----------------------|
+| tinycmmc     | all three           | grumbel / tinycmmc family           | none (CMake modules) |
+| logmich      | Pingus, SuperTux, Windstille | grumbel/logmich                  | none / std            |
+| strutcpp     | all                 | grumbel/strutcpp                    | logmich?              |
+| geomcpp      | all                 | grumbel/geomcpp                     | none                  |
+| argpp        | all                 | grumbel/argpp                       | none                  |
+| sexpcpp      | all                 | lispparser/sexp-cpp or grumbel      | none                  |
+| priocpp      | Pingus, SuperTux    | grumbel/priocpp                     | sexpcpp?              |
+| xdgcpp       | Pingus, SuperTux    | grumbel/xdgcpp                      | none                  |
+| tinygettext  | Pingus, SuperTux    | tinygettext upstream + local        | none                  |
+| wstsound     | all                 | grumbel/wstsound                    | OpenAL, codecs        |
+| miniswig     | SuperTux, Windstille| grumbel/miniswig                    | none                  |
+| squirrel     | SuperTux            | upstream squirrel + local flake     | none                  |
+| glad / obstack / SDL_SavePNG | SuperTux only | various                             | n/a                   |
+
+Order for upstreaming: **tinycmmc → logmich / geomcpp / argpp / sexpcpp / xdgcpp → strutcpp / priocpp → wstsound / tinygettext / miniswig**.
+
+### Observed change categories (to merge)
+
+- C++20 `std::format` / `std::print` polyfills and Win32 / MinGW compatibility
+  (Pingus "Use std::print polyfill for Win32 too").
+- Exception type cleanups (`std::runtime_error` → `std::invalid_argument` in
+  argpp parsers) – prefer the stricter type if it does not break callers.
+- EMSCRIPTEN / ANDROID / R36S CMake flags (force static, disable optional
+  codecs, MODPLUG paths, no system find_package for wrong arch).
+- Include hygiene for GCC 15 / MinGW (`<cfloat>`, `<cstdlib>`, etc.).
+- logmich → Android logcat tag plumbing (generalise to a compile-time tag
+  or callback, not hard-code "SuperTux").
+- FreeType / HarfBuzz / PNG / Brotli disable flags for constrained targets.
+- flake.nix / *.nix updates that are library-generic (not project packaging).
+
+### Steps (this will take multiple bundles)
+
+1. [ ] Per-library: checkout each library's upstream (or the newest common
+   base from Pingus/Windstille/SuperTux), apply the union of non-conflicting
+   diffs, drop pure-project code (e.g. SuperTux-specific log tags, Windstille
+   VirtualGamepad mentions that leaked into a lib).
+2. [ ] Resolve conflicts in favour of the most general fix; document in
+   PORTING.md why a change stayed project-local.
+3. [ ] Produce one git bundle **per library** (or small dependency group)
+   that can be applied to the library's own repository. Naming:
+   `libname-001-…` or continue the global `supertux-0NN-upstream-libname-…`
+   sequence so numbers never collide.
+4. [ ] After upstream PRs / merges, re-vendor the cleaned sources into
+   SuperTux / Pingus / Windstille `external/` (final step, not yet).
+5. [ ] Keep `external/` in SuperTux temporarily as a staging area; do not
+   delete local patches until the upstream round-trip is verified.
+
+### Notes
+
+- Some "external/" trees contain their own flake.nix / flake.lock; those
+  should also be brought into line with the library's real upstream flake.
+- Chained deps mean tinycmmc and logmich first: everything else may
+  `find_package` them.
+- Prefer clean, minimal patches over large rewrites. If a change is only
+  needed for one platform, guard it with `#if defined(EMSCRIPTEN)` etc.
+  rather than forking the library.
+
+See also PORTING.md for the concrete compiler / linker errors that drove
+many of these patches.
