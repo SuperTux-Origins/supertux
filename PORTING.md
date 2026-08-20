@@ -1688,3 +1688,13 @@ all `*.dll` so the flat Wine package is complete.
 `pkgs.writeShellScript`. Wine apps are Linux-only: gate on
 `buildPlatform.isLinux && hostPlatform.isLinux`, and create the script with
 `pkgs.buildPackages.writeShellScript`.
+
+## Magnification zoom-out (R36S / small panels)
+
+Design virtual max is ~1368x800; R36S is typically 640x480. Auto magnification
+only scaled *up* when the window exceeded max_size, and `mobile_controls`
+forced `scale = max(scale, 1)`. Sub-100% menu entries were also hidden under
+`HIDE_NONMOBILE_OPTIONS` (on for R36S).
+
+Now: auto uses the same fill formula in both directions (scale < 1 on small
+panels), no mobile floor at 1.0, and 40–80% options always listed.

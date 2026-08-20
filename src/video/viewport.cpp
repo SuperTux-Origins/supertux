@@ -58,19 +58,16 @@ calculate_scale(Size const& min_size, Size const& max_size,
                 float magnification)
 {
   float scale = magnification;
-  if (scale == 0.0f) // magic value
+  if (scale == 0.0f) // magic value: auto
   {
-    scale = 1.0f;
+    // Fill the window so the virtual area is as close to max_size as possible
+    // without exceeding it. On large displays this zooms *in* (scale > 1); on
+    // small handhelds (R36S 640x480) this zooms *out* (scale < 1) so more of
+    // the level is visible — previously only the > max_size branch ran.
+    scale = std::max(static_cast<float>(window_size.width) / static_cast<float>(max_size.width),
+                     static_cast<float>(window_size.height) / static_cast<float>(max_size.height));
 
-    // Find the minimum magnification that is needed to fill the screen
-    if (window_size.width > max_size.width ||
-        window_size.height > max_size.height)
-    {
-      scale = std::max(static_cast<float>(window_size.width) / static_cast<float>(max_size.width),
-                       static_cast<float>(window_size.height) / static_cast<float>(max_size.height));
-    }
-
-    // If the resulting area would violate min_size, scale it down
+    // Keep virtual size at least min_size (raises scale if we zoomed out too far).
     if (static_cast<float>(window_size.width) / scale < static_cast<float>(min_size.width) ||
         static_cast<float>(window_size.height) / scale < static_cast<float>(min_size.height))
     {
@@ -79,8 +76,8 @@ calculate_scale(Size const& min_size, Size const& max_size,
     }
   }
 
-  if (g_config->mobile_controls)
-    scale = std::max(scale, 1.f);
+  // Do not floor scale at 1.0 for mobile_controls — handhelds need scale < 1
+  // to see a full 1280x720-class area on a 640x480 panel.
 
   return scale;
 }

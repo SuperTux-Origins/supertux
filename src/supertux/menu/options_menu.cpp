@@ -105,12 +105,13 @@ OptionsMenu::OptionsMenu(bool complete) :
   // These values go from screen:640/projection:1600 to
   // screen:1600/projection:640 (i.e. 640, 800, 1024, 1280, 1600)
   magnifications.push_back(_("auto"));
-#ifndef HIDE_NONMOBILE_OPTIONS
+  // Zoom-out values must stay available on handhelds (R36S / Android):
+  // HIDE_NONMOBILE_OPTIONS used to hide them, but small panels need scale < 1
+  // to show a full design-sized game area.
   magnifications.push_back("40%");
   magnifications.push_back("50%");
   magnifications.push_back("62.5%");
   magnifications.push_back("80%");
-#endif
   magnifications.push_back("100%");
   magnifications.push_back("125%");
   magnifications.push_back("160%");

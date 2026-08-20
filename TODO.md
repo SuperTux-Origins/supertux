@@ -32,6 +32,7 @@ adapted from Pingus and Windstille.
 - [x] FreeType -U HARFBUZZ/PNG/BROTLI; MinGW postFixup copies real DLLs.
 - [x] nix run Wine apps: supertux-win32 / mingw64 (Pingus mkWineApp).
 - [x] R36S FreeType: custom ftmodule_min.h + ftgzip (link errors).
+- [x] Magnification can zoom out (auto + menu) for R36S/small screens.
 - [ ] Complete cross graph for remaining C++ deps; produce .exe + DLLs.
 - [ ] Unbreak `supertux-origins-win32` / zip once mingw64 package succeeds.
 
