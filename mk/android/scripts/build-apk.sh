@@ -470,17 +470,13 @@ do
   fi
 done
 
-# Nested zip so PhysFS can mount assets/data.zip as the data root (paths
-# images/, levels/, … without an assets/ prefix). See PHYSFS_AndroidInit
-# handling in PhysfsSubsystem::find_datadir().
-echo "==> packing assets/data.zip for PhysFS"
-rm -f src/assets/data.zip
-( cd src/assets && zip -r -0 data.zip . -x 'data.zip' -x 'android-asset-index.txt' )
-echo "assets/data.zip size: $(du -h src/assets/data.zip | awk '{print $1}')"
-# Avoid double-shipping: APK keeps assets/data.zip (+ index) only. PhysFS mounts
-# the zip as the data root; loose duplicates only bloated the package.
-echo "==> pruning loose assets (keep data.zip + index only)"
-find src/assets -mindepth 1 -maxdepth 1 ! -name 'data.zip' ! -name 'android-asset-index.txt' -exec rm -rf {} +
+# Keep loose files under assets/. PhysFS mounts the APK and PHYSFS_setRoot
+# shifts the VFS root to assets/ (see main.cpp). Nested data.zip was removed:
+# APK→data.zip double-zip made every seek pathologically slow on eMMC.
+# (Legacy APKs that still ship assets/data.zip remain readable as a fallback.)
+echo "==> Android assets (loose tree under assets/, no nested data.zip)"
+echo "    files=$ASSET_COUNT size=$ASSET_SIZE"
+# Do not pack or prune into data.zip.
 
 cp "$KEYSTORE" debug.keystore
 

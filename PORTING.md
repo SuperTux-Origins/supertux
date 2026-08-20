@@ -1484,3 +1484,16 @@ small files through the nested zip (slower than desktop, but sequential).
 Desktop: wrap `supertux-origins` with `LD_LIBRARY_PATH` including
 `xorg.libSM` / `libICE` (fixes `libSM.so.6: cannot open shared object file`).
 
+
+## Android: drop nested assets/data.zip
+
+Previously build-apk packed the whole data tree into `assets/data.zip` and
+pruned loose files. PhysFS mounted APK then mounted that zip → every open/seek
+went through two zip layers (multi-minute stalls on Fire eMMC).
+
+Now:
+- APK ships **loose** files under `assets/`
+- `PHYSFS_mount(apk)` + `PHYSFS_setRoot(apk, "assets")` (PhysFS 3.2+) so
+  game paths stay `images/`, `levels/`, …
+- Legacy `assets/data.zip` still mounts if `setRoot` fails (old APKs)
+

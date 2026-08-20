@@ -201,9 +201,11 @@ void PhysfsSubsystem::find_datadir() const
 #if defined(__ANDROID__)
   else
   {
-    // PHYSFS_AndroidInit made getBaseDir() the APK path (a zip). Mount it,
-    // then prefer assets/data.zip (packaged by build-apk.sh) so game paths
-    // are images/, levels/, … without an assets/ prefix.
+    // PHYSFS_AndroidInit: getBaseDir() is the APK (a zip). Mount it once.
+    // Ship *loose* files under assets/ (see build-apk.sh) and shift the VFS
+    // root with PHYSFS_setRoot so game paths stay images/, levels/, … without
+    // a nested assets/data.zip (double-zip I/O was pathologically slow on
+    // eMMC). Optional legacy data.zip still works if present.
     char const* basedir = PHYSFS_getBaseDir();
     if (basedir && basedir[0])
     {
@@ -214,20 +216,33 @@ void PhysfsSubsystem::find_datadir() const
       }
       else
       {
-        PHYSFS_File* data_zip = PHYSFS_openRead("assets/data.zip");
-        if (data_zip)
+        // Preferred: single zip layer (the APK). PhysFS 3.2+.
+        if (PHYSFS_setRoot(basedir, "assets"))
         {
-          if (!PHYSFS_mountHandle(data_zip, "assets/data.zip", nullptr, 1))
-          {
-            log_warning("Couldn't mount assets/data.zip inside APK: {}",
-                        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
-            PHYSFS_close(data_zip);
-          }
+          log_warn("PhysFS: APK mounted with root 'assets/' (no nested data.zip)");
         }
         else
         {
-          // Fallback: assets/ tree is visible under "assets/" prefix only.
-          log_warning("assets/data.zip not found in APK; data may need an assets/ prefix");
+          log_warning("PHYSFS_setRoot(assets) failed: {} — trying legacy data.zip",
+                      PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+          PHYSFS_File* data_zip = PHYSFS_openRead("assets/data.zip");
+          if (data_zip)
+          {
+            if (!PHYSFS_mountHandle(data_zip, "assets/data.zip", nullptr, 1))
+            {
+              log_warning("Couldn't mount assets/data.zip inside APK: {}",
+                          PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+              PHYSFS_close(data_zip);
+            }
+            else
+            {
+              log_warn("PhysFS: mounted legacy assets/data.zip (nested; slower)");
+            }
+          }
+          else
+          {
+            log_warning("No assets/ root and no assets/data.zip; data paths may be wrong");
+          }
         }
       }
     }
