@@ -199,10 +199,14 @@ Order for upstreaming: **tinycmmc → logmich / geomcpp / argpp / sexpcpp / xdgc
 
 ### Steps (this will take multiple bundles)
 
-1. [ ] Per-library: checkout each library's upstream (or the newest common
+1. [~] Per-library: checkout each library's upstream (or the newest common
    base from Pingus/Windstille/SuperTux), apply the union of non-conflicting
    diffs, drop pure-project code (e.g. SuperTux-specific log tags, Windstille
    VirtualGamepad mentions that leaked into a lib).
+   - tinycmmc: aligned Export/FindDependency with Windstille (top-level-only
+     install + multi-candidate external/ search + double-add guard). Kept
+     SuperTux FindOgg/FindVorbisfile vanished-path + static-link hygiene and
+     VERSION-first GetProjectVersion. Still needs real upstream repo round-trip.
 2. [ ] Resolve conflicts in favour of the most general fix; document in
    PORTING.md why a change stayed project-local.
 3. [ ] Produce one git bundle **per library** (or small dependency group)

@@ -1759,3 +1759,30 @@ package versioning and flake evaluation.
 
 Vendored trees use static `X.Y.Z-dev` in `VERSION`. The game uses top-level
 `VERSION` (`0.6.4-dev`); the flake appends `.<revCount>+g<hash>` for `-dev`.
+
+## tinycmmc external/ alignment (upstream prep)
+
+Merged the better pieces from Windstille into SuperTux's vendored tinycmmc
+while keeping SuperTux-specific hygiene that is still general:
+
+- `modules/tinycmmc/FindDependency.cmake`: Windstille's multi-candidate
+  search (`name` / `namecpp`), dual-root lookup (`CMAKE_SOURCE_DIR` +
+  `CMAKE_CURRENT_SOURCE_DIR`), and GLOBAL property guard against double
+  `add_subdirectory`. Essential when many libraries under `external/` call
+  `tinycmmc_find_dependency` on each other.
+- `ExportAndInstallLibrary` (both old compatibility wrapper and the
+  `tinycmmc/` macro): always create the namespaced ALIAS; run install /
+  export / Config only when the package is the top-level CMake project.
+  Prevents polluting the parent install tree and avoids missing export-set
+  errors for PUBLIC-linked dependencies that are themselves only
+  subdirectories.
+- Kept SuperTux `FindOgg.cmake` / `FindVorbisfile.cmake` filters that drop
+  vanished pkg-config include dirs and that explicitly resolve libvorbis +
+  libogg for static / wasm linking.
+- Kept SuperTux `GetProjectVersion.cmake` that prefers a plain `VERSION`
+  file over `git describe` (critical for vendored trees without a full
+  git history).
+
+These changes are library-generic and should be the basis for an upstream
+tinycmmc PR. Project-local packaging still lives in the SuperTux / Pingus /
+Windstille flakes.
