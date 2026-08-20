@@ -87,11 +87,12 @@ EOF
        # our binary does not help transitive deps, so expose the usual SDL2
        # closure via LD_LIBRARY_PATH. This is not raw X11 usage by SuperTux.
        wrapProgram $out/bin/supertux-origins \
-         --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([
-           SDL2 SDL2_image SDL2_ttf curl libGL physfs
-           # SDL2 X11 video backend (see libSM.so.6 runtime error without these)
-           libsm libice
-         ] ++ lib.optional (xdgcpp != null) xdgcpp)}
+         --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath (
+           [ SDL2 SDL2_image SDL2_ttf curl libGL physfs ]
+           ++ lib.optional (libsm != null) libsm
+           ++ lib.optional (libice != null) libice
+           ++ lib.optional (xdgcpp != null) xdgcpp
+         )}
     '');
 
 
