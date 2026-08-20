@@ -67,11 +67,18 @@ EOF
   ] ++
   lib.optional useGLES2 "-DENABLE_OPENGLES2=ON";
 
+  # Transitive runtime DLLs (ogg, vorbis, opus, zlib, …) live under dependency
+  # store paths, not only the top-level package bin/. Scan the buildInputs
+  # closure so Wine/flat packages get a complete set.
+  windowsDllRoots = lib.optionals stdenv.hostPlatform.isWindows (
+    lib.closePropagation (buildInputs ++ nativeBuildInputs ++ [ mcfgthreads stdenv.cc.cc ])
+  );
+
   postFixup =
     (lib.optionalString stdenv.hostPlatform.isWindows ''
-       # Nixpkgs Windows fixupPhase may already have linked runtime DLLs into
-       # $out/bin (symlinks or hardlinks). Materialize to real files without
-       # `cp: are the same file` when source and dest share an inode.
+       # Materialize runtime DLLs into $out/bin for Wine / redistribution.
+       # Nixpkgs may already link some; transitive audio deps (ogg.dll) are
+       # often missing unless we scan the full buildInputs closure.
        mkdir -p $out/bin
        materialize_dll() {
          local src="$1"
@@ -80,32 +87,21 @@ EOF
          base=$(basename "$src")
          dest="$out/bin/$base"
          tmp="$dest.tmp.$$"
-         # Always copy via a temp name, then rename — works for missing,
-         # symlink, hardlink-to-same, and different content.
          cp -L "$src" "$tmp"
          mv -f "$tmp" "$dest"
        }
-       # Turn any existing symlink DLLs into real files first.
        for f in "$out/bin"/*.dll; do
          [ -e "$f" ] || continue
          if [ -L "$f" ]; then
            materialize_dll "$f"
          fi
        done
-       for src in \
-         ${mcfgthreads}/bin/*.dll \
-         ${mcfgthreads}/lib/*.dll \
-         ${stdenv.cc.cc}/x86_64-w64-mingw32/lib/*.dll \
-         ${stdenv.cc.cc}/lib/*.dll \
-         ${SDL2}/bin/*.dll \
-         ${SDL2_image}/bin/*.dll \
-         ${SDL2_ttf}/bin/*.dll \
-         ${physfs}/bin/*.dll \
-         ${strutcpp}/bin/*.dll \
-         ${wstsound}/bin/*.dll${lib.optionalString (squirrel != null) " \\
-         ${squirrel}/bin/*.dll"}
-       do
-         materialize_dll "$src"
+       for root in ${lib.escapeShellArgs (map toString windowsDllRoots)}; do
+         [ -d "$root" ] || continue
+         # Prefer bin/ and lib/; skip huge unrelated trees when possible.
+         find "$root" -type f -iname '*.dll' 2>/dev/null | while read -r src; do
+           materialize_dll "$src"
+         done
        done
     '')
     + (lib.optionalString stdenv.hostPlatform.isLinux ''
@@ -122,7 +118,6 @@ EOF
            ++ lib.optional (xdgcpp != null) xdgcpp
          )}
     '');
-
 
   nativeBuildInputs = [
     cmake

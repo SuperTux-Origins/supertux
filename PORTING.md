@@ -1673,3 +1673,10 @@ compile TTF/CFF/smooth/raster sources.
 
 Fix: `mk/cmake/SuperTux/ftmodule_min.h` + `-DFT_CONFIG_MODULES_H="…"` and
 add `src/gzip/ftgzip.c` for `FT_Gzip_Uncompress` (sfnt compressed tables).
+
+## Win32 Wine: missing ogg.dll (transitive audio DLLs)
+
+`libvorbis-0.dll` / `libopusfile-0.dll` need `ogg.dll` from libogg, which is
+only a transitive dep of wstsound. postFixup used to copy only top-level
+package `bin/*.dll`. Now scans `lib.closePropagation` of buildInputs for
+all `*.dll` so the flat Wine package is complete.
