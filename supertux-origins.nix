@@ -69,20 +69,44 @@ EOF
 
   postFixup =
     (lib.optionalString stdenv.hostPlatform.isWindows ''
-       # Copy (dereference) runtime DLLs into $out/bin so the package is
-       # self-contained and easy to inspect/redistribute. Symlinks into the
-       # Nix store work for `nix run` but look wrong in result/ and break
-       # naive zip/copy outside the store.
-       mkdir -p $out/bin/
-       find ${mcfgthreads} -iname "*.dll" -exec cp -L -t $out/bin/ {} +
-       find ${stdenv.cc.cc} -iname "*.dll" -exec cp -L -t $out/bin/ {} + 2>/dev/null || true
-       cp -L ${SDL2_image}/bin/*.dll $out/bin/ 2>/dev/null || true
-       cp -L ${SDL2_ttf}/bin/*.dll $out/bin/ 2>/dev/null || true
-       cp -L ${SDL2}/bin/*.dll $out/bin/ 2>/dev/null || true
-       cp -L ${physfs}/bin/*.dll $out/bin/ 2>/dev/null || true
-       ${lib.optionalString (squirrel != null) "cp -L ${squirrel}/bin/*.dll $out/bin/ 2>/dev/null || true"}
-       cp -L ${strutcpp}/bin/*.dll $out/bin/ 2>/dev/null || true
-       cp -L ${wstsound}/bin/*.dll $out/bin/ 2>/dev/null || true
+       # Nixpkgs Windows fixupPhase may already have linked runtime DLLs into
+       # $out/bin (symlinks or hardlinks). Materialize to real files without
+       # `cp: are the same file` when source and dest share an inode.
+       mkdir -p $out/bin
+       materialize_dll() {
+         local src="$1"
+         [ -f "$src" ] || return 0
+         local base dest tmp
+         base=$(basename "$src")
+         dest="$out/bin/$base"
+         tmp="$dest.tmp.$$"
+         # Always copy via a temp name, then rename — works for missing,
+         # symlink, hardlink-to-same, and different content.
+         cp -L "$src" "$tmp"
+         mv -f "$tmp" "$dest"
+       }
+       # Turn any existing symlink DLLs into real files first.
+       for f in "$out/bin"/*.dll; do
+         [ -e "$f" ] || continue
+         if [ -L "$f" ]; then
+           materialize_dll "$f"
+         fi
+       done
+       for src in \
+         ${mcfgthreads}/bin/*.dll \
+         ${mcfgthreads}/lib/*.dll \
+         ${stdenv.cc.cc}/x86_64-w64-mingw32/lib/*.dll \
+         ${stdenv.cc.cc}/lib/*.dll \
+         ${SDL2}/bin/*.dll \
+         ${SDL2_image}/bin/*.dll \
+         ${SDL2_ttf}/bin/*.dll \
+         ${physfs}/bin/*.dll \
+         ${strutcpp}/bin/*.dll \
+         ${wstsound}/bin/*.dll${lib.optionalString (squirrel != null) " \\
+         ${squirrel}/bin/*.dll"}
+       do
+         materialize_dll "$src"
+       done
     '')
     + (lib.optionalString stdenv.hostPlatform.isLinux ''
        # The game only uses SDL. Under pure Nix, the dynamic linker still has to

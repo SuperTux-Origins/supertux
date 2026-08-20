@@ -1643,3 +1643,10 @@ Use `-UFT_CONFIG_OPTION_USE_HARFBUZZ` (same for PNG/BROTLI).
 `result/bin/*.dll` looks like broken/odd links when listed. Now `cp -L`
 real files into `$out/bin`. Flat package `.#supertux-origins-win32` already
 used `cp --dereference` and is no longer marked broken.
+
+## MinGW postFixup: cp same-file vs nixpkgs DLL links
+
+Nixpkgs Windows `fixupPhase` already links runtime DLLs into `$out/bin`.
+A second `cp -L src $out/bin/` then fails with `are the same file` when the
+destination is a hardlink to the same store object. Materialize via
+temp file + `mv -f` instead.
