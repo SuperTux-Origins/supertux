@@ -224,14 +224,14 @@
         var v = q.get(name);
         return v === '1' || v === 'true' || v === 'yes';
       }
-      return { verbose: on('verbose'), debug: on('debug') };
+      return { verbose: on('verbose'), debug: on('debug'), developer: on('developer') };
     })();
     if (stQuery.verbose || stQuery.debug) {
       console.log('[supertux-shell] query flags', stQuery, 'search=', window.location.search);
     }
 
     /* User data root (matches C++ System::find_userdir for Emscripten). */
-    var ST_USER_ROOT = '/pingus-user';
+    var ST_USER_ROOT = '/home/web_user/.local/share/supertux-origins';
 
     function stBytesToBase64(u8) {
       var CHUNK = 0x8000;
@@ -490,13 +490,12 @@
       };
     }
 
-    /* Map ?verbose=1 / ?debug=1 to argv consumed by PingusMain::parse_args. */
+    /* Map ?verbose=1 / ?debug=1 / ?developer=1 to SuperTux argv.
+       Note: SuperTux uses long options; -v is --version (not verbose). */
     var stArgv = [];
-    if (stQuery.verbose) stArgv.push('-v');
-    if (stQuery.debug) {
-      stArgv.push('-D');
-      stArgv.push('--developer-mode');
-    }
+    if (stQuery.verbose) stArgv.push('--verbose');
+    if (stQuery.debug) stArgv.push('--debug');
+    if (stQuery.developer) stArgv.push('--developer');
 
     var Module = {
       arguments: stArgv,

@@ -192,18 +192,18 @@ SoundManager::SoundManager() :
   if (m_sound_mgr.is_dummy()) {
     log_warning("SoundManager: OpenAL device unavailable — audio is disabled (dummy mode)");
   } else {
-    log_info("SoundManager: OpenAL device opened successfully");
+    log_warn("SoundManager: OpenAL device opened successfully");
 #if defined(__EMSCRIPTEN__)
     // Emscripten OpenAL wraps Web Audio; state may be 'suspended' until a
     // user gesture resumes the AudioContext (see st_emscripten_audio_resume).
-    log_info("SoundManager: WASM build — browser autoplay policy may mute until first click/tap");
+    log_warn("SoundManager: WASM build — browser autoplay policy may mute until first click/tap");
 #endif
     // Probe PhysFS open of a stock SFX so missing mounts / wrong VFS roots
     // show up at boot (SoundChannel::prepare swallows load errors into Dummy).
     try {
       auto is = std::make_unique<IFileStream>("sounds/coin.wav");
       (void)is;
-      log_info("SoundManager: PhysFS probe open of sounds/coin.wav succeeded");
+      log_warn("SoundManager: PhysFS probe open of sounds/coin.wav succeeded");
     } catch (std::exception const& e) {
       log_warning("SoundManager: PhysFS probe open of sounds/coin.wav failed: {}", e.what());
     }
@@ -211,12 +211,12 @@ SoundManager::SoundManager() :
     try {
       auto is = std::make_unique<IFileStream>("/music/misc/theme.ogg");
       (void)is;
-      log_info("SoundManager: PhysFS probe open of /music/misc/theme.ogg succeeded");
+      log_warn("SoundManager: PhysFS probe open of /music/misc/theme.ogg succeeded");
     } catch (std::exception const& e) {
       log_warning("SoundManager: PhysFS probe open of /music/misc/theme.ogg failed: {}", e.what());
     }
   }
-  log_info("SoundManager: sound_enabled={} music_enabled={}",
+  log_warn("SoundManager: sound_enabled={} music_enabled={}",
            m_sound_enabled, m_music_enabled);
 }
 

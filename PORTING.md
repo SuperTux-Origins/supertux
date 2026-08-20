@@ -1341,3 +1341,22 @@ SoundManager::play_music('…') started
 
 If probes fail, check `--preload-file …@/data` and `PHYSFS_mount("/data")`.
 
+
+## WASM shell URL flags → SuperTux argv
+
+Shell (`mk/wasm/shell.html`) maps query params to `Module.arguments`:
+
+| Query | Argv | Effect |
+|-------|------|--------|
+| `?verbose=1` | `--verbose` | logmich INFO |
+| `?debug=1` | `--debug` | logmich DEBUG |
+| `?developer=1` | `--developer` | developer_mode |
+
+**Do not** use Pingus short flags here: in SuperTux `-v` is **version**
+(exits after printing), and `-D` / `--developer-mode` are **unknown** and
+abort `parse_args` before `SoundManager` is constructed — which looked like
+“no audio logs at all”.
+
+Default log level is WARNING. Audio boot probes use `log_warn` so they show
+without query flags; `play`/`play_music` detail stays at info/debug.
+
