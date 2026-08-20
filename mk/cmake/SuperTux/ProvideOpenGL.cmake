@@ -16,12 +16,11 @@ if(ENABLE_OPENGL)
       list(APPEND OPENGL_LINK_LIBRARIES "${GLESV2_LIBRARIES}")
     endif()
   else()
-    message(STATUS "Checking for OpenGL (GLAD loader, no GLEW)")
+    message(STATUS "Checking for OpenGL (GLAD loader)")
 
     set(HAVE_OPENGL TRUE)
 
     # Vendored GLAD (OpenGL 3.3 core). Loads entry points via SDL_GL_GetProcAddress
-    # — no GLEW and no GLEW-propagated -lX11 on our link line.
     set(GLAD_DIR "${CMAKE_SOURCE_DIR}/external/glad")
     if(NOT EXISTS "${GLAD_DIR}/src/gl.c")
       message(FATAL_ERROR "GLAD sources missing at ${GLAD_DIR} (expected src/gl.c)")
@@ -35,9 +34,10 @@ if(ENABLE_OPENGL)
     list(APPEND OPENGL_LINK_LIBRARIES glad)
     list(APPEND OPENGL_INCLUDE_DIRECTORIES "${GLAD_DIR}/include")
 
-    # Platform GL library (symbols / ICD). Prefer CMake's OpenGL::GL when present
-    # but do not use GLEW. Linking OpenGL::GL may still pull GLX transitively on
-    # some systems; the game talks to GL only through GLAD + SDL context.
+    # Platform GL library (symbols / ICD). Prefer CMake's OpenGL::GL
+    # when present Linking OpenGL::GL may still pull GLX transitively
+    # on some systems; the game talks to GL only through GLAD + SDL
+    # context.
     if(WIN32)
       list(APPEND OPENGL_LINK_LIBRARIES opengl32)
     else()

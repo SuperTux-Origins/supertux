@@ -265,9 +265,6 @@
                      then physfs-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
                      else pkgs.physfs;
 
-
-            glew = null; # GLAD in-tree; no GLEW
-
             glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
 
             SDL2 = if pkgs.stdenv.hostPlatform.isWindows
@@ -301,7 +298,6 @@
             priocpp = priocpp-pkg;
             logmich = logmich-pkg;
             physfs = pkgs.physfs;
-            glew = null; # GLAD in-tree; no GLEW
             glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
             SDL2 = pkgs.SDL2;
             SDL2_image = pkgs.SDL2_image;
@@ -311,6 +307,7 @@
             mcfgthreads = pkgs.windows.mcfgthreads;
             gtest = pkgs.gtest;
             useGLES2 = true;
+            libGL = pkgs.libGL;
           };
           supertux-origins-mingw64 =
             if pkgs.stdenv.hostPlatform.isWindows then
@@ -381,7 +378,6 @@
                 SDL2_image = sdl2imgw;
                 SDL2_ttf = sdl2ttfw;
                 physfs = physfsw;
-                glew = null;
                 sexpcpp = sexpcppW;
                 # Host squirrel lacks IMPORTED_IMPLIB for MinGW; in-tree like R36S.
                 squirrel = null;
@@ -393,8 +389,6 @@
                 logmich = logmichW;
                 glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
                 xdgcpp = null;
-                libsm = null;
-                libice = null;
                 libGL = null;
                 mcfgthreads = pkgsW.windows.mcfgthreads;
                 gtest = null;

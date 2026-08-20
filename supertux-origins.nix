@@ -6,15 +6,11 @@
 , pkg-config
 , makeWrapper ? null
 , libGL ? null
-, libsm ? null
-, libice ? null
 
 , SDL2
 , SDL2_image
 , SDL2_ttf
 
-
-, glew ? null
 , glm
 , libpng
 , mcfgthreads ? null
@@ -102,20 +98,6 @@ stdenv.mkDerivation rec {
            materialize_dll "$src"
          done
        done
-    '')
-    + (lib.optionalString stdenv.hostPlatform.isLinux ''
-       # The game only uses SDL. Under pure Nix, the dynamic linker still has to
-       # resolve libraries *SDL2* is linked against (X11 backend). DT_RUNPATH on
-       # our binary does not help transitive deps, so expose the usual SDL2
-       # closure via LD_LIBRARY_PATH. This is not raw X11 usage by SuperTux.
-       wrapProgram $out/bin/supertux-origins \
-         --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath (
-           [ SDL2 SDL2_image SDL2_ttf physfs ]
-           ++ lib.optional (libGL != null) libGL
-           ++ lib.optional (libsm != null) libsm
-           ++ lib.optional (libice != null) libice
-           ++ lib.optional (xdgcpp != null) xdgcpp
-         )}
     '');
 
   nativeBuildInputs = [
@@ -142,6 +124,7 @@ stdenv.mkDerivation rec {
     # checkInputs
     gtest
   ]
+  ++ lib.optional (libGL != null) libGL
   ++ lib.optional (squirrel != null) squirrel
   ++ (lib.optional (!stdenv.hostPlatform.isWindows) xdgcpp);
 
