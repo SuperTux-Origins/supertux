@@ -1454,3 +1454,19 @@ Likely causes:
 3. Must link Emscripten -lopenal (Web Audio). Log AL_VENDOR/VERSION/RENDERER.
 4. Autoplay — context running before alSourcePlay (st_emscripten_audio_resume).
 
+
+## Android black screen + slow startup
+
+Log stopped after SoundManager on a Fire tablet (KFAUWI). Video is created
+*before* audio; so the hang is almost certainly later:
+
+1. Resources::load() — multiple TTF faces from assets/data.zip (slow flash I/O)
+2. TitleScreen — GameSession("levels/misc/menu.stlv") loads a full level
+   (tiles, sprites, scripts) before the first frame
+
+Black screen is expected until ScreenManager::run() draws; on slow devices
+that can be tens of seconds with no log if progress messages are missing.
+
+Mitigations added: log_warn checkpoints through init / TTF / TitleScreen;
+skip WASM-style full decode audio probe on Android.
+

@@ -223,7 +223,8 @@ SoundManager::SoundManager() :
     } catch (std::exception const& e) {
       log_warning("SoundManager: PhysFS probe open of /music/misc/theme.ogg failed: {}", e.what());
     }
-    // Decode + OpenAL buffer probe (catches empty/broken codecs without playing).
+#if defined(__EMSCRIPTEN__)
+    // Decode + OpenAL buffer probe (WASM only — full decode is slow on Android).
     try {
       auto src = m_sound_mgr.sound().prepare("sounds/coin.wav",
                                             wstsound::SoundSourceType::STATIC);
@@ -238,6 +239,7 @@ SoundManager::SoundManager() :
     } catch (std::exception const& e) {
       log_warning("SoundManager: decode probe sounds/coin.wav failed: {}", e.what());
     }
+#endif
   }
   log_warn("SoundManager: sound_enabled={} music_enabled={}",
            m_sound_enabled, m_music_enabled);

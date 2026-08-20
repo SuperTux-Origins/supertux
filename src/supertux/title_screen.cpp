@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "supertux/title_screen.hpp"
+#include "util/log.hpp"
 
 #include <version.h>
 
@@ -36,9 +37,9 @@
 #include "video/video_system.hpp"
 
 TitleScreen::TitleScreen(Savegame& savegame) :
-  m_frame(Surface::from_file("images/engine/menu/frame.png")),
+  m_frame(),
   m_controller(new CodeController()),
-  m_titlesession(new GameSession("levels/misc/menu.stlv", savegame)),
+  m_titlesession(),
   m_copyright_text("SuperTux " PACKAGE_VERSION "\n" +
     _("Copyright") + " (c) 2003-2023 SuperTux Devel Team\n" +
     _("This game comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to\n"
@@ -46,6 +47,11 @@ TitleScreen::TitleScreen(Savegame& savegame) :
       )),
   m_videosystem_name(VideoSystem::current()->get_name())
 {
+  log_warn("TitleScreen: loading frame.png…");
+  m_frame = Surface::from_file("images/engine/menu/frame.png");
+  log_warn("TitleScreen: loading levels/misc/menu.stlv (heavy)…");
+  m_titlesession.reset(new GameSession("levels/misc/menu.stlv", savegame));
+  log_warn("TitleScreen: menu level ready");
   Player& player = *(m_titlesession->get_current_sector().get_players()[0]);
   player.set_controller(m_controller.get());
   player.set_speedlimit(230); //MAX_WALK_XM

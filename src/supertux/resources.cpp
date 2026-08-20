@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "supertux/resources.hpp"
+#include "util/log.hpp"
 
 #include "gui/mousecursor.hpp"
 #include "sprite/sprite.hpp"
@@ -61,18 +62,22 @@ Resources::load()
   }
   else
   {
+    log_warn("Resources: loading TTF console_font…");
     console_font.reset(new TTFFont("fonts/SuperTux-Medium.ttf", 12, 1.25f, 0, 1));
 
     auto font = "fonts/SuperTux-Medium.ttf";
     if(font != current_font)
     {
       current_font = font;
+      log_warn("Resources: loading TTF fixed/normal/small/big…");
       fixed_font.reset(new TTFFont(font, 18, 1.25f, 2, 1));
       normal_font = fixed_font;
       small_font.reset(new TTFFont(font, 10, 1.25f, 2, 1));
       big_font.reset(new TTFFont(font, 22, 1.25f, 2, 1));
+      log_warn("Resources: loading TTF control_font (Roboto)…");
       control_font.reset(new TTFFont("fonts/Roboto-Regular.ttf", 15, 1.25f, 0, 0));
     }
+    log_warn("Resources: TTF fonts ready");
   }
 
   /* Load menu images */

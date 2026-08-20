@@ -467,23 +467,32 @@ Main::launch_game(CommandLineArguments const& args)
   m_video_system = VideoSystem::create(VideoSystem::VIDEO_AUTO);
 #endif
   init_video();
+  log_warn("init: video ready ({})", m_video_system ? "ok" : "null");
 
   m_ttf_surface_manager.reset(new TTFSurfaceManager());
 
   s_timelog.log("audio");
+  log_warn("init: creating SoundManager…");
   m_sound_manager.reset(new SoundManager());
   m_sound_manager->enable_sound(g_config->sound_enabled);
   m_sound_manager->enable_music(g_config->music_enabled);
   m_sound_manager->set_sound_volume(g_config->sound_volume);
   m_sound_manager->set_music_volume(g_config->music_volume);
+  log_warn("init: audio ready");
 
   s_timelog.log("scripting");
+  log_warn("init: creating Squirrel VM…");
   m_squirrel_virtual_machine.reset(new SquirrelVirtualMachine(g_config->enable_script_debugger));
+  log_warn("init: Squirrel VM ready");
 
   s_timelog.log("resources");
+  log_warn("init: TileManager…");
   m_tile_manager.reset(new TileManager());
+  log_warn("init: SpriteManager…");
   m_sprite_manager.reset(new SpriteManager());
+  log_warn("init: Resources (fonts/surfaces — can be slow on Android)…");
   m_resources.reset(new Resources());
+  log_warn("init: Resources ready");
 
   m_console.reset(new Console(*m_console_buffer));
 
@@ -492,7 +501,9 @@ Main::launch_game(CommandLineArguments const& args)
   m_savegame = std::make_unique<Savegame>(std::string());
 
   m_game_manager.reset(new GameManager());
+  log_warn("init: ScreenManager…");
   m_screen_manager.reset(new ScreenManager(*m_video_system, *m_input_manager));
+  log_warn("init: ScreenManager ready");
 
   if (!args.filenames.empty())
   {
@@ -554,9 +565,12 @@ Main::launch_game(CommandLineArguments const& args)
   }
   else
   {
+    log_warn("init: pushing TitleScreen…");
     m_screen_manager->push_screen(std::make_unique<TitleScreen>(*m_savegame));
+    log_warn("init: TitleScreen pushed");
   }
 
+  log_warn("init: entering ScreenManager::run() (first frame)");
   m_screen_manager->run();
 }
 
