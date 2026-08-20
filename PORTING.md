@@ -1750,3 +1750,12 @@ hashes stay stable.
 
 **Still flake inputs (needed):** tinycmmc, miniswig, xdgcpp, squirrel (packaging),
 SDL2*-win32, physfs-win32, openal-soft-win32, libmodplug-win32, *-src tarballs.
+
+## Vendored VERSION files (no export-subst)
+
+After removing `.gitattributes`, `VERSION` must be a plain string such as
+`0.1.0-dev` — never `$Format:%(describe)$`. Unexpanded placeholders break
+package versioning and flake evaluation.
+
+Vendored trees use static `X.Y.Z-dev` in `VERSION`. The game uses top-level
+`VERSION` (`0.6.4-dev`); the flake appends `.<revCount>+g<hash>` for `-dev`.

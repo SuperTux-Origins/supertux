@@ -6,7 +6,7 @@
 
 stdenv.mkDerivation {
   pname = "sexp-cpp";
-  version = "0.1.0";
+  version = "0.1.0-dev";
 
   src = lib.cleanSource ./.;
 

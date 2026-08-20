@@ -5,7 +5,7 @@
 
 stdenv.mkDerivation {
   pname = "logmich";
-  version = "0.2.0";
+  version = "0.2.0-dev";
 
   src = lib.cleanSource ./.;
 

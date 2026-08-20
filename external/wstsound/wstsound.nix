@@ -15,7 +15,7 @@
 
 stdenv.mkDerivation {
   pname = "wstsound";
-  version = "0.3.0";
+  version = "0.3.0-dev";
 
   src = ./.;
 

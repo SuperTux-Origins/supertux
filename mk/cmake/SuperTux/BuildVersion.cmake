@@ -40,6 +40,7 @@ endif()
 set(SUPERTUX_VERSION_STRING "${PROJECT_VERSION_FULL}")
 set(SUPERTUX_VERSION "${PROJECT_VERSION_FULL}")
 set(SUPERTUX_VERSION_BUILD "${PROJECT_VERSION_FULL}")
+# Legacy alias (was git build number); same as full version string.
 set(VERSION_NUMBER_GIT "${PROJECT_VERSION_FULL}")
 
 message(STATUS "SuperTux Origins version: ${PROJECT_VERSION_FULL}")
