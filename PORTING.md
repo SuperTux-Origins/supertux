@@ -1539,3 +1539,12 @@ Nix note: never write `x or throw "msg"` without parentheses around
 - Outputs use `flake-utils.lib.eachDefaultSystem` + explicit `pkgs = import nixpkgs { inherit system; … }` so system/pkgs are under our control (no bare `system` surprises).
 - libcurl removed: unused in src; ProvideCurl always sets HAVE_LIBCURL false; curl-win32 input dropped (avoids broken MinGW curl build).
 
+
+## Windows: wstsound + OpenAL (Pingus-style)
+
+`wstsound` must be built with `pkgsCross.mingwW64`, not the host flake
+package (host cmake config looks for Linux OpenAL). OpenAL Soft and
+libmodplug come from `openal-soft-win32` / `libmodplug-win32` as
+`openal-soft-win64` / `libmodplug-win64`. C++ deps (logmich, sexpcpp,
+strutcpp, priocpp) are also cross-built for mingw64.
+

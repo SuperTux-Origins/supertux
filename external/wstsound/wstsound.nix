@@ -1,7 +1,7 @@
 { stdenv
 , lib
 , cmake
-, gtest
+, gtest ? null
 , mcfgthreads
 , libmodplug
 , libogg
@@ -50,8 +50,7 @@ stdenv.mkDerivation {
 
   buildInputs = [
     tinycmmc
-    gtest
-  ];
+  ] ++ lib.optional (gtest != null) gtest;
 
   propagatedBuildInputs = [
     libmodplug

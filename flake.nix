@@ -57,6 +57,16 @@
     SDL2_ttf-win32.inputs.nixpkgs.follows = "nixpkgs";
     SDL2_ttf-win32.inputs.tinycmmc.follows = "tinycmmc";
 
+    # Prebuilt/cross MinGW OpenAL Soft + libmodplug (Pingus pattern; avoid
+    # pkgsCross.openal → ffmpeg on Windows).
+    openal-soft-win32.url = "git+https://github.com/grumnix/openal-soft-win32.git";
+    openal-soft-win32.inputs.nixpkgs.follows = "nixpkgs";
+    openal-soft-win32.inputs.flake-utils.follows = "flake-utils";
+
+    libmodplug-win32.url = "git+https://github.com/grumnix/libmodplug-win32.git";
+    libmodplug-win32.inputs.nixpkgs.follows = "nixpkgs";
+    libmodplug-win32.inputs.flake-utils.follows = "flake-utils";
+
     strutcpp.url = "github:grumbel/strutcpp";
     strutcpp.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -121,6 +131,7 @@
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc, sexpcpp, logmich,
               SDL2-win32, SDL2_image-win32, freetype-win32, physfs-win32, SDL2_ttf-win32,
+              openal-soft-win32, libmodplug-win32,
               strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, squirrel-src, sdl2-ttf-src, freetype-src, sdl2-src, sdl2-image-src }:
 
     flake-utils.lib.eachDefaultSystem (system:
@@ -256,11 +267,47 @@
             else
               let
                 pkgsW = pkgs.pkgsCross.mingwW64;
-                # Same naming as Pingus: SDL2-win64 on the *host* flake packages.
+                winSuffix = "win64";
+                # Pingus: SDL2-* from grumnix on *builder* system, not target.
                 sdl2w = pickWinFlakePkg SDL2-win32 [ "SDL2-win64" "default" ];
                 sdl2imgw = pickWinFlakePkg SDL2_image-win32 [ "SDL2_image-win64" "default" ];
                 sdl2ttfw = pickWinFlakePkg SDL2_ttf-win32 [ "SDL2_ttf" "default" ];
                 physfsw = pickWinFlakePkg physfs-win32 [ "default" "physfs" ];
+                openalw = pickWinFlakePkg openal-soft-win32 [ "openal-soft-win64" "default" ];
+                modplugw = pickWinFlakePkg libmodplug-win32 [ "libmodplug-win64" "default" ];
+
+                # Build C++ deps with the *cross* stdenv (not host Linux .so).
+                logmichW = pkgsW.callPackage ./external/logmich/logmich.nix { };
+                sexpcppW = (pkgsW.callPackage ./external/sexpcpp/sexpcpp.nix { }).overrideAttrs (o: {
+                  doCheck = false;
+                  cmakeFlags = [ "-DBUILD_TESTS=OFF" "-DWARNINGS=OFF" "-DWERROR=OFF" ];
+                });
+                strutcppW = (pkgsW.callPackage ./external/strutcpp/strutcpp.nix { }).overrideAttrs (o: {
+                  doCheck = false;
+                  cmakeFlags = [ "-DBUILD_TESTS=OFF" "-DWARNINGS=OFF" "-DWERROR=OFF" ];
+                });
+                priocppW = pkgsW.callPackage ./external/priocpp/priocpp.nix {
+                  inherit self;
+                  logmich = logmichW;
+                  sexpcpp = sexpcppW;
+                  withJsoncpp = false;
+                  withSexpcpp = true;
+                };
+                tinycmmcW = tinycmmc.packages.${system}.default; # cmake modules; host ok
+                wstsoundW = (pkgsW.callPackage ./external/wstsound/wstsound.nix {
+                  mcfgthreads = pkgsW.windows.mcfgthreads;
+                  openal = openalw;
+                  libmodplug = modplugw;
+                  tinycmmc = tinycmmcW;
+                  gtest = null;
+                  # ogg/vorbis/mpg123/opus: pkgsCross where available
+                }).overrideAttrs (o: {
+                  doCheck = false;
+                  cmakeFlags = [
+                    "-DWARNINGS=OFF" "-DWERROR=OFF"
+                    "-DBUILD_TESTS=OFF" "-DBUILD_EXTRA=OFF"
+                  ];
+                });
               in
               (pkgsW.callPackage ./supertux-origins.nix {
                 inherit self;
@@ -268,23 +315,21 @@
                 SDL2_image = sdl2imgw;
                 SDL2_ttf = sdl2ttfw;
                 physfs = physfsw;
-                glew = null; # GLAD vendored; no GLEW on Windows either
-                # WIP: these are still *host* packages until each has a mingw
-                # derivation (Pingus builds the equivalent graph with pkgs').
-                sexpcpp = sexpcpp-pkg;
-                squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
-                tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
-                strutcpp = strutcpp-pkg;
-                miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
-                wstsound = wstsound.packages.${pkgs.stdenv.hostPlatform.system}.default;
-                priocpp = priocpp-pkg;
-                logmich = logmich-pkg;
+                glew = null;
+                sexpcpp = sexpcppW;
+                squirrel = squirrel.packages.${system}.default; # may still be host WIP
+                tinycmmc = tinycmmcW;
+                strutcpp = strutcppW;
+                miniswig = miniswig.packages.${system}.default; # native tool, host ok
+                wstsound = wstsoundW;
+                priocpp = priocppW;
+                logmich = logmichW;
                 glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
                 xdgcpp = null;
                 libsm = null;
                 libice = null;
-                libGL = null; # desktop GL via GLAD + opengl32 on Windows
-                mcfgthreads = pkgsW.windows.mcfgthreads or pkgs.windows.mcfgthreads;
+                libGL = null;
+                mcfgthreads = pkgsW.windows.mcfgthreads;
                 gtest = null;
               });
 
