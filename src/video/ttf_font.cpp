@@ -21,12 +21,15 @@
 #include <numeric>
 
 #include "physfs/physfs_sdl.hpp"
+
+#include <physfs.h>
 #include "util/line_iterator.hpp"
 #include "util/log.hpp"
 #include "video/canvas.hpp"
 #include "video/ttf_surface_manager.hpp"
 
 TTFFont::TTFFont(std::string const& filename, int font_size, float line_spacing, int shadow_size, int border) :
+  m_font_blob(),
   m_font(),
   m_filename(filename),
   m_font_size(font_size),
@@ -34,13 +37,47 @@ TTFFont::TTFFont(std::string const& filename, int font_size, float line_spacing,
   m_shadow_size(shadow_size),
   m_border(border)
 {
-  m_font = TTF_OpenFontRW(get_physfs_SDLRWops(m_filename), 1, font_size);
+  // FreeType seeks the font file heavily. Streaming through PhysFS over a
+  // nested zip (Android: APK → assets/data.zip) makes each seek touch the
+  // outer archive again — multi-minute stalls on eMMC. Load once into RAM.
+  std::string path = m_filename;
+  while (!path.empty() && path[0] == '/')
+    path.erase(path.begin());
+
+  PHYSFS_file* file = PHYSFS_openRead(path.c_str());
+  if (!file) {
+    std::ostringstream msg;
+    msg << "Couldn't open TTFFont '" << m_filename << "': "
+        << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    throw std::runtime_error(msg.str());
+  }
+
+  PHYSFS_sint64 len = PHYSFS_fileLength(file);
+  if (len <= 0) {
+    PHYSFS_close(file);
+    throw std::runtime_error("TTFFont '" + m_filename + "': empty or unreadable");
+  }
+
+  m_font_blob.resize(static_cast<size_t>(len));
+  PHYSFS_sint64 got = PHYSFS_readBytes(file, m_font_blob.data(), static_cast<PHYSFS_uint64>(len));
+  PHYSFS_close(file);
+  if (got != len) {
+    throw std::runtime_error("TTFFont '" + m_filename + "': short read");
+  }
+
+  SDL_RWops* rw = SDL_RWFromConstMem(m_font_blob.data(), static_cast<int>(m_font_blob.size()));
+  if (!rw) {
+    throw std::runtime_error(std::string("TTFFont SDL_RWFromConstMem: ") + SDL_GetError());
+  }
+
+  m_font = TTF_OpenFontRW(rw, 1, font_size); // frees rw
   if (!m_font)
   {
     std::ostringstream msg;
     msg << "Couldn't load TTFFont: " << m_filename << ": " << TTF_GetError();
     throw std::runtime_error(msg.str());
   }
+  log_info("TTFFont: loaded '{}' ({} bytes) into memory", m_filename, m_font_blob.size());
 }
 
 TTFFont::~TTFFont()

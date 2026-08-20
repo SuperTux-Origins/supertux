@@ -5,6 +5,8 @@
 , cmake
 , pkg-config
 , makeWrapper
+, xorg
+, libGL
 
 , SDL2
 , SDL2_image
@@ -77,6 +79,15 @@ EOF
        ln -sfv ${squirrel}/bin/*.dll $out/bin/
        ln -sfv ${strutcpp}/bin/*.dll $out/bin/
        ln -sfv ${wstsound}/bin/*.dll $out/bin/
+    '')
+    + (lib.optionalString stdenv.hostPlatform.isLinux ''
+       # SDL2 pulls X11 libs (libSM/libICE/…) that are not always in RPATH.
+       wrapProgram $out/bin/supertux-origins \
+         --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([
+           SDL2 SDL2_image SDL2_ttf curl glew libGL physfs
+           xorg.libSM xorg.libICE xorg.libX11 xorg.libXext
+           xorg.libXrandr xorg.libXi xorg.libXcursor xorg.libXss
+         ] ++ lib.optional (xdgcpp != null) xdgcpp)}
     '');
 
   nativeBuildInputs = [

@@ -1470,3 +1470,17 @@ that can be tens of seconds with no log if progress messages are missing.
 Mitigations added: log_warn checkpoints through init / TTF / TitleScreen;
 skip WASM-style full decode audio probe on Android.
 
+
+## Android multi-minute hang on TTF load
+
+Cause: data is `APK (zip) → assets/data.zip (zip) → fonts/*.ttf`. FreeType
+opens fonts via PhysFS SDL_RWops and **seeks constantly**. Each seek through
+a nested zip re-walks the outer APK entry → extreme I/O on Fire/eMMC.
+
+Fix: `TTFFont` now reads the entire font into memory and uses
+`SDL_RWFromConstMem` + `TTF_OpenFontRW`. Menu level load still hits many
+small files through the nested zip (slower than desktop, but sequential).
+
+Desktop: wrap `supertux-origins` with `LD_LIBRARY_PATH` including
+`xorg.libSM` / `libICE` (fixes `libSM.so.6: cannot open shared object file`).
+

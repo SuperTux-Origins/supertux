@@ -20,6 +20,10 @@
 
 #include <SDL_ttf.h>
 
+#include <string>
+#include <cstdint>
+#include <vector>
+
 #include "math/fwd.hpp"
 #include "video/color.hpp"
 #include "video/font.hpp"
@@ -55,6 +59,8 @@ public:
   TTF_Font* get_ttf_font() const { return m_font; }
 
 private:
+  /** Whole font file kept alive for FreeType seeks (TTF_OpenFontRW). */
+  std::vector<uint8_t> m_font_blob;
   TTF_Font* m_font;
   std::string m_filename;
   int m_font_size;
