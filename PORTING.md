@@ -1680,3 +1680,11 @@ add `src/gzip/ftgzip.c` for `FT_Gzip_Uncompress` (sfnt compressed tables).
 only a transitive dep of wstsound. postFixup used to copy only top-level
 package `bin/*.dll`. Now scans `lib.closePropagation` of buildInputs for
 all `*.dll` so the flat Wine package is complete.
+
+## Wine app: writeShellScript must use buildPackages (not Windows host)
+
+`nix run .#supertux-origins-win32` failed with bash not available on
+`hostPlatform = x86_64-windows` when the wrapper was built with a Windows
+`pkgs.writeShellScript`. Wine apps are Linux-only: gate on
+`buildPlatform.isLinux && hostPlatform.isLinux`, and create the script with
+`pkgs.buildPackages.writeShellScript`.
