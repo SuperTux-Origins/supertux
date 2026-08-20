@@ -1423,3 +1423,19 @@ ABI (e.g. `arm64-v8a` only) in `jni/Application.mk` / nix `targetAbis`.
 - **R36S `arkos-sysroot` URL** is still `localhost:8888` placeholder — expected until a permanent host exists.
 - **Default log level WARNING** — use `?verbose=1` / `?debug=1` (long options only).
 
+
+## Android per-ABI flake packages
+
+| Attribute | APP_ABI |
+|-----------|--------|
+| `.#supertux-android` | armeabi-v7a arm64-v8a x86_64 (default / full) |
+| `.#supertux-android-arm64-v8a` | arm64-v8a only |
+| `.#supertux-android-armeabi-v7a` | armeabi-v7a only |
+| `.#supertux-android-x86_64` | x86_64 only |
+
+SDL/audio prebuilts are still built for **all** ABIs once; only `libmain.so`
+ndk-build is restricted. Use a single-ABI attr for day-to-day iteration.
+
+`ndk-build` is invoked via a bash array so `-j${NIX_BUILD_CORES}` cannot
+detach into a separate command (`-j12: command not found`).
+

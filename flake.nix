@@ -311,7 +311,10 @@
 
           # ---------------------------------------------------------------
           # Android (requires allowUnfree + android_sdk.accept_license)
-          #   nix build .#supertux-android
+          #   nix build .#supertux-android              # all ABIs (default)
+          #   nix build .#supertux-android-arm64-v8a    # single ABI (faster)
+          #   nix build .#supertux-android-armeabi-v7a
+          #   nix build .#supertux-android-x86_64
           #   nix build .#android-sdl-libs
           # Expect failures until jni links full game deps from external/.
           # ---------------------------------------------------------------
@@ -325,7 +328,9 @@
             buildToolsVersion = "34.0.0";
             packagePlatform = "22";
             compilePlatform = "34";
-            targetAbis = [ "armeabi-v7a" "arm64-v8a" ];
+            # Full set for SDL/audio prebuilts (shared). Per-ABI APKs subset this.
+            allAndroidAbis = [ "armeabi-v7a" "arm64-v8a" "x86_64" ];
+            targetAbis = allAndroidAbis;
             androidSdk = (androidPkgs.androidenv.composeAndroidPackages {
               platformVersions = [ packagePlatform compilePlatform ];
               buildToolsVersions = [ buildToolsVersion ];
@@ -346,7 +351,7 @@
               url = "https://raw.githubusercontent.com/nothings/stb/refs/heads/master/stb_image.h";
               sha256 = "sha256-WUwv411JSItDgtv67I+YNm3vyoGdkWrJW+zz519CALM=";
             };
-            apk = android.mkApk {
+            mkAndroidApk = abis: android.mkApk {
               appName = "supertux-origins";
               appDir = ./mk/android/app;
               outApkName = androidApkName;
@@ -361,14 +366,25 @@
               physfsSrc = physfs-src;
               sdl2TtfSrc = sdl2-ttf-src;
               freetypeSrc = freetype-src;
+              inherit abis;
+            };
+            metaAndroid = desc: old: {
+              meta = (old.meta or {}) // {
+                description = desc;
+              };
             };
           in {
             android-sdl-libs = android.sdlAndroidLibs;
-            supertux-android = apk.overrideAttrs (old: {
-              meta = (old.meta or {}) // {
-                description = "SuperTux Origins Android APK (WIP — expect link errors until jni deps land)";
-              };
-            });
+            # Default: all ABIs in one APK (release-style, slower native compile).
+            supertux-android = (mkAndroidApk allAndroidAbis).overrideAttrs
+              (metaAndroid "SuperTux Origins Android APK (armeabi-v7a + arm64-v8a + x86_64)");
+            # Fast single-ABI iteration outputs:
+            supertux-android-armeabi-v7a = (mkAndroidApk [ "armeabi-v7a" ]).overrideAttrs
+              (metaAndroid "SuperTux Origins Android APK (armeabi-v7a only)");
+            supertux-android-arm64-v8a = (mkAndroidApk [ "arm64-v8a" ]).overrideAttrs
+              (metaAndroid "SuperTux Origins Android APK (arm64-v8a only)");
+            supertux-android-x86_64 = (mkAndroidApk [ "x86_64" ]).overrideAttrs
+              (metaAndroid "SuperTux Origins Android APK (x86_64 only)");
           }
         ) // (
           # R36S / ArkOS hybrid cross (modern GCC + ArkOS glibc/SDL2/GLES sysroot).

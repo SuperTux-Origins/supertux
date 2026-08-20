@@ -492,22 +492,27 @@ echo "==> SUPERTUX_VERSION=$SUPERTUX_VERSION"
 echo "==> staged C/C++ sources: $(find src/jni/src \( -name '*.cpp' -o -name '*.c' \) | wc -l)"
 
 # Diagnostics: module LOCAL_PATH is jni/src — TTF/FreeType must live there.
+# Real SDL_ttf.c replaces the stub; only list paths that exist.
 echo "==> TTF/FreeType stage check (jni/src):"
-ls -la src/jni/src/SDL_ttf.c src/jni/src/sdl_ttf_stub.c src/jni/src/freetype/include/ft2build.h \
-  src/jni/src/freetype_Android.mk 2>&1 | sed 's/^/  /' || true
+for f in src/jni/src/SDL_ttf.c src/jni/src/sdl_ttf_stub.c \
+         src/jni/src/freetype/include/ft2build.h src/jni/src/freetype_Android.mk; do
+  if [ -e "$f" ]; then ls -la "$f" | sed 's/^/  /'
+  else echo "  (missing) $f"
+  fi
+done
 
-# One continuous ndk-build invocation. A blank line after a trailing \ used to
-# split this in two: ndk-build ran without -j / Application.mk (serial compile
-# across APP_ABI), then a stray "NDK_APPLICATION_MK=… -jN" was not part of it.
+# Bash array so -j cannot detach from ndk-build if a blank line sneaks in.
 JOBS="${NIX_BUILD_CORES:-${JOBS:-$(nproc)}}"
-echo "==> ndk-build -j${JOBS} (APP_ABI from Application.mk)"
-"$NDK/ndk-build" \
-  NDK_PROJECT_PATH="$PWD/src" \
-  APP_BUILD_SCRIPT="$PWD/src/jni/Android.mk" \
-  NDK_APPLICATION_MK="$PWD/src/jni/Application.mk" \
-  SUPERTUX_VERSION="$SUPERTUX_VERSION" \
-  ENABLE_ANDROID_SOUND="${ENABLE_ANDROID_SOUND:-0}" \
-  -j"${JOBS}"
+echo "==> ndk-build -j${JOBS} TARGET_ABIS=${TARGET_ABIS:-"(from Application.mk)"}"
+ndk_args=(
+  "NDK_PROJECT_PATH=$PWD/src"
+  "APP_BUILD_SCRIPT=$PWD/src/jni/Android.mk"
+  "NDK_APPLICATION_MK=$PWD/src/jni/Application.mk"
+  "SUPERTUX_VERSION=$SUPERTUX_VERSION"
+  "ENABLE_ANDROID_SOUND=${ENABLE_ANDROID_SOUND:-0}"
+  "-j${JOBS}"
+)
+"$NDK/ndk-build" "${ndk_args[@]}"
 
 mkdir -p out
 

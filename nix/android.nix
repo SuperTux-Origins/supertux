@@ -205,9 +205,24 @@ let
     gameVersion ? "0.6.3-dev",
     squirrelSrc ? null,
     physfsSrc ? null,
-    sdl2TtfSrc ? null
-  , freetypeSrc ? null,
+    sdl2TtfSrc ? null,
+    freetypeSrc ? null,
+    # Override APP_ABI for this APK only. SDL/audio prebuilts still use the
+    # outer targetAbis (build the full set once). Default = outer targetAbis.
+    abis ? targetAbis,
   }:
+  let
+    apkAbisStr = pkgs.lib.concatStringsSep " " abis;
+    apkApplicationMk = pkgs.writeTextFile {
+      name = "Application-${pkgs.lib.concatStringsSep "-" abis}.mk";
+      text = ''
+        APP_STL := c++_shared
+        APP_ABI := ${apkAbisStr}
+        APP_PLATFORM := android-${packagePlatform}
+        APP_CPPFLAGS := -std=c++20 -frtti -fexceptions -fexperimental-library -DUSE_OPENGLES2 -DANDROID -DGLM_ENABLE_EXPERIMENTAL
+      '';
+    };
+  in
     pkgs.stdenvNoCC.mkDerivation {
       pname = appName;
       version = gameVersion;
@@ -220,7 +235,7 @@ let
         PACKAGE_PLATFORM = packagePlatform;
         APP_NAME = appName;
         APP_DIR = "${appDir}";
-        APPLICATION_MK = applicationMk;
+        APPLICATION_MK = apkApplicationMk;
         TOP_ANDROID_MK = topAndroidMk;
         SDL_PREBUILT_MK = sdlPrebuiltAndroidMk;
         SDL_ANDROID_LIBS = sdlAndroidLibs;
@@ -264,7 +279,7 @@ let
       buildPhase = ''
         runHook preBuild
         export ANDROID_HOME=${androidSdk}/libexec/android-sdk
-        TARGET_ABIS=${pkgs.lib.escapeShellArg targetAbisStr} \
+        TARGET_ABIS=${pkgs.lib.escapeShellArg apkAbisStr} \
           bash ${../mk/android/scripts/build-apk.sh}
         runHook postBuild
       '';
