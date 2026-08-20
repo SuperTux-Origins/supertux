@@ -2,9 +2,13 @@
 , lib
 , cmake
 , gtest
-, version
 }:
 
+let
+  versionFile = lib.fileContents ./VERSION;
+  # Strip optional +g... suffix if present; keep -dev
+  version = builtins.head (lib.splitString "+" versionFile);
+in
 stdenv.mkDerivation {
   pname = "sexp-cpp";
   inherit version;

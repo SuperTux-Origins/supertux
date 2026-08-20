@@ -3,9 +3,12 @@
 , cmake
 , glm
 , gtest
-, version
 }:
 
+let
+  versionFile = lib.fileContents ./VERSION;
+  version = builtins.head (lib.splitString "+" versionFile);
+in
 stdenv.mkDerivation {
   pname = "geomcpp";
   inherit version;
