@@ -69,16 +69,20 @@ EOF
 
   postFixup =
     (lib.optionalString stdenv.hostPlatform.isWindows ''
+       # Copy (dereference) runtime DLLs into $out/bin so the package is
+       # self-contained and easy to inspect/redistribute. Symlinks into the
+       # Nix store work for `nix run` but look wrong in result/ and break
+       # naive zip/copy outside the store.
        mkdir -p $out/bin/
-       find ${mcfgthreads} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
-       find ${stdenv.cc.cc} -iname "*.dll" -exec ln -sfv {} $out/bin/ \;
-       ln -sfv ${SDL2_image}/bin/*.dll $out/bin/
-       ln -sfv ${SDL2_ttf}/bin/*.dll $out/bin/
-       ln -sfv ${SDL2}/bin/*.dll $out/bin/
-       ln -sfv ${physfs}/bin/*.dll $out/bin/
-       ${lib.optionalString (squirrel != null) "ln -sfv ${squirrel}/bin/*.dll $out/bin/"}
-       ln -sfv ${strutcpp}/bin/*.dll $out/bin/
-       ln -sfv ${wstsound}/bin/*.dll $out/bin/
+       find ${mcfgthreads} -iname "*.dll" -exec cp -L -t $out/bin/ {} +
+       find ${stdenv.cc.cc} -iname "*.dll" -exec cp -L -t $out/bin/ {} + 2>/dev/null || true
+       cp -L ${SDL2_image}/bin/*.dll $out/bin/ 2>/dev/null || true
+       cp -L ${SDL2_ttf}/bin/*.dll $out/bin/ 2>/dev/null || true
+       cp -L ${SDL2}/bin/*.dll $out/bin/ 2>/dev/null || true
+       cp -L ${physfs}/bin/*.dll $out/bin/ 2>/dev/null || true
+       ${lib.optionalString (squirrel != null) "cp -L ${squirrel}/bin/*.dll $out/bin/ 2>/dev/null || true"}
+       cp -L ${strutcpp}/bin/*.dll $out/bin/ 2>/dev/null || true
+       cp -L ${wstsound}/bin/*.dll $out/bin/ 2>/dev/null || true
     '')
     + (lib.optionalString stdenv.hostPlatform.isLinux ''
        # The game only uses SDL. Under pure Nix, the dynamic linker still has to

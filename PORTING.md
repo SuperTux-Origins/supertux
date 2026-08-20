@@ -1630,3 +1630,16 @@ Fix:
   FREETYPE_*, FindFreetype, sysroot `ft2build.h` + `libfreetype`, then
   compile a minimal FreeType static lib from FREETYPE_SOURCE_DIR (same
   source list as the Emscripten path).
+
+## FreeType: FT_CONFIG_OPTION_USE_HARFBUZZ is #ifdef, not value
+
+Defining `FT_CONFIG_OPTION_USE_HARFBUZZ=0` still **defines** the macro, so
+`ft-hb.h` includes `<hb.h>` and the R36S in-tree FreeType build fails.
+Use `-UFT_CONFIG_OPTION_USE_HARFBUZZ` (same for PNG/BROTLI).
+
+## MinGW result/bin/*.dll symlinks
+
+`postFixup` used `ln -sf` into the Nix store. Fine for `nix run`, but
+`result/bin/*.dll` looks like broken/odd links when listed. Now `cp -L`
+real files into `$out/bin`. Flat package `.#supertux-origins-win32` already
+used `cp --dereference` and is no longer marked broken.

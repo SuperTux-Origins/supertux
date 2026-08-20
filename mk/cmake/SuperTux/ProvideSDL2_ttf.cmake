@@ -55,6 +55,10 @@ if(EMSCRIPTEN)
       "${FREETYPE_SOURCE_DIR}/include")
     target_compile_definitions(supertux_freetype_wasm PRIVATE
       FT2_BUILD_LIBRARY DARWIN_NO_CARBON)
+    target_compile_options(supertux_freetype_wasm PRIVATE
+      -UFT_CONFIG_OPTION_USE_HARFBUZZ
+      -UFT_CONFIG_OPTION_USE_PNG
+      -UFT_CONFIG_OPTION_USE_BROTLI)
     target_include_directories(supertux_freetype_wasm PRIVATE
       "${FREETYPE_SOURCE_DIR}/src")
     add_library(LibSDL2_ttf STATIC "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
@@ -220,12 +224,15 @@ if(SDL2_TTF_SOURCE_DIR AND EXISTS "${SDL2_TTF_SOURCE_DIR}/SDL_ttf.c")
     add_library(supertux_freetype_static STATIC ${_ft_srcs})
     target_include_directories(supertux_freetype_static PUBLIC
       "${FREETYPE_SOURCE_DIR}/include")
+    # FT_CONFIG_OPTION_USE_* are #ifdef'd — defining them to 0 still enables
+    # the feature (e.g. ft-hb.h → <hb.h>). Force-undef instead.
     target_compile_definitions(supertux_freetype_static PRIVATE
       FT2_BUILD_LIBRARY
-      FT_CONFIG_OPTION_SYSTEM_ZLIB
-      FT_CONFIG_OPTION_USE_PNG=0
-      FT_CONFIG_OPTION_USE_HARFBUZZ=0
-      FT_CONFIG_OPTION_USE_BROTLI=0)
+      FT_CONFIG_OPTION_SYSTEM_ZLIB)
+    target_compile_options(supertux_freetype_static PRIVATE
+      -UFT_CONFIG_OPTION_USE_HARFBUZZ
+      -UFT_CONFIG_OPTION_USE_PNG
+      -UFT_CONFIG_OPTION_USE_BROTLI)
     # Prefer sysroot zlib when cross-compiling (R36S).
     find_library(_ST_Z_LIB NAMES z zlib
       PATHS

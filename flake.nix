@@ -348,9 +348,6 @@
           supertux-origins-win32 = pkgs.runCommand "supertux-origins-win32" {
             meta = {
               description = "SuperTux Origins Windows (MinGW) flat package";
-              # Mark broken until the full cross graph (sexpcpp/wstsound/…) is Windows-ready.
-              # Remove broken= when nix build .#supertux-origins-mingw64 succeeds.
-              broken = true;
             };
           } ''
             mkdir -p $out/data
@@ -368,7 +365,6 @@
           '';
 
           supertux-origins-win32-zip = pkgs.runCommand "supertux-origins-win32-zip" {
-            meta.broken = true;
           } ''
             mkdir -p $out
             WORKDIR=$(mktemp -d)
