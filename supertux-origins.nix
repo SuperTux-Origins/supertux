@@ -5,8 +5,9 @@
 , cmake
 , pkg-config
 , makeWrapper
-, xorg
 , libGL
+, libsm
+, libice
 
 , SDL2
 , SDL2_image
@@ -89,7 +90,7 @@ EOF
          --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([
            SDL2 SDL2_image SDL2_ttf curl libGL physfs
            # SDL2 X11 video backend (see libSM.so.6 runtime error without these)
-           xorg.libSM xorg.libICE
+           libsm libice
          ] ++ lib.optional (xdgcpp != null) xdgcpp)}
     '');
 

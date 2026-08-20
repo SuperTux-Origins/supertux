@@ -124,6 +124,18 @@ GLVideoSystem::create_gl_context()
       std::string("SDL_GL_CreateContext failed: ") + SDL_GetError());
   }
 
+#if !defined(USE_OPENGLES2)
+  // GLAD leaves all gl* pointers NULL until loaded. assert_gl() / any GL call
+  // before this is a null deref (signal 11). GLEW still had real libGL symbols
+  // for some core entry points when linked; GLAD does not.
+  if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress)))
+  {
+    throw std::runtime_error("GLVideoSystem: gladLoadGL failed (no GL context or loader?)");
+  }
+  log_info("OpenGL: {}", reinterpret_cast<char const*>(glGetString(GL_VERSION)));
+  log_info("GLAD: OpenGL 3.3 core loader ready");
+#endif
+
   assert_gl();
 
   if (g_config->try_vsync) {
@@ -144,20 +156,6 @@ GLVideoSystem::create_gl_context()
     }
 #endif
   }
-
-  assert_gl();
-
-#if defined(USE_OPENGLES2)
-  // nothing to do
-#else
-  // Load GL 3.3 core entry points through the current SDL context (no GLEW/X11 link).
-  if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress)))
-  {
-    throw std::runtime_error("GLVideoSystem: gladLoadGL failed (no GL context or loader?)");
-  }
-  log_info("OpenGL: {}", reinterpret_cast<char const*>(glGetString(GL_VERSION)));
-  log_info("GLAD: OpenGL 3.3 core loader ready");
-#endif
 
   assert_gl();
 }
