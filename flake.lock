@@ -220,6 +220,19 @@
         "type": "github"
       }
     },
+    "freetype-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1692989656,
+        "narHash": "sha256-loGTKr3641HJzavjyNikPNgIwx1crPJk2P2/wVrSu3w=",
+        "type": "tarball",
+        "url": "https://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz"
+      }
+    },
     "freetype-win32": {
       "inputs": {
         "freetype_src": "freetype_src",
@@ -701,6 +714,7 @@
         "SDL2_ttf-win32": "SDL2_ttf-win32",
         "curl-win32": "curl-win32",
         "flake-utils": "flake-utils_3",
+        "freetype-src": "freetype-src",
         "freetype-win32": "freetype-win32",
         "glew-win32": "glew-win32",
         "logmich": "logmich",
@@ -749,14 +763,14 @@
     "sdl2-ttf-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1705848753,
-        "narHash": "sha256-41LYZ/ZrscWV99GcooJ1LZFZL9VTovhRplTNQZL0+K4=",
+        "lastModified": 1705848619,
+        "narHash": "sha256-3NNyTVL9Xpj4QXsuIBcmKOVyindcftYXLbayWBu3c8A=",
         "type": "tarball",
-        "url": "https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.22.0/SDL2_ttf-2.22.0.tar.gz"
+        "url": "https://github.com/libsdl-org/SDL_ttf/archive/refs/tags/release-2.22.0.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.22.0/SDL2_ttf-2.22.0.tar.gz"
+        "url": "https://github.com/libsdl-org/SDL_ttf/archive/refs/tags/release-2.22.0.tar.gz"
       }
     },
     "sexpcpp": {
