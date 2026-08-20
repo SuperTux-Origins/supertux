@@ -1698,3 +1698,11 @@ forced `scale = max(scale, 1)`. Sub-100% menu entries were also hidden under
 
 Now: auto uses the same fill formula in both directions (scale < 1 on small
 panels), no mobile floor at 1.0, and 40–80% options always listed.
+
+## Flake: Linux-only systems; helpers not in packages
+
+- `eachSystem [ "x86_64-linux" "aarch64-linux" ]` — no Darwin (nixpkgs 26.11
+  dropped x86_64-darwin; we do not ship macOS).
+- `pickWinFlakePkg` lives in the per-system `let`, not under `packages`
+  (`nix flake check` requires every packages.* to be a derivation).
+- Wine apps only on `x86_64-linux` (wineWow64).

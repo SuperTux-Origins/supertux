@@ -134,7 +134,10 @@
               openal-soft-win32, libmodplug-win32,
               strutcpp, miniswig, xdgcpp, wstsound, squirrel, glew-win32, physfs-src, squirrel-src, sdl2-ttf-src, freetype-src, sdl2-src, sdl2-image-src }:
 
-    flake-utils.lib.eachDefaultSystem (system:
+    # Linux only — no Darwin (nixpkgs 26.11 dropped x86_64-darwin; we do not
+    # target macOS). Windows is a *cross* target via pkgsCross.mingwW64, not a
+    # flake system.
+    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -148,7 +151,9 @@
         wineAppsEnabled =
           pkgs.stdenv.buildPlatform.isLinux
           && pkgs.stdenv.hostPlatform.isLinux
-          && !isWin;
+          && !isWin
+          # wineWow64Packages is x86_64-oriented; skip on aarch64 flake systems.
+          && system == "x86_64-linux";
         mkWineApp = pkg: name: description:
           # Caller must gate with wineAppsEnabled; still guard the script body.
           assert wineAppsEnabled;
@@ -185,6 +190,39 @@
               platforms = lib.platforms.linux;
             };
           };
+
+        # Helper for MinGW prebuilt flakes (not a package output).
+
+        # Windows (MinGW-w64) — patterned after Pingus mkPingus:
+        #   SDL2* from grumnix *-win32 flakes as packages.${system}.SDL2-win64
+        #   C++ deps ideally built with pkgsCross.mingwW64 (not host Linux libs)
+        #
+        # Nix gotcha: `a or b or throw "x"` is parsed as `(a or b or throw) "x"`
+        # (function application binds tighter than `or`). Always parenthesize throw.
+        pickWinFlakePkg = flake: names:
+          let
+            all = flake.packages or {};
+            systems = builtins.attrNames all;
+            prefer = [
+              pkgs.stdenv.hostPlatform.system
+              "x86_64-linux"
+              "aarch64-linux"
+              "x86_64-windows"
+              "i686-windows"
+            ];
+            matches = builtins.filter (s: builtins.elem s systems) prefer;
+            sys =
+              if matches != [] then builtins.head matches
+              else if systems != [] then builtins.head systems
+              else throw "pickWinFlakePkg: flake has no packages.*";
+            set = all.${sys};
+            tryName = n: if builtins.hasAttr n set then set.${n} else null;
+            found = builtins.filter (x: x != null) (map tryName names);
+          in
+            if found != [] then builtins.head found
+            else throw ("pickWinFlakePkg: none of ${builtins.toString names} under packages.${sys}");
+
+
       in
       rec {
         packages = rec {
@@ -276,36 +314,6 @@
             gtest = pkgs.gtest;
             useGLES2 = true;
           };
-
-          # Windows (MinGW-w64) — patterned after Pingus mkPingus:
-          #   SDL2* from grumnix *-win32 flakes as packages.${system}.SDL2-win64
-          #   C++ deps ideally built with pkgsCross.mingwW64 (not host Linux libs)
-          #
-          # Nix gotcha: `a or b or throw "x"` is parsed as `(a or b or throw) "x"`
-          # (function application binds tighter than `or`). Always parenthesize throw.
-          pickWinFlakePkg = flake: names:
-            let
-              all = flake.packages or {};
-              systems = builtins.attrNames all;
-              prefer = [
-                pkgs.stdenv.hostPlatform.system
-                "x86_64-linux"
-                "aarch64-linux"
-                "x86_64-windows"
-                "i686-windows"
-              ];
-              matches = builtins.filter (s: builtins.elem s systems) prefer;
-              sys =
-                if matches != [] then builtins.head matches
-                else if systems != [] then builtins.head systems
-                else throw "pickWinFlakePkg: flake has no packages.*";
-              set = all.${sys};
-              tryName = n: if builtins.hasAttr n set then set.${n} else null;
-              found = builtins.filter (x: x != null) (map tryName names);
-            in
-              if found != [] then builtins.head found
-              else throw ("pickWinFlakePkg: none of ${builtins.toString names} under packages.${sys}");
-
           supertux-origins-mingw64 =
             if pkgs.stdenv.hostPlatform.isWindows then
               supertux-origins
