@@ -26,7 +26,7 @@
 #include <utility>
 #include <cstring>
 
-#if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
+#ifdef PRIO_USE_JSONCPP
 #  include "json_writer_impl.hpp"
 #  include "jsonpretty_writer_impl.hpp"
 #endif
@@ -62,7 +62,7 @@ Writer
 Writer::from_stream(Format format, std::ostream& out)
 {
   switch (format) {
-#if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
+#ifdef PRIO_USE_JSONCPP
 #ifndef PRIO_USE_SEXPCPP
     case Format::AUTO:
 #endif
@@ -108,14 +108,16 @@ Writer::Writer(std::ostream& out) :
   m_owned()
 {
 }
-#elif PRIO_USE_JSONCPP
+#else
+#  ifdef PRIO_USE_JSONCPP
 Writer::Writer(std::ostream& out) :
   m_impl(std::make_unique<JsonPrettyWriterImpl>(out)),
   m_owned()
 {
 }
-#else
-#  error "No syntax library available"
+#  else
+#    error "No syntax library available"
+#  endif
 #endif
 
 Writer::Writer(std::unique_ptr<WriterImpl> impl) :

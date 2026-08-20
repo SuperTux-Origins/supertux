@@ -399,12 +399,15 @@ TEST_P(ReaderMappingTest, read_wrong)
   SUCCEED();
 }
 
-#if defined(PRIO_USE_JSONCPP) && PRIO_USE_JSONCPP
-INSTANTIATE_TEST_SUITE_P(ParamReaderMappingTest, ReaderMappingTest,
-                         ::testing::Values(".sexp", ".json"));
-#else
-INSTANTIATE_TEST_SUITE_P(ParamReaderMappingTest, ReaderMappingTest,
-                         ::testing::Values(".sexp"));
+#if defined(PRIO_USE_SEXPCPP) && defined(PRIO_USE_JSONCPP)
+INSTANTIATE_TEST_CASE_P(ParamReaderMappingTest, ReaderMappingTest,
+                        ::testing::Values(".sexp", ".json"));
+#elif defined(PRIO_USE_SEXPCPP)
+INSTANTIATE_TEST_CASE_P(ParamReaderMappingTest, ReaderMappingTest,
+                        ::testing::Values(".sexp"));
+#elif defined(PRIO_USE_JSONCPP)
+INSTANTIATE_TEST_CASE_P(ParamReaderMappingTest, ReaderMappingTest,
+                        ::testing::Values(".json"));
 #endif
 
 /* EOF */
