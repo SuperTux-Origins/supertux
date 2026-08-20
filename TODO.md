@@ -28,6 +28,7 @@ adapted from Pingus and Windstille.
 - [x] Drop glm/ext.hpp (packing.inl → endian.h) for MinGW; use glm.hpp + gtx/io.
 - [x] Clean WASM/Android log_warn debug residue; keep AL_NONE + relative SFX.
 - [x] colorspace_oklab.cpp: #include <cfloat> for FLT_MAX (MinGW).
+- [x] R36S: wire freetypeSrc + ProvideSDL2_ttf FreeType resolution (ft2build.h).
 - [ ] Complete cross graph for remaining C++ deps; produce .exe + DLLs.
 - [ ] Unbreak `supertux-origins-win32` / zip once mingw64 package succeeds.
 

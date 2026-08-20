@@ -345,6 +345,7 @@ let
   , physfsSrc ? null
   , squirrelSrc ? null
   , sdl2TtfSrc ? null
+  , freetypeSrc ? null
   }:
     let
       wrappers = mkWrappers arkosSysroot;
@@ -429,6 +430,10 @@ let
         "-DUSE_SYSTEM_SQUIRREL=OFF"
       ] ++ lib.optionals (sdl2TtfSrc != null) [
         "-DSDL2_TTF_SOURCE_DIR=${sdl2TtfSrc}"
+      ] ++ lib.optionals (freetypeSrc != null) [
+        # Prefer sysroot libfreetype when present; FREETYPE_SOURCE_DIR is the
+        # offline fallback compiled by ProvideSDL2_ttf.cmake.
+        "-DFREETYPE_SOURCE_DIR=${freetypeSrc}"
       ];
 
       # Do not let nix stdenv rewrite RUNPATH to modern glibc / gcc-15 libs,

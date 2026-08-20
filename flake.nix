@@ -489,6 +489,7 @@
               physfsSrc = physfs-src;
               squirrelSrc = squirrel-src;
               sdl2TtfSrc = sdl2-ttf-src;
+              freetypeSrc = freetype-src;
             };
             portMaster = r36s.mkSuperTuxR36sPortMaster {
               r36sPkg = game;

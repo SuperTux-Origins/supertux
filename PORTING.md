@@ -1610,3 +1610,23 @@ Porting left several `log_warn` progress paths that drown real warnings:
 
 `colorspace_oklab.cpp` uses `FLT_MAX` without `<cfloat>`. Linux headers often
 pull it transitively; MinGW does not → add the include.
+
+## R36S: SDL2_ttf needs FreeType (ft2build.h)
+
+Building SDL_ttf from `SDL2_TTF_SOURCE_DIR` without FreeType headers fails:
+
+```
+SDL_ttf.c:28:10: fatal error: ft2build.h: No such file or directory
+```
+
+ArkOS sysroot may lack SDL2_ttf; we compile SDL_ttf.c in-tree. FreeType was
+not wired: `freetypeSrc` existed on the flake but was not passed into
+`mkSuperTuxR36s`, and ProvideSDL2_ttf only resolved FreeType via
+`find_package` (often empty under the hybrid sysroot).
+
+Fix:
+- `mkSuperTuxR36s` accepts `freetypeSrc` → `-DFREETYPE_SOURCE_DIR=…`
+- ProvideSDL2_ttf (non-Emscripten SOURCE_DIR path): try explicit
+  FREETYPE_*, FindFreetype, sysroot `ft2build.h` + `libfreetype`, then
+  compile a minimal FreeType static lib from FREETYPE_SOURCE_DIR (same
+  source list as the Emscripten path).
