@@ -252,6 +252,20 @@ Fix: prefer scanning `physfs.h` for `PHYSFS_getPrefDir` before try_compile;
 flake MinGW also passes `-DUSE_SYSTEM_PHYSFS=ON` and `-DPHYSFS_SOURCE_DIR`
 (physfs-src 3.2.0) as a safety net.
 
+### Static archive + MinGW link line
+
+`supertux-origins_lib` is a *static* archive. GNU ld does not reliably pull
+`INTERFACE`/`IMPORTED` deps of that archive into the final
+`supertux-origins.exe` link. Symptom: undefined `PHYSFS_*` / `TTF_*` at link
+despite `target_link_libraries(supertux-origins_lib PUBLIC LibPhysfs …)`.
+
+Fix: also `target_link_libraries(supertux-origins PRIVATE LibPhysfs LibSDL2_ttf)`
+on the executable when `WIN32 AND MINGW`. Prefer `UNKNOWN IMPORTED` for
+system PhysFS (with a real `IMPORTED_LOCATION` / implib) over a bare
+`INTERFACE` whose `INTERFACE_LINK_LIBRARIES` string can vanish from the link
+line.
+
+
 ### Wine apps
 
 ```bash

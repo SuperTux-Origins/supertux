@@ -346,6 +346,12 @@ else()
   add_executable(supertux-origins src/main.cpp)
 endif()
 target_link_libraries(supertux-origins supertux-origins_lib)
+# MinGW: GNU ld does not always pull INTERFACE/IMPORTED deps of a *static*
+# archive into the final link line. Re-state the critical shared libs on the
+# executable so PHYSFS_* / TTF_* resolve (see PORTING.md).
+if(WIN32 AND MINGW)
+  target_link_libraries(supertux-origins PRIVATE LibPhysfs LibSDL2_ttf)
+endif()
 
 set_target_properties(supertux-origins_lib PROPERTIES OUTPUT_NAME supertux-origins_lib)
 set_target_properties(supertux-origins_lib PROPERTIES COMPILE_FLAGS "${SUPERTUX-ORIGINS_EXTRA_WARNING_FLAGS}")

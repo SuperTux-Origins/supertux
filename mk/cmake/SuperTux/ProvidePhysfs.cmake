@@ -3,13 +3,48 @@
 
 find_package(PhysFS QUIET)
 
+# Some Config packages only export PhysFS::PhysFS / PhysFS_LIBRARIES.
+if(NOT PHYSFS_LIBRARY AND TARGET PhysFS::PhysFS)
+  get_target_property(_physfs_loc PhysFS::PhysFS IMPORTED_LOCATION)
+  if(NOT _physfs_loc)
+    get_target_property(_physfs_loc PhysFS::PhysFS IMPORTED_LOCATION_RELEASE)
+  endif()
+  if(NOT _physfs_loc)
+    get_target_property(_physfs_loc PhysFS::PhysFS IMPORTED_IMPLIB)
+  endif()
+  if(NOT _physfs_loc)
+    get_target_property(_physfs_loc PhysFS::PhysFS IMPORTED_IMPLIB_RELEASE)
+  endif()
+  if(_physfs_loc)
+    set(PHYSFS_LIBRARY "${_physfs_loc}")
+  endif()
+  get_target_property(_physfs_incs PhysFS::PhysFS INTERFACE_INCLUDE_DIRECTORIES)
+  if(_physfs_incs AND NOT PHYSFS_INCLUDE_DIR)
+    list(GET _physfs_incs 0 PHYSFS_INCLUDE_DIR)
+  endif()
+endif()
+if(NOT PHYSFS_LIBRARY AND DEFINED PhysFS_LIBRARIES)
+  set(PHYSFS_LIBRARY "${PhysFS_LIBRARIES}")
+endif()
+if(NOT PHYSFS_INCLUDE_DIR AND DEFINED PhysFS_INCLUDE_DIRS)
+  set(PHYSFS_INCLUDE_DIR "${PhysFS_INCLUDE_DIRS}")
+endif()
+
+# MinGW/pkg-config: try harder when find_package left variables empty.
+if(NOT PHYSFS_LIBRARY)
+  find_library(PHYSFS_LIBRARY NAMES physfs libphysfs
+    PATH_SUFFIXES lib lib64)
+endif()
+if(NOT PHYSFS_INCLUDE_DIR)
+  find_path(PHYSFS_INCLUDE_DIR physfs.h
+    PATH_SUFFIXES include)
+endif()
+
 # Detect PHYSFS_getPrefDir without relying solely on try_compile.
 # Under MinGW cross-compile, check_symbol_exists often fails even when the
-# prebuilt physfs-win32 (3.0.2+) header declares the symbol — CMAKE then
-# falls through to ExternalProject and dies because external/physfs is not
-# checked out.
+# prebuilt physfs-win32 (3.0.2+) header declares the symbol.
 set(HAVE_PHYSFS_GETPREFDIR FALSE)
-if(PHYSFS_LIBRARY)
+if(PHYSFS_LIBRARY OR TARGET PhysFS::PhysFS)
   set(_physfs_hdr "")
   if(PHYSFS_INCLUDE_DIR AND EXISTS "${PHYSFS_INCLUDE_DIR}/physfs.h")
     set(_physfs_hdr "${PHYSFS_INCLUDE_DIR}/physfs.h")
@@ -17,7 +52,6 @@ if(PHYSFS_LIBRARY)
     set(_physfs_hdr "${PhysFS_INCLUDE_DIR}/physfs.h")
     set(PHYSFS_INCLUDE_DIR "${PhysFS_INCLUDE_DIR}")
   endif()
-  # Also accept imported target include dirs (some FindPhysFS / Config packages).
   if(NOT _physfs_hdr AND TARGET PhysFS::PhysFS)
     get_target_property(_physfs_incs PhysFS::PhysFS INTERFACE_INCLUDE_DIRECTORIES)
     if(_physfs_incs)
@@ -39,7 +73,7 @@ if(PHYSFS_LIBRARY)
     endif()
   endif()
 
-  if(NOT HAVE_PHYSFS_GETPREFDIR)
+  if(NOT HAVE_PHYSFS_GETPREFDIR AND PHYSFS_LIBRARY)
     set(CMAKE_REQUIRED_LIBRARIES ${PHYSFS_LIBRARY})
     if(PHYSFS_INCLUDE_DIR)
       set(CMAKE_REQUIRED_INCLUDES ${PHYSFS_INCLUDE_DIR})
@@ -55,11 +89,24 @@ else()
 endif()
 
 if(USE_SYSTEM_PHYSFS)
-  message(STATUS "Using system PhysFS: ${PHYSFS_LIBRARY}")
-  add_library(LibPhysfs INTERFACE)
-  set_target_properties(LibPhysfs PROPERTIES
-    INTERFACE_LINK_LIBRARIES "${PHYSFS_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${PHYSFS_INCLUDE_DIR}")
+  message(STATUS "Using system PhysFS: library=${PHYSFS_LIBRARY} include=${PHYSFS_INCLUDE_DIR}")
+  # Prefer the real imported target when present (correct IMPORTED_IMPLIB for MinGW).
+  if(TARGET PhysFS::PhysFS)
+    add_library(LibPhysfs INTERFACE)
+    target_link_libraries(LibPhysfs INTERFACE PhysFS::PhysFS)
+  elseif(PHYSFS_LIBRARY)
+    # UNKNOWN IMPORTED (not INTERFACE) so the linker always sees the implib path.
+    # INTERFACE_LINK_LIBRARIES on a plain INTERFACE often drops out of the final
+    # MinGW link line when the only consumer is a static archive.
+    add_library(LibPhysfs UNKNOWN IMPORTED)
+    set_target_properties(LibPhysfs PROPERTIES
+      IMPORTED_LOCATION "${PHYSFS_LIBRARY}"
+      INTERFACE_INCLUDE_DIRECTORIES "${PHYSFS_INCLUDE_DIR}")
+  else()
+    message(FATAL_ERROR
+      "USE_SYSTEM_PHYSFS=ON but neither PhysFS::PhysFS nor PHYSFS_LIBRARY is set.\n"
+      "  Install physfs or pass -DPHYSFS_LIBRARY=... -DPHYSFS_INCLUDE_DIR=...")
+  endif()
 else()
   # Source tree: submodule, or override for cross builds (wasm/Android/R36S/MinGW).
   set(PHYSFS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/physfs" CACHE PATH
