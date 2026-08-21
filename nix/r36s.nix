@@ -641,15 +641,15 @@ LAUNCH
     };
 
   # Wrap a mkSuperTuxR36s result as a PortMaster-ready tree:
-  #   SuperTux.sh + supertux/ + metadata
+  #   "SuperTux Origins.sh" + supertux-origins/ + metadata
   # Copy into /roms/ports/ or zip for PortMaster autoinstall.
   mkSuperTuxR36sPortMaster = {
     r36sPkg
   , version
-  , pname ? "supertux-r36s-portmaster"
-  , title ? "SuperTux"
-  , scriptName ? "SuperTux.sh"
-  , portDirName ? "supertux"
+  , pname ? "supertux-origins-r36s-portmaster"
+  , title ? "SuperTux Origins"
+  , scriptName ? "SuperTux Origins.sh"
+  , portDirName ? "supertux-origins"
   , screenshotSrc ? ../data/images/engine/icons/supertux.png
   }:
     stdenvNoCC.mkDerivation {
@@ -717,14 +717,14 @@ LAUNCH
           cp -a "${r36sPkg}/share/licenses/." "$gamedir/licenses/" || true
         fi
         cat > "$gamedir/licenses/README.txt" << 'EOF_LIC'
-SuperTux — see upstream GPL-3.0-or-later and LICENSES/ in the source tree.
+SuperTux Origins — see upstream GPL-3.0-or-later and LICENSES/ in the source tree.
 This PortMaster package redistributes the game binary and data for ArkOS/R36S.
 EOF_LIC
 
         # PortMaster launch script (sources control.txt → SDL_GAMECONTROLLERCONFIG)
         cat > "$root/${scriptName}" << 'EOF_LAUNCH'
 #!/bin/bash
-# SuperTux — PortMaster launcher for R36S / ArkOS
+# SuperTux Origins — PortMaster launcher for R36S / ArkOS
 
 XDG_DATA_HOME=''${XDG_DATA_HOME:-$HOME/.local/share}
 
@@ -742,7 +742,7 @@ source "$controlfolder/control.txt"
 [ -f "''${controlfolder}/mod_''${CFW_NAME}.txt" ] && source "''${controlfolder}/mod_''${CFW_NAME}.txt"
 get_controls
 
-GAMEDIR="/$directory/ports/supertux"
+GAMEDIR="/$directory/ports/supertux-origins"
 CONFDIR="$GAMEDIR/conf"
 
 mkdir -p "$CONFDIR"
@@ -782,7 +782,7 @@ EOF_LAUNCH
         cat > "$root/port.json" << EOF_JSON
 {
   "version": 2,
-  "name": "supertux.zip",
+  "name": "supertux-origins.zip",
   "items": [
     "${scriptName}",
     "${portDirName}"
@@ -790,10 +790,10 @@ EOF_LAUNCH
   "items_opt": null,
   "attr": {
     "title": "${title}",
-    "desc": "SuperTux (SDL2 + GLES2) for ArkOS / R36S. Jump-and-run platformer starring Tux.",
-    "inst": "Ready to run. Copy SuperTux.sh and the supertux/ folder into /roms/ports/ (or install the zip via PortMaster autoinstall).",
+    "desc": "SuperTux Origins (SDL2 + GLES2) for ArkOS / R36S. Jump-and-run platformer starring Tux.",
+    "inst": "Ready to run. Copy "SuperTux Origins.sh" and the supertux-origins/ folder into /roms/ports/ (or install the zip via PortMaster autoinstall).",
     "genres": ["platform", "action"],
-    "porter": ["SuperTux-Origins"],
+    "porter": ["SuperTux Origins"],
     "image": {},
     "rtr": true,
     "runtime": null,
@@ -810,10 +810,10 @@ EOF_JSON
   <game>
     <path>./${scriptName}</path>
     <name>${title}</name>
-    <desc>SuperTux — jump-and-run platformer starring Tux. SDL2 + GLES2 build for ArkOS / R36S.</desc>
+    <desc>SuperTux Origins — jump-and-run platformer starring Tux. SDL2 + GLES2 build for ArkOS / R36S.</desc>
     <releasedate>20040511T000000</releasedate>
     <developer>SuperTux Team</developer>
-    <publisher>SuperTux-Origins</publisher>
+    <publisher>SuperTux Origins</publisher>
     <genre>Platform</genre>
     <image>./${portDirName}/cover.png</image>
   </game>
@@ -821,25 +821,25 @@ EOF_JSON
 EOF_XML
 
         cat > "$root/README.md" << 'EOF_README'
-## SuperTux (R36S / ArkOS)
+## SuperTux Origins (R36S / ArkOS)
 
 Native **aarch64** build linked against the ArkOS sysroot (SDL2 + GLES2).
 
 ### Install
 
-1. Copy `SuperTux.sh` and the `supertux/` directory to `/roms/ports/` on the device, **or**
+1. Copy `SuperTux Origins.sh` and the `supertux-origins/` directory to `/roms/ports/` on the device, **or**
 2. Zip this folder and place the zip in `ports/PortMaster/autoinstall/`, then open PortMaster once.
 
 ### Controls (required)
 
-SuperTux reads the pad via SDL (prefer GameController; see PORTING.md) (raw button/axis indices).
+SuperTux Origins reads the pad via SDL (prefer GameController; see PORTING.md) (raw button/axis indices).
 `SDL_GAMECONTROLLERCONFIG` is still exported by this launcher for consistency
 with other PortMaster ports; controller profiles should use SDL_GameControllerButton layout.
 
 **This PortMaster launcher** sources `control.txt` (`get_controls`). Prefer
 launching via EmulationStation **Ports** (or the `.sh` script). Select+Start
 exit is handled by gptokeyb/oga_controls when the launcher starts them — not
-by SuperTux itself.
+by SuperTux Origins itself.
 
 In-game: D-pad / left stick move; face buttons follow the device’s joystick
 indices (see `mk/r36s/CROSSCOMPILE.md`).
@@ -852,7 +852,7 @@ EOF_README
         '';
 
       meta = with lib; {
-        description = "PortMaster package of SuperTux for R36S/ArkOS";
+        description = "PortMaster package of SuperTux Origins for R36S/ArkOS";
         license = licenses.gpl3Plus;
         platforms = platforms.linux;
         hydraPlatforms = [];
@@ -864,8 +864,8 @@ EOF_README
   mkSuperTuxR36sPortMasterZip = {
     portMasterPkg
   , version
-  , pname ? "supertux-r36s-portmaster-zip"
-  , zipName ? "supertux.zip"
+  , pname ? "supertux-origins-r36s-portmaster-zip"
+  , zipName ? "supertux-origins.zip"
   }:
     stdenvNoCC.mkDerivation {
       inherit pname version;
