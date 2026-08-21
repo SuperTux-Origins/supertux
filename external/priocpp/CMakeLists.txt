@@ -310,37 +310,43 @@ if(BUILD_EXTRA)
 endif()
 
 # --- install / export (inlined from former tinycmmc_export_and_install_library) ---
-install(TARGETS prio
-  EXPORT prio
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/prio)
+# Only when building priocpp standalone. As a monorepo subdirectory
+# (SuperTux R36S/Android/wasm), prio PUBLIC-links logmich::logmich and
+# sexp::sexp from sibling targets that are not in this export set — CMake
+# then fails generate with "requires target X that is not in any export set".
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  install(TARGETS prio
+    EXPORT prio
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/prio)
 
-configure_package_config_file(
-  prio-config.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/prio-config.cmake
-  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/prio)
+  configure_package_config_file(
+    prio-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/prio-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/prio)
 
-if(NOT PROJECT_VERSION OR PROJECT_VERSION STREQUAL "")
-  set(PROJECT_VERSION "0.0.0")
+  if(NOT PROJECT_VERSION OR PROJECT_VERSION STREQUAL "")
+    set(PROJECT_VERSION "0.0.0")
+  endif()
+  write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/prio-config-version.cmake
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMinorVersion)
+
+  export(EXPORT prio
+    NAMESPACE prio::
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/prio-targets.cmake)
+
+  install(EXPORT prio
+    FILE prio-targets.cmake
+    NAMESPACE prio::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/prio)
+
+  install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/prio-config-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/prio-config.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/prio)
 endif()
-write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/prio-config-version.cmake
-  VERSION "${PROJECT_VERSION}"
-  COMPATIBILITY SameMinorVersion)
-
-export(EXPORT prio
-  NAMESPACE prio::
-  FILE ${CMAKE_CURRENT_BINARY_DIR}/prio-targets.cmake)
-
-install(EXPORT prio
-  FILE prio-targets.cmake
-  NAMESPACE prio::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/prio)
-
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/prio-config-version.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/prio-config.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/prio)
 
 # EOF #

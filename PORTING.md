@@ -273,6 +273,14 @@ system PhysFS (with a real `IMPORTED_LOCATION` / implib) over a bare
 line.
 
 
+### priocpp subdirectory export (R36S / monorepo)
+
+When `external/priocpp` is `add_subdirectory`'d under SuperTux, its
+`install(EXPORT prio)` failed because `prio` PUBLIC-links `logmich::logmich`
+and `sexp::sexp` from sibling targets not in the `prio` export set. Guard
+install/export with `CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR`
+(same pattern as sexpcpp / logmich / strutcpp).
+
 ### Wine apps
 
 ```bash
