@@ -15,56 +15,99 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 cmake_minimum_required(VERSION 3.15)
-if(POLICY CMP0077)
-  cmake_policy(SET CMP0077 NEW)
-endif()
 project(wstsound VERSION 0.3.0)
 
 # Prefer regular libraries over frameworks, so openal-soft is used
 # instead of the OpenAL framework that is missing effects support.
 set(CMAKE_FIND_FRAMEWORK "LAST")
 
-if(NOT tinycmmc_FOUND)
-  find_package(tinycmmc CONFIG QUIET)
-endif()
-if(tinycmmc_FOUND AND TINYCMMC_MODULE_PATH)
-  # use package
-elseif(TINYCMMC_MODULE_PATH AND EXISTS "${TINYCMMC_MODULE_PATH}/TinyCMMC.cmake")
-  # Caller passed -DTINYCMMC_MODULE_PATH=... (e.g. isolated wasm package)
-elseif(DEFINED ENV{TINYCMMC_MODULE_PATH} AND EXISTS "$ENV{TINYCMMC_MODULE_PATH}/TinyCMMC.cmake")
-  set(TINYCMMC_MODULE_PATH "$ENV{TINYCMMC_MODULE_PATH}")
-elseif(EXISTS "${CMAKE_SOURCE_DIR}/external/tinycmmc/modules/TinyCMMC.cmake")
-  set(TINYCMMC_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/tinycmmc/modules/")
-elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/external/tinycmmc/modules/TinyCMMC.cmake")
-  set(TINYCMMC_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/external/tinycmmc/modules/")
-elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/external/cmake-modules/modules/TinyCMMC.cmake")
-  set(TINYCMMC_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/external/cmake-modules/modules/")
-elseif(EXISTS "${CMAKE_SOURCE_DIR}/../tinycmmc/modules/TinyCMMC.cmake")
-  # monorepo: external/wstsound next to external/tinycmmc
-  set(TINYCMMC_MODULE_PATH "${CMAKE_SOURCE_DIR}/../tinycmmc/modules/")
-else()
-  message(FATAL_ERROR "tinycmmc modules not found (set TINYCMMC_MODULE_PATH)")
-endif()
-message(STATUS "tinycmmc module path: ${TINYCMMC_MODULE_PATH}")
-list(APPEND CMAKE_MODULE_PATH ${TINYCMMC_MODULE_PATH})
+# Local Find*.cmake modules (formerly from tinycmmc); keeps codec discovery
+# self-contained without a shared CMake module package.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GNUInstallDirs)
-include(ClangTidy)
-include(MaximumWarnings)
+include(CMakePackageConfigHelpers)
 
+option(BUILD_TESTS "Build test cases" OFF)
 option(BUILD_EXTRA "Build extra stuff" OFF)
+option(WARNINGS "Enable extra compiler warnings" OFF)
+option(WERROR "Treat warnings as errors" OFF)
 
-# Pre-seed codec toggles BEFORE option() so CMP0077 NEW keeps them
-# (parent may also pass -DWSTSOUND_WITH_*=OFF from nix).
-if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
-  set(WSTSOUND_WITH_MPG123 OFF)
-  # SuperTux Origins ships .ogg music — do not pre-seed VORBIS OFF.
-  set(WSTSOUND_WITH_OPUS OFF)
-  set(WSTSOUND_WITH_EFX OFF)
-  set(WSTSOUND_WITH_LOOPBACK OFF)
-  set(WSTSOUND_WITH_MODPLUG ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(WARNINGS_CXX_FLAGS "")
+if(WERROR)
+  list(APPEND WARNINGS_CXX_FLAGS -Werror)
 endif()
-
+if(WARNINGS)
+  list(APPEND WARNINGS_CXX_FLAGS -Wall -Wextra)
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    list(APPEND WARNINGS_CXX_FLAGS
+      -Wcast-align
+      -Wcast-qual
+      -Wconversion
+      -Wctor-dtor-privacy
+      -Wdisabled-optimization
+      -Wdouble-promotion
+      -Weffc++
+      -Wformat=2
+      -Winit-self
+      -Winvalid-pch
+      -Wlogical-op
+      -Wmissing-format-attribute
+      -Wmissing-noreturn
+      -Wno-suggest-attribute=noreturn
+      -Wunused-parameter
+      -Wnon-virtual-dtor
+      -Wold-style-cast
+      -Woverloaded-virtual
+      -Wpacked
+      -Wredundant-decls
+      -Wshadow
+      -Wsign-promo
+      -Wstrict-null-sentinel
+      -Wsuggest-override
+      -Wunreachable-code
+      -Wzero-as-null-pointer-constant
+      -pedantic
+    )
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8)
+      list(APPEND WARNINGS_CXX_FLAGS -Wint-in-bool-context)
+    endif()
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    list(APPEND WARNINGS_CXX_FLAGS
+      -Weverything
+      -Wno-c++98-compat
+      -Wno-c++98-compat-pedantic
+      -Wno-float-equal
+      -Wno-padded
+      -Wno-weak-vtables
+      -Wno-disabled-macro-expansion
+      -Wno-documentation
+      -Wno-reserved-id-macro
+      -Wno-sign-conversion
+      -Wno-gnu-zero-variadic-macro-arguments
+      -Wno-poison-system-directories
+      -Wno-documentation-unknown-command
+      -Wno-inconsistent-missing-destructor-override
+      -Wno-deprecated-dynamic-exception-spec
+      -Wno-deprecated
+      -Wno-switch-enum
+      -Wno-covered-switch-default
+      -Wno-exit-time-destructors
+      -Wno-global-constructors
+      -Wno-duplicate-enum
+      -Wno-unused-parameter
+      -Wno-old-style-cast
+      -Wno-unreachable-code-break
+      -Wno-double-promotion
+      -Wno-unused-private-field
+      -Wno-unused-exception-parameter
+    )
+  endif()
+endif()
 
 # Codec / feature toggles. Desktop defaults keep the full set; Emscripten
 # defaults match Pingus in-tree assets (WAV + module music via ModPlug).
@@ -75,16 +118,14 @@ option(WSTSOUND_WITH_MPG123 "Decode MP3 via mpg123" ON)
 option(WSTSOUND_WITH_EFX "OpenAL EFX effects API (not on Emscripten OpenAL)" ON)
 option(WSTSOUND_WITH_LOOPBACK "OpenAL-soft loopback device (needs alext.h)" ON)
 
-# Mobile / wasm: stock Pingus data is WAV SFX + .it/.s3m modules only.
+# Mobile / wasm / R36S: SuperTux ships .ogg music — keep VORBIS on.
+# Drop MP3/Opus/EFX; keep ModPlug for module tracks if present.
 if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
   set(WSTSOUND_WITH_MPG123 OFF CACHE BOOL "Decode MP3 via mpg123" FORCE)
-  # Keep Vorbis ON for SuperTux stock .ogg (parent may still force OFF).
+  # SuperTux Origins ships .ogg music — do not force VORBIS OFF.
   set(WSTSOUND_WITH_OPUS OFF CACHE BOOL "Decode Opus" FORCE)
   set(WSTSOUND_WITH_MODPLUG ON CACHE BOOL "Decode module formats via libmodplug" FORCE)
   set(WSTSOUND_WITH_EFX OFF CACHE BOOL "OpenAL EFX effects API" FORCE)
-endif()
-if(EMSCRIPTEN OR ANDROID OR SUPERTUX_R36S)
-  # Emscripten OpenAL has no alext.h; mobile/handheld builds skip loopback too.
   set(WSTSOUND_WITH_LOOPBACK OFF CACHE BOOL "OpenAL-soft loopback device" FORCE)
 endif()
 
@@ -125,10 +166,6 @@ if(WSTSOUND_WITH_MODPLUG)
   list(APPEND WSTSOUND_CODEC_LIBS ModPlug::modplug)
 endif()
 
-message(STATUS "wstsound codecs: MODPLUG=${WSTSOUND_WITH_MODPLUG} "
-    "VORBIS=${WSTSOUND_WITH_VORBIS} OPUS=${WSTSOUND_WITH_OPUS} "
-    "MPG123=${WSTSOUND_WITH_MPG123} EFX=${WSTSOUND_WITH_EFX} "
-    "LOOPBACK=${WSTSOUND_WITH_LOOPBACK}")
 file(GLOB WSTSOUND_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   include/wstsound/*.hpp)
 file(GLOB WSTSOUND_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -155,6 +192,7 @@ if(NOT WSTSOUND_WITH_LOOPBACK)
 endif()
 
 add_library(wstsound STATIC ${WSTSOUND_SOURCES})
+add_library(wstsound::wstsound ALIAS wstsound)
 set_target_properties(wstsound PROPERTIES PUBLIC_HEADER "${WSTSOUND_HEADERS}")
 target_compile_options(wstsound PRIVATE ${WARNINGS_CXX_FLAGS})
 set_target_properties(wstsound PROPERTIES
@@ -232,8 +270,10 @@ if(BUILD_EXTRA)
       CXX_STANDARD 20
       CXX_STANDARD_REQUIRED ON
       CXX_EXTENSIONS OFF)
-    install(TARGETS ${SRC_BASENAME}
-      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+    if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+      install(TARGETS ${SRC_BASENAME}
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+    endif()
   endforeach(SRC)
 endif()
 
@@ -265,6 +305,36 @@ if(WSTSOUND_WITH_MODPLUG)
     "find_dependency(ModPlug REQUIRED)\n")
 endif()
 
-include(ExportAndInstallLibrary)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  install(TARGETS wstsound
+    EXPORT wstsound
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/wstsound)
+
+  configure_package_config_file(
+    wstsound-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/wstsound-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/wstsound)
+
+  write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/wstsound-config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMinorVersion)
+
+  export(EXPORT wstsound
+    NAMESPACE wstsound::
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/wstsound-targets.cmake)
+
+  install(EXPORT wstsound
+    FILE wstsound-targets.cmake
+    NAMESPACE wstsound::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/wstsound)
+
+  install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/wstsound-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/wstsound-config-version.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/wstsound)
+endif()
 
 # EOF #

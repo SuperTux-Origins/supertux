@@ -1,8 +1,9 @@
 { stdenv
 , lib
 , cmake
+, pkg-config
 , gtest ? null
-, mcfgthreads
+, mcfgthreads ? null
 , libmodplug
 , libogg
 , libvorbis
@@ -10,7 +11,6 @@
 , openal
 , opusfile
 , libopus
-, tinycmmc
 }:
 
 stdenv.mkDerivation {
@@ -46,7 +46,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     cmake
-    tinycmmc
+    pkg-config
   ];
 
   buildInputs = [

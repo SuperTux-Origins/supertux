@@ -103,8 +103,10 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     cmake
     pkg-config
-
     miniswig
+    # CMake modules only; must be native so cross builds find them via
+    # CMAKE_PREFIX_PATH (not the MinGW target prefix).
+    tinycmmc
   ]
   ++ (lib.optional stdenv.hostPlatform.isLinux makeWrapper);
 
@@ -117,7 +119,6 @@ stdenv.mkDerivation rec {
     physfs
     logmich
     sexpcpp
-    tinycmmc
     strutcpp
     wstsound
     priocpp

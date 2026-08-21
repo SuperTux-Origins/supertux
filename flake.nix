@@ -226,8 +226,7 @@
           });
           # Vendored wstsound (avoid flake input with .gitattributes export-subst).
           wstsound-pkg = (pkgs.callPackage ./external/wstsound/wstsound.nix {
-            mcfgthreads = pkgs.windows.mcfgthreads;
-            tinycmmc = tinycmmc.packages.${system}.default;
+            mcfgthreads = null;
             gtest = null;
           }).overrideAttrs (o: {
             doCheck = false;
@@ -353,10 +352,10 @@
                 tinycmmcW = tinycmmc.packages.${system}.default; # cmake modules; host ok
                 wstsoundW = (pkgsW.callPackage ./external/wstsound/wstsound.nix {
                   cmake = bpCmake;
+                  pkg-config = pkgs.buildPackages.pkg-config;
                   mcfgthreads = pkgsW.windows.mcfgthreads;
                   openal = openalw;
                   libmodplug = modplugw;
-                  tinycmmc = tinycmmcW;
                   gtest = null;
                 }).overrideAttrs (o: {
                   doCheck = false;
