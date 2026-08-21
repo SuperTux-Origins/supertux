@@ -417,47 +417,79 @@
 
           # Flat layout for redistribution (exe + dlls + data). Only valid after a
           # successful MinGW build that installs supertux-origins.exe.
-          supertux-origins-win32 = pkgs.runCommand "supertux-origins-win32" {
-            meta = {
-              description = "SuperTux Origins Windows (MinGW) flat package";
-            };
-          } ''
-            mkdir -p $out/data
-            if [ ! -f ${supertux-origins-mingw64}/bin/supertux-origins.exe ]; then
-              echo "error: MinGW build did not produce bin/supertux-origins.exe" >&2
-              echo "contents of mingw package:" >&2
-              find ${supertux-origins-mingw64} -maxdepth 3 -type f >&2 || true
-              exit 1
-            fi
-            cp -v ${supertux-origins-mingw64}/bin/supertux-origins.exe $out/
-            cp -v --dereference --no-preserve=all ${supertux-origins-mingw64}/bin/*.dll $out/ 2>/dev/null || true
-            if [ -d ${supertux-origins-mingw64}/data ]; then
-              cp -a ${supertux-origins-mingw64}/data/. $out/data/
-            fi
-            # MinGW PE imports often use undecorated names (ogg.dll) while
-            # packages install libogg-0.dll — alias so Wine/Windows loaders find them.
-            alias_dll() {
-              local from="$1" to="$2"
-              if [ -f "$out/$from" ] && [ ! -e "$out/$to" ]; then
-                cp -L "$out/$from" "$out/$to"
-                echo "aliased $from -> $to"
+          # Harvest audio/runtime DLLs from pkgsCross directly — libogg often
+          # never lands in the game package bin/ via closePropagation alone.
+          supertux-origins-win32 =
+            let
+              pkgsW = pkgs.pkgsCross.mingwW64;
+              dllRoots = [
+                pkgsW.libogg
+                pkgsW.libvorbis
+                pkgsW.libopus
+                pkgsW.opusfile
+                pkgsW.mpg123
+                pkgsW.zlib
+                pkgsW.libpng
+              ];
+            in
+            pkgs.runCommand "supertux-origins-win32" {
+              meta = {
+                description = "SuperTux Origins Windows (MinGW) flat package";
+              };
+            } ''
+              mkdir -p $out/data
+              if [ ! -f ${supertux-origins-mingw64}/bin/supertux-origins.exe ]; then
+                echo "error: MinGW build did not produce bin/supertux-origins.exe" >&2
+                echo "contents of mingw package:" >&2
+                find ${supertux-origins-mingw64} -maxdepth 3 -type f >&2 || true
+                exit 1
               fi
-            }
-            alias_dll libogg-0.dll ogg.dll
-            alias_dll libogg.dll ogg.dll
-            alias_dll libvorbis-0.dll vorbis.dll
-            alias_dll libvorbisfile-3.dll vorbisfile.dll
-            alias_dll libopus-0.dll opus.dll
-            alias_dll libopusfile-0.dll opusfile.dll
-            alias_dll libmodplug-1.dll modplug.dll
-            alias_dll libmpg123-0.dll mpg123.dll
-            # Fail clearly if ogg is still missing (common Wine failure).
-            if ! ls "$out"/ogg.dll "$out"/libogg*.dll 1>/dev/null 2>&1; then
-              echo "warning: no ogg.dll / libogg*.dll in flat package; audio may fail" >&2
-              echo "dlls present:" >&2
-              ls -1 "$out"/*.dll 2>/dev/null >&2 || true
-            fi
-          '';
+              cp -v ${supertux-origins-mingw64}/bin/supertux-origins.exe $out/
+              cp -v --dereference --no-preserve=all ${supertux-origins-mingw64}/bin/*.dll $out/ 2>/dev/null || true
+              if [ -d ${supertux-origins-mingw64}/data ]; then
+                cp -a ${supertux-origins-mingw64}/data/. $out/data/
+              fi
+              # Explicit harvest from cross audio packages (libogg.dll missing was
+              # the Wine blocker: libvorbis-0.dll imports ogg.dll).
+              for root in ${pkgs.lib.concatStringsSep " " (map toString dllRoots)}; do
+                [ -d "$root" ] || continue
+                find "$root" -type f -iname '*.dll' 2>/dev/null | while read -r d; do
+                  cp -vL --no-preserve=all "$d" "$out/" || true
+                done
+              done
+              alias_dll() {
+                local from="$1" to="$2"
+                if [ -f "$out/$from" ] && [ ! -e "$out/$to" ]; then
+                  cp -L "$out/$from" "$out/$to"
+                  echo "aliased $from -> $to"
+                fi
+              }
+              alias_dll libogg-0.dll ogg.dll
+              alias_dll libogg.dll ogg.dll
+              alias_dll libvorbis-0.dll vorbis.dll
+              alias_dll libvorbisfile-3.dll vorbisfile.dll
+              alias_dll libopus-0.dll opus.dll
+              alias_dll libopusfile-0.dll opusfile.dll
+              alias_dll libmodplug-1.dll modplug.dll
+              alias_dll libmpg123-0.dll mpg123.dll
+              if [ ! -f "$out/ogg.dll" ] && [ ! -f "$out/libogg-0.dll" ] && [ ! -f "$out/libogg.dll" ]; then
+                echo "error: ogg.dll still missing after harvesting libogg" >&2
+                echo "libogg store contents:" >&2
+                find ${pkgsW.libogg} -type f 2>/dev/null | head -50 >&2 || true
+                echo "flat package dlls:" >&2
+                ls -1 "$out"/*.dll 2>/dev/null >&2 || true
+                exit 1
+              fi
+              # Ensure the PE import name exists even if only libogg-0.dll was harvested.
+              if [ ! -f "$out/ogg.dll" ]; then
+                for cand in libogg-0.dll libogg.dll; do
+                  if [ -f "$out/$cand" ]; then
+                    cp -L "$out/$cand" "$out/ogg.dll"
+                    break
+                  fi
+                done
+              fi
+            '';
 
           supertux-origins-win32-zip = pkgs.runCommand "supertux-origins-win32-zip-${version}" {
           } ''
