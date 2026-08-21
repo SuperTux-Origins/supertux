@@ -226,10 +226,17 @@ pulling ffmpeg-heavy openal from nixpkgs cross. Packaging: flat exe + DLLs
 ### hostPlatform vs buildPlatform
 
 Windows is a **cross target** only (`pkgs.pkgsCross.mingwW64` under a
-Linux flake system). Never publish or look up `packages.x86_64-windows` /
-`packages.i686-windows` for grumnix prebuilts — those flakes expose
-`packages.\${builderSystem}.SDL2-win64` etc. Use the flake `system` (or
-`pickWinFlakePkg`) for lookups.
+Linux flake system).
+
+grumnix `*-win32` flakes use tinycmmc `eachWin32SystemWithPkgs` and publish
+under **`packages.x86_64-windows`** / **`packages.i686-windows`** (the cross
+*target* system names), not under the Linux builder system. Picking the wrong
+ABI (e.g. `i686-windows` physfs while linking `x86_64-w64-mingw32`) makes ld
+skip the incompatible import library and leave `PHYSFS_*` undefined.
+
+`pickWinFlakePkg flake names abi` prefers `x86_64-windows` for `abi=win64`
+and `i686-windows` for `abi=win32`.
+
 
 ### wstsound without tinycmmc
 

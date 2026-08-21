@@ -185,17 +185,26 @@
         #
         # Nix gotcha: `a or b or throw "x"` is parsed as `(a or b or throw) "x"`
         # (function application binds tighter than `or`). Always parenthesize throw.
-        pickWinFlakePkg = flake: names:
+        # grumnix *-win32 flakes (via tinycmmc eachWin32SystemWithPkgs) publish
+        # under packages.x86_64-windows / packages.i686-windows — NOT under the
+        # Linux builder system. Prefer the ABI matching pkgsCross.mingwW64.
+        pickWinFlakePkg = flake: names: abi:
           let
             all = flake.packages or {};
             systems = builtins.attrNames all;
-            # Prebuilt MinGW flakes publish under the *builder* system
-            # (x86_64-linux / aarch64-linux), never as packages.x86_64-windows.
-            prefer = [
-              system
-              "x86_64-linux"
-              "aarch64-linux"
-            ];
+            # abi: "win64" → x86_64-windows, "win32" → i686-windows
+            prefer =
+              if abi == "win32" then [
+                "i686-windows"
+                "x86_64-windows"
+                system
+                "x86_64-linux"
+              ] else [
+                "x86_64-windows"
+                "i686-windows"
+                system
+                "x86_64-linux"
+              ];
             matches = builtins.filter (s: builtins.elem s systems) prefer;
             sys =
               if matches != [] then builtins.head matches
@@ -206,7 +215,7 @@
             found = builtins.filter (x: x != null) (map tryName names);
           in
             if found != [] then builtins.head found
-            else throw ("pickWinFlakePkg: none of ${builtins.toString names} under packages.${sys}");
+            else throw ("pickWinFlakePkg: none of ${builtins.toString names} under packages.${sys} (have: ${builtins.toString systems})");
 
 
       in
@@ -299,12 +308,12 @@
                 pkgsW = pkgs.pkgsCross.mingwW64;
                 winSuffix = "win64";
                 # Pingus: SDL2-* from grumnix on *builder* system, not target.
-                sdl2w = pickWinFlakePkg SDL2-win32 [ "SDL2-win64" "default" ];
-                sdl2imgw = pickWinFlakePkg SDL2_image-win32 [ "SDL2_image-win64" "default" ];
-                sdl2ttfw = pickWinFlakePkg SDL2_ttf-win32 [ "SDL2_ttf" "default" ];
-                physfsw = pickWinFlakePkg physfs-win32 [ "default" "physfs" ];
-                openalw = pickWinFlakePkg openal-soft-win32 [ "openal-soft-win64" "default" ];
-                modplugw = pickWinFlakePkg libmodplug-win32 [ "libmodplug-win64" "default" ];
+                sdl2w = pickWinFlakePkg SDL2-win32 [ "SDL2-win64" "default" ] "win64";
+                sdl2imgw = pickWinFlakePkg SDL2_image-win32 [ "SDL2_image-win64" "default" ] "win64";
+                sdl2ttfw = pickWinFlakePkg SDL2_ttf-win32 [ "SDL2_ttf" "default" ] "win64";
+                physfsw = pickWinFlakePkg physfs-win32 [ "default" "physfs" ] "win64";
+                openalw = pickWinFlakePkg openal-soft-win32 [ "openal-soft-win64" "default" ] "win64";
+                modplugw = pickWinFlakePkg libmodplug-win32 [ "libmodplug-win64" "default" ] "win64";
 
                 # Build C++ deps with the *cross* stdenv (not host Linux .so).
                 # Force Linux cmake into nativeBuildInputs via callPackage args.
@@ -381,10 +390,12 @@
                   "-DUSE_SYSTEM_SQUIRREL=OFF"
                   "-DSQUIRREL_SOURCE_DIR=${squirrel-src}"
                   # Prebuilt physfs-win32 (3.0.2) has PHYSFS_getPrefDir; force system
-                  # so we never require external/physfs under MinGW. Header-based
-                  # detection in ProvidePhysfs.cmake also covers the cross case.
+                  # so we never require external/physfs under MinGW.
                   "-DUSE_SYSTEM_PHYSFS=ON"
-                  # Fallback if find_package(PhysFS) still fails for the grumnix pkg.
+                  # Explicit import lib (avoids find_package picking a wrong/empty path).
+                  # physfs cmake installs libphysfs.dll.a under lib/ on MinGW.
+                  "-DPHYSFS_LIBRARY=${physfsw}/lib/libphysfs.dll.a"
+                  "-DPHYSFS_INCLUDE_DIR=${physfsw}/include"
                   "-DPHYSFS_SOURCE_DIR=${physfs-src}"
                 ];
                 buildInputs = builtins.filter (x: x != null) (o.buildInputs or []);
