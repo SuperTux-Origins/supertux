@@ -398,7 +398,20 @@
                   "-DPHYSFS_INCLUDE_DIR=${physfsw}/include"
                   "-DPHYSFS_SOURCE_DIR=${physfs-src}"
                 ];
-                buildInputs = builtins.filter (x: x != null) (o.buildInputs or []);
+                # Pull audio codec DLLs into the runtime closure for postFixup
+                # (libvorbis imports ogg.dll; must be next to the exe for Wine).
+                buildInputs = builtins.filter (x: x != null) (
+                  (o.buildInputs or [])
+                  ++ [
+                    pkgsW.libogg
+                    pkgsW.libvorbis
+                    pkgsW.libopus
+                    pkgsW.opusfile
+                    pkgsW.mpg123
+                    openalw
+                    modplugw
+                  ]
+                );
                 nativeBuildInputs = builtins.filter (x: x != null) (o.nativeBuildInputs or []);
               });
 
@@ -420,6 +433,29 @@
             cp -v --dereference --no-preserve=all ${supertux-origins-mingw64}/bin/*.dll $out/ 2>/dev/null || true
             if [ -d ${supertux-origins-mingw64}/data ]; then
               cp -a ${supertux-origins-mingw64}/data/. $out/data/
+            fi
+            # MinGW PE imports often use undecorated names (ogg.dll) while
+            # packages install libogg-0.dll — alias so Wine/Windows loaders find them.
+            alias_dll() {
+              local from="$1" to="$2"
+              if [ -f "$out/$from" ] && [ ! -e "$out/$to" ]; then
+                cp -L "$out/$from" "$out/$to"
+                echo "aliased $from -> $to"
+              fi
+            }
+            alias_dll libogg-0.dll ogg.dll
+            alias_dll libogg.dll ogg.dll
+            alias_dll libvorbis-0.dll vorbis.dll
+            alias_dll libvorbisfile-3.dll vorbisfile.dll
+            alias_dll libopus-0.dll opus.dll
+            alias_dll libopusfile-0.dll opusfile.dll
+            alias_dll libmodplug-1.dll modplug.dll
+            alias_dll libmpg123-0.dll mpg123.dll
+            # Fail clearly if ogg is still missing (common Wine failure).
+            if ! ls "$out"/ogg.dll "$out"/libogg*.dll 1>/dev/null 2>&1; then
+              echo "warning: no ogg.dll / libogg*.dll in flat package; audio may fail" >&2
+              echo "dlls present:" >&2
+              ls -1 "$out"/*.dll 2>/dev/null >&2 || true
             fi
           '';
 

@@ -72,8 +72,8 @@ stdenv.mkDerivation rec {
   postFixup =
     (lib.optionalString stdenv.hostPlatform.isWindows ''
        # Materialize runtime DLLs into $out/bin for Wine / redistribution.
-       # Nixpkgs may already link some; transitive audio deps (ogg.dll) are
-       # often missing unless we scan the full buildInputs closure.
+       # Transitive audio deps (libogg → ogg.dll) live under dependency store
+       # paths; scan the buildInputs closure and add MinGW import-name aliases.
        mkdir -p $out/bin
        materialize_dll() {
          local src="$1"
@@ -85,6 +85,14 @@ stdenv.mkDerivation rec {
          cp -L "$src" "$tmp"
          mv -f "$tmp" "$dest"
        }
+       alias_dll() {
+         # PE imports often use undecorated names (ogg.dll) while MinGW
+         # packages install libogg-0.dll — provide both.
+         local from="$1" to="$2"
+         if [ -f "$out/bin/$from" ] && [ ! -e "$out/bin/$to" ]; then
+           cp -L "$out/bin/$from" "$out/bin/$to"
+         fi
+       }
        for f in "$out/bin"/*.dll; do
          [ -e "$f" ] || continue
          if [ -L "$f" ]; then
@@ -93,12 +101,24 @@ stdenv.mkDerivation rec {
        done
        for root in ${lib.escapeShellArgs (map toString windowsDllRoots)}; do
          [ -d "$root" ] || continue
-         # Prefer bin/ and lib/; skip huge unrelated trees when possible.
-         find "$root" -type f -iname '*.dll' 2>/dev/null | while read -r src; do
+         find "$root" \( -path '*/bin/*' -o -path '*/lib/*' -o -path '*/bin' -o -path '*/lib' \) \
+           -type f -iname '*.dll' 2>/dev/null | while read -r src; do
+           materialize_dll "$src"
+         done
+         # Also a shallow full-tree pass for packages that install DLLs oddly.
+         find "$root" -maxdepth 3 -type f -iname '*.dll' 2>/dev/null | while read -r src; do
            materialize_dll "$src"
          done
        done
-    '');
+       alias_dll libogg-0.dll ogg.dll
+       alias_dll libogg.dll ogg.dll
+       alias_dll libvorbis-0.dll vorbis.dll
+       alias_dll libvorbisfile-3.dll vorbisfile.dll
+       alias_dll libopus-0.dll opus.dll
+       alias_dll libopusfile-0.dll opusfile.dll
+       alias_dll libmodplug-1.dll modplug.dll
+       alias_dll libmpg123-0.dll mpg123.dll
+     '');
 
   nativeBuildInputs = [
     cmake
