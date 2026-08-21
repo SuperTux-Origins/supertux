@@ -189,12 +189,12 @@
           let
             all = flake.packages or {};
             systems = builtins.attrNames all;
+            # Prebuilt MinGW flakes publish under the *builder* system
+            # (x86_64-linux / aarch64-linux), never as packages.x86_64-windows.
             prefer = [
-              pkgs.stdenv.hostPlatform.system
+              system
               "x86_64-linux"
               "aarch64-linux"
-              "x86_64-windows"
-              "i686-windows"
             ];
             matches = builtins.filter (s: builtins.elem s systems) prefer;
             sys =
@@ -243,42 +243,27 @@
             withSexpcpp = true;
           };
 
+          # Linux native packages only. Windows is *always* pkgsCross.mingwW64
+          # below — never evaluate packages.\${system} with hostPlatform=windows
+          # (that confused i686/x86_64-windows flake outputs in older recipes).
           supertux-origins = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
             versionFull = version;
-
-            SDL2_ttf = if pkgs.stdenv.hostPlatform.isWindows
-                       then SDL2_ttf-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
-                       else pkgs.SDL2_ttf;
-
+            SDL2 = pkgs.SDL2;
+            SDL2_image = pkgs.SDL2_image;
+            SDL2_ttf = pkgs.SDL2_ttf;
             sexpcpp = sexpcpp-pkg;
-            squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
-            tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            squirrel = squirrel.packages.${system}.default;
+            tinycmmc = tinycmmc.packages.${system}.default;
             strutcpp = strutcpp-pkg;
-            miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            miniswig = miniswig.packages.${system}.default;
             wstsound = wstsound-pkg;
             priocpp = priocpp-pkg;
             logmich = logmich-pkg;
-
-            physfs = if pkgs.stdenv.hostPlatform.isWindows
-                     then physfs-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
-                     else pkgs.physfs;
-
+            physfs = pkgs.physfs;
             glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
-
-            SDL2 = if pkgs.stdenv.hostPlatform.isWindows
-                   then SDL2-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
-                   else pkgs.SDL2;
-
-            SDL2_image = if pkgs.stdenv.hostPlatform.isWindows
-                         then SDL2_image-win32.packages.${pkgs.stdenv.hostPlatform.system}.default
-                         else pkgs.SDL2_image;
-
-            xdgcpp = if !pkgs.stdenv.hostPlatform.isWindows
-                     then xdgcpp.packages.${pkgs.stdenv.hostPlatform.system}.default
-                     else null;
-
-            mcfgthreads = pkgs.windows.mcfgthreads;
+            xdgcpp = xdgcpp.packages.${system}.default;
+            mcfgthreads = null;
             gtest = pkgs.gtest;
           };
 
@@ -287,23 +272,21 @@
           supertux-origins-gles2 = pkgs.callPackage ./supertux-origins.nix {
             inherit self;
             versionFull = version;
+            SDL2 = pkgs.SDL2;
+            SDL2_image = pkgs.SDL2_image;
             SDL2_ttf = pkgs.SDL2_ttf;
             sexpcpp = sexpcpp-pkg;
-            squirrel = squirrel.packages.${pkgs.stdenv.hostPlatform.system}.default;
-            tinycmmc = tinycmmc.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            squirrel = squirrel.packages.${system}.default;
+            tinycmmc = tinycmmc.packages.${system}.default;
             strutcpp = strutcpp-pkg;
-            miniswig = miniswig.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            miniswig = miniswig.packages.${system}.default;
             wstsound = wstsound-pkg;
             priocpp = priocpp-pkg;
             logmich = logmich-pkg;
             physfs = pkgs.physfs;
             glm = (pkgs.glm.overrideAttrs (oldAttrs: { meta = {}; }));
-            SDL2 = pkgs.SDL2;
-            SDL2_image = pkgs.SDL2_image;
-            xdgcpp = if !pkgs.stdenv.hostPlatform.isWindows
-                     then xdgcpp.packages.${pkgs.stdenv.hostPlatform.system}.default
-                     else null;
-            mcfgthreads = pkgs.windows.mcfgthreads;
+            xdgcpp = xdgcpp.packages.${system}.default;
+            mcfgthreads = null;
             gtest = pkgs.gtest;
             useGLES2 = true;
             libGL = pkgs.libGL;

@@ -221,7 +221,34 @@ work better on the handheld GLES stack.
 
 Origins already pulls many grumnix win32 packages. Prefer those over
 pulling ffmpeg-heavy openal from nixpkgs cross. Packaging: flat exe + DLLs
-+ data zip. Full external graph under pkgsCross.mingwW64 remains WIP.
++ data zip.
+
+### hostPlatform vs buildPlatform
+
+Windows is a **cross target** only (`pkgs.pkgsCross.mingwW64` under a
+Linux flake system). Never publish or look up `packages.x86_64-windows` /
+`packages.i686-windows` for grumnix prebuilts — those flakes expose
+`packages.\${builderSystem}.SDL2-win64` etc. Use the flake `system` (or
+`pickWinFlakePkg`) for lookups.
+
+### wstsound without tinycmmc
+
+Standalone MinGW builds of `external/wstsound` failed with
+`tinycmmc modules not found (set TINYCMMC_MODULE_PATH)` because
+`find_package(tinycmmc CONFIG)` does not see the native module package
+under the cross prefix. Fixed by shipping codec `Find*.cmake` under
+`external/wstsound/cmake/` (Pingus pattern) and dropping the tinycmmc
+dependency from `wstsound.nix`. SuperTux still uses tinycmmc modules for
+the main tree via `nativeBuildInputs` + in-tree `external/tinycmmc/modules/`.
+
+### Wine apps
+
+```bash
+nix run .#supertux-origins-win32
+nix run .#supertux-origins-mingw64
+```
+
+Requires `wineAppsEnabled` (x86_64-linux builder).
 
 ---
 
