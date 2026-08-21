@@ -3,9 +3,49 @@
 
 find_package(PhysFS QUIET)
 
+# Detect PHYSFS_getPrefDir without relying solely on try_compile.
+# Under MinGW cross-compile, check_symbol_exists often fails even when the
+# prebuilt physfs-win32 (3.0.2+) header declares the symbol — CMAKE then
+# falls through to ExternalProject and dies because external/physfs is not
+# checked out.
+set(HAVE_PHYSFS_GETPREFDIR FALSE)
 if(PHYSFS_LIBRARY)
-  set(CMAKE_REQUIRED_LIBRARIES ${PHYSFS_LIBRARY})
-  check_symbol_exists("PHYSFS_getPrefDir" "${PHYSFS_INCLUDE_DIR}/physfs.h" HAVE_PHYSFS_GETPREFDIR)
+  set(_physfs_hdr "")
+  if(PHYSFS_INCLUDE_DIR AND EXISTS "${PHYSFS_INCLUDE_DIR}/physfs.h")
+    set(_physfs_hdr "${PHYSFS_INCLUDE_DIR}/physfs.h")
+  elseif(DEFINED PhysFS_INCLUDE_DIR AND EXISTS "${PhysFS_INCLUDE_DIR}/physfs.h")
+    set(_physfs_hdr "${PhysFS_INCLUDE_DIR}/physfs.h")
+    set(PHYSFS_INCLUDE_DIR "${PhysFS_INCLUDE_DIR}")
+  endif()
+  # Also accept imported target include dirs (some FindPhysFS / Config packages).
+  if(NOT _physfs_hdr AND TARGET PhysFS::PhysFS)
+    get_target_property(_physfs_incs PhysFS::PhysFS INTERFACE_INCLUDE_DIRECTORIES)
+    if(_physfs_incs)
+      foreach(_inc ${_physfs_incs})
+        if(EXISTS "${_inc}/physfs.h")
+          set(_physfs_hdr "${_inc}/physfs.h")
+          set(PHYSFS_INCLUDE_DIR "${_inc}")
+          break()
+        endif()
+      endforeach()
+    endif()
+  endif()
+
+  if(_physfs_hdr)
+    file(STRINGS "${_physfs_hdr}" _physfs_prefdir_lines REGEX "PHYSFS_getPrefDir")
+    if(_physfs_prefdir_lines)
+      set(HAVE_PHYSFS_GETPREFDIR TRUE)
+      message(STATUS "PHYSFS_getPrefDir: declared in ${_physfs_hdr}")
+    endif()
+  endif()
+
+  if(NOT HAVE_PHYSFS_GETPREFDIR)
+    set(CMAKE_REQUIRED_LIBRARIES ${PHYSFS_LIBRARY})
+    if(PHYSFS_INCLUDE_DIR)
+      set(CMAKE_REQUIRED_INCLUDES ${PHYSFS_INCLUDE_DIR})
+    endif()
+    check_symbol_exists("PHYSFS_getPrefDir" "physfs.h" HAVE_PHYSFS_GETPREFDIR)
+  endif()
 endif()
 
 if(HAVE_PHYSFS_GETPREFDIR AND NOT EMSCRIPTEN AND NOT ANDROID)
@@ -15,19 +55,23 @@ else()
 endif()
 
 if(USE_SYSTEM_PHYSFS)
+  message(STATUS "Using system PhysFS: ${PHYSFS_LIBRARY}")
   add_library(LibPhysfs INTERFACE)
   set_target_properties(LibPhysfs PROPERTIES
     INTERFACE_LINK_LIBRARIES "${PHYSFS_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${PHYSFS_INCLUDE_DIR}")
 else()
-  # Source tree: submodule, or override for cross builds (wasm/Android/R36S).
+  # Source tree: submodule, or override for cross builds (wasm/Android/R36S/MinGW).
   set(PHYSFS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/physfs" CACHE PATH
       "Path to physfs sources (CMakeLists.txt)")
   if(NOT EXISTS "${PHYSFS_SOURCE_DIR}/CMakeLists.txt")
     message(FATAL_ERROR
       "physfs sources not found at PHYSFS_SOURCE_DIR=${PHYSFS_SOURCE_DIR}.\n"
       "  Checkout external/physfs or pass -DPHYSFS_SOURCE_DIR=/path/to/physfs\n"
-      "  (needed for EMSCRIPTEN/Android when system PhysFS is unavailable).")
+      "  (needed when system PhysFS is unavailable or lacks PHYSFS_getPrefDir).\n"
+      "  PHYSFS_LIBRARY=${PHYSFS_LIBRARY}\n"
+      "  PHYSFS_INCLUDE_DIR=${PHYSFS_INCLUDE_DIR}\n"
+      "  HAVE_PHYSFS_GETPREFDIR=${HAVE_PHYSFS_GETPREFDIR}")
   endif()
 
   if(WIN32 AND NOT EMSCRIPTEN)

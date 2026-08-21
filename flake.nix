@@ -380,6 +380,12 @@
                 cmakeFlags = (o.cmakeFlags or []) ++ [
                   "-DUSE_SYSTEM_SQUIRREL=OFF"
                   "-DSQUIRREL_SOURCE_DIR=${squirrel-src}"
+                  # Prebuilt physfs-win32 (3.0.2) has PHYSFS_getPrefDir; force system
+                  # so we never require external/physfs under MinGW. Header-based
+                  # detection in ProvidePhysfs.cmake also covers the cross case.
+                  "-DUSE_SYSTEM_PHYSFS=ON"
+                  # Fallback if find_package(PhysFS) still fails for the grumnix pkg.
+                  "-DPHYSFS_SOURCE_DIR=${physfs-src}"
                 ];
                 buildInputs = builtins.filter (x: x != null) (o.buildInputs or []);
                 nativeBuildInputs = builtins.filter (x: x != null) (o.nativeBuildInputs or []);

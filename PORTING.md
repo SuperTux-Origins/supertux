@@ -241,6 +241,17 @@ under the cross prefix. Fixed by shipping codec `Find*.cmake` under
 dependency from `wstsound.nix`. SuperTux still uses tinycmmc modules for
 the main tree via `nativeBuildInputs` + in-tree `external/tinycmmc/modules/`.
 
+### PhysFS under MinGW
+
+`ProvidePhysfs.cmake` used `check_symbol_exists(PHYSFS_getPrefDir)`, which
+often fails under MinGW *cross* try_compile even though grumnix physfs-win32
+(3.0.2) declares the symbol. Configure then required `external/physfs` (not
+checked out) and died.
+
+Fix: prefer scanning `physfs.h` for `PHYSFS_getPrefDir` before try_compile;
+flake MinGW also passes `-DUSE_SYSTEM_PHYSFS=ON` and `-DPHYSFS_SOURCE_DIR`
+(physfs-src 3.2.0) as a safety net.
+
 ### Wine apps
 
 ```bash
