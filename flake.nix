@@ -102,13 +102,17 @@
       flake = false;
     };
 
+    arkosSysrootSrc.url = "github:grumnix/arkos-sysroot";
+    arkosSysrootSrc.flake = false;
   };
 
   outputs = { self, nixpkgs, flake-utils,
               tinycmmc,
               SDL2-win32, SDL2_image-win32, physfs-win32, SDL2_ttf-win32,
               openal-soft-win32, libmodplug-win32,
-              miniswig, xdgcpp, squirrel, physfs-src, squirrel-src, sdl2-ttf-src, freetype-src, sdl2-src, sdl2-image-src }:
+              miniswig, xdgcpp, squirrel, physfs-src, squirrel-src, sdl2-ttf-src, freetype-src, sdl2-src, sdl2-image-src,
+              arkosSysrootSrc
+            }:
 
     # Linux only — no Darwin (nixpkgs 26.11 dropped x86_64-darwin; we do not
     # target macOS). Windows is a *cross* target via pkgsCross.mingwW64, not a
@@ -598,6 +602,7 @@
           let
             r36s = import ./nix/r36s.nix {
               inherit (pkgs) lib stdenv stdenvNoCC fetchurl cmake pkg-config writeShellScript zip glm;
+              inherit arkosSysrootSrc;
               pkgsCross = pkgs.pkgsCross;
             };
             gitDate = self.lastModifiedDate or "19700101";

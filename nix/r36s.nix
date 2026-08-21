@@ -19,23 +19,10 @@
 , writeShellScript
 , zip
 , glm  # header-only; not present in ArkOS sysroot
-  # Optional: path or derivation for the sysroot tarball (overrides default URL).
-  # Example:  sysrootSrc = /path/to/arkos-sysroot4.tar.gz;
-, sysrootSrc ? null
+, arkosSysrootSrc
 }:
 
 let
-  arkosSysrootSrc =
-    if sysrootSrc != null then sysrootSrc
-    else fetchurl {
-      name = "arkos-sysroot.tar.gz";
-      # Placeholder URL — replace with a permanent host, or pass sysrootSrc=.
-      # Build local: mk/r36s/scripts/make-sysroot-debootstrap.sh
-      #   nix store prefetch-file <url>  → paste sha256
-      url = "http://localhost:8888/arkos-sysroot4.tar.gz";
-      hash = "sha256-Sm1Xcy++M6LuOLXs9nOs7xIfuvzqAOledKnWH8H7+/g=";
-    };
-
   # Allow hash to be overridden by the user who already fetched the tarball;
   # if the placeholder remains, Nix will print the expected hash.
   khrplatformH = ../mk/r36s/include/KHR/khrplatform.h;

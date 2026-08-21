@@ -107,6 +107,22 @@
         "url": "https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.22.0/SDL2_ttf-devel-2.22.0-mingw.tar.gz"
       }
     },
+    "arkosSysrootSrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787339014,
+        "narHash": "sha256-vdc15JmtewgOwZPk8PfWZzM+t19P6YlRfe2Jp02+ycg=",
+        "owner": "grumnix",
+        "repo": "arkos-sysroot",
+        "rev": "3d2a98fe2fdff123fe4c6c7c7e9f6c0150c99a1c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "grumnix",
+        "repo": "arkos-sysroot",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -366,6 +382,7 @@
         "SDL2-win32": "SDL2-win32",
         "SDL2_image-win32": "SDL2_image-win32",
         "SDL2_ttf-win32": "SDL2_ttf-win32",
+        "arkosSysrootSrc": "arkosSysrootSrc",
         "flake-utils": "flake-utils_3",
         "freetype-src": "freetype-src",
         "libmodplug-win32": "libmodplug-win32",
