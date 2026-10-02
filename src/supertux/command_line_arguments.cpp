@@ -44,6 +44,9 @@ CommandLineArguments::CommandLineArguments() :
   enable_script_debugger(),
   start_demo(),
   record_demo(),
+  dump_state(),
+  max_frames(),
+  fast_forward(),
   tux_spawn_pos(),
   sector(),
   spawnpoint(),
@@ -127,6 +130,9 @@ CommandLineArguments::print_help(char const* arg0) const
     << _("Demo Recording Options:") << "\n"
     << _("  --record-demo FILE LEVEL     Record a demo to FILE") << "\n"
     << _("  --play-demo FILE LEVEL       Play a recorded demo") << "\n"
+    << _("  --dump-state FILE            Dump object state every frame, quit at death or level end") << "\n"
+    << _("  --max-frames N               Quit after N frames of gameplay") << "\n"
+    << _("  --fast-forward               Run game logic as fast as possible") << "\n"
     << "\n"
     << _("Directory Options:") << "\n"
     << _("  --datadir DIR                Set the directory for the games datafiles") << "\n"
@@ -340,6 +346,32 @@ CommandLineArguments::parse_args(int argc, char** argv)
         record_demo = argv[++i];
       }
     }
+    else if (arg == "--dump-state")
+    {
+      if (i + 1 >= argc)
+      {
+        throw std::runtime_error("Need to specify a state dump filename");
+      }
+      else
+      {
+        dump_state = argv[++i];
+      }
+    }
+    else if (arg == "--max-frames")
+    {
+      if (i + 1 >= argc)
+      {
+        throw std::runtime_error("Need to specify a frame count");
+      }
+      else
+      {
+        max_frames = std::stoi(argv[++i]);
+      }
+    }
+    else if (arg == "--fast-forward")
+    {
+      fast_forward = true;
+    }
     else if (arg == "--spawn-pos")
     {
       Vector spawn_pos(0.0f, 0.0f);
@@ -428,6 +460,9 @@ CommandLineArguments::merge_into(Config& config)
   merge_option(enable_script_debugger)
   merge_option(start_demo)
   merge_option(record_demo)
+  merge_option(dump_state)
+  merge_option(max_frames)
+  merge_option(fast_forward)
   merge_option(tux_spawn_pos)
   merge_option(developer_mode)
   merge_option(christmas_mode)

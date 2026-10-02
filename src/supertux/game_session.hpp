@@ -40,6 +40,7 @@ class EndSequence;
 class Level;
 class Player;
 class Sector;
+class StateDumper;
 class Statistics;
 class Savegame;
 
@@ -50,6 +51,7 @@ class GameSession final : public Screen,
 {
 public:
   GameSession(std::string const& levelfile, Savegame& savegame, Statistics* statistics = nullptr);
+  ~GameSession() override;
 
   void draw(Compositor& compositor) override;
   void update(float dt_sec, Controller const& controller) override;
@@ -99,6 +101,9 @@ public:
 
 private:
   void check_end_conditions();
+
+  /** End a headless run (--dump-state / --max-frames) and quit. */
+  void end_run(std::string const& reason);
 
   void drawstatus(DrawingContext& context);
   void draw_pause(DrawingContext& context);
@@ -162,6 +167,10 @@ private:
   std::unique_ptr<GameObject> m_current_cutscene_text;
 
   Timer m_endsequence_timer;
+
+  std::unique_ptr<StateDumper> m_state_dumper;
+  int m_frame_count; /**< logical frames of gameplay since the session started */
+  bool m_run_ended;
 
 private:
   GameSession(GameSession const&) = delete;

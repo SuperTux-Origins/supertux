@@ -40,6 +40,9 @@ public:
 
   bool is_playing_demo() const { return m_playing; }
 
+  /** True once playback has consumed all input in the demo file. */
+  bool is_demo_finished() const { return m_demo_finished; }
+
 private:
   void capture_demo_step();
 
@@ -49,6 +52,7 @@ private:
   std::unique_ptr<std::istream> m_playback_demo_stream;
   std::unique_ptr<CodeController> m_demo_controller;
   bool m_playing;
+  bool m_demo_finished;
 
 private:
   GameSessionRecorder(GameSessionRecorder const&) = delete;

@@ -35,6 +35,7 @@
 #include "supertux/savegame.hpp"
 #include "supertux/screen_manager.hpp"
 #include "supertux/sector.hpp"
+#include "supertux/state_dumper.hpp"
 #include "util/file_system.hpp"
 #include "video/compositor.hpp"
 #include "video/surface.hpp"
@@ -74,7 +75,10 @@ GameSession::GameSession(std::string const& levelfile_, Savegame& savegame, Stat
   m_active(false),
   m_end_seq_started(false),
   m_current_cutscene_text(),
-  m_endsequence_timer()
+  m_endsequence_timer(),
+  m_state_dumper(g_config->dump_state.empty() ? nullptr : std::make_unique<StateDumper>(g_config->dump_state)),
+  m_frame_count(0),
+  m_run_ended(false)
 {
   m_boni_at_start.resize(InputManager::current()->get_num_users(), NO_BONUS);
   m_max_fire_bullets_at_start.resize(InputManager::current()->get_num_users(), 0);
@@ -82,6 +86,10 @@ GameSession::GameSession(std::string const& levelfile_, Savegame& savegame, Stat
 
   if (restart_level() != 0)
     throw std::runtime_error ("Initializing the level failed.");
+}
+
+GameSession::~GameSession()
+{
 }
 
 void
@@ -198,6 +206,9 @@ GameSession::restart_level(bool after_death)
   }
 
   start_recording();
+
+  if (is_playing_demo())
+    reset_demo_controller();
 
   return (0);
 }
@@ -350,7 +361,11 @@ GameSession::check_end_conditions()
   } else if (m_end_sequence && m_end_sequence->is_done()) {
     finish(true);
   } else if (!m_end_sequence && all_dead) {
-    restart_level(true);
+    if (m_state_dumper) {
+      end_run("death");
+    } else {
+      restart_level(true);
+    }
   }
 }
 
@@ -387,7 +402,7 @@ GameSession::setup()
   m_currentsector->get_singleton_by_type<MusicObject>().play_music(LEVEL_MUSIC);
 
   int total_stats_to_be_collected = m_level->m_stats.m_total_coins + m_level->m_stats.m_total_badguys + m_level->m_stats.m_total_secrets;
-  if ((!m_levelintro_shown) && (total_stats_to_be_collected > 0)) {
+  if ((!m_levelintro_shown) && (total_stats_to_be_collected > 0) && !m_state_dumper) {
     m_levelintro_shown = true;
     m_active = false;
     ScreenManager::current()->push_screen(std::make_unique<LevelIntro>(*m_level, m_best_level_statistics, m_savegame.get_player_status()));
@@ -404,6 +419,9 @@ GameSession::leave()
 void
 GameSession::update(float dt_sec, Controller const& controller)
 {
+  if (m_run_ended)
+    return;
+
   // Set active flag
   if (!m_active)
   {
@@ -523,6 +541,18 @@ GameSession::update(float dt_sec, Controller const& controller)
   if (m_currentsector == nullptr)
     return;
 
+  if (!m_game_pause && !m_run_ended) {
+    if (m_state_dumper)
+      m_state_dumper->dump(*m_currentsector);
+    m_frame_count += 1;
+
+    if (g_config->max_frames > 0 && m_frame_count >= g_config->max_frames) {
+      end_run("max-frames");
+    } else if (m_state_dumper && is_demo_finished()) {
+      end_run("demo-end");
+    }
+  }
+
   // update sounds
   SoundManager::current()->set_listener_position(m_currentsector->get_camera().get_center());
 
@@ -563,8 +593,27 @@ GameSession::update(float dt_sec, Controller const& controller)
 }
 
 void
+GameSession::end_run(std::string const& reason)
+{
+  if (m_run_ended)
+    return;
+  m_run_ended = true;
+
+  if (m_state_dumper)
+    m_state_dumper->finish(reason);
+
+  log_info("Run ended after {} frames: {}", m_frame_count, reason);
+  ScreenManager::current()->quit();
+}
+
+void
 GameSession::finish(bool win)
 {
+  if (m_state_dumper) {
+    end_run("finish");
+    return;
+  }
+
   if (m_end_seq_started)
     return;
   m_end_seq_started = true;
@@ -665,6 +714,11 @@ GameSession::start_sequence(Player* caller, Sequence seq, SequenceData const* da
           m_end_sequence->stop_tux(player->get_id());
       }
     }
+    return;
+  }
+
+  if (m_state_dumper) {
+    end_run("finish");
     return;
   }
 

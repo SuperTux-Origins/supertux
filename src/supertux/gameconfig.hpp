@@ -86,6 +86,17 @@ public:
   std::string start_demo;
   std::string record_demo;
 
+  /** Headless golden-master run: dump MovingObject state every logical
+      frame to this file and quit at the first death or level end. */
+  std::string dump_state;
+
+  /** Quit after this many logical frames of gameplay, 0 = unlimited. */
+  int max_frames;
+
+  /** Run one logical step per main loop iteration without waiting for
+      the wall clock. */
+  bool fast_forward;
+
   /** this variable is set if tux should spawn somewhere which isn't the "main" spawn point*/
   std::optional<Vector> tux_spawn_pos;
 
