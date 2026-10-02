@@ -20,7 +20,6 @@
 #include "badguy/archetype_badguy.hpp"
 #include "badguy/bouncing_snowball.hpp"
 #include "badguy/captainsnowball.hpp"
-#include "badguy/crystallo.hpp"
 #include "badguy/dart.hpp"
 #include "badguy/darttrap.hpp"
 #include "badguy/dispenser.hpp"
@@ -55,14 +54,11 @@
 #include "badguy/snail.hpp"
 #include "badguy/snowman.hpp"
 #include "badguy/spidermite.hpp"
-#include "badguy/spiky.hpp"
 #include "badguy/sspiky.hpp"
 #include "badguy/stumpy.hpp"
 #include "badguy/toad.hpp"
 #include "badguy/totem.hpp"
-#include "badguy/viciousivy.hpp"
 #include "badguy/walking_candle.hpp"
-#include "badguy/walkingleaf.hpp"
 #include "badguy/willowisp.hpp"
 #include "badguy/yeti.hpp"
 #include "badguy/yeti_stalactite.hpp"
@@ -170,7 +166,6 @@ GameObjectFactory::init_factories()
   add_factory<AngryStone>("angrystone");
   add_factory<BouncingSnowball>("bouncingsnowball");
   add_factory<CaptainSnowball>("captainsnowball");
-  add_factory<Crystallo>("crystallo");
   add_factory<Dart>("dart");
   add_factory<DartTrap>("darttrap");
   add_factory<Dispenser>("dispenser");
@@ -213,15 +208,11 @@ GameObjectFactory::init_factories()
   add_factory<Snail>("snail", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Snowman>("snowman");
   add_factory<SpiderMite>("spidermite");
-  add_factory<Spiky>("spiky");
   add_factory<Stalactite>("stalactite");
   add_factory<Stumpy>("stumpy");
   add_factory<Toad>("toad");
   add_factory<Totem>("totem");
-  add_factory<ViciousIvy>("poisonivy"); // backward compatibility
-  add_factory<ViciousIvy>("viciousivy");
   add_factory<WalkingCandle>("walking_candle");
-  add_factory<WalkingLeaf>("walkingleaf");
   add_factory<WillOWisp>("willowisp");
   add_factory<Yeti>("yeti");
   add_factory<YetiStalactite>("yeti_stalactite");

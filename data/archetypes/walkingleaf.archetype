@@ -1,0 +1,13 @@
+(supertux-archetype
+  (name "walkingleaf")
+  (base "walking-badguy")
+  (properties
+    (sprite "images/creatures/walkingleaf/walkingleaf.sprite")
+    (walk-speed 60)
+    (max-drop-height 16)
+    (freezable #t))
+  (components
+    (floater (max-fall-speed 35))
+    (squish-reaction (action "squished")
+                     (particles "images/particles/walkingleaf.sprite")
+                     (particle-count 3))))

@@ -3,6 +3,8 @@
 # INPUT is a synthetic pattern from tools/golden.py (idle, hop, run) or
 # the name of a recorded demo in tests/golden/demos/ (e.g. foo.demo,
 # recorded with --record-demo). FRAMES is the frame limit (60 per second).
+# Optional SPAWN "X,Y" starts Tux there instead of the level's spawn point,
+# to cover objects that the default runs never reach.
 data/levels/world1/23rd_airborne.stlv idle 1800
 data/levels/world1/23rd_airborne.stlv hop 1800
 data/levels/world1/above_arctic_skies.stlv idle 1800
@@ -117,3 +119,8 @@ data/levels/world2/welcome_forest.stlv idle 1800
 data/levels/world2/welcome_forest.stlv hop 1800
 data/levels/world2/wooden_roots.stlv idle 1800
 data/levels/world2/wooden_roots.stlv hop 1800
+
+# Targeted: crystallo patrol (crystal_mine). No run stomps one yet; a
+# recorded demo is needed to cover its shatter reaction.
+data/levels/world1/crystal_mine.stlv idle 900 2950,450
+data/levels/world1/crystal_mine.stlv hop 900 2950,450

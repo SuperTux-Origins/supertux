@@ -9,17 +9,17 @@ Starter clustering (from plan §4.1) — **verify each against its real `.cpp`
 before trusting the cluster**, names are a triage hint, not ground truth:
 
 ## Ground walkers / patrollers
-- [ ] snowball
+- [x] snowball — `data/archetypes/snowball.archetype`
 - [ ] bouncing_snowball
 - [ ] mriceblock
-- [ ] spiky
+- [x] spiky — `data/archetypes/spiky.archetype`
 - [ ] sspiky
 - [ ] snail
-- [ ] crystallo
+- [x] crystallo — `data/archetypes/crystallo.archetype` (shatter reaction not covered by golden suite yet)
 - [ ] rcrystallo
 - [ ] scrystallo
-- [ ] viciousivy
-- [ ] walkingleaf
+- [x] viciousivy (+ alias poisonivy) — `data/archetypes/viciousivy.archetype`
+- [x] walkingleaf — `data/archetypes/walkingleaf.archetype`
 - [ ] walking_candle
 - [ ] igel
 - [ ] toad

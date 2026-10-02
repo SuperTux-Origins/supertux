@@ -62,13 +62,17 @@ def read_suite():
         line = line.split("#", 1)[0].strip()
         if not line:
             continue
-        level, pattern, frames = line.split()
+        fields = line.split()
+        level, pattern, frames = fields[:3]
+        spawn = fields[3] if len(fields) > 3 else None
         name = "{}-{}-{}".format(Path(level).parent.name, Path(level).stem, Path(pattern).stem)
-        entries.append((name, level, pattern, int(frames)))
+        if spawn:
+            name += "-at" + spawn.replace(",", "x")
+        entries.append((name, level, pattern, int(frames), spawn))
     return entries
 
 
-def run_one(binary, level, pattern, frames, dump_path, workdir):
+def run_one(binary, level, pattern, frames, spawn, dump_path, workdir):
     if pattern.endswith(".demo"):
         demo = DEMO_DIR / pattern
     else:
@@ -85,8 +89,10 @@ def run_one(binary, level, pattern, frames, dump_path, workdir):
            "--fast-forward",
            "--max-frames", str(frames + 60),  # safety net, demo-end comes first
            "--play-demo", str(demo),
-           "--dump-state", str(dump_path),
-           str(ROOT / level)]
+           "--dump-state", str(dump_path)]
+    if spawn:
+        cmd += ["--spawn-pos", spawn]
+    cmd.append(str(ROOT / level))
     proc = subprocess.run(cmd, env=env, cwd=workdir,
                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                           timeout=600)
@@ -101,9 +107,9 @@ def run_suite(binary, outdir, jobs, only=None):
     with tempfile.TemporaryDirectory(prefix="golden-") as workdir, \
          concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as pool:
         futures = {}
-        for name, level, pattern, frames in entries:
+        for name, level, pattern, frames, spawn in entries:
             dump = Path(workdir) / (name + ".dump")
-            futures[pool.submit(run_one, binary, level, pattern, frames, dump, workdir)] = (name, dump)
+            futures[pool.submit(run_one, binary, level, pattern, frames, spawn, dump, workdir)] = (name, dump)
         for fut in concurrent.futures.as_completed(futures):
             name, dump = futures[fut]
             fut.result()

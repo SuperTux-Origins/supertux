@@ -110,6 +110,33 @@ Revisit when systems are batched.
 
 ## Step 2 — First vertical slice: ground walkers (commits 6–10)
 
+**Status: DONE.** snowball, spiky, walkingleaf, viciousivy/poisonivy and
+crystallo are archetypes; their five classes are deleted. All 116
+golden-master runs are identical to the old classes, including two
+targeted crystal_mine runs whose baselines were recorded from the
+pre-migration build (Release and Debug builds produce identical dumps).
+
+Differences from the plan below:
+
+- **No `walker_system`.** `WalkingBadguy` is still the base of 17 other
+  classes, so `ArchetypeBadguy` derives from it, and walking stays in the
+  base class until that cluster migrates. Only the per-enemy variations
+  became components: `Floater`, `Patrol` and `SquishReaction`
+  (`src/ecs/badguy_components.hpp`). They are handled in the shell's
+  `active_update()`/`collision_squished()`, which keeps update order
+  unchanged.
+- **Archetype format:** `(properties ...)` configures the C++ shell
+  ("base"), and `(components ...)` go into the registry. A level object's
+  top-level keys override component fields (e.g. crystallo `radius`).
+  Components are resolved at construction and emplaced by the new
+  `GameObject::create_components()` hook, because the entity only exists
+  once the object is added.
+- **Factory:** archetypes register under their name and `aliases` in the
+  existing factory map, so nothing else needs to know about them.
+  Runtime spawns (Snowman, MrTree) use `ArchetypeBadguy::create()`.
+- **Coverage gap:** no synthetic run stomps a crystallo. Its
+  `SquishReaction` (anchor-bottom, stop) is verified by review only.
+
 Target: `snowball` (841 uses), `spiky` (451), `walkingleaf` (439),
 `poisonivy` (388, factory alias of `ViciousIvy`), `crystallo`: thin
 `WalkingBadguy` subclasses (`snowball.cpp` is 41 lines: sprite, speed,
