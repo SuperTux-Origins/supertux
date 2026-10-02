@@ -4,6 +4,12 @@
 **Audience:** an LLM (e.g. Claude Code) working through this repo commit-by-commit, plus the human maintainer reviewing PRs.
 **Scope note:** This version of the plan is grounded in the actual `src/` tree (provided as a tarball) — every class name, file path, and line count below is verified against real source, not inferred from upstream knowledge. Phase 0's audit task is correspondingly lighter than a from-scratch audit would be (see §0.5 below for what's still worth double-checking, e.g. build files and `data/` weren't in the tarball).
 
+> **Status (2026-10-03):** `audit.md` now holds facts verified against the
+> real checkout, and `kickoff.md` overrides this plan's phase *ordering*
+> (vertical slice first, demo-based golden master). Open decisions #3,
+> #6, #7, #8 and #9 are resolved there. The git-bundle workflow
+> mentioned below is obsolete: commit directly, per AGENTS.md.
+
 ---
 
 ## 0. What the actual source tells us
