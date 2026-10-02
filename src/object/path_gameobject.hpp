@@ -41,10 +41,6 @@ public:
   void draw(DrawingContext& context) override;
 
 
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/path.png";
-  }
-
   void remove_me() override;
 
   Path& get_path() { return *m_path; }

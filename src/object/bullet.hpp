@@ -35,7 +35,6 @@ public:
   void draw(DrawingContext& context) override;
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  bool is_saveable() const override { return false; }
 
   int get_layer() const override { return LAYER_OBJECTS; }
 

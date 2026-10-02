@@ -29,9 +29,6 @@ public:
 
   void draw(DrawingContext& context) override;
   void update(float dt_sec) override;
-  bool is_saveable() const override {
-    return false;
-  }
 
 private:
   Physic physic;

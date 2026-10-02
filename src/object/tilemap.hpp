@@ -51,8 +51,6 @@ public:
 
   void finish_construction() override;
 
-  const std::string get_icon_path() const override { return "images/engine/editor/tilemap.png"; }
-
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
 

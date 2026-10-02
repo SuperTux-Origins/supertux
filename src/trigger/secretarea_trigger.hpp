@@ -31,8 +31,6 @@ public:
   SecretAreaTrigger(ReaderMapping const& reader);
   SecretAreaTrigger(Rectf const& area, std::string const& fade_tilemap = "");
 
-  bool has_variable_size() const override { return true; }
-
   void event(Player& player, EventType type) override;
   void draw(DrawingContext& context) override;
 

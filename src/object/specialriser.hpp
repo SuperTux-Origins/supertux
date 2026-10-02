@@ -27,9 +27,6 @@ class SpecialRiser final : public MovingObject
 {
 public:
   SpecialRiser(Vector const& pos, std::unique_ptr<MovingObject> child, bool is_solid = false);
-  bool is_saveable() const override {
-    return false;
-  }
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override {
     return FORCE_MOVE;

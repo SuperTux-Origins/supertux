@@ -30,10 +30,6 @@ public:
   void update(float dt_sec) override;
 
 
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/snow.png";
-  }
-
   void init();
 
 private:

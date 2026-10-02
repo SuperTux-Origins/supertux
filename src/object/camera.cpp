@@ -830,10 +830,4 @@ Camera::move(const int dx, const int dy)
   m_translation.y += static_cast<float>(dy);
 }
 
-bool
-Camera::is_saveable() const
-{
-  return !(Level::current() &&
-           Level::current()->is_worldmap());
-}
 /* EOF */

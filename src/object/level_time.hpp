@@ -50,8 +50,6 @@ public:
 
   /** @} */
 
-  const std::string get_icon_path() const override { return "images/engine/editor/clock.png"; }
-
 private:
   SurfacePtr time_surface;
   bool running;

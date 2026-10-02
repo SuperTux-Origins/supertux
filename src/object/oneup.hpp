@@ -25,9 +25,6 @@ class OneUp final : public MovingSprite
 {
 public:
   OneUp(Vector const& pos, Direction direction = Direction::RIGHT);
-  bool is_saveable() const override {
-    return false;
-  }
 
   void update(float dt_sec) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;

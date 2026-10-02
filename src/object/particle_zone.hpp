@@ -33,7 +33,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
 
-  bool has_variable_size() const override { return true; }
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
   int get_layer() const override { return LAYER_OBJECTS; }

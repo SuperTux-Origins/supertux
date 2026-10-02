@@ -25,7 +25,6 @@ GameObject::GameObject() :
   m_fade_helpers(),
   m_uid(),
   m_scheduled_for_removal(false),
-  m_components(),
   m_remove_listeners()
 {
 }
@@ -35,7 +34,6 @@ GameObject::GameObject(std::string const& name) :
   m_fade_helpers(),
   m_uid(),
   m_scheduled_for_removal(false),
-  m_components(),
   m_remove_listeners()
 {
 }

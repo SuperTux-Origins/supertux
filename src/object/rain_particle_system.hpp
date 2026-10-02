@@ -41,10 +41,6 @@ public:
   void fade_angle(float new_angle, float fade_time, easing ease_func);
   void fade_amount(float new_amount, float fade_time);
 
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/rain.png";
-  }
-
   // Minimum and maximum multiplier for the amount of particles (intensity)
   static float constexpr const max_amount = 5.0f;
   static float constexpr const min_amount = 0.1f;

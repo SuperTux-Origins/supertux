@@ -17,17 +17,16 @@
 #ifndef HEADER_SUPERTUX_SUPERTUX_GAME_OBJECT_HPP
 #define HEADER_SUPERTUX_SUPERTUX_GAME_OBJECT_HPP
 
-#include <algorithm>
+#include <memory>
 #include <string>
+#include <vector>
 
-#include "supertux/game_object_component.hpp"
 #include "util/fade_helper.hpp"
 #include "util/gettext.hpp"
 #include "util/reader_fwd.hpp"
 #include "util/uid.hpp"
 
 class DrawingContext;
-class GameObjectComponent;
 class ObjectRemoveListener;
 class Writer;
 
@@ -71,23 +70,9 @@ public:
       DrawingContext if this function is called. */
   virtual void draw(DrawingContext& context) = 0;
 
-  /** This function saves the object. Editor will use that. */
-
   /** If true only a single object of this type is allowed in a
       given GameObjectManager */
   virtual bool is_singleton() const { return false; }
-
-  /** Does this object have variable size
-      (secret area trigger, wind, etc.) */
-  virtual bool has_variable_size() const { return false; }
-
-  /** Indicates if the object will be saved. If false, the object will
-      be skipped on saving and can't be cloned in the editor. */
-  virtual bool is_saveable() const { return true; }
-
-  /** Indicates if get_settings() is implemented. If true the editor
-      will display Tip and ObjectMenu. */
-  virtual bool has_settings() const { return is_saveable(); }
 
   /** schedules this object to be removed at the end of the frame */
   virtual void remove_me() { m_scheduled_for_removal = true; }
@@ -106,52 +91,11 @@ public:
   void set_name(std::string const& name) { m_name = name; }
   std::string const& get_name() const { return m_name; }
 
-  virtual const std::string get_icon_path() const {
-    return "images/tiles/auxiliary/notile.png";
-  }
-
   /** stops all looping sounds */
   virtual void stop_looping_sounds() {}
 
   /** continues all looping sounds */
   virtual void play_looping_sounds() {}
-
-  template<typename T>
-  T* get_component() {
-    for(auto& component : m_components) {
-      if (T* result = dynamic_cast<T*>(component.get())) {
-        return result;
-      }
-    }
-    return nullptr;
-  }
-
-  void add_component(std::unique_ptr<GameObjectComponent> component) {
-    m_components.emplace_back(std::move(component));
-  }
-
-  void remove_component(GameObjectComponent* component) {
-    auto it = std::find_if(m_components.begin(), m_components.end(),
-                           [component](std::unique_ptr<GameObjectComponent> const& lhs){
-                             return lhs.get() == component;
-                           });
-    if (it != m_components.end()) {
-      m_components.erase(it);
-    }
-  }
-
-  /** The editor requested the deletion of the object */
-  virtual void editor_delete() { remove_me(); }
-
-  /** The user clicked on the object in the editor and selected it*/
-  virtual void editor_select() {}
-
-  /** The object got deselected */
-  virtual void editor_deselect() {}
-
-  /** Called each frame in the editor, used to keep linked objects
-      together (e.g. platform on a path) */
-  virtual void editor_update() {}
 
 private:
   void set_uid(UID const& uid) { m_uid = uid; }
@@ -171,8 +115,6 @@ private:
 
   /** this flag indicates if the object should be removed at the end of the frame */
   bool m_scheduled_for_removal;
-
-  std::vector<std::unique_ptr<GameObjectComponent> > m_components;
 
   std::vector<ObjectRemoveListener*> m_remove_listeners;
 

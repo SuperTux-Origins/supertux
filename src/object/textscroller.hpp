@@ -37,8 +37,6 @@ public:
   void draw(DrawingContext& context) override;
   void update(float dt_sec) override;
 
-  const std::string get_icon_path() const override { return "images/engine/editor/textscroller.png"; }
-
   void set_default_speed(float default_speed);
   void scroll(float offset);
   bool is_finished() const { return m_finished; }

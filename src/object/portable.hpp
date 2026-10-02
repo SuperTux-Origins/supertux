@@ -18,7 +18,6 @@
 #define HEADER_SUPERTUX_OBJECT_PORTABLE_HPP
 
 #include "supertux/direction.hpp"
-#include "supertux/game_object_component.hpp"
 
 class MovingObject;
 
@@ -26,11 +25,11 @@ class MovingObject;
     be carried around by the player.
     The object has to additionally set the PORTABLE flag (this allows to
     make the object only temporarily portable by resetting the flag) */
-class Portable : public GameObjectComponent
+class Portable
 {
 public:
   Portable() {}
-  ~Portable() override {}
+  virtual ~Portable() {}
 
   /** called each frame when the object has been grabbed. */
   virtual void grab(MovingObject& other, Vector const& pos, Direction dir) { m_owner = &other; }

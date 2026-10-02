@@ -34,7 +34,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
-  bool is_saveable() const override { return false; }
 
   bool hurts() const { return hurt; }
   void hurts (bool val) { hurt = val; }

@@ -33,7 +33,6 @@ public:
 
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void update(float dt_sec) override;
-  bool is_saveable() const override { return false; }
 
 protected:
   PneumaticPlatform& m_parent;

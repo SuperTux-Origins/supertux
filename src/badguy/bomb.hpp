@@ -24,9 +24,6 @@ class Bomb final : public BadGuy
 {
 public:
   Bomb(Vector const& pos, Direction dir, std::string const& custom_sprite = "images/creatures/mr_bomb/bomb.sprite" );
-  bool is_saveable() const override {
-    return false;
-  }
 
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision_player(Player& player, CollisionHit const& hit) override;

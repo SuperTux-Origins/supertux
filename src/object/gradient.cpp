@@ -216,11 +216,4 @@ Gradient::draw(DrawingContext& context)
   context.pop_transform();
 }
 
-bool
-Gradient::is_saveable() const
-{
-  return !(Level::current() &&
-           Level::current()->is_worldmap());
-}
-
 /* EOF */

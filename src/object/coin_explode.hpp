@@ -26,9 +26,6 @@ public:
   CoinExplode(Vector const& pos);
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
-  bool is_saveable() const override {
-    return false;
-  }
 
 private:
   Vector position;
