@@ -19,7 +19,6 @@ adapted from Pingus and Windstille.
       (stb_image, GLES packages, linuxPorts hygiene, full outputs).
 - [ ] Inventory remaining gaps in mk/ and nix/ vs Pingus/Windstille
       (wasm.nix still shorter; SDL static builds incomplete).
-- [ ] Continuous numbered git bundles (`supertux-001-…`).
 
 ## Windows (MinGW)
 

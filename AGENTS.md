@@ -29,11 +29,11 @@ High-level packaging and flake outputs should mirror the structure used by
 ## Coding / process standards
 
 - Author for all commits: `Ingo Ruhnke <grumbel@gmail.com>`
-- Trailer on every commit: `Co-authored-by: Grok <grok@x.ai>`
-- Code is delivered as **git bundles** that stack cleanly.
-- Bundle naming: `supertux-001-…`, `supertux-002-…`, … (never reuse numbers).
-- Bundles use `HEAD` as the ref.
-- Prefer small, task-focused commits; one large bundle at the end of a work unit.
+- Trailer on every commit: a `Co-Authored-By:` line naming the AI agent
+  that did the work (e.g. `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`).
+- Commit directly to the current branch in the working tree; no bundles or
+  patch files are needed.
+- Prefer small, task-focused commits, one per logical change.
 - Prefer clean code over quick hacks. If complexity grows, refactor.
 - Nix store is read-only; after copying from the store, fix permissions.
 - Double-check Nix string quoting and escaping.
@@ -89,9 +89,8 @@ derivations under `packages`/`checks`.
 ## Working practices
 
 1. Keep PORTING.md updated with every non-obvious fix.
-- **PORTS.md** — high-level packaging map and flake outputs.
 2. Keep TODO.md current.
-3. After each logical unit of work, produce a numbered git bundle.
+3. Commit after each logical unit of work.
 4. Compare CMake options, data install paths, and controller profiles with
    the corresponding Pingus/Windstille files before inventing new ones.
 
