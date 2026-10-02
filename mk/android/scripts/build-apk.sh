@@ -211,7 +211,7 @@ mkdir -p src/jni/external_includes
 # package cannot create e.g. external_includes/geom → Permission denied.
 # Copy then force owner-writable on the staging tree.
 # Header-only / public includes (layout: include/<ns>/… → external_includes/<ns>/…)
-for name in argpp geomcpp logmich priocpp strutcpp sexpcpp tinygettext; do
+for name in argpp entt geomcpp logmich priocpp strutcpp sexpcpp tinygettext; do
   inc="$EXTERNAL_DIR/$name/include"
   if [ -d "$inc" ]; then
     cp -a "$inc"/. src/jni/external_includes/

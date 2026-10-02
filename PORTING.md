@@ -1908,3 +1908,22 @@ env -u LD_LIBRARY_PATH nix develop .#supertux-origins -c bash -c \
   'unset LD_LIBRARY_PATH; cmake --build build -j$(nproc)'
 env -u LD_LIBRARY_PATH tools/golden.py check
 ```
+
+## New vendored header libraries: Android stages them separately
+
+Android builds with ndk-build (`mk/android/app/jni/Android.mk`), not
+CMake. `mk/android/scripts/build-apk.sh` copies each `external/<lib>/include`
+into `external_includes/` from an explicit list. A header-only library
+wired only through CMake (e.g. EnTT via `ProvideEnTT.cmake`) builds
+everywhere else but fails on Android with `'entt/entity/fwd.hpp' file not
+found`. Add new vendored libraries to that list.
+
+Game data needs no extra step: Android, wasm and R36S package all of
+`data/`. Desktop installs use the explicit directory list in
+`mk/cmake/SuperTux/BuildInstall.cmake` (`data/archetypes` was added there).
+
+## Golden master: Release and Debug builds are identical
+
+The replay dumps (`tools/golden.py`) of a Release build match the
+baselines recorded with a Debug build exactly, so baselines can be
+recorded with either build type.
