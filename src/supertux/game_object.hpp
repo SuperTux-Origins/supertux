@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include <entt/entity/fwd.hpp>
+
 #include "util/fade_helper.hpp"
 #include "util/gettext.hpp"
 #include "util/reader_fwd.hpp"
@@ -58,6 +60,10 @@ public:
   virtual void finish_construction() {}
 
   UID get_uid() const { return m_uid; }
+
+  /** The ECS entity backing this object, entt::null while the object is
+      not part of a GameObjectManager. */
+  entt::entity get_entity() const { return m_entity; }
 
   /** This function is called once per frame and allows the object to
       update it's state. The dt_sec is the time that has passed since
@@ -99,6 +105,7 @@ public:
 
 private:
   void set_uid(UID const& uid) { m_uid = uid; }
+  void set_entity(entt::entity entity) { m_entity = entity; }
 
 protected:
   /** a name for the gameobject, this is mostly a hint for scripts and
@@ -112,6 +119,8 @@ private:
   /** A unique id for the object to safely refer to it. This will be
       set by the GameObjectManager. */
   UID m_uid;
+
+  entt::entity m_entity;
 
   /** this flag indicates if the object should be removed at the end of the frame */
   bool m_scheduled_for_removal;

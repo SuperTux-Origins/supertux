@@ -16,6 +16,8 @@
 
 #include "supertux/game_object.hpp"
 
+#include <entt/entity/entity.hpp>
+
 
 #include "supertux/object_remove_listener.hpp"
 #include "util/reader_mapping.hpp"
@@ -24,6 +26,7 @@ GameObject::GameObject() :
   m_name(),
   m_fade_helpers(),
   m_uid(),
+  m_entity(entt::null),
   m_scheduled_for_removal(false),
   m_remove_listeners()
 {
@@ -33,6 +36,7 @@ GameObject::GameObject(std::string const& name) :
   m_name(name),
   m_fade_helpers(),
   m_uid(),
+  m_entity(entt::null),
   m_scheduled_for_removal(false),
   m_remove_listeners()
 {

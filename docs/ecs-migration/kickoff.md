@@ -81,6 +81,19 @@ original task list follows:
 
 ## Step 1 — ECS spine (commits 4–5)
 
+**Status: DONE, except `PhysicsBody`.** The entity is created in
+`GameObjectManager::add_object()` together with the UID and destroyed
+when the object leaves the manager (or is rejected by
+`before_object_add`). `GameObjectManager::get_object_by_entity()`
+resolves `ObjectRef`. The registry is held behind a forward declaration
+so `<entt/entity/registry.hpp>` only reaches the files that use it.
+
+**`PhysicsBody` is deferred.** Objects configure `m_physic` in their
+constructors, before they are added to a manager, so no entity exists
+yet. Moving it now would mean a local copy plus a handover on add, which
+is duplicated state for no gain until a system iterates physics in bulk.
+Revisit when systems are batched.
+
 - `entt::registry` owned by `GameObjectManager` (so both `Sector` and
   `WorldMapSector` get one).
 - Every `GameObject` gets an `entt::entity`, created in
