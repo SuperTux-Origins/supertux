@@ -1,0 +1,157 @@
+//  SuperTux
+//  Copyright (C) 2026 Ingo Ruhnke <grumbel@gmail.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#include "ecs/archetype.hpp"
+
+#include <functional>
+#include <physfs.h>
+#include <stdexcept>
+
+#include "ecs/badguy_components.hpp"
+#include "util/file_system.hpp"
+#include "util/log.hpp"
+#include "util/reader_collection.hpp"
+#include "util/reader_object.hpp"
+
+namespace {
+
+using ComponentReader = std::function<std::unique_ptr<ComponentPrototype> (ReaderMapping const&)>;
+
+/** Component names usable in an archetype's (components ...) section */
+std::map<std::string, ComponentReader> const& component_readers()
+{
+  static std::map<std::string, ComponentReader> const readers = {
+    { "floater", &ComponentPrototypeT<Floater>::from_reader },
+    { "patrol", &ComponentPrototypeT<Patrol>::from_reader },
+    { "squish-reaction", &ComponentPrototypeT<SquishReaction>::from_reader },
+  };
+  return readers;
+}
+
+} // namespace
+
+Archetype::Archetype(ReaderMapping const& mapping) :
+  m_name(),
+  m_base(),
+  m_aliases(),
+  m_properties(),
+  m_components()
+{
+  if (!mapping.read("name", m_name)) {
+    throw std::runtime_error("archetype without name");
+  }
+  if (!mapping.read("base", m_base)) {
+    throw std::runtime_error("archetype '" + m_name + "' without base");
+  }
+
+  mapping.read("aliases", m_aliases);
+  mapping.read("properties", m_properties);
+
+  ReaderCollection components;
+  if (mapping.read("components", components)) {
+    for (auto const& component : components.get_objects()) {
+      auto const& readers = component_readers();
+      auto it = readers.find(component.get_name());
+      if (it == readers.end()) {
+        throw std::runtime_error("archetype '" + m_name + "': unknown component '" + component.get_name() + "'");
+      }
+      m_components.push_back(it->second(component.get_mapping()));
+    }
+  }
+}
+
+std::vector<std::unique_ptr<ComponentPrototype>>
+Archetype::resolve_components(ReaderMapping const& instance) const
+{
+  std::vector<std::unique_ptr<ComponentPrototype>> result;
+  result.reserve(m_components.size());
+  for (auto const& component : m_components) {
+    result.push_back(component->with_overrides(instance));
+  }
+  return result;
+}
+
+std::vector<std::unique_ptr<ComponentPrototype>>
+Archetype::clone_components() const
+{
+  std::vector<std::unique_ptr<ComponentPrototype>> result;
+  result.reserve(m_components.size());
+  for (auto const& component : m_components) {
+    result.push_back(component->clone());
+  }
+  return result;
+}
+
+ArchetypeRegistry&
+ArchetypeRegistry::instance()
+{
+  static ArchetypeRegistry instance_;
+  return instance_;
+}
+
+ArchetypeRegistry::ArchetypeRegistry() :
+  m_documents(),
+  m_archetypes()
+{
+  char** files = PHYSFS_enumerateFiles("archetypes");
+  if (!files) {
+    log_warning("Couldn't read archetypes directory");
+    return;
+  }
+
+  for (char const* const* filename = files; *filename != nullptr; ++filename) {
+    if (std::string_view(*filename).ends_with(".archetype")) {
+      load(FileSystem::join("archetypes", *filename));
+    }
+  }
+  PHYSFS_freeList(files);
+}
+
+void
+ArchetypeRegistry::load(std::string const& filename)
+{
+  auto doc = std::make_unique<ReaderDocument>(load_reader_document(filename));
+  auto root = doc->get_root();
+  if (root.get_name() != "supertux-archetype") {
+    throw std::runtime_error(filename + ": not a supertux-archetype file");
+  }
+
+  auto archetype = std::make_unique<Archetype>(root.get_mapping());
+  std::string const name = archetype->get_name();
+  if (m_archetypes.contains(name)) {
+    throw std::runtime_error(filename + ": duplicate archetype '" + name + "'");
+  }
+  m_archetypes[name] = std::move(archetype);
+  m_documents.push_back(std::move(doc));
+}
+
+Archetype const*
+ArchetypeRegistry::get(std::string const& name) const
+{
+  auto it = m_archetypes.find(name);
+  return it != m_archetypes.end() ? it->second.get() : nullptr;
+}
+
+std::vector<Archetype const*>
+ArchetypeRegistry::get_archetypes() const
+{
+  std::vector<Archetype const*> result;
+  for (auto const& [name, archetype] : m_archetypes) {
+    result.push_back(archetype.get());
+  }
+  return result;
+}
+
+/* EOF */

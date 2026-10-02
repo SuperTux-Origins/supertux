@@ -37,6 +37,9 @@ private:
 
   void init_factories();
 
+  /** Register data-defined types from data/archetypes/ */
+  void add_archetypes();
+
 private:
   GameObjectFactory(GameObjectFactory const&) = delete;
   GameObjectFactory& operator=(GameObjectFactory const&) = delete;

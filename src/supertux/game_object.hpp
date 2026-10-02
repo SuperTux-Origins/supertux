@@ -65,6 +65,10 @@ public:
       not part of a GameObjectManager. */
   entt::entity get_entity() const { return m_entity; }
 
+  /** Called when the object is added to a GameObjectManager and has
+      received its entity; emplace ECS components here. */
+  virtual void create_components(entt::registry& /*registry*/) {}
+
   /** This function is called once per frame and allows the object to
       update it's state. The dt_sec is the time that has passed since
       the last frame in seconds and should be the base for all timed

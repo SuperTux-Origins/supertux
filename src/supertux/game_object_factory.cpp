@@ -17,6 +17,7 @@
 #include "supertux/game_object_factory.hpp"
 
 #include "badguy/angrystone.hpp"
+#include "badguy/archetype_badguy.hpp"
 #include "badguy/bouncing_snowball.hpp"
 #include "badguy/captainsnowball.hpp"
 #include "badguy/crystallo.hpp"
@@ -52,7 +53,6 @@
 #include "badguy/smartball.hpp"
 #include "badguy/smartblock.hpp"
 #include "badguy/snail.hpp"
-#include "badguy/snowball.hpp"
 #include "badguy/snowman.hpp"
 #include "badguy/spidermite.hpp"
 #include "badguy/spiky.hpp"
@@ -117,6 +117,7 @@
 #include "object/unstable_tile.hpp"
 #include "object/weak_block.hpp"
 #include "object/wind.hpp"
+#include "ecs/archetype.hpp"
 #include "supertux/level.hpp"
 #include "supertux/tile_manager.hpp"
 #include "trigger/climbable.hpp"
@@ -140,6 +141,25 @@ GameObjectFactory::instance()
 GameObjectFactory::GameObjectFactory()
 {
   init_factories();
+}
+
+void
+GameObjectFactory::add_archetypes()
+{
+  for (Archetype const* archetype : ArchetypeRegistry::instance().get_archetypes())
+  {
+    if (archetype->get_base() != "walking-badguy") {
+      throw std::runtime_error("archetype '" + archetype->get_name() + "': unknown base '" + archetype->get_base() + "'");
+    }
+
+    auto factory = [archetype](ReaderMapping const& reader) -> std::unique_ptr<GameObject> {
+      return std::make_unique<ArchetypeBadguy>(reader, *archetype);
+    };
+    add_factory(archetype->get_name().c_str(), factory);
+    for (auto const& alias : archetype->get_aliases()) {
+      add_factory(alias.c_str(), factory);
+    }
+  }
 }
 
 void
@@ -191,7 +211,6 @@ GameObjectFactory::init_factories()
   add_factory<SmartBall>("smartball");
   add_factory<SmartBlock>("smartblock", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Snail>("snail", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
-  add_factory<SnowBall>("snowball");
   add_factory<Snowman>("snowman");
   add_factory<SpiderMite>("spidermite");
   add_factory<Spiky>("spiky");
@@ -207,6 +226,7 @@ GameObjectFactory::init_factories()
   add_factory<Yeti>("yeti");
   add_factory<YetiStalactite>("yeti_stalactite");
   add_factory<Zeekling>("zeekling");
+  add_archetypes();
   m_adding_badguys = false;
 
   // other objects

@@ -17,7 +17,7 @@
 #include "badguy/snowman.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/snowball.hpp"
+#include "badguy/archetype_badguy.hpp"
 #include "object/bullet.hpp"
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
@@ -48,7 +48,7 @@ Snowman::loose_head()
   m_countMe = false;
 
   /* Create a new snowball where the snowman's head was */
-  Sector::get().add<SnowBall>(snowball_pos, m_dir, m_dead_script);
+  Sector::get().add_object(ArchetypeBadguy::create("snowball", snowball_pos, m_dir, m_dead_script));
 }
 
 HitResponse
@@ -62,7 +62,7 @@ Snowman::collision_bullet(Bullet& bullet, CollisionHit const& hit)
     snowball_pos.y += 1;
 
     /* Create a new snowball where the snowman's head was */
-    Sector::get().add<SnowBall>(snowball_pos, m_dir, m_dead_script);
+    Sector::get().add_object(ArchetypeBadguy::create("snowball", snowball_pos, m_dir, m_dead_script));
     m_countMe = false;
 
     SoundManager::current()->play("sounds/pop.ogg", get_pos()); // this could be a different sound

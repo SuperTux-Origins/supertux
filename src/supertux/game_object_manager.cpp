@@ -115,6 +115,7 @@ GameObjectManager::add_object(std::unique_ptr<GameObject> object)
   entt::entity const entity = m_registry->create();
   m_registry->emplace<ObjectRef>(entity, object.get());
   object->set_entity(entity);
+  object->create_components(*m_registry);
 
   // make sure the object isn't already in the list
 #ifndef NDEBUG
