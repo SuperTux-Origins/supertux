@@ -19,6 +19,14 @@ adapted from Pingus and Windstille.
       (stb_image, GLES packages, linuxPorts hygiene, full outputs).
 - [ ] Inventory remaining gaps in mk/ and nix/ vs Pingus/Windstille
       (wasm.nix still shorter; SDL static builds incomplete).
+- [ ] Unit tests in `tests/` are not built: `mk/cmake/SuperTux/BuildTests.cmake`
+      is no longer included, and `build_dependencies()` force-caches
+      `BUILD_TESTS=OFF` for the subprojects. Re-wire under a
+      SuperTux-specific option (needed for the ECS EnTT smoke test).
+- [ ] Demo recorder: `restart_level()` calls `start_recording()`, which
+      reseeds and truncates the `--record-demo` file on every death.
+- [ ] Missing snowball melting textures (`images/creatures/snowball/*melting*`)
+      logged on every level load.
 
 ## Windows (MinGW)
 

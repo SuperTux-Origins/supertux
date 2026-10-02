@@ -44,7 +44,14 @@ Further adjustments from the audit:
 
 ## Step 0 — Safety net (commits 1–3)
 
-**0.a Golden-master harness**
+**0.a Golden-master harness** — DONE, see `tests/golden/README.md`.
+Implemented as planned, with these differences: the dump is delta-encoded
+(1.7 MB of xz baselines for 114 runs), and the suite is all world1/world2
+levels × synthetic `idle`/`hop` input. Runs are deterministic, and the whole
+suite takes about 30 s. A 2.5% snowball speed change is flagged at
+frame 34. Synthetic input dies early, so recorded human demos
+(`tests/golden/demos/`) should be added for the walker levels. The
+original task list follows:
 - `--dump-state FILE`: every logical frame, write `frame uid type x y vx vy
   action` for each `MovingObject` (sorted by UID) plus the player state.
 - `--play-demo` + `--renderer null` + exit when the demo input runs out
@@ -132,12 +139,17 @@ dispatch with components → non-badguy objects (blocks, platforms via a
 `PathFollower`) → Player decomposition last, once the collision bridge
 has matured → scripting bindings per component.
 
-## Decisions for the maintainer
+## Decisions (maintainer, 2026-10-03)
 
-1. Vertical slice first (this doc) vs. plan.md's horizontal Phase 1?
-2. EnTT vs. a small hand-rolled registry? (Recommend EnTT: in nixpkgs,
-   header-only, widely used.)
-3. Gameplay must stay byte-identical through the migration, or are
-   reviewed one-frame ordering diffs acceptable once systems are batched?
-4. Objects unused in shipped levels (see audit): migrate, or delete
-   up front to shrink the work?
+1. **Vertical slice first** — this document's ordering replaces plan.md's
+   horizontal Phase 1.
+2. **EnTT** — no hand-rolled registry.
+3. **Gameplay may differ slightly.** The golden master is a regression
+   *aid*, not a byte-exact gate: dumps are compared with a tolerance, and
+   divergences are reviewed and re-baselined rather than treated as
+   automatic failures. Large divergences (an enemy dies or a level is no
+   longer completable in the demo) are still bugs.
+4. **Objects unused in shipped levels are skipped for now.** They keep
+   working through the factory's class-map fallback. The maintainer checks
+   each one (obsolete vs. work in progress) before it is migrated or
+   removed. Do not delete any of them as part of the migration.
