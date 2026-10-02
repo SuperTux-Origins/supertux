@@ -1,6 +1,8 @@
-option(BUILD_TESTS "Build test cases" OFF)
+# Not BUILD_TESTS: build_dependencies() force-caches BUILD_TESTS=OFF so the
+# vendored subprojects skip their own tests.
+option(SUPERTUX_BUILD_TESTS "Build test cases" OFF)
 
-if(BUILD_TESTS)
+if(SUPERTUX_BUILD_TESTS)
   find_package(Threads REQUIRED)
   find_package(GTest REQUIRED)
 

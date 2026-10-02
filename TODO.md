@@ -19,10 +19,12 @@ adapted from Pingus and Windstille.
       (stb_image, GLES packages, linuxPorts hygiene, full outputs).
 - [ ] Inventory remaining gaps in mk/ and nix/ vs Pingus/Windstille
       (wasm.nix still shorter; SDL static builds incomplete).
-- [ ] Unit tests in `tests/` are not built: `mk/cmake/SuperTux/BuildTests.cmake`
-      is no longer included, and `build_dependencies()` force-caches
-      `BUILD_TESTS=OFF` for the subprojects. Re-wire under a
-      SuperTux-specific option (needed for the ECS EnTT smoke test).
+- [x] Unit tests in `tests/` were never built (`build_dependencies()`
+      force-caches `BUILD_TESTS=OFF`); now `SUPERTUX_BUILD_TESTS`, run by
+      `nix build` on native builds.
+- [ ] `ReaderTest.syntax_error` disabled: the priocpp mapping reader
+      accepts stray atoms (`(mymapping (a 1) err (b 2))`) and does not
+      throw.
 - [ ] Demo recorder: `restart_level()` calls `start_recording()`, which
       reseeds and truncates the `--record-demo` file on every death.
 - [ ] Missing snowball melting textures (`images/creatures/snowball/*melting*`)
