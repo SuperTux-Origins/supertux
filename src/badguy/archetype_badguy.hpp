@@ -47,7 +47,7 @@ public:
                                                  std::string const& sprite = {});
 
   bool is_freezable() const override { return m_freezable; }
-  bool is_flammable() const override { return m_flammable; }
+  bool is_flammable() const override;
   void freeze() override;
   void ignite() override;
   void kill_fall() override;
@@ -73,6 +73,7 @@ public:
   HitResponse default_collision(GameObject& other, CollisionHit const& hit) { return BadGuy::collision(other, hit); }
   HitResponse default_collision_player(Player& player, CollisionHit const& hit) { return BadGuy::collision_player(player, hit); }
   HitResponse default_collision_badguy(BadGuy& other, CollisionHit const& hit) { return BadGuy::collision_badguy(other, hit); }
+  HitResponse default_collision_bullet(Bullet& bullet, CollisionHit const& hit) { return BadGuy::collision_bullet(bullet, hit); }
 
   // BadGuy state available to behaviors
   using BadGuy::State;

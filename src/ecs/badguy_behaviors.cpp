@@ -1266,7 +1266,232 @@ void iceblock_ignite(ArchetypeBadguy& self)
   self.default_ignite();
 }
 
+// Boarder ------------------------------------------------------------
+
+bool boarder_might_climb(ArchetypeBadguy const& self, int width, int height)
+{
+  // make sure we check for at least a 1-pixel climb
+  assert(height > 0);
+
+  Rectf const& bbox = self.m_col.m_bbox;
+  float x1;
+  float x2;
+  float y1a = bbox.get_top() + 1;
+  float y2a = bbox.get_bottom() - 1;
+  float y1b = bbox.get_top() + 1 - static_cast<float>(height);
+  float y2b = bbox.get_bottom() - 1 - static_cast<float>(height);
+  if (self.m_dir == Direction::LEFT) {
+    x1 = bbox.get_left() - static_cast<float>(width);
+    x2 = bbox.get_left() - 1;
+  } else {
+    x1 = bbox.get_right() + 1;
+    x2 = bbox.get_right() + static_cast<float>(width);
+  }
+  return ((!Sector::get().is_free_of_statics(Rectf(x1, y1a, x2, y2a))) &&
+          (Sector::get().is_free_of_statics(Rectf(x1, y1b, x2, y2b))));
+}
+
+void boarder_construct(ArchetypeBadguy& self)
+{
+  self.m_physic.set_velocity_y(ecs::get<Boarder>(self.get_entity()).jump_speed);
+}
+
+bool boarder_update(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  Boarder const& boarder = ecs::get<Boarder>(self.get_entity());
+  Walker& walker = ecs::get<Walker>(self.get_entity());
+
+  if (self.on_ground() && boarder_might_climb(self, 8, 64)) {
+    self.m_physic.set_velocity_y(boarder.jump_speed);
+  } else if (self.on_ground() && self.might_fall(16)) {
+    self.m_physic.set_velocity_y(boarder.jump_speed);
+    walker.speed = boarder.board_speed;
+    self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -walker.speed : walker.speed);
+  }
+  return true;
+}
+
+void boarder_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Boarder const& boarder = ecs::get<Boarder>(self.get_entity());
+  Walker& walker = ecs::get<Walker>(self.get_entity());
+
+  if (self.is_active() && (walker.speed == boarder.board_speed)) {
+    walker.speed = boarder.walk_speed;
+    self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -walker.speed : walker.speed);
+  }
+  walker::collision_solid(self, walker, hit);
+}
+
+// Sleeper ------------------------------------------------------------
+
+void sleeper_initialize(ArchetypeBadguy& self)
+{
+  ecs::get<Sleeper>(self.get_entity()).state = Sleeper::State::SLEEPING;
+  self.m_physic.set_velocity_x(0);
+  self.m_sprite->set_action("sleeping", self.m_dir);
+}
+
+bool sleeper_update(ArchetypeBadguy& self, float dt_sec)
+{
+  Sleeper& sleeper = ecs::get<Sleeper>(self.get_entity());
+
+  if (sleeper.state == Sleeper::State::WALKING) {
+    return true;
+  }
+
+  if (sleeper.state == Sleeper::State::SLEEPING) {
+    if (Player* player = self.get_nearest_player()) {
+      Rectf const& bbox = self.m_col.m_bbox;
+      Rectf pb = player->get_bbox();
+
+      bool inReach_left = (pb.get_right() >= bbox.get_right() - ((self.m_dir == Direction::LEFT) ? sleeper.reach : 0));
+      bool inReach_right = (pb.get_left() <= bbox.get_left() + ((self.m_dir == Direction::RIGHT) ? sleeper.reach : 0));
+      bool inReach_top = (pb.get_bottom() >= bbox.get_top());
+      bool inReach_bottom = (pb.get_top() <= bbox.get_bottom());
+
+      if (inReach_left && inReach_right && inReach_top && inReach_bottom) {
+        // wake up
+        self.m_sprite->set_action("waking", self.m_dir, 1);
+        sleeper.state = Sleeper::State::WAKING;
+      }
+    }
+
+    self.default_move(dt_sec);
+  }
+
+  if (sleeper.state == Sleeper::State::WAKING) {
+    if (self.m_sprite->animation_done()) {
+      // start walking
+      sleeper.state = Sleeper::State::WALKING;
+      walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+    }
+
+    self.default_move(dt_sec);
+  }
+
+  return false;
+}
+
+void sleeper_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (ecs::get<Sleeper>(self.get_entity()).state != Sleeper::State::WALKING) {
+    self.default_collision_solid(hit);
+    return;
+  }
+  walker::collision_solid(self, ecs::get<Walker>(self.get_entity()), hit);
+}
+
+HitResponse sleeper_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& hit)
+{
+  if (ecs::get<Sleeper>(self.get_entity()).state != Sleeper::State::WALKING) {
+    return self.default_collision_badguy(badguy, hit);
+  }
+  return walker::collision_badguy(self, ecs::get<Walker>(self.get_entity()), badguy, hit);
+}
+
+void sleeper_freeze(ArchetypeBadguy& self)
+{
+  self.default_freeze();
+  // if we get hit while sleeping, wake up :)
+  ecs::get<Sleeper>(self.get_entity()).state = Sleeper::State::WALKING;
+}
+
+bool sleeper_is_flammable(ArchetypeBadguy const& self)
+{
+  return ecs::get<Sleeper>(self.get_entity()).state != Sleeper::State::SLEEPING;
+}
+
+// BulletShy ----------------------------------------------------------
+
+bool shy_can_see(ArchetypeBadguy const& self, BulletShy const& shy, MovingObject const& o)
+{
+  Rectf const& bbox = self.m_col.m_bbox;
+  Rectf ob = o.get_bbox();
+
+  bool inReach_left = ((ob.get_right() < bbox.get_left()) &&
+                       (ob.get_right() >= bbox.get_left() - ((self.m_dir == Direction::LEFT) ? shy.range_of_vision : 0)));
+  bool inReach_right = ((ob.get_left() > bbox.get_right()) &&
+                        (ob.get_left() <= bbox.get_right() + ((self.m_dir == Direction::RIGHT) ? shy.range_of_vision : 0)));
+  bool inReach_top = (ob.get_bottom() >= bbox.get_top());
+  bool inReach_bottom = (ob.get_top() <= bbox.get_bottom());
+
+  return ((inReach_left || inReach_right) && inReach_top && inReach_bottom);
+}
+
+bool shy_update(ArchetypeBadguy& self, float dt_sec)
+{
+  BulletShy& shy = ecs::get<BulletShy>(self.get_entity());
+
+  bool wants_to_flee = false;
+
+  // check if we see a fire bullet
+  for (auto const& bullet : Sector::get().get_objects_by_type<Bullet>()) {
+    if (bullet.get_type() != FIRE_BONUS) continue;
+    if (shy_can_see(self, shy, bullet)) wants_to_flee = true;
+  }
+
+  // if we flee, handle this ourselves
+  if (wants_to_flee && (!shy.turn_recover_timer.started())) {
+    walker::turn_around(self, ecs::get<Walker>(self.get_entity()));
+    shy.turn_recover_timer.start(shy.turn_recover_time);
+    self.default_move(dt_sec);
+    return false;
+  }
+
+  // else adhere to default behaviour
+  return true;
+}
+
+HitResponse shy_collision_bullet(ArchetypeBadguy& self, Bullet& bullet, CollisionHit const& hit)
+{
+  // default reaction if hit on front side or for freeze and unfreeze
+  if (((self.m_dir == Direction::LEFT) && hit.left) || ((self.m_dir == Direction::RIGHT) && hit.right) ||
+      (bullet.get_type() == ICE_BONUS) || ((bullet.get_type() == FIRE_BONUS) && (self.m_frozen))) {
+    return self.default_collision_bullet(bullet, hit);
+  }
+
+  // else make bullet ricochet and ignore the hit
+  bullet.ricochet(self, hit);
+  return FORCE_MOVE;
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Boarder>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &boarder_construct,
+    .update = &boarder_update,
+    .collision_solid = &boarder_collision_solid,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Sleeper>()
+{
+  static BadGuyBehavior const behavior = {
+    .initialize = &sleeper_initialize,
+    .update = &sleeper_update,
+    .collision_solid = &sleeper_collision_solid,
+    .collision_badguy = &sleeper_collision_badguy,
+    .freeze = &sleeper_freeze,
+    .is_flammable = &sleeper_is_flammable,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<BulletShy>()
+{
+  static BadGuyBehavior const behavior = {
+    .update = &shy_update,
+    .collision_bullet = &shy_collision_bullet,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<IceBlock>()

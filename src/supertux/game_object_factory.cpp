@@ -18,7 +18,6 @@
 
 #include "badguy/angrystone.hpp"
 #include "badguy/archetype_badguy.hpp"
-#include "badguy/captainsnowball.hpp"
 #include "badguy/dart.hpp"
 #include "badguy/darttrap.hpp"
 #include "badguy/dispenser.hpp"
@@ -29,7 +28,6 @@
 #include "badguy/ghoul.hpp"
 #include "badguy/goldbomb.hpp"
 #include "badguy/haywire.hpp"
-#include "badguy/igel.hpp"
 #include "badguy/kamikazesnowball.hpp"
 #include "badguy/kugelblitz.hpp"
 #include "badguy/livefire.hpp"
@@ -46,7 +44,6 @@
 #include "badguy/snail.hpp"
 #include "badguy/snowman.hpp"
 #include "badguy/spidermite.hpp"
-#include "badguy/sspiky.hpp"
 #include "badguy/stumpy.hpp"
 #include "badguy/toad.hpp"
 #include "badguy/totem.hpp"
@@ -156,7 +153,6 @@ GameObjectFactory::init_factories()
   // badguys
   m_adding_badguys = true;
   add_factory<AngryStone>("angrystone");
-  add_factory<CaptainSnowball>("captainsnowball");
   add_factory<Dart>("dart");
   add_factory<DartTrap>("darttrap");
   add_factory<Dispenser>("dispenser");
@@ -169,7 +165,6 @@ GameObjectFactory::init_factories()
   add_factory<Ghoul>("ghoul");
   add_factory<GoldBomb>("goldbomb", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Haywire>("haywire");
-  add_factory<Igel>("igel");
   add_factory<KamikazeSnowball>("kamikazesnowball");
   add_factory<Kugelblitz>("kugelblitz");
   add_factory<LeafShot>("leafshot");
@@ -184,7 +179,6 @@ GameObjectFactory::init_factories()
   add_factory<RCrystallo>("rcrystallo");
   add_factory<SCrystallo>("scrystallo");
   add_factory<ShortFuse>("short_fuse");
-  add_factory<SSpiky>("sspiky");
   add_factory<SkyDive>("skydive", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<SkullyHop>("skullyhop");
   add_factory<Snail>("snail", RegisteredObjectParam::OBJ_PARAM_PORTABLE);

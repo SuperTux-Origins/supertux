@@ -41,8 +41,9 @@ struct BadGuyBehavior
 {
   /** all: end of construction */
   void (*construct)(ArchetypeBadguy& self) = nullptr;
-  /** all */
+  /** first */
   void (*initialize)(ArchetypeBadguy& self) = nullptr;
+  /** all */
   void (*activate)(ArchetypeBadguy& self) = nullptr;
   void (*deactivate)(ArchetypeBadguy& self) = nullptr;
   /** returning false skips the rest of this frame's update */
@@ -63,6 +64,7 @@ struct BadGuyBehavior
   void (*kill_fall)(ArchetypeBadguy& self) = nullptr;
   bool (*is_portable)(ArchetypeBadguy const& self) = nullptr;
   bool (*can_break)(ArchetypeBadguy const& self) = nullptr;
+  bool (*is_flammable)(ArchetypeBadguy const& self) = nullptr;
   void (*grab)(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir) = nullptr;
   void (*ungrab)(ArchetypeBadguy& self, MovingObject& object, Direction dir) = nullptr;
   void (*draw)(ArchetypeBadguy& self, DrawingContext& context) = nullptr;

@@ -353,8 +353,20 @@ ArchetypeBadguy::initialize()
   for (auto const* behavior : m_behaviors) {
     if (behavior->initialize) {
       behavior->initialize(*this);
+      return;
     }
   }
+}
+
+bool
+ArchetypeBadguy::is_flammable() const
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->is_flammable) {
+      return behavior->is_flammable(*this);
+    }
+  }
+  return m_flammable;
 }
 
 void

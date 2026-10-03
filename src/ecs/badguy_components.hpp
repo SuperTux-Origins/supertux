@@ -279,6 +279,58 @@ inline void read_component(ReaderMapping const& mapping, IceBlock& iceblock)
   mapping.read("flat-time", iceblock.flat_time);
 }
 
+/** Jumps onto ledges and over gaps; walks at board_speed until it
+    first lands, then at walk_speed (captainsnowball). List it before
+    the walker. */
+struct Boarder
+{
+  float walk_speed = 100.0f;
+  float board_speed = 200.0f;
+  float jump_speed = -400.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Boarder& boarder)
+{
+  mapping.read("walk-speed", boarder.walk_speed);
+  mapping.read("board-speed", boarder.board_speed);
+  mapping.read("jump-speed", boarder.jump_speed);
+}
+
+/** Sleeps until a player comes within reach in front of it, then
+    wakes up and walks (sspiky). List it before the walker. */
+struct Sleeper
+{
+  float reach = 256.0f;
+
+  enum class State { SLEEPING, WAKING, WALKING };
+
+  // state
+  State state = State::SLEEPING;
+};
+
+inline void read_component(ReaderMapping const& mapping, Sleeper& sleeper)
+{
+  mapping.read("reach", sleeper.reach);
+}
+
+/** Turns away from fire bullets it can see, and ricochets bullets that
+    do not hit it in front (igel). List it before the walker. */
+struct BulletShy
+{
+  float range_of_vision = 256.0f;
+  /** seconds before turning around again */
+  float turn_recover_time = 0.5f;
+
+  // state
+  Timer turn_recover_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, BulletShy& shy)
+{
+  mapping.read("range-of-vision", shy.range_of_vision);
+  mapping.read("turn-recover-time", shy.turn_recover_time);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

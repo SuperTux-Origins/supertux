@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "igel")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/igel/igel.sprite")
+    (freezable #t))
+  (components
+    (bullet-shy (range-of-vision 256) (turn-recover-time 0.5))
+    (walker (speed 80) (max-drop-height 16)
+            (left-action "walking-left") (right-action "walking-right"))))

@@ -129,3 +129,11 @@ data/levels/world1/crystal_mine.stlv hop 900 2950,450
 data/levels/world1/icy_valley.stlv hop 600 4646,344
 data/levels/world1/icy_valley.stlv hop 600 9446,408
 data/levels/world1/icy_valley.stlv hop 600 13318,344
+
+# Targeted: captainsnowball (23rd_airborne, frozen_bridge), sspiky (end_of_tunnel)
+data/levels/world1/23rd_airborne.stlv idle 600 14400,450
+data/levels/world1/23rd_airborne.stlv hop 600 14400,450
+data/levels/world1/frozen_bridge.stlv idle 600 8000,480
+data/levels/world1/frozen_bridge.stlv hop 600 8000,480
+data/levels/world1/end_of_tunnel.stlv idle 600 13400,440
+data/levels/world1/end_of_tunnel.stlv hop 600 13400,440

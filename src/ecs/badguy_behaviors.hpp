@@ -33,6 +33,9 @@ template<> BadGuyBehavior const& behavior_of<BombCarrier>();
 template<> BadGuyBehavior const& behavior_of<Fuse>();
 template<> BadGuyBehavior const& behavior_of<Stalactite>();
 template<> BadGuyBehavior const& behavior_of<IceBlock>();
+template<> BadGuyBehavior const& behavior_of<Boarder>();
+template<> BadGuyBehavior const& behavior_of<Sleeper>();
+template<> BadGuyBehavior const& behavior_of<BulletShy>();
 
 namespace stalactite {
 

@@ -13,7 +13,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] bouncing_snowball — `data/archetypes/bouncingsnowball.archetype`
 - [x] mriceblock — `data/archetypes/mriceblock.archetype`
 - [x] spiky — `data/archetypes/spiky.archetype`
-- [ ] sspiky
+- [x] sspiky — `data/archetypes/sspiky.archetype`
 - [ ] snail
 - [x] crystallo — `data/archetypes/crystallo.archetype` (shatter reaction not covered by golden suite yet)
 - [ ] rcrystallo
@@ -21,7 +21,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] viciousivy (+ alias poisonivy) — `data/archetypes/viciousivy.archetype`
 - [x] walkingleaf — `data/archetypes/walkingleaf.archetype`
 - [ ] walking_candle
-- [ ] igel
+- [x] igel — `data/archetypes/igel.archetype`
 - [ ] toad
 - [ ] mrtree
 - [ ] stumpy
@@ -38,7 +38,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] zeekling
 - [ ] spidermite
 - [ ] owl
-- [ ] captainsnowball
+- [x] captainsnowball — `data/archetypes/captainsnowball.archetype`
 
 ## Stationary / turret / trap
 - [ ] angrystone
