@@ -129,13 +129,17 @@ namespace {
 
 void walker_initialize(ArchetypeBadguy& self)
 {
-  Walker const& walker = ecs::get<Walker>(self.get_entity());
-  if (self.m_frozen)
-    return;
-  self.m_sprite->set_action(self.m_dir == Direction::LEFT ? walker.left_action : walker.right_action);
-  self.m_col.m_bbox.set_size(self.m_sprite->get_current_hitbox_width(), self.m_sprite->get_current_hitbox_height());
-  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -walker.speed : walker.speed);
-  self.m_physic.set_acceleration_x(0.0);
+  walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+}
+
+void walker_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  walker::collision_solid(self, ecs::get<Walker>(self.get_entity()), hit);
+}
+
+HitResponse walker_collision_badguy(ArchetypeBadguy& self, BadGuy& other, CollisionHit const& hit)
+{
+  return walker::collision_badguy(self, ecs::get<Walker>(self.get_entity()), other, hit);
 }
 
 void walker_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
@@ -149,7 +153,21 @@ void walker_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
   walker::walk(self, walker, target, acceleration);
 }
 
-void walker_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+} // namespace
+
+namespace walker {
+
+void initialize(ArchetypeBadguy& self, Walker const& walker)
+{
+  if (self.m_frozen)
+    return;
+  self.m_sprite->set_action(self.m_dir == Direction::LEFT ? walker.left_action : walker.right_action);
+  self.m_col.m_bbox.set_size(self.m_sprite->get_current_hitbox_width(), self.m_sprite->get_current_hitbox_height());
+  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -walker.speed : walker.speed);
+  self.m_physic.set_acceleration_x(0.0);
+}
+
+void collision_solid(ArchetypeBadguy& self, Walker& walker, CollisionHit const& hit)
 {
   self.update_on_ground_flag(hit);
 
@@ -167,11 +185,11 @@ void walker_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
   }
 
   if ((hit.left && (self.m_dir == Direction::LEFT)) || (hit.right && (self.m_dir == Direction::RIGHT))) {
-    walker::turn_around(self, ecs::get<Walker>(self.get_entity()));
+    turn_around(self, walker);
   }
 }
 
-HitResponse walker_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& hit)
+HitResponse collision_badguy(ArchetypeBadguy& self, Walker& walker, BadGuy& badguy, CollisionHit const& hit)
 {
   if (hit.top) {
     return FORCE_MOVE;
@@ -181,11 +199,15 @@ HitResponse walker_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, Colli
     self.collision_solid(hit);
 
   if ((hit.left && (self.m_dir == Direction::LEFT)) || (hit.right && (self.m_dir == Direction::RIGHT))) {
-    walker::turn_around(self, ecs::get<Walker>(self.get_entity()));
+    turn_around(self, walker);
   }
 
   return CONTINUE;
 }
+
+} // namespace walker
+
+namespace {
 
 // Floater ------------------------------------------------------------
 
@@ -966,7 +988,306 @@ void stalactite_deactivate(ArchetypeBadguy& self)
     self.remove_me();
 }
 
+// IceBlock -----------------------------------------------------------
+
+void iceblock_set_state(ArchetypeBadguy& self, IceBlock& iceblock, IceBlock::State state)
+{
+  if (iceblock.state == state)
+    return;
+
+  switch (state) {
+    case IceBlock::State::NORMAL:
+      self.set_action(self.m_dir == Direction::LEFT ? "left" : "right", /* loops = */ -1);
+      walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+      break;
+    case IceBlock::State::FLAT:
+      self.set_action(self.m_dir == Direction::LEFT ? "flat-left" : "flat-right", /* loops = */ -1);
+      iceblock.flat_timer.start(iceblock.flat_time);
+      break;
+    case IceBlock::State::KICKED:
+      SoundManager::current()->play("sounds/kick.wav", self.get_pos());
+      self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -iceblock.kick_speed : iceblock.kick_speed);
+      self.set_action(self.m_dir == Direction::LEFT ? "flat-left" : "flat-right", /* loops = */ -1);
+      // we should slide above 1 block holes now...
+      self.m_col.m_bbox.set_size(34, 31.8f);
+      break;
+    case IceBlock::State::GRABBED:
+      iceblock.flat_timer.stop();
+      break;
+    case IceBlock::State::WAKING:
+      self.m_sprite->set_action(self.m_dir == Direction::LEFT ? "waking-left" : "waking-right",
+                                /* loops = */ 1);
+      break;
+  }
+  iceblock.state = state;
+}
+
+void iceblock_construct(ArchetypeBadguy& /*self*/)
+{
+  SoundManager::current()->preload("sounds/iceblock_bump.wav");
+  SoundManager::current()->preload("sounds/stomp.wav");
+  SoundManager::current()->preload("sounds/kick.wav");
+}
+
+void iceblock_initialize(ArchetypeBadguy& self)
+{
+  walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+  iceblock_set_state(self, ecs::get<IceBlock>(self.get_entity()), IceBlock::State::NORMAL);
+}
+
+bool iceblock_update(ArchetypeBadguy& self, float dt_sec)
+{
+  IceBlock& iceblock = ecs::get<IceBlock>(self.get_entity());
+  if (iceblock.state == IceBlock::State::GRABBED || self.is_grabbed())
+    return false;
+
+  if (iceblock.state == IceBlock::State::FLAT && iceblock.flat_timer.check()) {
+    iceblock_set_state(self, iceblock, IceBlock::State::WAKING);
+  }
+
+  if (iceblock.state == IceBlock::State::WAKING && self.m_sprite->animation_done()) {
+    iceblock_set_state(self, iceblock, IceBlock::State::NORMAL);
+  }
+
+  if (iceblock.state == IceBlock::State::NORMAL)
+  {
+    // move and walk
+    return true;
+  }
+
+  self.default_move(dt_sec);
+  return false;
+}
+
+bool iceblock_can_break(ArchetypeBadguy const& self)
+{
+  IceBlock const& iceblock = ecs::get<IceBlock>(self.get_entity());
+  return iceblock.state == IceBlock::State::KICKED || iceblock.state == IceBlock::State::FLAT;
+}
+
+void iceblock_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  IceBlock& iceblock = ecs::get<IceBlock>(self.get_entity());
+  Walker& walker = ecs::get<Walker>(self.get_entity());
+
+  self.update_on_ground_flag(hit);
+
+  if (hit.top || hit.bottom) { // floor or roof
+    self.m_physic.set_velocity_y(0);
+  }
+
+  // hit left or right
+  switch (iceblock.state) {
+    case IceBlock::State::NORMAL:
+      walker::collision_solid(self, walker, hit);
+      break;
+    case IceBlock::State::KICKED: {
+      if ((hit.right && self.m_dir == Direction::RIGHT) || (hit.left && self.m_dir == Direction::LEFT)) {
+        self.m_dir = (self.m_dir == Direction::LEFT) ? Direction::RIGHT : Direction::LEFT;
+        SoundManager::current()->play("sounds/iceblock_bump.wav", self.get_pos());
+        self.m_physic.set_velocity_x(-self.m_physic.get_velocity_x() * .975f);
+      }
+      self.set_action(self.m_dir == Direction::LEFT ? "flat-left" : "flat-right", /* loops = */ -1);
+      if (fabsf(self.m_physic.get_velocity_x()) < walker.speed * 1.5f)
+        iceblock_set_state(self, iceblock, IceBlock::State::NORMAL);
+      break;
+    }
+    case IceBlock::State::FLAT:
+    case IceBlock::State::WAKING:
+      self.m_physic.set_velocity_x(0);
+      break;
+    case IceBlock::State::GRABBED:
+      break;
+  }
+}
+
+HitResponse iceblock_collision(ArchetypeBadguy& self, GameObject& object, CollisionHit const& hit)
+{
+  if (ecs::get<IceBlock>(self.get_entity()).state == IceBlock::State::GRABBED)
+    return FORCE_MOVE;
+
+  return self.default_collision(object, hit);
+}
+
+HitResponse iceblock_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& hit)
+{
+  IceBlock& iceblock = ecs::get<IceBlock>(self.get_entity());
+
+  // handle kicks from left or right side
+  if ((iceblock.state == IceBlock::State::WAKING || iceblock.state == IceBlock::State::FLAT) &&
+      self.get_state() == ArchetypeBadguy::STATE_ACTIVE) {
+    if (hit.left) {
+      self.m_dir = Direction::RIGHT;
+      player.kick();
+      iceblock_set_state(self, iceblock, IceBlock::State::KICKED);
+      return FORCE_MOVE;
+    }
+    else if (hit.right) {
+      self.m_dir = Direction::LEFT;
+      player.kick();
+      iceblock_set_state(self, iceblock, IceBlock::State::KICKED);
+      return FORCE_MOVE;
+    }
+  }
+
+  return self.default_collision_player(player, hit);
+}
+
+HitResponse iceblock_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& hit)
+{
+  switch (ecs::get<IceBlock>(self.get_entity()).state) {
+    case IceBlock::State::NORMAL:
+      return walker::collision_badguy(self, ecs::get<Walker>(self.get_entity()), badguy, hit);
+    case IceBlock::State::FLAT:
+    case IceBlock::State::WAKING:
+      return FORCE_MOVE;
+    case IceBlock::State::KICKED:
+      badguy.kill_fall();
+      return FORCE_MOVE;
+    default:
+      assert(false);
+  }
+  return ABORT_MOVE;
+}
+
+bool iceblock_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  IceBlock& iceblock = ecs::get<IceBlock>(self.get_entity());
+
+  Player* player = dynamic_cast<Player*>(&object);
+  if (player && (player->m_does_buttjump || player->is_invincible())) {
+    player->bounce(self);
+    self.kill_fall();
+    return true;
+  }
+
+  switch (iceblock.state)
+  {
+    case IceBlock::State::KICKED:
+      {
+        auto badguy = dynamic_cast<BadGuy*>(&object);
+        if (badguy) {
+          badguy->kill_fall();
+          break;
+        }
+      }
+      [[fallthrough]];
+
+    case IceBlock::State::NORMAL:
+      {
+        iceblock.squishcount++;
+        if (iceblock.squishcount >= iceblock.max_squishes) {
+          self.kill_fall();
+          return true;
+        }
+      }
+
+      SoundManager::current()->play("sounds/stomp.wav", self.get_pos());
+      self.m_physic.set_velocity_x(0);
+      self.m_physic.set_velocity_y(0);
+      iceblock_set_state(self, iceblock, IceBlock::State::FLAT);
+      iceblock.nokick_timer.start(iceblock.nokick_time);
+      break;
+
+    case IceBlock::State::FLAT:
+    case IceBlock::State::WAKING:
+      {
+        auto movingobject = dynamic_cast<MovingObject*>(&object);
+        if (movingobject && (movingobject->get_pos().x < self.get_pos().x)) {
+          self.m_dir = Direction::RIGHT;
+        } else {
+          self.m_dir = Direction::LEFT;
+        }
+      }
+      if (iceblock.nokick_timer.check()) iceblock_set_state(self, iceblock, IceBlock::State::KICKED);
+      break;
+
+    case IceBlock::State::GRABBED:
+      assert(false);
+      break;
+  }
+
+  if (player) player->bounce(self);
+  return true;
+}
+
+void iceblock_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir)
+{
+  self.Portable::grab(object, pos, dir);
+  self.m_col.set_movement(pos - self.get_pos());
+  self.m_dir = dir;
+  self.set_action(dir == Direction::LEFT ? "flat-left" : "flat-right", /* loops = */ -1);
+  iceblock_set_state(self, ecs::get<IceBlock>(self.get_entity()), IceBlock::State::GRABBED);
+  self.set_colgroup_active(COLGROUP_DISABLED);
+}
+
+void iceblock_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
+{
+  IceBlock& iceblock = ecs::get<IceBlock>(self.get_entity());
+
+  auto player = dynamic_cast<Player*> (&object);
+  if (player && (player->is_swimming() || player->is_water_jumping()))
+  {
+    //move icecube a little bit away as to not insta-kill Tux
+    float swimangle = player->get_swimming_angle();
+    self.m_col.m_bbox.move(Vector(std::cos(swimangle) * 48.f, std::sin(swimangle) * 48.f));
+  }
+
+  if (dir == Direction::UP) {
+    self.m_physic.set_velocity_y(-iceblock.kick_speed);
+    iceblock_set_state(self, iceblock, IceBlock::State::FLAT);
+  }
+  else if (dir == Direction::DOWN) {
+    Vector mov(0, 32);
+    if (Sector::get().is_free_of_statics(self.get_bbox().moved(mov), &self)) {
+      // There is free space, so throw it down
+      SoundManager::current()->play("sounds/kick.wav", self.get_pos());
+      self.m_physic.set_velocity_y(iceblock.kick_speed);
+    }
+    iceblock_set_state(self, iceblock, IceBlock::State::FLAT);
+  }
+  else {
+    self.m_dir = dir;
+    iceblock_set_state(self, iceblock, IceBlock::State::KICKED);
+  }
+
+  self.set_colgroup_active(COLGROUP_MOVING);
+  self.Portable::ungrab(object, dir);
+}
+
+bool iceblock_is_portable(ArchetypeBadguy const& self)
+{
+  return self.m_frozen || ecs::get<IceBlock>(self.get_entity()).state == IceBlock::State::FLAT;
+}
+
+void iceblock_ignite(ArchetypeBadguy& self)
+{
+  iceblock_set_state(self, ecs::get<IceBlock>(self.get_entity()), IceBlock::State::NORMAL);
+  self.default_ignite();
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<IceBlock>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &iceblock_construct,
+    .initialize = &iceblock_initialize,
+    .update = &iceblock_update,
+    .collision = &iceblock_collision,
+    .collision_player = &iceblock_collision_player,
+    .collision_solid = &iceblock_collision_solid,
+    .collision_badguy = &iceblock_collision_badguy,
+    .collision_squished = &iceblock_collision_squished,
+    .ignite = &iceblock_ignite,
+    .is_portable = &iceblock_is_portable,
+    .can_break = &iceblock_can_break,
+    .grab = &iceblock_grab,
+    .ungrab = &iceblock_ungrab,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<Stalactite>()

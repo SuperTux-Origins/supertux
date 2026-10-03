@@ -1,0 +1,8 @@
+(supertux-archetype
+  (name "smartblock")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/mr_iceblock/smart_block/smart_block.sprite"))
+  (components
+    (iceblock (kick-speed 500) (max-squishes 10) (nokick-time 0.1) (flat-time 4))
+    (walker (speed 80) (max-drop-height 16))))

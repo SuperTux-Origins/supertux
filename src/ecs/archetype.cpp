@@ -56,6 +56,7 @@ std::map<std::string, ComponentType> const& component_types()
     { "bomb-carrier", component_type<BombCarrier>() },
     { "fuse", component_type<Fuse>() },
     { "stalactite", component_type<Stalactite>() },
+    { "iceblock", component_type<IceBlock>() },
   };
   return types;
 }

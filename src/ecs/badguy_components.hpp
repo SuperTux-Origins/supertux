@@ -252,6 +252,33 @@ inline void read_component(ReaderMapping const& mapping, Stalactite& stalactite)
   mapping.read("type", stalactite.type);
 }
 
+/** Walks (with its Walker) until stomped; then lies flat, can be
+    carried, and kicked to slide along killing badguys (mriceblock).
+    List it before the walker: it decides when the Walker runs. */
+struct IceBlock
+{
+  float kick_speed = 500.0f;
+  int max_squishes = 10;
+  float nokick_time = 0.1f;
+  float flat_time = 4.0f;
+
+  enum class State { NORMAL, FLAT, GRABBED, KICKED, WAKING };
+
+  // state
+  State state = State::NORMAL;
+  Timer nokick_timer = {};
+  Timer flat_timer = {};
+  int squishcount = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, IceBlock& iceblock)
+{
+  mapping.read("kick-speed", iceblock.kick_speed);
+  mapping.read("max-squishes", iceblock.max_squishes);
+  mapping.read("nokick-time", iceblock.nokick_time);
+  mapping.read("flat-time", iceblock.flat_time);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

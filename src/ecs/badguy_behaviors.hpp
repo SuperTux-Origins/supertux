@@ -32,6 +32,7 @@ template<> BadGuyBehavior const& behavior_of<LoopingSound>();
 template<> BadGuyBehavior const& behavior_of<BombCarrier>();
 template<> BadGuyBehavior const& behavior_of<Fuse>();
 template<> BadGuyBehavior const& behavior_of<Stalactite>();
+template<> BadGuyBehavior const& behavior_of<IceBlock>();
 
 namespace stalactite {
 
@@ -46,6 +47,10 @@ namespace walker {
 void walk(ArchetypeBadguy& self, Walker& walker, float target_velocity, float acceleration);
 
 void turn_around(ArchetypeBadguy& self, Walker& walker);
+
+void initialize(ArchetypeBadguy& self, Walker const& walker);
+void collision_solid(ArchetypeBadguy& self, Walker& walker, CollisionHit const& hit);
+HitResponse collision_badguy(ArchetypeBadguy& self, Walker& walker, BadGuy& other, CollisionHit const& hit);
 
 } // namespace walker
 

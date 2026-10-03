@@ -62,6 +62,7 @@ struct BadGuyBehavior
   void (*ignite)(ArchetypeBadguy& self) = nullptr;
   void (*kill_fall)(ArchetypeBadguy& self) = nullptr;
   bool (*is_portable)(ArchetypeBadguy const& self) = nullptr;
+  bool (*can_break)(ArchetypeBadguy const& self) = nullptr;
   void (*grab)(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir) = nullptr;
   void (*ungrab)(ArchetypeBadguy& self, MovingObject& object, Direction dir) = nullptr;
   void (*draw)(ArchetypeBadguy& self, DrawingContext& context) = nullptr;

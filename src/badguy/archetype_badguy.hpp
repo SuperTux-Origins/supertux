@@ -52,6 +52,7 @@ public:
   void ignite() override;
   void kill_fall() override;
   bool is_portable() const override;
+  bool can_break() const override;
   void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   void ungrab(MovingObject& object, Direction dir) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
@@ -67,6 +68,8 @@ public:
   void default_freeze() { BadGuy::freeze(); }
   void default_ignite() { BadGuy::ignite(); }
   void default_kill_fall();
+  /** physics movement for this frame (BadGuy::active_update) */
+  void default_move(float dt_sec) { BadGuy::active_update(dt_sec); }
   HitResponse default_collision(GameObject& other, CollisionHit const& hit) { return BadGuy::collision(other, hit); }
   HitResponse default_collision_player(Player& player, CollisionHit const& hit) { return BadGuy::collision_player(player, hit); }
   HitResponse default_collision_badguy(BadGuy& other, CollisionHit const& hit) { return BadGuy::collision_badguy(other, hit); }

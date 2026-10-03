@@ -43,7 +43,6 @@
 #include "badguy/short_fuse.hpp"
 #include "badguy/skullyhop.hpp"
 #include "badguy/skydive.hpp"
-#include "badguy/smartblock.hpp"
 #include "badguy/snail.hpp"
 #include "badguy/snowman.hpp"
 #include "badguy/spidermite.hpp"
@@ -179,7 +178,6 @@ GameObjectFactory::init_factories()
   add_factory<LiveFireDormant>("livefire_dormant");
   add_factory<Mole>("mole");
   add_factory<MoleRock>("mole_rock");
-  add_factory<MrIceBlock>("mriceblock", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<MrTree>("mrtree");
   add_factory<Owl>("owl");
   add_factory<Plant>("plant");
@@ -189,7 +187,6 @@ GameObjectFactory::init_factories()
   add_factory<SSpiky>("sspiky");
   add_factory<SkyDive>("skydive", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<SkullyHop>("skullyhop");
-  add_factory<SmartBlock>("smartblock", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Snail>("snail", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Snowman>("snowman");
   add_factory<SpiderMite>("spidermite");

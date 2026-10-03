@@ -227,6 +227,17 @@ ArchetypeBadguy::is_portable() const
   return BadGuy::is_portable();
 }
 
+bool
+ArchetypeBadguy::can_break() const
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->can_break) {
+      return behavior->can_break(*this);
+    }
+  }
+  return BadGuy::can_break();
+}
+
 void
 ArchetypeBadguy::grab(MovingObject& object, Vector const& pos, Direction dir)
 {
