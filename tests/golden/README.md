@@ -28,7 +28,8 @@ Verdicts per run:
 --dump-state DUMP LEVEL` runs one logical step per loop iteration, skips
 the level intro, and quits at the first death, at the level end, when the
 demo input runs out, or at `--max-frames`. The dump is delta-encoded:
-`frame N`, then `UID TYPE X Y W H [VX VY]` for changed objects and
+`frame N`, then `UID TYPE X Y W H [VX VY] g:GROUP [a:ACTION]` for changed
+objects (collision group and sprite action compare exactly) and
 `- UID` for removed ones, then `end REASON FRAMES`.
 
 ## Inputs

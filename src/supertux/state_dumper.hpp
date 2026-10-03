@@ -28,9 +28,10 @@ class Sector;
     frame. Used with demo playback as a golden-master regression check
     (see tools/golden.sh).
 
-    Format: "frame N", then one "UID TYPE X Y W H [VX VY]" line per
-    object whose state changed since the previous frame, and "- UID" for
-    objects that went away. */
+    Format: "frame N", then one "UID TYPE X Y W H [VX VY] g:GROUP [a:ACTION]"
+    line per object whose state changed since the previous frame (VX VY
+    for players, ACTION for sprites), and "- UID" for objects that went
+    away. */
 class StateDumper final
 {
 public:

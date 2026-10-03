@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <typeinfo>
 
+#include "object/moving_sprite.hpp"
 #include "object/player.hpp"
 #include "supertux/moving_object.hpp"
 #include "supertux/sector.hpp"
@@ -62,6 +63,12 @@ StateDumper::dump(Sector& sector)
     if (auto* player = dynamic_cast<Player*>(moving)) {
       Physic const& physic = player->get_physic();
       line += std::format(" {:.3f} {:.3f}", physic.get_velocity_x(), physic.get_velocity_y());
+    }
+
+    // collision group and sprite action, compared exactly
+    line += std::format(" g:{}", static_cast<int>(moving->get_group()));
+    if (auto* sprite = dynamic_cast<MovingSprite*>(moving)) {
+      line += " a:" + sprite->get_action();
     }
 
     auto it = m_last.find(uid);

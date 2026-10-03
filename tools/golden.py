@@ -151,7 +151,9 @@ def parse_dump(lines):
             yield "end", reason, int(count)
         else:
             parts = line.split()
-            state[int(parts[0])] = (parts[1], tuple(float(v) for v in parts[2:]))
+            numbers = tuple(float(v) for v in parts[2:] if ":" not in v)
+            tags = tuple(v for v in parts[2:] if ":" in v)
+            state[int(parts[0])] = (parts[1], numbers, tags)
     if frame is not None:
         yield frame, state
         yield "end", "truncated", frame + 1
@@ -195,11 +197,12 @@ def compare(base_lines, new_lines, tolerance):
         for uid in bstate.keys() & nstate.keys():
             bv = bstate[uid][1]
             nv = nstate[uid][1]
-            if bv == nv:
+            if bv == nv and bstate[uid][2] == nstate[uid][2]:
                 continue
             any_diff = True
             dev = max((abs(x - y) for x, y in zip(bv, nv)), default=0.0)
-            if len(bv) != len(nv):
+            if len(bv) != len(nv) or bstate[uid][2] != nstate[uid][2]:
+                # changed collision group or sprite action
                 dev = float("inf")
             if dev > max_dev[0]:
                 max_dev = (dev, frame, uid, bstate[uid][0])
