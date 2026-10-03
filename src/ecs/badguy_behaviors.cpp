@@ -1822,7 +1822,284 @@ bool snail_is_portable(ArchetypeBadguy const& self)
   return (ecs::get<Snail>(self.get_entity()).state == Snail::State::FLAT || self.m_frozen) && !self.m_ignited;
 }
 
+// Snowman ------------------------------------------------------------
+
+void snowman_spawn_head(ArchetypeBadguy& self)
+{
+  // Hard-coded values from sprites
+  Vector head_pos = self.get_pos() + Vector(5, 1);
+  Sector::get().add_object(ArchetypeBadguy::create(ecs::get<Snowman>(self.get_entity()).head,
+                                                   head_pos, self.m_dir, self.m_dead_script));
+}
+
+void snowman_construct(ArchetypeBadguy& /*self*/)
+{
+  SoundManager::current()->preload("sounds/pop.ogg");
+}
+
+HitResponse snowman_collision_bullet(ArchetypeBadguy& self, Bullet& bullet, CollisionHit const& hit)
+{
+  if (bullet.get_type() == FIRE_BONUS) {
+    // fire bullets destroy snowman's body
+    snowman_spawn_head(self);
+    self.m_countMe = false;
+    SoundManager::current()->play("sounds/pop.ogg", self.get_pos()); // this could be a different sound
+    bullet.remove_me();
+    self.ignite();
+    return ABORT_MOVE;
+  }
+  else {
+    // in all other cases, bullets ricochet
+    bullet.ricochet(self, hit);
+    return FORCE_MOVE;
+  }
+}
+
+bool snowman_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  auto player = dynamic_cast<Player*>(&object);
+  if (player && (player->m_does_buttjump || player->is_invincible())) {
+    player->bounce(self);
+    self.kill_fall();
+    return true;
+  }
+
+  // bounce
+  if (player)
+    player->bounce(self);
+
+  SoundManager::current()->play("sounds/pop.ogg", self.get_pos());
+
+  // loose head: the remaining body falls off the screen
+  Vector const head_pos = self.get_pos();
+  self.set_action(self.m_dir == Direction::LEFT ? "headless-left" : "headless-right", /* loops = */ -1);
+  self.set_pos(self.get_pos() + Vector(-4.0, 19.0)); /* difference in the sprite offsets */
+  self.m_physic.set_velocity_y(0);
+  self.m_physic.set_acceleration_y(0);
+  self.m_physic.enable_gravity(true);
+  self.set_state(ArchetypeBadguy::STATE_FALLING);
+  self.m_countMe = false;
+
+  /* Create a new badguy where the snowman's head was */
+  Sector::get().add_object(ArchetypeBadguy::create(ecs::get<Snowman>(self.get_entity()).head,
+                                                   head_pos + Vector(5, 1), self.m_dir, self.m_dead_script));
+  return true;
+}
+
+// MrTree -------------------------------------------------------------
+
+constexpr float SPROUT_WIDTH = 32;
+constexpr float SPROUT_HEIGHT = 32;
+constexpr float SPROUT_Y_OFFSET = 24;
+
+void mrtree_construct(ArchetypeBadguy& /*self*/)
+{
+  SoundManager::current()->preload("sounds/mr_tree.ogg");
+}
+
+bool mrtree_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  MrTree const& tree = ecs::get<MrTree>(self.get_entity());
+
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  auto player = dynamic_cast<Player*>(&object);
+  if (player && (player->m_does_buttjump || player->is_invincible())) {
+    player->bounce(self);
+    self.kill_fall();
+    return true;
+  }
+
+  // replace with the stump
+  Vector stump_pos = self.get_pos() + Vector(20, 25);
+  auto stump = ArchetypeBadguy::create(tree.stump, stump_pos, self.m_dir);
+  Rectf const stump_bbox = stump->get_bbox();
+  Sector::get().add_object(std::move(stump));
+  self.remove_me();
+
+  // give Feedback
+  SoundManager::current()->play("sounds/mr_tree.ogg", self.get_pos());
+  if (player) player->bounce(self);
+
+  // spawn some particles
+  for (int px = static_cast<int>(stump_bbox.get_left()); px < static_cast<int>(stump_bbox.get_right()); px+=10) {
+    Vector ppos = Vector(static_cast<float>(px),
+                         static_cast<float>(stump_bbox.get_top()) - 5.0f);
+    float angle = graphicsRandom.randf(-math::PI_2, math::PI_2);
+    float velocity = graphicsRandom.randf(45, 90);
+    float vx = sinf(angle)*velocity;
+    float vy = -cosf(angle)*velocity;
+    Vector pspeed = Vector(vx, vy);
+    Vector paccel = Vector(0, Sector::get().get_gravity()*10);
+    Sector::get().add<SpriteParticle>("images/particles/leaf.sprite",
+                                      "default",
+                                      ppos, ANCHOR_MIDDLE,
+                                      pspeed, paccel,
+                                      LAYER_OBJECTS-1);
+  }
+
+  if (!self.m_frozen) { //Frozen Mr.Trees don't spawn any sprouts.
+    Vector sprout1_pos(stump_pos.x - SPROUT_WIDTH - 1, stump_pos.y - SPROUT_Y_OFFSET);
+    Rectf sprout1_bbox(sprout1_pos.x, sprout1_pos.y, sprout1_pos.x + SPROUT_WIDTH, sprout1_pos.y + SPROUT_HEIGHT);
+    if (Sector::get().is_free_of_movingstatics(sprout1_bbox, &self)) {
+      auto sprout = ArchetypeBadguy::create(tree.sprout, sprout1_bbox.p1(), Direction::LEFT);
+      sprout->m_countMe = false;
+      Sector::get().add_object(std::move(sprout));
+    }
+
+    Vector sprout2_pos(stump_pos.x + self.m_sprite->get_current_hitbox_width() + 1, stump_pos.y - SPROUT_Y_OFFSET);
+    Rectf sprout2_bbox(sprout2_pos.x, sprout2_pos.y, sprout2_pos.x + SPROUT_WIDTH, sprout2_pos.y + SPROUT_HEIGHT);
+    if (Sector::get().is_free_of_movingstatics(sprout2_bbox, &self)) {
+      auto sprout = ArchetypeBadguy::create(tree.sprout, sprout2_bbox.p1(), Direction::RIGHT);
+      sprout->m_countMe = false;
+      Sector::get().add_object(std::move(sprout));
+    }
+  }
+  return true;
+}
+
+// Stumpy -------------------------------------------------------------
+
+void stumpy_construct(ArchetypeBadguy& self)
+{
+  SoundManager::current()->preload("sounds/mr_treehit.ogg");
+
+  // a stump left behind by a MrTree is dizzy at first
+  if (self.is_spawned()) {
+    Stumpy& stumpy = ecs::get<Stumpy>(self.get_entity());
+    stumpy.invincible = true;
+    stumpy.invincible_timer.start(stumpy.invincible_time);
+  }
+}
+
+void stumpy_initialize(ArchetypeBadguy& self)
+{
+  if (ecs::get<Stumpy>(self.get_entity()).invincible) {
+    self.m_sprite->set_action("dizzy", self.m_dir);
+    self.m_col.m_bbox.set_size(self.m_sprite->get_current_hitbox_width(), self.m_sprite->get_current_hitbox_height());
+    self.m_physic.set_velocity_x(0);
+  } else {
+    walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+  }
+}
+
+bool stumpy_update(ArchetypeBadguy& self, float dt_sec)
+{
+  Stumpy& stumpy = ecs::get<Stumpy>(self.get_entity());
+  if (!stumpy.invincible) {
+    return true;
+  }
+
+  if (stumpy.invincible_timer.check()) {
+    stumpy.invincible = false;
+    walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+  }
+  self.default_move(dt_sec);
+  return false;
+}
+
+bool stumpy_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  // if we're still invincible, we ignore the hit
+  if (ecs::get<Stumpy>(self.get_entity()).invincible) {
+    SoundManager::current()->play("sounds/mr_treehit.ogg", self.get_pos());
+    if (auto player = dynamic_cast<Player*>(&object)) player->bounce(self);
+    return true;
+  }
+
+  // if we can die, we do
+  self.m_sprite->set_action("squished", self.m_dir);
+  self.m_col.set_size(self.m_sprite->get_current_hitbox_width(), self.m_sprite->get_current_hitbox_height());
+  self.kill_squished(object);
+
+  // spawn some particles
+  for (int i = 0; i < 25; i++) {
+    Vector ppos = self.m_col.m_bbox.get_middle();
+    float angle = graphicsRandom.randf(-math::PI_2, math::PI_2);
+    float velocity = graphicsRandom.randf(45, 90);
+    float vx = sinf(angle)*velocity;
+    float vy = -cosf(angle)*velocity;
+    Vector pspeed = Vector(vx, vy);
+    Vector paccel = Vector(0, Sector::get().get_gravity()*10);
+    Sector::get().add<SpriteParticle>("images/particles/bark.sprite",
+                                      "default",
+                                      ppos, ANCHOR_MIDDLE,
+                                      pspeed, paccel,
+                                      LAYER_OBJECTS-1);
+  }
+  return true;
+}
+
+void stumpy_stop_on_hit(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (hit.top || hit.bottom) {
+    self.m_physic.set_velocity_y(0);
+  }
+  if (hit.left || hit.right) {
+    self.m_physic.set_velocity_x(0);
+  }
+}
+
+void stumpy_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  self.update_on_ground_flag(hit);
+
+  if (ecs::get<Stumpy>(self.get_entity()).invincible) {
+    stumpy_stop_on_hit(self, hit);
+  } else {
+    walker::collision_solid(self, ecs::get<Walker>(self.get_entity()), hit);
+  }
+}
+
+HitResponse stumpy_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& hit)
+{
+  if (ecs::get<Stumpy>(self.get_entity()).invincible) {
+    stumpy_stop_on_hit(self, hit);
+    return CONTINUE;
+  }
+  return walker::collision_badguy(self, ecs::get<Walker>(self.get_entity()), badguy, hit);
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Snowman>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &snowman_construct,
+    .collision_squished = &snowman_collision_squished,
+    .collision_bullet = &snowman_collision_bullet,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<MrTree>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &mrtree_construct,
+    .collision_squished = &mrtree_collision_squished,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Stumpy>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &stumpy_construct,
+    .initialize = &stumpy_initialize,
+    .update = &stumpy_update,
+    .collision_solid = &stumpy_collision_solid,
+    .collision_badguy = &stumpy_collision_badguy,
+    .collision_squished = &stumpy_collision_squished,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<Firecracker>()

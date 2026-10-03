@@ -368,6 +368,48 @@ inline void read_component(ReaderMapping const& mapping, Snail& snail)
   mapping.read("flat-time", snail.flat_time);
 }
 
+/** Loses its head when stomped or burnt: the head becomes a new badguy
+    (snowman). Bullets other than fire ricochet. */
+struct Snowman
+{
+  std::string head = "snowball";
+};
+
+inline void read_component(ReaderMapping const& mapping, Snowman& snowman)
+{
+  mapping.read("head", snowman.head);
+}
+
+/** Turns into a stump badguy when stomped, sprouting two smaller
+    badguys (mrtree). */
+struct MrTree
+{
+  std::string stump = "stumpy";
+  std::string sprout = "viciousivy";
+};
+
+inline void read_component(ReaderMapping const& mapping, MrTree& tree)
+{
+  mapping.read("stump", tree.stump);
+  mapping.read("sprout", tree.sprout);
+}
+
+/** Is dizzy and invincible for a while when spawned by a MrTree, then
+    walks (stumpy). List it before the walker. */
+struct Stumpy
+{
+  float invincible_time = 1.0f;
+
+  // state
+  bool invincible = false;
+  Timer invincible_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Stumpy& stumpy)
+{
+  mapping.read("invincible-time", stumpy.invincible_time);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

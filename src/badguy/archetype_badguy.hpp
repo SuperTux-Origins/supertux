@@ -46,6 +46,10 @@ public:
                                                  std::string const& dead_script = {},
                                                  std::string const& sprite = {});
 
+  /** true if spawned at runtime by another object (positional
+      constructor) rather than placed in the level */
+  bool is_spawned() const { return m_spawned; }
+
   bool is_freezable() const override { return m_freezable; }
   bool is_flammable() const override;
   void freeze() override;
@@ -93,12 +97,14 @@ public:
   using BadGuy::update_on_ground_flag;
   using BadGuy::kill_squished;
   using BadGuy::run_dead_script;
+  using BadGuy::m_dead_script;
   using MovingSprite::m_sprite;
   using MovingSprite::m_sprite_name;
   using MovingSprite::m_layer;
   using MovingSprite::m_flip;
   using BadGuy::set_state;
   using BadGuy::STATE_SQUISHED;
+  using BadGuy::STATE_FALLING;
   using BadGuy::set_colgroup_active;
   using MovingSprite::set_action;
   using MovingObject::m_col;
@@ -144,6 +150,7 @@ private:
   bool m_freezable;
   bool m_flammable;
   bool m_fall_immune;
+  bool m_spawned;
 
 private:
   ArchetypeBadguy(ArchetypeBadguy const&) = delete;

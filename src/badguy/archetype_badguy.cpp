@@ -61,7 +61,8 @@ ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, Archetype const& a
   m_behaviors(),
   m_freezable(false),
   m_flammable(true),
-  m_fall_immune(false)
+  m_fall_immune(false),
+  m_spawned(false)
 {
   read_properties(archetype);
   m_behaviors = archetype.emplace_components(get_entity(), &reader);
@@ -74,8 +75,10 @@ ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, Direction dir, Archetype con
   m_behaviors(),
   m_freezable(false),
   m_flammable(true),
-  m_fall_immune(false)
+  m_fall_immune(false),
+  m_spawned(false)
 {
+  m_spawned = true;
   m_dead_script = dead_script;
   read_properties(archetype);
   m_behaviors = archetype.emplace_components(get_entity(), nullptr);
@@ -88,7 +91,8 @@ ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, std::string const&
   m_behaviors(),
   m_freezable(false),
   m_flammable(true),
-  m_fall_immune(false)
+  m_fall_immune(false),
+  m_spawned(false)
 {
 }
 
@@ -98,7 +102,8 @@ ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, std::string const& sprite_na
   m_behaviors(),
   m_freezable(false),
   m_flammable(true),
-  m_fall_immune(false)
+  m_fall_immune(false),
+  m_spawned(false)
 {
 }
 
@@ -108,7 +113,8 @@ ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, Direction dir, std::string c
   m_behaviors(),
   m_freezable(false),
   m_flammable(true),
-  m_fall_immune(false)
+  m_fall_immune(false),
+  m_spawned(false)
 {
 }
 

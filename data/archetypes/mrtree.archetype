@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "mrtree")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/mr_tree/mr_tree.sprite")
+    (light-sprite "images/objects/lightmap_light/lightmap_light-large.sprite")
+    (freezable #t))
+  (components
+    (walker (speed 100) (max-drop-height 16))
+    (mrtree (stump "stumpy") (sprout "viciousivy"))))

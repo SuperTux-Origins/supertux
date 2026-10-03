@@ -1,0 +1,8 @@
+(supertux-archetype
+  (name "snowman")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/snowman/snowman.sprite"))
+  (components
+    (walker (speed 40))
+    (snowman (head "snowball"))))

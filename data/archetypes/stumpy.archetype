@@ -1,0 +1,11 @@
+; Usually spawned by a stomped mrtree, invincible for a moment then.
+(supertux-archetype
+  (name "stumpy")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/mr_tree/stumpy.sprite")
+    (light-sprite "images/objects/lightmap_light/lightmap_light-large.sprite")
+    (freezable #t))
+  (components
+    (stumpy (invincible-time 1))
+    (walker (speed 120) (max-drop-height 16))))

@@ -23,8 +23,8 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] walking_candle
 - [x] igel — `data/archetypes/igel.archetype`
 - [ ] toad
-- [ ] mrtree
-- [ ] stumpy
+- [x] mrtree — `data/archetypes/mrtree.archetype`
+- [x] stumpy — `data/archetypes/stumpy.archetype`
 - [ ] mole
 
 ## Jumpers
@@ -80,7 +80,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 ## Plants / scenery-enemy
 - [ ] plant
 - [ ] root
-- [ ] snowman
+- [x] snowman — `data/archetypes/snowman.archetype`
 
 ## Bosses / unique multi-phase (candidate exceptions per plan §4.4 — confirm each is actually boss-scale before treating it as an exception)
 - [ ] yeti

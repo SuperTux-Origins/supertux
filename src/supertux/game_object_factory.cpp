@@ -33,16 +33,13 @@
 #include "badguy/livefire.hpp"
 #include "badguy/mole.hpp"
 #include "badguy/mole_rock.hpp"
-#include "badguy/mrtree.hpp"
 #include "badguy/owl.hpp"
 #include "badguy/plant.hpp"
 #include "badguy/rcrystallo.hpp"
 #include "badguy/scrystallo.hpp"
 #include "badguy/skullyhop.hpp"
 #include "badguy/skydive.hpp"
-#include "badguy/snowman.hpp"
 #include "badguy/spidermite.hpp"
-#include "badguy/stumpy.hpp"
 #include "badguy/toad.hpp"
 #include "badguy/totem.hpp"
 #include "badguy/walking_candle.hpp"
@@ -171,16 +168,13 @@ GameObjectFactory::init_factories()
   add_factory<LiveFireDormant>("livefire_dormant");
   add_factory<Mole>("mole");
   add_factory<MoleRock>("mole_rock");
-  add_factory<MrTree>("mrtree");
   add_factory<Owl>("owl");
   add_factory<Plant>("plant");
   add_factory<RCrystallo>("rcrystallo");
   add_factory<SCrystallo>("scrystallo");
   add_factory<SkyDive>("skydive", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<SkullyHop>("skullyhop");
-  add_factory<Snowman>("snowman");
   add_factory<SpiderMite>("spidermite");
-  add_factory<Stumpy>("stumpy");
   add_factory<Toad>("toad");
   add_factory<Totem>("totem");
   add_factory<WalkingCandle>("walking_candle");
