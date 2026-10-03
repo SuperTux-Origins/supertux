@@ -587,6 +587,27 @@ inline void read_component(ReaderMapping const& /*mapping*/, GoldBomb& /*goldbom
 {
 }
 
+/** A walking flame that goes out (instead of freezing) when frozen or
+    killed (livefire). variant "walking" walks from the start,
+    "sleeping" waits for a player like Sleeper, "dormant" never wakes.
+    List it before the walker. */
+struct LiveFire
+{
+  std::string variant = "walking";
+  std::string death_sound = "sounds/fall.wav";
+
+  enum class State { SLEEPING, WAKING, WALKING, DORMANT, DEAD };
+
+  // state
+  State state = State::WALKING;
+};
+
+inline void read_component(ReaderMapping const& mapping, LiveFire& livefire)
+{
+  mapping.read("variant", livefire.variant);
+  mapping.read("death-sound", livefire.death_sound);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

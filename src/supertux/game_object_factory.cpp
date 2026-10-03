@@ -25,7 +25,6 @@
 #include "badguy/ghoul.hpp"
 #include "badguy/kamikazesnowball.hpp"
 #include "badguy/kugelblitz.hpp"
-#include "badguy/livefire.hpp"
 #include "badguy/mole.hpp"
 #include "badguy/mole_rock.hpp"
 #include "badguy/owl.hpp"
@@ -149,9 +148,6 @@ GameObjectFactory::init_factories()
   add_factory<KamikazeSnowball>("kamikazesnowball");
   add_factory<Kugelblitz>("kugelblitz");
   add_factory<LeafShot>("leafshot");
-  add_factory<LiveFire>("livefire");
-  add_factory<LiveFireAsleep>("livefire_asleep");
-  add_factory<LiveFireDormant>("livefire_dormant");
   add_factory<Mole>("mole");
   add_factory<MoleRock>("mole_rock");
   add_factory<Owl>("owl");

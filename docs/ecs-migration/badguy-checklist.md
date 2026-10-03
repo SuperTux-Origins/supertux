@@ -54,7 +54,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] flame — `data/archetypes/flame.archetype`
 - [x] iceflame — `data/archetypes/iceflame.archetype` (not exercised by golden suite)
 - [x] ghostflame — `data/archetypes/ghostflame.archetype`
-- [ ] livefire
+- [x] livefire (+ livefire_asleep, livefire_dormant) — `data/archetypes/livefire*.archetype`
 - [ ] willowisp
 - [ ] ghoul
 - [ ] treewillowisp

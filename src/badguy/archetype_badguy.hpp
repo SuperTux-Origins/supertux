@@ -95,6 +95,7 @@ public:
   using BadGuy::m_frozen;
   using BadGuy::m_ignited;
   using BadGuy::m_in_water;
+  using BadGuy::m_lightsprite;
   using BadGuy::m_start_position;
   using BadGuy::get_state;
   using BadGuy::get_nearest_player;

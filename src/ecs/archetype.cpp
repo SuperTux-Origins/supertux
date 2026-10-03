@@ -73,6 +73,7 @@ std::map<std::string, ComponentType> const& component_types()
     { "diver", component_type<Diver>() },
     { "haywire", component_type<Haywire>() },
     { "goldbomb", component_type<GoldBomb>() },
+    { "livefire", component_type<LiveFire>() },
   };
   return types;
 }

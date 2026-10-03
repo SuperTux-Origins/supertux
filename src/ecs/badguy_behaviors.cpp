@@ -3102,7 +3102,138 @@ void goldbomb_play_sound(ArchetypeBadguy& self)
   }
 }
 
+// LiveFire -----------------------------------------------------------
+
+void livefire_construct(ArchetypeBadguy& self)
+{
+  LiveFire& livefire = ecs::get<LiveFire>(self.get_entity());
+  if (livefire.variant == "sleeping") {
+    livefire.state = LiveFire::State::SLEEPING;
+  } else if (livefire.variant == "dormant") {
+    livefire.state = LiveFire::State::DORMANT;
+  } else {
+    livefire.state = LiveFire::State::WALKING;
+  }
+}
+
+void livefire_initialize(ArchetypeBadguy& self)
+{
+  if (ecs::get<LiveFire>(self.get_entity()).variant == "walking") {
+    walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+  } else {
+    self.m_physic.set_velocity_x(0);
+    self.m_sprite->set_action("sleeping", self.m_dir);
+  }
+}
+
+void livefire_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (ecs::get<LiveFire>(self.get_entity()).state != LiveFire::State::WALKING) {
+    self.default_collision_solid(hit);
+    return;
+  }
+  walker::collision_solid(self, ecs::get<Walker>(self.get_entity()), hit);
+}
+
+HitResponse livefire_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& hit)
+{
+  if (ecs::get<LiveFire>(self.get_entity()).state != LiveFire::State::WALKING) {
+    return self.default_collision_badguy(badguy, hit);
+  }
+  return walker::collision_badguy(self, ecs::get<Walker>(self.get_entity()), badguy, hit);
+}
+
+bool livefire_update(ArchetypeBadguy& self, float dt_sec)
+{
+  LiveFire& livefire = ecs::get<LiveFire>(self.get_entity());
+
+  // Remove when extinguish animation is done
+  if ((self.m_sprite->get_action() == "extinguish-left" || self.m_sprite->get_action() == "extinguish-right")
+      && self.m_sprite->animation_done()) self.remove_me();
+
+  if (livefire.state == LiveFire::State::WALKING) {
+    return true;
+  }
+
+  if (livefire.state == LiveFire::State::SLEEPING && self.m_col.get_group() == COLGROUP_MOVING) {
+    if (auto player = self.get_nearest_player()) {
+      Rectf const& bbox = self.m_col.m_bbox;
+      Rectf pb = player->get_bbox();
+
+      bool inReach_left = (pb.get_right() >= bbox.get_right() - ((self.m_dir == Direction::LEFT) ? 256 : 0));
+      bool inReach_right = (pb.get_left() <= bbox.get_left() + ((self.m_dir == Direction::RIGHT) ? 256 : 0));
+      bool inReach_top = (pb.get_bottom() >= bbox.get_top());
+      bool inReach_bottom = (pb.get_top() <= bbox.get_bottom());
+
+      if (inReach_left && inReach_right && inReach_top && inReach_bottom) {
+        // wake up
+        self.m_sprite->set_action("waking", self.m_dir, 1);
+        livefire.state = LiveFire::State::WAKING;
+      }
+    }
+  }
+  else if (livefire.state == LiveFire::State::WAKING) {
+    if (self.m_sprite->animation_done()) {
+      // start walking
+      livefire.state = LiveFire::State::WALKING;
+      walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+    }
+  }
+
+  self.default_move(dt_sec);
+  return false;
+}
+
+void livefire_kill_fall(ArchetypeBadguy& self)
+{
+  LiveFire& livefire = ecs::get<LiveFire>(self.get_entity());
+
+  SoundManager::current()->play(livefire.death_sound, self.get_pos());
+  // throw a puff of smoke
+  Vector ppos = self.m_col.m_bbox.get_middle();
+  Vector pspeed = Vector(0, -150);
+  Vector paccel = Vector(0,0);
+  Sector::get().add<SpriteParticle>("images/particles/smoke.sprite",
+                                    "default", ppos, ANCHOR_MIDDLE,
+                                    pspeed, paccel,
+                                    LAYER_BACKGROUNDTILES+2);
+  // extinguish the flame
+  self.m_sprite->set_action("extinguish", self.m_dir, 1);
+  self.m_physic.set_velocity_y(0);
+  self.m_physic.set_acceleration_y(0);
+  self.m_physic.enable_gravity(false);
+  self.m_lightsprite->set_blend(Blend::ADD);
+  self.m_lightsprite->set_color(Color(1.0f, 0.9f, 0.8f));
+  self.set_group(COLGROUP_DISABLED);
+  livefire.state = LiveFire::State::DEAD;
+
+  // start dead-script
+  self.run_dead_script();
+}
+
+void livefire_freeze(ArchetypeBadguy& self)
+{
+  // attempting to freeze a flame causes it to go out
+  ecs::get<LiveFire>(self.get_entity()).death_sound = "sounds/sizzle.ogg";
+  self.kill_fall();
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<LiveFire>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &livefire_construct,
+    .initialize = &livefire_initialize,
+    .update = &livefire_update,
+    .collision_solid = &livefire_collision_solid,
+    .collision_badguy = &livefire_collision_badguy,
+    .freeze = &livefire_freeze,
+    .kill_fall = &livefire_kill_fall,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<GoldBomb>()
