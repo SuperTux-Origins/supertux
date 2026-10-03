@@ -410,6 +410,71 @@ inline void read_component(ReaderMapping const& mapping, Stumpy& stumpy)
   mapping.read("invincible-time", stumpy.invincible_time);
 }
 
+/** Jumps out of the water, waits below the surface, and gets beached
+    (and burns) when it lands on solid ground for too long (fish). */
+struct JumpingFish
+{
+  float jump_speed = -600.0f;
+  float wait_time = 1.0f;
+  float beach_time = 5.0f;
+
+  // state
+  Timer wait_timer = {};
+  Timer beached_timer = {};
+  /** y-coordinate to stop at, 0 until it first enters water */
+  float stop_y = 0.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, JumpingFish& fish)
+{
+  mapping.read("jump-speed", fish.jump_speed);
+  mapping.read("wait-time", fish.wait_time);
+  mapping.read("beach-time", fish.beach_time);
+}
+
+/** Stands, charges and jumps towards its facing direction (skullyhop).
+    Sprite actions: standing, charging, jumping. */
+struct Hopper
+{
+  float jump_speed_x = 220.0f;
+  float jump_speed_y = -450.0f;
+  float recover_time = 0.5f;
+  std::string sound = "sounds/hop.ogg";
+
+  enum class State { STANDING, CHARGING, JUMPING };
+
+  // state
+  State state = State::JUMPING;
+  Timer recover_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Hopper& hopper)
+{
+  mapping.read("jump-speed-x", hopper.jump_speed_x);
+  mapping.read("jump-speed-y", hopper.jump_speed_y);
+  mapping.read("recover-time", hopper.recover_time);
+  mapping.read("sound", hopper.sound);
+}
+
+/** Flies up and down without gravity, facing the nearest player
+    (spidermite). */
+struct Bobber
+{
+  float speed = 100.0f;
+  /** seconds for one full up or down stroke */
+  float fly_time = 1.2f;
+
+  // state
+  bool going_up = true;
+  Timer timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Bobber& bobber)
+{
+  mapping.read("speed", bobber.speed);
+  mapping.read("fly-time", bobber.fly_time);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

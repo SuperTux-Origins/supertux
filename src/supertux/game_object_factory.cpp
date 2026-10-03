@@ -23,7 +23,6 @@
 #include "badguy/dispenser.hpp"
 #include "badguy/fish_chasing.hpp"
 #include "badguy/fish_harmless.hpp"
-#include "badguy/fish_jumping.hpp"
 #include "badguy/ghosttree.hpp"
 #include "badguy/ghoul.hpp"
 #include "badguy/goldbomb.hpp"
@@ -37,9 +36,7 @@
 #include "badguy/plant.hpp"
 #include "badguy/rcrystallo.hpp"
 #include "badguy/scrystallo.hpp"
-#include "badguy/skullyhop.hpp"
 #include "badguy/skydive.hpp"
-#include "badguy/spidermite.hpp"
 #include "badguy/toad.hpp"
 #include "badguy/totem.hpp"
 #include "badguy/walking_candle.hpp"
@@ -153,8 +150,6 @@ GameObjectFactory::init_factories()
   add_factory<Dispenser>("dispenser");
   add_factory<FishChasing>("fish-chasing");
   add_factory<FishHarmless>("fish-harmless");
-  add_factory<FishJumping>("fish"); // backward compatibility
-  add_factory<FishJumping>("fish-jumping");
   add_factory<FishSwimming>("fish-swimming");
   add_factory<GhostTree>("ghosttree");
   add_factory<Ghoul>("ghoul");
@@ -173,8 +168,6 @@ GameObjectFactory::init_factories()
   add_factory<RCrystallo>("rcrystallo");
   add_factory<SCrystallo>("scrystallo");
   add_factory<SkyDive>("skydive", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
-  add_factory<SkullyHop>("skullyhop");
-  add_factory<SpiderMite>("spidermite");
   add_factory<Toad>("toad");
   add_factory<Totem>("totem");
   add_factory<WalkingCandle>("walking_candle");

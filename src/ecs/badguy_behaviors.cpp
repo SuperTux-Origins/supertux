@@ -23,6 +23,7 @@
 #include "badguy/owl.hpp"
 #include "object/bullet.hpp"
 #include "object/explosion.hpp"
+#include "supertux/tile.hpp"
 #include "util/log.hpp"
 #include "video/drawing_context.hpp"
 #include "math/random.hpp"
@@ -2064,7 +2065,346 @@ HitResponse stumpy_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, Colli
   return walker::collision_badguy(self, ecs::get<Walker>(self.get_entity()), badguy, hit);
 }
 
+// JumpingFish --------------------------------------------------------
+
+void fish_start_waiting(ArchetypeBadguy& self, JumpingFish& fish)
+{
+  fish.wait_timer.start(fish.wait_time);
+  self.m_physic.enable_gravity(false);
+  self.m_physic.set_velocity_y(0);
+}
+
+void fish_construct(ArchetypeBadguy& self)
+{
+  self.m_physic.enable_gravity(true);
+}
+
+void fish_hit(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (hit.top)
+    self.m_physic.set_velocity_y(0);
+}
+
+void fish_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  JumpingFish& fish = ecs::get<JumpingFish>(self.get_entity());
+
+  fish_hit(self, hit);
+  if (!self.m_in_water && hit.bottom && !self.m_frozen)
+  {
+    self.m_physic.set_velocity_y(-300.f);
+    if (!fish.beached_timer.started())
+      fish.beached_timer.start(fish.beach_time);
+  }
+
+  if (self.m_frozen)
+    self.default_collision_solid(hit);
+}
+
+HitResponse fish_collision_badguy(ArchetypeBadguy& self, BadGuy& /*other*/, CollisionHit const& hit)
+{
+  if (ecs::get<JumpingFish>(self.get_entity()).beached_timer.started())
+    self.collision_solid(hit);
+
+  fish_hit(self, hit);
+  return CONTINUE;
+}
+
+void fish_collision_tile(ArchetypeBadguy& self, uint32_t tile_attributes)
+{
+  JumpingFish& fish = ecs::get<JumpingFish>(self.get_entity());
+
+  if ((tile_attributes & Tile::WATER) && (self.m_physic.get_velocity_y() >= 0)) {
+    if (fish.beached_timer.started())
+      fish.beached_timer.stop();
+
+    // initialize stop position if uninitialized
+    if (fish.stop_y == 0) fish.stop_y = self.get_pos().y + self.m_col.m_bbox.get_height();
+
+    // stop when we have reached the stop position
+    if (self.get_pos().y >= fish.stop_y && self.m_physic.get_velocity_y() > 0.f) {
+      if (!self.m_frozen)
+        fish_start_waiting(self, fish);
+      self.m_col.set_movement(Vector(0, 0));
+    }
+  }
+
+  if ((!(tile_attributes & Tile::WATER) || self.m_frozen) && (tile_attributes & Tile::HURTS)) {
+    self.kill_fall();
+  }
+}
+
+void fish_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  JumpingFish& fish = ecs::get<JumpingFish>(self.get_entity());
+
+  self.m_in_water = !Sector::get().is_free_of_tiles(self.get_bbox(), true, Tile::WATER);
+
+  if (fish.beached_timer.check())
+  {
+    self.ignite();
+    self.m_physic.reset();
+    self.m_physic.enable_gravity(false);
+    fish.beached_timer.stop();
+  }
+
+  // waited long enough?
+  if (fish.wait_timer.check()) {
+    self.m_physic.set_velocity_y(fish.jump_speed);
+    self.m_physic.enable_gravity(true);
+  }
+
+  // set sprite
+  if (!self.m_frozen && !self.is_ignited())
+    self.m_sprite->set_action((self.m_physic.get_velocity_y() == 0.f && self.m_in_water) ? "wait" :
+                              self.m_physic.get_velocity_y() < 0.f ? "normal" : "down");
+
+  // we can't afford flying out of the tilemap, 'cause the engine would remove us.
+  if ((self.get_pos().y - 31.8f) < 0) // too high, let us fall
+  {
+    self.m_physic.set_velocity_y(0);
+    self.m_physic.enable_gravity(true);
+  }
+
+  if (self.m_ignited && self.m_in_water)
+    self.remove_me();
+}
+
+void fish_freeze(ArchetypeBadguy& self)
+{
+  JumpingFish& fish = ecs::get<JumpingFish>(self.get_entity());
+
+  self.default_freeze();
+  self.m_physic.enable_gravity(true);
+  self.m_sprite->set_action(self.m_physic.get_velocity_y() < 0 ? "iced" : "iced-down");
+  self.m_sprite->set_color(Color(1.0f, 1.0f, 1.0f));
+  fish.wait_timer.stop();
+  if (fish.beached_timer.started())
+    fish.beached_timer.stop();
+}
+
+void fish_unfreeze(ArchetypeBadguy& self, bool melt)
+{
+  self.m_dir = Direction::LEFT;
+  self.default_unfreeze(melt);
+}
+
+void fish_kill_fall(ArchetypeBadguy& self)
+{
+  if (!self.is_ignited())
+    self.m_sprite->set_action("normal");
+  self.default_kill_fall();
+}
+
+// Hopper -------------------------------------------------------------
+
+void hopper_set_state(ArchetypeBadguy& self, Hopper& hopper, Hopper::State state)
+{
+  if (state == Hopper::State::STANDING) {
+    self.m_physic.set_velocity_x(0);
+    self.m_physic.set_velocity_y(0);
+    self.m_sprite->set_action("standing", self.m_dir);
+    hopper.recover_timer.start(hopper.recover_time);
+  } else if (state == Hopper::State::CHARGING) {
+    self.m_sprite->set_action("charging", self.m_dir, 1);
+  } else if (state == Hopper::State::JUMPING) {
+    self.m_sprite->set_action("jumping", self.m_dir);
+    self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -hopper.jump_speed_x : hopper.jump_speed_x);
+    self.m_physic.set_velocity_y(hopper.jump_speed_y);
+    SoundManager::current()->play(hopper.sound, self.get_pos());
+  }
+
+  hopper.state = state;
+}
+
+void hopper_construct(ArchetypeBadguy& self)
+{
+  SoundManager::current()->preload(ecs::get<Hopper>(self.get_entity()).sound);
+}
+
+void hopper_initialize(ArchetypeBadguy& self)
+{
+  // initial state is JUMPING, because we might start airborne
+  ecs::get<Hopper>(self.get_entity()).state = Hopper::State::JUMPING;
+  self.m_sprite->set_action("jumping", self.m_dir);
+}
+
+void hopper_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Hopper& hopper = ecs::get<Hopper>(self.get_entity());
+
+  if (self.m_frozen || self.get_state() == ArchetypeBadguy::STATE_BURNING)
+  {
+    self.default_collision_solid(hit);
+    return;
+  }
+
+  // just default behaviour (i.e. stop at floor/walls) when squished
+  if (self.get_state() == ArchetypeBadguy::STATE_SQUISHED) {
+    self.default_collision_solid(hit);
+  }
+
+  // ignore collisions while standing still
+  if (hopper.state != Hopper::State::JUMPING)
+    return;
+
+  // check if we hit the floor while falling
+  if (hit.bottom && self.m_physic.get_velocity_y() > 0) {
+    hopper_set_state(self, hopper, Hopper::State::STANDING);
+  }
+  // check if we hit the roof while climbing
+  if (hit.top) {
+    self.m_physic.set_velocity_y(0);
+  }
+
+  // check if we hit left or right while moving in either direction
+  if (hit.left || hit.right) {
+    self.m_dir = self.m_dir == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
+    self.m_sprite->set_action("jumping", self.m_dir);
+    self.m_physic.set_velocity_x(-0.25f*self.m_physic.get_velocity_x());
+  }
+}
+
+HitResponse hopper_collision_badguy(ArchetypeBadguy& self, BadGuy& /*other*/, CollisionHit const& hit)
+{
+  // behaviour for badguy collisions is the same as for collisions with solids
+  self.collision_solid(hit);
+  return CONTINUE;
+}
+
+void hopper_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  Hopper& hopper = ecs::get<Hopper>(self.get_entity());
+
+  // no change if frozen
+  if (self.m_frozen)
+    return;
+
+  // charge when fully recovered
+  if ((hopper.state == Hopper::State::STANDING) && (hopper.recover_timer.check())) {
+    hopper_set_state(self, hopper, Hopper::State::CHARGING);
+    return;
+  }
+
+  // jump as soon as charging animation completed
+  if ((hopper.state == Hopper::State::CHARGING) && (self.m_sprite->animation_done())) {
+    hopper_set_state(self, hopper, Hopper::State::JUMPING);
+    return;
+  }
+}
+
+void hopper_unfreeze(ArchetypeBadguy& self, bool melt)
+{
+  self.default_unfreeze(melt);
+  hopper_initialize(self);
+}
+
+// Bobber -------------------------------------------------------------
+
+void bobber_construct(ArchetypeBadguy& self)
+{
+  self.m_physic.enable_gravity(false);
+}
+
+void bobber_initialize(ArchetypeBadguy& self)
+{
+  Bobber& bobber = ecs::get<Bobber>(self.get_entity());
+  self.m_sprite->set_action(self.m_dir);
+  bobber.going_up = true;
+  self.m_physic.set_velocity_y(-bobber.speed);
+  bobber.timer.start(bobber.fly_time / 2);
+}
+
+void bobber_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (hit.top || hit.bottom) { // hit floor or roof?
+    self.m_physic.set_velocity_y(0);
+  }
+  if (self.m_frozen)
+    self.default_collision_solid(hit);
+}
+
+void bobber_move(ArchetypeBadguy& self, float dt_sec)
+{
+  Bobber& bobber = ecs::get<Bobber>(self.get_entity());
+
+  if (self.m_frozen)
+  {
+    self.default_move(dt_sec);
+    return;
+  }
+
+  if (bobber.timer.check()) {
+    bobber.going_up = !bobber.going_up;
+    self.m_physic.set_velocity_y(bobber.going_up ? -bobber.speed : bobber.speed);
+    bobber.timer.start(bobber.fly_time);
+  }
+  self.m_col.set_movement(self.m_physic.get_movement(dt_sec));
+
+  if (auto player = self.get_nearest_player()) {
+    self.m_dir = (player->get_pos().x > self.get_pos().x) ? Direction::RIGHT : Direction::LEFT;
+    self.m_sprite->set_action(self.m_dir);
+  }
+}
+
+void bobber_freeze(ArchetypeBadguy& self)
+{
+  self.m_physic.enable_gravity(true);
+  self.default_freeze();
+}
+
+void bobber_unfreeze(ArchetypeBadguy& self, bool melt)
+{
+  self.default_unfreeze(melt);
+  self.m_physic.enable_gravity(false);
+  bobber_initialize(self);
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<JumpingFish>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &fish_construct,
+    .after_move = &fish_after_move,
+    .collision_solid = &fish_collision_solid,
+    .collision_badguy = &fish_collision_badguy,
+    .collision_tile = &fish_collision_tile,
+    .freeze = &fish_freeze,
+    .unfreeze = &fish_unfreeze,
+    .kill_fall = &fish_kill_fall,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Hopper>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &hopper_construct,
+    .initialize = &hopper_initialize,
+    .after_move = &hopper_after_move,
+    .collision_solid = &hopper_collision_solid,
+    .collision_badguy = &hopper_collision_badguy,
+    .unfreeze = &hopper_unfreeze,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Bobber>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &bobber_construct,
+    .initialize = &bobber_initialize,
+    .move = &bobber_move,
+    .collision_solid = &bobber_collision_solid,
+    .freeze = &bobber_freeze,
+    .unfreeze = &bobber_unfreeze,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<Snowman>()

@@ -191,6 +191,30 @@ ArchetypeBadguy::freeze()
 }
 
 void
+ArchetypeBadguy::unfreeze(bool melt)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->unfreeze) {
+      behavior->unfreeze(*this, melt);
+      return;
+    }
+  }
+  BadGuy::unfreeze(melt);
+}
+
+void
+ArchetypeBadguy::collision_tile(uint32_t tile_attributes)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->collision_tile) {
+      behavior->collision_tile(*this, tile_attributes);
+      return;
+    }
+  }
+  BadGuy::collision_tile(tile_attributes);
+}
+
+void
 ArchetypeBadguy::ignite()
 {
   for (auto const* behavior : m_behaviors) {

@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "spidermite")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/spidermite/spidermite.sprite")
+    (freezable #t))
+  (components
+    (bobber (speed 100) (fly-time 1.2))
+    (squish-reaction (action "squished"))))

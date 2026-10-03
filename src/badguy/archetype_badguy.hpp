@@ -53,7 +53,9 @@ public:
   bool is_freezable() const override { return m_freezable; }
   bool is_flammable() const override;
   void freeze() override;
+  void unfreeze(bool melt = true) override;
   void ignite() override;
+  void collision_tile(uint32_t tile_attributes) override;
   void kill_fall() override;
   bool is_portable() const override;
   bool can_break() const override;
@@ -70,6 +72,8 @@ public:
   void default_collision_solid(CollisionHit const& hit) { BadGuy::collision_solid(hit); }
   bool default_collision_squished(GameObject& object) { return BadGuy::collision_squished(object); }
   void default_freeze() { BadGuy::freeze(); }
+  void default_unfreeze(bool melt) { BadGuy::unfreeze(melt); }
+  void default_collision_tile(uint32_t tile_attributes) { BadGuy::collision_tile(tile_attributes); }
   void default_ignite() { BadGuy::ignite(); }
   void default_kill_fall();
   /** physics movement for this frame (BadGuy::active_update) */
@@ -88,6 +92,7 @@ public:
   using BadGuy::m_dir;
   using BadGuy::m_frozen;
   using BadGuy::m_ignited;
+  using BadGuy::m_in_water;
   using BadGuy::m_start_position;
   using BadGuy::get_state;
   using BadGuy::get_nearest_player;
@@ -105,6 +110,7 @@ public:
   using BadGuy::set_state;
   using BadGuy::STATE_SQUISHED;
   using BadGuy::STATE_FALLING;
+  using BadGuy::STATE_BURNING;
   using BadGuy::set_colgroup_active;
   using MovingSprite::set_action;
   using MovingObject::m_col;

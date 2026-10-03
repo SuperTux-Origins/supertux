@@ -17,7 +17,6 @@
 #include "supertux/sector_parser.hpp"
 
 
-#include "badguy/fish_jumping.hpp"
 #include "object/background.hpp"
 #include "object/camera.hpp"
 #include "object/gradient.hpp"
@@ -61,15 +60,11 @@ SectorParser::SectorParser(Sector& sector) :
 std::unique_ptr<GameObject>
 SectorParser::parse_object(std::string const& name_, ReaderMapping const& reader)
 {
-  if (name_ == "fish") { //because the "fish" was renamed to "fish-jumping"
-    return std::make_unique<FishJumping>(reader);
-  } else {
-    try {
-      return GameObjectFactory::instance().create(name_, reader);
-    } catch(std::exception& e) {
-      log_warning("{}", e.what());
-      return {};
-    }
+  try {
+    return GameObjectFactory::instance().create(name_, reader);
+  } catch(std::exception& e) {
+    log_warning("{}", e.what());
+    return {};
   }
 }
 

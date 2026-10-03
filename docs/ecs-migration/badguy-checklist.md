@@ -29,14 +29,14 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 
 ## Jumpers
 - [x] jumpy — `data/archetypes/jumpy.archetype`
-- [ ] skullyhop
+- [x] skullyhop — `data/archetypes/skullyhop.archetype`
 - [x] mrbomb — `data/archetypes/mrbomb.archetype`
 - [ ] kamikazesnowball
 
 ## Flyers
 - [x] flyingsnowball — `data/archetypes/flyingsnowball.archetype`
 - [ ] zeekling
-- [ ] spidermite
+- [x] spidermite — `data/archetypes/spidermite.archetype`
 - [ ] owl
 - [x] captainsnowball — `data/archetypes/captainsnowball.archetype`
 
@@ -68,7 +68,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 
 ## Aquatic
 - [ ] fish_swimming
-- [ ] fish_jumping
+- [x] fish_jumping — `data/archetypes/fish-jumping.archetype`
 - [ ] fish_chasing
 - [ ] fish_harmless
 

@@ -16,6 +16,8 @@
 #ifndef HEADER_SUPERTUX_ECS_BADGUY_BEHAVIOR_HPP
 #define HEADER_SUPERTUX_ECS_BADGUY_BEHAVIOR_HPP
 
+#include <stdint.h>
+
 #include "collision/collision_hit.hpp"
 #include "math/vector.hpp"
 
@@ -59,7 +61,9 @@ struct BadGuyBehavior
   HitResponse (*collision_badguy)(ArchetypeBadguy& self, BadGuy& other, CollisionHit const& hit) = nullptr;
   bool (*collision_squished)(ArchetypeBadguy& self, GameObject& object) = nullptr;
   HitResponse (*collision_bullet)(ArchetypeBadguy& self, Bullet& bullet, CollisionHit const& hit) = nullptr;
+  void (*collision_tile)(ArchetypeBadguy& self, uint32_t tile_attributes) = nullptr;
   void (*freeze)(ArchetypeBadguy& self) = nullptr;
+  void (*unfreeze)(ArchetypeBadguy& self, bool melt) = nullptr;
   void (*ignite)(ArchetypeBadguy& self) = nullptr;
   void (*kill_fall)(ArchetypeBadguy& self) = nullptr;
   bool (*is_portable)(ArchetypeBadguy const& self) = nullptr;
