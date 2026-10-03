@@ -61,13 +61,10 @@ public:
 
   UID get_uid() const { return m_uid; }
 
-  /** The ECS entity backing this object, entt::null while the object is
-      not part of a GameObjectManager. */
+  /** The ECS entity backing this object (see ecs/registry.hpp). It
+      exists for the object's whole lifetime, so components can be
+      emplaced in constructors. */
   entt::entity get_entity() const { return m_entity; }
-
-  /** Called when the object is added to a GameObjectManager and has
-      received its entity; emplace ECS components here. */
-  virtual void create_components(entt::registry& /*registry*/) {}
 
   /** This function is called once per frame and allows the object to
       update it's state. The dt_sec is the time that has passed since
@@ -109,7 +106,6 @@ public:
 
 private:
   void set_uid(UID const& uid) { m_uid = uid; }
-  void set_entity(entt::entity entity) { m_entity = entity; }
 
 protected:
   /** a name for the gameobject, this is mostly a hint for scripts and
@@ -124,7 +120,7 @@ private:
       set by the GameObjectManager. */
   UID m_uid;
 
-  entt::entity m_entity;
+  entt::entity const m_entity;
 
   /** this flag indicates if the object should be removed at the end of the frame */
   bool m_scheduled_for_removal;

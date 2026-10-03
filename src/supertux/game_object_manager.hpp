@@ -24,8 +24,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <entt/entity/fwd.hpp>
-
 #include "supertux/game_object.hpp"
 #include "util/uid_generator.hpp"
 
@@ -54,12 +52,8 @@ public:
   GameObject& add_object(std::unique_ptr<GameObject> object);
   void clear_objects();
 
-  /** ECS registry holding the entities of all objects in this manager */
-  entt::registry& get_registry() { return *m_registry; }
-  entt::registry const& get_registry() const { return *m_registry; }
-
   /** Returns the object owning the given entity, or nullptr */
-  GameObject* get_object_by_entity(entt::entity entity) const;
+  static GameObject* get_object_by_entity(entt::entity entity);
 
   template<typename T, typename... Args>
   T& add(Args&&... args)
@@ -213,12 +207,9 @@ protected:
 private:
   void this_before_object_add(GameObject& object);
   void this_before_object_remove(GameObject& object);
-  void destroy_entity(GameObject& object);
 
 private:
   UIDGenerator m_uid_generator;
-
-  std::unique_ptr<entt::registry> m_registry;
 
   std::vector<std::unique_ptr<GameObject>> m_gameobjects;
 

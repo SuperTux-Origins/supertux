@@ -20,9 +20,9 @@
 #include <vector>
 
 #include "badguy/walking_badguy.hpp"
+#include "ecs/registry.hpp"
 
 class Archetype;
-class ComponentPrototype;
 struct Floater;
 
 /** Generic shell for data-defined walking badguys ("base" =
@@ -40,8 +40,6 @@ public:
   static std::unique_ptr<ArchetypeBadguy> create(std::string const& name, Vector const& pos, Direction dir,
                                                  std::string const& dead_script = {});
 
-  void create_components(entt::registry& registry) override;
-
   void active_update(float dt_sec) override;
   bool is_freezable() const override { return m_freezable; }
   bool is_flammable() const override { return m_flammable; }
@@ -53,13 +51,11 @@ private:
   void read_properties(Archetype const& archetype);
 
   template<typename T>
-  T const* find() const;
+  T const* find() const { return ecs::try_get<T>(get_entity()); }
 
   void update_floater(Floater const& floater);
 
 private:
-  std::vector<std::unique_ptr<ComponentPrototype>> m_prototypes;
-  entt::registry* m_registry;
   bool m_freezable;
   bool m_flammable;
 

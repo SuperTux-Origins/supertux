@@ -15,8 +15,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "badguy/archetype_badguy.hpp"
 
-#include <entt/entity/registry.hpp>
-
 #include "ecs/archetype.hpp"
 #include "ecs/badguy_components.hpp"
 #include "sprite/sprite.hpp"
@@ -42,24 +40,22 @@ char const* dir_suffix(Direction dir)
 
 ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, Archetype const& archetype) :
   WalkingBadguy(reader, sprite_of(archetype), "left", "right"),
-  m_prototypes(archetype.resolve_components(reader)),
-  m_registry(nullptr),
   m_freezable(false),
   m_flammable(true)
 {
   read_properties(archetype);
+  archetype.emplace_components(get_entity(), &reader);
 }
 
 ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, Direction dir, Archetype const& archetype,
                                  std::string const& dead_script) :
   WalkingBadguy(pos, dir, sprite_of(archetype), "left", "right"),
-  m_prototypes(archetype.clone_components()),
-  m_registry(nullptr),
   m_freezable(false),
   m_flammable(true)
 {
   m_dead_script = dead_script;
   read_properties(archetype);
+  archetype.emplace_components(get_entity(), nullptr);
 }
 
 ArchetypeBadguy::~ArchetypeBadguy()
@@ -85,22 +81,6 @@ ArchetypeBadguy::read_properties(Archetype const& archetype)
   props.read("max-drop-height", max_drop_height);
   props.read("freezable", m_freezable);
   props.read("flammable", m_flammable);
-}
-
-void
-ArchetypeBadguy::create_components(entt::registry& registry)
-{
-  m_registry = &registry;
-  for (auto const& prototype : m_prototypes) {
-    prototype->emplace(registry, get_entity());
-  }
-}
-
-template<typename T>
-T const*
-ArchetypeBadguy::find() const
-{
-  return m_registry ? m_registry->try_get<T>(get_entity()) : nullptr;
 }
 
 void

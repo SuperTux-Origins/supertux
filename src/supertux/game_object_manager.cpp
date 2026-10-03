@@ -17,9 +17,8 @@
 
 #include "supertux/game_object_manager.hpp"
 
-#include <entt/entity/registry.hpp>
-
 #include "ecs/object_ref.hpp"
+#include "ecs/registry.hpp"
 
 
 #include "object/tilemap.hpp"
@@ -28,7 +27,6 @@ bool GameObjectManager::s_draw_solids_only = false;
 
 GameObjectManager::GameObjectManager() :
   m_uid_generator(),
-  m_registry(std::make_unique<entt::registry>()),
   m_gameobjects(),
   m_gameobjects_new(),
   m_solid_tilemaps(),
@@ -112,11 +110,6 @@ GameObjectManager::add_object(std::unique_ptr<GameObject> object)
 
   object->set_uid(m_uid_generator.next());
 
-  entt::entity const entity = m_registry->create();
-  m_registry->emplace<ObjectRef>(entity, object.get());
-  object->set_entity(entity);
-  object->create_components(*m_registry);
-
   // make sure the object isn't already in the list
 #ifndef NDEBUG
   for (auto const& game_object : m_gameobjects) {
@@ -141,7 +134,6 @@ GameObjectManager::clear_objects()
     before_object_remove(*obj);
   }
   m_gameobjects.clear();
-  m_registry->clear();
 }
 
 void
@@ -206,10 +198,7 @@ GameObjectManager::flush_game_objects()
           this_before_object_add(*object);
           m_gameobjects.push_back(std::move(object));
         }
-        else
-        {
-          destroy_entity(*object);
-        }
+
       }
     }
   }
@@ -241,22 +230,13 @@ GameObjectManager::update_tilemaps()
 }
 
 GameObject*
-GameObjectManager::get_object_by_entity(entt::entity entity) const
+GameObjectManager::get_object_by_entity(entt::entity entity)
 {
-  if (!m_registry->valid(entity))
+  if (!ecs::registry().valid(entity))
     return nullptr;
 
-  auto const* ref = m_registry->try_get<ObjectRef>(entity);
+  auto const* ref = ecs::registry().try_get<ObjectRef>(entity);
   return ref ? ref->object : nullptr;
-}
-
-void
-GameObjectManager::destroy_entity(GameObject& object)
-{
-  if (object.get_entity() != entt::null) {
-    m_registry->destroy(object.get_entity());
-    object.set_entity(entt::null);
-  }
 }
 
 void
@@ -283,7 +263,6 @@ GameObjectManager::this_before_object_add(GameObject& object)
 void
 GameObjectManager::this_before_object_remove(GameObject& object)
 {
-  destroy_entity(object);
 
   { // by_name
     std::string const& name = object.get_name();

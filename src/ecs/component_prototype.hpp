@@ -22,22 +22,16 @@
 
 #include "util/reader_mapping.hpp"
 
-/** The value of one component as defined by an archetype. Objects are
-    constructed before they have an entity, so an object resolves its
-    archetype's prototypes (applying per-instance overrides from the
-    level file) at construction and emplaces them once the entity exists. */
+/** The value of one component as defined by an archetype. */
 class ComponentPrototype
 {
 public:
   virtual ~ComponentPrototype() = default;
 
-  /** Copy of this prototype with keys from a level object's mapping
-      applied on top, e.g. "(crystallo (radius 150))". */
-  virtual std::unique_ptr<ComponentPrototype> with_overrides(ReaderMapping const& instance) const = 0;
-
-  virtual std::unique_ptr<ComponentPrototype> clone() const = 0;
-
-  virtual void emplace(entt::registry& registry, entt::entity entity) const = 0;
+  /** Emplace a copy of the value on the entity. Keys in the optional
+      level object mapping override fields, e.g. "(crystallo (radius 150))". */
+  virtual void emplace(entt::registry& registry, entt::entity entity,
+                       ReaderMapping const* overrides) const = 0;
 };
 
 /** Component types provide "void read_component(ReaderMapping const&, T&)",
@@ -55,21 +49,14 @@ public:
     return std::make_unique<ComponentPrototypeT<T>>(std::move(value));
   }
 
-  std::unique_ptr<ComponentPrototype> with_overrides(ReaderMapping const& instance) const override
+  void emplace(entt::registry& registry, entt::entity entity,
+               ReaderMapping const* overrides) const override
   {
     T value = m_value;
-    read_component(instance, value);
-    return std::make_unique<ComponentPrototypeT<T>>(std::move(value));
-  }
-
-  std::unique_ptr<ComponentPrototype> clone() const override
-  {
-    return std::make_unique<ComponentPrototypeT<T>>(m_value);
-  }
-
-  void emplace(entt::registry& registry, entt::entity entity) const override
-  {
-    registry.emplace_or_replace<T>(entity, m_value);
+    if (overrides) {
+      read_component(*overrides, value);
+    }
+    registry.emplace_or_replace<T>(entity, std::move(value));
   }
 
 private:

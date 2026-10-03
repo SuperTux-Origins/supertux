@@ -53,11 +53,9 @@ public:
   /** Base properties of the shell class (sprite, walk-speed, ...) */
   ReaderMapping const& get_properties() const { return m_properties; }
 
-  /** Component prototypes with the level object's overrides applied */
-  std::vector<std::unique_ptr<ComponentPrototype>> resolve_components(ReaderMapping const& instance) const;
-
-  /** Component prototypes as defined, for objects spawned at runtime */
-  std::vector<std::unique_ptr<ComponentPrototype>> clone_components() const;
+  /** Emplace the archetype's components on an entity, with fields
+      overridden by the level object's mapping if given */
+  void emplace_components(entt::entity entity, ReaderMapping const* overrides) const;
 
 private:
   std::string m_name;

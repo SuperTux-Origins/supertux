@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "ecs/badguy_components.hpp"
+#include "ecs/registry.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/reader_collection.hpp"
@@ -72,26 +73,12 @@ Archetype::Archetype(ReaderMapping const& mapping) :
   }
 }
 
-std::vector<std::unique_ptr<ComponentPrototype>>
-Archetype::resolve_components(ReaderMapping const& instance) const
+void
+Archetype::emplace_components(entt::entity entity, ReaderMapping const* overrides) const
 {
-  std::vector<std::unique_ptr<ComponentPrototype>> result;
-  result.reserve(m_components.size());
   for (auto const& component : m_components) {
-    result.push_back(component->with_overrides(instance));
+    component->emplace(ecs::registry(), entity, overrides);
   }
-  return result;
-}
-
-std::vector<std::unique_ptr<ComponentPrototype>>
-Archetype::clone_components() const
-{
-  std::vector<std::unique_ptr<ComponentPrototype>> result;
-  result.reserve(m_components.size());
-  for (auto const& component : m_components) {
-    result.push_back(component->clone());
-  }
-  return result;
 }
 
 ArchetypeRegistry&
