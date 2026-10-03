@@ -124,3 +124,8 @@ data/levels/world2/wooden_roots.stlv hop 1800
 # recorded demo is needed to cover its shatter reaction.
 data/levels/world1/crystal_mine.stlv idle 900 2950,450
 data/levels/world1/crystal_mine.stlv hop 900 2950,450
+
+# Targeted: stalactites (icy_valley), Tux hops in from just left of one
+data/levels/world1/icy_valley.stlv hop 600 4646,344
+data/levels/world1/icy_valley.stlv hop 600 9446,408
+data/levels/world1/icy_valley.stlv hop 600 13318,344

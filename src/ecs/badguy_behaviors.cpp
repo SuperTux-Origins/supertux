@@ -21,7 +21,10 @@
 #include "audio/sound_manager.hpp"
 #include "badguy/archetype_badguy.hpp"
 #include "badguy/owl.hpp"
+#include "object/bullet.hpp"
 #include "object/explosion.hpp"
+#include "util/log.hpp"
+#include "video/drawing_context.hpp"
 #include "math/random.hpp"
 #include "math/util.hpp"
 #include "object/sprite_particle.hpp"
@@ -811,7 +814,176 @@ void fuse_play_sound(ArchetypeBadguy& self)
   }
 }
 
+// Stalactite ---------------------------------------------------------
+
+constexpr int SHAKE_RANGE_X = 40;
+constexpr float SHAKE_RANGE_Y = 400;
+
+bool is_rock(Stalactite const& stalactite)
+{
+  return stalactite.type == "rock";
+}
+
+void stalactite_construct(ArchetypeBadguy& self)
+{
+  Stalactite const& stalactite = ecs::get<Stalactite>(self.get_entity());
+  if (stalactite.type.empty()) {
+    log_warning("No stalactite type set, setting to ice.");
+  } else if (stalactite.type != "ice" && stalactite.type != "rock") {
+    log_warning("Unknown type of stalactite:{}, setting to ice.", stalactite.type);
+  }
+
+  self.m_countMe = false;
+  self.set_colgroup_active(COLGROUP_TOUCHABLE);
+  SoundManager::current()->preload("sounds/cracking.wav");
+  SoundManager::current()->preload("sounds/sizzle.ogg");
+  SoundManager::current()->preload("sounds/icecrash.ogg");
+}
+
+void stalactite_move(ArchetypeBadguy& self, float dt_sec)
+{
+  Stalactite& stalactite = ecs::get<Stalactite>(self.get_entity());
+  Rectf const& bbox = self.m_col.m_bbox;
+
+  if (stalactite.state == Stalactite::State::HANGING) {
+    auto player = self.get_nearest_player();
+    if (player && !player->get_ghost_mode()) {
+      if (player->get_bbox().get_right() > bbox.get_left() - SHAKE_RANGE_X
+         && player->get_bbox().get_left() < bbox.get_right() + SHAKE_RANGE_X
+         && player->get_bbox().get_bottom() > bbox.get_top()
+         && player->get_bbox().get_top() < bbox.get_bottom() + SHAKE_RANGE_Y
+         && Sector::get().can_see_player(bbox.get_middle())) {
+        stalactite.timer.start(stalactite::SHAKE_TIME);
+        stalactite.state = Stalactite::State::SHAKING;
+        SoundManager::current()->play("sounds/cracking.wav", self.get_pos());
+      }
+    }
+  } else if (stalactite.state == Stalactite::State::SHAKING) {
+    stalactite.shake_delta = Vector(static_cast<float>(graphicsRandom.rand(-3, 3)), 0.0f);
+    if (stalactite.timer.check()) {
+      stalactite.state = Stalactite::State::FALLING;
+      self.m_physic.enable_gravity(true);
+      self.set_colgroup_active(COLGROUP_MOVING);
+    }
+  } else if (stalactite.state == Stalactite::State::FALLING) {
+    self.m_col.set_movement(self.m_physic.get_movement(dt_sec));
+  }
+}
+
+void stalactite_squish(ArchetypeBadguy& self, Stalactite& stalactite)
+{
+  stalactite.state = Stalactite::State::SQUISHED;
+  self.m_physic.enable_gravity(true);
+  self.m_physic.set_velocity_x(0);
+  self.m_physic.set_velocity_y(0);
+  self.set_state(ArchetypeBadguy::STATE_SQUISHED);
+  self.m_sprite->set_action("squished");
+  SoundManager::current()->play("sounds/icecrash.ogg", self.get_pos());
+  self.set_group(COLGROUP_MOVING_ONLY_STATIC);
+  self.run_dead_script();
+}
+
+void stalactite_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Stalactite& stalactite = ecs::get<Stalactite>(self.get_entity());
+  if (stalactite.state == Stalactite::State::FALLING) {
+    if (hit.bottom) stalactite_squish(self, stalactite);
+  }
+  if (stalactite.state == Stalactite::State::SQUISHED) {
+    self.m_physic.set_velocity_y(0);
+  }
+}
+
+HitResponse stalactite_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& /*hit*/)
+{
+  if (ecs::get<Stalactite>(self.get_entity()).state != Stalactite::State::SQUISHED) {
+    player.kill(false);
+  }
+  return FORCE_MOVE;
+}
+
+HitResponse stalactite_collision_badguy(ArchetypeBadguy& self, BadGuy& other, CollisionHit const& hit)
+{
+  Stalactite const& stalactite = ecs::get<Stalactite>(self.get_entity());
+  if (stalactite.state == Stalactite::State::SQUISHED) return FORCE_MOVE;
+
+  // ignore other Stalactites
+  if (ecs::try_get<Stalactite>(other.get_entity())) return FORCE_MOVE;
+
+  if (stalactite.state != Stalactite::State::FALLING) return self.default_collision_badguy(other, hit);
+
+  if (other.is_freezable() && !is_rock(stalactite)) {
+    other.freeze();
+  } else {
+    other.kill_fall();
+  }
+
+  return FORCE_MOVE;
+}
+
+HitResponse stalactite_collision_bullet(ArchetypeBadguy& self, Bullet& bullet, CollisionHit const& hit)
+{
+  Stalactite& stalactite = ecs::get<Stalactite>(self.get_entity());
+  if (is_rock(stalactite))
+  {
+    bullet.ricochet(self, hit);
+  }
+  else if (stalactite.state == Stalactite::State::HANGING)
+  {
+    stalactite.timer.start(stalactite::SHAKE_TIME);
+    stalactite.state = Stalactite::State::SHAKING;
+    bullet.remove_me();
+    if (bullet.get_type() == FIRE_BONUS)
+      SoundManager::current()->play("sounds/sizzle.ogg", self.get_pos());
+    SoundManager::current()->play("sounds/cracking.wav", self.get_pos());
+  }
+
+  return FORCE_MOVE;
+}
+
+void stalactite_kill_fall(ArchetypeBadguy& /*self*/)
+{
+}
+
+void stalactite_draw(ArchetypeBadguy& self, DrawingContext& context)
+{
+  if (self.get_state() == ArchetypeBadguy::STATE_INIT || self.get_state() == ArchetypeBadguy::STATE_INACTIVE)
+    return;
+
+  Stalactite const& stalactite = ecs::get<Stalactite>(self.get_entity());
+  if (stalactite.state == Stalactite::State::SQUISHED) {
+    self.m_sprite->draw(context.color(), self.get_pos(), LAYER_OBJECTS);
+  } else if (stalactite.state == Stalactite::State::SHAKING) {
+    self.m_sprite->draw(context.color(), self.get_pos() + stalactite.shake_delta, self.m_layer, self.m_flip);
+  } else {
+    self.m_sprite->draw(context.color(), self.get_pos(), self.m_layer, self.m_flip);
+  }
+}
+
+void stalactite_deactivate(ArchetypeBadguy& self)
+{
+  if (ecs::get<Stalactite>(self.get_entity()).state != Stalactite::State::HANGING)
+    self.remove_me();
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Stalactite>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &stalactite_construct,
+    .deactivate = &stalactite_deactivate,
+    .move = &stalactite_move,
+    .collision_player = &stalactite_collision_player,
+    .collision_solid = &stalactite_collision_solid,
+    .collision_badguy = &stalactite_collision_badguy,
+    .collision_bullet = &stalactite_collision_bullet,
+    .kill_fall = &stalactite_kill_fall,
+    .draw = &stalactite_draw,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<BombCarrier>()

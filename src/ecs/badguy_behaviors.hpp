@@ -31,6 +31,13 @@ template<> BadGuyBehavior const& behavior_of<ElementalFade>();
 template<> BadGuyBehavior const& behavior_of<LoopingSound>();
 template<> BadGuyBehavior const& behavior_of<BombCarrier>();
 template<> BadGuyBehavior const& behavior_of<Fuse>();
+template<> BadGuyBehavior const& behavior_of<Stalactite>();
+
+namespace stalactite {
+
+constexpr float SHAKE_TIME = .8f;
+
+} // namespace stalactite
 
 namespace walker {
 

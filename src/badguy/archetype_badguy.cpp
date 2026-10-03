@@ -38,6 +38,8 @@ int layer_of(Archetype const& archetype)
   std::string layer;
   if (!archetype.get_properties().read("layer", layer) || layer == "objects") {
     return LAYER_OBJECTS;
+  } else if (layer == "behind-tiles") {
+    return LAYER_TILES - 1;
   } else if (layer == "floatingobjects") {
     return LAYER_FLOATINGOBJECTS;
   } else {
@@ -258,6 +260,29 @@ ArchetypeBadguy::collision(GameObject& other, CollisionHit const& hit)
     }
   }
   return BadGuy::collision(other, hit);
+}
+
+void
+ArchetypeBadguy::draw(DrawingContext& context)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->draw) {
+      behavior->draw(*this, context);
+      return;
+    }
+  }
+  BadGuy::draw(context);
+}
+
+HitResponse
+ArchetypeBadguy::collision_bullet(Bullet& bullet, CollisionHit const& hit)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->collision_bullet) {
+      return behavior->collision_bullet(*this, bullet, hit);
+    }
+  }
+  return BadGuy::collision_bullet(bullet, hit);
 }
 
 HitResponse

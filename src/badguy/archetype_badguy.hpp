@@ -55,6 +55,7 @@ public:
   void grab(MovingObject& object, Vector const& pos, Direction dir) override;
   void ungrab(MovingObject& object, Direction dir) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
+  void draw(DrawingContext& context) override;
   void stop_looping_sounds() override;
   void play_looping_sounds() override;
 
@@ -68,6 +69,7 @@ public:
   void default_kill_fall();
   HitResponse default_collision(GameObject& other, CollisionHit const& hit) { return BadGuy::collision(other, hit); }
   HitResponse default_collision_player(Player& player, CollisionHit const& hit) { return BadGuy::collision_player(player, hit); }
+  HitResponse default_collision_badguy(BadGuy& other, CollisionHit const& hit) { return BadGuy::collision_badguy(other, hit); }
 
   // BadGuy state available to behaviors
   using BadGuy::State;
@@ -89,6 +91,10 @@ public:
   using BadGuy::run_dead_script;
   using MovingSprite::m_sprite;
   using MovingSprite::m_sprite_name;
+  using MovingSprite::m_layer;
+  using MovingSprite::m_flip;
+  using BadGuy::set_state;
+  using BadGuy::STATE_SQUISHED;
   using BadGuy::set_colgroup_active;
   using MovingSprite::set_action;
   using MovingObject::m_col;
@@ -108,7 +114,11 @@ protected:
   T& add_behavior(T value)
   {
     T& component = ecs::emplace<T>(get_entity(), std::move(value));
-    m_behaviors.push_back(&behavior_of<T>());
+    BadGuyBehavior const& behavior = behavior_of<T>();
+    m_behaviors.push_back(&behavior);
+    if (behavior.construct) {
+      behavior.construct(*this);
+    }
     return component;
   }
 
@@ -119,6 +129,7 @@ protected:
   HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
   bool collision_squished(GameObject& object) override;
+  HitResponse collision_bullet(Bullet& bullet, CollisionHit const& hit) override;
 
 private:
   void read_properties(Archetype const& archetype);

@@ -193,7 +193,6 @@ GameObjectFactory::init_factories()
   add_factory<Snail>("snail", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Snowman>("snowman");
   add_factory<SpiderMite>("spidermite");
-  add_factory<Stalactite>("stalactite");
   add_factory<Stumpy>("stumpy");
   add_factory<Toad>("toad");
   add_factory<Totem>("totem");

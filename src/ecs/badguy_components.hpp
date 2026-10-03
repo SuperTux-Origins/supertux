@@ -228,6 +228,30 @@ inline void read_component(ReaderMapping const& mapping, Fuse& fuse)
   mapping.read("sound", fuse.sound);
 }
 
+/** Hangs from the ceiling, shakes when a player passes below (or a
+    bullet hits it) and falls, freezing or killing badguys it hits.
+    type is "ice" or "rock" (rock ricochets bullets and kills instead of
+    freezing). */
+struct Stalactite
+{
+  /** YetiStalactite holds a reference to its Stalactite */
+  static constexpr auto in_place_delete = true;
+
+  std::string type;
+
+  enum class State { HANGING, SHAKING, FALLING, SQUISHED };
+
+  // state
+  State state = State::HANGING;
+  Timer timer = {};
+  Vector shake_delta = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Stalactite& stalactite)
+{
+  mapping.read("type", stalactite.type);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

@@ -21,6 +21,8 @@
 
 class ArchetypeBadguy;
 class BadGuy;
+class Bullet;
+class DrawingContext;
 class GameObject;
 class MovingObject;
 class Player;
@@ -55,12 +57,14 @@ struct BadGuyBehavior
   void (*collision_solid)(ArchetypeBadguy& self, CollisionHit const& hit) = nullptr;
   HitResponse (*collision_badguy)(ArchetypeBadguy& self, BadGuy& other, CollisionHit const& hit) = nullptr;
   bool (*collision_squished)(ArchetypeBadguy& self, GameObject& object) = nullptr;
+  HitResponse (*collision_bullet)(ArchetypeBadguy& self, Bullet& bullet, CollisionHit const& hit) = nullptr;
   void (*freeze)(ArchetypeBadguy& self) = nullptr;
   void (*ignite)(ArchetypeBadguy& self) = nullptr;
   void (*kill_fall)(ArchetypeBadguy& self) = nullptr;
   bool (*is_portable)(ArchetypeBadguy const& self) = nullptr;
   void (*grab)(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir) = nullptr;
   void (*ungrab)(ArchetypeBadguy& self, MovingObject& object, Direction dir) = nullptr;
+  void (*draw)(ArchetypeBadguy& self, DrawingContext& context) = nullptr;
   /** all */
   void (*stop_looping_sounds)(ArchetypeBadguy& self) = nullptr;
   void (*play_looping_sounds)(ArchetypeBadguy& self) = nullptr;

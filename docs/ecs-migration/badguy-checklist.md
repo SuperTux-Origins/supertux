@@ -46,8 +46,8 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] dart
 - [ ] dispenser  — spawns other archetypes at runtime; sequence AFTER Phase 3's archetype registry lands, not earlier
 - [ ] totem
-- [ ] stalactite
-- [ ] yeti_stalactite
+- [x] stalactite — `data/archetypes/stalactite.archetype`
+- [~] yeti_stalactite — shell subclass of ArchetypeBadguy with the Stalactite behavior (yeti needs is_hanging/start_shaking)
 - [ ] crusher
 
 ## Fire/ice elemental & status-effect-carrying

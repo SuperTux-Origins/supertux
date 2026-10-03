@@ -13,22 +13,34 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #include "badguy/yeti_stalactite.hpp"
 
+#include "ecs/badguy_behaviors.hpp"
+#include "sprite/sprite.hpp"
 
-static const float YT_SHAKE_TIME = .8f;
+namespace {
+
+Stalactite read_stalactite(ReaderMapping const& mapping)
+{
+  Stalactite stalactite;
+  read_component(mapping, stalactite);
+  return stalactite;
+}
+
+} // namespace
 
 YetiStalactite::YetiStalactite(ReaderMapping const& mapping) :
-  Stalactite(mapping)
+  ArchetypeBadguy(mapping, "images/creatures/stalactite/stalactite.sprite", LAYER_TILES - 1,
+                  "images/objects/lightmap_light/lightmap_light-medium.sprite"),
+  m_stalactite(add_behavior(read_stalactite(mapping)))
 {
 }
 
 void
 YetiStalactite::start_shaking()
 {
-  timer.start(YT_SHAKE_TIME);
-  state = STALACTITE_SHAKING;
+  m_stalactite.timer.start(stalactite::SHAKE_TIME);
+  m_stalactite.state = Stalactite::State::SHAKING;
   if ((static_cast<int>(get_pos().x) / 32) % 2 == 0) {
     m_physic.set_velocity_y(100);
   }
@@ -37,16 +49,16 @@ YetiStalactite::start_shaking()
 bool
 YetiStalactite::is_hanging() const
 {
-  return state == STALACTITE_HANGING;
+  return m_stalactite.state == Stalactite::State::HANGING;
 }
 
 void
 YetiStalactite::active_update(float dt_sec)
 {
-  if (state == STALACTITE_HANGING)
+  if (m_stalactite.state == Stalactite::State::HANGING)
     return;
 
-  Stalactite::active_update(dt_sec);
+  ArchetypeBadguy::active_update(dt_sec);
 }
 
 void
@@ -55,7 +67,7 @@ YetiStalactite::update(float dt_sec)
   // Respawn instead of removing once squished
   if (get_state() == STATE_SQUISHED && check_state_timer()) {
     set_state(STATE_ACTIVE);
-    state = STALACTITE_HANGING;
+    m_stalactite.state = Stalactite::State::HANGING;
     // Hopefully we shouldn't come into contact with anything...
     m_sprite->set_action("normal");
     set_pos(m_start_position);
@@ -63,19 +75,7 @@ YetiStalactite::update(float dt_sec)
   }
 
   // Call back to badguy to do normal stuff
-  BadGuy::update(dt_sec);
-}
-
-void
-YetiStalactite::draw(DrawingContext& context)
-{
-  Stalactite::draw(context);
-}
-
-bool
-YetiStalactite::is_flammable() const
-{
-  return false;
+  ArchetypeBadguy::update(dt_sec);
 }
 
 /* EOF */
