@@ -25,14 +25,11 @@
 #include "badguy/ghoul.hpp"
 #include "badguy/kamikazesnowball.hpp"
 #include "badguy/kugelblitz.hpp"
-#include "badguy/mole.hpp"
-#include "badguy/mole_rock.hpp"
 #include "badguy/owl.hpp"
 #include "badguy/plant.hpp"
 #include "badguy/rcrystallo.hpp"
 #include "badguy/scrystallo.hpp"
 #include "badguy/skydive.hpp"
-#include "badguy/toad.hpp"
 #include "badguy/totem.hpp"
 #include "badguy/walking_candle.hpp"
 #include "badguy/willowisp.hpp"
@@ -148,14 +145,11 @@ GameObjectFactory::init_factories()
   add_factory<KamikazeSnowball>("kamikazesnowball");
   add_factory<Kugelblitz>("kugelblitz");
   add_factory<LeafShot>("leafshot");
-  add_factory<Mole>("mole");
-  add_factory<MoleRock>("mole_rock");
   add_factory<Owl>("owl");
   add_factory<Plant>("plant");
   add_factory<RCrystallo>("rcrystallo");
   add_factory<SCrystallo>("scrystallo");
   add_factory<SkyDive>("skydive", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
-  add_factory<Toad>("toad");
   add_factory<Totem>("totem");
   add_factory<WalkingCandle>("walking_candle");
   add_factory<WillOWisp>("willowisp");

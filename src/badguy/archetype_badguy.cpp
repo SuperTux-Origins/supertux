@@ -33,15 +33,26 @@ std::string sprite_of(Archetype const& archetype)
 
 constexpr char const* default_light_sprite = "images/objects/lightmap_light/lightmap_light-medium.sprite";
 
+/** "objects", "floatingobjects" or "tiles", optionally with an offset
+    like "tiles-1" */
 int layer_of(Archetype const& archetype)
 {
-  std::string layer;
-  if (!archetype.get_properties().read("layer", layer) || layer == "objects") {
-    return LAYER_OBJECTS;
-  } else if (layer == "behind-tiles") {
-    return LAYER_TILES - 1;
-  } else if (layer == "floatingobjects") {
-    return LAYER_FLOATINGOBJECTS;
+  std::string layer = "objects";
+  archetype.get_properties().read("layer", layer);
+
+  int offset = 0;
+  std::string base = layer;
+  if (auto pos = layer.find_last_of("+-"); pos != std::string::npos && pos > 0) {
+    base = layer.substr(0, pos);
+    offset = std::stoi(layer.substr(pos));
+  }
+
+  if (base == "objects") {
+    return LAYER_OBJECTS + offset;
+  } else if (base == "floatingobjects") {
+    return LAYER_FLOATINGOBJECTS + offset;
+  } else if (base == "tiles") {
+    return LAYER_TILES + offset;
   } else {
     throw std::runtime_error("archetype '" + archetype.get_name() + "': unknown layer '" + layer + "'");
   }

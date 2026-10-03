@@ -19,6 +19,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include <entt/entity/entity.hpp>
 
@@ -504,19 +505,30 @@ inline void read_component(ReaderMapping const& mapping, DartShooter& shooter)
   mapping.read("ammo", shooter.ammo);
 }
 
-/** Flies straight until it hits something, killing badguys other than
-    the one that shot it (dart). */
-struct Dart
+/** Flies until it hits something, killing badguys other than the one
+    that shot it (dart, mole_rock). Starts with velocity if given, else
+    horizontally at speed in its facing direction. One of actions is
+    picked at random (-left/-right suffixed if directional). */
+struct Projectile
 {
   float speed = 200.0f;
+  std::optional<Vector> velocity = {};
+  std::vector<std::string> actions = { "flying" };
+  bool directional = true;
 
   // state
   entt::entity parent = entt::null;
 };
 
-inline void read_component(ReaderMapping const& mapping, Dart& dart)
+inline void read_component(ReaderMapping const& mapping, Projectile& projectile)
 {
-  mapping.read("speed", dart.speed);
+  mapping.read("speed", projectile.speed);
+  std::vector<float> velocity;
+  if (mapping.read("velocity", velocity) && velocity.size() == 2) {
+    projectile.velocity = Vector(velocity[0], velocity[1]);
+  }
+  mapping.read("actions", projectile.actions);
+  mapping.read("directional", projectile.directional);
 }
 
 /** Flies back and forth at a random speed and dives at players below
@@ -606,6 +618,56 @@ inline void read_component(ReaderMapping const& mapping, LiveFire& livefire)
 {
   mapping.read("variant", livefire.variant);
   mapping.read("death-sound", livefire.death_sound);
+}
+
+/** Jumps towards its facing direction, turning towards the nearest
+    player when falling (toad). */
+struct Toad
+{
+  float jump_speed_x = 320.0f;
+  float jump_speed_y = -450.0f;
+  float recover_time = 0.5f;
+  std::string sound = "sounds/hop.ogg";
+
+  enum class State { IDLE, JUMPING, FALLING };
+
+  // state
+  State state = State::JUMPING;
+  Timer recover_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Toad& toad)
+{
+  mapping.read("jump-speed-x", toad.jump_speed_x);
+  mapping.read("jump-speed-y", toad.jump_speed_y);
+  mapping.read("recover-time", toad.recover_time);
+  mapping.read("sound", toad.sound);
+}
+
+/** Hides in the ground, peeks out and throws rocks (mole). */
+struct Mole
+{
+  std::string rock = "mole_rock";
+  float wait_time = 0.2f;
+  float throw_time = 4.6f;
+  float throw_interval = 1.0f;
+  float throw_velocity = 400.0f;
+
+  enum class State { PRE_THROWING, THROWING, POST_THROWING, PEEKING, DEAD, BURNING };
+
+  // state
+  State state = State::PRE_THROWING;
+  Timer timer = {};
+  Timer throw_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Mole& mole)
+{
+  mapping.read("rock", mole.rock);
+  mapping.read("wait-time", mole.wait_time);
+  mapping.read("throw-time", mole.throw_time);
+  mapping.read("throw-interval", mole.throw_interval);
+  mapping.read("throw-velocity", mole.throw_velocity);
 }
 
 /** How the badguy reacts to being stomped. Without this component the

@@ -22,10 +22,10 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] walkingleaf — `data/archetypes/walkingleaf.archetype`
 - [ ] walking_candle
 - [x] igel — `data/archetypes/igel.archetype`
-- [ ] toad
+- [x] toad — `data/archetypes/toad.archetype` (not exercised by golden suite, 3 uses)
 - [x] mrtree — `data/archetypes/mrtree.archetype`
 - [x] stumpy — `data/archetypes/stumpy.archetype`
-- [ ] mole
+- [x] mole — `data/archetypes/mole.archetype`
 
 ## Jumpers
 - [x] jumpy — `data/archetypes/jumpy.archetype`
@@ -73,7 +73,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] fish_harmless
 
 ## Rolling / physical projectile-like
-- [ ] mole_rock
+- [x] mole_rock — `data/archetypes/mole_rock.archetype`
 - [x] smartball — `data/archetypes/smartball.archetype`
 - [x] smartblock — `data/archetypes/smartblock.archetype`
 

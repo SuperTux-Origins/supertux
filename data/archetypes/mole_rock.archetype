@@ -1,0 +1,11 @@
+; Thrown by mole, which sets the velocity.
+(supertux-archetype
+  (name "mole_rock")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/mole/mole_rock.sprite")
+    (layer "tiles-2")
+    (flammable #f)
+    (hurtable #f))
+  (components
+    (projectile (velocity 0 -400) (actions "small" "medium") (directional #f))))

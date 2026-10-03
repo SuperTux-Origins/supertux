@@ -4,7 +4,7 @@
   (base "badguy")
   (properties
     (sprite "images/creatures/darttrap/darttrap.sprite")
-    (layer "behind-tiles")
+    (layer "tiles-1")
     (colgroup "disabled"))
   (components
     (dart-shooter (dart "dart") (fire-delay 2))))

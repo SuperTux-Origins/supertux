@@ -4,6 +4,6 @@
   (base "badguy")
   (properties
     (sprite "images/creatures/stalactite/stalactite.sprite")
-    (layer "behind-tiles"))
+    (layer "tiles-1"))
   (components
     (stalactite)))

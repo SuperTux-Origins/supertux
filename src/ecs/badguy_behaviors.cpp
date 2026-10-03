@@ -2406,8 +2406,8 @@ void shooter_fire(ArchetypeBadguy& self, DartShooter& shooter)
 
   SoundManager::current()->play("sounds/dartfire.wav", self.get_pos());
   auto dart = ArchetypeBadguy::create(shooter.dart, Vector(px, py), self.m_dir);
-  if (auto* dart_component = ecs::try_get<Dart>(dart->get_entity())) {
-    dart_component->parent = self.get_entity();
+  if (auto* projectile = ecs::try_get<Projectile>(dart->get_entity())) {
+    projectile->parent = self.get_entity();
   }
   Sector::get().add_object(std::move(dart));
   shooter.loading = false;
@@ -2434,38 +2434,48 @@ void shooter_move(ArchetypeBadguy& self, float /*dt_sec*/)
   }
 }
 
-// Dart ---------------------------------------------------------------
+// Projectile ---------------------------------------------------------
 
-void dart_construct(ArchetypeBadguy& self)
+void projectile_construct(ArchetypeBadguy& self)
 {
-  self.m_physic.enable_gravity(false);
   self.m_countMe = false;
   SoundManager::current()->preload("sounds/darthit.wav");
   SoundManager::current()->preload("sounds/stomp.wav");
 }
 
-void dart_initialize(ArchetypeBadguy& self)
+void projectile_initialize(ArchetypeBadguy& self)
 {
-  float const speed = ecs::get<Dart>(self.get_entity()).speed;
-  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -speed : speed);
-  self.m_sprite->set_action("flying", self.m_dir);
+  Projectile const& projectile = ecs::get<Projectile>(self.get_entity());
+  if (projectile.velocity) {
+    self.m_physic.set_velocity(*projectile.velocity);
+  } else {
+    self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -projectile.speed : projectile.speed);
+  }
+
+  std::string const& action = projectile.actions.size() == 1 ? projectile.actions[0] :
+    projectile.actions[graphicsRandom.rand(static_cast<int>(projectile.actions.size()))];
+  if (projectile.directional) {
+    self.m_sprite->set_action(action, self.m_dir);
+  } else {
+    self.m_sprite->set_action(action);
+  }
 }
 
-void dart_deactivate(ArchetypeBadguy& self)
+void projectile_deactivate(ArchetypeBadguy& self)
 {
   self.remove_me();
 }
 
-void dart_collision_solid(ArchetypeBadguy& self, CollisionHit const& /*hit*/)
+void projectile_collision_solid(ArchetypeBadguy& self, CollisionHit const& /*hit*/)
 {
   SoundManager::current()->play("sounds/darthit.wav", self.get_pos());
   self.remove_me();
 }
 
-HitResponse dart_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& /*hit*/)
+HitResponse projectile_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& /*hit*/)
 {
   // ignore collisions with parent
-  if (badguy.get_entity() == ecs::get<Dart>(self.get_entity()).parent) {
+  if (badguy.get_entity() == ecs::get<Projectile>(self.get_entity()).parent) {
     return FORCE_MOVE;
   }
   SoundManager::current()->play("sounds/stomp.wav", self.get_pos());
@@ -2474,11 +2484,254 @@ HitResponse dart_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, Collisi
   return ABORT_MOVE;
 }
 
-HitResponse dart_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& hit)
+HitResponse projectile_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& hit)
 {
   SoundManager::current()->play("sounds/stomp.wav", self.get_pos());
   self.remove_me();
   return self.default_collision_player(player, hit);
+}
+
+// Toad ---------------------------------------------------------------
+
+void toad_set_state(ArchetypeBadguy& self, Toad& toad, Toad::State state)
+{
+  if (state == Toad::State::IDLE) {
+    self.m_physic.set_velocity_x(0);
+    self.m_physic.set_velocity_y(0);
+    if (!self.m_frozen)
+      self.m_sprite->set_action("idle", self.m_dir);
+
+    toad.recover_timer.start(toad.recover_time);
+  } else if (state == Toad::State::JUMPING) {
+    self.m_sprite->set_action("jumping", self.m_dir);
+    self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -toad.jump_speed_x : toad.jump_speed_x);
+    self.m_physic.set_velocity_y(toad.jump_speed_y);
+    SoundManager::current()->play(toad.sound, self.get_pos());
+  } else if (state == Toad::State::FALLING) {
+    Player* player = self.get_nearest_player();
+    Rectf const& bbox = self.m_col.m_bbox;
+    // face player
+    if (player && (player->get_bbox().get_right() < bbox.get_left()) && (self.m_dir == Direction::RIGHT)) self.m_dir = Direction::LEFT;
+    if (player && (player->get_bbox().get_left() > bbox.get_right()) && (self.m_dir == Direction::LEFT)) self.m_dir = Direction::RIGHT;
+    self.m_sprite->set_action("idle", self.m_dir);
+  }
+
+  toad.state = state;
+}
+
+void toad_construct(ArchetypeBadguy& self)
+{
+  SoundManager::current()->preload(ecs::get<Toad>(self.get_entity()).sound);
+}
+
+void toad_initialize(ArchetypeBadguy& self)
+{
+  // initial state is JUMPING, because we might start airborne
+  ecs::get<Toad>(self.get_entity()).state = Toad::State::JUMPING;
+  self.m_sprite->set_action("jumping", self.m_dir);
+}
+
+void toad_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Toad& toad = ecs::get<Toad>(self.get_entity());
+
+  // default behavior when frozen
+  if (self.m_frozen || self.get_state() == ArchetypeBadguy::STATE_BURNING)
+  {
+    self.default_collision_solid(hit);
+    return;
+  }
+
+  // just default behaviour (i.e. stop at floor/walls) when squished
+  if (self.get_state() == ArchetypeBadguy::STATE_SQUISHED) {
+    self.default_collision_solid(hit);
+    return;
+  }
+
+  // ignore collisions while standing still
+  if (toad.state == Toad::State::IDLE) {
+    return;
+  }
+
+  // check if we hit left or right while moving in either direction
+  if (((self.m_physic.get_velocity_x() < 0) && hit.left) || ((self.m_physic.get_velocity_x() > 0) && hit.right)) {
+    self.m_physic.set_velocity_x(-0.25f*self.m_physic.get_velocity_x());
+  }
+
+  // check if we hit the floor while falling
+  if ((toad.state == Toad::State::FALLING) && hit.bottom) {
+    toad_set_state(self, toad, Toad::State::IDLE);
+    return;
+  }
+
+  // check if we hit the roof while climbing
+  if ((toad.state == Toad::State::JUMPING) && hit.top) {
+    self.m_physic.set_velocity_y(0);
+  }
+}
+
+HitResponse toad_collision_badguy(ArchetypeBadguy& self, BadGuy& /*other*/, CollisionHit const& hit)
+{
+  // behaviour for badguy collisions is the same as for collisions with solids
+  self.collision_solid(hit);
+  return CONTINUE;
+}
+
+void toad_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  Toad& toad = ecs::get<Toad>(self.get_entity());
+
+  // change sprite when we are falling and not frozen
+  if ((toad.state == Toad::State::JUMPING) && (self.m_physic.get_velocity_y() > 0) && !self.m_frozen) {
+    toad_set_state(self, toad, Toad::State::FALLING);
+    return;
+  }
+
+  // jump when fully recovered and if not frozen
+  if ((toad.state == Toad::State::IDLE) && (toad.recover_timer.check() && !self.m_frozen)) {
+    toad_set_state(self, toad, Toad::State::JUMPING);
+    return;
+  }
+}
+
+void toad_unfreeze(ArchetypeBadguy& self, bool melt)
+{
+  self.default_unfreeze(melt);
+  toad_initialize(self);
+}
+
+// Mole ---------------------------------------------------------------
+
+void mole_set_state(ArchetypeBadguy& self, Mole& mole, Mole::State state)
+{
+  switch (state) {
+    case Mole::State::PRE_THROWING:
+      self.m_sprite->set_action("idle");
+      self.set_colgroup_active(COLGROUP_DISABLED);
+      mole.timer.start(mole.wait_time);
+      break;
+    case Mole::State::THROWING:
+      self.m_sprite->set_action("idle");
+      self.set_colgroup_active(COLGROUP_DISABLED);
+      mole.timer.start(mole.throw_time);
+      mole.throw_timer.start(mole.throw_interval);
+      break;
+    case Mole::State::POST_THROWING:
+      self.m_sprite->set_action("idle");
+      self.set_colgroup_active(COLGROUP_DISABLED);
+      mole.timer.start(mole.wait_time);
+      break;
+    case Mole::State::PEEKING:
+      self.m_sprite->set_action("peeking", 1);
+      self.set_colgroup_active(COLGROUP_STATIC);
+      break;
+    case Mole::State::DEAD:
+      self.m_sprite->set_action("squished");
+      self.set_colgroup_active(COLGROUP_DISABLED);
+      break;
+    case Mole::State::BURNING:
+      self.m_sprite->set_action("burning", 1);
+      self.set_colgroup_active(COLGROUP_DISABLED);
+      break;
+  }
+
+  mole.state = state;
+}
+
+void mole_throw_rock(ArchetypeBadguy& self, Mole& mole)
+{
+  float base_angle = (self.m_flip == NO_FLIP ? 90.0f : 270.0f);
+  float angle = math::radians(gameRandom.randf(base_angle - 15.0f, base_angle + 15.0f));
+  float vx = cosf(angle) * mole.throw_velocity;
+  float vy = -sinf(angle) * mole.throw_velocity;
+
+  SoundManager::current()->play("sounds/dartfire.wav", self.get_pos());
+  auto rock = ArchetypeBadguy::create(mole.rock, self.m_col.m_bbox.get_middle(), Direction::LEFT);
+  if (auto* projectile = ecs::try_get<Projectile>(rock->get_entity())) {
+    projectile->velocity = Vector(vx, vy);
+    projectile->parent = self.get_entity();
+  }
+  Sector::get().add_object(std::move(rock));
+}
+
+void mole_construct(ArchetypeBadguy& self)
+{
+  self.m_physic.enable_gravity(false);
+  SoundManager::current()->preload("sounds/fall.wav");
+  SoundManager::current()->preload("sounds/squish.wav");
+  SoundManager::current()->preload("sounds/dartfire.wav");
+}
+
+void mole_activate(ArchetypeBadguy& self)
+{
+  Mole& mole = ecs::get<Mole>(self.get_entity());
+  if (mole.state != Mole::State::DEAD) mole_set_state(self, mole, Mole::State::PRE_THROWING);
+}
+
+void mole_kill_fall(ArchetypeBadguy& self)
+{
+  mole_set_state(self, ecs::get<Mole>(self.get_entity()), Mole::State::DEAD);
+  SoundManager::current()->play("sounds/fall.wav", self.get_pos());
+  self.run_dead_script();
+}
+
+HitResponse mole_collision_badguy(ArchetypeBadguy& /*self*/, BadGuy& /*other*/, CollisionHit const& /*hit*/)
+{
+  return FORCE_MOVE;
+}
+
+bool mole_collision_squished(ArchetypeBadguy& self, GameObject& /*object*/)
+{
+  mole_set_state(self, ecs::get<Mole>(self.get_entity()), Mole::State::DEAD);
+  SoundManager::current()->play("sounds/squish.wav", self.get_pos());
+  self.run_dead_script();
+  return true;
+}
+
+void mole_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  Mole& mole = ecs::get<Mole>(self.get_entity());
+
+  switch (mole.state) {
+    case Mole::State::PRE_THROWING:
+      if (mole.timer.check()) {
+        mole_set_state(self, mole, Mole::State::THROWING);
+      }
+      break;
+    case Mole::State::THROWING:
+      if (mole.throw_timer.check()) {
+        mole_throw_rock(self, mole);
+        mole.throw_timer.start(mole.throw_interval);
+      }
+      if (mole.timer.check()) {
+        mole_set_state(self, mole, Mole::State::POST_THROWING);
+      }
+      break;
+    case Mole::State::POST_THROWING:
+      if (mole.timer.check()) {
+        mole_set_state(self, mole, Mole::State::PEEKING);
+      }
+      break;
+    case Mole::State::PEEKING:
+      if (self.m_sprite->animation_done()) {
+        mole_set_state(self, mole, Mole::State::PRE_THROWING);
+      }
+      break;
+    case Mole::State::BURNING:
+      if (self.m_sprite->animation_done()) {
+        mole_set_state(self, mole, Mole::State::DEAD);
+      }
+      break;
+    case Mole::State::DEAD:
+      break;
+  }
+}
+
+void mole_ignite(ArchetypeBadguy& self)
+{
+  mole_set_state(self, ecs::get<Mole>(self.get_entity()), Mole::State::BURNING);
+  self.run_dead_script();
+  SoundManager::current()->play("sounds/fire.ogg", self.get_pos());
 }
 
 // Diver --------------------------------------------------------------
@@ -3290,15 +3543,44 @@ BadGuyBehavior const& behavior_of<DartShooter>()
 }
 
 template<>
-BadGuyBehavior const& behavior_of<Dart>()
+BadGuyBehavior const& behavior_of<Projectile>()
 {
   static BadGuyBehavior const behavior = {
-    .construct = &dart_construct,
-    .initialize = &dart_initialize,
-    .deactivate = &dart_deactivate,
-    .collision_player = &dart_collision_player,
-    .collision_solid = &dart_collision_solid,
-    .collision_badguy = &dart_collision_badguy,
+    .construct = &projectile_construct,
+    .initialize = &projectile_initialize,
+    .deactivate = &projectile_deactivate,
+    .collision_player = &projectile_collision_player,
+    .collision_solid = &projectile_collision_solid,
+    .collision_badguy = &projectile_collision_badguy,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Toad>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &toad_construct,
+    .initialize = &toad_initialize,
+    .after_move = &toad_after_move,
+    .collision_solid = &toad_collision_solid,
+    .collision_badguy = &toad_collision_badguy,
+    .unfreeze = &toad_unfreeze,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Mole>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &mole_construct,
+    .activate = &mole_activate,
+    .after_move = &mole_after_move,
+    .collision_badguy = &mole_collision_badguy,
+    .collision_squished = &mole_collision_squished,
+    .ignite = &mole_ignite,
+    .kill_fall = &mole_kill_fall,
   };
   return behavior;
 }

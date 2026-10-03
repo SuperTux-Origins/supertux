@@ -143,3 +143,8 @@ data/levels/world2/beside_bushes.stlv idle 600 4916,420
 data/levels/world2/beside_bushes.stlv hop 600 4916,420
 data/levels/world2/find_big_fish.stlv idle 600 11796,228
 data/levels/world2/find_big_fish.stlv hop 600 11796,228
+
+# Targeted: mole throwing rocks (going_underground)
+data/levels/world2/going_underground.stlv idle 600 2758,828
+data/levels/world2/going_underground.stlv hop 600 3897,1910
+data/levels/world2/going_underground.stlv hop 600 3738,3128
