@@ -22,21 +22,21 @@
 
 #include "scripting/badguy.hpp"
 
-class WillOWisp;
+class ArchetypeBadguy;
 #endif
 
 namespace scripting {
 
 class WillOWisp final : public scripting::BadGuy
 #ifndef SCRIPTING_API
-  , virtual public GameObject<::WillOWisp>
+  , virtual public GameObject<::ArchetypeBadguy>
 #endif
 {
 #ifndef SCRIPTING_API
 public:
   WillOWisp(UID uid) :
     GameObject<::BadGuy>(uid),
-    GameObject<::WillOWisp>(uid),
+    GameObject<::ArchetypeBadguy>(uid),
     BadGuy(uid)
   {}
 

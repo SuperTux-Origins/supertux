@@ -67,6 +67,8 @@ struct BadGuyBehavior
   /** all */
   void (*after_move)(ArchetypeBadguy& self, float dt_sec) = nullptr;
   /** first */
+  /** first, default: collide with everything */
+  bool (*collides)(ArchetypeBadguy const& self, GameObject& other, CollisionHit const& hit) = nullptr;
   HitResponse (*collision)(ArchetypeBadguy& self, GameObject& other, CollisionHit const& hit) = nullptr;
   HitResponse (*collision_player)(ArchetypeBadguy& self, Player& player, CollisionHit const& hit) = nullptr;
   void (*collision_solid)(ArchetypeBadguy& self, CollisionHit const& hit) = nullptr;

@@ -54,6 +54,7 @@ template<> BadGuyBehavior const& behavior_of<Owl>();
 template<> BadGuyBehavior const& behavior_of<Ghoul>();
 template<> BadGuyBehavior const& behavior_of<PathFollower>();
 template<> BadGuyBehavior const& behavior_of<Dispenser>();
+template<> BadGuyBehavior const& behavior_of<WillOWisp>();
 template<> BadGuyBehavior const& behavior_of<Diver>();
 template<> BadGuyBehavior const& behavior_of<Haywire>();
 template<> BadGuyBehavior const& behavior_of<GoldBomb>();
@@ -75,6 +76,19 @@ void activate(ArchetypeBadguy& self);
 void deactivate(ArchetypeBadguy& self);
 
 } // namespace dispenser
+
+namespace willowisp {
+
+/** Fade out and stop chasing the player */
+void vanish(ArchetypeBadguy& self);
+
+/** Script interface; see scripting::WillOWisp */
+void goto_node(ArchetypeBadguy& self, int node_no);
+void set_state(ArchetypeBadguy& self, std::string const& state);
+void start_moving(ArchetypeBadguy& self);
+void stop_moving(ArchetypeBadguy& self);
+
+} // namespace willowisp
 
 namespace walker {
 

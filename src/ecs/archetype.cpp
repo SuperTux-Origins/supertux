@@ -94,6 +94,7 @@ std::map<std::string, ComponentType> const& component_types()
     { "owl", component_type<Owl>() },
     { "ghoul", component_type<Ghoul>() },
     { "dispenser", component_type<Dispenser>() },
+    { "willowisp", component_type<WillOWisp>() },
 
     // objects
     { "unstable-tile", object_component_type<UnstableTile>() },

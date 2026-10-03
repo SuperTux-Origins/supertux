@@ -55,7 +55,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] iceflame — `data/archetypes/iceflame.archetype` (not exercised by golden suite)
 - [x] ghostflame — `data/archetypes/ghostflame.archetype`
 - [x] livefire (+ livefire_asleep, livefire_dormant) — `data/archetypes/livefire*.archetype`
-- [ ] willowisp
+- [x] willowisp — `data/archetypes/willowisp.archetype` (+ path-follower); scriptable; new `collides` hook; lantern catches it by component (lantern catching not exercised by golden suite)
 - [x] ghoul — `data/archetypes/ghoul.archetype` (ghoul + path-follower; 3 runs)
 - [ ] treewillowisp
 - [ ] kugelblitz
@@ -87,11 +87,11 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 ## Bosses / unique multi-phase (candidate exceptions per plan §4.4 — confirm each is actually boss-scale before treating it as an exception)
 - [ ] yeti
 - [ ] ghosttree
-- [ ] totem — ONLY if this is a distinct boss variant, not the stationary-trap `totem` above; check before double-counting
-- [ ] owl — ONLY if this is a distinct boss variant, not the flyer `owl` above; check before double-counting
+- [ ] totem — same class as the unused stationary `totem` above (no shipped level uses it)
+- [x] owl — the only owl is the carrier flyer above
 
 ## Shared base to retire (not an archetype itself)
-- [ ] walking_badguy — dissolve into the `Walker` component/system once all dependents above are migrated; do not port this class into an archetype of its own
+- [x] walking_badguy — reduced to a thin ArchetypeBadguy subclass that adds the Walker behavior in code
 
 ---
 

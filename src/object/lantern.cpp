@@ -20,7 +20,9 @@
 #include "audio/sound_manager.hpp"
 #include "ecs/object_behaviors.hpp"
 #include "badguy/treewillowisp.hpp"
-#include "badguy/willowisp.hpp"
+#include "badguy/archetype_badguy.hpp"
+#include "ecs/badguy_behaviors.hpp"
+#include "ecs/badguy_components.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -88,14 +90,15 @@ Lantern::draw(DrawingContext& context){
 
 HitResponse Lantern::collision(GameObject& other, CollisionHit const& hit) {
 
-  WillOWisp* wow = dynamic_cast<WillOWisp*>(&other);
+  auto* wow = dynamic_cast<ArchetypeBadguy*>(&other);
+  auto* wisp = wow ? ecs::try_get<WillOWisp>(wow->get_entity()) : nullptr;
 
-  if (wow && (is_open() || wow->get_color().greyscale() == 0.f)) {
+  if (wisp && (is_open() || wisp->color.greyscale() == 0.f)) {
     // collided with WillOWisp while grabbed and unlit
     SoundManager::current()->play("sounds/willocatch.wav", get_pos());
-    lightcolor = wow->get_color();
+    lightcolor = wisp->color;
     updateColor();
-    wow->vanish();
+    willowisp::vanish(*wow);
   }
 
   TreeWillOWisp* twow = dynamic_cast<TreeWillOWisp*>(&other);

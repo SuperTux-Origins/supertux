@@ -57,6 +57,7 @@ public:
 
   bool is_freezable() const override { return m_freezable; }
   bool is_hurtable() const override { return m_hurtable; }
+  bool collides(GameObject& other, CollisionHit const& hit) const override;
   bool is_flammable() const override;
   void freeze() override;
   void unfreeze(bool melt = true) override;
@@ -112,6 +113,7 @@ public:
   using BadGuy::run_dead_script;
   using BadGuy::m_dead_script;
   using BadGuy::m_countMe;
+  using BadGuy::m_glowing;
   using BadGuy::is_offscreen;
   using MovingSprite::change_sprite;
   using MovingSprite::m_sprite;

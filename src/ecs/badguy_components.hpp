@@ -720,6 +720,40 @@ inline void read_component(ReaderMapping const& mapping, Ghoul& ghoul)
   mapping.read("track-range", ghoul.track_range);
 }
 
+/** Floats until the player comes near, then chases them and warps them
+    to a spawnpoint, or runs a hit-script (willowisp). May follow a
+    path (PathFollower). Lanterns catch it. Scriptable as a WillOWisp. */
+struct WillOWisp
+{
+  enum class State { STOPPED, IDLE, TRACKING, VANISHING, WARPING, PATHMOVING, PATHMOVING_TRACK };
+
+  std::string target_sector = "main";
+  std::string target_spawnpoint = "main";
+  std::string hit_script;
+  float flyspeed = 64.0f;
+  float track_range = 384.0f;
+  float vanish_range = 512.0f;
+  Color color = Color(0, 1, 0);
+
+  // state
+  State state = State::IDLE;
+  std::shared_ptr<SoundSource> sound_source = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, WillOWisp& wisp)
+{
+  mapping.read("sector", wisp.target_sector);
+  mapping.read("spawnpoint", wisp.target_spawnpoint);
+  mapping.read("hit-script", wisp.hit_script);
+  mapping.read("flyspeed", wisp.flyspeed);
+  mapping.read("track-range", wisp.track_range);
+  mapping.read("vanish-range", wisp.vanish_range);
+  std::vector<float> color;
+  if (mapping.read("color", color)) {
+    wisp.color = Color(color);
+  }
+}
+
 /** Periodically spawns badguys by name, as a cannon, a dropper or an
     invisible point (dispenser). Levels set badguy, type, cycle, random,
     limit-dispensed-badguys and max-concurrent-badguys. Scriptable as a

@@ -20,7 +20,11 @@
 
 #include "audio/sound_manager.hpp"
 #include "badguy/archetype_badguy.hpp"
+#include "audio/sound_source.hpp"
+#include "object/lantern.hpp"
 #include "scripting/dispenser.hpp"
+#include "scripting/willowisp.hpp"
+#include "supertux/game_session.hpp"
 #include "squirrel/squirrel_util.hpp"
 #include "util/file_system.hpp"
 #include "ecs/object_behaviors.hpp"
@@ -4748,6 +4752,294 @@ BadGuyBehavior const& behavior_of<Dispenser>()
     .unfreeze = &dispenser_unfreeze,
     .is_portable = &dispenser_is_portable,
     .draw = &dispenser_draw,
+  };
+  return behavior;
+}
+
+namespace {
+
+// WillOWisp ----------------------------------------------------------
+
+const std::string WILLOWISP_SOUND = "sounds/willowisp.wav";
+
+void willowisp_construct(ArchetypeBadguy& self)
+{
+  WillOWisp const& wisp = ecs::get<WillOWisp>(self.get_entity());
+
+  SoundManager::current()->preload(WILLOWISP_SOUND);
+  SoundManager::current()->preload("sounds/warp.wav");
+
+  self.m_lightsprite->set_color(Color(wisp.color.red * 0.2f,
+                                      wisp.color.green * 0.2f,
+                                      wisp.color.blue * 0.2f));
+  self.m_sprite->set_color(wisp.color);
+  self.m_sprite->set_action("idle");
+}
+
+void willowisp_finish_construction(ArchetypeBadguy& self)
+{
+  PathObject* path = path_follower::get(self);
+  if (path && path->get_walker() && path->get_walker()->is_running()) {
+    ecs::get<WillOWisp>(self.get_entity()).state = WillOWisp::State::PATHMOVING_TRACK;
+  }
+}
+
+void willowisp_activate(ArchetypeBadguy& self)
+{
+  WillOWisp& wisp = ecs::get<WillOWisp>(self.get_entity());
+  wisp.sound_source = SoundManager::current()->create_sound_source(WILLOWISP_SOUND);
+  wisp.sound_source->set_position(self.get_pos());
+  wisp.sound_source->set_looping(true);
+  wisp.sound_source->set_gain(1.0f);
+  wisp.sound_source->set_reference_distance(32);
+  wisp.sound_source->play();
+}
+
+void willowisp_deactivate(ArchetypeBadguy& self)
+{
+  WillOWisp& wisp = ecs::get<WillOWisp>(self.get_entity());
+  wisp.sound_source.reset();
+
+  switch (wisp.state) {
+    case WillOWisp::State::STOPPED:
+    case WillOWisp::State::IDLE:
+    case WillOWisp::State::PATHMOVING:
+    case WillOWisp::State::PATHMOVING_TRACK:
+      break;
+    case WillOWisp::State::TRACKING:
+      wisp.state = WillOWisp::State::IDLE;
+      break;
+    case WillOWisp::State::WARPING:
+    case WillOWisp::State::VANISHING:
+      self.remove_me();
+      break;
+  }
+}
+
+void willowisp_move(ArchetypeBadguy& self, float dt_sec)
+{
+  WillOWisp& wisp = ecs::get<WillOWisp>(self.get_entity());
+
+  auto player = self.get_nearest_player();
+  if (!player) return;
+  Vector p1 = self.m_col.m_bbox.get_middle();
+  Vector p2 = player->get_bbox().get_middle();
+  Vector dist = (p2 - p1);
+
+  switch (wisp.state) {
+    case WillOWisp::State::STOPPED:
+      break;
+
+    case WillOWisp::State::IDLE:
+      if (glm::length(dist) <= wisp.track_range) {
+        wisp.state = WillOWisp::State::TRACKING;
+      }
+      break;
+
+    case WillOWisp::State::TRACKING:
+      if (glm::length(dist) > wisp.vanish_range) {
+        willowisp::vanish(self);
+      } else if (glm::length(dist) >= 1) {
+        Vector dir_ = glm::normalize(dist);
+        self.m_col.set_movement(dir_ * dt_sec * wisp.flyspeed);
+      } else {
+        /* We somehow landed right on top of the player without colliding.
+         * Sit tight and avoid a division by zero. */
+      }
+      if (wisp.sound_source) {
+        wisp.sound_source->set_position(self.get_pos());
+      }
+      break;
+
+    case WillOWisp::State::WARPING:
+      if (self.m_sprite->animation_done()) {
+        self.remove_me();
+      }
+      break;
+
+    case WillOWisp::State::VANISHING: {
+      Vector dir_ = glm::normalize(dist);
+      self.m_col.set_movement(dir_ * dt_sec * wisp.flyspeed);
+      if (self.m_sprite->animation_done()) {
+        self.remove_me();
+      }
+      break;
+    }
+
+    case WillOWisp::State::PATHMOVING:
+    case WillOWisp::State::PATHMOVING_TRACK: {
+      PathObject* path = path_follower::get(self);
+      if (path == nullptr || path->get_walker() == nullptr)
+        return;
+      path->get_walker()->update(dt_sec);
+      self.m_col.set_movement(path->get_walker()->get_pos(self.m_col.m_bbox.get_size(), path->get_path_handle()) - self.get_pos());
+      if (wisp.state == WillOWisp::State::PATHMOVING_TRACK && glm::length(dist) <= wisp.track_range) {
+        wisp.state = WillOWisp::State::TRACKING;
+      }
+      break;
+    }
+  }
+}
+
+bool willowisp_collides(ArchetypeBadguy const& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  auto lantern = dynamic_cast<Lantern*>(&other);
+
+  //                                 vv  'xor'
+  if (lantern && (lantern->is_open() != (ecs::get<WillOWisp>(self.get_entity()).color.greyscale() == 0)))
+    return true;
+
+  if (dynamic_cast<Player*>(&other))
+    return true;
+
+  return false;
+}
+
+HitResponse willowisp_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& /*hit*/)
+{
+  WillOWisp& wisp = ecs::get<WillOWisp>(self.get_entity());
+
+  if (player.is_invincible())
+    return ABORT_MOVE;
+
+  if (wisp.state != WillOWisp::State::TRACKING)
+    return ABORT_MOVE;
+
+  wisp.state = WillOWisp::State::WARPING;
+  self.m_sprite->set_action("warping", 1);
+
+  if (!wisp.hit_script.empty()) {
+    Sector::get().run_script(wisp.hit_script, "hit-script");
+  } else {
+    GameSession::current()->respawn(wisp.target_sector, wisp.target_spawnpoint);
+  }
+  SoundManager::current()->play("sounds/warp.wav", self.get_pos());
+
+  return CONTINUE;
+}
+
+void willowisp_kill_fall(ArchetypeBadguy& self)
+{
+  willowisp::vanish(self);
+}
+
+void willowisp_stop_looping_sounds(ArchetypeBadguy& self)
+{
+  WillOWisp& wisp = ecs::get<WillOWisp>(self.get_entity());
+  if (wisp.sound_source) {
+    wisp.sound_source->stop();
+  }
+}
+
+void willowisp_play_looping_sounds(ArchetypeBadguy& self)
+{
+  WillOWisp& wisp = ecs::get<WillOWisp>(self.get_entity());
+  if (wisp.sound_source) {
+    wisp.sound_source->play();
+  }
+}
+
+void willowisp_expose(ArchetypeBadguy& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  expose_object(vm, table_idx, std::make_unique<scripting::WillOWisp>(self.get_uid()), self.get_name());
+}
+
+void willowisp_unexpose(ArchetypeBadguy& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  unexpose_object(vm, table_idx, self.get_name());
+}
+
+PathWalker* willowisp_walker(ArchetypeBadguy& self)
+{
+  PathObject* path = path_follower::get(self);
+  return path ? path->get_walker() : nullptr;
+}
+
+} // namespace
+
+namespace willowisp {
+
+void vanish(ArchetypeBadguy& self)
+{
+  ecs::get<WillOWisp>(self.get_entity()).state = WillOWisp::State::VANISHING;
+  self.m_sprite->set_action("vanishing", 1);
+  self.set_colgroup_active(COLGROUP_DISABLED);
+
+  if (self.get_parent_dispenser() != entt::null)
+  {
+    dispenser::notify_dead(self.get_parent_dispenser());
+  }
+}
+
+void goto_node(ArchetypeBadguy& self, int node_no)
+{
+  WillOWisp& wisp = ecs::get<WillOWisp>(self.get_entity());
+  if (PathWalker* walker = willowisp_walker(self)) {
+    walker->goto_node(node_no);
+  }
+  if (wisp.state != WillOWisp::State::PATHMOVING && wisp.state != WillOWisp::State::PATHMOVING_TRACK) {
+    wisp.state = WillOWisp::State::PATHMOVING;
+  }
+}
+
+void start_moving(ArchetypeBadguy& self)
+{
+  if (PathWalker* walker = willowisp_walker(self)) {
+    walker->start_moving();
+  }
+}
+
+void stop_moving(ArchetypeBadguy& self)
+{
+  if (PathWalker* walker = willowisp_walker(self)) {
+    walker->stop_moving();
+  }
+}
+
+void set_state(ArchetypeBadguy& self, std::string const& new_state)
+{
+  WillOWisp& wisp = ecs::get<WillOWisp>(self.get_entity());
+  if (new_state == "stopped") {
+    wisp.state = WillOWisp::State::STOPPED;
+  } else if (new_state == "idle") {
+    wisp.state = WillOWisp::State::IDLE;
+  } else if (new_state == "move_path") {
+    wisp.state = WillOWisp::State::PATHMOVING;
+    start_moving(self);
+  } else if (new_state == "move_path_track") {
+    wisp.state = WillOWisp::State::PATHMOVING_TRACK;
+    start_moving(self);
+  } else if (new_state == "normal") {
+    wisp.state = WillOWisp::State::IDLE;
+  } else if (new_state == "vanish") {
+    vanish(self);
+  } else {
+    log_warning("Can't set unknown willowisp state '{}", new_state);
+  }
+}
+
+} // namespace willowisp
+
+template<>
+BadGuyBehavior const& behavior_of<WillOWisp>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &willowisp_construct,
+    .finish_construction = &willowisp_finish_construction,
+    .expose = &willowisp_expose,
+    .unexpose = &willowisp_unexpose,
+    .activate = &willowisp_activate,
+    .deactivate = &willowisp_deactivate,
+    .move = &willowisp_move,
+    .collides = &willowisp_collides,
+    .collision_player = &willowisp_collision_player,
+    .kill_fall = &willowisp_kill_fall,
+    .stop_looping_sounds = &willowisp_stop_looping_sounds,
+    .play_looping_sounds = &willowisp_play_looping_sounds,
   };
   return behavior;
 }

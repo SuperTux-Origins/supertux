@@ -283,6 +283,17 @@ ArchetypeBadguy::default_kill_fall()
 }
 
 bool
+ArchetypeBadguy::collides(GameObject& other, CollisionHit const& hit) const
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->collides) {
+      return behavior->collides(*this, other, hit);
+    }
+  }
+  return BadGuy::collides(other, hit);
+}
+
+bool
 ArchetypeBadguy::is_portable() const
 {
   for (auto const* behavior : m_behaviors) {

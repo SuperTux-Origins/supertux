@@ -162,3 +162,5 @@ data/levels/world1/ice_in_the_hole.stlv idle 600 10016,360
 data/levels/world1/living_inside_fridge.stlv idle 600 10464,392
 # Targeted: a cannon dispensing a snowball
 data/levels/bonus2/level1.stlv idle 600 3776,544
+# Targeted: a willowisp catching Tux
+data/levels/world2/tux_own_horror_show.stlv idle 600 4512,800
