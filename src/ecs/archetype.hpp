@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "ecs/badguy_behavior.hpp"
 #include "ecs/component_prototype.hpp"
 #include "util/reader_document.hpp"
 
@@ -29,12 +30,12 @@
       (supertux-archetype
         (name "crystallo")
         (aliases "crystal")                ; optional, extra factory names
-        (base "walking-badguy")
+        (base "badguy")
         (properties
           (sprite "images/creatures/crystallo/crystallo.sprite")
-          (walk-speed 80)
-          (max-drop-height 16))
+          (flammable #f))
         (components
+          (walker (speed 80) (max-drop-height 16))
           (patrol (radius 100) (acceleration 2) (slowdown-action "slowdown"))
           (squish-reaction (action "shattered") (anchor-bottom #t))))
 
@@ -54,15 +55,21 @@ public:
   ReaderMapping const& get_properties() const { return m_properties; }
 
   /** Emplace the archetype's components on an entity, with fields
-      overridden by the level object's mapping if given */
-  void emplace_components(entt::entity entity, ReaderMapping const* overrides) const;
+      overridden by the level object's mapping if given. Returns the
+      behaviors of those components, in archetype order. */
+  std::vector<BadGuyBehavior const*> emplace_components(entt::entity entity, ReaderMapping const* overrides) const;
 
 private:
   std::string m_name;
   std::string m_base;
   std::vector<std::string> m_aliases;
   ReaderMapping m_properties;
-  std::vector<std::unique_ptr<ComponentPrototype>> m_components;
+  struct Component
+  {
+    std::unique_ptr<ComponentPrototype> prototype;
+    BadGuyBehavior const* behavior;
+  };
+  std::vector<Component> m_components;
 
 private:
   Archetype(Archetype const&) = delete;

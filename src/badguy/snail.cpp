@@ -34,8 +34,8 @@ Snail::Snail(ReaderMapping const& reader) :
   flat_timer(),
   squishcount(0)
 {
-  walk_speed = 80;
-  max_drop_height = 600;
+  m_walker.speed = 80;
+  m_walker.max_drop_height = 600;
   SoundManager::current()->preload("sounds/iceblock_bump.wav");
   SoundManager::current()->preload("sounds/stomp.wav");
   SoundManager::current()->preload("sounds/kick.wav");
@@ -143,7 +143,7 @@ Snail::active_update(float dt_sec)
 
     case STATE_KICKED:
       m_physic.set_velocity_x(m_physic.get_velocity_x() * powf(0.99f, dt_sec/0.02f));
-      if (fabsf(m_physic.get_velocity_x()) < walk_speed) be_normal();
+      if (fabsf(m_physic.get_velocity_x()) < m_walker.speed) be_normal();
       break;
 
     case STATE_GRABBED:

@@ -25,7 +25,7 @@
 Snowman::Snowman(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/snowman/snowman.sprite", "left", "right")
 {
-  walk_speed = 40;
+  m_walker.speed = 40;
   SoundManager::current()->preload("sounds/pop.ogg");
 }
 

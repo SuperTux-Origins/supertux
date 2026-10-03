@@ -1,12 +1,12 @@
 (supertux-archetype
   (name "viciousivy")
   (aliases "poisonivy")
-  (base "walking-badguy")
+  (base "badguy")
   (properties
     (sprite "images/creatures/vicious_ivy/vicious_ivy.sprite")
-    (walk-speed 80)
     (freezable #t))
   (components
+    (walker (speed 80))
     (floater (max-fall-speed 35))
     (squish-reaction (action "squished")
                      (particles "images/particles/viciousivy.sprite")

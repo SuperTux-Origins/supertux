@@ -144,7 +144,7 @@ GameObjectFactory::add_archetypes()
 {
   for (Archetype const* archetype : ArchetypeRegistry::instance().get_archetypes())
   {
-    if (archetype->get_base() != "walking-badguy") {
+    if (archetype->get_base() != "badguy") {
       throw std::runtime_error("archetype '" + archetype->get_name() + "': unknown base '" + archetype->get_base() + "'");
     }
 

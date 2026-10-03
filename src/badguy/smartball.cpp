@@ -20,8 +20,8 @@
 SmartBall::SmartBall(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/snowball/smart-snowball.sprite", "left", "right")
 {
-  walk_speed = 80;
-  max_drop_height = 16;
+  m_walker.speed = 80;
+  m_walker.max_drop_height = 16;
 }
 
 bool

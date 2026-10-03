@@ -36,8 +36,8 @@ MrTree::MrTree(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/mr_tree/mr_tree.sprite","left","right", LAYER_OBJECTS,
                   "images/objects/lightmap_light/lightmap_light-large.sprite")
 {
-  walk_speed = TREE_SPEED;
-  max_drop_height = 16;
+  m_walker.speed = TREE_SPEED;
+  m_walker.max_drop_height = 16;
   SoundManager::current()->preload("sounds/mr_tree.ogg");
 }
 

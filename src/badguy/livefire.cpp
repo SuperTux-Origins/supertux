@@ -26,8 +26,8 @@ LiveFire::LiveFire(ReaderMapping const& reader) :
   death_sound("sounds/fall.wav"),
   state(STATE_WALKING)
 {
-  walk_speed = 80;
-  max_drop_height = 20;
+  m_walker.speed = 80;
+  m_walker.max_drop_height = 20;
   m_lightsprite->set_color(Color(0.89f, 0.75f, 0.44f));
   m_glowing = true;
 }
@@ -163,7 +163,7 @@ LiveFireAsleep::initialize()
 LiveFireDormant::LiveFireDormant(ReaderMapping const& reader) :
   LiveFire(reader)
 {
-  walk_speed = 0;
+  m_walker.speed = 0;
   state = STATE_DORMANT;
 }
 

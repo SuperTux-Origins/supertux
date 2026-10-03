@@ -19,16 +19,20 @@
 #include <memory>
 #include <vector>
 
-#include "badguy/walking_badguy.hpp"
+#include "badguy/badguy.hpp"
+#include "ecs/badguy_behavior.hpp"
 #include "ecs/registry.hpp"
 
 class Archetype;
-struct Floater;
 
-/** Generic shell for data-defined walking badguys ("base" =
-    "walking-badguy" in data/archetypes/). Behavior beyond plain walking
-    comes from ECS components (ecs/badguy_components.hpp), not subclasses. */
-class ArchetypeBadguy final : public WalkingBadguy
+/** Generic badguy whose behavior comes from ECS components with
+    BadGuyBehavior handlers (ecs/badguy_behaviors.cpp), configured by
+    data/archetypes/ instead of a subclass per enemy.
+
+    Remaining hand-written badguys can derive from it as well and add
+    behaviors in code (see WalkingBadguy). The public section below is
+    the BadGuy state that behavior handlers may use. */
+class ArchetypeBadguy : public BadGuy
 {
 public:
   ArchetypeBadguy(ReaderMapping const& reader, Archetype const& archetype);
@@ -40,22 +44,63 @@ public:
   static std::unique_ptr<ArchetypeBadguy> create(std::string const& name, Vector const& pos, Direction dir,
                                                  std::string const& dead_script = {});
 
-  void active_update(float dt_sec) override;
   bool is_freezable() const override { return m_freezable; }
   bool is_flammable() const override { return m_flammable; }
 
+  void collision_solid(CollisionHit const& hit) override;
+
+  /** The BadGuy implementations, for behaviors that fall back to them */
+  void default_collision_solid(CollisionHit const& hit) { BadGuy::collision_solid(hit); }
+  bool default_collision_squished(GameObject& object) { return BadGuy::collision_squished(object); }
+
+  // BadGuy state available to behaviors
+  using BadGuy::State;
+  using BadGuy::STATE_INIT;
+  using BadGuy::STATE_INACTIVE;
+  using BadGuy::STATE_ACTIVE;
+  using BadGuy::m_physic;
+  using BadGuy::m_dir;
+  using BadGuy::m_frozen;
+  using BadGuy::m_ignited;
+  using BadGuy::m_start_position;
+  using BadGuy::get_state;
+  using BadGuy::is_active;
+  using BadGuy::might_fall;
+  using BadGuy::on_ground;
+  using BadGuy::update_on_ground_flag;
+  using BadGuy::kill_squished;
+  using MovingSprite::m_sprite;
+  using MovingSprite::set_action;
+  using MovingObject::m_col;
+
 protected:
+  /** For hand-written subclasses that add their behaviors in code */
+  ArchetypeBadguy(ReaderMapping const& reader, std::string const& sprite_name, int layer,
+                  std::string const& light_sprite_name);
+  ArchetypeBadguy(Vector const& pos, std::string const& sprite_name, int layer,
+                  std::string const& light_sprite_name);
+  ArchetypeBadguy(Vector const& pos, Direction dir, std::string const& sprite_name, int layer,
+                  std::string const& light_sprite_name);
+
+  /** Emplace a behavior component; behaviors run in the order added */
+  template<typename T>
+  T& add_behavior(T value)
+  {
+    T& component = ecs::emplace<T>(get_entity(), std::move(value));
+    m_behaviors.push_back(&behavior_of<T>());
+    return component;
+  }
+
+  void initialize() override;
+  void active_update(float dt_sec) override;
+  HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
   bool collision_squished(GameObject& object) override;
 
 private:
   void read_properties(Archetype const& archetype);
 
-  template<typename T>
-  T const* find() const { return ecs::try_get<T>(get_entity()); }
-
-  void update_floater(Floater const& floater);
-
 private:
+  std::vector<BadGuyBehavior const*> m_behaviors;
   bool m_freezable;
   bool m_flammable;
 

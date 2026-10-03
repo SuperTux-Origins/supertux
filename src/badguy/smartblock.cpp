@@ -22,7 +22,7 @@
 SmartBlock::SmartBlock(ReaderMapping const& reader) :
   MrIceBlock(reader)
 {
-  max_drop_height = 16;
+  m_walker.max_drop_height = 16;
   m_default_sprite_name = "images/creatures/mr_iceblock/smart_block/smart_block.sprite";
 
   if (!reader.read("sprite", m_sprite_name)) {

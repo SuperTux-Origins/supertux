@@ -1,8 +1,8 @@
 (supertux-archetype
   (name "snowball")
-  (base "walking-badguy")
+  (base "badguy")
   (properties
-    (sprite "images/creatures/snowball/snowball.sprite")
-    (walk-speed 80))
+    (sprite "images/creatures/snowball/snowball.sprite"))
   (components
+    (walker (speed 80))
     (squish-reaction (action "squished"))))

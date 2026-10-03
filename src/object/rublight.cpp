@@ -15,7 +15,9 @@
 
 #include "object/rublight.hpp"
 
-#include "badguy/walking_badguy.hpp"
+#include "ecs/badguy_components.hpp"
+#include "ecs/registry.hpp"
+#include "supertux/physic.hpp"
 #include "object/explosion.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite_manager.hpp"
@@ -63,9 +65,8 @@ RubLight::collision(GameObject& other, CollisionHit const&)
     return FORCE_MOVE;
   }
 
-  WalkingBadguy* obj = dynamic_cast<WalkingBadguy*>(&other);
-  if (obj != nullptr) {
-    float vel_horiz = fabsf(obj->get_velocity_x()) / 32.0f;
+  if (ecs::try_get<Walker>(other.get_entity())) {
+    float vel_horiz = fabsf(ecs::get<Physic>(other.get_entity()).get_velocity_x()) / 32.0f;
     rub(vel_horiz * 0.01f);
   }
 

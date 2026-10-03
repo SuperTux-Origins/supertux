@@ -18,7 +18,9 @@
 #include "object/rusty_trampoline.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/walking_badguy.hpp"
+#include "ecs/badguy_components.hpp"
+#include "ecs/registry.hpp"
+#include "supertux/physic.hpp"
 #include "control/controller.hpp"
 #include "object/player.hpp"
 #include "util/reader_mapping.hpp"
@@ -84,14 +86,12 @@ RustyTrampoline::collision(GameObject& other, CollisionHit const& hit)
         return FORCE_MOVE;
       }
     }
-    auto walking_badguy = dynamic_cast<WalkingBadguy*> (&other);
-    //Trampoline also works for WalkingBadguy
-    if (walking_badguy) {
-      float vy = walking_badguy->get_velocity_y();
-      //walking_badguy is falling down on trampoline
-      if (hit.top && vy >= 0) {
-        vy = VY_BOUNCE;
-        walking_badguy->set_velocity_y(vy);
+    //Trampoline also works for walking badguys
+    if (ecs::try_get<Walker>(other.get_entity())) {
+      Physic& physic = ecs::get<Physic>(other.get_entity());
+      //walking badguy is falling down on trampoline
+      if (hit.top && physic.get_velocity_y() >= 0) {
+        physic.set_velocity_y(VY_BOUNCE);
         SoundManager::current()->play(BOUNCE_SOUND, get_pos());
         counter--;
         if (counter > 0) {

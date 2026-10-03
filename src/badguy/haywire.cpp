@@ -46,8 +46,8 @@ Haywire::Haywire(ReaderMapping const& reader) :
   grunting(),
   stomped_timer()
 {
-  walk_speed = NORMAL_WALK_SPEED;
-  max_drop_height = 16;
+  m_walker.speed = NORMAL_WALK_SPEED;
+  m_walker.max_drop_height = 16;
 
   //Prevent stutter when Tux jumps on Mr Bomb
   SoundManager::current()->preload("sounds/explosion.wav");
@@ -169,13 +169,13 @@ Haywire::active_update(float dt_sec)
 
 	  if (stomped_timer.get_timeleft() < 0.05f) {
         set_action ((m_dir == Direction::LEFT) ? "ticking-left" : "ticking-right", /* loops = */ -1);
-        walk_left_action = "ticking-left";
-        walk_right_action = "ticking-right";
+        m_walker.left_action = "ticking-left";
+        m_walker.right_action = "ticking-right";
     }
     else {
         set_action ((m_dir == Direction::LEFT) ? "active-left" : "active-right", /* loops = */ 1);
-        walk_left_action = "active-left";
-	      walk_right_action = "active-right";
+        m_walker.left_action = "active-left";
+	      m_walker.right_action = "active-right";
     }
 
     float target_velocity = 0.f;
@@ -189,7 +189,7 @@ Haywire::active_update(float dt_sec)
       else if (player && time_stunned == 0.0f)
       {
         /* Player is on the right or left*/
-        target_velocity = (player->get_pos().x > get_pos().x) ? walk_speed : (-1.f) * walk_speed;
+        target_velocity = (player->get_pos().x > get_pos().x) ? m_walker.speed : (-1.f) * m_walker.speed;
       }
     }
     else
@@ -258,7 +258,7 @@ void
 Haywire::start_exploding()
 {
   set_walk_speed (EXPLODING_WALK_SPEED);
-  max_drop_height = -1;
+  m_walker.max_drop_height = -1;
   time_until_explosion = TIME_EXPLOSION;
   is_exploding = true;
 
@@ -277,10 +277,10 @@ Haywire::start_exploding()
 void
 Haywire::stop_exploding()
 {
-  walk_left_action = "left";
-  walk_right_action = "right";
+  m_walker.left_action = "left";
+  m_walker.right_action = "right";
   set_walk_speed(NORMAL_WALK_SPEED);
-  max_drop_height = 16;
+  m_walker.max_drop_height = 16;
   time_until_explosion = 0.0f;
   is_exploding = false;
 

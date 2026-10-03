@@ -26,8 +26,8 @@ namespace{
 CaptainSnowball::CaptainSnowball(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/snowball/cpt-snowball.sprite", "left", "right")
 {
-  walk_speed = BOARDING_SPEED;
-  max_drop_height = -1;
+  m_walker.speed = BOARDING_SPEED;
+  m_walker.max_drop_height = -1;
   m_physic.set_velocity_y(-400);
 }
 
@@ -61,8 +61,8 @@ CaptainSnowball::active_update(float dt_sec)
     m_physic.set_velocity_y(-400);
   } else if (on_ground() && might_fall(16)) {
     m_physic.set_velocity_y(-400);
-    walk_speed = BOARDING_SPEED;
-    m_physic.set_velocity_x(m_dir == Direction::LEFT ? -walk_speed : walk_speed);
+    m_walker.speed = BOARDING_SPEED;
+    m_physic.set_velocity_x(m_dir == Direction::LEFT ? -m_walker.speed : m_walker.speed);
   }
   WalkingBadguy::active_update(dt_sec);
 }
@@ -70,9 +70,9 @@ CaptainSnowball::active_update(float dt_sec)
 void
 CaptainSnowball::collision_solid(CollisionHit const& hit)
 {
-  if (is_active() && (walk_speed == BOARDING_SPEED)) {
-    walk_speed = CAPTAIN_WALK_SPEED;
-    m_physic.set_velocity_x(m_dir == Direction::LEFT ? -walk_speed : walk_speed);
+  if (is_active() && (m_walker.speed == BOARDING_SPEED)) {
+    m_walker.speed = CAPTAIN_WALK_SPEED;
+    m_physic.set_velocity_x(m_dir == Direction::LEFT ? -m_walker.speed : m_walker.speed);
   }
   WalkingBadguy::collision_solid(hit);
 }

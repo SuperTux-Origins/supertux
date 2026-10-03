@@ -16,9 +16,42 @@
 #ifndef HEADER_SUPERTUX_ECS_BADGUY_COMPONENTS_HPP
 #define HEADER_SUPERTUX_ECS_BADGUY_COMPONENTS_HPP
 
+#include <optional>
 #include <string>
 
+#include "supertux/timer.hpp"
 #include "util/reader_mapping.hpp"
+
+/** Walks along the floor, turning at walls and optionally at ledges. */
+struct Walker
+{
+  /** WalkingBadguy holds a reference to its Walker */
+  static constexpr auto in_place_delete = true;
+
+  float speed = 80.0f;
+  /** maximum drop before turning around at a ledge, -1 to walk off any ledge */
+  int max_drop_height = -1;
+  std::string left_action = "left";
+  std::string right_action = "right";
+
+  /** too many turns within a second make the badguy dizzy, it falls off */
+  Timer turn_around_timer = {};
+  int turn_around_counter = 0;
+
+  /** Set by other behaviors (Patrol) for the current frame only:
+      velocity to walk towards instead of +/-speed, and the acceleration
+      multiplier. */
+  std::optional<float> target_velocity = {};
+  float acceleration = 1.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Walker& walker)
+{
+  mapping.read("speed", walker.speed);
+  mapping.read("max-drop-height", walker.max_drop_height);
+  mapping.read("left-action", walker.left_action);
+  mapping.read("right-action", walker.right_action);
+}
 
 /** Floats down slowly when there is no ground directly below
     (walkingleaf, viciousivy). */
@@ -33,7 +66,7 @@ inline void read_component(ReaderMapping const& mapping, Floater& floater)
 }
 
 /** Walks back and forth around the start position, slowing down before
-    turning (crystallo). */
+    turning (crystallo). Requires a Walker. */
 struct Patrol
 {
   float radius = 100.0f;

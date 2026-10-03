@@ -33,8 +33,8 @@ Stumpy::Stumpy(ReaderMapping const& reader) :
   mystate(STATE_NORMAL),
   invincible_timer()
 {
-  walk_speed = STUMPY_SPEED;
-  max_drop_height = 16;
+  m_walker.speed = STUMPY_SPEED;
+  m_walker.max_drop_height = 16;
   SoundManager::current()->preload("sounds/mr_treehit.ogg");
 }
 
@@ -43,8 +43,8 @@ Stumpy::Stumpy(Vector const& pos, Direction d) :
   mystate(STATE_INVINCIBLE),
   invincible_timer()
 {
-  walk_speed = STUMPY_SPEED;
-  max_drop_height = 16;
+  m_walker.speed = STUMPY_SPEED;
+  m_walker.max_drop_height = 16;
   SoundManager::current()->preload("sounds/mr_treehit.ogg");
   invincible_timer.start(INVINCIBLE_TIME);
 }

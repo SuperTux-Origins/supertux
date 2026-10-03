@@ -15,11 +15,10 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "ecs/archetype.hpp"
 
-#include <functional>
 #include <physfs.h>
 #include <stdexcept>
 
-#include "ecs/badguy_components.hpp"
+#include "ecs/badguy_behaviors.hpp"
 #include "ecs/registry.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
@@ -28,17 +27,28 @@
 
 namespace {
 
-using ComponentReader = std::function<std::unique_ptr<ComponentPrototype> (ReaderMapping const&)>;
+struct ComponentType
+{
+  std::unique_ptr<ComponentPrototype> (*read)(ReaderMapping const&);
+  BadGuyBehavior const* behavior;
+};
+
+template<typename T>
+ComponentType component_type()
+{
+  return { &ComponentPrototypeT<T>::from_reader, &behavior_of<T>() };
+}
 
 /** Component names usable in an archetype's (components ...) section */
-std::map<std::string, ComponentReader> const& component_readers()
+std::map<std::string, ComponentType> const& component_types()
 {
-  static std::map<std::string, ComponentReader> const readers = {
-    { "floater", &ComponentPrototypeT<Floater>::from_reader },
-    { "patrol", &ComponentPrototypeT<Patrol>::from_reader },
-    { "squish-reaction", &ComponentPrototypeT<SquishReaction>::from_reader },
+  static std::map<std::string, ComponentType> const types = {
+    { "walker", component_type<Walker>() },
+    { "floater", component_type<Floater>() },
+    { "patrol", component_type<Patrol>() },
+    { "squish-reaction", component_type<SquishReaction>() },
   };
-  return readers;
+  return types;
 }
 
 } // namespace
@@ -63,22 +73,25 @@ Archetype::Archetype(ReaderMapping const& mapping) :
   ReaderCollection components;
   if (mapping.read("components", components)) {
     for (auto const& component : components.get_objects()) {
-      auto const& readers = component_readers();
-      auto it = readers.find(component.get_name());
-      if (it == readers.end()) {
+      auto const& types = component_types();
+      auto it = types.find(component.get_name());
+      if (it == types.end()) {
         throw std::runtime_error("archetype '" + m_name + "': unknown component '" + component.get_name() + "'");
       }
-      m_components.push_back(it->second(component.get_mapping()));
+      m_components.push_back({ it->second.read(component.get_mapping()), it->second.behavior });
     }
   }
 }
 
-void
+std::vector<BadGuyBehavior const*>
 Archetype::emplace_components(entt::entity entity, ReaderMapping const* overrides) const
 {
+  std::vector<BadGuyBehavior const*> behaviors;
   for (auto const& component : m_components) {
-    component->emplace(ecs::registry(), entity, overrides);
+    component.prototype->emplace(ecs::registry(), entity, overrides);
+    behaviors.push_back(component.behavior);
   }
+  return behaviors;
 }
 
 ArchetypeRegistry&

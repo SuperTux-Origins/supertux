@@ -27,8 +27,8 @@
 ShortFuse::ShortFuse(ReaderMapping const& reader) :
   WalkingBadguy(reader, "images/creatures/short_fuse/short_fuse.sprite", "left", "right")
 {
-  walk_speed = 100;
-  max_drop_height = -1;
+  m_walker.speed = 100;
+  m_walker.max_drop_height = -1;
 
   //Check if we need another sprite
   if ( !reader.read( "sprite", m_sprite_name ) ){

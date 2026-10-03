@@ -34,8 +34,8 @@ MrIceBlock::MrIceBlock(ReaderMapping const& reader) :
   flat_timer(),
   squishcount(0)
 {
-  walk_speed = 80;
-  max_drop_height = 600;
+  m_walker.speed = 80;
+  m_walker.max_drop_height = 600;
   SoundManager::current()->preload("sounds/iceblock_bump.wav");
   SoundManager::current()->preload("sounds/stomp.wav");
   SoundManager::current()->preload("sounds/kick.wav");
@@ -97,7 +97,7 @@ MrIceBlock::collision_solid(CollisionHit const& hit)
       m_physic.set_velocity_x(-m_physic.get_velocity_x() * .975f);
     }
     set_action(m_dir == Direction::LEFT ? "flat-left" : "flat-right", /* loops = */ -1);
-    if (fabsf(m_physic.get_velocity_x()) < walk_speed * 1.5f)
+    if (fabsf(m_physic.get_velocity_x()) < m_walker.speed * 1.5f)
       set_state(ICESTATE_NORMAL);
     break;
   }

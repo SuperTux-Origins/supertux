@@ -32,8 +32,8 @@ GoldBomb::GoldBomb(ReaderMapping const& reader) :
   tstate(STATE_NORMAL),
   ticking()
 {
-  walk_speed = 80;
-  max_drop_height = 16;
+  m_walker.speed = 80;
+  m_walker.max_drop_height = 16;
 
   //Prevent stutter when Tux jumps on Gold Bomb
   SoundManager::current()->preload("sounds/explosion.wav");

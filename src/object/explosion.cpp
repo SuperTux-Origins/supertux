@@ -17,7 +17,8 @@
 #include "object/explosion.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/walking_badguy.hpp"
+#include "badguy/archetype_badguy.hpp"
+#include "ecs/badguy_components.hpp"
 #include "math/random.hpp"
 #include "object/bonus_block.hpp"
 #include "object/brick.hpp"
@@ -111,9 +112,9 @@ Explosion::explode()
         player->add_velocity(add_speed);
       }
 
-      auto badguy = dynamic_cast<WalkingBadguy*>(obj);
-      if (badguy && badguy->is_active()) {
-        badguy->add_velocity(add_speed);
+      auto badguy = dynamic_cast<ArchetypeBadguy*>(obj);
+      if (badguy && ecs::try_get<Walker>(badguy->get_entity()) && badguy->is_active()) {
+        badguy->m_physic.set_velocity(badguy->m_physic.get_velocity() + add_speed);
       }
 
       bool in_break_range = distance <= 60.f;
