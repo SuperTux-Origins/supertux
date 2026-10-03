@@ -1,0 +1,10 @@
+; A checkpoint; levels may pick another bell or torch sprite.
+(supertux-archetype
+  (name "firefly")
+  (base "object")
+  (properties
+    (sprite "images/objects/resetpoints/default-resetpoint.sprite")
+    (layer "tiles")
+    (colgroup "touchable"))
+  (components
+    (reset-point)))

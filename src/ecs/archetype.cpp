@@ -89,6 +89,8 @@ std::map<std::string, ComponentType> const& component_types()
     // objects
     { "unstable-tile", object_component_type<UnstableTile>() },
     { "weak-block", object_component_type<WeakBlock>() },
+    { "magicblock", object_component_type<MagicBlock>() },
+    { "reset-point", object_component_type<ResetPoint>() },
     { "diver", component_type<Diver>() },
     { "haywire", component_type<Haywire>() },
     { "goldbomb", component_type<GoldBomb>() },

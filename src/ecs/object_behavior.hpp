@@ -40,6 +40,8 @@ struct ObjectBehavior
   HitResponse (*collision)(ArchetypeObject& self, GameObject& other, CollisionHit const& hit) = nullptr;
   /** first, default: nothing */
   void (*collision_solid)(ArchetypeObject& self, CollisionHit const& hit) = nullptr;
+  /** first, default: true */
+  bool (*collides)(ArchetypeObject const& self, GameObject& other, CollisionHit const& hit) = nullptr;
 };
 
 /** The object behavior of a component type, specialized in object_behaviors.cpp */

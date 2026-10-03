@@ -50,7 +50,6 @@
 #include "object/decal.hpp"
 #include "object/explosion.hpp"
 #include "object/fallblock.hpp"
-#include "object/firefly.hpp"
 #include "object/ghost_particle_system.hpp"
 #include "object/gradient.hpp"
 #include "object/hurting_platform.hpp"
@@ -61,7 +60,6 @@
 #include "object/lantern.hpp"
 #include "object/level_time.hpp"
 #include "object/lit_object.hpp"
-#include "object/magicblock.hpp"
 #include "object/music_object.hpp"
 #include "object/pneumatic_platform.hpp"
 #include "object/powerup.hpp"
@@ -185,7 +183,6 @@ GameObjectFactory::init_factories()
   add_factory<Decal>("decal");
   add_factory<Explosion>("explosion");
   add_factory<FallBlock>("fallblock");
-  add_factory<Firefly>("firefly");
   add_factory<GhostParticleSystem>("particles-ghosts");
   add_factory<Gradient>("gradient");
   add_factory<HeavyBrick>("heavy-brick");
@@ -198,7 +195,6 @@ GameObjectFactory::init_factories()
   add_factory<Lantern>("lantern", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<LevelTime>("leveltime");
   add_factory<LitObject>("lit-object");
-  add_factory<MagicBlock>("magicblock");
   add_factory<MusicObject>("music");
   add_factory<ParticleZone>("particle-zone");
   add_factory<Platform>("platform");

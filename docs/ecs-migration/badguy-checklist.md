@@ -107,3 +107,6 @@ Non-badguy objects use the same pattern: `ArchetypeObject` (base
 
 - [x] unstable_tile — `data/archetypes/unstable_tile.archetype` (4 targeted golden runs)
 - [x] weak_block — `data/archetypes/weak_block.archetype` (not exercised: needs fire or explosions)
+- [x] magicblock — `data/archetypes/magicblock.archetype` (solid/normal switching verified via group+action dump)
+- [x] firefly (checkpoint) — `data/archetypes/firefly.archetype` (ringing not exercised)
+- [ ] invisible_wall — kept: sprite-less static collider without behavior (level geometry)

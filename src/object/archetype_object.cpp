@@ -91,6 +91,17 @@ ArchetypeObject::collision(GameObject& other, CollisionHit const& hit)
   return FORCE_MOVE;
 }
 
+bool
+ArchetypeObject::collides(GameObject& other, CollisionHit const& hit) const
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->collides) {
+      return behavior->collides(*this, other, hit);
+    }
+  }
+  return MovingSprite::collides(other, hit);
+}
+
 void
 ArchetypeObject::collision_solid(CollisionHit const& hit)
 {

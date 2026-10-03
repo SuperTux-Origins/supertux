@@ -21,7 +21,14 @@
 #include "object/archetype_object.hpp"
 #include "object/bullet.hpp"
 #include "object/explosion.hpp"
+#include "math/util.hpp"
+#include "object/camera.hpp"
 #include "object/player.hpp"
+#include "object/sprite_particle.hpp"
+#include "supertux/game_session.hpp"
+#include "supertux/globals.hpp"
+#include "video/video_system.hpp"
+#include "video/viewport.hpp"
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/constants.hpp"
@@ -388,6 +395,226 @@ void weak_block_draw(ArchetypeObject& self, DrawingContext& context)
   }
 }
 
+// MagicBlock ---------------------------------------------------------
+
+void magicblock_construct(ArchetypeObject& self)
+{
+  MagicBlock& block = ecs::get<MagicBlock>(self.get_entity());
+
+  // all alpha to make the sprite still visible
+  block.color.alpha = block.alpha_solid;
+
+  // set trigger
+  if (block.color.red == 0 && block.color.green == 0 && block.color.blue == 0) { // is it black?
+    block.black = true;
+    block.trigger_red = block.min_intensity;
+    block.trigger_green = block.min_intensity;
+    block.trigger_blue = block.min_intensity;
+  } else {
+    block.black = false;
+    block.trigger_red = block.color.red;
+    block.trigger_green = block.color.green;
+    block.trigger_blue = block.color.blue;
+  }
+
+  Rectf const& bbox = self.m_col.m_bbox;
+  block.center = bbox.get_middle();
+  block.solid_box = Rectf(bbox.get_left() + SHIFT_DELTA, bbox.get_top() + SHIFT_DELTA,
+                          bbox.get_right() - SHIFT_DELTA, bbox.get_bottom() - SHIFT_DELTA);
+}
+
+void magicblock_update(ArchetypeObject& self, float dt_sec)
+{
+  MagicBlock& block = ecs::get<MagicBlock>(self.get_entity());
+
+  // Check if center of this block is on screen.
+  // Don't update if not, because there is no light off screen.
+  float screen_left = Sector::get().get_camera().get_translation().x;
+  float screen_top = Sector::get().get_camera().get_translation().y;
+  float screen_right = screen_left + static_cast<float>(SCREEN_WIDTH);
+  float screen_bottom = screen_top + static_cast<float>(SCREEN_HEIGHT);
+  if ((block.center.x > screen_right) || (block.center.y > screen_bottom) ||
+      (block.center.x < screen_left) || (block.center.y < screen_top)) {
+    block.switch_delay = block.switch_delay_time;
+    return;
+  }
+
+  bool lighting_ok;
+  if (block.black) {
+    lighting_ok = (block.light.red >= block.trigger_red ||
+                   block.light.green >= block.trigger_green ||
+                   block.light.blue >= block.trigger_blue);
+  } else {
+    lighting_ok = (block.light.red >= block.trigger_red &&
+                   block.light.green >= block.trigger_green &&
+                   block.light.blue >= block.trigger_blue);
+  }
+
+  // overrule lighting_ok if switch_delay has not yet passed
+  if (lighting_ok == block.is_solid) {
+    block.switch_delay = block.switch_delay_time;
+  } else {
+    if (block.switch_delay > 0) {
+      lighting_ok = block.is_solid;
+      block.switch_delay -= dt_sec;
+    }
+  }
+
+  if (lighting_ok) {
+    // lighting suggests going solid
+    if (!block.is_solid) {
+      if (Sector::get().is_free_of_movingstatics(block.solid_box, &self)) {
+        block.is_solid = true;
+        block.solid_time = 0;
+        block.switch_delay = block.switch_delay_time;
+      }
+    }
+  } else {
+    // lighting suggests going nonsolid
+    if (block.solid_time >= block.min_solid_time) {
+      block.is_solid = false;
+    }
+  }
+
+  // Update Sprite.
+  if (block.is_solid) {
+    block.solid_time += dt_sec;
+    block.color.alpha = block.alpha_solid;
+    self.m_sprite->set_action("solid");
+    self.set_group(COLGROUP_STATIC);
+  } else {
+    block.color.alpha = block.alpha_nonsolid;
+    self.m_sprite->set_action("normal");
+    self.set_group(COLGROUP_DISABLED);
+  }
+}
+
+void magicblock_draw(ArchetypeObject& self, DrawingContext& context)
+{
+  // Ask for update about lightmap at center of this block
+  // context.light().get_pixel(m_center, m_light);
+  log_warning("FIXME: get_pixel() no longer supported, implement this differently");
+
+  self.default_draw(context);
+  context.color().draw_filled_rect(self.m_col.m_bbox, ecs::get<MagicBlock>(self.get_entity()).color, self.m_layer);
+}
+
+bool magicblock_collides(ArchetypeObject const& self, GameObject& /*other*/, CollisionHit const& /*hit*/)
+{
+  return ecs::get<MagicBlock>(self.get_entity()).is_solid;
+}
+
+// ResetPoint ---------------------------------------------------------
+
+/** Color and offset of the light of torch sprites */
+const Color TORCH_LIGHT_COLOR = Color(0.87f, 0.64f, 0.12f);
+const Vector TORCH_LIGHT_OFFSET = Vector(0, 12);
+
+bool is_torch(ArchetypeObject const& self)
+{
+  return self.m_sprite_name.find("torch", 0) != std::string::npos;
+}
+
+void reset_point_reactivate(ArchetypeObject& self, ResetPoint const& point)
+{
+  if (!GameSession::current()) {
+    return;
+  }
+
+  if (!GameSession::current()->get_reset_point_sectorname().empty() &&
+      GameSession::current()->get_reset_point_pos() == point.initial_position) {
+    // TODO: && GameSession::current()->get_reset_point_sectorname() ==  <sector this firefly is in>
+    // GameSession::current()->get_current_sector()->get_name() is not yet initialized.
+    // Worst case a resetpoint in a different sector at the same position as the real
+    // resetpoint the player is spawning is set to ringing, too. Until we can check the sector, too, dont set
+    // activated = true; here.
+    self.m_sprite->set_action("ringing");
+  }
+}
+
+void reset_point_construct(ArchetypeObject& self)
+{
+  ResetPoint& point = ecs::get<ResetPoint>(self.get_entity());
+  point.initial_position = self.get_pos();
+
+  // a level-specific sprite (bell variants, torch) brings its own light and sound
+  if (self.m_sprite_name != self.m_default_sprite_name) {
+    self.m_sprite = SpriteManager::current()->create(self.m_sprite_name);
+    self.m_col.m_bbox.set_size(self.m_sprite->get_current_hitbox_width(), self.m_sprite->get_current_hitbox_height());
+
+    if (is_torch(self)) {
+      point.light = SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite");
+      point.light->set_blend(Blend::ADD);
+      point.light->set_color(TORCH_LIGHT_COLOR);
+    }
+
+    reset_point_reactivate(self, point);
+
+    if (self.m_sprite_name.find("vbell", 0) != std::string::npos) {
+      SoundManager::current()->preload("sounds/savebell_low.wav");
+    }
+    else if (is_torch(self)) {
+      SoundManager::current()->preload("sounds/fire.ogg");
+    }
+    else {
+      SoundManager::current()->preload("sounds/savebell2.wav");
+    }
+  } else {
+    reset_point_reactivate(self, point);
+  }
+}
+
+void reset_point_draw(ArchetypeObject& self, DrawingContext& context)
+{
+  ResetPoint const& point = ecs::get<ResetPoint>(self.get_entity());
+  self.default_draw(context);
+
+  if (is_torch(self) && (point.activated || self.m_sprite->get_action() == "ringing")) {
+    point.light->draw(context.light(), self.m_col.m_bbox.get_middle() +
+                      (self.m_flip == NO_FLIP ? -TORCH_LIGHT_OFFSET : TORCH_LIGHT_OFFSET), 0);
+  }
+}
+
+HitResponse reset_point_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  ResetPoint& point = ecs::get<ResetPoint>(self.get_entity());
+
+  // If the bell is already activated, don't ring it again!
+  if (point.activated || self.m_sprite->get_action() == "ringing")
+    return ABORT_MOVE;
+
+  if (dynamic_cast<Player*>(&other)) {
+    point.activated = true;
+
+    // spawn some particles
+    for (int i = 0; i < 5; i++) {
+      Vector ppos = self.m_col.m_bbox.get_middle();
+      float angle = graphicsRandom.randf(-math::PI_2, math::PI_2);
+      float velocity = graphicsRandom.randf(450.0f, 900.0f);
+      float vx = sinf(angle)*velocity;
+      float vy = -cosf(angle)*velocity;
+      Vector pspeed = Vector(vx, vy);
+      Vector paccel = Vector(0.0f, 1000.0f);
+      Sector::get().add<SpriteParticle>("images/particles/reset.sprite", "default", ppos, ANCHOR_MIDDLE, pspeed, paccel, LAYER_OBJECTS-1);
+    }
+
+    if (self.m_sprite_name.find("vbell", 0) != std::string::npos) {
+      SoundManager::current()->play("sounds/savebell_low.wav", self.get_pos());
+    }
+    else if (is_torch(self)) {
+      SoundManager::current()->play("sounds/fire.ogg", self.get_pos());
+    }
+    else {
+      SoundManager::current()->play("sounds/savebell2.wav", self.get_pos());
+    }
+
+    self.m_sprite->set_action("ringing");
+    GameSession::current()->set_reset_point(Sector::get().get_name(), point.initial_position);
+  }
+
+  return ABORT_MOVE;
+}
+
 } // namespace
 
 namespace weak_block {
@@ -418,6 +645,29 @@ ObjectBehavior const& object_behavior_of<UnstableTile>()
     .update = &unstable_update,
     .draw = &unstable_draw,
     .collision = &unstable_collision,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<MagicBlock>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &magicblock_construct,
+    .update = &magicblock_update,
+    .draw = &magicblock_draw,
+    .collides = &magicblock_collides,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<ResetPoint>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &reset_point_construct,
+    .draw = &reset_point_draw,
+    .collision = &reset_point_collision,
   };
   return behavior;
 }

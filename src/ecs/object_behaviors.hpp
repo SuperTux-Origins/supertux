@@ -21,6 +21,8 @@
 
 template<> ObjectBehavior const& object_behavior_of<UnstableTile>();
 template<> ObjectBehavior const& object_behavior_of<WeakBlock>();
+template<> ObjectBehavior const& object_behavior_of<MagicBlock>();
+template<> ObjectBehavior const& object_behavior_of<ResetPoint>();
 
 namespace weak_block {
 

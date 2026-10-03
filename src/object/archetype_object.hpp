@@ -38,6 +38,7 @@ public:
   void draw(DrawingContext& context) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void collision_solid(CollisionHit const& hit) override;
+  bool collides(GameObject& other, CollisionHit const& hit) const override;
 
   /** MovingSprite::draw(), for behaviors that wrap it */
   void default_draw(DrawingContext& context) { MovingSprite::draw(context); }

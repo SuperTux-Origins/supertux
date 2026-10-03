@@ -18,8 +18,11 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
+#include "math/rectf.hpp"
 #include "math/vector.hpp"
+#include "video/color.hpp"
 #include "supertux/timer.hpp"
 #include "util/fade_helper.hpp"
 #include "util/reader_mapping.hpp"
@@ -86,6 +89,55 @@ inline void read_component(ReaderMapping const& mapping, WeakBlock& block)
 {
   mapping.read("linked", block.linked);
   mapping.read("unlinked-sprite", block.unlinked_sprite);
+}
+
+/** Solid only while lit with its color, translucent otherwise
+    (magicblock). Black blocks need any bright light. */
+struct MagicBlock
+{
+  Color color = Color(0, 0, 0);
+  float min_intensity = 0.8f;
+  float alpha_solid = 0.7f;
+  float alpha_nonsolid = 0.3f;
+  float min_solid_time = 1.0f;
+  /** seconds to wait for stable conditions until switching solidity */
+  float switch_delay_time = 0.0f;
+
+  // state
+  bool is_solid = false;
+  bool black = false;
+  float trigger_red = 0.f;
+  float trigger_green = 0.f;
+  float trigger_blue = 0.f;
+  float solid_time = 0.f;
+  float switch_delay = 0.f;
+  Rectf solid_box = {};
+  Color light = Color(1.0f, 1.0f, 1.0f);
+  Vector center = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, MagicBlock& block)
+{
+  std::vector<float> color;
+  if (mapping.read("color", color)) {
+    block.color = Color(color);
+  }
+}
+
+/** A checkpoint: touching it rings it and makes it the player's reset
+    point (firefly). Torch sprites get a light, vbell/torch sprites
+    their own sound. */
+struct ResetPoint
+{
+  // state
+  bool activated = false;
+  /** position as in the level file, where Tux respawns */
+  Vector initial_position = {};
+  std::shared_ptr<Sprite> light = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, ResetPoint& /*point*/)
+{
 }
 
 #endif
