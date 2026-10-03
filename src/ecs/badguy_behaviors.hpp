@@ -55,6 +55,7 @@ template<> BadGuyBehavior const& behavior_of<Ghoul>();
 template<> BadGuyBehavior const& behavior_of<PathFollower>();
 template<> BadGuyBehavior const& behavior_of<Dispenser>();
 template<> BadGuyBehavior const& behavior_of<WillOWisp>();
+template<> BadGuyBehavior const& behavior_of<Yeti>();
 template<> BadGuyBehavior const& behavior_of<Diver>();
 template<> BadGuyBehavior const& behavior_of<Haywire>();
 template<> BadGuyBehavior const& behavior_of<GoldBomb>();

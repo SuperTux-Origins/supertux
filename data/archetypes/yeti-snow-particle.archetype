@@ -1,0 +1,6 @@
+; Snow the defeated yeti scatters; spawned by the yeti, not placed in levels.
+(supertux-archetype
+  (name "yeti-snow-particle")
+  (base "badguy")
+  (properties
+    (sprite "images/objects/bullets/icebullet.sprite")))

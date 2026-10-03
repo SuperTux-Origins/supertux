@@ -28,7 +28,6 @@
 #include "badguy/scrystallo.hpp"
 #include "badguy/totem.hpp"
 #include "badguy/walking_candle.hpp"
-#include "badguy/yeti.hpp"
 #include "badguy/yeti_stalactite.hpp"
 #include "object/ambient_light.hpp"
 #include "object/ambient_sound.hpp"
@@ -148,7 +147,6 @@ GameObjectFactory::init_factories()
   add_factory<SCrystallo>("scrystallo");
   add_factory<Totem>("totem");
   add_factory<WalkingCandle>("walking_candle");
-  add_factory<Yeti>("yeti");
   add_factory<YetiStalactite>("yeti_stalactite");
   add_archetypes("badguy");
   m_adding_badguys = false;

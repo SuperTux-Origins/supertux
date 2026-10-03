@@ -85,7 +85,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] skydive — `data/archetypes/skydive.archetype`
 
 ## Bosses / unique multi-phase (candidate exceptions per plan §4.4 — confirm each is actually boss-scale before treating it as an exception)
-- [ ] yeti
+- [x] yeti — `data/archetypes/yeti.archetype` (+ `yeti-snow-particle`); stalactites stay a code-built shell (YetiStalactite)
 - [ ] ghosttree
 - [ ] totem — same class as the unused stationary `totem` above (no shipped level uses it)
 - [x] owl — the only owl is the carrier flyer above

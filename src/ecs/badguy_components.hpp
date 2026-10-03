@@ -18,7 +18,6 @@
 
 #include <memory>
 #include <optional>
-#include <vector>
 #include <string>
 #include <vector>
 
@@ -28,6 +27,8 @@
 #include "audio/sound_source.hpp"
 #include "supertux/timer.hpp"
 #include "util/reader_mapping.hpp"
+#include "video/color.hpp"
+#include "video/surface_ptr.hpp"
 
 class MovingObject;
 
@@ -718,6 +719,37 @@ inline void read_component(ReaderMapping const& mapping, Ghoul& ghoul)
 {
   mapping.read("flyspeed", ghoul.flyspeed);
   mapping.read("track-range", ghoul.track_range);
+}
+
+/** Boss of the yeti lair: runs between two daises, stomps on them to
+    shake down the YetiStalactites, takes a hit per stomp from Tux
+    (yeti). Levels set lives, hud-icon and fixed-pos. */
+struct Yeti
+{
+  int lives = 5;
+  std::string hud_icon = "images/creatures/yeti/hudlife.png";
+  bool fixed_pos = false;
+
+  enum class State { JUMP_DOWN, RUN, JUMP_UP, BE_ANGRY, SQUISHED, FALLING };
+
+  // state
+  State state = State::JUMP_DOWN;
+  Timer state_timer = {};
+  Timer safe_timer = {};
+  int stomp_count = 0;
+  int hit_points = 0;
+  SurfacePtr hud_head = {};
+  float left_stand_x = 0.0f;
+  float right_stand_x = 0.0f;
+  float left_jump_x = 0.0f;
+  float right_jump_x = 0.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Yeti& yeti)
+{
+  mapping.read("lives", yeti.lives);
+  mapping.read("hud-icon", yeti.hud_icon);
+  mapping.read("fixed-pos", yeti.fixed_pos);
 }
 
 /** Floats until the player comes near, then chases them and warps them

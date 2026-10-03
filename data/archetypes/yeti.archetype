@@ -1,0 +1,9 @@
+; Boss of the yeti lair. Levels may set lives, hud-icon and fixed-pos.
+(supertux-archetype
+  (name "yeti")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/yeti/yeti.sprite")
+    (flammable #f))
+  (components
+    (yeti)))

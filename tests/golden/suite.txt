@@ -164,3 +164,5 @@ data/levels/world1/living_inside_fridge.stlv idle 600 10464,392
 data/levels/bonus2/level1.stlv idle 600 3776,544
 # Targeted: a willowisp catching Tux
 data/levels/world2/tux_own_horror_show.stlv idle 600 4512,800
+# Targeted: Tux landing on the yeti (take_hit)
+data/levels/world1/yeti_boss.stlv idle 600 480,400

@@ -21,6 +21,11 @@
 #include "audio/sound_manager.hpp"
 #include "badguy/archetype_badguy.hpp"
 #include "audio/sound_source.hpp"
+#include "badguy/yeti_stalactite.hpp"
+#include "object/camera.hpp"
+#include "supertux/globals.hpp"
+#include "supertux/player_status.hpp"
+#include "video/surface.hpp"
 #include "object/lantern.hpp"
 #include "scripting/dispenser.hpp"
 #include "scripting/willowisp.hpp"
@@ -5040,6 +5045,344 @@ BadGuyBehavior const& behavior_of<WillOWisp>()
     .kill_fall = &willowisp_kill_fall,
     .stop_looping_sounds = &willowisp_stop_looping_sounds,
     .play_looping_sounds = &willowisp_play_looping_sounds,
+  };
+  return behavior;
+}
+
+namespace {
+
+// Yeti ---------------------------------------------------------------
+
+const float YETI_JUMP_DOWN_VX = 250; /**< horizontal speed while jumping off the dais */
+const float YETI_JUMP_DOWN_VY = -250; /**< vertical speed while jumping off the dais */
+
+const float YETI_RUN_VX = 350; /**< horizontal speed while running */
+
+const float YETI_JUMP_UP_VX = 350; /**< horizontal speed while jumping on the dais */
+const float YETI_JUMP_UP_VY = -700; /**< vertical speed while jumping on the dais */
+
+const float YETI_STOMP_VY = -300; /** vertical speed while stomping on the dais */
+
+const float YETI_RUN_DISTANCE = 1060; /** Distance between the x-coordinates of left and right end positions */
+const float YETI_JUMP_SPACE = 448; /** Distance between jump position and stand position */
+const float YETI_STOMP_WAIT = .5; /**< time we stay on the dais before jumping again */
+const float YETI_SAFE_TIME = .5; /**< the time we are safe when tux just hit us */
+
+const float YETI_SQUISH_TIME = 3;
+
+const float YETI_SNOW_EXPLOSIONS_FREQUENCY = 8; /**< number of snowball explosions per second */
+const int YETI_SNOW_EXPLOSIONS_COUNT = 5; /**< number of snowballs per explosion */
+const float YETI_SNOW_EXPLOSIONS_VX = 150; /**< Speed of snowballs */
+const float YETI_SNOW_EXPLOSIONS_VY = -200; /**< Speed of snowballs */
+
+float yeti_dir_sign(ArchetypeBadguy const& self)
+{
+  return self.m_dir == Direction::RIGHT ? 1.0f : -1.0f;
+}
+
+void yeti_jump_down(ArchetypeBadguy& self, Yeti& yeti)
+{
+  self.m_sprite->set_action("jump", self.m_dir);
+  self.m_physic.set_velocity_x(yeti_dir_sign(self) * YETI_JUMP_DOWN_VX);
+  self.m_physic.set_velocity_y(YETI_JUMP_DOWN_VY);
+  yeti.state = Yeti::State::JUMP_DOWN;
+}
+
+void yeti_run(ArchetypeBadguy& self, Yeti& yeti)
+{
+  self.m_sprite->set_action("walking", self.m_dir);
+  self.m_physic.set_velocity_x(yeti_dir_sign(self) * YETI_RUN_VX);
+  self.m_physic.set_velocity_y(0);
+  yeti.state = Yeti::State::RUN;
+}
+
+void yeti_jump_up(ArchetypeBadguy& self, Yeti& yeti)
+{
+  self.m_sprite->set_action("jump", self.m_dir);
+  self.m_physic.set_velocity_x(yeti_dir_sign(self) * YETI_JUMP_UP_VX);
+  self.m_physic.set_velocity_y(YETI_JUMP_UP_VY);
+  yeti.state = Yeti::State::JUMP_UP;
+}
+
+void yeti_be_angry(ArchetypeBadguy& self, Yeti& yeti)
+{
+  //turn around
+  self.m_dir = (self.m_dir == Direction::RIGHT) ? Direction::LEFT : Direction::RIGHT;
+
+  self.m_sprite->set_action("stand", self.m_dir);
+  self.m_physic.set_velocity_x(0);
+  yeti.stomp_count = 0;
+  yeti.state = Yeti::State::BE_ANGRY;
+  yeti.state_timer.start(YETI_STOMP_WAIT);
+}
+
+void yeti_recalculate_pos(ArchetypeBadguy& self, Yeti& yeti)
+{
+  if (self.m_dir == Direction::RIGHT) {
+    yeti.left_stand_x = self.m_col.m_bbox.get_left();
+    yeti.right_stand_x = yeti.left_stand_x + YETI_RUN_DISTANCE;
+  } else {
+    yeti.right_stand_x = self.m_col.m_bbox.get_left();
+    yeti.left_stand_x = yeti.right_stand_x - YETI_RUN_DISTANCE;
+  }
+
+  yeti.left_jump_x = yeti.left_stand_x + YETI_JUMP_SPACE;
+  yeti.right_jump_x = yeti.right_stand_x - YETI_JUMP_SPACE;
+}
+
+void yeti_add_snow_explosions(ArchetypeBadguy& self)
+{
+  for (int i = 0; i < YETI_SNOW_EXPLOSIONS_COUNT; i++) {
+    Vector pos = self.get_pos();
+    Vector velocity(YETI_SNOW_EXPLOSIONS_VX * graphicsRandom.randf(0.5f, 2.0f) * (graphicsRandom.rand(2) ? 1.0f : -1.0f),
+                    YETI_SNOW_EXPLOSIONS_VY * graphicsRandom.randf(0.5f, 2.0f));
+    pos.x += static_cast<float>(self.m_sprite->get_width()) / 2.0f;
+    pos.x += static_cast<float>(self.m_sprite->get_width()) * graphicsRandom.randf(0.3f, 0.5f) * ((velocity.x > 0) ? 1.0f : -1.0f);
+    pos.y += static_cast<float>(self.m_sprite->get_height()) * graphicsRandom.randf(-0.3f, 0.3f);
+    velocity.x += self.m_physic.get_velocity_x();
+
+    auto particle = ArchetypeBadguy::create("yeti-snow-particle", pos,
+                                            (velocity.x > 0) ? Direction::RIGHT : Direction::LEFT);
+    particle->m_physic.set_velocity_x(velocity.x);
+    particle->m_physic.set_velocity_y(velocity.y);
+    particle->m_physic.enable_gravity(true);
+    particle->set_state(ArchetypeBadguy::STATE_FALLING);
+    particle->m_layer = Sector::get().get_foremost_layer() + 1;
+    Sector::get().add_object(std::move(particle));
+  }
+}
+
+void yeti_drop_stalactite(ArchetypeBadguy& self, Yeti& yeti)
+{
+  // make a stalactite falling down and shake camera a bit
+  Sector::get().get_camera().shake(.1f, 0, 10);
+
+  auto player = self.get_nearest_player();
+  if (!player) return;
+
+  for (auto& stalactite : Sector::get().get_objects_by_type<YetiStalactite>())
+  {
+    if (stalactite.is_hanging()) {
+      if (yeti.hit_points >= 3) {
+        // drop stalactites within 3 of player, going out with each jump
+        float distancex = fabsf(stalactite.get_bbox().get_middle().x - player->get_bbox().get_middle().x);
+        if (distancex < static_cast<float>(yeti.stomp_count) * 32.0f) {
+          stalactite.start_shaking();
+        }
+      }
+      else { /* if (hitpoints < 3) */
+        // drop every 3rd pair of stalactites
+        if ((((static_cast<int>(stalactite.get_pos().x) + 16) / 64) % 3) == (yeti.stomp_count % 3)) {
+          stalactite.start_shaking();
+        }
+      }
+    }
+  }
+}
+
+void yeti_initialize(ArchetypeBadguy& self)
+{
+  self.m_dir = Direction::RIGHT;
+  yeti_jump_down(self, ecs::get<Yeti>(self.get_entity()));
+}
+
+void yeti_construct(ArchetypeBadguy& self)
+{
+  Yeti& yeti = ecs::get<Yeti>(self.get_entity());
+
+  yeti.hit_points = yeti.lives;
+  SoundManager::current()->preload("sounds/yeti_gna.wav");
+  SoundManager::current()->preload("sounds/yeti_roar.wav");
+
+  yeti.hud_head = Surface::from_file(yeti.hud_icon);
+
+  yeti_initialize(self);
+
+  if (yeti.fixed_pos) {
+    yeti.left_stand_x = 80;
+    yeti.right_stand_x = 1140;
+    yeti.left_jump_x = 528;
+    yeti.right_jump_x = 692;
+  } else {
+    yeti_recalculate_pos(self, yeti);
+  }
+}
+
+void yeti_draw(ArchetypeBadguy& self, DrawingContext& context)
+{
+  Yeti const& yeti = ecs::get<Yeti>(self.get_entity());
+
+  // we blink when we are safe
+  if (yeti.safe_timer.started() && size_t(g_game_time * 40) % 2)
+    return;
+
+  if (yeti.hud_head)
+  {
+    context.push_transform();
+    context.set_translation(Vector(0, 0));
+    context.transform().scale = 1.f;
+
+    for (int i = 0; i < yeti.hit_points; ++i)
+    {
+      context.color().draw_surface(yeti.hud_head, Vector(BORDER_X + (static_cast<float>(i * yeti.hud_head->get_width())), BORDER_Y + 1), LAYER_FOREGROUND1);
+    }
+
+    context.pop_transform();
+  }
+
+  self.BadGuy::draw(context);
+}
+
+void yeti_move(ArchetypeBadguy& self, float dt_sec)
+{
+  Yeti& yeti = ecs::get<Yeti>(self.get_entity());
+
+  switch (yeti.state) {
+    case Yeti::State::JUMP_DOWN:
+      self.m_physic.set_velocity_x(yeti_dir_sign(self) * YETI_JUMP_DOWN_VX);
+      break;
+    case Yeti::State::RUN:
+      self.m_physic.set_velocity_x(yeti_dir_sign(self) * YETI_RUN_VX);
+      if (((self.m_dir == Direction::RIGHT) && (self.get_pos().x >= yeti.right_jump_x)) ||
+          ((self.m_dir == Direction::LEFT) && (self.get_pos().x <= yeti.left_jump_x)))
+        yeti_jump_up(self, yeti);
+      break;
+    case Yeti::State::JUMP_UP:
+      self.m_physic.set_velocity_x(yeti_dir_sign(self) * YETI_JUMP_UP_VX);
+      if (((self.m_dir == Direction::RIGHT) && (self.get_pos().x >= yeti.right_stand_x)) ||
+          ((self.m_dir == Direction::LEFT) && (self.get_pos().x <= yeti.left_stand_x)))
+        yeti_be_angry(self, yeti);
+      break;
+    case Yeti::State::BE_ANGRY:
+      if (yeti.state_timer.check() && self.on_ground()) {
+        self.m_physic.set_velocity_y(YETI_STOMP_VY);
+        self.m_sprite->set_action("stomp", self.m_dir);
+        SoundManager::current()->play("sounds/yeti_gna.wav", self.get_pos());
+      }
+      break;
+    case Yeti::State::SQUISHED:
+      {
+        Direction newdir = (int(yeti.state_timer.get_timeleft() * YETI_SNOW_EXPLOSIONS_FREQUENCY) % 2) ? Direction::LEFT : Direction::RIGHT;
+        if (self.m_dir != newdir && self.m_dir == Direction::RIGHT) {
+          SoundManager::current()->play("sounds/stomp.wav", self.get_pos());
+          yeti_add_snow_explosions(self);
+          Sector::get().get_camera().shake(.05f, 0, 5);
+        }
+        self.m_dir = newdir;
+        self.m_sprite->set_action("jump", self.m_dir);
+      }
+      if (yeti.state_timer.check()) {
+        self.default_kill_fall();
+        yeti.state = Yeti::State::FALLING;
+        self.m_physic.set_velocity_y(YETI_JUMP_UP_VY / 2); // Move up a bit before falling
+        // Add some extra explosions
+        for (int i = 0; i < 10; i++) {
+          yeti_add_snow_explosions(self);
+        }
+        self.run_dead_script();
+      }
+      break;
+    case Yeti::State::FALLING:
+      break;
+  }
+
+  self.m_col.set_movement(self.m_physic.get_movement(dt_sec));
+}
+
+void yeti_take_hit(ArchetypeBadguy& self, Yeti& yeti)
+{
+  if (yeti.safe_timer.started())
+    return;
+
+  SoundManager::current()->play("sounds/yeti_roar.wav", self.get_pos());
+  yeti.hit_points--;
+
+  if (yeti.hit_points <= 0) {
+    // We're dead
+    self.m_physic.set_velocity_x(yeti_dir_sign(self) * YETI_RUN_VX / 5);
+    self.m_physic.set_velocity_y(0);
+
+    // Set the badguy layer to be above the foremost, so that
+    // this does not reveal secret tilemaps:
+    self.m_layer = Sector::get().get_foremost_layer() + 1;
+    yeti.state = Yeti::State::SQUISHED;
+    yeti.state_timer.start(YETI_SQUISH_TIME);
+    self.set_colgroup_active(COLGROUP_MOVING_ONLY_STATIC);
+    //sprite->set_action("dead"); // This sprite does not look very good
+  }
+  else {
+    yeti.safe_timer.start(YETI_SAFE_TIME);
+  }
+}
+
+bool yeti_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  if (auto player = dynamic_cast<Player*>(&object)) {
+    player->bounce(self);
+    yeti_take_hit(self, ecs::get<Yeti>(self.get_entity()));
+  }
+  return true;
+}
+
+void yeti_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Yeti& yeti = ecs::get<Yeti>(self.get_entity());
+
+  self.update_on_ground_flag(hit);
+  if (hit.top || hit.bottom) {
+    // hit floor or roof
+    self.m_physic.set_velocity_y(0);
+    switch (yeti.state) {
+      case Yeti::State::JUMP_DOWN:
+        yeti_run(self, yeti);
+        break;
+      case Yeti::State::BE_ANGRY:
+        // we just landed
+        if (!yeti.state_timer.started()) {
+          self.m_sprite->set_action((self.m_dir == Direction::RIGHT) ? "stand-right" : "stand-left");
+          yeti.stomp_count++;
+          yeti_drop_stalactite(self, yeti);
+
+          // go to other side after 3 jumps
+          if (yeti.stomp_count == 3) {
+            yeti_jump_down(self, yeti);
+          } else {
+            // jump again
+            yeti.state_timer.start(YETI_STOMP_WAIT);
+          }
+        }
+        break;
+      case Yeti::State::RUN:
+      case Yeti::State::JUMP_UP:
+      case Yeti::State::SQUISHED:
+      case Yeti::State::FALLING:
+        break;
+    }
+  } else if (hit.left || hit.right) {
+    // hit wall
+    if (yeti.state != Yeti::State::SQUISHED && yeti.state != Yeti::State::FALLING)
+      yeti_jump_up(self, yeti);
+  }
+}
+
+void yeti_kill_fall(ArchetypeBadguy& /*self*/)
+{
+  // shooting bullets or being invincible won't work :)
+}
+
+} // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Yeti>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &yeti_construct,
+    .initialize = &yeti_initialize,
+    .move = &yeti_move,
+    .collision_solid = &yeti_collision_solid,
+    .collision_squished = &yeti_collision_squished,
+    .kill_fall = &yeti_kill_fall,
+    .draw = &yeti_draw,
   };
   return behavior;
 }
