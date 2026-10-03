@@ -1179,7 +1179,7 @@ bool iceblock_collision_squished(ArchetypeBadguy& self, GameObject& object)
   IceBlock& iceblock = ecs::get<IceBlock>(self.get_entity());
 
   Player* player = dynamic_cast<Player*>(&object);
-  if (player && (player->m_does_buttjump || player->is_invincible())) {
+  if (player && (player->m_jump.does_buttjump || player->is_invincible())) {
     player->bounce(self);
     self.kill_fall();
     return true;
@@ -1760,7 +1760,7 @@ bool snail_collision_squished(ArchetypeBadguy& self, GameObject& object)
     return self.default_collision_squished(object);
 
   Player* player = dynamic_cast<Player*>(&object);
-  if (player && (player->is_invincible() || player->m_does_buttjump)) {
+  if (player && (player->is_invincible() || player->m_jump.does_buttjump)) {
     self.kill_fall();
     player->bounce(self);
     return true;
@@ -1882,7 +1882,7 @@ HitResponse snowman_collision_bullet(ArchetypeBadguy& self, Bullet& bullet, Coll
 bool snowman_collision_squished(ArchetypeBadguy& self, GameObject& object)
 {
   auto player = dynamic_cast<Player*>(&object);
-  if (player && (player->m_does_buttjump || player->is_invincible())) {
+  if (player && (player->m_jump.does_buttjump || player->is_invincible())) {
     player->bounce(self);
     self.kill_fall();
     return true;
@@ -1929,7 +1929,7 @@ bool mrtree_collision_squished(ArchetypeBadguy& self, GameObject& object)
     return self.default_collision_squished(object);
 
   auto player = dynamic_cast<Player*>(&object);
-  if (player && (player->m_does_buttjump || player->is_invincible())) {
+  if (player && (player->m_jump.does_buttjump || player->is_invincible())) {
     player->bounce(self);
     self.kill_fall();
     return true;

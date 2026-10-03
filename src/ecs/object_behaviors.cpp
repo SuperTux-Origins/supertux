@@ -1071,7 +1071,7 @@ HitResponse bonus_collision(ArchetypeObject& self, GameObject& other, CollisionH
 
   auto player = dynamic_cast<Player*> (&other);
   if (player) {
-    if (player->m_does_buttjump ||
+    if (player->m_jump.does_buttjump ||
         (player->is_swimboosting() && player->get_bbox().get_bottom() < bbox.get_top() + SHIFT_DELTA))
     {
       bonus_try_drop(self, player);
@@ -1158,7 +1158,7 @@ HitResponse heavy_brick_collision(ArchetypeObject& self, GameObject& other, Coll
   {
     if (player->is_stone() && player->get_velocity().y >= 280)
       brick::try_break(self, player);
-    else if (player->m_does_buttjump)
+    else if (player->m_jump.does_buttjump)
       heavy_brick_ricochet(self, &other);
   }
 
@@ -1197,7 +1197,7 @@ HitResponse brick_collision(ArchetypeObject& self, GameObject& other, CollisionH
 
   auto player = dynamic_cast<Player*> (&other);
   if (player) {
-    if (player->m_does_buttjump) brick::try_break(self, player);
+    if (player->m_jump.does_buttjump) brick::try_break(self, player);
     if (player->is_stone() && player->get_velocity().y >= 280) brick::try_break(self, player); // stoneform breaks through bricks
   }
 
@@ -1327,7 +1327,7 @@ HitResponse info_collision(ArchetypeObject& self, GameObject& other, CollisionHi
   auto player = dynamic_cast<Player*> (&other);
   if (player)
   {
-    if (player->m_does_buttjump)
+    if (player->m_jump.does_buttjump)
       info_hit(self, *player);
   }
   return block_collision(self, other, hit);
@@ -1889,8 +1889,8 @@ HitResponse trampoline_collision(ArchetypeObject& self, GameObject& other, Colli
     //Trampoline works for player
     if (player) {
       player->override_velocity();
-      if (player->m_does_buttjump)
-        player->m_does_buttjump = false;
+      if (player->m_jump.does_buttjump)
+        player->m_jump.does_buttjump = false;
       float vy = player->get_physic().get_velocity_y();
       //player is falling down on trampoline
       if (hit.top && vy >= 0) {

@@ -238,7 +238,7 @@ GameSession::on_escape_press(bool force_quick_respawn)
     }
 
     for (auto* player : players)
-      player->m_dying_timer.start(FLT_EPSILON);
+      player->m_life.dying_timer.start(FLT_EPSILON);
 
     return;   // don't let the player open the menu, when Tux is dying
   }
@@ -503,7 +503,7 @@ GameSession::update(float dt_sec, Controller const& controller)
     // retain invincibility if the player has it
     auto players = m_currentsector->get_players();
     for (auto const& player : players)
-      player->m_invincible_timer.start(m_invincibilitytimeleft[player->get_id()]);
+      player->m_life.invincible_timer.start(m_invincibilitytimeleft[player->get_id()]);
   }
 
   // Update the world state and all objects in the world
@@ -565,8 +565,8 @@ GameSession::update(float dt_sec, Controller const& controller)
 
   for (auto const* p : m_currentsector->get_players())
   {
-    invincible_timer_started |= (p->m_invincible_timer.started() && !p->is_winning());
-    max_invincible_timer_left = std::max(max_invincible_timer_left, p->m_invincible_timer.get_timeleft());
+    invincible_timer_started |= (p->m_life.invincible_timer.started() && !p->is_winning());
+    max_invincible_timer_left = std::max(max_invincible_timer_left, p->m_life.invincible_timer.get_timeleft());
   }
 
   if (invincible_timer_started) {
@@ -652,7 +652,7 @@ GameSession::respawn(std::string const& sector, std::string const& spawnpoint,
   if (retain_invincibility)
     for (auto const* player : Sector::get().get_players())
       if (player->is_invincible())
-        m_invincibilitytimeleft[player->get_id()] = player->m_invincible_timer.get_timeleft();
+        m_invincibilitytimeleft[player->get_id()] = player->m_life.invincible_timer.get_timeleft();
 }
 
 void

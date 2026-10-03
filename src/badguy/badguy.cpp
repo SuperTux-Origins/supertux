@@ -437,7 +437,7 @@ BadGuy::collision_squished(GameObject& object)
   if (m_frozen)
   {
     auto player = dynamic_cast<Player*>(&object);
-    if (player && (player->m_does_buttjump)) {
+    if (player && (player->m_jump.does_buttjump)) {
       player->bounce(*this);
       kill_fall();
       return true;

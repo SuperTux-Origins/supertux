@@ -72,7 +72,7 @@ TitleScreen::make_tux_jump()
   lookahead.set_right(lookahead.get_right() + 96);
   lookahead.set_bottom(lookahead.get_bottom() - 2);
   bool pathBlocked = !sector.is_free_of_statics(lookahead);
-  if ((pathBlocked && jumpWasReleased) || tux.m_fall_mode == Player::FallMode::JUMPING) {
+  if ((pathBlocked && jumpWasReleased) || tux.m_jump.fall_mode == Player::FallMode::JUMPING) {
     m_controller->press(Control::JUMP);
     jumpWasReleased = false;
   } else {
