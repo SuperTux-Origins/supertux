@@ -179,6 +179,30 @@ ArchetypeBadguy::finish_construction()
 }
 
 void
+ArchetypeBadguy::expose(HSQUIRRELVM vm, SQInteger table_idx)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->expose) {
+      behavior->expose(*this, vm, table_idx);
+      return;
+    }
+  }
+  BadGuy::expose(vm, table_idx);
+}
+
+void
+ArchetypeBadguy::unexpose(HSQUIRRELVM vm, SQInteger table_idx)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->unexpose) {
+      behavior->unexpose(*this, vm, table_idx);
+      return;
+    }
+  }
+  BadGuy::unexpose(vm, table_idx);
+}
+
+void
 ArchetypeBadguy::move_to(Vector const& pos)
 {
   for (auto const* behavior : m_behaviors) {

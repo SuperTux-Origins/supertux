@@ -44,11 +44,11 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] angrystone
 - [x] darttrap — `data/archetypes/darttrap.archetype`
 - [x] dart — `data/archetypes/dart.archetype`
-- [ ] dispenser  — spawns other archetypes at runtime; sequence AFTER Phase 3's archetype registry lands, not earlier
+- [x] dispenser — `data/archetypes/dispenser.archetype`; spawns badguys through the factory, links them back by entity (pre-existing: the default `dropper.sprite`/`invisible.sprite` don't exist, so dispensers without an explicit sprite fail to load)
 - [ ] totem
 - [x] stalactite — `data/archetypes/stalactite.archetype`
 - [~] yeti_stalactite — shell subclass of ArchetypeBadguy with the Stalactite behavior (yeti needs is_hanging/start_shaking)
-- [ ] crusher
+- [x] crusher — `data/archetypes/crusher.archetype` (+ icecrusher)
 
 ## Fire/ice elemental & status-effect-carrying
 - [x] flame — `data/archetypes/flame.archetype`

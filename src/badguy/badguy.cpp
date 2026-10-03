@@ -19,7 +19,7 @@
 #include "ecs/registry.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/dispenser.hpp"
+#include "ecs/badguy_behaviors.hpp"
 #include "math/random.hpp"
 #include "object/bullet.hpp"
 #include "object/camera.hpp"
@@ -59,7 +59,7 @@ BadGuy::BadGuy(Vector const& pos, Direction direction, std::string const& sprite
   m_dead_script(),
   m_lightsprite(SpriteManager::current()->create(light_sprite_name)),
   m_glowing(false),
-  m_parent_dispenser(),
+  m_parent_dispenser(entt::null),
   m_state(STATE_INIT),
   m_is_active_flag(),
   m_state_timer(),
@@ -93,7 +93,7 @@ BadGuy::BadGuy(ReaderMapping const& reader, std::string const& sprite_name_, int
   m_dead_script(),
   m_lightsprite(SpriteManager::current()->create(light_sprite_name)),
   m_glowing(false),
-  m_parent_dispenser(),
+  m_parent_dispenser(entt::null),
   m_state(STATE_INIT),
   m_is_active_flag(),
   m_state_timer(),
@@ -562,9 +562,9 @@ BadGuy::run_dead_script()
 
   m_countMe = false;
 
-  if (m_parent_dispenser != nullptr)
+  if (m_parent_dispenser != entt::null)
   {
-    m_parent_dispenser->notify_dead();
+    dispenser::notify_dead(m_parent_dispenser);
   }
 
   // start dead-script

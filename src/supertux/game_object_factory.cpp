@@ -18,7 +18,6 @@
 
 #include "badguy/angrystone.hpp"
 #include "badguy/archetype_badguy.hpp"
-#include "badguy/dispenser.hpp"
 #include "badguy/fish_chasing.hpp"
 #include "badguy/fish_harmless.hpp"
 #include "badguy/ghosttree.hpp"
@@ -138,7 +137,6 @@ GameObjectFactory::init_factories()
   // badguys
   m_adding_badguys = true;
   add_factory<AngryStone>("angrystone");
-  add_factory<Dispenser>("dispenser");
   add_factory<FishChasing>("fish-chasing");
   add_factory<FishHarmless>("fish-harmless");
   add_factory<FishSwimming>("fish-swimming");

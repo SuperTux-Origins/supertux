@@ -20,6 +20,9 @@
 
 #include "audio/sound_manager.hpp"
 #include "badguy/archetype_badguy.hpp"
+#include "scripting/dispenser.hpp"
+#include "squirrel/squirrel_util.hpp"
+#include "util/file_system.hpp"
 #include "ecs/object_behaviors.hpp"
 #include "object/path.hpp"
 #include "object/path_walker.hpp"
@@ -646,10 +649,10 @@ bool carrier_collision_squished(ArchetypeBadguy& self, GameObject& object)
                                         self.get_pos(), self.m_dir, {}, self.m_sprite_name);
     // Do not trigger dispenser because we need to wait for
     // the bomb instance to explode.
-    if (self.get_parent_dispenser() != nullptr)
+    if (self.get_parent_dispenser() != entt::null)
     {
       bomb->set_parent_dispenser(self.get_parent_dispenser());
-      self.set_parent_dispenser(nullptr);
+      self.set_parent_dispenser(entt::null);
     }
     Sector::get().add_object(std::move(bomb));
     self.remove_me();
@@ -4394,6 +4397,357 @@ BadGuyBehavior const& behavior_of<Ghoul>()
     .deactivate = &ghoul_deactivate,
     .move = &ghoul_move,
     .collision_squished = &ghoul_collision_squished,
+  };
+  return behavior;
+}
+
+namespace {
+
+// Dispenser ----------------------------------------------------------
+
+const std::vector<std::string> DISPENSER_SPRITES = { "cannon.sprite", "dropper.sprite", "invisible.sprite" };
+
+std::string cannon_direction_to_string(Direction direction)
+{
+  switch (direction)
+  {
+    case Direction::LEFT:
+      return "left";
+    case Direction::RIGHT:
+      return "right";
+    default:
+      if (direction != Direction::AUTO)
+        log_warning("Direction \"{}\" not valid for cannon. Switching to \"auto\".", dir_to_string(direction));
+      return "center";
+  }
+}
+
+void dispenser_set_correct_action(ArchetypeBadguy& self, Dispenser const& dispenser)
+{
+  if (std::find(DISPENSER_SPRITES.begin(), DISPENSER_SPRITES.end(), FileSystem::basename(self.m_sprite_name)) != DISPENSER_SPRITES.end())
+    self.change_sprite("images/creatures/dispenser/" + DISPENSER_SPRITES[static_cast<int>(dispenser.type)]);
+
+  switch (dispenser.type)
+  {
+    case Dispenser::Type::CANNON:
+      self.m_sprite->set_action(cannon_direction_to_string(self.m_dir));
+      break;
+    case Dispenser::Type::POINT:
+      self.set_colgroup_active(COLGROUP_DISABLED);
+      break;
+    default:
+      break;
+  }
+}
+
+void dispenser_launch_badguy(ArchetypeBadguy& self, Dispenser& dispenser)
+{
+  if (dispenser.badguys.empty()) return;
+  if (self.m_frozen) return;
+  if (dispenser.limit_dispensed_badguys &&
+      dispenser.current_badguys >= dispenser.max_concurrent_badguys)
+    return;
+
+  //FIXME: Does is_offscreen() work right here?
+  if (!self.is_offscreen())
+  {
+    Direction launch_dir = self.m_dir;
+    if (!dispenser.autotarget && self.m_start_dir == Direction::AUTO)
+    {
+      Player* player = self.get_nearest_player();
+      if (player)
+        launch_dir = (player->get_pos().x > self.get_pos().x) ? Direction::RIGHT : Direction::LEFT;
+    }
+
+    if (dispenser.badguys.size() > 1)
+    {
+      if (dispenser.random)
+      {
+        dispenser.next_badguy = static_cast<unsigned int>(gameRandom.rand(static_cast<int>(dispenser.badguys.size())));
+      }
+      else
+      {
+        dispenser.next_badguy++;
+
+        if (dispenser.next_badguy >= dispenser.badguys.size())
+          dispenser.next_badguy = 0;
+      }
+    }
+
+    std::string badguy = dispenser.badguys[dispenser.next_badguy];
+
+    if (badguy == "random")
+    {
+      log_warning("random is outdated; use a list of badguys to select from.");
+      return;
+    }
+    if (badguy == "goldbomb")
+    {
+      log_warning("goldbomb is not allowed to be dispensed");
+      return;
+    }
+
+    try {
+      //Need to allocate the badguy first to figure out its bounding box.
+      auto game_object = GameObjectFactory::instance().create(badguy, self.get_pos(), launch_dir);
+      if (game_object == nullptr)
+        throw std::runtime_error("Creating " + badguy + " object failed.");
+
+      auto& bad_guy = dynamic_cast<BadGuy&>(*game_object);
+
+      Rectf object_bbox = bad_guy.get_bbox();
+      Rectf const& bbox = self.m_col.m_bbox;
+
+      Vector spawnpoint(0.0f, 0.0f);
+      switch (dispenser.type)
+      {
+        case Dispenser::Type::DROPPER:
+          if (self.m_flip == NO_FLIP)
+          {
+            spawnpoint = get_anchor_pos(bbox, ANCHOR_BOTTOM);
+            spawnpoint.x -= 0.5f * object_bbox.get_width();
+          }
+          else
+          {
+            spawnpoint = get_anchor_pos(bbox, ANCHOR_TOP);
+            spawnpoint.y -= bbox.get_height();
+            spawnpoint.x -= 0.5f * object_bbox.get_width();
+          }
+          break;
+
+        case Dispenser::Type::CANNON:
+          spawnpoint = self.get_pos(); /* top-left corner of the cannon */
+          if (launch_dir == Direction::LEFT)
+            spawnpoint.x -= object_bbox.get_width() + 1;
+          else
+            spawnpoint.x += bbox.get_width() + 1;
+          if (self.m_flip != NO_FLIP)
+            spawnpoint.y += (bbox.get_height() - 20);
+          break;
+
+        case Dispenser::Type::POINT:
+          spawnpoint = bbox.p1();
+          break;
+      }
+
+      /* Now we set the real spawn position */
+      bad_guy.set_pos(spawnpoint);
+
+      /* We don't want to count dispensed badguys in level stats */
+      bad_guy.m_countMe = false;
+
+      /* Set reference to dispenser in badguy itself */
+      if (dispenser.limit_dispensed_badguys)
+      {
+        bad_guy.set_parent_dispenser(self.get_entity());
+        dispenser.current_badguys++;
+      }
+
+      Sector::get().add_object(std::move(game_object));
+    } catch(std::exception const& e) {
+      log_warning("Error dispensing badguy: {}", e.what());
+      return;
+    }
+  }
+}
+
+void dispenser_construct(ArchetypeBadguy& self)
+{
+  Dispenser& dispenser = ecs::get<Dispenser>(self.get_entity());
+
+  self.set_colgroup_active(COLGROUP_MOVING_STATIC);
+  SoundManager::current()->preload("sounds/squish.wav");
+
+  if (dispenser.gravity) self.m_physic.enable_gravity(true);
+
+  if (dispenser.type_name == "dropper") {
+    dispenser.type = Dispenser::Type::DROPPER;
+  } else if (dispenser.type_name == "rocketlauncher") { // Retro-compatibility with "rocketlauncher"
+    log_warning("Rocket launcher is no longer available. Replacing with cannon.");
+    dispenser.type = Dispenser::Type::CANNON;
+  } else if (dispenser.type_name == "cannon") {
+    dispenser.type = Dispenser::Type::CANNON;
+  } else if (dispenser.type_name == "point") {
+    dispenser.type = Dispenser::Type::POINT;
+  } else {
+    if (dispenser.type_name.empty())
+    {
+      log_warning("No dispenser type set, setting to cannon.");
+    }
+    else
+    {
+      log_warning("Unknown type of dispenser:{}, setting to cannon.", dispenser.type_name);
+    }
+    dispenser.type = Dispenser::Type::CANNON;
+  }
+
+  self.m_dir = self.m_start_dir; // Reset direction to default.
+
+  dispenser_set_correct_action(self, dispenser);
+
+  self.m_col.m_bbox.set_size(self.m_sprite->get_current_hitbox_width(), self.m_sprite->get_current_hitbox_height());
+  self.m_countMe = false;
+}
+
+void dispenser_draw(ArchetypeBadguy& self, DrawingContext& context)
+{
+  if (ecs::get<Dispenser>(self.get_entity()).type != Dispenser::Type::POINT)
+    self.BadGuy::draw(context);
+}
+
+void dispenser_initialize(ArchetypeBadguy& self)
+{
+  self.m_dir = self.m_start_dir; // Reset direction to default.
+}
+
+HitResponse dispenser_collision(ArchetypeBadguy& self, GameObject& other, CollisionHit const& hit)
+{
+  if (auto bullet = dynamic_cast<Bullet*>(&other))
+    return self.default_collision_bullet(*bullet, hit);
+
+  return FORCE_MOVE;
+}
+
+void dispenser_move(ArchetypeBadguy& self, float dt_sec)
+{
+  Dispenser& dispenser = ecs::get<Dispenser>(self.get_entity());
+
+  if (dispenser.gravity)
+  {
+    self.default_move(dt_sec);
+  }
+
+  if (dispenser.dispense_timer.check())
+  {
+    // auto always shoots in Tux's direction
+    if (dispenser.autotarget)
+    {
+      auto player = self.get_nearest_player();
+      if (player)
+      {
+        Direction target_dir = (player->get_pos().x > self.get_pos().x) ? Direction::RIGHT : Direction::LEFT;
+
+        if (self.m_dir != target_dir)
+        {
+          self.m_dir = target_dir;
+          return;
+        }
+      }
+    }
+
+    dispenser_launch_badguy(self, dispenser);
+  }
+}
+
+void dispenser_freeze(ArchetypeBadguy& self)
+{
+  Dispenser& dispenser = ecs::get<Dispenser>(self.get_entity());
+
+  if (dispenser.type == Dispenser::Type::POINT)
+    return;
+
+  self.set_group(COLGROUP_MOVING_STATIC);
+  SoundManager::current()->play("sounds/sizzle.ogg", self.get_pos());
+  self.m_frozen = true;
+
+  const std::string cannon_iced = "iced-" + cannon_direction_to_string(self.m_dir);
+  if (dispenser.type == Dispenser::Type::CANNON && self.m_sprite->has_action(cannon_iced))
+  {
+    // When the dispenser is a cannon, it uses the respective "iced" action, based on the current direction.
+    self.m_sprite->set_action(cannon_iced, 1);
+  }
+  else
+  {
+    if (dispenser.type == Dispenser::Type::DROPPER && self.m_sprite->has_action("dropper-iced"))
+    {
+      // When the dispenser is a dropper, it uses the "dropper-iced".
+      self.m_sprite->set_action("dropper-iced", 1);
+    }
+    else
+    {
+      // When the dispenser is something else (unprobable), or has no matching iced sprite, it shades to blue.
+      self.m_sprite->set_color(Color(0.6f, 0.72f, 0.88f));
+      self.m_sprite->stop_animation();
+    }
+  }
+  dispenser.dispense_timer.stop();
+}
+
+void dispenser_unfreeze(ArchetypeBadguy& self, bool melt)
+{
+  Dispenser& dispenser = ecs::get<Dispenser>(self.get_entity());
+  self.default_unfreeze(melt);
+  self.set_colgroup_active(dispenser.type == Dispenser::Type::POINT ? COLGROUP_DISABLED :
+                           COLGROUP_MOVING_STATIC);
+  dispenser_set_correct_action(self, dispenser);
+  dispenser::activate(self);
+}
+
+bool dispenser_is_portable(ArchetypeBadguy const& /*self*/)
+{
+  return false;
+}
+
+void dispenser_expose(ArchetypeBadguy& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  expose_object(vm, table_idx, std::make_unique<scripting::Dispenser>(self.get_uid()), self.get_name());
+}
+
+void dispenser_unexpose(ArchetypeBadguy& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  unexpose_object(vm, table_idx, self.get_name());
+}
+
+} // namespace
+
+namespace dispenser {
+
+void notify_dead(entt::entity entity)
+{
+  auto* object = GameObjectManager::get_object_by_entity(entity);
+  if (!object)
+    return;
+
+  auto* dispenser = ecs::try_get<Dispenser>(entity);
+  if (dispenser && dispenser->limit_dispensed_badguys) {
+    dispenser->current_badguys--;
+  }
+}
+
+void activate(ArchetypeBadguy& self)
+{
+  Dispenser& dispenser = ecs::get<Dispenser>(self.get_entity());
+  dispenser.dispense_timer.start(dispenser.cycle, true);
+  dispenser_launch_badguy(self, dispenser);
+}
+
+void deactivate(ArchetypeBadguy& self)
+{
+  ecs::get<Dispenser>(self.get_entity()).dispense_timer.stop();
+}
+
+} // namespace dispenser
+
+template<>
+BadGuyBehavior const& behavior_of<Dispenser>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &dispenser_construct,
+    .expose = &dispenser_expose,
+    .unexpose = &dispenser_unexpose,
+    .initialize = &dispenser_initialize,
+    .activate = &dispenser::activate,
+    .deactivate = &dispenser::deactivate,
+    .move = &dispenser_move,
+    .collision = &dispenser_collision,
+    .freeze = &dispenser_freeze,
+    .unfreeze = &dispenser_unfreeze,
+    .is_portable = &dispenser_is_portable,
+    .draw = &dispenser_draw,
   };
   return behavior;
 }

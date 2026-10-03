@@ -53,6 +53,7 @@ template<> BadGuyBehavior const& behavior_of<Skydive>();
 template<> BadGuyBehavior const& behavior_of<Owl>();
 template<> BadGuyBehavior const& behavior_of<Ghoul>();
 template<> BadGuyBehavior const& behavior_of<PathFollower>();
+template<> BadGuyBehavior const& behavior_of<Dispenser>();
 template<> BadGuyBehavior const& behavior_of<Diver>();
 template<> BadGuyBehavior const& behavior_of<Haywire>();
 template<> BadGuyBehavior const& behavior_of<GoldBomb>();
@@ -63,6 +64,17 @@ namespace stalactite {
 constexpr float SHAKE_TIME = .8f;
 
 } // namespace stalactite
+
+namespace dispenser {
+
+/** A badguy spawned by the dispenser with this entity died */
+void notify_dead(entt::entity dispenser);
+
+/** Start or stop dispensing, also from scripts */
+void activate(ArchetypeBadguy& self);
+void deactivate(ArchetypeBadguy& self);
+
+} // namespace dispenser
 
 namespace walker {
 

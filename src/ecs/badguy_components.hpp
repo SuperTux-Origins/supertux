@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <optional>
+#include <vector>
 #include <string>
 #include <vector>
 
@@ -717,6 +718,41 @@ inline void read_component(ReaderMapping const& mapping, Ghoul& ghoul)
 {
   mapping.read("flyspeed", ghoul.flyspeed);
   mapping.read("track-range", ghoul.track_range);
+}
+
+/** Periodically spawns badguys by name, as a cannon, a dropper or an
+    invisible point (dispenser). Levels set badguy, type, cycle, random,
+    limit-dispensed-badguys and max-concurrent-badguys. Scriptable as a
+    Dispenser. */
+struct Dispenser
+{
+  enum class Type { CANNON, DROPPER, POINT };
+
+  std::vector<std::string> badguys;
+  std::string type_name;
+  float cycle = 5.0f;
+  bool random = false;
+  bool gravity = false;
+  bool limit_dispensed_badguys = false;
+  int max_concurrent_badguys = 0;
+
+  // state
+  Type type = Type::CANNON;
+  unsigned int next_badguy = 0;
+  Timer dispense_timer = {};
+  bool autotarget = false;
+  int current_badguys = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, Dispenser& dispenser)
+{
+  mapping.read("badguy", dispenser.badguys);
+  mapping.read("type", dispenser.type_name);
+  mapping.read("cycle", dispenser.cycle);
+  mapping.read("random", dispenser.random);
+  mapping.read("gravity", dispenser.gravity);
+  mapping.read("limit-dispensed-badguys", dispenser.limit_dispensed_badguys);
+  mapping.read("max-concurrent-badguys", dispenser.max_concurrent_badguys);
 }
 
 /** How the badguy reacts to being stomped. Without this component the

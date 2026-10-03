@@ -18,6 +18,8 @@
 
 #include <stdint.h>
 
+#include <squirrel.h>
+
 #include "collision/collision_hit.hpp"
 #include "math/vector.hpp"
 #include "util/reader_mapping.hpp"
@@ -50,6 +52,9 @@ struct BadGuyBehavior
   void (*finish_construction)(ArchetypeBadguy& self) = nullptr;
   /** first, default: set_pos(); e.g. move the path along */
   void (*move_to)(ArchetypeBadguy& self, Vector const& pos) = nullptr;
+  /** first, default: expose as scripting::BadGuy */
+  void (*expose)(ArchetypeBadguy& self, HSQUIRRELVM vm, SQInteger table_idx) = nullptr;
+  void (*unexpose)(ArchetypeBadguy& self, HSQUIRRELVM vm, SQInteger table_idx) = nullptr;
   /** first */
   void (*initialize)(ArchetypeBadguy& self) = nullptr;
   /** all */

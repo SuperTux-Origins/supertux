@@ -27,6 +27,9 @@ adapted from Pingus and Windstille.
       throw.
 - [ ] Demo recorder: `restart_level()` calls `start_recording()`, which
       reseeds and truncates the `--record-demo` file on every death.
+- [ ] Dispenser default sprites `images/creatures/dispenser/{dropper,invisible}.sprite`
+  don't exist: dispensers without an explicit `(sprite ...)` fail to load
+  (e.g. world2/owls_skydive_commando, world2/going_underground).
 - [ ] Missing snowball melting textures (`images/creatures/snowball/*melting*`)
       logged on every level load.
 

@@ -18,7 +18,7 @@
 
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
-#include "badguy/dispenser.hpp"
+#include "ecs/badguy_behaviors.hpp"
 #include "object/lantern.hpp"
 #include "object/player.hpp"
 #include "supertux/game_session.hpp"
@@ -189,9 +189,9 @@ WillOWisp::vanish()
   m_sprite->set_action("vanishing", 1);
   set_colgroup_active(COLGROUP_DISABLED);
 
-  if (m_parent_dispenser != nullptr)
+  if (m_parent_dispenser != entt::null)
   {
-    m_parent_dispenser->notify_dead();
+    dispenser::notify_dead(m_parent_dispenser);
   }
 }
 

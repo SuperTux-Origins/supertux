@@ -14,20 +14,23 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "badguy/dispenser.hpp"
+#include "scripting/dispenser.hpp"
+
+#include "badguy/archetype_badguy.hpp"
+#include "ecs/badguy_behaviors.hpp"
 
 namespace scripting {
 
 void Dispenser::activate()
 {
-  SCRIPT_GUARD_VOID_T(Dispenser);
-  object.activate();
+  SCRIPT_GUARD_VOID_T(ArchetypeBadguy);
+  dispenser::activate(object);
 }
 
 void Dispenser::deactivate()
 {
-  SCRIPT_GUARD_VOID_T(Dispenser);
-  object.deactivate();
+  SCRIPT_GUARD_VOID_T(ArchetypeBadguy);
+  dispenser::deactivate(object);
 }
 
 }

@@ -51,6 +51,8 @@ public:
   bool is_spawned() const { return m_spawned; }
 
   void finish_construction() override;
+  void expose(HSQUIRRELVM vm, SQInteger table_idx) override;
+  void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override;
   void move_to(Vector const& pos) override;
 
   bool is_freezable() const override { return m_freezable; }
@@ -109,6 +111,9 @@ public:
   using BadGuy::kill_squished;
   using BadGuy::run_dead_script;
   using BadGuy::m_dead_script;
+  using BadGuy::m_countMe;
+  using BadGuy::is_offscreen;
+  using MovingSprite::change_sprite;
   using MovingSprite::m_sprite;
   using MovingSprite::m_sprite_name;
   using MovingSprite::m_layer;
