@@ -16,6 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "object/player.hpp"
+#include "object/player_constants.hpp"
+#include "ecs/player_systems.hpp"
 
 #include "ecs/registry.hpp"
 
@@ -40,103 +42,9 @@
 #include "video/surface.hpp"
 #include <sstream>
 
-#define SWIMMING
-
 const float TUX_INVINCIBLE_TIME_WARNING = 2.0f;
 
-namespace {
-
-/* Times: */
-const float TUX_SAFE_TIME = 1.8f;
-const float TUX_INVINCIBLE_TIME = 14.0f;
-const float TUX_BACKFLIP_TIME = 2.1f; // minimum air time that backflip results in a loss of control
-
-const int IDLE_TIME[] = { 5000, 0, 2500, 0, 2500 };
-const int TIME_UNTIL_IDLE = 5000;
-const unsigned int IDLE_STAGE_COUNT = 5;
-
-/** idle stages */
-const std::string IDLE_STAGES[] =
-{ "stand",
-  "idle",
-  "stand",
-  "idle",
-  "stand" };
-
-/** acceleration in horizontal direction when walking
- * (all accelerations are in  pixel/s^2) */
-const float WALK_ACCELERATION_X = 300;
-/** acceleration in horizontal direction when running */
-const float RUN_ACCELERATION_X = 400;
-/** acceleration when skidding */
-const float SKID_XM = 200;
-/** time of skidding in seconds */
-const float SKID_TIME = .3f;
-/** maximum walk velocity (pixel/s) */
-const float MAX_WALK_XM = 230;
-/** maximum run velocity (pixel/s) */
-const float MAX_RUN_XM = 320;
-/** bonus run velocity addition (pixel/s) */
-const float BONUS_RUN_XM = 80;
-/** maximum horizontal climb velocity */
-const float MAX_CLIMB_XM = 96;
-/** maximum vertical climb velocity */
-const float MAX_CLIMB_YM = 128;
-/** maximum vertical glide velocity */
-const float MAX_GLIDE_YM = 128;
-/** sliding down walls velocity */
-const float MAX_WALLCLING_YM = 64;
-/** instant velocity when tux starts to walk */
-const float WALK_SPEED = 100;
-/** rate at which m_move.boost decreases */
-const float BOOST_DECREASE_RATE = 500;
-/** rate at which the speed decreases if going above maximum */
-const float OVERSPEED_DECELERATION = 100;
-
-/** multiplied by WALK_ACCELERATION to give friction */
-const float NORMAL_FRICTION_MULTIPLIER = 1.5f;
-/** multiplied by WALK_ACCELERATION to give friction */
-const float ICE_FRICTION_MULTIPLIER = 0.1f;
-const float ICE_ACCELERATION_MULTIPLIER = 0.25f;
-
-/** time of the kick (kicking mriceblock) animation */
-const float KICK_TIME = .3f;
-
-/** if Tux cannot unduck for this long, he will get hurt */
-const float UNDUCK_HURT_TIME = 0.25f;
-/** gravity is higher after the jump key is released before
-    the apex of the jump is reached */
-const float JUMP_EARLY_APEX_FACTOR = 3.0;
-
-const float JUMP_GRACE_TIME = 0.25f; /**< time before hitting the ground that the jump button may be pressed (and still trigger a jump) */
-const float COYOTE_TIME = 0.1f; /**< time between the moment leaving a platform without jumping and being able to jump anyways despite being in the air */
-
-/* Tux's collision rectangle */
-const float TUX_WIDTH = 31.8f;
-const float RUNNING_TUX_WIDTH = 34;
-const float SMALL_TUX_HEIGHT = 30.8f;
-const float BIG_TUX_HEIGHT = 62.8f;
-const float DUCKED_TUX_HEIGHT = 31.8f;
-
-/* Stone Tux variables */
-const float MAX_STONE_SPEED = 500.f;
-const float STONE_KEY_ACCELERATION = 200.f;
-const float STONE_DOWN_ACCELERATION = 300.f;
-const float STONE_UP_ACCELERATION = 400.f;
-
-/* Swim variables */
-const float SWIM_SPEED = 300.f;
-const float SWIM_BOOST_SPEED = 600.f;
-const float SWIM_TO_BOOST_ACCEL = 15.f;
-const float TURN_MAGNITUDE = 0.15f;
-const float TURN_MAGNITUDE_BOOST = 0.2f;
-
-/* Buttjump variables */
-
-const float BUTTJUMP_WAIT_TIME = 0.2f; // the length of time that the buttjump action is being played
-const float BUTTJUMP_SPEED = 800.f;
-
-} // namespace
+using namespace player_constants;
 
 Color
 Player::get_player_color(int id)
@@ -306,28 +214,7 @@ Player::trigger_sequence(Sequence seq, SequenceData const* data)
 void
 Player::update(float dt_sec)
 {
-  if (is_dead() || Sector::get().get_object_count<Player>() == 1)
-  {
-    m_look.tag_timer.stop();
-    m_tag_fade = nullptr;
-    m_look.tag_alpha = 0.f;
-    m_look.has_moved = true;
-  }
-
-  if (m_look.tag_timer.check())
-  {
-    m_look.tag_timer.stop();
-    m_tag_fade = std::make_unique<FadeHelper>(1.f, 0.f, 1.f);
-  }
-
-  if (m_tag_fade)
-  {
-    m_look.tag_alpha = m_tag_fade->update(dt_sec);
-    if (m_tag_fade->completed())
-    {
-      m_tag_fade = nullptr;
-    }
-  }
+  PlayerSystems::update_tag(*this, dt_sec);
 
   // Skip if in multiplayer respawn
   if (is_dead() && m_target && Sector::get().get_object_count<Player>([this](Player const& p) { return !p.is_dead() && !p.is_dying() && !p.is_winning() && &p != this; }))
@@ -373,85 +260,7 @@ Player::update(float dt_sec)
     m_move.velocity_override = false;
   }
 
-  //handling of swimming
-
-#ifdef SWIMMING
-  if (!m_life.ghost_mode)
-  {
-    if (m_swim.no_water)
-    {
-      if (m_swim.swimming)
-      {
-        m_swim.water_jump = true;
-        if (m_physic.get_velocity_y() > -350.f && m_controller->hold(Control::UP))
-          m_physic.set_velocity_y(-350.f);
-      }
-      m_swim.swimming = false;
-    }
-
-    if ((on_ground() || m_climbing || m_jump.does_buttjump) && m_swim.water_jump)
-    {
-      if (is_big() && !m_move.stone && !adjust_height(BIG_TUX_HEIGHT))
-      {
-        //Force Tux's box up a little in order to not phase into floor
-        adjust_height(BIG_TUX_HEIGHT, 10.f);
-        do_duck();
-      }
-      else if (!is_big() || m_move.stone)
-      {
-        adjust_height(SMALL_TUX_HEIGHT);
-      }
-      m_dir = (m_physic.get_velocity_x() >= 0.f) ? Direction::RIGHT : Direction::LEFT;
-      m_swim.water_jump = false;
-      m_swim.boosting = false;
-      m_powersprite->set_angle(0.f);
-      m_lightsprite->set_angle(0.f);
-    }
-    m_swim.no_water = true;
-
-    if ((m_swim.swimming || m_swim.water_jump) && is_big())
-    {
-      m_col.set_size(TUX_WIDTH, TUX_WIDTH);
-      adjust_height(TUX_WIDTH);
-    }
-
-    Rectf swim_here_box = get_bbox();
-    swim_here_box.set_bottom(m_col.m_bbox.get_bottom() - 16.f);
-    bool can_swim_here = !Sector::get().is_free_of_tiles(swim_here_box, true, Tile::WATER);
-
-    if (m_swim.swimming)
-    {
-      if (can_swim_here)
-      {
-        m_swim.no_water = false;
-      }
-      else
-      {
-        m_swim.swimming = false;
-        m_swim.water_jump = true;
-        if (m_physic.get_velocity_y() > -350.f && m_controller->hold(Control::UP))
-          m_physic.set_velocity_y(-350.f);
-      }
-    }
-    else
-    {
-      if (can_swim_here && !m_climbing)
-      {
-        m_swim.no_water = false;
-        m_swim.water_jump = false;
-        m_swim.swimming = true;
-        m_swim.angle = math::angle(Vector(m_physic.get_velocity_x(), m_physic.get_velocity_y()));
-        if (is_big())
-          adjust_height(TUX_WIDTH);
-        m_jump.wants_buttjump = m_jump.does_buttjump = m_jump.backflipping = false;
-        m_dir = (m_physic.get_velocity_x() > 0) ? Direction::LEFT : Direction::RIGHT;
-        SoundManager::current()->play("sounds/splash.wav", get_pos());
-      }
-    }
-  }
-#endif
-
-  //end of swimming handling
+  PlayerSystems::update_swimming(*this);
 
   if (m_life.dying && m_life.dying_timer.check()) {
 
@@ -478,114 +287,15 @@ Player::update(float dt_sec)
   apply_friction();
   */
 
-  // extend/shrink tux collision rectangle so that we fall through/walk over 1
-  // tile holes
+  PlayerSystems::update_wall_cling(*this);
 
-  //wallclinging and walljumping
+  PlayerSystems::update_rolling(*this, dt_sec);
 
-  Rectf wallclingleft = get_bbox();
-  wallclingleft.set_left(wallclingleft.get_left() - 8.f);
-  m_wall.on_left_wall = !Sector::get().is_free_of_statics(wallclingleft);
+  PlayerSystems::update_ground_movement(*this);
 
-  Rectf wallclingright = get_bbox();
-  wallclingright.set_right(wallclingright.get_right() + 8.f);
-  m_wall.on_right_wall = !Sector::get().is_free_of_statics(wallclingright);
+  PlayerSystems::update_backflip(*this, dt_sec);
 
-  m_wall.can_walljump = ((m_wall.on_right_wall || m_wall.on_left_wall) && !on_ground() && !m_swim.swimming && m_wall.in_walljump_tile && !m_move.stone);
-  if (m_wall.can_walljump && (m_controller->hold(Control::LEFT) || m_controller->hold(Control::RIGHT)) && m_physic.get_velocity_y() >= 0.f && !m_controller->pressed(Control::JUMP))
-  {
-    m_physic.set_velocity_y(MAX_WALLCLING_YM);
-    m_physic.set_acceleration_y(0);
-    if (m_swim.water_jump)
-    {
-      adjust_height(is_big() ? BIG_TUX_HEIGHT : SMALL_TUX_HEIGHT);
-      m_swim.water_jump = false;
-      m_swim.boosting = false;
-    }
-    m_powersprite->set_angle(0.f);
-    m_lightsprite->set_angle(0.f);
-  }
-
-  m_wall.in_walljump_tile = false;
-
-  //End of wallclinging
-
-  // Roll the sprite if Tux is rolling
-  if (m_move.stone)
-  {
-    float f = 1.f;
-
-    if (!std::isnan(m_move.floor_normal.x))
-      f = std::cos(m_move.floor_normal.x);
-
-    m_sprite->set_angle(m_sprite->get_angle() + m_physic.get_movement(dt_sec).x * 3.141592653898f / 2.f / f);
-  }
-
-  // extend/shrink tux collision rectangle so that we fall through/walk over 1
-  // tile holes
-  if (fabsf(m_physic.get_velocity_x()) > MAX_WALK_XM) {
-    m_col.set_width(RUNNING_TUX_WIDTH);
-  }
-  else {
-    m_col.set_width(TUX_WIDTH);
-  }
-
-  // on downward slopes, adjust vertical velocity so tux walks smoothly down
-  if (on_ground() && !m_swim.swimming && !m_life.dying) {
-    if (m_move.floor_normal.y != 0) {
-      if ((m_move.floor_normal.x * m_physic.get_velocity_x()) >= 0) {
-        m_physic.set_velocity_y(250);
-      }
-    }
-  }
-
-  // handle backflipping
-  if (m_jump.backflipping && !m_life.dying) {
-    //prevent player from changing direction when backflipping
-    m_dir = (m_jump.backflip_direction == 1) ? Direction::LEFT : Direction::RIGHT;
-    if (m_jump.backflip_timer.started()) m_physic.set_velocity_x(100.0f * static_cast<float>(m_jump.backflip_direction));
-    //rotate sprite during flip
-    m_sprite->set_angle(m_sprite->get_angle() + (m_dir == Direction::LEFT ? 1 : -1) * dt_sec * (360.0f / 0.5f));
-    if (m_player_status.has_hat_sprite(get_id()) && !m_swim.swimming && !m_swim.water_jump)
-      m_powersprite->set_angle(m_sprite->get_angle());
-    if (m_player_status.bonus[get_id()] == EARTH_BONUS)
-      m_lightsprite->set_angle(m_sprite->get_angle());
-  }
-
-  if (on_ground()) {
-    m_jump.coyote_timer.start(COYOTE_TIME);
-  }
-
-  // set fall mode...
-  if (on_ground()) {
-    m_jump.fall_mode = ON_GROUND;
-    m_jump.last_ground_y = get_pos().y;
-  }
-  else {
-    if (get_pos().y > m_jump.last_ground_y)
-      m_jump.fall_mode = FALLING;
-    else if (m_jump.fall_mode == ON_GROUND)
-      m_jump.fall_mode = JUMPING;
-  }
-
-  // check if we landed
-  if (on_ground()) {
-    m_jump.jumping = false;
-    if (m_jump.backflipping && (m_jump.backflip_timer.get_timegone() > 0.15f)) {
-      m_jump.backflipping = false;
-      m_jump.backflip_direction = 0;
-      m_physic.set_velocity_x(0);
-      if (!m_move.stone) {
-        m_sprite->set_angle(0.0f);
-        m_powersprite->set_angle(0.0f);
-        m_lightsprite->set_angle(0.0f);
-      }
-
-      // if controls are currently deactivated, we take care of standing up ourselves
-      if (m_deactivated)
-        do_standup(false);
-    }
-  }
+  PlayerSystems::update_landing(*this);
 
   if (m_look.second_growup_sound_timer.check())
   {
@@ -593,13 +303,7 @@ Player::update(float dt_sec)
     m_look.second_growup_sound_timer.stop();
   }
 
-  if (m_move.boost != 0.f)
-  {
-    bool sign = std::signbit(m_move.boost);
-    m_move.boost = (sign ? -1.f : +1.f) * (std::abs(m_move.boost) - dt_sec * BOOST_DECREASE_RATE);
-    if (std::signbit(m_move.boost) != sign)
-      m_move.boost = 0.f;
-  }
+  PlayerSystems::update_boost(*this, dt_sec);
 
   // calculate movement for this frame
   m_col.set_movement(m_physic.get_movement(dt_sec) + Vector(m_move.boost * dt_sec, 0));
@@ -618,45 +322,13 @@ Player::update(float dt_sec)
   m_move.on_ground_flag = false;
   m_move.ice_this_frame = false;
 
-  // when invincible, spawn particles
-  if (m_life.invincible_timer.started())
-  {
-    if (graphicsRandom.rand(0, 2) == 0)
-    {
-      float px = graphicsRandom.randf(m_col.m_bbox.get_left() + 0, m_col.m_bbox.get_right() - 0);
-      float py = graphicsRandom.randf(m_col.m_bbox.get_top() + 0, m_col.m_bbox.get_bottom() - 0);
-      Vector ppos = Vector(px, py);
-      Vector pspeed = Vector(0, 0);
-      Vector paccel = Vector(0, 0);
-      Sector::get().add<SpriteParticle>(
-        "images/particles/sparkle.sprite",
-        // draw bright sparkle when there is lots of time left,
-        // dark sparkle when invincibility is about to end
-        (m_life.invincible_timer.get_timeleft() > TUX_INVINCIBLE_TIME_WARNING) ?
-        // make every other a longer sparkle to make trail a bit fuzzy
-        (size_t(g_game_time * 20) % 2) ? "small" : "medium"
-        :
-        "dark", ppos, ANCHOR_MIDDLE, pspeed, paccel, LAYER_OBJECTS + 1 + 5);
-    }
-  }
+  PlayerSystems::spawn_invincible_sparkles(*this);
 
   if (m_look.growing) {
     if (m_sprite->animation_done()) m_look.growing = false;
   }
 
-  // when climbing animate only while moving
-  if (m_climbing) {
-    if ((m_physic.get_velocity_x() == 0) && (m_physic.get_velocity_y() == 0))
-    {
-      m_sprite->stop_animation();
-      m_powersprite->stop_animation();
-    }
-    else
-    {
-      m_sprite->set_animation_loops(-1);
-      m_powersprite->set_animation_loops(-1);
-    }
-  }
+  PlayerSystems::update_climb_animation(*this);
 }
 
 void

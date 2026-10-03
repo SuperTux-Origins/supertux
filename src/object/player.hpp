@@ -322,6 +322,8 @@ private:
   std::unique_ptr<FadeHelper> m_tag_fade;
 
 private:
+  friend struct PlayerSystems;
+
   Player(Player const&) = delete;
   Player& operator=(Player const&) = delete;
 };
