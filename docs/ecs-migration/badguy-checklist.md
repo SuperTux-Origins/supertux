@@ -37,7 +37,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] flyingsnowball — `data/archetypes/flyingsnowball.archetype`
 - [x] zeekling — `data/archetypes/zeekling.archetype`
 - [x] spidermite — `data/archetypes/spidermite.archetype`
-- [ ] owl
+- [x] owl — `data/archetypes/owl.archetype`
 - [x] captainsnowball — `data/archetypes/captainsnowball.archetype`
 
 ## Stationary / turret / trap
@@ -81,6 +81,8 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] plant
 - [ ] root
 - [x] snowman — `data/archetypes/snowman.archetype`
+
+- [x] skydive — `data/archetypes/skydive.archetype`
 
 ## Bosses / unique multi-phase (candidate exceptions per plan §4.4 — confirm each is actually boss-scale before treating it as an exception)
 - [ ] yeti

@@ -1,0 +1,10 @@
+; Levels may set (carry "NAME") per owl.
+(supertux-archetype
+  (name "owl")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/owl/owl.sprite")
+    (layer "objects+1")
+    (freezable #t))
+  (components
+    (owl (carry "skydive") (speed 120) (activation-distance 128))))

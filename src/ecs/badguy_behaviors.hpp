@@ -48,6 +48,8 @@ template<> BadGuyBehavior const& behavior_of<DartShooter>();
 template<> BadGuyBehavior const& behavior_of<Projectile>();
 template<> BadGuyBehavior const& behavior_of<Toad>();
 template<> BadGuyBehavior const& behavior_of<Mole>();
+template<> BadGuyBehavior const& behavior_of<Skydive>();
+template<> BadGuyBehavior const& behavior_of<Owl>();
 template<> BadGuyBehavior const& behavior_of<Diver>();
 template<> BadGuyBehavior const& behavior_of<Haywire>();
 template<> BadGuyBehavior const& behavior_of<GoldBomb>();

@@ -20,8 +20,10 @@
 
 #include "audio/sound_manager.hpp"
 #include "badguy/archetype_badguy.hpp"
-#include "badguy/owl.hpp"
 #include "object/bullet.hpp"
+#include "supertux/constants.hpp"
+#include "supertux/game_object_factory.hpp"
+#include "supertux/game_object_manager.hpp"
 #include "object/coin_explode.hpp"
 #include "object/explosion.hpp"
 #include "supertux/tile.hpp"
@@ -682,7 +684,7 @@ bool carrier_is_portable(ArchetypeBadguy const& self)
 void carrier_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir)
 {
   self.Portable::grab(object, pos, dir);
-  if (dynamic_cast<Owl*>(&object))
+  if (ecs::try_get<Owl>(object.get_entity()))
     self.m_sprite->set_action(dir);
   else
   {
@@ -1813,7 +1815,7 @@ void snail_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
     }
     else {
       self.m_dir = dir;
-      snail_be_kicked(self, snail, dynamic_cast<Owl*>(&object) ? false : true);
+      snail_be_kicked(self, snail, ecs::try_get<Owl>(object.get_entity()) ? false : true);
     }
   }
   else
@@ -3310,7 +3312,7 @@ void goldbomb_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& po
   else if (self.m_frozen) {
     self.m_sprite->set_action("iced", dir);
   }
-  else if (dynamic_cast<Owl*>(&object))
+  else if (ecs::try_get<Owl>(object.get_entity()))
     self.m_sprite->set_action(dir);
   self.m_col.set_movement(pos - self.get_pos());
   self.m_dir = dir;
@@ -3922,6 +3924,340 @@ template<>
 BadGuyBehavior const& behavior_of<SquishReaction>()
 {
   static BadGuyBehavior const behavior = { .collision_squished = &squish_collision_squished };
+  return behavior;
+}
+
+namespace {
+
+// Skydive ------------------------------------------------------------
+
+void skydive_explode(ArchetypeBadguy& self)
+{
+  if (!self.is_valid())
+    return;
+
+  if (self.m_frozen)
+    self.default_kill_fall();
+  else
+  {
+    auto& explosion = Sector::get().add<Explosion>(
+      get_anchor_pos(self.m_col.m_bbox, ANCHOR_BOTTOM), EXPLOSION_STRENGTH_NEAR);
+    explosion.hurts(true);
+
+    self.remove_me();
+  }
+}
+
+void skydive_construct(ArchetypeBadguy& self)
+{
+  SoundManager::current()->preload("sounds/explosion.wav");
+  self.set_action("normal", 1);
+}
+
+void skydive_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (self.m_frozen)
+  {
+    self.default_collision_solid(hit);
+    return;
+  }
+
+  if (hit.bottom) {
+    skydive_explode(self);
+    return;
+  }
+
+  if (hit.left || hit.right)
+    self.m_physic.set_velocity_x(0.0);
+
+  skydive_explode(self);
+}
+
+HitResponse skydive_collision_badguy(ArchetypeBadguy& self, BadGuy& /*other*/, CollisionHit const& hit)
+{
+  if (hit.bottom) {
+    skydive_explode(self);
+    return ABORT_MOVE;
+  }
+  return FORCE_MOVE;
+}
+
+HitResponse skydive_collision_player(ArchetypeBadguy& self, Player& /*player*/, CollisionHit const& hit)
+{
+  if (hit.bottom) {
+    skydive_explode(self);
+    return ABORT_MOVE;
+  }
+  return FORCE_MOVE;
+}
+
+bool skydive_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  if (auto player = dynamic_cast<Player *>(&object)) {
+    player->bounce(self);
+    return false;
+  }
+
+  skydive_explode(self);
+  return false;
+}
+
+void skydive_collision_tile(ArchetypeBadguy& self, uint32_t tile_attributes)
+{
+  if (tile_attributes & Tile::HURTS)
+  {
+    skydive_explode(self);
+  }
+}
+
+bool skydive_is_portable(ArchetypeBadguy const& /*self*/)
+{
+  return true;
+}
+
+void skydive_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir)
+{
+  Vector movement = pos - self.get_pos();
+  self.m_col.set_movement(movement);
+  self.m_dir = dir;
+
+  if (!self.m_frozen)
+  {
+    self.m_physic.set_velocity_x(movement.x * LOGICAL_FPS);
+    self.m_physic.set_velocity_y(0.0);
+    self.m_physic.set_acceleration_y(0.0);
+  }
+  self.m_physic.enable_gravity(false);
+  self.set_group(COLGROUP_DISABLED);
+  self.BadGuy::grab(object, pos, dir);
+}
+
+void skydive_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
+{
+  if (auto player = dynamic_cast<Player*>(&object))
+  {
+    throw_by(self, player, dir);
+  }
+  else if (!self.m_frozen)
+  {
+    self.m_sprite->set_action("falling", 1);
+    self.m_physic.set_velocity_y(0);
+    self.m_physic.set_acceleration_y(0);
+  }
+  self.m_physic.enable_gravity(true);
+  self.set_group(self.m_frozen ? COLGROUP_MOVING_STATIC : COLGROUP_MOVING);
+  self.BadGuy::ungrab(object, dir);
+}
+
+// Owl ----------------------------------------------------------------
+
+Portable* owl_carried(Owl const& owl)
+{
+  if (owl.carried == entt::null)
+    return nullptr;
+  return dynamic_cast<Portable*>(GameObjectManager::get_object_by_entity(owl.carried));
+}
+
+void owl_drop(ArchetypeBadguy& self, Owl& owl)
+{
+  if (Portable* carried = owl_carried(owl)) {
+    carried->ungrab(self, self.m_dir);
+  }
+  owl.carried = entt::null;
+}
+
+void owl_construct(ArchetypeBadguy& self)
+{
+  self.set_action(self.m_dir == Direction::LEFT ? "left" : "right", /* loops = */ -1);
+}
+
+void owl_initialize(ArchetypeBadguy& self)
+{
+  Owl& owl = ecs::get<Owl>(self.get_entity());
+  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -owl.speed : owl.speed);
+  self.m_physic.enable_gravity(false);
+  self.m_sprite->set_action(self.m_dir);
+
+  auto game_object = GameObjectFactory::instance().create(owl.carry, self.get_pos(), self.m_dir);
+  if (game_object == nullptr)
+  {
+    log_fatal("Creating \"{}\" object failed.", owl.carry);
+  }
+  else if (dynamic_cast<Portable*>(game_object.get()) == nullptr)
+  {
+    log_warning("Object is not portable: {}", owl.carry);
+  }
+  else
+  {
+    owl.carried = game_object->get_entity();
+    Sector::get().add_object(std::move(game_object));
+  }
+}
+
+bool owl_is_above_player(ArchetypeBadguy const& self, Owl const& owl)
+{
+  auto player = Sector::get().get_nearest_player(self.m_col.m_bbox);
+  if (!player)
+    return false;
+
+  // Let go of carried objects a short while *before* Tux is below us. This
+  // makes it more likely that we'll hit him.
+  float x_offset = (self.m_dir == Direction::LEFT) ? owl.activation_distance : -owl.activation_distance;
+
+  Rectf const& bbox = self.m_col.m_bbox;
+  Rectf const& player_bbox = player->get_bbox();
+
+  return ((player_bbox.get_top() >= bbox.get_bottom()) /* player is below us */
+          && ((player_bbox.get_right() + x_offset) > bbox.get_left())
+          && ((player_bbox.get_left() + x_offset) < bbox.get_right()));
+}
+
+void owl_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  Owl& owl = ecs::get<Owl>(self.get_entity());
+
+  if (self.m_frozen)
+    return;
+
+  Portable* carried = owl_carried(owl);
+  if (carried == nullptr)
+    return;
+
+  if (!owl_is_above_player(self, owl)) {
+    Vector obj_pos = get_anchor_pos(self.m_col.m_bbox, ANCHOR_BOTTOM);
+    obj_pos.x -= 16.f; /* FIXME: Actually do use the half width of the carried object here. */
+    obj_pos.y += 3.f; /* Move a little away from the hitbox (the body). Looks nicer. */
+
+    //To drop enemie before leave the screen
+    if (obj_pos.x <= 16 || obj_pos.x + 16 >= Sector::get().get_width()) {
+      owl_drop(self, owl);
+    }
+    else
+      carried->grab(self, obj_pos, self.m_dir);
+  }
+  else { /* if (is_above_player) */
+    owl_drop(self, owl);
+  }
+}
+
+bool owl_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  if (auto player = Sector::get().get_nearest_player(self.m_col.m_bbox))
+    player->bounce(self);
+
+  owl_drop(self, ecs::get<Owl>(self.get_entity()));
+
+  self.kill_fall();
+  return true;
+}
+
+void owl_kill_fall(ArchetypeBadguy& self)
+{
+  if (!self.m_frozen)
+  {
+    SoundManager::current()->play("sounds/fall.wav", self.get_pos());
+    self.m_physic.set_velocity_y(0);
+    self.m_physic.set_acceleration_y(0);
+    self.m_physic.enable_gravity(true);
+    self.set_state(ArchetypeBadguy::STATE_FALLING);
+  }
+  else
+    self.default_kill_fall();
+
+  owl_drop(self, ecs::get<Owl>(self.get_entity()));
+
+  // start dead-script
+  self.run_dead_script();
+}
+
+void owl_freeze(ArchetypeBadguy& self)
+{
+  owl_drop(self, ecs::get<Owl>(self.get_entity()));
+  self.m_physic.enable_gravity(true);
+  self.default_freeze();
+}
+
+void owl_unfreeze(ArchetypeBadguy& self, bool melt)
+{
+  Owl const& owl = ecs::get<Owl>(self.get_entity());
+  self.default_unfreeze(melt);
+  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -owl.speed : owl.speed);
+  self.m_physic.enable_gravity(false);
+  self.m_sprite->set_action(self.m_dir);
+}
+
+void owl_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Owl const& owl = ecs::get<Owl>(self.get_entity());
+
+  if (self.m_frozen)
+  {
+    self.default_collision_solid(hit);
+    return;
+  }
+
+  if (hit.top || hit.bottom) {
+    self.m_physic.set_velocity_y(0);
+  } else if (hit.left || hit.right) {
+    if (self.m_dir == Direction::LEFT) {
+      self.set_action("right", /* loops = */ -1);
+      self.m_dir = Direction::RIGHT;
+      self.m_physic.set_velocity_x(owl.speed);
+    }
+    else {
+      self.set_action("left", /* loops = */ -1);
+      self.m_dir = Direction::LEFT;
+      self.m_physic.set_velocity_x(-owl.speed);
+    }
+  }
+}
+
+void owl_ignite(ArchetypeBadguy& self)
+{
+  owl_drop(self, ecs::get<Owl>(self.get_entity()));
+  self.default_ignite();
+}
+
+} // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Skydive>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &skydive_construct,
+    .collision_player = &skydive_collision_player,
+    .collision_solid = &skydive_collision_solid,
+    .collision_badguy = &skydive_collision_badguy,
+    .collision_squished = &skydive_collision_squished,
+    .collision_tile = &skydive_collision_tile,
+    .kill_fall = &skydive_explode,
+    .is_portable = &skydive_is_portable,
+    .grab = &skydive_grab,
+    .ungrab = &skydive_ungrab,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Owl>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &owl_construct,
+    .initialize = &owl_initialize,
+    .after_move = &owl_after_move,
+    .collision_solid = &owl_collision_solid,
+    .collision_squished = &owl_collision_squished,
+    .freeze = &owl_freeze,
+    .unfreeze = &owl_unfreeze,
+    .ignite = &owl_ignite,
+    .kill_fall = &owl_kill_fall,
+  };
   return behavior;
 }
 

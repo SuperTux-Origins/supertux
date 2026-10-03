@@ -670,6 +670,36 @@ inline void read_component(ReaderMapping const& mapping, Mole& mole)
   mapping.read("throw-velocity", mole.throw_velocity);
 }
 
+/** Explodes when it lands, hits something or is stomped; can be carried
+    (skydive, dropped by owls). */
+struct Skydive
+{
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, Skydive& /*skydive*/)
+{
+}
+
+/** Flies back and forth carrying an object (another archetype or
+    object type, by name), which it drops when above a player (owl). */
+struct Owl
+{
+  std::string carry = "skydive";
+  float speed = 120.0f;
+  /** drop the object this far ahead of the player */
+  float activation_distance = 128.0f;
+
+  // state
+  entt::entity carried = entt::null;
+};
+
+inline void read_component(ReaderMapping const& mapping, Owl& owl)
+{
+  mapping.read("carry", owl.carry);
+  mapping.read("speed", owl.speed);
+  mapping.read("activation-distance", owl.activation_distance);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction
