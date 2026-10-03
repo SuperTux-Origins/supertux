@@ -20,6 +20,9 @@
 
 #include "audio/sound_manager.hpp"
 #include "badguy/archetype_badguy.hpp"
+#include "ecs/object_behaviors.hpp"
+#include "object/path.hpp"
+#include "object/path_walker.hpp"
 #include "object/bullet.hpp"
 #include "supertux/constants.hpp"
 #include "supertux/game_object_factory.hpp"
@@ -4257,6 +4260,140 @@ BadGuyBehavior const& behavior_of<Owl>()
     .unfreeze = &owl_unfreeze,
     .ignite = &owl_ignite,
     .kill_fall = &owl_kill_fall,
+  };
+  return behavior;
+}
+
+namespace {
+
+// PathFollower -------------------------------------------------------
+
+void badguy_path_read(ArchetypeBadguy& self, ReaderMapping const& mapping)
+{
+  PathFollower& follower = ecs::get<PathFollower>(self.get_entity());
+  follower.path.value = std::make_unique<PathObject>();
+  follower.path.value->init_path(mapping, follower.running);
+}
+
+void badguy_path_move_to(ArchetypeBadguy& self, Vector const& pos)
+{
+  Vector shift = pos - self.m_col.m_bbox.p1();
+  if (PathObject* path = path_follower::get(self); path && path->get_path()) {
+    path->get_path()->move_by(shift);
+  }
+  self.set_pos(pos);
+}
+
+// Ghoul --------------------------------------------------------------
+
+void ghoul_construct(ArchetypeBadguy& self)
+{
+  self.m_sprite->set_action(self.m_dir);
+}
+
+void ghoul_finish_construction(ArchetypeBadguy& self)
+{
+  PathObject* path = path_follower::get(self);
+  if (path && path->get_walker() && path->get_walker()->is_running()) {
+    ecs::get<Ghoul>(self.get_entity()).state = Ghoul::State::PATHMOVING_TRACK;
+  }
+}
+
+void ghoul_deactivate(ArchetypeBadguy& self)
+{
+  Ghoul& ghoul = ecs::get<Ghoul>(self.get_entity());
+  if (ghoul.state == Ghoul::State::TRACKING) {
+    ghoul.state = Ghoul::State::IDLE;
+  }
+}
+
+bool ghoul_collision_squished(ArchetypeBadguy& self, GameObject& /*object*/)
+{
+  if (auto player = Sector::get().get_nearest_player(self.m_col.m_bbox))
+    player->bounce(self);
+  self.m_sprite->set_action("squished", 1);
+  self.kill_fall();
+  return true;
+}
+
+void ghoul_move(ArchetypeBadguy& self, float dt_sec)
+{
+  Ghoul& ghoul = ecs::get<Ghoul>(self.get_entity());
+
+  auto player = self.get_nearest_player();
+  if (!player)
+    return;
+
+  Rectf const& bbox = self.m_col.m_bbox;
+  Vector p1 = bbox.get_middle();
+  Vector p2 = player->get_bbox().get_middle();
+  Vector dist = (p2 - p1);
+
+  Rectf const& player_bbox = player->get_bbox();
+
+  if (player_bbox.get_right() < bbox.get_left()) {
+    self.m_sprite->set_action("left", -1);
+  }
+  if (player_bbox.get_left() > bbox.get_right()) {
+    self.m_sprite->set_action("right", -1);
+  }
+
+  switch (ghoul.state) {
+    case Ghoul::State::STOPPED:
+      break;
+
+    case Ghoul::State::IDLE:
+      if (glm::length(dist) <= ghoul.track_range) {
+        ghoul.state = Ghoul::State::TRACKING;
+      }
+      break;
+
+    case Ghoul::State::TRACKING:
+      if (glm::length(dist) >= 1) {
+        Vector dir_ = glm::normalize(dist);
+        self.m_col.set_movement(dir_ * dt_sec * ghoul.flyspeed);
+      } else {
+        /* We somehow landed right on top of the player without colliding.
+         * Sit tight and avoid a division by zero. */
+      }
+      break;
+
+    case Ghoul::State::PATHMOVING:
+    case Ghoul::State::PATHMOVING_TRACK: {
+      PathObject* path = path_follower::get(self);
+      if (path == nullptr || path->get_walker() == nullptr)
+        return;
+      path->get_walker()->update(dt_sec);
+      self.m_col.set_movement(path->get_walker()->get_pos(bbox.get_size(), path->get_path_handle()) - self.get_pos());
+      if (ghoul.state == Ghoul::State::PATHMOVING_TRACK && glm::length(dist) <= ghoul.track_range) {
+        ghoul.state = Ghoul::State::TRACKING;
+      }
+      break;
+    }
+  }
+}
+
+} // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<PathFollower>()
+{
+  static BadGuyBehavior const behavior = {
+    .read = &badguy_path_read,
+    .move_to = &badguy_path_move_to,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Ghoul>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &ghoul_construct,
+    .finish_construction = &ghoul_finish_construction,
+    .deactivate = &ghoul_deactivate,
+    .move = &ghoul_move,
+    .collision_squished = &ghoul_collision_squished,
   };
   return behavior;
 }

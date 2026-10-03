@@ -20,6 +20,7 @@
 
 #include "collision/collision_hit.hpp"
 #include "math/vector.hpp"
+#include "util/reader_mapping.hpp"
 
 class ArchetypeBadguy;
 class BadGuy;
@@ -41,8 +42,14 @@ enum class Direction;
     default: physics movement), after_move (all). */
 struct BadGuyBehavior
 {
+  /** all: read instance data from the level object, before construct */
+  void (*read)(ArchetypeBadguy& self, ReaderMapping const& mapping) = nullptr;
   /** all: end of construction */
   void (*construct)(ArchetypeBadguy& self) = nullptr;
+  /** all: the sector is complete, named objects can be resolved */
+  void (*finish_construction)(ArchetypeBadguy& self) = nullptr;
+  /** first, default: set_pos(); e.g. move the path along */
+  void (*move_to)(ArchetypeBadguy& self, Vector const& pos) = nullptr;
   /** first */
   void (*initialize)(ArchetypeBadguy& self) = nullptr;
   /** all */

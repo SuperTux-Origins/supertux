@@ -700,6 +700,25 @@ inline void read_component(ReaderMapping const& mapping, Owl& owl)
   mapping.read("activation-distance", owl.activation_distance);
 }
 
+/** Flies towards the nearest player within track range, or along its
+    path (PathFollower) (ghoul). */
+struct Ghoul
+{
+  float flyspeed = 80.0f;
+  float track_range = 2500.0f;
+
+  enum class State { STOPPED, IDLE, TRACKING, PATHMOVING, PATHMOVING_TRACK };
+
+  // state
+  State state = State::IDLE;
+};
+
+inline void read_component(ReaderMapping const& mapping, Ghoul& ghoul)
+{
+  mapping.read("flyspeed", ghoul.flyspeed);
+  mapping.read("track-range", ghoul.track_range);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

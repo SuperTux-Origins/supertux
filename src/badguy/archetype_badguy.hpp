@@ -50,6 +50,9 @@ public:
       constructor) rather than placed in the level */
   bool is_spawned() const { return m_spawned; }
 
+  void finish_construction() override;
+  void move_to(Vector const& pos) override;
+
   bool is_freezable() const override { return m_freezable; }
   bool is_hurtable() const override { return m_hurtable; }
   bool is_flammable() const override;

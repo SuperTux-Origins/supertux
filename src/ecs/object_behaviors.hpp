@@ -70,7 +70,7 @@ void spawn_heavy(Vector const& pos, Vector const& velocity);
 namespace path_follower {
 
 /** The path object of the entity, or nullptr */
-PathObject* get(ArchetypeObject const& self);
+PathObject* get(GameObject const& self);
 
 } // namespace path_follower
 

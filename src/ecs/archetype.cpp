@@ -43,6 +43,13 @@ ComponentType component_type()
   return { &ComponentPrototypeT<T>::from_reader, &behavior_of<T>(), nullptr };
 }
 
+/** a component of both badguy and object archetypes */
+template<typename T>
+ComponentType shared_component_type()
+{
+  return { &ComponentPrototypeT<T>::from_reader, &behavior_of<T>(), &object_behavior_of<T>() };
+}
+
 /** a component of object archetypes */
 template<typename T>
 ComponentType object_component_type()
@@ -85,6 +92,7 @@ std::map<std::string, ComponentType> const& component_types()
     { "mole", component_type<Mole>() },
     { "skydive", component_type<Skydive>() },
     { "owl", component_type<Owl>() },
+    { "ghoul", component_type<Ghoul>() },
 
     // objects
     { "unstable-tile", object_component_type<UnstableTile>() },
@@ -96,7 +104,7 @@ std::map<std::string, ComponentType> const& component_types()
     { "brick", object_component_type<Brick>() },
     { "invisible-block", object_component_type<InvisibleBlock>() },
     { "infoblock", object_component_type<InfoBlock>() },
-    { "path-follower", object_component_type<PathFollower>() },
+    { "path-follower", shared_component_type<PathFollower>() },
     { "platform", object_component_type<Platform>() },
     { "hurting", object_component_type<Hurting>() },
     { "coin", object_component_type<Coin>() },

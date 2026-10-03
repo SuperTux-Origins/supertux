@@ -1,0 +1,11 @@
+; Levels may give a (path ...) and set running, flyspeed and track-range.
+(supertux-archetype
+  (name "ghoul")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/ghoul/ghoul.sprite")
+    (freezable #f)
+    (flammable #f))
+  (components
+    (ghoul (flyspeed 80) (track-range 2500))
+    (path-follower (running #f))))

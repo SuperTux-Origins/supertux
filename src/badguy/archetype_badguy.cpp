@@ -44,6 +44,11 @@ ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, Archetype const& a
 {
   read_properties(archetype);
   m_behaviors = archetype.emplace_components(get_entity(), &reader);
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->read) {
+      behavior->read(*this, reader);
+    }
+  }
   construct();
 }
 
@@ -161,6 +166,28 @@ ArchetypeBadguy::construct()
       behavior->construct(*this);
     }
   }
+}
+
+void
+ArchetypeBadguy::finish_construction()
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->finish_construction) {
+      behavior->finish_construction(*this);
+    }
+  }
+}
+
+void
+ArchetypeBadguy::move_to(Vector const& pos)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->move_to) {
+      behavior->move_to(*this, pos);
+      return;
+    }
+  }
+  BadGuy::move_to(pos);
 }
 
 void

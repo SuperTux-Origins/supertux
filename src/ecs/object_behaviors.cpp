@@ -1725,7 +1725,7 @@ void spawn_heavy(Vector const& pos, Vector const& velocity)
 
 namespace path_follower {
 
-PathObject* get(ArchetypeObject const& self)
+PathObject* get(GameObject const& self)
 {
   auto* follower = ecs::try_get<PathFollower>(self.get_entity());
   return follower ? follower->path.value.get() : nullptr;

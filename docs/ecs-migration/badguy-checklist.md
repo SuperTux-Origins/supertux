@@ -56,7 +56,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] ghostflame — `data/archetypes/ghostflame.archetype`
 - [x] livefire (+ livefire_asleep, livefire_dormant) — `data/archetypes/livefire*.archetype`
 - [ ] willowisp
-- [ ] ghoul
+- [x] ghoul — `data/archetypes/ghoul.archetype` (ghoul + path-follower; 3 runs)
 - [ ] treewillowisp
 - [ ] kugelblitz
 
