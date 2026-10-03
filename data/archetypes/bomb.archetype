@@ -1,0 +1,9 @@
+; Spawned by mrbomb when stomped, not placed in levels.
+(supertux-archetype
+  (name "bomb")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/mr_bomb/bomb.sprite")
+    (count-me #f))
+  (components
+    (fuse (sound "sounds/fizz.wav"))))

@@ -36,19 +36,25 @@ class ArchetypeBadguy : public BadGuy
 {
 public:
   ArchetypeBadguy(ReaderMapping const& reader, Archetype const& archetype);
+  /** sprite overrides the archetype's sprite if not empty */
   ArchetypeBadguy(Vector const& pos, Direction dir, Archetype const& archetype,
-                  std::string const& dead_script = {});
+                  std::string const& dead_script = {}, std::string const& sprite = {});
   ~ArchetypeBadguy() override;
 
   /** Spawn the named archetype at runtime, e.g. a snowball from a snowman */
   static std::unique_ptr<ArchetypeBadguy> create(std::string const& name, Vector const& pos, Direction dir,
-                                                 std::string const& dead_script = {});
+                                                 std::string const& dead_script = {},
+                                                 std::string const& sprite = {});
 
   bool is_freezable() const override { return m_freezable; }
   bool is_flammable() const override { return m_flammable; }
   void freeze() override;
   void ignite() override;
   void kill_fall() override;
+  bool is_portable() const override;
+  void grab(MovingObject& object, Vector const& pos, Direction dir) override;
+  void ungrab(MovingObject& object, Direction dir) override;
+  HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void stop_looping_sounds() override;
   void play_looping_sounds() override;
 
@@ -59,6 +65,9 @@ public:
   bool default_collision_squished(GameObject& object) { return BadGuy::collision_squished(object); }
   void default_freeze() { BadGuy::freeze(); }
   void default_ignite() { BadGuy::ignite(); }
+  void default_kill_fall();
+  HitResponse default_collision(GameObject& other, CollisionHit const& hit) { return BadGuy::collision(other, hit); }
+  HitResponse default_collision_player(Player& player, CollisionHit const& hit) { return BadGuy::collision_player(player, hit); }
 
   // BadGuy state available to behaviors
   using BadGuy::State;
@@ -79,6 +88,8 @@ public:
   using BadGuy::kill_squished;
   using BadGuy::run_dead_script;
   using MovingSprite::m_sprite;
+  using MovingSprite::m_sprite_name;
+  using BadGuy::set_colgroup_active;
   using MovingSprite::set_action;
   using MovingObject::m_col;
   using MovingObject::set_group;
@@ -105,6 +116,7 @@ protected:
   void activate() override;
   void deactivate() override;
   void active_update(float dt_sec) override;
+  HitResponse collision_player(Player& player, CollisionHit const& hit) override;
   HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
   bool collision_squished(GameObject& object) override;
 

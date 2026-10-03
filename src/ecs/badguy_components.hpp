@@ -200,6 +200,34 @@ inline void read_component(ReaderMapping const& mapping, LoopingSound& sound)
   mapping.read("reference-distance", sound.reference_distance);
 }
 
+/** Stomping leaves a ticking bomb (the "bomb" archetype, using this
+    badguy's sprite); falling or burning makes it explode. Can be carried
+    while frozen (mrbomb). */
+struct BombCarrier
+{
+  std::string bomb = "bomb";
+};
+
+inline void read_component(ReaderMapping const& mapping, BombCarrier& carrier)
+{
+  mapping.read("bomb", carrier.bomb);
+}
+
+/** A ticking bomb that explodes when its "ticking" animation ends, or
+    when it falls or burns. Can be carried and thrown (bomb). */
+struct Fuse
+{
+  std::string sound = "sounds/fizz.wav";
+
+  // state, shared_ptr keeps the prototype copyable
+  std::shared_ptr<SoundSource> ticking = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Fuse& fuse)
+{
+  mapping.read("sound", fuse.sound);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

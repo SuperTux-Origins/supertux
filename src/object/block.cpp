@@ -19,7 +19,7 @@
 #include "object/block.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/bomb.hpp"
+#include "badguy/badguy.hpp"
 #include "math/random.hpp"
 #include "object/coin.hpp"
 #include "object/growup.hpp"
@@ -110,11 +110,10 @@ Block::collision(GameObject& other, CollisionHit const& )
   auto badguy = dynamic_cast<BadGuy*> (&other);
   auto portable = dynamic_cast<Portable*> (&other);
   auto moving_object = dynamic_cast<MovingObject*> (&other);
-  auto bomb = dynamic_cast<Bomb*> (&other);
   bool is_portable = ((portable != nullptr) && portable->is_portable());
-  bool is_bomb = (bomb != nullptr); // bombs need to explode, although they are considered portable
   bool hit_mo_from_below = ((moving_object == nullptr) || (moving_object->get_bbox().get_bottom() < (m_col.m_bbox.get_top() + SHIFT_DELTA)));
-  if (m_bouncing && (!is_portable || badguy || is_bomb) && hit_mo_from_below) {
+  // portable badguys (e.g. bombs) still get hit
+  if (m_bouncing && (!is_portable || badguy) && hit_mo_from_below) {
 
     // Badguys get killed
     if (badguy) {

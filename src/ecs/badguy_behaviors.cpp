@@ -20,6 +20,8 @@
 
 #include "audio/sound_manager.hpp"
 #include "badguy/archetype_badguy.hpp"
+#include "badguy/owl.hpp"
+#include "object/explosion.hpp"
 #include "math/random.hpp"
 #include "math/util.hpp"
 #include "object/sprite_particle.hpp"
@@ -184,11 +186,11 @@ HitResponse walker_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, Colli
 
 // Floater ------------------------------------------------------------
 
-void floater_update(ArchetypeBadguy& self, float /*dt_sec*/)
+bool floater_update(ArchetypeBadguy& self, float /*dt_sec*/)
 {
   Floater const& floater = ecs::get<Floater>(self.get_entity());
   if (self.m_frozen || self.m_ignited)
-    return;
+    return true;
 
   Rectf floatbox = self.get_bbox();
   floatbox.set_bottom(self.get_bbox().get_bottom() + 8.f);
@@ -201,11 +203,12 @@ void floater_update(ArchetypeBadguy& self, float /*dt_sec*/)
       self.m_physic.set_velocity_y(floater.max_fall_speed);
     }
   }
+  return true;
 }
 
 // Patrol -------------------------------------------------------------
 
-void patrol_update(ArchetypeBadguy& self, float /*dt_sec*/)
+bool patrol_update(ArchetypeBadguy& self, float /*dt_sec*/)
 {
   Patrol const& patrol = ecs::get<Patrol>(self.get_entity());
   Walker& walker = ecs::get<Walker>(self.get_entity());
@@ -226,6 +229,7 @@ void patrol_update(ArchetypeBadguy& self, float /*dt_sec*/)
 
   walker.target_velocity = target;
   walker.acceleration = patrol.acceleration;
+  return true;
 }
 
 // SquishReaction -----------------------------------------------------
@@ -561,7 +565,290 @@ void sound_play(ArchetypeBadguy& self)
   }
 }
 
+// BombCarrier --------------------------------------------------------
+
+void explode_at(ArchetypeBadguy& self)
+{
+  Sector::get().add<Explosion>(self.m_col.m_bbox.get_middle(), EXPLOSION_STRENGTH_DEFAULT);
+}
+
+void carrier_construct(ArchetypeBadguy& /*self*/)
+{
+  // Prevent stutter when Tux jumps on it
+  SoundManager::current()->preload("sounds/explosion.wav");
+}
+
+bool carrier_update(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  return !self.is_grabbed();
+}
+
+HitResponse carrier_collision(ArchetypeBadguy& self, GameObject& object, CollisionHit const& hit)
+{
+  if (self.is_grabbed())
+    return FORCE_MOVE;
+  return self.default_collision(object, hit);
+}
+
+HitResponse carrier_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& hit)
+{
+  if (self.is_grabbed())
+    return FORCE_MOVE;
+  return self.default_collision_player(player, hit);
+}
+
+bool carrier_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  auto player = dynamic_cast<Player*>(&object);
+  if (player && player->is_invincible()) {
+    player->bounce(self);
+    self.kill_fall();
+    return true;
+  }
+
+  if (self.is_valid()) {
+    auto bomb = ArchetypeBadguy::create(ecs::get<BombCarrier>(self.get_entity()).bomb,
+                                        self.get_pos(), self.m_dir, {}, self.m_sprite_name);
+    // Do not trigger dispenser because we need to wait for
+    // the bomb instance to explode.
+    if (self.get_parent_dispenser() != nullptr)
+    {
+      bomb->set_parent_dispenser(self.get_parent_dispenser());
+      self.set_parent_dispenser(nullptr);
+    }
+    Sector::get().add_object(std::move(bomb));
+    self.remove_me();
+  }
+  self.kill_squished(object);
+  return true;
+}
+
+void carrier_kill_fall(ArchetypeBadguy& self)
+{
+  if (self.is_valid()) {
+    if (self.m_frozen)
+      self.default_kill_fall();
+    else
+    {
+      self.remove_me();
+      explode_at(self);
+      self.run_dead_script();
+    }
+  }
+}
+
+void carrier_ignite(ArchetypeBadguy& self)
+{
+  if (self.m_frozen)
+    self.unfreeze();
+  self.kill_fall();
+}
+
+bool carrier_is_portable(ArchetypeBadguy const& self)
+{
+  return self.m_frozen;
+}
+
+void carrier_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir)
+{
+  self.Portable::grab(object, pos, dir);
+  if (dynamic_cast<Owl*>(&object))
+    self.m_sprite->set_action(dir);
+  else
+  {
+    assert(self.m_frozen);
+    self.m_sprite->set_action("iced", dir);
+  }
+
+  self.m_col.set_movement(pos - self.get_pos());
+  self.m_dir = dir;
+  self.set_colgroup_active(COLGROUP_DISABLED);
+}
+
+// Fuse ---------------------------------------------------------------
+
+void fuse_explode(ArchetypeBadguy& self)
+{
+  ecs::get<Fuse>(self.get_entity()).ticking->stop();
+
+  // Make the player let go before we explode, otherwise the player is holding
+  // an invalid object.
+  if (self.is_grabbed()) {
+    auto player = dynamic_cast<Player*>(self.get_owner());
+    if (player)
+      player->stop_grabbing();
+  }
+
+  if (self.is_valid()) {
+    self.remove_me();
+    explode_at(self);
+  }
+
+  self.run_dead_script();
+}
+
+void fuse_construct(ArchetypeBadguy& self)
+{
+  Fuse& fuse = ecs::get<Fuse>(self.get_entity());
+  fuse.ticking = SoundManager::current()->create_sound_source(fuse.sound);
+  SoundManager::current()->preload("sounds/explosion.wav");
+  self.set_action(self.m_dir == Direction::LEFT ? "ticking-left" : "ticking-right", 1);
+  fuse.ticking->set_position(self.get_pos());
+  fuse.ticking->set_looping(true);
+  fuse.ticking->set_gain(1.0f);
+  fuse.ticking->set_reference_distance(32);
+  fuse.ticking->play();
+}
+
+void fuse_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (self.is_grabbed()) {
+    return;
+  }
+  if (hit.top || hit.bottom)
+    self.m_physic.set_velocity_y(0);
+  if (hit.left || hit.right)
+    self.m_physic.set_velocity_x(-self.m_physic.get_velocity_x() * 0.5f);
+  if (hit.crush)
+    self.m_physic.set_velocity(0, 0);
+
+  self.update_on_ground_flag(hit);
+}
+
+HitResponse fuse_collision_player(ArchetypeBadguy& /*self*/, Player& /*player*/, CollisionHit const& /*hit*/)
+{
+  return ABORT_MOVE;
+}
+
+HitResponse fuse_collision_badguy(ArchetypeBadguy& /*self*/, BadGuy& /*other*/, CollisionHit const& /*hit*/)
+{
+  return ABORT_MOVE;
+}
+
+void fuse_move(ArchetypeBadguy& self, float dt_sec)
+{
+  if (self.on_ground()) self.m_physic.set_velocity_x(0);
+
+  ecs::get<Fuse>(self.get_entity()).ticking->set_position(self.get_pos());
+
+  if (self.m_sprite->animation_done()) {
+    fuse_explode(self);
+  }
+  else if (!self.is_grabbed()) {
+    self.m_col.set_movement(self.m_physic.get_movement(dt_sec));
+  }
+}
+
+bool fuse_is_portable(ArchetypeBadguy const& /*self*/)
+{
+  return true;
+}
+
+void fuse_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir)
+{
+  self.Portable::grab(object, pos, dir);
+  self.m_col.set_movement(pos - self.get_pos());
+  self.m_dir = dir;
+
+  // We actually face the opposite direction of Tux here to make the fuse more
+  // visible instead of hiding it behind Tux
+  self.m_sprite->set_action_continued(self.m_dir == Direction::LEFT ? "ticking-right" : "ticking-left");
+  self.set_colgroup_active(COLGROUP_DISABLED);
+}
+
+void fuse_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
+{
+  auto player = dynamic_cast<Player*> (&object);
+  Physic& physic = self.m_physic;
+
+  //handle swimming
+  if (player && (player->is_swimming() || player->is_water_jumping()))
+  {
+    float swimangle = player->get_swimming_angle();
+    physic.set_velocity(Vector(std::cos(swimangle) * 40.f, std::sin(swimangle) * 40.f) +
+                        player->get_physic().get_velocity());
+  }
+  //handle non-swimming
+  else
+  {
+    if (player)
+    {
+      //handle x-movement
+      if (fabsf(player->get_physic().get_velocity_x()) < 1.0f)
+        physic.set_velocity_x(0.f);
+      else if ((player->m_dir == Direction::LEFT && player->get_physic().get_velocity_x() <= -1.0f)
+               || (player->m_dir == Direction::RIGHT && player->get_physic().get_velocity_x() >= 1.0f))
+        physic.set_velocity_x(player->get_physic().get_velocity_x()
+                              + (player->m_dir == Direction::LEFT ? -10.f : 10.f));
+      else
+        physic.set_velocity_x(player->get_physic().get_velocity_x()
+                              + (player->m_dir == Direction::LEFT ? -330.f : 330.f));
+      //handle y-movement
+      physic.set_velocity_y(dir == Direction::UP ? -500.f :
+                            dir == Direction::DOWN ? 500.f :
+                            player->get_physic().get_velocity_x() != 0.f ? -200.f : 0.f);
+    }
+  }
+
+  self.set_colgroup_active(COLGROUP_MOVING);
+  self.Portable::ungrab(object, dir);
+}
+
+void fuse_stop_sound(ArchetypeBadguy& self)
+{
+  if (auto& ticking = ecs::get<Fuse>(self.get_entity()).ticking) {
+    ticking->stop();
+  }
+}
+
+void fuse_play_sound(ArchetypeBadguy& self)
+{
+  if (auto& ticking = ecs::get<Fuse>(self.get_entity()).ticking) {
+    ticking->play();
+  }
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<BombCarrier>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &carrier_construct,
+    .update = &carrier_update,
+    .collision = &carrier_collision,
+    .collision_player = &carrier_collision_player,
+    .collision_squished = &carrier_collision_squished,
+    .ignite = &carrier_ignite,
+    .kill_fall = &carrier_kill_fall,
+    .is_portable = &carrier_is_portable,
+    .grab = &carrier_grab,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Fuse>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &fuse_construct,
+    .move = &fuse_move,
+    .collision_player = &fuse_collision_player,
+    .collision_solid = &fuse_collision_solid,
+    .collision_badguy = &fuse_collision_badguy,
+    .ignite = &fuse_explode,
+    .kill_fall = &fuse_explode,
+    .is_portable = &fuse_is_portable,
+    .grab = &fuse_grab,
+    .ungrab = &fuse_ungrab,
+    .stop_looping_sounds = &fuse_stop_sound,
+    .play_looping_sounds = &fuse_play_sound,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<Circler>()

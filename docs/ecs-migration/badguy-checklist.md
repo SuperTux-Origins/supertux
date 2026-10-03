@@ -30,7 +30,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 ## Jumpers
 - [x] jumpy — `data/archetypes/jumpy.archetype`
 - [ ] skullyhop
-- [ ] mrbomb
+- [x] mrbomb — `data/archetypes/mrbomb.archetype`
 - [ ] kamikazesnowball
 
 ## Flyers
@@ -61,7 +61,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] kugelblitz
 
 ## Explosive
-- [ ] bomb
+- [x] bomb — `data/archetypes/bomb.archetype`
 - [ ] goldbomb
 - [ ] short_fuse
 - [ ] haywire

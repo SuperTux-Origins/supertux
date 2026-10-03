@@ -17,10 +17,14 @@
 #define HEADER_SUPERTUX_ECS_BADGUY_BEHAVIOR_HPP
 
 #include "collision/collision_hit.hpp"
+#include "math/vector.hpp"
 
 class ArchetypeBadguy;
 class BadGuy;
 class GameObject;
+class MovingObject;
+class Player;
+enum class Direction;
 
 /** Handlers that give a component behavior on an ArchetypeBadguy.
     Every handler is optional and fetches its component with
@@ -39,17 +43,24 @@ struct BadGuyBehavior
   void (*initialize)(ArchetypeBadguy& self) = nullptr;
   void (*activate)(ArchetypeBadguy& self) = nullptr;
   void (*deactivate)(ArchetypeBadguy& self) = nullptr;
-  void (*update)(ArchetypeBadguy& self, float dt_sec) = nullptr;
+  /** returning false skips the rest of this frame's update */
+  bool (*update)(ArchetypeBadguy& self, float dt_sec) = nullptr;
   /** first */
   void (*move)(ArchetypeBadguy& self, float dt_sec) = nullptr;
   /** all */
   void (*after_move)(ArchetypeBadguy& self, float dt_sec) = nullptr;
   /** first */
+  HitResponse (*collision)(ArchetypeBadguy& self, GameObject& other, CollisionHit const& hit) = nullptr;
+  HitResponse (*collision_player)(ArchetypeBadguy& self, Player& player, CollisionHit const& hit) = nullptr;
   void (*collision_solid)(ArchetypeBadguy& self, CollisionHit const& hit) = nullptr;
   HitResponse (*collision_badguy)(ArchetypeBadguy& self, BadGuy& other, CollisionHit const& hit) = nullptr;
   bool (*collision_squished)(ArchetypeBadguy& self, GameObject& object) = nullptr;
   void (*freeze)(ArchetypeBadguy& self) = nullptr;
   void (*ignite)(ArchetypeBadguy& self) = nullptr;
+  void (*kill_fall)(ArchetypeBadguy& self) = nullptr;
+  bool (*is_portable)(ArchetypeBadguy const& self) = nullptr;
+  void (*grab)(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir) = nullptr;
+  void (*ungrab)(ArchetypeBadguy& self, MovingObject& object, Direction dir) = nullptr;
   /** all */
   void (*stop_looping_sounds)(ArchetypeBadguy& self) = nullptr;
   void (*play_looping_sounds)(ArchetypeBadguy& self) = nullptr;

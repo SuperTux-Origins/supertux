@@ -67,8 +67,8 @@ ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, Archetype const& a
 }
 
 ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, Direction dir, Archetype const& archetype,
-                                 std::string const& dead_script) :
-  BadGuy(pos, dir, sprite_of(archetype), layer_of(archetype), light_sprite_of(archetype)),
+                                 std::string const& dead_script, std::string const& sprite) :
+  BadGuy(pos, dir, sprite.empty() ? sprite_of(archetype) : sprite, layer_of(archetype), light_sprite_of(archetype)),
   m_behaviors(),
   m_freezable(false),
   m_flammable(true),
@@ -116,13 +116,13 @@ ArchetypeBadguy::~ArchetypeBadguy()
 
 std::unique_ptr<ArchetypeBadguy>
 ArchetypeBadguy::create(std::string const& name, Vector const& pos, Direction dir,
-                        std::string const& dead_script)
+                        std::string const& dead_script, std::string const& sprite)
 {
   Archetype const* archetype = ArchetypeRegistry::instance().get(name);
   if (!archetype) {
     throw std::runtime_error("unknown archetype '" + name + "'");
   }
-  return std::make_unique<ArchetypeBadguy>(pos, dir, *archetype, dead_script);
+  return std::make_unique<ArchetypeBadguy>(pos, dir, *archetype, dead_script, sprite);
 }
 
 void
@@ -197,9 +197,78 @@ ArchetypeBadguy::ignite()
 void
 ArchetypeBadguy::kill_fall()
 {
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->kill_fall) {
+      behavior->kill_fall(*this);
+      return;
+    }
+  }
+  default_kill_fall();
+}
+
+void
+ArchetypeBadguy::default_kill_fall()
+{
   if (m_fall_immune)
     return;
   BadGuy::kill_fall();
+}
+
+bool
+ArchetypeBadguy::is_portable() const
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->is_portable) {
+      return behavior->is_portable(*this);
+    }
+  }
+  return BadGuy::is_portable();
+}
+
+void
+ArchetypeBadguy::grab(MovingObject& object, Vector const& pos, Direction dir)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->grab) {
+      behavior->grab(*this, object, pos, dir);
+      return;
+    }
+  }
+  BadGuy::grab(object, pos, dir);
+}
+
+void
+ArchetypeBadguy::ungrab(MovingObject& object, Direction dir)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->ungrab) {
+      behavior->ungrab(*this, object, dir);
+      return;
+    }
+  }
+  BadGuy::ungrab(object, dir);
+}
+
+HitResponse
+ArchetypeBadguy::collision(GameObject& other, CollisionHit const& hit)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->collision) {
+      return behavior->collision(*this, other, hit);
+    }
+  }
+  return BadGuy::collision(other, hit);
+}
+
+HitResponse
+ArchetypeBadguy::collision_player(Player& player, CollisionHit const& hit)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->collision_player) {
+      return behavior->collision_player(*this, player, hit);
+    }
+  }
+  return BadGuy::collision_player(player, hit);
 }
 
 void
@@ -256,8 +325,8 @@ void
 ArchetypeBadguy::active_update(float dt_sec)
 {
   for (auto const* behavior : m_behaviors) {
-    if (behavior->update) {
-      behavior->update(*this, dt_sec);
+    if (behavior->update && !behavior->update(*this, dt_sec)) {
+      return;
     }
   }
 

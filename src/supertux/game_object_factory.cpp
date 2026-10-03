@@ -35,7 +35,6 @@
 #include "badguy/livefire.hpp"
 #include "badguy/mole.hpp"
 #include "badguy/mole_rock.hpp"
-#include "badguy/mrbomb.hpp"
 #include "badguy/mrtree.hpp"
 #include "badguy/owl.hpp"
 #include "badguy/plant.hpp"
@@ -180,7 +179,6 @@ GameObjectFactory::init_factories()
   add_factory<LiveFireDormant>("livefire_dormant");
   add_factory<Mole>("mole");
   add_factory<MoleRock>("mole_rock");
-  add_factory<MrBomb>("mrbomb", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<MrIceBlock>("mriceblock", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<MrTree>("mrtree");
   add_factory<Owl>("owl");
