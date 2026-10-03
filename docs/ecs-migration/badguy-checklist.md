@@ -99,3 +99,11 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 If Phase 0.1's `data/` audit finds any of these unused by any shipped level,
 flag to the maintainer per plan Open Decision #4 (delete vs. archive) rather
 than migrating dead content.
+
+# Object migration checklist
+
+Non-badguy objects use the same pattern: `ArchetypeObject` (base
+"object") with `ObjectBehavior` handlers in `src/ecs/object_behaviors.cpp`.
+
+- [x] unstable_tile — `data/archetypes/unstable_tile.archetype` (4 targeted golden runs)
+- [x] weak_block — `data/archetypes/weak_block.archetype` (not exercised: needs fire or explosions)

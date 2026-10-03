@@ -24,7 +24,8 @@
 #include "object/brick.hpp"
 #include "object/particles.hpp"
 #include "object/player.hpp"
-#include "object/weak_block.hpp"
+#include "ecs/object_behaviors.hpp"
+#include "object/archetype_object.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 
@@ -134,9 +135,9 @@ Explosion::explode()
           brick->try_break(nullptr);
       }
 
-      auto weakblock = dynamic_cast<WeakBlock*>(obj);
-      if (weakblock && in_break_range) {
-        weakblock->startBurning();
+      auto object = dynamic_cast<ArchetypeObject*>(obj);
+      if (object && ecs::try_get<WeakBlock>(object->get_entity()) && in_break_range) {
+        weak_block::start_burning(*object);
       }
     }
   }

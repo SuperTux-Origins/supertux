@@ -22,41 +22,7 @@
 
 namespace {
 
-std::string sprite_of(Archetype const& archetype)
-{
-  std::string sprite;
-  if (!archetype.get_properties().read("sprite", sprite)) {
-    throw std::runtime_error("archetype '" + archetype.get_name() + "' has no sprite");
-  }
-  return sprite;
-}
-
 constexpr char const* default_light_sprite = "images/objects/lightmap_light/lightmap_light-medium.sprite";
-
-/** "objects", "floatingobjects" or "tiles", optionally with an offset
-    like "tiles-1" */
-int layer_of(Archetype const& archetype)
-{
-  std::string layer = "objects";
-  archetype.get_properties().read("layer", layer);
-
-  int offset = 0;
-  std::string base = layer;
-  if (auto pos = layer.find_last_of("+-"); pos != std::string::npos && pos > 0) {
-    base = layer.substr(0, pos);
-    offset = std::stoi(layer.substr(pos));
-  }
-
-  if (base == "objects") {
-    return LAYER_OBJECTS + offset;
-  } else if (base == "floatingobjects") {
-    return LAYER_FLOATINGOBJECTS + offset;
-  } else if (base == "tiles") {
-    return LAYER_TILES + offset;
-  } else {
-    throw std::runtime_error("archetype '" + archetype.get_name() + "': unknown layer '" + layer + "'");
-  }
-}
 
 std::string light_sprite_of(Archetype const& archetype)
 {
@@ -68,7 +34,7 @@ std::string light_sprite_of(Archetype const& archetype)
 } // namespace
 
 ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, Archetype const& archetype) :
-  BadGuy(reader, sprite_of(archetype), layer_of(archetype), light_sprite_of(archetype)),
+  BadGuy(reader, archetype.get_sprite(), archetype.get_layer(), light_sprite_of(archetype)),
   m_behaviors(),
   m_freezable(false),
   m_flammable(true),
@@ -83,7 +49,7 @@ ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, Archetype const& a
 
 ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, Direction dir, Archetype const& archetype,
                                  std::string const& dead_script, std::string const& sprite) :
-  BadGuy(pos, dir, sprite.empty() ? sprite_of(archetype) : sprite, layer_of(archetype), light_sprite_of(archetype)),
+  BadGuy(pos, dir, sprite.empty() ? archetype.get_sprite() : sprite, archetype.get_layer(), light_sprite_of(archetype)),
   m_behaviors(),
   m_freezable(false),
   m_flammable(true),

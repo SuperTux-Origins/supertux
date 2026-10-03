@@ -148,3 +148,9 @@ data/levels/world2/find_big_fish.stlv hop 600 11796,228
 data/levels/world2/going_underground.stlv idle 600 2758,828
 data/levels/world2/going_underground.stlv hop 600 3897,1910
 data/levels/world2/going_underground.stlv hop 600 3738,3128
+
+# Targeted: unstable tiles collapsing under Tux
+data/levels/world1/between_glaciers.stlv idle 600 8096,600
+data/levels/world1/entrance_cave.stlv idle 600 2560,600
+data/levels/world1/fork_in_the_road.stlv idle 600 7136,632
+data/levels/world1/into_stars.stlv idle 600 8608,1368

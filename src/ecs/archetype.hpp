@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "ecs/badguy_behavior.hpp"
+#include "ecs/object_behavior.hpp"
 #include "ecs/component_prototype.hpp"
 #include "util/reader_document.hpp"
 
@@ -51,13 +52,23 @@ public:
   std::string const& get_base() const { return m_base; }
   std::vector<std::string> const& get_aliases() const { return m_aliases; }
 
-  /** Base properties of the shell class (sprite, walk-speed, ...) */
+  /** Base properties of the shell class (sprite, layer, ...) */
   ReaderMapping const& get_properties() const { return m_properties; }
+
+  /** The "sprite" property, required */
+  std::string get_sprite() const;
+
+  /** The "layer" property: "objects", "floatingobjects" or "tiles",
+      optionally with an offset like "tiles-1". Default "objects". */
+  int get_layer() const;
 
   /** Emplace the archetype's components on an entity, with fields
       overridden by the level object's mapping if given. Returns the
       behaviors of those components, in archetype order. */
   std::vector<BadGuyBehavior const*> emplace_components(entt::entity entity, ReaderMapping const* overrides) const;
+
+  /** Same for archetypes of non-badguy objects (base "object") */
+  std::vector<ObjectBehavior const*> emplace_object_components(entt::entity entity, ReaderMapping const* overrides) const;
 
 private:
   std::string m_name;
@@ -67,7 +78,9 @@ private:
   struct Component
   {
     std::unique_ptr<ComponentPrototype> prototype;
-    BadGuyBehavior const* behavior;
+    /** exactly one of these is set, depending on the component */
+    BadGuyBehavior const* badguy_behavior;
+    ObjectBehavior const* object_behavior;
   };
   std::vector<Component> m_components;
 

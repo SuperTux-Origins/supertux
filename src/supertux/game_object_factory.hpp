@@ -38,7 +38,7 @@ private:
   void init_factories();
 
   /** Register data-defined types from data/archetypes/ */
-  void add_archetypes();
+  void add_archetypes(std::string const& base);
 
 private:
   GameObjectFactory(GameObjectFactory const&) = delete;

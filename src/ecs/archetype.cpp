@@ -19,24 +19,35 @@
 #include <stdexcept>
 
 #include "ecs/badguy_behaviors.hpp"
+#include "ecs/object_behaviors.hpp"
 #include "ecs/registry.hpp"
 #include "util/file_system.hpp"
 #include "util/log.hpp"
 #include "util/reader_collection.hpp"
 #include "util/reader_object.hpp"
+#include "video/layer.hpp"
 
 namespace {
 
 struct ComponentType
 {
   std::unique_ptr<ComponentPrototype> (*read)(ReaderMapping const&);
-  BadGuyBehavior const* behavior;
+  BadGuyBehavior const* badguy_behavior;
+  ObjectBehavior const* object_behavior;
 };
 
+/** a component of badguy archetypes */
 template<typename T>
 ComponentType component_type()
 {
-  return { &ComponentPrototypeT<T>::from_reader, &behavior_of<T>() };
+  return { &ComponentPrototypeT<T>::from_reader, &behavior_of<T>(), nullptr };
+}
+
+/** a component of object archetypes */
+template<typename T>
+ComponentType object_component_type()
+{
+  return { &ComponentPrototypeT<T>::from_reader, nullptr, &object_behavior_of<T>() };
 }
 
 /** Component names usable in an archetype's (components ...) section */
@@ -74,6 +85,10 @@ std::map<std::string, ComponentType> const& component_types()
     { "mole", component_type<Mole>() },
     { "skydive", component_type<Skydive>() },
     { "owl", component_type<Owl>() },
+
+    // objects
+    { "unstable-tile", object_component_type<UnstableTile>() },
+    { "weak-block", object_component_type<WeakBlock>() },
     { "diver", component_type<Diver>() },
     { "haywire", component_type<Haywire>() },
     { "goldbomb", component_type<GoldBomb>() },
@@ -109,8 +124,43 @@ Archetype::Archetype(ReaderMapping const& mapping) :
       if (it == types.end()) {
         throw std::runtime_error("archetype '" + m_name + "': unknown component '" + component.get_name() + "'");
       }
-      m_components.push_back({ it->second.read(component.get_mapping()), it->second.behavior });
+      m_components.push_back({ it->second.read(component.get_mapping()),
+                               it->second.badguy_behavior, it->second.object_behavior });
     }
+  }
+}
+
+std::string
+Archetype::get_sprite() const
+{
+  std::string sprite;
+  if (!m_properties.read("sprite", sprite)) {
+    throw std::runtime_error("archetype '" + m_name + "' has no sprite");
+  }
+  return sprite;
+}
+
+int
+Archetype::get_layer() const
+{
+  std::string layer = "objects";
+  m_properties.read("layer", layer);
+
+  int offset = 0;
+  std::string base = layer;
+  if (auto pos = layer.find_last_of("+-"); pos != std::string::npos && pos > 0) {
+    base = layer.substr(0, pos);
+    offset = std::stoi(layer.substr(pos));
+  }
+
+  if (base == "objects") {
+    return LAYER_OBJECTS + offset;
+  } else if (base == "floatingobjects") {
+    return LAYER_FLOATINGOBJECTS + offset;
+  } else if (base == "tiles") {
+    return LAYER_TILES + offset;
+  } else {
+    throw std::runtime_error("archetype '" + m_name + "': unknown layer '" + layer + "'");
   }
 }
 
@@ -119,8 +169,25 @@ Archetype::emplace_components(entt::entity entity, ReaderMapping const* override
 {
   std::vector<BadGuyBehavior const*> behaviors;
   for (auto const& component : m_components) {
+    if (!component.badguy_behavior) {
+      throw std::runtime_error("archetype '" + m_name + "': component is not for badguys");
+    }
     component.prototype->emplace(ecs::registry(), entity, overrides);
-    behaviors.push_back(component.behavior);
+    behaviors.push_back(component.badguy_behavior);
+  }
+  return behaviors;
+}
+
+std::vector<ObjectBehavior const*>
+Archetype::emplace_object_components(entt::entity entity, ReaderMapping const* overrides) const
+{
+  std::vector<ObjectBehavior const*> behaviors;
+  for (auto const& component : m_components) {
+    if (!component.object_behavior) {
+      throw std::runtime_error("archetype '" + m_name + "': component is not for objects");
+    }
+    component.prototype->emplace(ecs::registry(), entity, overrides);
+    behaviors.push_back(component.object_behavior);
   }
   return behaviors;
 }

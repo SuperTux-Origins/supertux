@@ -37,6 +37,7 @@
 #include "object/ambient_sound.hpp"
 #include "object/background.hpp"
 #include "object/bicycle_platform.hpp"
+#include "object/archetype_object.hpp"
 #include "object/bonus_block.hpp"
 #include "object/brick.hpp"
 #include "object/bumper.hpp"
@@ -80,8 +81,6 @@
 #include "object/tilemap.hpp"
 #include "object/torch.hpp"
 #include "object/trampoline.hpp"
-#include "object/unstable_tile.hpp"
-#include "object/weak_block.hpp"
 #include "object/wind.hpp"
 #include "ecs/archetype.hpp"
 #include "supertux/level.hpp"
@@ -110,17 +109,27 @@ GameObjectFactory::GameObjectFactory()
 }
 
 void
-GameObjectFactory::add_archetypes()
+GameObjectFactory::add_archetypes(std::string const& base)
 {
   for (Archetype const* archetype : ArchetypeRegistry::instance().get_archetypes())
   {
-    if (archetype->get_base() != "badguy") {
+    if (archetype->get_base() != "badguy" && archetype->get_base() != "object") {
       throw std::runtime_error("archetype '" + archetype->get_name() + "': unknown base '" + archetype->get_base() + "'");
     }
+    if (archetype->get_base() != base) {
+      continue;
+    }
 
-    auto factory = [archetype](ReaderMapping const& reader) -> std::unique_ptr<GameObject> {
-      return std::make_unique<ArchetypeBadguy>(reader, *archetype);
-    };
+    std::function<std::unique_ptr<GameObject> (ReaderMapping const&)> factory;
+    if (base == "badguy") {
+      factory = [archetype](ReaderMapping const& reader) -> std::unique_ptr<GameObject> {
+        return std::make_unique<ArchetypeBadguy>(reader, *archetype);
+      };
+    } else {
+      factory = [archetype](ReaderMapping const& reader) -> std::unique_ptr<GameObject> {
+        return std::make_unique<ArchetypeObject>(reader, *archetype);
+      };
+    }
     add_factory(archetype->get_name().c_str(), factory);
     for (auto const& alias : archetype->get_aliases()) {
       add_factory(alias.c_str(), factory);
@@ -151,7 +160,7 @@ GameObjectFactory::init_factories()
   add_factory<WillOWisp>("willowisp");
   add_factory<Yeti>("yeti");
   add_factory<YetiStalactite>("yeti_stalactite");
-  add_archetypes();
+  add_archetypes("badguy");
   m_adding_badguys = false;
 
   // other objects
@@ -210,8 +219,6 @@ GameObjectFactory::init_factories()
   add_factory<Torch>("torch");
   add_factory<Trampoline>("trampoline", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<RustyTrampoline>("rustytrampoline", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
-  add_factory<UnstableTile>("unstable_tile");
-  add_factory<WeakBlock>("weak_block");
   add_factory<Wind>("wind");
   add_factory<TextArea>("text-area");
 
@@ -230,6 +237,8 @@ GameObjectFactory::init_factories()
     auto tileset = TileManager::current()->get_tileset(Level::current()->get_tileset());
     return std::make_unique<TileMap>(tileset, reader);
   });
+
+  add_archetypes("object");
 }
 
 std::unique_ptr<GameObject>

@@ -1,0 +1,105 @@
+//  SuperTux
+//  Copyright (C) 2026 Ingo Ruhnke <grumbel@gmail.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#include "object/archetype_object.hpp"
+
+#include <stdexcept>
+
+#include "ecs/archetype.hpp"
+
+namespace {
+
+CollisionGroup colgroup_of(Archetype const& archetype)
+{
+  std::string colgroup = "moving";
+  archetype.get_properties().read("colgroup", colgroup);
+
+  if (colgroup == "moving") return COLGROUP_MOVING;
+  if (colgroup == "static") return COLGROUP_STATIC;
+  if (colgroup == "moving-static") return COLGROUP_MOVING_STATIC;
+  if (colgroup == "moving-only-static") return COLGROUP_MOVING_ONLY_STATIC;
+  if (colgroup == "touchable") return COLGROUP_TOUCHABLE;
+  if (colgroup == "disabled") return COLGROUP_DISABLED;
+  throw std::runtime_error("archetype '" + archetype.get_name() + "': unknown colgroup '" + colgroup + "'");
+}
+
+} // namespace
+
+ArchetypeObject::ArchetypeObject(ReaderMapping const& reader, Archetype const& archetype) :
+  MovingSprite(reader, archetype.get_sprite(), archetype.get_layer(), colgroup_of(archetype)),
+  m_behaviors(archetype.emplace_object_components(get_entity(), &reader))
+{
+  construct();
+}
+
+ArchetypeObject::~ArchetypeObject()
+{
+}
+
+void
+ArchetypeObject::construct()
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->construct) {
+      behavior->construct(*this);
+    }
+  }
+}
+
+void
+ArchetypeObject::update(float dt_sec)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->update) {
+      behavior->update(*this, dt_sec);
+    }
+  }
+}
+
+void
+ArchetypeObject::draw(DrawingContext& context)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->draw) {
+      behavior->draw(*this, context);
+      return;
+    }
+  }
+  MovingSprite::draw(context);
+}
+
+HitResponse
+ArchetypeObject::collision(GameObject& other, CollisionHit const& hit)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->collision) {
+      return behavior->collision(*this, other, hit);
+    }
+  }
+  return FORCE_MOVE;
+}
+
+void
+ArchetypeObject::collision_solid(CollisionHit const& hit)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->collision_solid) {
+      behavior->collision_solid(*this, hit);
+      return;
+    }
+  }
+}
+
+/* EOF */
