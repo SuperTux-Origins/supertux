@@ -42,6 +42,9 @@ public:
 
   void start_bounce(GameObject* hitter);
 
+  /** The current action of the sprite */
+  std::string const& get_action() const;
+
 protected:
   virtual void hit(Player& player) = 0;
 

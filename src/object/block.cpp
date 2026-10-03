@@ -167,6 +167,12 @@ Block::draw(DrawingContext& context)
   m_sprite->draw(context.color(), get_pos(), LAYER_OBJECTS+1, m_flip);
 }
 
+std::string const&
+Block::get_action() const
+{
+  return m_sprite->get_action();
+}
+
 void
 Block::start_bounce(GameObject* hitter)
 {
