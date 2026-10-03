@@ -69,6 +69,9 @@ public:
   std::optional<bool> enable_script_debugger;
   std::optional<std::string> start_demo;
   std::optional<std::string> record_demo;
+  std::optional<std::string> dump_state;
+  std::optional<int> max_frames;
+  std::optional<bool> fast_forward;
   std::optional<Vector> tux_spawn_pos;
   std::optional<std::string> sector;
   std::optional<std::string> spawnpoint;

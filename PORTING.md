@@ -1893,3 +1893,37 @@ SuperTux already avoids `#include <glm/ext.hpp>` (GLM 1.0+ packing.inl
 pulls `<endian.h>`, missing on MinGW) in favour of `<glm/glm.hpp>` +
 explicit gtx headers. This is library-generic and should be upstreamed;
 Pingus/Windstille still use the old include.
+
+## Dev shell: host LD_LIBRARY_PATH breaks linking
+
+`nix develop .#supertux-origins` inherits the host `LD_LIBRARY_PATH`. If it
+points at libraries from a newer nixpkgs (e.g. the system alsa-lib built
+against glibc 2.43), the link fails with
+`libasound.so.2: undefined reference to sqrtf@GLIBC_2.43`, and the binary
+fails at startup with `GLIBC_2.43 not found`. `nix build` is unaffected.
+Clear it for dev builds and runs:
+
+```bash
+env -u LD_LIBRARY_PATH nix develop .#supertux-origins -c bash -c \
+  'unset LD_LIBRARY_PATH; cmake --build build -j$(nproc)'
+env -u LD_LIBRARY_PATH tools/golden.py check
+```
+
+## New vendored header libraries: Android stages them separately
+
+Android builds with ndk-build (`mk/android/app/jni/Android.mk`), not
+CMake. `mk/android/scripts/build-apk.sh` copies each `external/<lib>/include`
+into `external_includes/` from an explicit list. A header-only library
+wired only through CMake (e.g. EnTT via `ProvideEnTT.cmake`) builds
+everywhere else but fails on Android with `'entt/entity/fwd.hpp' file not
+found`. Add new vendored libraries to that list.
+
+Game data needs no extra step: Android, wasm and R36S package all of
+`data/`. Desktop installs use the explicit directory list in
+`mk/cmake/SuperTux/BuildInstall.cmake` (`data/archetypes` was added there).
+
+## Golden master: Release and Debug builds are identical
+
+The replay dumps (`tools/golden.py`) of a Release build match the
+baselines recorded with a Debug build exactly, so baselines can be
+recorded with either build type.

@@ -31,8 +31,6 @@ public:
   void draw(DrawingContext& context) override;
 
 
-  bool has_variable_size() const override { return true; }
-
   int get_layer() const override { return LAYER_OBJECTS; }
 
 private:

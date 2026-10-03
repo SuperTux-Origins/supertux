@@ -32,7 +32,7 @@ public:
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
 protected:
-  Physic m_physic;
+  Physic& m_physic;
 
 private:
   Timer m_stick_timer;

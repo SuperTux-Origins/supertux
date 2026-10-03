@@ -17,6 +17,9 @@
 
 #include "supertux/game_object_manager.hpp"
 
+#include "ecs/object_ref.hpp"
+#include "ecs/registry.hpp"
+
 
 #include "object/tilemap.hpp"
 
@@ -195,6 +198,7 @@ GameObjectManager::flush_game_objects()
           this_before_object_add(*object);
           m_gameobjects.push_back(std::move(object));
         }
+
       }
     }
   }
@@ -225,6 +229,16 @@ GameObjectManager::update_tilemaps()
   }
 }
 
+GameObject*
+GameObjectManager::get_object_by_entity(entt::entity entity)
+{
+  if (!ecs::registry().valid(entity))
+    return nullptr;
+
+  auto const* ref = ecs::registry().try_get<ObjectRef>(entity);
+  return ref ? ref->object : nullptr;
+}
+
 void
 GameObjectManager::this_before_object_add(GameObject& object)
 {
@@ -249,6 +263,7 @@ GameObjectManager::this_before_object_add(GameObject& object)
 void
 GameObjectManager::this_before_object_remove(GameObject& object)
 {
+
   { // by_name
     std::string const& name = object.get_name();
     if (!name.empty())

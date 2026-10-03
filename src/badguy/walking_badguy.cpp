@@ -13,10 +13,23 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #include "badguy/walking_badguy.hpp"
 
+#include <math.h>
 
+#include "ecs/badguy_behaviors.hpp"
+
+namespace {
+
+Walker make_walker(std::string const& left_action, std::string const& right_action)
+{
+  Walker walker;
+  walker.left_action = left_action;
+  walker.right_action = right_action;
+  return walker;
+}
+
+} // namespace
 
 WalkingBadguy::WalkingBadguy(Vector const& pos,
                              std::string const& sprite_name_,
@@ -24,13 +37,8 @@ WalkingBadguy::WalkingBadguy(Vector const& pos,
                              std::string const& walk_right_action_,
                              int layer_,
                              std::string const& light_sprite_name) :
-  BadGuy(pos, sprite_name_, layer_, light_sprite_name),
-  walk_left_action(walk_left_action_),
-  walk_right_action(walk_right_action_),
-  walk_speed(80),
-  max_drop_height(-1),
-  turn_around_timer(),
-  turn_around_counter()
+  ArchetypeBadguy(pos, sprite_name_, layer_, light_sprite_name),
+  m_walker(add_behavior(make_walker(walk_left_action_, walk_right_action_)))
 {
 }
 
@@ -41,13 +49,8 @@ WalkingBadguy::WalkingBadguy(Vector const& pos,
                              std::string const& walk_right_action_,
                              int layer_,
                              std::string const& light_sprite_name) :
-  BadGuy(pos, direction, sprite_name_, layer_, light_sprite_name),
-  walk_left_action(walk_left_action_),
-  walk_right_action(walk_right_action_),
-  walk_speed(80),
-  max_drop_height(-1),
-  turn_around_timer(),
-  turn_around_counter()
+  ArchetypeBadguy(pos, direction, sprite_name_, layer_, light_sprite_name),
+  m_walker(add_behavior(make_walker(walk_left_action_, walk_right_action_)))
 {
 }
 
@@ -57,169 +60,34 @@ WalkingBadguy::WalkingBadguy(ReaderMapping const& reader,
                              std::string const& walk_right_action_,
                              int layer_,
                              std::string const& light_sprite_name) :
-  BadGuy(reader, sprite_name_, layer_, light_sprite_name),
-  walk_left_action(walk_left_action_),
-  walk_right_action(walk_right_action_),
-  walk_speed(80),
-  max_drop_height(-1),
-  turn_around_timer(),
-  turn_around_counter()
+  ArchetypeBadguy(reader, sprite_name_, layer_, light_sprite_name),
+  m_walker(add_behavior(make_walker(walk_left_action_, walk_right_action_)))
 {
 }
 
 void
-WalkingBadguy::initialize()
-{
-  if (m_frozen)
-    return;
-  m_sprite->set_action(m_dir == Direction::LEFT ? walk_left_action : walk_right_action);
-  m_col.m_bbox.set_size(m_sprite->get_current_hitbox_width(), m_sprite->get_current_hitbox_height());
-  m_physic.set_velocity_x(m_dir == Direction::LEFT ? -walk_speed : walk_speed);
-  m_physic.set_acceleration_x (0.0);
-}
-
-void
-WalkingBadguy::set_walk_speed (float ws)
-{
-  walk_speed = fabsf(ws);
-  /* physic.set_velocity_x(dir == LEFT ? -walk_speed : walk_speed); */
-}
-
-void
-WalkingBadguy::add_velocity (Vector const& velocity)
-{
-  m_physic.set_velocity(m_physic.get_velocity() + velocity);
-}
-
-void
-WalkingBadguy::active_update(float dt_sec, float dest_x_velocity, float modifier)
+WalkingBadguy::active_update(float dt_sec, float target_velocity, float modifier)
 {
   BadGuy::active_update(dt_sec);
+  walker::walk(*this, m_walker, target_velocity, modifier);
+}
 
-  float current_x_velocity = m_physic.get_velocity_x ();
-
-  if (m_frozen)
-    return;
-  /* We're very close to our target speed. Just set it to avoid oscillation */
-  if ((current_x_velocity > (dest_x_velocity - 5.0f)) &&
-           (current_x_velocity < (dest_x_velocity + 5.0f)))
-  {
-    m_physic.set_velocity_x (dest_x_velocity);
-    m_physic.set_acceleration_x (0.0);
-  }
-  /* Check if we're going too slow or even in the wrong direction */
-  else if (((dest_x_velocity <= 0.0f) && (current_x_velocity > dest_x_velocity)) ||
-           ((dest_x_velocity > 0.0f) && (current_x_velocity < dest_x_velocity)))
-  {
-    /* acceleration == walk-speed => it will take one second to get from zero
-     * to full speed. */
-    m_physic.set_acceleration_x (dest_x_velocity * modifier);
-  }
-  /* Check if we're going too fast */
-  else if (((dest_x_velocity <= 0.0f) && (current_x_velocity < dest_x_velocity)) ||
-           ((dest_x_velocity > 0.0f) && (current_x_velocity > dest_x_velocity)))
-  {
-    /* acceleration == walk-speed => it will take one second to get twice the
-     * speed to normal speed. */
-    m_physic.set_acceleration_x ((-1.f) * dest_x_velocity);
-  }
-  else
-  {
-    /* The above should have covered all cases. */
-    assert(false);
-  }
-
-  if (max_drop_height > -1) {
-    if (on_ground() && might_fall(max_drop_height+1))
-    {
-      turn_around();
-    }
-  }
-
-  if ((m_dir == Direction::LEFT) && (m_physic.get_velocity_x () > 0.0f)) {
-    m_dir = Direction::RIGHT;
-    set_action (walk_right_action, /* loops = */ -1);
-  }
-  else if ((m_dir == Direction::RIGHT) && (m_physic.get_velocity_x () < 0.0f)) {
-    m_dir = Direction::LEFT;
-    set_action (walk_left_action, /* loops = */ -1);
-  }
+float
+WalkingBadguy::get_walk_speed() const
+{
+  return m_walker.speed;
 }
 
 void
-WalkingBadguy::active_update(float dt_sec)
+WalkingBadguy::set_walk_speed(float speed)
 {
-  active_update (dt_sec, (m_dir == Direction::LEFT) ? -walk_speed : +walk_speed);
-}
-
-void
-WalkingBadguy::collision_solid(CollisionHit const& hit)
-{
-
-  update_on_ground_flag(hit);
-
-  if (m_frozen)
-  {
-    BadGuy::collision_solid(hit);
-    return;
-  }
-
-  if (hit.top) {
-    if (m_physic.get_velocity_y() < 0) m_physic.set_velocity_y(0);
-  }
-  if (hit.bottom) {
-    if (m_physic.get_velocity_y() > 0) m_physic.set_velocity_y(0);
-  }
-
-  if ((hit.left && (m_dir == Direction::LEFT)) || (hit.right && (m_dir == Direction::RIGHT))) {
-    turn_around();
-  }
-
-}
-
-HitResponse
-WalkingBadguy::collision_badguy(BadGuy& badguy, CollisionHit const& hit)
-{
-  if (hit.top) {
-    return FORCE_MOVE;
-  }
-
-  if (badguy.is_frozen())
-    collision_solid(hit);
-
-  if ((hit.left && (m_dir == Direction::LEFT)) || (hit.right && (m_dir == Direction::RIGHT))) {
-    turn_around();
-  }
-
-  return CONTINUE;
+  m_walker.speed = fabsf(speed);
 }
 
 void
 WalkingBadguy::turn_around()
 {
-  if (m_frozen)
-    return;
-  m_dir = m_dir == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
-  if (get_state() == STATE_INIT || get_state() == STATE_INACTIVE || get_state() == STATE_ACTIVE) {
-    m_sprite->set_action(m_dir == Direction::LEFT ? walk_left_action : walk_right_action);
-  }
-  m_physic.set_velocity_x(-m_physic.get_velocity_x());
-  m_physic.set_acceleration_x (-m_physic.get_acceleration_x ());
-
-  // if we get dizzy, we fall off the screen
-  if (turn_around_timer.started()) {
-    if (turn_around_counter++ > 10) kill_fall();
-  } else {
-    turn_around_timer.start(1);
-    turn_around_counter = 0;
-  }
-
-}
-
-void
-WalkingBadguy::set_velocity_y(float vy)
-{
-  m_physic.set_velocity_y(vy);
+  walker::turn_around(*this, m_walker);
 }
 
 /* EOF */

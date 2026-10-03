@@ -1,0 +1,10 @@
+; The star bouncing out of a bonus block.
+(supertux-archetype
+  (name "star")
+  (base "object")
+  (properties
+    (sprite "images/powerups/star/star.sprite")
+    (colgroup "moving"))
+  (components
+    (star)
+    (glow (color 0.4 0.4 0.4))))

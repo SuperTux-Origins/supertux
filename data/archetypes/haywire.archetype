@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "haywire")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/haywire/haywire.sprite")
+    (freezable #t))
+  (components
+    (haywire (explosion-time 5) (stomped-time 1) (stunned-time 0.5)
+             (normal-speed 80) (exploding-speed 200) (normal-max-drop-height 16))
+    (walker (speed 80) (max-drop-height 16))))

@@ -15,6 +15,8 @@
 
 #include "object/fallblock.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "math/random.hpp"
 #include "object/bumper.hpp"
@@ -25,7 +27,7 @@
 FallBlock::FallBlock(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/fallblock/cave-4x4.sprite", LAYER_OBJECTS, COLGROUP_STATIC),
   state(IDLE),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   timer()
 {
   SoundManager::current()->preload("sounds/cracking.wav");

@@ -44,8 +44,6 @@ public:
   Climbable(Rectf const& area);
   ~Climbable() override;
 
-  bool has_variable_size() const override { return true; }
-
   void event(Player& player, EventType type) override;
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;

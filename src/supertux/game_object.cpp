@@ -16,16 +16,31 @@
 
 #include "supertux/game_object.hpp"
 
+#include "ecs/object_ref.hpp"
+#include "ecs/registry.hpp"
+
+
 
 #include "supertux/object_remove_listener.hpp"
 #include "util/reader_mapping.hpp"
+
+namespace {
+
+entt::entity create_entity(GameObject* object)
+{
+  entt::entity const entity = ecs::registry().create();
+  ecs::registry().emplace<ObjectRef>(entity, object);
+  return entity;
+}
+
+} // namespace
 
 GameObject::GameObject() :
   m_name(),
   m_fade_helpers(),
   m_uid(),
+  m_entity(create_entity(this)),
   m_scheduled_for_removal(false),
-  m_components(),
   m_remove_listeners()
 {
 }
@@ -34,8 +49,8 @@ GameObject::GameObject(std::string const& name) :
   m_name(name),
   m_fade_helpers(),
   m_uid(),
+  m_entity(create_entity(this)),
   m_scheduled_for_removal(false),
-  m_components(),
   m_remove_listeners()
 {
 }
@@ -52,6 +67,8 @@ GameObject::~GameObject()
     entry->object_removed(this);
   }
   m_remove_listeners.clear();
+
+  ecs::registry().destroy(m_entity);
 }
 
 void

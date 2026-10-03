@@ -35,10 +35,6 @@ public:
   ~CustomParticleSystemFile() override;
 
 
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/sparkle-file.png";
-  }
-
 private:
   void update_data();
 

@@ -1,0 +1,10 @@
+; Levels set the sprite (egg, flowers, star, 1up, potions), and may set
+; a script or disable-physics.
+(supertux-archetype
+  (name "powerup")
+  (base "object")
+  (properties
+    (sprite "images/powerups/egg/egg.sprite")
+    (colgroup "moving"))
+  (components
+    (powerup)))

@@ -1,0 +1,12 @@
+; A root the ghost tree grows under the player; spawned by it, not placed in levels.
+(supertux-archetype
+  (name "ghosttree-root")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/ghosttree/root.sprite")
+    (layer "tiles-1")
+    (freezable #f)
+    (flammable #f)
+    (fall-immune #t))
+  (components
+    (ghosttree-root)))

@@ -16,36 +16,37 @@
 
 #include "scripting/willowisp.hpp"
 
-#include "badguy/willowisp.hpp"
+#include "badguy/archetype_badguy.hpp"
+#include "ecs/badguy_behaviors.hpp"
 
 namespace scripting {
 
 void
 WillOWisp::goto_node(int node_no)
 {
-  SCRIPT_GUARD_VOID_T(WillOWisp);
-  object.goto_node(node_no);
+  SCRIPT_GUARD_VOID_T(ArchetypeBadguy);
+  willowisp::goto_node(object, node_no);
 }
 
 void
 WillOWisp::set_state(std::string const& state)
 {
-  SCRIPT_GUARD_VOID_T(WillOWisp);
-  object.set_state(state);
+  SCRIPT_GUARD_VOID_T(ArchetypeBadguy);
+  willowisp::set_state(object, state);
 }
 
 void
 WillOWisp::start_moving()
 {
-  SCRIPT_GUARD_VOID_T(WillOWisp);
-  object.start_moving();
+  SCRIPT_GUARD_VOID_T(ArchetypeBadguy);
+  willowisp::start_moving(object);
 }
 
 void
 WillOWisp::stop_moving()
 {
-  SCRIPT_GUARD_VOID_T(WillOWisp);
-  object.stop_moving();
+  SCRIPT_GUARD_VOID_T(ArchetypeBadguy);
+  willowisp::stop_moving(object);
 }
 
 } // namespace scripting

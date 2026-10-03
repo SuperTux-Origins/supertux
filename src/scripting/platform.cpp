@@ -14,7 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "object/platform.hpp"
+#include "scripting/platform.hpp"
+
+#include "ecs/object_behaviors.hpp"
+#include "object/archetype_object.hpp"
 
 namespace scripting {
 
@@ -22,21 +25,21 @@ void
 Platform::goto_node(int node_no)
 {
   SCRIPT_GUARD_VOID;
-  object.goto_node(node_no);
+  platform::goto_node(object, node_no);
 }
 
 void
 Platform::start_moving()
 {
   SCRIPT_GUARD_VOID;
-  object.start_moving();
+  platform::start_moving(object);
 }
 
 void
 Platform::stop_moving()
 {
   SCRIPT_GUARD_VOID;
-  object.stop_moving();
+  platform::stop_moving(object);
 }
 
 void

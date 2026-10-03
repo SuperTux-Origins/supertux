@@ -1,0 +1,10 @@
+; Runs its script when it sees the player. Levels set script and direction.
+(supertux-archetype
+  (name "ispy")
+  (base "object")
+  (properties
+    (sprite "images/objects/ispy/ispy.sprite")
+    (layer "tiles+5")
+    (colgroup "disabled"))
+  (components
+    (ispy)))

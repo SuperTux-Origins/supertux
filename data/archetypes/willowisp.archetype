@@ -1,0 +1,17 @@
+; Levels may set sector, spawnpoint, hit-script, flyspeed, track-range,
+; vanish-range, color, and give a (path ...) with running.
+(supertux-archetype
+  (name "willowisp")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/willowisp/willowisp.sprite")
+    (layer "floatingobjects")
+    (light-sprite "images/objects/lightmap_light/lightmap_light-small.sprite")
+    (freezable #f)
+    (flammable #f)
+    (hurtable #f)
+    (count-me #f)
+    (glowing #t))
+  (components
+    (willowisp)
+    (path-follower (running #f))))

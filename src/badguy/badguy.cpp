@@ -16,8 +16,10 @@
 
 #include "badguy/badguy.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
-#include "badguy/dispenser.hpp"
+#include "ecs/badguy_behaviors.hpp"
 #include "math/random.hpp"
 #include "object/bullet.hpp"
 #include "object/camera.hpp"
@@ -45,7 +47,7 @@ BadGuy::BadGuy(Vector const& pos, Direction direction, std::string const& sprite
                std::string const& light_sprite_name, std::string const& ice_sprite_name) :
   MovingSprite(pos, sprite_name_, layer_, COLGROUP_DISABLED),
   ExposedObject<BadGuy, scripting::BadGuy>(this),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_countMe(true),
   m_is_initialized(false),
   m_start_position(m_col.m_bbox.p1()),
@@ -57,7 +59,7 @@ BadGuy::BadGuy(Vector const& pos, Direction direction, std::string const& sprite
   m_dead_script(),
   m_lightsprite(SpriteManager::current()->create(light_sprite_name)),
   m_glowing(false),
-  m_parent_dispenser(),
+  m_parent_dispenser(entt::null),
   m_state(STATE_INIT),
   m_is_active_flag(),
   m_state_timer(),
@@ -79,7 +81,7 @@ BadGuy::BadGuy(ReaderMapping const& reader, std::string const& sprite_name_, int
                std::string const& light_sprite_name, std::string const& ice_sprite_name) :
   MovingSprite(reader, sprite_name_, layer_, COLGROUP_DISABLED),
   ExposedObject<BadGuy, scripting::BadGuy>(this),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_countMe(true),
   m_is_initialized(false),
   m_start_position(m_col.m_bbox.p1()),
@@ -91,7 +93,7 @@ BadGuy::BadGuy(ReaderMapping const& reader, std::string const& sprite_name_, int
   m_dead_script(),
   m_lightsprite(SpriteManager::current()->create(light_sprite_name)),
   m_glowing(false),
-  m_parent_dispenser(),
+  m_parent_dispenser(entt::null),
   m_state(STATE_INIT),
   m_is_active_flag(),
   m_state_timer(),
@@ -435,7 +437,7 @@ BadGuy::collision_squished(GameObject& object)
   if (m_frozen)
   {
     auto player = dynamic_cast<Player*>(&object);
-    if (player && (player->m_does_buttjump)) {
+    if (player && (player->m_jump.does_buttjump)) {
       player->bounce(*this);
       kill_fall();
       return true;
@@ -560,9 +562,9 @@ BadGuy::run_dead_script()
 
   m_countMe = false;
 
-  if (m_parent_dispenser != nullptr)
+  if (m_parent_dispenser != entt::null)
   {
-    m_parent_dispenser->notify_dead();
+    dispenser::notify_dead(m_parent_dispenser);
   }
 
   // start dead-script

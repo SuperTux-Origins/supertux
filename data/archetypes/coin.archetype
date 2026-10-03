@@ -1,0 +1,11 @@
+; Levels may give a (path ...) and set collect-script and starting-node.
+(supertux-archetype
+  (name "coin")
+  (base "object")
+  (properties
+    (sprite "images/objects/coin/coin.sprite")
+    (layer "objects-1")
+    (colgroup "touchable"))
+  (components
+    (coin)
+    (path-follower (running #t))))

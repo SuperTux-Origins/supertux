@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "mrbomb")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/mr_bomb/mr_bomb.sprite")
+    (freezable #t))
+  (components
+    (walker (speed 80) (max-drop-height 16))
+    (bomb-carrier (bomb "bomb"))))

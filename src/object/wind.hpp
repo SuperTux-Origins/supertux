@@ -35,8 +35,6 @@ public:
   void draw(DrawingContext& context) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  bool has_variable_size() const override { return true; }
-
   int get_layer() const override { return LAYER_OBJECTS; }
 
   /** @name Scriptable Methods

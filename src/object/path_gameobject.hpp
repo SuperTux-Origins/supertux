@@ -41,10 +41,6 @@ public:
   void draw(DrawingContext& context) override;
 
 
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/path.png";
-  }
-
   void remove_me() override;
 
   Path& get_path() { return *m_path; }
@@ -54,6 +50,9 @@ public:
 private:
   /** Removes the object if the path is not referenced anywhere */
   void check_references();
+
+  /** used by a PathObject or a PathFollower component */
+  bool is_referenced() const;
 
 private:
   std::unique_ptr<Path> m_path;

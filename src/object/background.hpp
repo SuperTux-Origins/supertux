@@ -39,10 +39,6 @@ public:
   void draw(DrawingContext& context) override;
 
 
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/background.png";
-  }
-
   void set_image(std::string const& name);
   void set_images(std::string const& name_top, std::string const& name_middle, std::string const& name_bottom);
   void set_speed(float bgd_speed);

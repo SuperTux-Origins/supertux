@@ -21,7 +21,8 @@
 #include "math/random.hpp"
 #include "object/particles.hpp"
 #include "object/player.hpp"
-#include "object/rock.hpp"
+#include "ecs/object_behaviors.hpp"
+#include "object/archetype_object.hpp"
 #include "object/sprite_particle.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
@@ -127,10 +128,10 @@ Wind::collision(GameObject& other, CollisionHit const& )
     badguy->add_wind_velocity(speed * acceleration * dt_sec, speed);
   }
 
-  auto rock = dynamic_cast<Rock*>(&other);
-  if (rock && affects_objects)
+  auto object = dynamic_cast<ArchetypeObject*>(&other);
+  if (object && ecs::try_get<Rock>(object->get_entity()) && affects_objects)
   {
-    rock->add_wind_velocity(speed * acceleration * dt_sec, speed);
+    rock::add_wind_velocity(*object, speed * acceleration * dt_sec, speed);
   }
 
   return ABORT_MOVE;

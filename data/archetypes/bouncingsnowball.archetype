@@ -1,0 +1,8 @@
+(supertux-archetype
+  (name "bouncingsnowball")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/bouncing_snowball/bouncing_snowball.sprite"))
+  (components
+    (bouncer (speed 80) (jump-speed -450) (bounce-factor 0.8))
+    (squish-reaction (action "squished") (directional #f))))

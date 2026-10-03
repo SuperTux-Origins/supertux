@@ -1,0 +1,10 @@
+; The 1up doll jumping out of a bonus block.
+(supertux-archetype
+  (name "oneup")
+  (base "object")
+  (properties
+    (sprite "images/powerups/1up/1up.sprite")
+    (layer "floatingobjects")
+    (colgroup "touchable"))
+  (components
+    (oneup)))

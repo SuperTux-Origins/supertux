@@ -1,0 +1,12 @@
+(supertux-archetype
+  (name "livefire_dormant")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/livefire/livefire.sprite")
+    (light-color 0.89 0.75 0.44)
+    (glowing #t)
+    (freezable #t)
+    (flammable #f))
+  (components
+    (livefire (variant "dormant"))
+    (walker (speed 0) (max-drop-height 20))))

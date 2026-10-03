@@ -20,14 +20,14 @@
 #ifndef SCRIPTING_API
 #include "scripting/game_object.hpp"
 
-class Candle;
+class ArchetypeObject;
 #endif
 
 namespace scripting {
 
 class Candle final
 #ifndef SCRIPTING_API
-  : public GameObject<::Candle>
+  : public GameObject<::ArchetypeObject>
 #endif
 {
 public:

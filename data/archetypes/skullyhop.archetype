@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "skullyhop")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/skullyhop/skullyhop.sprite")
+    (freezable #t))
+  (components
+    (hopper (jump-speed-x 220) (jump-speed-y -450) (recover-time 0.5) (sound "sounds/hop.ogg"))
+    (squish-reaction (action "squished"))))

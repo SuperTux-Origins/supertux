@@ -1,0 +1,8 @@
+(supertux-archetype
+  (name "mole")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/mole/mole.sprite")
+    (layer "tiles-1"))
+  (components
+    (mole (rock "mole_rock") (wait-time 0.2) (throw-time 4.6) (throw-interval 1) (throw-velocity 400))))

@@ -37,9 +37,6 @@ public:
   bool is_running() const; /**< returns true if the ending cinematic started */
   bool is_tux_stopped(int player); /**< returns true if Tux has reached his final position */
   bool is_done() const; /**< returns true if EndSequence has finished playing */
-  bool is_saveable() const override {
-    return false;
-  }
 
   Controller const* get_controller(int player);
 

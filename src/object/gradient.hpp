@@ -34,12 +34,6 @@ public:
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
 
-  bool is_saveable() const override;
-
-
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/gradient.png";
-  }
 
   void set_gradient(Color top, Color bottom);
   void fade_gradient(Color top, Color bottom, float time);

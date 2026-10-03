@@ -16,9 +16,10 @@
 
 #include "supertux/level.hpp"
 
-#include "badguy/goldbomb.hpp"
-#include "object/bonus_block.hpp"
-#include "object/coin.hpp"
+#include "badguy/badguy.hpp"
+#include "ecs/badguy_components.hpp"
+#include "ecs/registry.hpp"
+#include "ecs/object_components.hpp"
 #include "supertux/sector.hpp"
 #include "trigger/secretarea_trigger.hpp"
 
@@ -90,28 +91,26 @@ Level::get_total_coins() const
   int total_coins = 0;
   for (auto const& sector : m_sectors) {
     for (auto const& o: sector->get_objects()) {
-      auto coin = dynamic_cast<Coin*>(o.get());
-      if (coin)
+      if (ecs::try_get<Coin>(o->get_entity()))
       {
         total_coins++;
         continue;
       }
-      auto block = dynamic_cast<BonusBlock*>(o.get());
-      if (block)
+      if (auto* block = ecs::try_get<BonusBlock>(o->get_entity()))
       {
-        if (block->get_contents() == BonusBlock::Content::COIN)
+        if (block->contents == BonusBlock::Content::COIN)
         {
-          total_coins += block->get_hit_counter();
+          total_coins += block->hit_counter;
           continue;
-        } else if (block->get_contents() == BonusBlock::Content::RAIN ||
-                   block->get_contents() == BonusBlock::Content::EXPLODE)
+        } else if (block->contents == BonusBlock::Content::RAIN ||
+                   block->contents == BonusBlock::Content::EXPLODE)
         {
-          total_coins += 10 * block->get_hit_counter();
+          total_coins += 10 * block->hit_counter;
           continue;
         }
       }
-      auto goldbomb = dynamic_cast<GoldBomb*>(o.get());
-      if (goldbomb)
+      // explodes into coins
+      if (ecs::try_get<GoldBomb>(o->get_entity()))
         total_coins += 10;
     }
   }

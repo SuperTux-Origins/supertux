@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "unstable_tile")
+  (base "object")
+  (properties
+    (sprite "images/objects/unstable_tile/snow.sprite")
+    (layer "tiles")
+    (colgroup "static"))
+  (components
+    (unstable-tile (respawn-time 5) (fade-out-time 1) (fade-in-time 0.5))))

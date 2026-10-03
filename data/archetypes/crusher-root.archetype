@@ -1,0 +1,8 @@
+; Spawned where a root crusher hits the ground.
+(supertux-archetype
+  (name "crusher-root")
+  (base "object")
+  (properties
+    (sprite "images/creatures/crusher/roots/crusher_root.sprite"))
+  (components
+    (crusher-root)))

@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "crystallo")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/crystallo/crystallo.sprite")
+    (flammable #f))
+  (components
+    (walker (speed 80) (max-drop-height 16))
+    (patrol (radius 100) (acceleration 2) (slowdown-action "slowdown"))
+    (squish-reaction (action "shattered") (anchor-bottom #t) (stop #t))))

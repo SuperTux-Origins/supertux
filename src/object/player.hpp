@@ -19,6 +19,7 @@
 
 #include "scripting/player.hpp"
 #include "sprite/sprite_ptr.hpp"
+#include "ecs/player_components.hpp"
 #include "squirrel/exposed_object.hpp"
 #include "supertux/direction.hpp"
 #include "supertux/moving_object.hpp"
@@ -43,7 +44,11 @@ class Player final : public MovingObject,
                      public ExposedObject<Player, scripting::Player>
 {
 public:
-  enum FallMode { ON_GROUND, JUMPING, TRAMPOLINE_JUMP, FALLING };
+  using FallMode = PlayerJump::FallMode;
+  static constexpr FallMode ON_GROUND = PlayerJump::ON_GROUND;
+  static constexpr FallMode JUMPING = PlayerJump::JUMPING;
+  static constexpr FallMode TRAMPOLINE_JUMP = PlayerJump::TRAMPOLINE_JUMP;
+  static constexpr FallMode FALLING = PlayerJump::FALLING;
 
 private:
   class GrabListener final : public ObjectRemoveListener
@@ -76,7 +81,6 @@ public:
   void collision_solid(CollisionHit const& hit) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
   void collision_tile(uint32_t tile_attributes) override;
-  bool is_saveable() const override { return false; }
   bool is_singleton() const override { return false; }
   void remove_me() override;
 
@@ -88,7 +92,7 @@ public:
   void set_controller(Controller const* controller);
   /** Level solved. Don't kill Tux any more. */
   void set_winning();
-  bool is_winning() const { return m_winning; }
+  bool is_winning() const { return m_life.winning; }
 
   // Tux can only go this fast. If set to 0 no special limit is used, only the default limits.
   void set_speedlimit(float newlimit);
@@ -101,11 +105,11 @@ public:
 
   void make_invincible();
 
-  bool is_invincible() const { return m_invincible_timer.started(); }
-  bool is_dying() const { return m_dying; }
+  bool is_invincible() const { return m_life.invincible_timer.started(); }
+  bool is_dying() const { return m_life.dying; }
 
-  Direction peeking_direction_x() const { return m_peekingX; }
-  Direction peeking_direction_y() const { return m_peekingY; }
+  Direction peeking_direction_x() const { return m_move.peeking_x; }
+  Direction peeking_direction_y() const { return m_move.peeking_y; }
 
   void kill(bool completely);
   void move(Vector const& vector);
@@ -159,16 +163,16 @@ public:
   Vector get_velocity() const;
 
   void bounce(BadGuy& badguy);
-  void override_velocity() { m_velocity_override = true; }
+  void override_velocity() { m_move.velocity_override = true; }
 
-  bool is_dead() const { return m_dead; }
+  bool is_dead() const { return m_life.dead; }
   bool is_big() const;
-  bool is_stone() const { return m_stone; }
-  bool is_swimming() const { return m_swimming; }
-  bool is_swimboosting() const { return m_swimboosting; }
-  bool is_water_jumping() const { return m_water_jump; }
-  bool is_skidding() const { return m_skidding_timer.started(); }
-  float get_swimming_angle() const { return m_swimming_angle; }
+  bool is_stone() const { return m_move.stone; }
+  bool is_swimming() const { return m_swim.swimming; }
+  bool is_swimboosting() const { return m_swim.boosting; }
+  bool is_water_jumping() const { return m_swim.water_jump; }
+  bool is_skidding() const { return m_move.skidding_timer.started(); }
+  float get_swimming_angle() const { return m_swim.angle; }
 
   void set_visible(bool visible);
   bool get_visible() const;
@@ -192,7 +196,7 @@ public:
   void set_edit_mode(bool enable);
 
   /** Returns whether ghost mode is currently enabled */
-  bool get_ghost_mode() const { return m_ghost_mode; }
+  bool get_ghost_mode() const { return m_life.ghost_mode; }
 
   /** Changes height of bounding box.
       Returns true if successful, false otherwise */
@@ -223,8 +227,6 @@ public:
   void set_dir(bool right);
   void stop_backflipping();
 
-  void position_grabbed_object();
-  bool try_grab();
 
   /** Boosts Tux in a certain direction, sideways. Useful for bumpers/walljumping. */
   void sideways_push(float delta);
@@ -235,25 +237,14 @@ public:
   int get_ending_direction() const { return m_ending_direction; }
 
 private:
-  void handle_input();
-  void handle_input_ghost(); /**< input handling while in ghost mode */
-  void handle_input_climbing(); /**< input handling while climbing */
-  void handle_input_rolling();
 
-  void handle_input_swimming();
 
-  void handle_horizontal_input();
-  void handle_vertical_input();
 
-  void do_jump_apex();
-  void early_jump_apex();
 
-  void swim(float pointx, float pointy, bool boost);
 
   BonusType string_to_bonus(std::string const& bonus) const;
 
   /** slows Tux down a little, based on where he's standing */
-  void apply_friction();
 
   void check_bounds();
 
@@ -278,38 +269,7 @@ private:
   Controller const* m_controller;
   std::unique_ptr<CodeController> m_scripting_controller; /**< This controller is used when the Player is controlled via scripting */
   PlayerStatus& m_player_status;
-  bool m_duck;
-  bool m_dead;
-  bool m_dying;
-  bool m_winning;
-  bool m_backflipping;
-  int  m_backflip_direction;
-  Direction m_peekingX;
-  Direction m_peekingY;
-  bool m_stone;
-  bool m_swimming;
-  bool m_swimboosting;
-  bool m_no_water;
-  bool m_on_left_wall;
-  bool m_on_right_wall;
-  bool m_in_walljump_tile;
-  bool m_can_walljump;
-  float m_boost;
-  float m_speedlimit;
-  bool m_velocity_override;
   Controller const* m_scripting_controller_old; /**< Saves the old controller while the scripting_controller is used */
-  bool m_jump_early_apex;
-  bool m_on_ice;
-  bool m_ice_this_frame;
-  SpritePtr m_lightsprite;
-  SpritePtr m_powersprite;
-  SpritePtr m_multiplayer_arrow;
-
-  // Multiplayer tag stuff (number displayed over the players)
-  Timer m_tag_timer;
-  std::unique_ptr<FadeHelper> m_tag_fade;
-  float m_tag_alpha;
-  bool m_has_moved; // If the player sent input to move the player
 
 public:
   Direction m_dir;
@@ -317,68 +277,40 @@ public:
 private:
   Direction m_old_dir;
 
-public:
-  float m_last_ground_y;
-  FallMode m_fall_mode;
-
-private:
-  bool m_on_ground_flag;
-  bool m_jumping;
-  bool m_can_jump;
-  Timer m_jump_button_timer; /**< started when player presses the jump button; runs until Tux jumps or JUMP_GRACE_TIME runs out */
-  Timer m_coyote_timer; /**< started when Tux falls off a ledge; runs until Tux jumps or COYOTE_TIME runs out */
-  bool m_wants_buttjump;
+  // State kept in the registry (ecs/player_components.hpp)
+  Physic& m_physic;
+  PlayerSwim& m_swim;
+  PlayerWallJump& m_wall;
+  PlayerMovement& m_move;
+  PlayerAppearance& m_look;
 
 public:
-  bool m_does_buttjump;
-  Timer m_invincible_timer;
+  /** public for badguys, objects and the camera */
+  PlayerJump& m_jump;
+  PlayerLife& m_life;
 
 private:
-  Timer m_skidding_timer;
-  Timer m_safe_timer;
-  Timer m_kick_timer;
-  Timer m_buttjump_timer;
-
-public:
-  Timer m_dying_timer;
-
-private:
-  Timer m_second_growup_sound_timer;
-  bool m_growing;
-  Timer m_backflip_timer;
-
-  Physic m_physic;
-
-  bool m_visible;
-
   Portable* m_grabbed_object;
   std::unique_ptr<ObjectRemoveListener> m_grabbed_object_remove_listener;
   bool m_released_object;
-
-  SpritePtr m_sprite; /**< The main sprite representing Tux */
-
-  float m_swimming_angle;
-  float m_swimming_accel_modifier;
-  bool m_water_jump;
-
-  SurfacePtr m_airarrow; /**< arrow indicating Tux' position when he's above the camera */
-
-  Vector m_floor_normal;
-
-  bool m_ghost_mode; /**< indicates if Tux should float around and through solid objects */
-  bool m_edit_mode; /**< indicates if Tux should switch to ghost mode rather than dying */
-
-  Timer m_unduck_hurt_timer; /**< if Tux wants to stand up again after ducking and cannot, this timer is started */
-
-  Timer m_idle_timer;
-  unsigned int m_idle_stage;
 
   Climbable* m_climbing; /**< Climbable object we are currently climbing, null if none */
   std::unique_ptr<ObjectRemoveListener> m_climbing_remove_listener;
 
   int m_ending_direction;
 
+  SpritePtr m_sprite; /**< The main sprite representing Tux */
+  SpritePtr m_lightsprite;
+  SpritePtr m_powersprite;
+  SpritePtr m_multiplayer_arrow;
+  SurfacePtr m_airarrow; /**< arrow indicating Tux' position when he's above the camera */
+
+  // Multiplayer tag stuff (number displayed over the players)
+  std::unique_ptr<FadeHelper> m_tag_fade;
+
 private:
+  friend struct PlayerSystems;
+
   Player(Player const&) = delete;
   Player& operator=(Player const&) = delete;
 };

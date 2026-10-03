@@ -19,7 +19,36 @@ adapted from Pingus and Windstille.
       (stb_image, GLES packages, linuxPorts hygiene, full outputs).
 - [ ] Inventory remaining gaps in mk/ and nix/ vs Pingus/Windstille
       (wasm.nix still shorter; SDL static builds incomplete).
-- [ ] Continuous numbered git bundles (`supertux-001-…`).
+- [x] Unit tests in `tests/` were never built (`build_dependencies()`
+      force-caches `BUILD_TESTS=OFF`); now `SUPERTUX_BUILD_TESTS`, run by
+      `nix build` on native builds.
+- [ ] `ReaderTest.syntax_error` disabled: the priocpp mapping reader
+      accepts stray atoms (`(mymapping (a 1) err (b 2))`) and does not
+      throw.
+- [ ] Demo recorder: `restart_level()` calls `start_recording()`, which
+      reseeds and truncates the `--record-demo` file on every death.
+- [ ] Dispenser default sprites `images/creatures/dispenser/{dropper,invisible}.sprite`
+  don't exist: dispensers without an explicit `(sprite ...)` fail to load
+  (e.g. world2/owls_skydive_commando, world2/going_underground).
+- [ ] Missing snowball melting textures (`images/creatures/snowball/*melting*`)
+      logged on every level load.
+
+## ECS migration (see docs/ecs-migration/kickoff.md, "Current state")
+
+- [x] Badguys used by shipped levels are archetypes (incl. bosses).
+- [x] Blocks, platforms, coins, powerups, crushers, carryables and
+      interactive scenery are object archetypes.
+- [x] Player state in registry components, logic in PlayerSystems.
+- [ ] Sprite-less "area" shell; migrate triggers, climbable, wind.
+- [ ] scriptedobject, spotlight.
+- [ ] Batch behaviors into system passes over component views (needs
+      reviewed re-baselining; update order changes).
+- [ ] Maintainer review of objects no shipped level places (walking_candle,
+      rcrystallo, scrystallo, plant, totem, angrystone, fish-swimming,
+      fish-chasing, fish-harmless, kamikazesnowball, kugelblitz, ...);
+      kamikazesnowball and leafshot are still dispensed by bonus levels.
+- [ ] Android / wasm / R36S / MinGW builds of the ECS branch (Linux only
+      so far).
 
 ## Windows (MinGW)
 

@@ -1,0 +1,10 @@
+; The earth flower rising from a bonus block.
+(supertux-archetype
+  (name "earthflower-bonus")
+  (base "object")
+  (properties
+    (sprite "images/powerups/earthflower/earthflower.sprite")
+    (colgroup "touchable"))
+  (components
+    (flower-bonus (bonus "earth"))
+    (glow (color 0.0 0.3 0.0))))

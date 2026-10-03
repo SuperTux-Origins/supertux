@@ -28,9 +28,6 @@ class RainSplash final : public GameObject
 public:
   RainSplash(Vector const& pos, bool vertical);
   ~RainSplash() override;
-  bool is_saveable() const override {
-    return false;
-  }
 
 protected:
   virtual void hit(Player& );

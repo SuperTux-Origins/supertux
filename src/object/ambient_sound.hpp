@@ -59,8 +59,6 @@ public:
 
   HitResponse collision(GameObject& other, CollisionHit const& hit_) override;
 
-  bool has_variable_size() const override { return true; }
-
   /** @name Scriptable Methods
       @{ */
 #ifndef SCRIPTING_API

@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "toad")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/toad/toad.sprite")
+    (freezable #t))
+  (components
+    (toad (jump-speed-x 320) (jump-speed-y -450) (recover-time 0.5) (sound "sounds/hop.ogg"))
+    (squish-reaction (action "squished"))))

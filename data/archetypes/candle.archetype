@@ -1,0 +1,10 @@
+; Scenery candle. Levels may set burning, flicker, color and layer.
+(supertux-archetype
+  (name "candle")
+  (base "object")
+  (properties
+    (sprite "images/objects/candle/candle.sprite")
+    (layer "backgroundtiles+1")
+    (colgroup "disabled"))
+  (components
+    (candle)))

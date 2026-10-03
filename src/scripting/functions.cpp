@@ -366,7 +366,7 @@ void invincible()
   if (!validate_sector_player()) return;
   // FIXME: This only has effect on the first player
   ::Player& tux = *(::Sector::get().get_players()[0]);
-  tux.m_invincible_timer.start(10000);
+  tux.m_life.invincible_timer.start(10000);
 }
 
 void ghost()
@@ -382,7 +382,7 @@ void mortal()
   if (!validate_sector_player()) return;
   // FIXME: This only has effect on the first player
   ::Player& tux = *(::Sector::get().get_players()[0]);
-  tux.m_invincible_timer.stop();
+  tux.m_life.invincible_timer.stop();
   tux.set_ghost_mode(false);
 }
 

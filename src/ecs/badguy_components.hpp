@@ -1,0 +1,924 @@
+//  SuperTux
+//  Copyright (C) 2026 Ingo Ruhnke <grumbel@gmail.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#ifndef HEADER_SUPERTUX_ECS_BADGUY_COMPONENTS_HPP
+#define HEADER_SUPERTUX_ECS_BADGUY_COMPONENTS_HPP
+
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
+#include <entt/entity/entity.hpp>
+
+#include "ecs/runtime_state.hpp"
+#include "math/vector.hpp"
+#include "sprite/sprite.hpp"
+#include "util/uid.hpp"
+#include "audio/sound_source.hpp"
+#include "supertux/timer.hpp"
+#include "util/reader_mapping.hpp"
+#include "video/color.hpp"
+#include "video/surface_ptr.hpp"
+
+class MovingObject;
+
+/** Walks along the floor, turning at walls and optionally at ledges. */
+struct Walker
+{
+  /** WalkingBadguy holds a reference to its Walker */
+  static constexpr auto in_place_delete = true;
+
+  float speed = 80.0f;
+  /** maximum drop before turning around at a ledge, -1 to walk off any ledge */
+  int max_drop_height = -1;
+  std::string left_action = "left";
+  std::string right_action = "right";
+
+  /** too many turns within a second make the badguy dizzy, it falls off */
+  Timer turn_around_timer = {};
+  int turn_around_counter = 0;
+
+  /** Set by other behaviors (Patrol) for the current frame only:
+      velocity to walk towards instead of +/-speed, and the acceleration
+      multiplier. */
+  std::optional<float> target_velocity = {};
+  float acceleration = 1.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Walker& walker)
+{
+  mapping.read("speed", walker.speed);
+  mapping.read("max-drop-height", walker.max_drop_height);
+  mapping.read("left-action", walker.left_action);
+  mapping.read("right-action", walker.right_action);
+}
+
+/** Floats down slowly when there is no ground directly below
+    (walkingleaf, viciousivy). */
+struct Floater
+{
+  float max_fall_speed = 35.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Floater& floater)
+{
+  mapping.read("max-fall-speed", floater.max_fall_speed);
+}
+
+/** Walks back and forth around the start position, slowing down before
+    turning (crystallo). Requires a Walker. */
+struct Patrol
+{
+  float radius = 100.0f;
+  /** walk acceleration multiplier */
+  float acceleration = 1.0f;
+  /** action prefix used while slower than walk speed, empty for none */
+  std::string slowdown_action;
+};
+
+inline void read_component(ReaderMapping const& mapping, Patrol& patrol)
+{
+  mapping.read("radius", patrol.radius);
+  mapping.read("acceleration", patrol.acceleration);
+  mapping.read("slowdown-action", patrol.slowdown_action);
+}
+
+/** Jumps in place whenever it lands, facing the nearest player
+    (jumpy). Sprite actions: left/right-up, -middle, -down, and "editor"
+    before the first landing. */
+struct Jumper
+{
+  float jump_speed = -600.0f;
+  /** height above the landing position that separates the up, middle
+      and down actions */
+  float mid_tolerance = 4.0f;
+  float low_tolerance = 2.0f;
+
+  // state
+  Vector ground_pos = {};
+  bool ground_pos_set = false;
+};
+
+inline void read_component(ReaderMapping const& mapping, Jumper& jumper)
+{
+  mapping.read("jump-speed", jumper.jump_speed);
+  mapping.read("mid-tolerance", jumper.mid_tolerance);
+  mapping.read("low-tolerance", jumper.low_tolerance);
+}
+
+/** Bounces along the floor, losing some speed per bounce but never
+    jumping lower than jump_speed (bouncingsnowball). Sprite actions:
+    left/right, left/right-up after a bounce, left/right-down before
+    landing. */
+struct Bouncer
+{
+  float speed = 80.0f;
+  float jump_speed = -450.0f;
+  float bounce_factor = 0.8f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Bouncer& bouncer)
+{
+  mapping.read("speed", bouncer.speed);
+  mapping.read("jump-speed", bouncer.jump_speed);
+  mapping.read("bounce-factor", bouncer.bounce_factor);
+}
+
+/** Orbits its start position (flame). spin rotates the sprite by
+    that many degrees per degree of orbit (iceflame). */
+struct Circler
+{
+  float radius = 100.0f;
+  /** radians per second */
+  float speed = 2.0f;
+  float spin = 0.0f;
+
+  // state
+  float angle = 0.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Circler& circler)
+{
+  mapping.read("radius", circler.radius);
+  mapping.read("speed", circler.speed);
+  mapping.read("spin", circler.spin);
+}
+
+/** Flies a fixed up and down curve around its start height, facing the
+    nearest player and puffing smoke (flyingsnowball). */
+struct Flyer
+{
+  float amplitude = 100.0f;
+  float rate = 0.8f;
+  float puff_interval_min = 4.0f;
+  float puff_interval_max = 8.0f;
+
+  // state
+  float elapsed = 0.0f;
+  Timer puff_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Flyer& flyer)
+{
+  mapping.read("amplitude", flyer.amplitude);
+  mapping.read("rate", flyer.rate);
+  mapping.read("puff-interval-min", flyer.puff_interval_min);
+  mapping.read("puff-interval-max", flyer.puff_interval_max);
+}
+
+/** Fizzles out (sizzle, "fade" action, smoke) instead of freezing or
+    burning, depending on trigger: "freeze" (flame) or "ignite"
+    (iceflame). The badguy is removed when the fade animation ends. */
+struct ElementalFade
+{
+  std::string trigger = "freeze";
+};
+
+inline void read_component(ReaderMapping const& mapping, ElementalFade& fade)
+{
+  mapping.read("trigger", fade.trigger);
+}
+
+/** Plays a looping sound at the badguy's position while it is active. */
+struct LoopingSound
+{
+  std::string sound;
+  float gain = 1.0f;
+  float reference_distance = 32.0f;
+
+  // state, shared_ptr keeps the prototype copyable
+  std::shared_ptr<SoundSource> source = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, LoopingSound& sound)
+{
+  mapping.read("sound", sound.sound);
+  mapping.read("gain", sound.gain);
+  mapping.read("reference-distance", sound.reference_distance);
+}
+
+/** Stomping leaves a ticking bomb (the "bomb" archetype, using this
+    badguy's sprite); falling or burning makes it explode. Can be carried
+    while frozen (mrbomb). */
+struct BombCarrier
+{
+  std::string bomb = "bomb";
+};
+
+inline void read_component(ReaderMapping const& mapping, BombCarrier& carrier)
+{
+  mapping.read("bomb", carrier.bomb);
+}
+
+/** A ticking bomb that explodes when its "ticking" animation ends, or
+    when it falls or burns. Can be carried and thrown (bomb). */
+struct Fuse
+{
+  std::string sound = "sounds/fizz.wav";
+
+  // state, shared_ptr keeps the prototype copyable
+  std::shared_ptr<SoundSource> ticking = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Fuse& fuse)
+{
+  mapping.read("sound", fuse.sound);
+}
+
+/** Hangs from the ceiling, shakes when a player passes below (or a
+    bullet hits it) and falls, freezing or killing badguys it hits.
+    type is "ice" or "rock" (rock ricochets bullets and kills instead of
+    freezing). */
+struct Stalactite
+{
+  /** YetiStalactite holds a reference to its Stalactite */
+  static constexpr auto in_place_delete = true;
+
+  std::string type;
+
+  enum class State { HANGING, SHAKING, FALLING, SQUISHED };
+
+  // state
+  State state = State::HANGING;
+  Timer timer = {};
+  Vector shake_delta = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Stalactite& stalactite)
+{
+  mapping.read("type", stalactite.type);
+}
+
+/** Walks (with its Walker) until stomped; then lies flat, can be
+    carried, and kicked to slide along killing badguys (mriceblock).
+    List it before the walker: it decides when the Walker runs. */
+struct IceBlock
+{
+  float kick_speed = 500.0f;
+  int max_squishes = 10;
+  float nokick_time = 0.1f;
+  float flat_time = 4.0f;
+
+  enum class State { NORMAL, FLAT, GRABBED, KICKED, WAKING };
+
+  // state
+  State state = State::NORMAL;
+  Timer nokick_timer = {};
+  Timer flat_timer = {};
+  int squishcount = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, IceBlock& iceblock)
+{
+  mapping.read("kick-speed", iceblock.kick_speed);
+  mapping.read("max-squishes", iceblock.max_squishes);
+  mapping.read("nokick-time", iceblock.nokick_time);
+  mapping.read("flat-time", iceblock.flat_time);
+}
+
+/** Jumps onto ledges and over gaps; walks at board_speed until it
+    first lands, then at walk_speed (captainsnowball). List it before
+    the walker. */
+struct Boarder
+{
+  float walk_speed = 100.0f;
+  float board_speed = 200.0f;
+  float jump_speed = -400.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Boarder& boarder)
+{
+  mapping.read("walk-speed", boarder.walk_speed);
+  mapping.read("board-speed", boarder.board_speed);
+  mapping.read("jump-speed", boarder.jump_speed);
+}
+
+/** Sleeps until a player comes within reach in front of it, then
+    wakes up and walks (sspiky). List it before the walker. */
+struct Sleeper
+{
+  float reach = 256.0f;
+
+  enum class State { SLEEPING, WAKING, WALKING };
+
+  // state
+  State state = State::SLEEPING;
+};
+
+inline void read_component(ReaderMapping const& mapping, Sleeper& sleeper)
+{
+  mapping.read("reach", sleeper.reach);
+}
+
+/** Turns away from fire bullets it can see, and ricochets bullets that
+    do not hit it in front (igel). List it before the walker. */
+struct BulletShy
+{
+  float range_of_vision = 256.0f;
+  /** seconds before turning around again */
+  float turn_recover_time = 0.5f;
+
+  // state
+  Timer turn_recover_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, BulletShy& shy)
+{
+  mapping.read("range-of-vision", shy.range_of_vision);
+  mapping.read("turn-recover-time", shy.turn_recover_time);
+}
+
+/** Explodes harmlessly (pushing things away) when touched, stomped,
+    burnt or falling (short_fuse). */
+struct Firecracker
+{
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, Firecracker& /*firecracker*/)
+{
+}
+
+/** Walks (with its Walker) until stomped; then hides in its shell, can
+    be carried, and kicked to slide (upwards when stomped) killing
+    badguys (snail). List it before the walker. */
+struct Snail
+{
+  float kick_speed = 500.0f;
+  float kick_speed_y = -500.0f;
+  int max_squishes = 10;
+  float flat_time = 4.0f;
+
+  enum class State { NORMAL, FLAT, WAKING, KICKED_DELAY, KICKED, GRABBED };
+
+  // state
+  State state = State::NORMAL;
+  Timer kicked_delay_timer = {};
+  Timer flat_timer = {};
+  int squishcount = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, Snail& snail)
+{
+  mapping.read("kick-speed", snail.kick_speed);
+  mapping.read("kick-speed-y", snail.kick_speed_y);
+  mapping.read("max-squishes", snail.max_squishes);
+  mapping.read("flat-time", snail.flat_time);
+}
+
+/** Loses its head when stomped or burnt: the head becomes a new badguy
+    (snowman). Bullets other than fire ricochet. */
+struct Snowman
+{
+  std::string head = "snowball";
+};
+
+inline void read_component(ReaderMapping const& mapping, Snowman& snowman)
+{
+  mapping.read("head", snowman.head);
+}
+
+/** Turns into a stump badguy when stomped, sprouting two smaller
+    badguys (mrtree). */
+struct MrTree
+{
+  std::string stump = "stumpy";
+  std::string sprout = "viciousivy";
+};
+
+inline void read_component(ReaderMapping const& mapping, MrTree& tree)
+{
+  mapping.read("stump", tree.stump);
+  mapping.read("sprout", tree.sprout);
+}
+
+/** Is dizzy and invincible for a while when spawned by a MrTree, then
+    walks (stumpy). List it before the walker. */
+struct Stumpy
+{
+  float invincible_time = 1.0f;
+
+  // state
+  bool invincible = false;
+  Timer invincible_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Stumpy& stumpy)
+{
+  mapping.read("invincible-time", stumpy.invincible_time);
+}
+
+/** Jumps out of the water, waits below the surface, and gets beached
+    (and burns) when it lands on solid ground for too long (fish). */
+struct JumpingFish
+{
+  float jump_speed = -600.0f;
+  float wait_time = 1.0f;
+  float beach_time = 5.0f;
+
+  // state
+  Timer wait_timer = {};
+  Timer beached_timer = {};
+  /** y-coordinate to stop at, 0 until it first enters water */
+  float stop_y = 0.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, JumpingFish& fish)
+{
+  mapping.read("jump-speed", fish.jump_speed);
+  mapping.read("wait-time", fish.wait_time);
+  mapping.read("beach-time", fish.beach_time);
+}
+
+/** Stands, charges and jumps towards its facing direction (skullyhop).
+    Sprite actions: standing, charging, jumping. */
+struct Hopper
+{
+  float jump_speed_x = 220.0f;
+  float jump_speed_y = -450.0f;
+  float recover_time = 0.5f;
+  std::string sound = "sounds/hop.ogg";
+
+  enum class State { STANDING, CHARGING, JUMPING };
+
+  // state
+  State state = State::JUMPING;
+  Timer recover_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Hopper& hopper)
+{
+  mapping.read("jump-speed-x", hopper.jump_speed_x);
+  mapping.read("jump-speed-y", hopper.jump_speed_y);
+  mapping.read("recover-time", hopper.recover_time);
+  mapping.read("sound", hopper.sound);
+}
+
+/** Flies up and down without gravity, facing the nearest player
+    (spidermite). */
+struct Bobber
+{
+  float speed = 100.0f;
+  /** seconds for one full up or down stroke */
+  float fly_time = 1.2f;
+
+  // state
+  bool going_up = true;
+  Timer timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Bobber& bobber)
+{
+  mapping.read("speed", bobber.speed);
+  mapping.read("fly-time", bobber.fly_time);
+}
+
+/** Stationary trap that periodically shoots darts (darttrap). Its
+    settings are usually given per level object. */
+struct DartShooter
+{
+  std::string dart = "dart";
+  bool enabled = true;
+  float initial_delay = 0.0f;
+  float fire_delay = 2.0f;
+  /** -1 means unlimited */
+  int ammo = -1;
+
+  // state
+  bool loading = false;
+  Timer fire_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, DartShooter& shooter)
+{
+  mapping.read("dart", shooter.dart);
+  mapping.read("enabled", shooter.enabled);
+  mapping.read("initial-delay", shooter.initial_delay);
+  mapping.read("fire-delay", shooter.fire_delay);
+  mapping.read("ammo", shooter.ammo);
+}
+
+/** Flies until it hits something, killing badguys other than the one
+    that shot it (dart, mole_rock). Starts with velocity if given, else
+    horizontally at speed in its facing direction. One of actions is
+    picked at random (-left/-right suffixed if directional). */
+struct Projectile
+{
+  float speed = 200.0f;
+  std::optional<Vector> velocity = {};
+  std::vector<std::string> actions = { "flying" };
+  bool directional = true;
+
+  // state
+  entt::entity parent = entt::null;
+};
+
+inline void read_component(ReaderMapping const& mapping, Projectile& projectile)
+{
+  mapping.read("speed", projectile.speed);
+  std::vector<float> velocity;
+  if (mapping.read("velocity", velocity) && velocity.size() == 2) {
+    projectile.velocity = Vector(velocity[0], velocity[1]);
+  }
+  mapping.read("actions", projectile.actions);
+  mapping.read("directional", projectile.directional);
+}
+
+/** Flies back and forth at a random speed and dives at players below
+    it (zeekling). */
+struct Diver
+{
+  float min_speed = 130.0f;
+  float max_speed = 171.0f;
+
+  enum class State { FLYING, DIVING, CLIMBING };
+
+  // state
+  float speed = 0.0f;
+  State state = State::FLYING;
+  MovingObject const* last_player = nullptr; /**< last player we tracked */
+  Vector last_player_pos = {}; /**< position we last spotted the player at */
+  Vector last_self_pos = {}; /**< position we last were at */
+};
+
+inline void read_component(ReaderMapping const& mapping, Diver& diver)
+{
+  mapping.read("min-speed", diver.min_speed);
+  mapping.read("max-speed", diver.max_speed);
+}
+
+/** Stomping lights its fuse: it chases the nearest player, jumping
+    over obstacles, and explodes after a while (haywire). Steers its
+    Walker; list it before the walker. */
+struct Haywire
+{
+  float explosion_time = 5.0f;
+  float stomped_time = 1.0f;
+  float stunned_time = 0.5f;
+  float normal_speed = 80.0f;
+  float exploding_speed = 200.0f;
+  int normal_max_drop_height = 16;
+
+  // state
+  bool exploding = false;
+  float time_until_explosion = 0.0f;
+  bool stunned = false;
+  float time_stunned = 0.0f;
+  Timer stomped_timer = {};
+  std::shared_ptr<SoundSource> ticking = {};
+  std::shared_ptr<SoundSource> grunting = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Haywire& haywire)
+{
+  mapping.read("explosion-time", haywire.explosion_time);
+  mapping.read("stomped-time", haywire.stomped_time);
+  mapping.read("stunned-time", haywire.stunned_time);
+  mapping.read("normal-speed", haywire.normal_speed);
+  mapping.read("exploding-speed", haywire.exploding_speed);
+  mapping.read("normal-max-drop-height", haywire.normal_max_drop_height);
+}
+
+/** Stomping lights its fuse; it then can be carried and thrown, and
+    explodes into coins (goldbomb). List it before the walker. */
+struct GoldBomb
+{
+  // state
+  bool ticking = false;
+  std::shared_ptr<SoundSource> ticking_sound = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, GoldBomb& /*goldbomb*/)
+{
+}
+
+/** A walking flame that goes out (instead of freezing) when frozen or
+    killed (livefire). variant "walking" walks from the start,
+    "sleeping" waits for a player like Sleeper, "dormant" never wakes.
+    List it before the walker. */
+struct LiveFire
+{
+  std::string variant = "walking";
+  std::string death_sound = "sounds/fall.wav";
+
+  enum class State { SLEEPING, WAKING, WALKING, DORMANT, DEAD };
+
+  // state
+  State state = State::WALKING;
+};
+
+inline void read_component(ReaderMapping const& mapping, LiveFire& livefire)
+{
+  mapping.read("variant", livefire.variant);
+  mapping.read("death-sound", livefire.death_sound);
+}
+
+/** Jumps towards its facing direction, turning towards the nearest
+    player when falling (toad). */
+struct Toad
+{
+  float jump_speed_x = 320.0f;
+  float jump_speed_y = -450.0f;
+  float recover_time = 0.5f;
+  std::string sound = "sounds/hop.ogg";
+
+  enum class State { IDLE, JUMPING, FALLING };
+
+  // state
+  State state = State::JUMPING;
+  Timer recover_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Toad& toad)
+{
+  mapping.read("jump-speed-x", toad.jump_speed_x);
+  mapping.read("jump-speed-y", toad.jump_speed_y);
+  mapping.read("recover-time", toad.recover_time);
+  mapping.read("sound", toad.sound);
+}
+
+/** Hides in the ground, peeks out and throws rocks (mole). */
+struct Mole
+{
+  std::string rock = "mole_rock";
+  float wait_time = 0.2f;
+  float throw_time = 4.6f;
+  float throw_interval = 1.0f;
+  float throw_velocity = 400.0f;
+
+  enum class State { PRE_THROWING, THROWING, POST_THROWING, PEEKING, DEAD, BURNING };
+
+  // state
+  State state = State::PRE_THROWING;
+  Timer timer = {};
+  Timer throw_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Mole& mole)
+{
+  mapping.read("rock", mole.rock);
+  mapping.read("wait-time", mole.wait_time);
+  mapping.read("throw-time", mole.throw_time);
+  mapping.read("throw-interval", mole.throw_interval);
+  mapping.read("throw-velocity", mole.throw_velocity);
+}
+
+/** Explodes when it lands, hits something or is stomped; can be carried
+    (skydive, dropped by owls). */
+struct Skydive
+{
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, Skydive& /*skydive*/)
+{
+}
+
+/** Flies back and forth carrying an object (another archetype or
+    object type, by name), which it drops when above a player (owl). */
+struct Owl
+{
+  std::string carry = "skydive";
+  float speed = 120.0f;
+  /** drop the object this far ahead of the player */
+  float activation_distance = 128.0f;
+
+  // state
+  entt::entity carried = entt::null;
+};
+
+inline void read_component(ReaderMapping const& mapping, Owl& owl)
+{
+  mapping.read("carry", owl.carry);
+  mapping.read("speed", owl.speed);
+  mapping.read("activation-distance", owl.activation_distance);
+}
+
+/** Flies towards the nearest player within track range, or along its
+    path (PathFollower) (ghoul). */
+struct Ghoul
+{
+  float flyspeed = 80.0f;
+  float track_range = 2500.0f;
+
+  enum class State { STOPPED, IDLE, TRACKING, PATHMOVING, PATHMOVING_TRACK };
+
+  // state
+  State state = State::IDLE;
+};
+
+inline void read_component(ReaderMapping const& mapping, Ghoul& ghoul)
+{
+  mapping.read("flyspeed", ghoul.flyspeed);
+  mapping.read("track-range", ghoul.track_range);
+}
+
+/** Boss of the ghost tree level: spawns circling TreeWillOWisps, changes
+    color and sucks in the willowisps and lanterns of that color, and
+    dies when it swallows a lantern of a different color (ghosttree). */
+struct GhostTree
+{
+  enum class State { IDLE, SUCKING, SWALLOWING, DYING };
+
+  // state
+  State state = State::IDLE;
+  Timer willowisp_timer = {};
+  Timer colorchange_timer = {};
+  Timer suck_timer = {};
+  Timer root_timer = {};
+  float willo_spawn_y = 0.0f;
+  float willo_radius = 200.0f;
+  float willo_speed = 1.8f;
+  int willo_color = 0;
+  int treecolor = 0;
+  Color suck_lantern_color = {};
+  /** Lantern that is currently being sucked in */
+  UID suck_lantern = {};
+  std::vector<entt::entity> willowisps = {};
+  RuntimeState<SpritePtr> glow_sprite = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, GhostTree& /*tree*/)
+{
+}
+
+/** A willowisp circling its ghost tree until sucked in or vanished
+    (ghosttree-willowisp). Lanterns catch it. */
+struct TreeWillOWisp
+{
+  enum class State { DEFAULT, VANISHING, SUCKED };
+
+  // state
+  State state = State::DEFAULT;
+  entt::entity tree = entt::null;
+  Color color = {};
+  float angle = 0.0f;
+  float radius = 0.0f;
+  float speed = 0.0f;
+  Vector suck_target = {};
+  bool was_sucked = false;
+  std::shared_ptr<SoundSource> sound_source = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, TreeWillOWisp& /*wisp*/)
+{
+}
+
+/** A root the ghost tree grows under the player (ghosttree-root). */
+struct GhostTreeRoot
+{
+  enum class State { APPEARING, HATCHING, GROWING, SHRINKING, VANISHING };
+
+  // state
+  State state = State::APPEARING;
+  RuntimeState<SpritePtr> base_sprite = {};
+  float offset_y = 0.0f;
+  Timer hatch_timer = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, GhostTreeRoot& /*root*/)
+{
+}
+
+/** Boss of the yeti lair: runs between two daises, stomps on them to
+    shake down the YetiStalactites, takes a hit per stomp from Tux
+    (yeti). Levels set lives, hud-icon and fixed-pos. */
+struct Yeti
+{
+  int lives = 5;
+  std::string hud_icon = "images/creatures/yeti/hudlife.png";
+  bool fixed_pos = false;
+
+  enum class State { JUMP_DOWN, RUN, JUMP_UP, BE_ANGRY, SQUISHED, FALLING };
+
+  // state
+  State state = State::JUMP_DOWN;
+  Timer state_timer = {};
+  Timer safe_timer = {};
+  int stomp_count = 0;
+  int hit_points = 0;
+  SurfacePtr hud_head = {};
+  float left_stand_x = 0.0f;
+  float right_stand_x = 0.0f;
+  float left_jump_x = 0.0f;
+  float right_jump_x = 0.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Yeti& yeti)
+{
+  mapping.read("lives", yeti.lives);
+  mapping.read("hud-icon", yeti.hud_icon);
+  mapping.read("fixed-pos", yeti.fixed_pos);
+}
+
+/** Floats until the player comes near, then chases them and warps them
+    to a spawnpoint, or runs a hit-script (willowisp). May follow a
+    path (PathFollower). Lanterns catch it. Scriptable as a WillOWisp. */
+struct WillOWisp
+{
+  enum class State { STOPPED, IDLE, TRACKING, VANISHING, WARPING, PATHMOVING, PATHMOVING_TRACK };
+
+  std::string target_sector = "main";
+  std::string target_spawnpoint = "main";
+  std::string hit_script;
+  float flyspeed = 64.0f;
+  float track_range = 384.0f;
+  float vanish_range = 512.0f;
+  Color color = Color(0, 1, 0);
+
+  // state
+  State state = State::IDLE;
+  std::shared_ptr<SoundSource> sound_source = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, WillOWisp& wisp)
+{
+  mapping.read("sector", wisp.target_sector);
+  mapping.read("spawnpoint", wisp.target_spawnpoint);
+  mapping.read("hit-script", wisp.hit_script);
+  mapping.read("flyspeed", wisp.flyspeed);
+  mapping.read("track-range", wisp.track_range);
+  mapping.read("vanish-range", wisp.vanish_range);
+  std::vector<float> color;
+  if (mapping.read("color", color)) {
+    wisp.color = Color(color);
+  }
+}
+
+/** Periodically spawns badguys by name, as a cannon, a dropper or an
+    invisible point (dispenser). Levels set badguy, type, cycle, random,
+    limit-dispensed-badguys and max-concurrent-badguys. Scriptable as a
+    Dispenser. */
+struct Dispenser
+{
+  enum class Type { CANNON, DROPPER, POINT };
+
+  std::vector<std::string> badguys;
+  std::string type_name;
+  float cycle = 5.0f;
+  bool random = false;
+  bool gravity = false;
+  bool limit_dispensed_badguys = false;
+  int max_concurrent_badguys = 0;
+
+  // state
+  Type type = Type::CANNON;
+  unsigned int next_badguy = 0;
+  Timer dispense_timer = {};
+  bool autotarget = false;
+  int current_badguys = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, Dispenser& dispenser)
+{
+  mapping.read("badguy", dispenser.badguys);
+  mapping.read("type", dispenser.type_name);
+  mapping.read("cycle", dispenser.cycle);
+  mapping.read("random", dispenser.random);
+  mapping.read("gravity", dispenser.gravity);
+  mapping.read("limit-dispensed-badguys", dispenser.limit_dispensed_badguys);
+  mapping.read("max-concurrent-badguys", dispenser.max_concurrent_badguys);
+}
+
+/** How the badguy reacts to being stomped. Without this component the
+    BadGuy default applies (not squishable). */
+struct SquishReaction
+{
+  std::string action = "squished";
+  /** suffix the action with -left/-right */
+  bool directional = true;
+  /** keep the sprite's bottom edge in place when switching action */
+  bool anchor_bottom = false;
+  /** before dying: drop (enable gravity, stop vertical movement) */
+  bool drop = false;
+  /** after dying: stop moving and fall with normal gravity */
+  bool stop = false;
+  std::string particles;
+  int particle_count = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, SquishReaction& squish)
+{
+  mapping.read("action", squish.action);
+  mapping.read("directional", squish.directional);
+  mapping.read("anchor-bottom", squish.anchor_bottom);
+  mapping.read("drop", squish.drop);
+  mapping.read("stop", squish.stop);
+  mapping.read("particles", squish.particles);
+  mapping.read("particle-count", squish.particle_count);
+}
+
+#endif
+
+/* EOF */

@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "bonusblock")
+  (base "object")
+  (properties
+    (sprite "images/objects/bonus_block/bonusblock.sprite")
+    (layer "objects+1")
+    (colgroup "static"))
+  (components
+    (bonus-block)
+    (block)))

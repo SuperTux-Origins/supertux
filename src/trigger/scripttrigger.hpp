@@ -27,8 +27,6 @@ public:
   ScriptTrigger(ReaderMapping const& reader);
   ScriptTrigger(Vector const& pos, std::string const& script);
 
-  bool has_variable_size() const override { return true; }
-
   void event(Player& player, EventType type) override;
   void draw(DrawingContext& context) override;
 

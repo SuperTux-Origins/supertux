@@ -34,7 +34,7 @@ public:
   void draw(DrawingContext& context) override;
 
 private:
-  Physic physic;
+  Physic& physic;
   Timer timer;
   bool hit;
   bool falling;

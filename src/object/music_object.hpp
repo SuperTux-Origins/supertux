@@ -37,8 +37,6 @@ public:
 
   bool is_singleton() const override { return true; }
 
-  const std::string get_icon_path() const override { return "images/engine/editor/music.png"; }
-
   void play_music(MusicType musictype);
   void resume_music();
   MusicType get_music_type() const;

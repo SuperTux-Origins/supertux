@@ -29,7 +29,6 @@ public:
 	~VerticalStripes() override;
 
   bool is_singleton() const override { return true; }
-  bool is_saveable() const override { return false; }
   void update(float dt_sec) override;
  	void draw(DrawingContext& context) override;
 

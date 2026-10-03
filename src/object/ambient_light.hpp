@@ -32,8 +32,6 @@ public:
 
   bool is_singleton() const override { return true; }
 
-  const std::string get_icon_path() const override { return "images/engine/editor/ambient_light.png"; }
-
   void set_ambient_light(Color const& ambient_light);
   Color get_ambient_light() const;
 

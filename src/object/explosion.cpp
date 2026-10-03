@@ -17,13 +17,13 @@
 #include "object/explosion.hpp"
 
 #include "audio/sound_manager.hpp"
-#include "badguy/walking_badguy.hpp"
+#include "badguy/archetype_badguy.hpp"
+#include "ecs/badguy_components.hpp"
 #include "math/random.hpp"
-#include "object/bonus_block.hpp"
-#include "object/brick.hpp"
 #include "object/particles.hpp"
 #include "object/player.hpp"
-#include "object/weak_block.hpp"
+#include "ecs/object_behaviors.hpp"
+#include "object/archetype_object.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/sector.hpp"
 
@@ -111,31 +111,30 @@ Explosion::explode()
         player->add_velocity(add_speed);
       }
 
-      auto badguy = dynamic_cast<WalkingBadguy*>(obj);
-      if (badguy && badguy->is_active()) {
-        badguy->add_velocity(add_speed);
+      auto badguy = dynamic_cast<ArchetypeBadguy*>(obj);
+      if (badguy && ecs::try_get<Walker>(badguy->get_entity()) && badguy->is_active()) {
+        badguy->m_physic.set_velocity(badguy->m_physic.get_velocity() + add_speed);
       }
 
       bool in_break_range = distance <= 60.f;
       bool in_shake_range = distance <= 100.f;
 
-      auto bonusblock = dynamic_cast<BonusBlock*>(obj);
-      if (bonusblock && in_shake_range && hurts()) {
-        bonusblock->start_bounce(this);
-        if (in_break_range)
-          bonusblock->try_open(player);
+      auto block_object = dynamic_cast<ArchetypeObject*>(obj);
+      if (block_object && in_shake_range && hurts()) {
+        if (ecs::try_get<BonusBlock>(block_object->get_entity())) {
+          block::start_bounce(*block_object, this);
+          if (in_break_range)
+            bonus_block::try_open(*block_object, player);
+        } else if (ecs::try_get<Brick>(block_object->get_entity())) {
+          block::start_bounce(*block_object, this);
+          if (in_break_range)
+            brick::try_break(*block_object, nullptr);
+        }
       }
 
-      auto brick = dynamic_cast<Brick*>(obj);
-      if (brick && in_shake_range && hurts()) {
-        brick->start_bounce(this);
-        if (in_break_range)
-          brick->try_break(nullptr);
-      }
-
-      auto weakblock = dynamic_cast<WeakBlock*>(obj);
-      if (weakblock && in_break_range) {
-        weakblock->startBurning();
+      auto object = dynamic_cast<ArchetypeObject*>(obj);
+      if (object && ecs::try_get<WeakBlock>(object->get_entity()) && in_break_range) {
+        weak_block::start_burning(*object);
       }
     }
   }

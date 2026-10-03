@@ -13,25 +13,30 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #ifndef HEADER_SUPERTUX_BADGUY_YETI_STALACTITE_HPP
 #define HEADER_SUPERTUX_BADGUY_YETI_STALACTITE_HPP
 
-#include "badguy/stalactite.hpp"
+#include "badguy/archetype_badguy.hpp"
+#include "ecs/badguy_components.hpp"
 
-class YetiStalactite final : public Stalactite
+/** A stalactite in the yeti's lair: only falls when the yeti makes it
+    shake, and respawns after being squished. */
+class YetiStalactite final : public ArchetypeBadguy
 {
 public:
   YetiStalactite(ReaderMapping const& mapping);
 
-  void active_update(float dt_sec) override;
-  void draw(DrawingContext& context) override;
   void update(float dt_sec) override;
-
-  bool is_flammable() const override;
+  bool is_flammable() const override { return false; }
 
   void start_shaking();
   bool is_hanging() const;
+
+protected:
+  void active_update(float dt_sec) override;
+
+private:
+  Stalactite& m_stalactite;
 
 private:
   YetiStalactite(YetiStalactite const&) = delete;

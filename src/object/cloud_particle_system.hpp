@@ -36,10 +36,6 @@ public:
   void draw(DrawingContext& context) override;
 
 
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/clouds.png";
-  }
-
   void fade_speed(float new_speed, float fade_time);
   void fade_amount(int new_amount, float fade_time, float time_between = 0.f);
 

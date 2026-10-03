@@ -1,0 +1,10 @@
+; Levels set (portable #f) for fixed trampolines.
+(supertux-archetype
+  (name "trampoline")
+  (base "portable")
+  (properties
+    (sprite "images/objects/trampoline/trampoline.sprite")
+    (colgroup "moving-static"))
+  (components
+    (trampoline (portable #t) (fixed-sprite "images/objects/trampoline/trampoline_fix.sprite"))
+    (rock)))

@@ -1,0 +1,10 @@
+; Levels set (linked #f) for blocks that melt alone.
+(supertux-archetype
+  (name "weak_block")
+  (base "object")
+  (properties
+    (sprite "images/objects/weak_block/strawbox.sprite")
+    (layer "tiles")
+    (colgroup "static"))
+  (components
+    (weak-block (linked #t) (unlinked-sprite "images/objects/weak_block/meltbox.sprite"))))

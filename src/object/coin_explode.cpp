@@ -17,7 +17,7 @@
 #include "object/coin_explode.hpp"
 
 #include "math/random.hpp"
-#include "object/coin.hpp"
+#include "ecs/object_behaviors.hpp"
 #include "supertux/sector.hpp"
 
 CoinExplode::CoinExplode(Vector const& pos) :
@@ -31,16 +31,16 @@ CoinExplode::update(float )
   float mag = 100.0f; // madnitude that coins are to be thrown
   float rand = 30.0f; // max variation to be subtracted from magnitide
 
-  Sector::get().add<HeavyCoin>(position, Vector(2.5, -4.5) * (mag - gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(2, -5) * (mag - gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(1.5, -5.5) * (mag - gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(1, -6) * (mag+gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(0.5, -6.5) * (mag - gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(-2.5, -4.5) * (mag - gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(-2, -5) * (mag - gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(-1.5, -5.5) * (mag - gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(-1, -6) * (mag+gameRandom.randf(rand)));
-  Sector::get().add<HeavyCoin>(position, Vector(-0.5, -6.5) * (mag - gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(2.5, -4.5) * (mag - gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(2, -5) * (mag - gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(1.5, -5.5) * (mag - gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(1, -6) * (mag+gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(0.5, -6.5) * (mag - gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(-2.5, -4.5) * (mag - gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(-2, -5) * (mag - gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(-1.5, -5.5) * (mag - gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(-1, -6) * (mag+gameRandom.randf(rand)));
+  coin::spawn_heavy(position, Vector(-0.5, -6.5) * (mag - gameRandom.randf(rand)));
 
   remove_me();
 }

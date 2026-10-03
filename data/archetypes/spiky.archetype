@@ -1,0 +1,8 @@
+(supertux-archetype
+  (name "spiky")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/spiky/spiky.sprite")
+    (freezable #t))
+  (components
+    (walker (speed 80) (max-drop-height 600))))

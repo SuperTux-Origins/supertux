@@ -559,6 +559,11 @@ void ScreenManager::loop_iter()
     elapsed_ticks = 0;
   }
 
+  if (g_config->fast_forward) {
+    // Exactly one logical step per iteration, independent of wall clock
+    elapsed_ticks = ms_per_step;
+  }
+
   if (elapsed_ticks < ms_per_step && !g_debug.draw_redundant_frames) {
     // Not enough time for another logical step — wait.
     // Under Emscripten the browser paces via requestAnimationFrame; SDL_Delay

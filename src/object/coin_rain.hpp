@@ -28,9 +28,6 @@ public:
   CoinRain(Vector const& pos, bool emerge=false);
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
-  bool is_saveable() const override {
-    return false;
-  }
 
 private:
   SpritePtr sprite;

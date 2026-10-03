@@ -1,0 +1,8 @@
+(supertux-archetype
+  (name "skydive")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/skydive/skydive.sprite")
+    (freezable #t))
+  (components
+    (skydive)))

@@ -1,0 +1,17 @@
+(supertux-archetype
+  (name "ghostflame")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/flame/ghostflame.sprite")
+    (layer "floatingobjects")
+    (light-sprite "images/objects/lightmap_light/lightmap_light-small.sprite")
+    (light-color 0.21 0.00 0.21)
+    (glowing #t)
+    (count-me #f)
+    (colgroup "touchable")
+    (fall-immune #t)
+    (freezable #f)
+    (flammable #f))
+  (components
+    (circler (radius 100) (speed 2))
+    (looping-sound (sound "sounds/flame.wav"))))

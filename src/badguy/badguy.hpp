@@ -17,6 +17,8 @@
 #ifndef HEADER_SUPERTUX_BADGUY_BADGUY_HPP
 #define HEADER_SUPERTUX_BADGUY_BADGUY_HPP
 
+#include <entt/entity/entity.hpp>
+
 #include "object/moving_sprite.hpp"
 #include "object/portable.hpp"
 #include "scripting/badguy.hpp"
@@ -25,7 +27,6 @@
 #include "supertux/physic.hpp"
 #include "supertux/timer.hpp"
 
-class Dispenser;
 class Player;
 class Bullet;
 
@@ -115,10 +116,10 @@ public:
 
   /** Sets the dispenser that spawns this badguy.
       @param parent The dispenser */
-  void set_parent_dispenser(Dispenser* parent) { m_parent_dispenser = parent; }
+  void set_parent_dispenser(entt::entity parent) { m_parent_dispenser = parent; }
 
   /** Returns the dispenser this badguys was spawned by */
-  Dispenser* get_parent_dispenser() const { return m_parent_dispenser; }
+  entt::entity get_parent_dispenser() const { return m_parent_dispenser; }
 
   /** Returns true if the badguy can currently be affected by wind */
   virtual bool can_be_affected_by_wind() const;
@@ -222,7 +223,7 @@ private:
   void try_activate();
 
 protected:
-  Physic m_physic;
+  Physic& m_physic;
 
 public:
   /** Count this badguy to the statistics? This value should not be
@@ -252,7 +253,7 @@ protected:
 
   /** If this badguy was dispensed from a dispenser,
       save the dispenser here. */
-  Dispenser* m_parent_dispenser;
+  entt::entity m_parent_dispenser;
 
 private:
   State m_state;

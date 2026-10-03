@@ -15,6 +15,8 @@
 
 #include "object/bumper.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "object/player.hpp"
 #include "util/reader_mapping.hpp"
@@ -27,7 +29,7 @@ const float BOUNCE_X = 700.0f;
 
 Bumper::Bumper(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/trampoline/bumper.sprite", LAYER_OBJECTS, COLGROUP_MOVING),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   left()
 {
   reader.read("left", left);

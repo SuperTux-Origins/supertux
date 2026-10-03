@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "flyingsnowball")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/flying_snowball/flying_snowball.sprite")
+    (gravity #f))
+  (components
+    (flyer (amplitude 100) (rate 0.8) (puff-interval-min 4) (puff-interval-max 8))
+    (squish-reaction (action "squished") (drop #t))))

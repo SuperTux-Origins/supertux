@@ -1,0 +1,9 @@
+; The egg rising from a bonus block.
+(supertux-archetype
+  (name "growup")
+  (base "object")
+  (properties
+    (sprite "images/powerups/egg/egg.sprite")
+    (colgroup "moving"))
+  (components
+    (growup)))

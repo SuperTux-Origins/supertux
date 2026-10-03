@@ -17,12 +17,13 @@
 #ifndef HEADER_SUPERTUX_BADGUY_WALKING_BADGUY_HPP
 #define HEADER_SUPERTUX_BADGUY_WALKING_BADGUY_HPP
 
-#include "badguy/badguy.hpp"
+#include "badguy/archetype_badguy.hpp"
+#include "ecs/badguy_components.hpp"
 
-class Timer;
-
-/** Base class for Badguys that walk on the floor. */
-class WalkingBadguy : public BadGuy
+/** Base class for hand-written badguys that walk on the floor. The
+    walking itself is the Walker behavior (ecs/badguy_behaviors.cpp);
+    data-defined walkers use ArchetypeBadguy with a (walker) component. */
+class WalkingBadguy : public ArchetypeBadguy
 {
 public:
   WalkingBadguy(Vector const& pos,
@@ -44,34 +45,26 @@ public:
                 int layer = LAYER_OBJECTS,
                 std::string const& light_sprite_name = "images/objects/lightmap_light/lightmap_light-medium.sprite");
 
-  void initialize() override;
-  void active_update(float dt_sec) override;
-  void collision_solid(CollisionHit const& hit) override;
-  HitResponse collision_badguy(BadGuy& badguy, CollisionHit const& hit) override;
+  using ArchetypeBadguy::active_update;
 
+  /** Move this frame and walk towards target_velocity */
   void active_update(float dt_sec, float target_velocity, float modifier = 1.f);
 
   float get_velocity_x() const { return m_physic.get_velocity_x(); }
   float get_velocity_y() const { return m_physic.get_velocity_y(); }
-  void set_velocity_y(float vy);
+  void set_velocity_y(float vy) { m_physic.set_velocity_y(vy); }
 
   /** Adds velocity to the badguy (be careful when using this) */
-  void add_velocity(Vector const& velocity);
+  void add_velocity(Vector const& velocity) { m_physic.set_velocity(m_physic.get_velocity() + velocity); }
 
-  float get_walk_speed() const { return walk_speed; }
-  void set_walk_speed (float);
-  bool is_active() const { return BadGuy::is_active(); }
+  float get_walk_speed() const;
+  void set_walk_speed(float speed);
 
 protected:
   void turn_around();
 
 protected:
-  std::string walk_left_action;
-  std::string walk_right_action;
-  float walk_speed;
-  int max_drop_height; /**< Maximum height of drop before we will turn around, or -1 to just drop from any ledge */
-  Timer turn_around_timer;
-  int turn_around_counter; /**< counts number of turns since turn_around_timer was started */
+  Walker& m_walker;
 
 private:
   WalkingBadguy(WalkingBadguy const&) = delete;

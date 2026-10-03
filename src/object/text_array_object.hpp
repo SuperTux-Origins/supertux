@@ -44,12 +44,7 @@ public:
   void update(float dt_sec) override;
 
   bool is_singleton() const override { return true; }
-  bool is_saveable() const override { return false; }
 
-
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/textarray.png";
-  }
 
   /////////// TextArray api related ///////////
 

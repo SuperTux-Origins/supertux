@@ -23,8 +23,8 @@ WalkingCandle::WalkingCandle(ReaderMapping const& reader)
   : WalkingBadguy(reader, "images/creatures/mr_candle/mr-candle.sprite", "left", "right"),
     lightcolor(1, 1, 1)
 {
-  walk_speed = 80;
-  max_drop_height = 64;
+  m_walker.speed = 80;
+  m_walker.max_drop_height = 64;
 
   std::vector<float> vColor;
   if (reader.read("color", vColor)) {

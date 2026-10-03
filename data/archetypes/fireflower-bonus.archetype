@@ -1,0 +1,10 @@
+; The fire flower rising from a bonus block.
+(supertux-archetype
+  (name "fireflower-bonus")
+  (base "object")
+  (properties
+    (sprite "images/powerups/fireflower/fireflower.sprite")
+    (colgroup "touchable"))
+  (components
+    (flower-bonus (bonus "fire"))
+    (glow (color 0.3 0.0 0.0))))

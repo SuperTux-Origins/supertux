@@ -51,6 +51,9 @@ public:
   int get_layer() const override { return m_layer; }
 
   std::string get_sprite_name() const;
+
+  /** The current action of the sprite */
+  std::string const& get_action() const;
   bool change_sprite(std::string const& new_sprite_name);
   void spawn_explosion_sprites(int count, std::string const& sprite_path);
 

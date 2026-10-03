@@ -1,0 +1,76 @@
+//  SuperTux
+//  Copyright (C) 2026 Ingo Ruhnke <grumbel@gmail.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#ifndef HEADER_SUPERTUX_ECS_OBJECT_BEHAVIOR_HPP
+#define HEADER_SUPERTUX_ECS_OBJECT_BEHAVIOR_HPP
+
+#include <squirrel.h>
+
+#include "collision/collision_hit.hpp"
+#include "math/vector.hpp"
+#include "util/reader_mapping.hpp"
+
+class ArchetypeObject;
+class Bullet;
+class MovingObject;
+enum class Direction;
+class Player;
+class DrawingContext;
+class GameObject;
+
+/** Handlers that give a component behavior on an ArchetypeObject, the
+    generic shell for non-badguy objects (see BadGuyBehavior for the
+    dispatch rules). "all" handlers run for every behavior in archetype
+    order, for "first" handlers the first behavior that has one replaces
+    the default. */
+struct ObjectBehavior
+{
+  /** all: read instance data from the level object, before construct */
+  void (*read)(ArchetypeObject& self, ReaderMapping const& mapping) = nullptr;
+  /** all: end of construction */
+  void (*construct)(ArchetypeObject& self) = nullptr;
+  /** all: the sector is complete, named objects can be resolved */
+  void (*finish_construction)(ArchetypeObject& self) = nullptr;
+  /** all: register a scripting wrapper if the object has a name */
+  void (*expose)(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx) = nullptr;
+  void (*unexpose)(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx) = nullptr;
+  /** first, default: set_pos(); e.g. move the path along */
+  void (*move_to)(ArchetypeObject& self, Vector const& pos) = nullptr;
+  /** all */
+  void (*update)(ArchetypeObject& self, float dt_sec) = nullptr;
+  /** first, default: draw the sprite */
+  void (*draw)(ArchetypeObject& self, DrawingContext& context) = nullptr;
+  /** first, default: FORCE_MOVE */
+  HitResponse (*collision)(ArchetypeObject& self, GameObject& other, CollisionHit const& hit) = nullptr;
+  /** first, default: nothing */
+  void (*collision_solid)(ArchetypeObject& self, CollisionHit const& hit) = nullptr;
+  /** first, default: true */
+  bool (*collides)(ArchetypeObject const& self, GameObject& other, CollisionHit const& hit) = nullptr;
+  /** first, default: nothing; e.g. a block hit by the player */
+  void (*hit)(ArchetypeObject& self, Player& player) = nullptr;
+  /** first, only for PortableObject (base "portable"), default: the
+      Portable implementation */
+  bool (*is_portable)(ArchetypeObject const& self) = nullptr;
+  void (*grab)(ArchetypeObject& self, MovingObject& object, Vector const& pos, Direction dir) = nullptr;
+  void (*ungrab)(ArchetypeObject& self, MovingObject& object, Direction dir) = nullptr;
+};
+
+/** The object behavior of a component type, specialized in object_behaviors.cpp */
+template<typename T>
+ObjectBehavior const& object_behavior_of();
+
+#endif
+
+/* EOF */

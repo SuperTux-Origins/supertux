@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "brick")
+  (base "object")
+  (properties
+    (sprite "images/objects/bonus_block/brick.sprite")
+    (layer "objects+1")
+    (colgroup "static"))
+  (components
+    (brick (breakable #t))
+    (block)))

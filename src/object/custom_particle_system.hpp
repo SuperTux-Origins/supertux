@@ -42,10 +42,6 @@ public:
   void update(float dt_sec) override;
 
 
-  const std::string get_icon_path() const override {
-    return "images/engine/editor/sparkle.png";
-  }
-
   void expose(HSQUIRRELVM vm, SQInteger table_idx) override {
     ExposedObject<CustomParticleSystem, scripting::CustomParticles>::expose(vm, table_idx);
   }

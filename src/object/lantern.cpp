@@ -18,16 +18,31 @@
 
 
 #include "audio/sound_manager.hpp"
-#include "badguy/treewillowisp.hpp"
-#include "badguy/willowisp.hpp"
+#include "ecs/object_behaviors.hpp"
+#include "badguy/archetype_badguy.hpp"
+#include "ecs/badguy_behaviors.hpp"
+#include "ecs/badguy_components.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "util/reader_mapping.hpp"
 
+namespace {
+
+Rock read_rock(ReaderMapping const& reader)
+{
+  Rock rock;
+  read_component(reader, rock);
+  return rock;
+}
+
+} // namespace
+
 Lantern::Lantern(ReaderMapping const& reader) :
-  Rock(reader, "images/objects/lantern/lantern.sprite"),
+  PortableObject(reader, "images/objects/lantern/lantern.sprite", LAYER_OBJECTS, COLGROUP_MOVING_STATIC),
   lightcolor(1.0f, 1.0f, 1.0f),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light.sprite"))
 {
+  add_behavior(read_rock(reader));
+
   std::vector<float> vColor;
   if (reader.read("color", vColor)) {
     lightcolor = Color(vColor);
@@ -40,10 +55,12 @@ Lantern::Lantern(ReaderMapping const& reader) :
 }
 
 Lantern::Lantern(Vector const& pos) :
-  Rock(pos, "images/objects/lantern/lantern.sprite"),
+  PortableObject(pos, "images/objects/lantern/lantern.sprite", LAYER_OBJECTS, COLGROUP_MOVING_STATIC),
   lightcolor(0.0f, 0.0f, 0.0f),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light.sprite"))
 {
+  add_behavior(Rock());
+
   lightsprite->set_blend(Blend::ADD);
   updateColor();
   SoundManager::current()->preload("sounds/willocatch.wav");
@@ -72,32 +89,33 @@ Lantern::draw(DrawingContext& context){
 
 HitResponse Lantern::collision(GameObject& other, CollisionHit const& hit) {
 
-  WillOWisp* wow = dynamic_cast<WillOWisp*>(&other);
+  auto* wow = dynamic_cast<ArchetypeBadguy*>(&other);
+  auto* wisp = wow ? ecs::try_get<WillOWisp>(wow->get_entity()) : nullptr;
 
-  if (wow && (is_open() || wow->get_color().greyscale() == 0.f)) {
+  if (wisp && (is_open() || wisp->color.greyscale() == 0.f)) {
     // collided with WillOWisp while grabbed and unlit
     SoundManager::current()->play("sounds/willocatch.wav", get_pos());
-    lightcolor = wow->get_color();
+    lightcolor = wisp->color;
     updateColor();
-    wow->vanish();
+    willowisp::vanish(*wow);
   }
 
-  TreeWillOWisp* twow = dynamic_cast<TreeWillOWisp*>(&other);
-  if (twow && (is_open() || twow->get_color().greyscale() == 0.f)) {
+  auto* twow = wow ? ecs::try_get<TreeWillOWisp>(wow->get_entity()) : nullptr;
+  if (twow && (is_open() || twow->color.greyscale() == 0.f)) {
     // collided with TreeWillOWisp while grabbed and unlit
     SoundManager::current()->play("sounds/willocatch.wav", get_pos());
-    lightcolor = twow->get_color();
+    lightcolor = twow->color;
     updateColor();
-    twow->vanish();
+    tree_willowisp::vanish(*wow);
   }
 
-  return Rock::collision(other, hit);
+  return ArchetypeObject::collision(other, hit);
 }
 
 void
 Lantern::grab(MovingObject& object, Vector const& pos, Direction dir)
 {
-  Rock::grab(object, pos, dir);
+  PortableObject::grab(object, pos, dir);
 
   // if lantern is not lit, draw it as opened
   if (is_open()) {
@@ -114,7 +132,7 @@ Lantern::ungrab(MovingObject& object, Direction dir)
     m_sprite->set_action("off");
   }
 
-  Rock::ungrab(object, dir);
+  PortableObject::ungrab(object, dir);
 }
 
 bool

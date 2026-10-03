@@ -1,0 +1,18 @@
+(supertux-archetype
+  (name "iceflame")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/flame/iceflame.sprite")
+    (layer "floatingobjects")
+    (light-sprite "images/objects/lightmap_light/lightmap_light-small.sprite")
+    (light-color 0.00 0.13 0.18)
+    (glowing #t)
+    (count-me #f)
+    (colgroup "touchable")
+    (fall-immune #t)
+    (freezable #f)
+    (flammable #t))
+  (components
+    (circler (radius 100) (speed 2) (spin 3))
+    (looping-sound (sound "sounds/flame.wav"))
+    (elemental-fade (trigger "ignite"))))

@@ -36,8 +36,6 @@ public:
   void draw(DrawingContext& context) override;
 
 
-  const std::string get_icon_path() const override { return "images/engine/editor/thunderstorm.png"; }
-
   /** @name Scriptable Methods
       @{ */
 

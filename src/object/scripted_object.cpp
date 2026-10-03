@@ -16,6 +16,8 @@
 
 #include "object/scripted_object.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "math/random.hpp"
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
@@ -25,7 +27,7 @@
 ScriptedObject::ScriptedObject(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/bonus_block/brick.sprite", LAYER_OBJECTS, COLGROUP_MOVING_STATIC),
   ExposedObject<ScriptedObject, scripting::ScriptedObject>(this),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   solid(),
   physic_enabled(),
   visible(),

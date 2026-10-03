@@ -1,0 +1,10 @@
+; Levels set enabled, initial-delay, fire-delay and ammo per trap.
+(supertux-archetype
+  (name "darttrap")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/darttrap/darttrap.sprite")
+    (layer "tiles-1")
+    (colgroup "disabled"))
+  (components
+    (dart-shooter (dart "dart") (fire-delay 2))))

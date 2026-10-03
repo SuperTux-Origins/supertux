@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "captainsnowball")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/snowball/cpt-snowball.sprite"))
+  (components
+    (boarder (walk-speed 100) (board-speed 200) (jump-speed -400))
+    (walker (speed 200))
+    (squish-reaction (action "squished"))))

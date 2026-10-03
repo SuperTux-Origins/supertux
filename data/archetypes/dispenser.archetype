@@ -1,0 +1,11 @@
+; Levels set badguy, type (cannon, dropper, point), cycle, random, gravity,
+; limit-dispensed-badguys and max-concurrent-badguys.
+(supertux-archetype
+  (name "dispenser")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/dispenser/dropper.sprite")
+    (freezable #t)
+    (flammable #f))
+  (components
+    (dispenser)))

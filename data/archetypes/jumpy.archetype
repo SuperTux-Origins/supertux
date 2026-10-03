@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "jumpy")
+  (aliases "money") ; name in old levels
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/snowjumpy/snowjumpy.sprite")
+    (initial-action "left-middle")
+    (freezable #t))
+  (components
+    (jumper (jump-speed -600) (mid-tolerance 4) (low-tolerance 2))))

@@ -28,8 +28,6 @@ public:
   SequenceTrigger(ReaderMapping const& reader);
   SequenceTrigger(Vector const& pos, std::string const& sequence_name);
 
-  bool has_variable_size() const override { return true; }
-
   void event(Player& player, EventType type) override;
   void draw(DrawingContext& context) override;
 

@@ -48,10 +48,6 @@ private:
   float m_period;
   float m_cycle_start;
   bool m_cyclic;
-
-private:
-  Timer(Timer const&) = delete;
-  Timer& operator=(Timer const&) = delete;
 };
 
 #endif

@@ -52,6 +52,9 @@ public:
   GameObject& add_object(std::unique_ptr<GameObject> object);
   void clear_objects();
 
+  /** Returns the object owning the given entity, or nullptr */
+  static GameObject* get_object_by_entity(entt::entity entity);
+
   template<typename T, typename... Args>
   T& add(Args&&... args)
   {

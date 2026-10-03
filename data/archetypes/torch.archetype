@@ -1,0 +1,9 @@
+; A torch lit by touching it. Levels may set sprite, burning, color and layer.
+(supertux-archetype
+  (name "torch")
+  (base "object")
+  (properties
+    (sprite "images/objects/torch/torch1.sprite")
+    (colgroup "touchable"))
+  (components
+    (torch)))

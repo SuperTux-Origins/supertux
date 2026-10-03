@@ -41,8 +41,6 @@ public:
   void event(Player& player, EventType type) override;
   void update(float dt_sec) override;
 
-  bool has_variable_size() const override { return true; }
-
 private:
   bool m_once;
   std::vector<std::string> m_items;

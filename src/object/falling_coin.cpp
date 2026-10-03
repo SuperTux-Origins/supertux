@@ -16,6 +16,8 @@
 
 #include "object/falling_coin.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "sprite/sprite.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "supertux/globals.hpp"
@@ -23,7 +25,7 @@
 #include "video/viewport.hpp"
 
 FallingCoin::FallingCoin(Vector const& start_position, float vel_x) :
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   pos(start_position),
   sprite(SpriteManager::current()->create("images/objects/coin/coin.sprite"))
 {

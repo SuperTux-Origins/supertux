@@ -47,10 +47,13 @@ stdenv.mkDerivation rec {
 
   strictDeps = true;
 
+  # Unit tests (tests/, gtest) only run on native builds.
+  doCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
+
   cmakeFlags = [
     "-DINSTALL_SUBDIR_BIN=bin"
     "-DUSE_SYSTEM_SDL2_TTF=ON"
-    "-DBUILD_TESTS=ON"
+    "-DSUPERTUX_BUILD_TESTS=${if doCheck then "ON" else "OFF"}"
     "-DPROJECT_VERSION_FULL=${version}"
   ] ++
   lib.optional useGLES2 "-DENABLE_OPENGLES2=ON";

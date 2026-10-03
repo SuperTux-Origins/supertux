@@ -114,6 +114,12 @@ MovingSprite::update(float )
 {
 }
 
+std::string const&
+MovingSprite::get_action() const
+{
+  return m_sprite->get_action();
+}
+
 std::string
 MovingSprite::get_sprite_name() const
 {

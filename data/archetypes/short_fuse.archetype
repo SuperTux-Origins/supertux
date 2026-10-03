@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "short_fuse")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/short_fuse/short_fuse.sprite")
+    (freezable #t))
+  (components
+    (firecracker)
+    (walker (speed 100))))

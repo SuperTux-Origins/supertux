@@ -390,8 +390,8 @@ Camera::update_scroll_normal(float dt_sec)
     // position where they last touched the ground. (this probably needs
     // exceptions for trampolines and similar things in the future)
     float target_y;
-    if (player.m_fall_mode == Player::JUMPING)
-      target_y = player.m_last_ground_y + player.get_bbox().get_height();
+    if (player.m_jump.fall_mode == Player::JUMPING)
+      target_y = player.m_jump.last_ground_y + player.get_bbox().get_height();
     else
       target_y = player.get_bbox().get_bottom();
     target_y -= static_cast<float>(static_cast<float>(m_screen_size.height)) * config_.target_y;
@@ -402,8 +402,8 @@ Camera::update_scroll_normal(float dt_sec)
     float speed_y = delta_y / dt_sec;
 
     // limit the camera speed when jumping upwards
-    if (player.m_fall_mode != Player::FALLING
-       && player.m_fall_mode != Player::TRAMPOLINE_JUMP) {
+    if (player.m_jump.fall_mode != Player::FALLING
+       && player.m_jump.fall_mode != Player::TRAMPOLINE_JUMP) {
       speed_y = std::clamp(speed_y, -config_.max_speed_y, config_.max_speed_y);
     }
 
@@ -830,10 +830,4 @@ Camera::move(const int dx, const int dy)
   m_translation.y += static_cast<float>(dy);
 }
 
-bool
-Camera::is_saveable() const
-{
-  return !(Level::current() &&
-           Level::current()->is_worldmap());
-}
 /* EOF */

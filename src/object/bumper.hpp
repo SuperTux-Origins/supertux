@@ -29,7 +29,7 @@ public:
   void update(float dt_sec) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
-  Physic physic;
+  Physic& physic;
 
 private:
   bool left;

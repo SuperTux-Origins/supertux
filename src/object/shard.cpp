@@ -16,6 +16,8 @@
 
 #include "object/shard.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
 #include "math/util.hpp"
@@ -23,7 +25,7 @@
 
 Shard::Shard(ReaderMapping const& reader) :
   MovingSprite(reader, "images/creatures/crystallo/shard.sprite", LAYER_TILES - 2, COLGROUP_MOVING),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_stick_timer()
 {
   m_physic.enable_gravity(true);
@@ -32,7 +34,7 @@ Shard::Shard(ReaderMapping const& reader) :
 
 Shard::Shard(Vector const& pos, Vector const& velocity) :
   MovingSprite(pos, "images/creatures/crystallo/shard.sprite", LAYER_TILES - 2, COLGROUP_MOVING),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_stick_timer()
 {
   m_physic.enable_gravity(true);

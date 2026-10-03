@@ -1,0 +1,9 @@
+; Levels set the (color R G B) the block reacts to.
+(supertux-archetype
+  (name "magicblock")
+  (base "object")
+  (properties
+    (sprite "images/objects/magicblock/magicblock.sprite")
+    (colgroup "static"))
+  (components
+    (magicblock)))

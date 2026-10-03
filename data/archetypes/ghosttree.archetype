@@ -1,0 +1,12 @@
+; Boss of the ghost tree level; spawns ghosttree-willowisp and ghosttree-root.
+(supertux-archetype
+  (name "ghosttree")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/ghosttree/ghosttree.sprite")
+    (layer "objects-10")
+    (freezable #f)
+    (flammable #f)
+    (fall-immune #t))
+  (components
+    (ghosttree)))

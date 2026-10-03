@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "fish-jumping")
+  (aliases "fish") ; name in old levels
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/fish/forest/jumpfish.sprite")
+    (freezable #t))
+  (components
+    (jumping-fish (jump-speed -600) (wait-time 1) (beach-time 5))))

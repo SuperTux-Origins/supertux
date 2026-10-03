@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "infoblock")
+  (base "object")
+  (properties
+    (sprite "images/objects/bonus_block/infoblock.sprite")
+    (layer "objects+1")
+    (colgroup "static"))
+  (components
+    (infoblock)
+    (block)))

@@ -32,7 +32,8 @@ GameSessionRecorder::GameSessionRecorder() :
   m_capture_demo_stream(),
   m_playback_demo_stream(),
   m_demo_controller(),
-  m_playing(false)
+  m_playing(false),
+  m_demo_finished(false)
 {
 }
 
@@ -120,8 +121,6 @@ GameSessionRecorder::play_demo(std::string const& filename)
     m_playback_demo_stream->get(buf[i]);
   if (sscanf(buf, "random_seed=%010d", &seed) != 1)
     m_playback_demo_stream->seekg(0);     // old style w/o seed, restart at beg
-
-  m_playing = false;
 }
 
 void
@@ -142,7 +141,7 @@ void
 GameSessionRecorder::process_events()
 {
   // playback a demo?
-  if (m_playback_demo_stream != nullptr)
+  if (m_playback_demo_stream != nullptr && !m_demo_finished)
   {
     m_demo_controller->update();
 
@@ -154,6 +153,11 @@ GameSessionRecorder::process_events()
     m_playback_demo_stream->get(down);
     m_playback_demo_stream->get(jump);
     m_playback_demo_stream->get(action);
+
+    if (!*m_playback_demo_stream) {
+      m_demo_finished = true;
+      left = right = up = down = jump = action = 0;
+    }
 
     m_demo_controller->press(Control::LEFT, left != 0);
     m_demo_controller->press(Control::RIGHT, right != 0);

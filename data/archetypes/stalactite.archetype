@@ -1,0 +1,9 @@
+; The level sets (type "ice") or (type "rock").
+(supertux-archetype
+  (name "stalactite")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/stalactite/stalactite.sprite")
+    (layer "tiles-1"))
+  (components
+    (stalactite)))
