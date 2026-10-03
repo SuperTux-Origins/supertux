@@ -20,14 +20,14 @@
 #ifndef SCRIPTING_API
 #include "scripting/game_object.hpp"
 
-class Rock;
+class ArchetypeObject;
 #endif
 
 namespace scripting {
 
 class Rock final
 #ifndef SCRIPTING_API
-  : public GameObject<::Rock>
+  : public GameObject<::ArchetypeObject>
 #endif
 {
 #ifndef SCRIPTING_API

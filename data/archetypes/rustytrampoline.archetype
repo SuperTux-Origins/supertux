@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "rustytrampoline")
+  (base "portable")
+  (properties
+    (sprite "images/objects/rusty-trampoline/rusty-trampoline.sprite")
+    (colgroup "moving-static"))
+  (components
+    (rusty-trampoline (portable #t) (counter 3))
+    (rock)))

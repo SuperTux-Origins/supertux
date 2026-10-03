@@ -56,6 +56,20 @@ ArchetypeObject::ArchetypeObject(Vector const& pos, Archetype const& archetype) 
   construct();
 }
 
+ArchetypeObject::ArchetypeObject(ReaderMapping const& reader, std::string const& sprite_name, int layer,
+                                 CollisionGroup collision_group) :
+  MovingSprite(reader, sprite_name, layer, collision_group),
+  m_behaviors()
+{
+}
+
+ArchetypeObject::ArchetypeObject(Vector const& pos, std::string const& sprite_name, int layer,
+                                 CollisionGroup collision_group) :
+  MovingSprite(pos, sprite_name, layer, collision_group),
+  m_behaviors()
+{
+}
+
 ArchetypeObject::~ArchetypeObject()
 {
 }

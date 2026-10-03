@@ -38,6 +38,7 @@
 #include "object/bicycle_platform.hpp"
 #include "badguy/crusher.hpp"
 #include "object/archetype_object.hpp"
+#include "object/portable_object.hpp"
 #include "object/bumper.hpp"
 #include "object/camera.hpp"
 #include "object/candle.hpp"
@@ -60,7 +61,6 @@
 #include "object/pushbutton.hpp"
 #include "object/rain_particle_system.hpp"
 #include "object/rublight.hpp"
-#include "object/rusty_trampoline.hpp"
 #include "object/scripted_object.hpp"
 #include "object/shard.hpp"
 #include "object/skull_tile.hpp"
@@ -72,7 +72,6 @@
 #include "object/thunderstorm.hpp"
 #include "object/tilemap.hpp"
 #include "object/torch.hpp"
-#include "object/trampoline.hpp"
 #include "object/wind.hpp"
 #include "ecs/archetype.hpp"
 #include "supertux/level.hpp"
@@ -105,10 +104,12 @@ GameObjectFactory::add_archetypes(std::string const& base)
 {
   for (Archetype const* archetype : ArchetypeRegistry::instance().get_archetypes())
   {
-    if (archetype->get_base() != "badguy" && archetype->get_base() != "object") {
+    if (archetype->get_base() != "badguy" && archetype->get_base() != "object" &&
+        archetype->get_base() != "portable") {
       throw std::runtime_error("archetype '" + archetype->get_name() + "': unknown base '" + archetype->get_base() + "'");
     }
-    if (archetype->get_base() != base) {
+    // portable objects register with the other objects
+    if (archetype->get_base() != base && !(base == "object" && archetype->get_base() == "portable")) {
       continue;
     }
 
@@ -116,6 +117,10 @@ GameObjectFactory::add_archetypes(std::string const& base)
     if (base == "badguy") {
       factory = [archetype](ReaderMapping const& reader) -> std::unique_ptr<GameObject> {
         return std::make_unique<ArchetypeBadguy>(reader, *archetype);
+      };
+    } else if (archetype->get_base() == "portable") {
+      factory = [archetype](ReaderMapping const& reader) -> std::unique_ptr<GameObject> {
+        return std::make_unique<PortableObject>(reader, *archetype);
       };
     } else {
       factory = [archetype](ReaderMapping const& reader) -> std::unique_ptr<GameObject> {
@@ -186,7 +191,6 @@ GameObjectFactory::init_factories()
   add_factory<PowerUp>("powerup");
   add_factory<PushButton>("pushbutton");
   add_factory<RainParticleSystem>("particles-rain");
-  add_factory<Rock>("rock", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<RubLight>("rublight");
   add_factory<ScriptedObject>("scriptedobject");
   add_factory<Shard>("shard");
@@ -197,8 +201,6 @@ GameObjectFactory::init_factories()
   add_factory<TextArrayObject>("text-array");
   add_factory<Thunderstorm>("thunderstorm");
   add_factory<Torch>("torch");
-  add_factory<Trampoline>("trampoline", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
-  add_factory<RustyTrampoline>("rustytrampoline", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Wind>("wind");
   add_factory<TextArea>("text-area");
 

@@ -330,6 +330,54 @@ inline void read_component(ReaderMapping const& /*mapping*/, HeavyCoin& /*coin*/
 {
 }
 
+/** A carryable object with gravity and ground friction that hurts
+    what it falls on (rock). Base of trampolines and lanterns. Levels
+    may set on-grab-script and on-ungrab-script. */
+struct Rock
+{
+  std::string on_grab_script;
+  std::string on_ungrab_script;
+
+  // state
+  bool on_ground = false;
+  Vector last_movement = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Rock& rock)
+{
+  mapping.read("on-grab-script", rock.on_grab_script);
+  mapping.read("on-ungrab-script", rock.on_ungrab_script);
+}
+
+/** Bounces players and walking badguys landing on it while it is on
+    the ground (trampoline). Non-portable ones use a fixed sprite. List
+    it before the rock. */
+struct Trampoline
+{
+  bool portable = true;
+  std::string fixed_sprite = "images/objects/trampoline/trampoline_fix.sprite";
+};
+
+inline void read_component(ReaderMapping const& mapping, Trampoline& trampoline)
+{
+  mapping.read("portable", trampoline.portable);
+  mapping.read("fixed-sprite", trampoline.fixed_sprite);
+}
+
+/** A trampoline that breaks after counter bounces or when let go
+    (rustytrampoline). List it before the rock. */
+struct RustyTrampoline
+{
+  bool portable = true;
+  int counter = 3;
+};
+
+inline void read_component(ReaderMapping const& mapping, RustyTrampoline& trampoline)
+{
+  mapping.read("portable", trampoline.portable);
+  mapping.read("counter", trampoline.counter);
+}
+
 #endif
 
 /* EOF */

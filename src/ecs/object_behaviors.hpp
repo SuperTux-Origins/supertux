@@ -19,6 +19,8 @@
 #include "ecs/object_behavior.hpp"
 #include "ecs/object_components.hpp"
 
+#include <memory>
+
 template<> ObjectBehavior const& object_behavior_of<UnstableTile>();
 template<> ObjectBehavior const& object_behavior_of<WeakBlock>();
 template<> ObjectBehavior const& object_behavior_of<MagicBlock>();
@@ -34,6 +36,9 @@ template<> ObjectBehavior const& object_behavior_of<Platform>();
 template<> ObjectBehavior const& object_behavior_of<Hurting>();
 template<> ObjectBehavior const& object_behavior_of<Coin>();
 template<> ObjectBehavior const& object_behavior_of<HeavyCoin>();
+template<> ObjectBehavior const& object_behavior_of<Rock>();
+template<> ObjectBehavior const& object_behavior_of<Trampoline>();
+template<> ObjectBehavior const& object_behavior_of<RustyTrampoline>();
 
 class Crusher;
 class GameObject;
@@ -57,6 +62,22 @@ void try_break(ArchetypeObject& self, Player* player);
 void break_for_crusher(ArchetypeObject& self, Crusher& crusher);
 
 } // namespace brick
+
+class PortableObject;
+
+namespace rock {
+
+/** Accelerate the rock with the wind, up to end_speed */
+void add_wind_velocity(ArchetypeObject& self, Vector const& velocity, Vector const& end_speed);
+
+} // namespace rock
+
+namespace trampoline {
+
+/** Create a trampoline at runtime, e.g. from a bonus block */
+std::unique_ptr<PortableObject> create(Vector const& pos, bool portable);
+
+} // namespace trampoline
 
 namespace coin {
 

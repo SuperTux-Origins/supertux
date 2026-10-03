@@ -18,16 +18,30 @@
 
 
 #include "audio/sound_manager.hpp"
+#include "ecs/object_behaviors.hpp"
 #include "badguy/treewillowisp.hpp"
 #include "badguy/willowisp.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "util/reader_mapping.hpp"
 
+namespace {
+
+Rock read_rock(ReaderMapping const& reader)
+{
+  Rock rock;
+  read_component(reader, rock);
+  return rock;
+}
+
+} // namespace
+
 Lantern::Lantern(ReaderMapping const& reader) :
-  Rock(reader, "images/objects/lantern/lantern.sprite"),
+  PortableObject(reader, "images/objects/lantern/lantern.sprite", LAYER_OBJECTS, COLGROUP_MOVING_STATIC),
   lightcolor(1.0f, 1.0f, 1.0f),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light.sprite"))
 {
+  add_behavior(read_rock(reader));
+
   std::vector<float> vColor;
   if (reader.read("color", vColor)) {
     lightcolor = Color(vColor);
@@ -40,10 +54,12 @@ Lantern::Lantern(ReaderMapping const& reader) :
 }
 
 Lantern::Lantern(Vector const& pos) :
-  Rock(pos, "images/objects/lantern/lantern.sprite"),
+  PortableObject(pos, "images/objects/lantern/lantern.sprite", LAYER_OBJECTS, COLGROUP_MOVING_STATIC),
   lightcolor(0.0f, 0.0f, 0.0f),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light.sprite"))
 {
+  add_behavior(Rock());
+
   lightsprite->set_blend(Blend::ADD);
   updateColor();
   SoundManager::current()->preload("sounds/willocatch.wav");
@@ -91,13 +107,13 @@ HitResponse Lantern::collision(GameObject& other, CollisionHit const& hit) {
     twow->vanish();
   }
 
-  return Rock::collision(other, hit);
+  return ArchetypeObject::collision(other, hit);
 }
 
 void
 Lantern::grab(MovingObject& object, Vector const& pos, Direction dir)
 {
-  Rock::grab(object, pos, dir);
+  PortableObject::grab(object, pos, dir);
 
   // if lantern is not lit, draw it as opened
   if (is_open()) {
@@ -114,7 +130,7 @@ Lantern::ungrab(MovingObject& object, Direction dir)
     m_sprite->set_action("off");
   }
 
-  Rock::ungrab(object, dir);
+  PortableObject::ungrab(object, dir);
 }
 
 bool

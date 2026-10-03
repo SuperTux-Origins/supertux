@@ -1,0 +1,9 @@
+; Levels may set on-grab-script and on-ungrab-script.
+(supertux-archetype
+  (name "rock")
+  (base "portable")
+  (properties
+    (sprite "images/objects/rock/rock.sprite")
+    (colgroup "moving-static"))
+  (components
+    (rock)))

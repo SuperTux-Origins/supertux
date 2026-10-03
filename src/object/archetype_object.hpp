@@ -68,6 +68,32 @@ public:
   using MovingObject::m_col;
   using MovingObject::set_group;
 
+protected:
+  /** For hand-written subclasses that add their behaviors in code */
+  ArchetypeObject(ReaderMapping const& reader, std::string const& sprite_name, int layer,
+                  CollisionGroup collision_group);
+  ArchetypeObject(Vector const& pos, std::string const& sprite_name, int layer,
+                  CollisionGroup collision_group);
+
+  /** Emplace a behavior component; behaviors run in the order added.
+      The read handler runs if a level object mapping is given. */
+  template<typename T>
+  T& add_behavior(T value, ReaderMapping const* reader = nullptr)
+  {
+    T& component = ecs::emplace<T>(get_entity(), std::move(value));
+    ObjectBehavior const& behavior = object_behavior_of<T>();
+    m_behaviors.push_back(&behavior);
+    if (reader && behavior.read) {
+      behavior.read(*this, *reader);
+    }
+    if (behavior.construct) {
+      behavior.construct(*this);
+    }
+    return component;
+  }
+
+  std::vector<ObjectBehavior const*> const& get_behaviors() const { return m_behaviors; }
+
 private:
   void construct();
 

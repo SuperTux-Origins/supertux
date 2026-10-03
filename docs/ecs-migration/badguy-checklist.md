@@ -118,3 +118,6 @@ Non-badguy objects use the same pattern: `ArchetypeObject` (base
 - [x] hurting_platform — `data/archetypes/hurting_platform.archetype` (not exercised)
 - [x] coin — `data/archetypes/coin.archetype` (coin + path-follower; 42 coins collected in 12 golden runs)
 - [x] heavycoin — `data/archetypes/heavycoin.archetype` (spawned by coin rain/explode; 1 run)
+- [x] rock — `data/archetypes/rock.archetype` (base "portable"; 10 runs; scriptable as before)
+- [x] trampoline, rustytrampoline — archetypes (trampoline + rock; 6 runs)
+- [~] lantern — C++ subclass of PortableObject adding the Rock behavior (willowisp/ghosttree need its type); 6 runs

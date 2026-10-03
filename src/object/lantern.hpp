@@ -17,10 +17,14 @@
 #ifndef HEADER_SUPERTUX_OBJECT_LANTERN_HPP
 #define HEADER_SUPERTUX_OBJECT_LANTERN_HPP
 
-#include "object/rock.hpp"
+#include "object/portable_object.hpp"
+#include "sprite/sprite_ptr.hpp"
+#include "video/color.hpp"
 
 /** Lantern. A portable Light Source. */
-class Lantern final : public Rock
+/** A carryable lantern (a rock with a light) that catches will-o'-wisps
+    to take on their color. */
+class Lantern final : public PortableObject
 {
 public:
   Lantern(Vector const& pos);

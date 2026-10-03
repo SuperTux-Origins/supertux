@@ -24,6 +24,8 @@
 
 class ArchetypeObject;
 class Bullet;
+class MovingObject;
+enum class Direction;
 class Player;
 class DrawingContext;
 class GameObject;
@@ -58,6 +60,11 @@ struct ObjectBehavior
   bool (*collides)(ArchetypeObject const& self, GameObject& other, CollisionHit const& hit) = nullptr;
   /** first, default: nothing; e.g. a block hit by the player */
   void (*hit)(ArchetypeObject& self, Player& player) = nullptr;
+  /** first, only for PortableObject (base "portable"), default: the
+      Portable implementation */
+  bool (*is_portable)(ArchetypeObject const& self) = nullptr;
+  void (*grab)(ArchetypeObject& self, MovingObject& object, Vector const& pos, Direction dir) = nullptr;
+  void (*ungrab)(ArchetypeObject& self, MovingObject& object, Direction dir) = nullptr;
 };
 
 /** The object behavior of a component type, specialized in object_behaviors.cpp */

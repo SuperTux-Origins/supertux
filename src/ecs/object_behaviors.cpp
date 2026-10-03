@@ -18,6 +18,12 @@
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
 #include "badguy/crusher.hpp"
+#include "control/controller.hpp"
+#include "ecs/badguy_components.hpp"
+#include "object/lit_object.hpp"
+#include "object/portable_object.hpp"
+#include "object/pushbutton.hpp"
+#include "scripting/rock.hpp"
 #include "object/path.hpp"
 #include "object/path_walker.hpp"
 #include "scripting/platform.hpp"
@@ -31,10 +37,8 @@
 #include "object/oneup.hpp"
 #include "object/portable.hpp"
 #include "object/powerup.hpp"
-#include "object/rock.hpp"
 #include "object/specialriser.hpp"
 #include "object/star.hpp"
-#include "object/trampoline.hpp"
 #include "supertux/game_object_factory.hpp"
 #include "supertux/level.hpp"
 #include "util/reader_collection.hpp"
@@ -846,11 +850,11 @@ void bonus_preload_contents(ArchetypeObject& self, BonusBlock& block, int d)
       break;
 
     case 8: // Trampoline
-      block.object.value = std::make_unique<Trampoline>(self.get_pos(), true);
+      block.object.value = trampoline::create(self.get_pos(), true);
       break;
 
     case 9: // Rock
-      block.object.value = std::make_unique<Rock>(self.get_pos(), "images/objects/rock/rock.sprite");
+      block.object.value = PortableObject::create("rock", self.get_pos());
       break;
 
     case 12: // Red potion
@@ -1658,7 +1662,413 @@ void heavy_coin_collision_solid(ArchetypeObject& self, CollisionHit const& hit)
   coin.last_hit = hit;
 }
 
+// Rock ---------------------------------------------------------------
+
+const std::string ROCK_SOUND = "sounds/brick.wav"; //TODO use own sound.
+constexpr float GROUND_FRICTION = 0.1f; // Amount of friction to apply while on ground.
+
+PortableObject& as_portable(ArchetypeObject& self)
+{
+  return dynamic_cast<PortableObject&>(self);
+}
+
+PortableObject const& as_portable(ArchetypeObject const& self)
+{
+  return dynamic_cast<PortableObject const&>(self);
+}
+
+void rock_construct(ArchetypeObject& self)
+{
+  ecs::emplace<Physic>(self.get_entity());
+  SoundManager::current()->preload(ROCK_SOUND);
+}
+
+void rock_update(ArchetypeObject& self, float dt_sec)
+{
+  if (!as_portable(self).is_grabbed())
+    self.m_col.set_movement(ecs::get<Physic>(self.get_entity()).get_movement(dt_sec));
+}
+
+void rock_collision_solid(ArchetypeObject& self, CollisionHit const& hit)
+{
+  Rock& rock = ecs::get<Rock>(self.get_entity());
+  Physic& physic = ecs::get<Physic>(self.get_entity());
+
+  if (as_portable(self).is_grabbed()) {
+    return;
+  }
+  if (hit.top || hit.bottom)
+    physic.set_velocity_y(0);
+  if (hit.left || hit.right) {
+    // Bounce back slightly when hitting a wall
+    float velx = physic.get_velocity_x();
+    physic.set_velocity_x(-0.1f * velx);
+  }
+  if (hit.crush)
+    physic.set_velocity(0, 0);
+
+  if (hit.bottom && !rock.on_ground && !as_portable(self).is_grabbed()) {
+    SoundManager::current()->play(ROCK_SOUND, self.get_pos());
+    physic.set_velocity_x(0);
+    rock.on_ground = true;
+  }
+
+  if (rock.on_ground) {
+    // Full friction!
+    physic.set_velocity_x(physic.get_velocity_x() * (1.f - GROUND_FRICTION));
+  }
+}
+
+HitResponse rock_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& hit)
+{
+  Rock& rock = ecs::get<Rock>(self.get_entity());
+  Physic& physic = ecs::get<Physic>(self.get_entity());
+
+  if (ecs::try_get<HeavyCoin>(other.get_entity())) {
+    return ABORT_MOVE;
+  }
+
+  if (dynamic_cast<Explosion*>(&other)) {
+    return ABORT_MOVE;
+  }
+
+  // Why is it necessary to list exceptions here? Why doesn't the rock just not
+  // affect object that have ABORT_MOVE on all collisions?
+  if (dynamic_cast<LitObject*>(&other)) {
+    return ABORT_MOVE;
+  }
+
+  if (dynamic_cast<PushButton*>(&other)) {
+    return ABORT_MOVE;
+  }
+
+  if (as_portable(self).is_grabbed()) {
+    return ABORT_MOVE;
+  }
+
+  auto crusher = dynamic_cast<Crusher*>(&other);
+  if (crusher) {
+    auto state = crusher->get_state();
+    if (state == Crusher::CrusherState::RECOVERING ||
+        state == Crusher::CrusherState::IDLE) {
+      return ABORT_MOVE;
+    }
+  }
+
+  // Don't fall further if we are on a rock which is on the ground.
+  // This is to avoid jittering.
+  auto* other_rock = ecs::try_get<Rock>(other.get_entity());
+  if (other_rock && other_rock->on_ground && hit.bottom) {
+    physic.set_velocity_y(0);
+    return CONTINUE;
+  }
+
+  if (!rock.on_ground) {
+    if (hit.bottom && physic.get_velocity_y() > 200) {
+      auto badguy = dynamic_cast<BadGuy*>(&other);
+      auto player = dynamic_cast<Player*>(&other);
+      if (badguy && badguy->get_group() != COLGROUP_TOUCHABLE) {
+        //Getting a rock on the head hurts. A lot.
+        badguy->kill_fall();
+        physic.set_velocity_y(0);
+      }
+      else if (player)
+      {
+        player->kill(false);
+        physic.set_velocity_y(0);
+      }
+    }
+    return FORCE_MOVE;
+  }
+
+  return FORCE_MOVE;
+}
+
+void rock_grab(ArchetypeObject& self, MovingObject& object, Vector const& pos, Direction dir)
+{
+  Rock& rock = ecs::get<Rock>(self.get_entity());
+
+  as_portable(self).default_grab(object, pos, dir);
+  Vector movement = pos - self.get_pos();
+  self.m_col.set_movement(movement);
+  rock.last_movement = movement;
+  self.set_group(COLGROUP_TOUCHABLE); //needed for lanterns catching willowisps
+  rock.on_ground = false;
+
+  if (!rock.on_grab_script.empty()) {
+    Sector::get().run_script(rock.on_grab_script, "Rock::on_grab");
+  }
+}
+
+void rock_ungrab(ArchetypeObject& self, MovingObject& object, Direction dir)
+{
+  Rock& rock = ecs::get<Rock>(self.get_entity());
+  Physic& physic = ecs::get<Physic>(self.get_entity());
+
+  auto player = dynamic_cast<Player*>(&object);
+  self.set_group(COLGROUP_MOVING_STATIC);
+  rock.on_ground = false;
+  if (player)
+  {
+    if (player->is_swimming() || player->is_water_jumping())
+    {
+      float swimangle = player->get_swimming_angle();
+      physic.set_velocity(player->get_velocity() + Vector(std::cos(swimangle), std::sin(swimangle)));
+    }
+    else
+    {
+      physic.set_velocity_x(fabsf(player->get_physic().get_velocity_x()) < 1.f ? 0.f :
+                            player->m_dir == Direction::LEFT ? -200.f : 200.f);
+      physic.set_velocity_y((dir == Direction::UP) ? -500.f : (dir == Direction::DOWN) ? 500.f :
+                            (glm::length(rock.last_movement) > 1) ? -200.f : 0.f);
+    }
+  }
+
+  if (!rock.on_ungrab_script.empty())
+  {
+    Sector::get().run_script(rock.on_ungrab_script, "Rock::on_ungrab");
+  }
+  as_portable(self).default_ungrab(object, dir);
+}
+
+void rock_expose(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  expose_object(vm, table_idx, std::make_unique<scripting::Rock>(self.get_uid()), self.get_name());
+}
+
+void rock_unexpose(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  unexpose_object(vm, table_idx, self.get_name());
+}
+
+// Trampoline ---------------------------------------------------------
+
+/* Trampoline will accelerate Tux to to VY_INITIAL, if
+ * he jumps on it to VY_MIN. */
+const std::string TRAMPOLINE_SOUND = "sounds/trampoline.wav";
+constexpr float VY_MIN = -900; //negative, upwards
+constexpr float VY_INITIAL = -500;
+
+void trampoline_read(ArchetypeObject& self, ReaderMapping const& mapping)
+{
+  Trampoline const& trampoline = ecs::get<Trampoline>(self.get_entity());
+
+  //Check if this trampoline is not portable
+  std::string sprite;
+  if (!trampoline.portable && !mapping.read("sprite", sprite)) {
+    //we need another sprite
+    self.m_sprite_name = trampoline.fixed_sprite;
+    self.m_default_sprite_name = self.m_sprite_name;
+    self.m_sprite = SpriteManager::current()->create(self.m_sprite_name);
+    self.m_sprite->set_action("normal");
+  }
+}
+
+void trampoline_construct(ArchetypeObject& /*self*/)
+{
+  SoundManager::current()->preload(TRAMPOLINE_SOUND);
+}
+
+void trampoline_update(ArchetypeObject& self, float /*dt_sec*/)
+{
+  if (self.m_sprite->animation_done()) {
+    self.m_sprite->set_action("normal");
+  }
+}
+
+HitResponse trampoline_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& hit)
+{
+  if (ecs::try_get<HeavyCoin>(other.get_entity())) {
+    return ABORT_MOVE;
+  }
+
+  //Tramponine has to be on ground to work.
+  if (ecs::get<Rock>(self.get_entity()).on_ground) {
+    auto player = dynamic_cast<Player*>(&other);
+    //Trampoline works for player
+    if (player) {
+      player->override_velocity();
+      if (player->m_does_buttjump)
+        player->m_does_buttjump = false;
+      float vy = player->get_physic().get_velocity_y();
+      //player is falling down on trampoline
+      if (hit.top && vy >= 0) {
+        if (!(player->get_status().bonus[player->get_id()] == AIR_BONUS))
+        {
+          if (player->get_controller().hold(Control::JUMP))
+            vy = VY_MIN;
+          else if (player->get_controller().hold(Control::DOWN))
+            vy = VY_MIN + 100;
+          else
+            vy = VY_INITIAL;
+        }
+        else
+        {
+          if (player->get_controller().hold(Control::JUMP))
+            vy = VY_MIN - 80;
+          else if (player->get_controller().hold(Control::DOWN))
+            vy = VY_MIN - 70;
+          else
+            vy = VY_INITIAL - 40;
+        }
+        player->get_physic().set_velocity_y(vy);
+        SoundManager::current()->play(TRAMPOLINE_SOUND, self.get_pos());
+        self.m_sprite->set_action("swinging", 1);
+        return FORCE_MOVE;
+      }
+    }
+
+    //Trampoline also works for walking badguys
+    if (ecs::try_get<Walker>(other.get_entity())) {
+      Physic& physic = ecs::get<Physic>(other.get_entity());
+      //walking badguy is falling down on trampoline
+      if (hit.top && physic.get_velocity_y() >= 0) {
+        physic.set_velocity_y(VY_INITIAL);
+        SoundManager::current()->play(TRAMPOLINE_SOUND, self.get_pos());
+        self.m_sprite->set_action("swinging", 1);
+        return FORCE_MOVE;
+      }
+    }
+  }
+
+  return rock_collision(self, other, hit);
+}
+
+void trampoline_grab(ArchetypeObject& self, MovingObject& object, Vector const& pos, Direction dir)
+{
+  self.m_sprite->set_animation_loops(0);
+  rock_grab(self, object, pos, dir);
+}
+
+bool trampoline_is_portable(ArchetypeObject const& self)
+{
+  return as_portable(self).Portable::is_portable() && ecs::get<Trampoline>(self.get_entity()).portable;
+}
+
+// RustyTrampoline ----------------------------------------------------
+
+/* Trampoline will accelerate Tux to to VY_BOUNCE, if
+ * he jumps on it to VY_TRIGGER. */
+constexpr float VY_TRIGGER = -900; //negative, upwards
+constexpr float VY_BOUNCE = -500;
+
+void rusty_construct(ArchetypeObject& /*self*/)
+{
+  SoundManager::current()->preload(TRAMPOLINE_SOUND);
+}
+
+void rusty_update(ArchetypeObject& self, float /*dt_sec*/)
+{
+  if (self.m_sprite->animation_done()) {
+    if (ecs::get<RustyTrampoline>(self.get_entity()).counter < 1) {
+      self.remove_me();
+    } else {
+      self.m_sprite->set_action("normal");
+    }
+  }
+}
+
+void rusty_bounced(ArchetypeObject& self, RustyTrampoline& trampoline)
+{
+  SoundManager::current()->play(TRAMPOLINE_SOUND, self.get_pos());
+  trampoline.counter--;
+  if (trampoline.counter > 0) {
+    self.m_sprite->set_action("swinging", 1);
+  } else {
+    self.m_sprite->set_action("breaking", 1);
+  }
+}
+
+HitResponse rusty_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& hit)
+{
+  RustyTrampoline& trampoline = ecs::get<RustyTrampoline>(self.get_entity());
+
+  //Trampoline has to be on ground to work.
+  if (ecs::get<Rock>(self.get_entity()).on_ground) {
+    auto player = dynamic_cast<Player*>(&other);
+    //Trampoline works for player
+    if (player) {
+      float vy = player->get_physic().get_velocity_y();
+      //player is falling down on trampoline
+      if (hit.top && vy >= 0) {
+        if (player->get_controller().hold(Control::JUMP)) {
+          vy = VY_TRIGGER;
+        } else {
+          vy = VY_BOUNCE;
+        }
+        player->get_physic().set_velocity_y(vy);
+        rusty_bounced(self, trampoline);
+        return FORCE_MOVE;
+      }
+    }
+
+    //Trampoline also works for walking badguys
+    if (ecs::try_get<Walker>(other.get_entity())) {
+      Physic& physic = ecs::get<Physic>(other.get_entity());
+      //walking badguy is falling down on trampoline
+      if (hit.top && physic.get_velocity_y() >= 0) {
+        physic.set_velocity_y(VY_BOUNCE);
+        rusty_bounced(self, trampoline);
+        return FORCE_MOVE;
+      }
+    }
+  }
+
+  return rock_collision(self, other, hit);
+}
+
+void rusty_ungrab(ArchetypeObject& self, MovingObject& object, Direction dir)
+{
+  rock_ungrab(self, object, dir);
+  self.m_sprite->set_action("breaking", 1);
+  ecs::get<RustyTrampoline>(self.get_entity()).counter = 0; //remove in update()
+}
+
+bool rusty_is_portable(ArchetypeObject const& self)
+{
+  return as_portable(self).Portable::is_portable() && ecs::get<RustyTrampoline>(self.get_entity()).portable;
+}
+
 } // namespace
+
+namespace rock {
+
+void add_wind_velocity(ArchetypeObject& self, Vector const& velocity, Vector const& end_speed)
+{
+  Physic& physic = ecs::get<Physic>(self.get_entity());
+
+  // only add velocity in the same direction as the wind
+  if (end_speed.x > 0 && physic.get_velocity_x() < end_speed.x)
+    physic.set_velocity_x(std::min(physic.get_velocity_x() + velocity.x, end_speed.x));
+  if (end_speed.x < 0 && physic.get_velocity_x() > end_speed.x)
+    physic.set_velocity_x(std::max(physic.get_velocity_x() + velocity.x, end_speed.x));
+  if (end_speed.y > 0 && physic.get_velocity_y() < end_speed.y)
+    physic.set_velocity_y(std::min(physic.get_velocity_y() + velocity.y, end_speed.y));
+  if (end_speed.y < 0 && physic.get_velocity_y() > end_speed.y)
+    physic.set_velocity_y(std::max(physic.get_velocity_y() + velocity.y, end_speed.y));
+}
+
+} // namespace rock
+
+namespace trampoline {
+
+std::unique_ptr<PortableObject> create(Vector const& pos, bool portable)
+{
+  auto object = PortableObject::create("trampoline", pos);
+  ecs::get<Trampoline>(object->get_entity()).portable = portable;
+  if (!portable) {
+    object->m_sprite_name = ecs::get<Trampoline>(object->get_entity()).fixed_sprite;
+    object->m_sprite = SpriteManager::current()->create(object->m_sprite_name);
+    object->m_sprite->set_action("normal");
+  }
+  return object;
+}
+
+} // namespace trampoline
 
 namespace coin {
 
@@ -1851,7 +2261,7 @@ void try_open(ArchetypeObject& self, Player* player)
       break;
 
     case BonusBlock::Content::TRAMPOLINE:
-      Sector::get().add<SpecialRiser>(self.get_pos(), std::make_unique<Trampoline>(self.get_pos(), false), true);
+      Sector::get().add<SpecialRiser>(self.get_pos(), trampoline::create(self.get_pos(), false), true);
       play_upgrade_sound = true;
       break;
 
@@ -2097,6 +2507,49 @@ ObjectBehavior const& object_behavior_of<HeavyCoin>()
     .construct = &heavy_coin_construct,
     .update = &heavy_coin_update,
     .collision_solid = &heavy_coin_collision_solid,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Rock>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &rock_construct,
+    .expose = &rock_expose,
+    .unexpose = &rock_unexpose,
+    .update = &rock_update,
+    .collision = &rock_collision,
+    .collision_solid = &rock_collision_solid,
+    .grab = &rock_grab,
+    .ungrab = &rock_ungrab,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Trampoline>()
+{
+  static ObjectBehavior const behavior = {
+    .read = &trampoline_read,
+    .construct = &trampoline_construct,
+    .update = &trampoline_update,
+    .collision = &trampoline_collision,
+    .is_portable = &trampoline_is_portable,
+    .grab = &trampoline_grab,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<RustyTrampoline>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &rusty_construct,
+    .update = &rusty_update,
+    .collision = &rusty_collision,
+    .is_portable = &rusty_is_portable,
+    .ungrab = &rusty_ungrab,
   };
   return behavior;
 }

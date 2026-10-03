@@ -18,7 +18,8 @@
 
 #include "audio/sound_manager.hpp"
 #include "object/player.hpp"
-#include "object/rock.hpp"
+#include "ecs/object_components.hpp"
+#include "ecs/registry.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -54,7 +55,7 @@ HitResponse
 PushButton::collision(GameObject& other, CollisionHit const& hit)
 {
   auto player = dynamic_cast<Player*>(&other);
-  auto rock = dynamic_cast<Rock*>(&other);
+  bool const rock = ecs::try_get<Rock>(other.get_entity()) != nullptr;
   if (!player && !rock)
     return FORCE_MOVE;
 	if (player)
