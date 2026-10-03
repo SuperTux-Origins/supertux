@@ -17,6 +17,8 @@
 #ifndef HEADER_SUPERTUX_ECS_PLAYER_COMPONENTS_HPP
 #define HEADER_SUPERTUX_ECS_PLAYER_COMPONENTS_HPP
 
+#include "math/vector.hpp"
+#include "supertux/direction.hpp"
 #include "supertux/timer.hpp"
 
 // State of the Player, kept in the registry. The Player holds
@@ -87,6 +89,46 @@ struct PlayerLife
   bool ghost_mode = false;
   /** switch to ghost mode rather than dying */
   bool edit_mode = false;
+};
+
+/** Walking, ducking, rolling (stone) and ground contact */
+struct PlayerMovement
+{
+  static constexpr auto in_place_delete = true;
+
+  bool duck = false;
+  /** rolling as a stone (earth bonus) */
+  bool stone = false;
+  float boost = 0.0f;
+  /** if not 0, Tux can go only this fast */
+  float speedlimit = 0.0f;
+  bool velocity_override = false;
+  bool on_ice = false;
+  bool ice_this_frame = false;
+  bool on_ground_flag = false;
+  Timer skidding_timer = {};
+  Timer kick_timer = {};
+  Vector floor_normal = Vector(0.0f, 0.0f);
+  /** if Tux wants to stand up again after ducking and cannot, this timer is started */
+  Timer unduck_hurt_timer = {};
+  Direction peeking_x = Direction::AUTO;
+  Direction peeking_y = Direction::AUTO;
+};
+
+/** Visibility, idle animations, growing and the multiplayer name tag */
+struct PlayerAppearance
+{
+  static constexpr auto in_place_delete = true;
+
+  bool visible = true;
+  bool growing = false;
+  Timer second_growup_sound_timer = {};
+  Timer idle_timer = {};
+  unsigned int idle_stage = 0;
+  Timer tag_timer = {};
+  float tag_alpha = 1.0f;
+  /** the player sent input to move */
+  bool has_moved = false;
 };
 
 #endif

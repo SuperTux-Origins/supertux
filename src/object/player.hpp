@@ -108,8 +108,8 @@ public:
   bool is_invincible() const { return m_life.invincible_timer.started(); }
   bool is_dying() const { return m_life.dying; }
 
-  Direction peeking_direction_x() const { return m_peekingX; }
-  Direction peeking_direction_y() const { return m_peekingY; }
+  Direction peeking_direction_x() const { return m_move.peeking_x; }
+  Direction peeking_direction_y() const { return m_move.peeking_y; }
 
   void kill(bool completely);
   void move(Vector const& vector);
@@ -163,15 +163,15 @@ public:
   Vector get_velocity() const;
 
   void bounce(BadGuy& badguy);
-  void override_velocity() { m_velocity_override = true; }
+  void override_velocity() { m_move.velocity_override = true; }
 
   bool is_dead() const { return m_life.dead; }
   bool is_big() const;
-  bool is_stone() const { return m_stone; }
+  bool is_stone() const { return m_move.stone; }
   bool is_swimming() const { return m_swim.swimming; }
   bool is_swimboosting() const { return m_swim.boosting; }
   bool is_water_jumping() const { return m_swim.water_jump; }
-  bool is_skidding() const { return m_skidding_timer.started(); }
+  bool is_skidding() const { return m_move.skidding_timer.started(); }
   float get_swimming_angle() const { return m_swim.angle; }
 
   void set_visible(bool visible);
@@ -282,42 +282,20 @@ private:
   Controller const* m_controller;
   std::unique_ptr<CodeController> m_scripting_controller; /**< This controller is used when the Player is controlled via scripting */
   PlayerStatus& m_player_status;
-  bool m_duck;
-  Direction m_peekingX;
-  Direction m_peekingY;
-  bool m_stone;
-  float m_boost;
-  float m_speedlimit;
-  bool m_velocity_override;
   Controller const* m_scripting_controller_old; /**< Saves the old controller while the scripting_controller is used */
-  bool m_on_ice;
-  bool m_ice_this_frame;
-  SpritePtr m_lightsprite;
-  SpritePtr m_powersprite;
-  SpritePtr m_multiplayer_arrow;
-
-  // Multiplayer tag stuff (number displayed over the players)
-  Timer m_tag_timer;
-  std::unique_ptr<FadeHelper> m_tag_fade;
-  float m_tag_alpha;
-  bool m_has_moved; // If the player sent input to move the player
 
 public:
   Direction m_dir;
 
 private:
   Direction m_old_dir;
-  bool m_on_ground_flag;
 
-  Timer m_skidding_timer;
-  Timer m_kick_timer;
-
-  Timer m_second_growup_sound_timer;
-  bool m_growing;
-
+  // State kept in the registry (ecs/player_components.hpp)
   Physic& m_physic;
   PlayerSwim& m_swim;
   PlayerWallJump& m_wall;
+  PlayerMovement& m_move;
+  PlayerAppearance& m_look;
 
 public:
   /** public for badguys, objects and the camera */
@@ -325,29 +303,23 @@ public:
   PlayerLife& m_life;
 
 private:
-  bool m_visible;
-
   Portable* m_grabbed_object;
   std::unique_ptr<ObjectRemoveListener> m_grabbed_object_remove_listener;
   bool m_released_object;
-
-  SpritePtr m_sprite; /**< The main sprite representing Tux */
-
-
-  SurfacePtr m_airarrow; /**< arrow indicating Tux' position when he's above the camera */
-
-  Vector m_floor_normal;
-
-
-  Timer m_unduck_hurt_timer; /**< if Tux wants to stand up again after ducking and cannot, this timer is started */
-
-  Timer m_idle_timer;
-  unsigned int m_idle_stage;
 
   Climbable* m_climbing; /**< Climbable object we are currently climbing, null if none */
   std::unique_ptr<ObjectRemoveListener> m_climbing_remove_listener;
 
   int m_ending_direction;
+
+  SpritePtr m_sprite; /**< The main sprite representing Tux */
+  SpritePtr m_lightsprite;
+  SpritePtr m_powersprite;
+  SpritePtr m_multiplayer_arrow;
+  SurfacePtr m_airarrow; /**< arrow indicating Tux' position when he's above the camera */
+
+  // Multiplayer tag stuff (number displayed over the players)
+  std::unique_ptr<FadeHelper> m_tag_fade;
 
 private:
   Player(Player const&) = delete;
