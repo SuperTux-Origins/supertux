@@ -574,6 +574,19 @@ inline void read_component(ReaderMapping const& mapping, Haywire& haywire)
   mapping.read("normal-max-drop-height", haywire.normal_max_drop_height);
 }
 
+/** Stomping lights its fuse; it then can be carried and thrown, and
+    explodes into coins (goldbomb). List it before the walker. */
+struct GoldBomb
+{
+  // state
+  bool ticking = false;
+  std::shared_ptr<SoundSource> ticking_sound = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, GoldBomb& /*goldbomb*/)
+{
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

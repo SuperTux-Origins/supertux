@@ -16,7 +16,9 @@
 
 #include "supertux/level.hpp"
 
-#include "badguy/goldbomb.hpp"
+#include "badguy/badguy.hpp"
+#include "ecs/badguy_components.hpp"
+#include "ecs/registry.hpp"
 #include "object/bonus_block.hpp"
 #include "object/coin.hpp"
 #include "supertux/sector.hpp"
@@ -110,8 +112,8 @@ Level::get_total_coins() const
           continue;
         }
       }
-      auto goldbomb = dynamic_cast<GoldBomb*>(o.get());
-      if (goldbomb)
+      // explodes into coins
+      if (ecs::try_get<GoldBomb>(o->get_entity()))
         total_coins += 10;
     }
   }

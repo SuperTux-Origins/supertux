@@ -22,6 +22,7 @@
 #include "badguy/archetype_badguy.hpp"
 #include "badguy/owl.hpp"
 #include "object/bullet.hpp"
+#include "object/coin_explode.hpp"
 #include "object/explosion.hpp"
 #include "supertux/tile.hpp"
 #include "util/log.hpp"
@@ -785,9 +786,9 @@ void fuse_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, D
   self.set_colgroup_active(COLGROUP_DISABLED);
 }
 
-void fuse_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
+/** Velocity of an object thrown by the player (or let go while swimming) */
+void throw_by(ArchetypeBadguy& self, Player* player, Direction dir)
 {
-  auto player = dynamic_cast<Player*> (&object);
   Physic& physic = self.m_physic;
 
   //handle swimming
@@ -818,7 +819,11 @@ void fuse_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
                             player->get_physic().get_velocity_x() != 0.f ? -200.f : 0.f);
     }
   }
+}
 
+void fuse_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
+{
+  throw_by(self, dynamic_cast<Player*>(&object), dir);
   self.set_colgroup_active(COLGROUP_MOVING);
   self.Portable::ungrab(object, dir);
 }
@@ -2894,7 +2899,233 @@ HitResponse haywire_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, Coll
   return ABORT_MOVE;
 }
 
+// GoldBomb -----------------------------------------------------------
+
+void goldbomb_construct(ArchetypeBadguy& /*self*/)
+{
+  //Prevent stutter when Tux jumps on Gold Bomb
+  SoundManager::current()->preload("sounds/explosion.wav");
+}
+
+void goldbomb_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (ecs::get<GoldBomb>(self.get_entity()).ticking) {
+    if (hit.bottom) {
+      self.m_physic.set_velocity_y(0);
+      self.m_physic.set_velocity_x(0);
+    } else if (hit.left || hit.right)
+      self.m_physic.set_velocity_x(-self.m_physic.get_velocity_x());
+    else if (hit.top)
+      self.m_physic.set_velocity_y(0);
+    self.update_on_ground_flag(hit);
+    return;
+  }
+  walker::collision_solid(self, ecs::get<Walker>(self.get_entity()), hit);
+}
+
+HitResponse goldbomb_collision(ArchetypeBadguy& self, GameObject& object, CollisionHit const& hit)
+{
+  if (ecs::get<GoldBomb>(self.get_entity()).ticking) {
+    if (dynamic_cast<Player*>(&object)) {
+      return ABORT_MOVE;
+    }
+    if (dynamic_cast<BadGuy*>(&object)) {
+      return ABORT_MOVE;
+    }
+  }
+  if (self.is_grabbed())
+    return FORCE_MOVE;
+
+  return self.default_collision(object, hit);
+}
+
+HitResponse goldbomb_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& hit)
+{
+  if (ecs::get<GoldBomb>(self.get_entity()).ticking)
+    return FORCE_MOVE;
+  if (self.is_grabbed())
+    return FORCE_MOVE;
+  return self.default_collision_player(player, hit);
+}
+
+HitResponse goldbomb_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& hit)
+{
+  if (ecs::get<GoldBomb>(self.get_entity()).ticking)
+    return FORCE_MOVE;
+  return walker::collision_badguy(self, ecs::get<Walker>(self.get_entity()), badguy, hit);
+}
+
+bool goldbomb_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  GoldBomb& goldbomb = ecs::get<GoldBomb>(self.get_entity());
+
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  Player* player = dynamic_cast<Player*>(&object);
+  if (player && player->is_invincible()) {
+    player->bounce(self);
+    self.kill_fall();
+    return true;
+  }
+
+  if (self.is_valid() && !goldbomb.ticking) {
+    goldbomb.ticking = true;
+    self.m_frozen = false;
+    self.set_action(self.m_dir == Direction::LEFT ? "ticking-left" : "ticking-right", 1);
+    self.m_physic.set_velocity_x(0);
+
+    if (player)
+      player->bounce(self);
+
+    SoundManager::current()->play("sounds/squish.wav", self.get_pos());
+    goldbomb.ticking_sound = SoundManager::current()->create_sound_source("sounds/fizz.wav");
+    goldbomb.ticking_sound->set_position(self.get_pos());
+    goldbomb.ticking_sound->set_looping(true);
+    goldbomb.ticking_sound->set_gain(1.0f);
+    goldbomb.ticking_sound->set_reference_distance(32);
+    goldbomb.ticking_sound->play();
+  }
+
+  return true;
+}
+
+bool goldbomb_update(ArchetypeBadguy& self, float dt_sec)
+{
+  GoldBomb& goldbomb = ecs::get<GoldBomb>(self.get_entity());
+
+  if (goldbomb.ticking) {
+    if (self.on_ground()) self.m_physic.set_velocity_x(0);
+    goldbomb.ticking_sound->set_position(self.get_pos());
+    if (self.m_sprite->animation_done()) {
+      self.kill_fall();
+    }
+    else if (!self.is_grabbed()) {
+      self.m_col.set_movement(self.m_physic.get_movement(dt_sec));
+    }
+    return false;
+  }
+
+  // walk unless carried
+  return !self.is_grabbed();
+}
+
+void goldbomb_kill_fall(ArchetypeBadguy& self)
+{
+  GoldBomb& goldbomb = ecs::get<GoldBomb>(self.get_entity());
+
+  if (goldbomb.ticking)
+    goldbomb.ticking_sound->stop();
+
+  // Make the player let go before we explode, otherwise the player is holding
+  // an invalid object.
+  if (self.is_grabbed()) {
+    Player* player = dynamic_cast<Player*>(self.get_owner());
+    if (player)
+      player->stop_grabbing();
+  }
+
+  if (self.is_valid()) {
+    if (self.m_frozen)
+      self.default_kill_fall();
+    else
+    {
+      self.remove_me();
+      explode_at(self);
+      self.run_dead_script();
+    }
+    Sector::get().add<CoinExplode>(self.get_pos() + Vector(0, -40));
+  }
+}
+
+void goldbomb_ignite(ArchetypeBadguy& self)
+{
+  if (self.m_frozen)
+    self.unfreeze();
+  self.kill_fall();
+}
+
+void goldbomb_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir)
+{
+  self.Portable::grab(object, pos, dir);
+  if (ecs::get<GoldBomb>(self.get_entity()).ticking) {
+    // We actually face the opposite direction of Tux here to make the fuse more
+    // visible instead of hiding it behind Tux
+    self.m_sprite->set_action_continued(self.m_dir == Direction::LEFT ? "ticking-right" : "ticking-left");
+    self.set_colgroup_active(COLGROUP_DISABLED);
+  }
+  else if (self.m_frozen) {
+    self.m_sprite->set_action("iced", dir);
+  }
+  else if (dynamic_cast<Owl*>(&object))
+    self.m_sprite->set_action(dir);
+  self.m_col.set_movement(pos - self.get_pos());
+  self.m_dir = dir;
+  self.set_colgroup_active(COLGROUP_DISABLED);
+}
+
+void goldbomb_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
+{
+  if (self.m_frozen)
+    self.BadGuy::ungrab(object, dir);
+  else
+    throw_by(self, dynamic_cast<Player*>(&object), dir);
+
+  self.set_colgroup_active(self.m_frozen ? COLGROUP_MOVING_STATIC : COLGROUP_MOVING);
+  self.Portable::ungrab(object, dir);
+}
+
+void goldbomb_freeze(ArchetypeBadguy& self)
+{
+  if (!ecs::get<GoldBomb>(self.get_entity()).ticking) {
+    self.default_freeze();
+  }
+}
+
+bool goldbomb_is_portable(ArchetypeBadguy const& self)
+{
+  return (self.m_frozen || ecs::get<GoldBomb>(self.get_entity()).ticking);
+}
+
+void goldbomb_stop_sound(ArchetypeBadguy& self)
+{
+  if (auto& sound = ecs::get<GoldBomb>(self.get_entity()).ticking_sound) {
+    sound->stop();
+  }
+}
+
+void goldbomb_play_sound(ArchetypeBadguy& self)
+{
+  GoldBomb& goldbomb = ecs::get<GoldBomb>(self.get_entity());
+  if (goldbomb.ticking && goldbomb.ticking_sound) {
+    goldbomb.ticking_sound->play();
+  }
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<GoldBomb>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &goldbomb_construct,
+    .update = &goldbomb_update,
+    .collision = &goldbomb_collision,
+    .collision_player = &goldbomb_collision_player,
+    .collision_solid = &goldbomb_collision_solid,
+    .collision_badguy = &goldbomb_collision_badguy,
+    .collision_squished = &goldbomb_collision_squished,
+    .freeze = &goldbomb_freeze,
+    .ignite = &goldbomb_ignite,
+    .kill_fall = &goldbomb_kill_fall,
+    .is_portable = &goldbomb_is_portable,
+    .grab = &goldbomb_grab,
+    .ungrab = &goldbomb_ungrab,
+    .stop_looping_sounds = &goldbomb_stop_sound,
+    .play_looping_sounds = &goldbomb_play_sound,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<Haywire>()

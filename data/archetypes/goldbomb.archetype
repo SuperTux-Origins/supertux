@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "goldbomb")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/gold_bomb/gold_bomb.sprite")
+    (freezable #t))
+  (components
+    (goldbomb)
+    (walker (speed 80) (max-drop-height 16))))
