@@ -48,7 +48,6 @@ private:
   Vector m_offset;
   bool m_from_tilemap;
   bool m_add_path;
-  Physic m_physic;
   std::string m_collect_script;
 
   int m_starting_node;
@@ -68,7 +67,7 @@ public:
   void collision_solid(CollisionHit const& hit) override;
 
 private:
-  Physic m_physic;
+  Physic& m_physic;
   CollisionHit m_last_hit;
 
 private:

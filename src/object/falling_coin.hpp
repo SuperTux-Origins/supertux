@@ -31,7 +31,7 @@ public:
   void update(float dt_sec) override;
 
 private:
-  Physic physic;
+  Physic& physic;
   Vector pos;
   SpritePtr sprite;
 };

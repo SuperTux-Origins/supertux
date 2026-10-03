@@ -27,6 +27,12 @@
 class Physic final
 {
 public:
+  /** Physic is an ECS component that objects hold by reference
+      (Physic& m_physic), so its address must not change when other
+      entities are destroyed. */
+  static constexpr auto in_place_delete = true;
+
+public:
   Physic();
 
   /// Resets all velocities and accelerations to 0.

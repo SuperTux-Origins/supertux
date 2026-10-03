@@ -16,6 +16,8 @@
 
 #include "object/growup.hpp"
 
+#include "ecs/registry.hpp"
+
 
 #include "audio/sound_manager.hpp"
 #include "math/util.hpp"
@@ -24,7 +26,7 @@
 
 GrowUp::GrowUp(Vector const& pos, Direction direction) :
   MovingSprite(pos, "images/powerups/egg/egg.sprite", LAYER_OBJECTS, COLGROUP_MOVING),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   shadesprite(SpriteManager::current()->create("images/powerups/egg/egg.sprite")),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite"))
 {

@@ -16,6 +16,8 @@
 
 #include "object/coin.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "audio/sound_source.hpp"
 #include "object/bouncy_coin.hpp"
@@ -30,7 +32,6 @@ Coin::Coin(Vector const& pos) :
   m_offset(0.0f, 0.0f),
   m_from_tilemap(false),
   m_add_path(false),
-  m_physic(),
   m_collect_script(),
   m_starting_node(0)
 {
@@ -43,7 +44,6 @@ Coin::Coin(ReaderMapping const& reader) :
   m_offset(0.0f, 0.0f),
   m_from_tilemap(false),
   m_add_path(false),
-  m_physic(),
   m_collect_script(),
   m_starting_node(0)
 {
@@ -185,7 +185,7 @@ Coin::collision(GameObject& other, CollisionHit const& )
 /* The following defines a coin subject to gravity */
 HeavyCoin::HeavyCoin(Vector const& pos, Vector const& init_velocity) :
   Coin(pos),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_last_hit()
 {
   m_physic.enable_gravity(true);
@@ -196,7 +196,7 @@ HeavyCoin::HeavyCoin(Vector const& pos, Vector const& init_velocity) :
 
 HeavyCoin::HeavyCoin(ReaderMapping const& reader) :
   Coin(reader),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_last_hit()
 {
   m_physic.enable_gravity(true);

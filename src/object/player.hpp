@@ -346,7 +346,7 @@ private:
   bool m_growing;
   Timer m_backflip_timer;
 
-  Physic m_physic;
+  Physic& m_physic;
 
   bool m_visible;
 

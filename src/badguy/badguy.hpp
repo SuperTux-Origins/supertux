@@ -222,7 +222,7 @@ private:
   void try_activate();
 
 protected:
-  Physic m_physic;
+  Physic& m_physic;
 
 public:
   /** Count this badguy to the statistics? This value should not be

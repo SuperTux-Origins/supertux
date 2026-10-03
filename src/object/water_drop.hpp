@@ -32,7 +32,7 @@ public:
   HitResponse collision(GameObject& other, CollisionHit const& ) override;
 
 private:
-  Physic physic;
+  Physic& physic;
 
   typedef enum {
     WDS_FALLING,

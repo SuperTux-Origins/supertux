@@ -16,6 +16,8 @@
 
 #include "object/skull_tile.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "math/random.hpp"
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
@@ -28,7 +30,7 @@ static const float DELAY_IF_TUX = 0.001f;
 
 SkullTile::SkullTile(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/skull_tile/skull_tile.sprite", LAYER_TILES, COLGROUP_STATIC),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   timer(),
   hit(false),
   falling(false),

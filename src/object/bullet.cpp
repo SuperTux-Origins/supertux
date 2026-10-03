@@ -16,6 +16,8 @@
 
 #include "object/bullet.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "math/random.hpp"
 #include "object/camera.hpp"
 #include "sprite/sprite.hpp"
@@ -26,7 +28,7 @@
 
 Bullet::Bullet(Vector const& pos, Vector const& xm, Direction dir, BonusType type_, Player& player) :
   m_player(player),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   life_count(3),
   sprite(),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite")),

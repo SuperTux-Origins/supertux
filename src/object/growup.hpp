@@ -33,7 +33,7 @@ public:
   void do_jump();
 
 private:
-  Physic physic;
+  Physic& physic;
   SpritePtr shadesprite;
   SpritePtr lightsprite;
 };

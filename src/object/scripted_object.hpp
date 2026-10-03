@@ -53,7 +53,7 @@ public:
   bool gravity_enabled() const;
 
 private:
-  Physic physic;
+  Physic& physic;
   bool solid;
   bool physic_enabled;
   bool visible;

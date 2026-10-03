@@ -16,12 +16,14 @@
 
 #include "object/oneup.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
 
 OneUp::OneUp(Vector const& pos, Direction direction) :
   MovingSprite(pos, "images/powerups/1up/1up.sprite", LAYER_FLOATINGOBJECTS, COLGROUP_TOUCHABLE),
-  physic()
+  physic(ecs::emplace<Physic>(get_entity()))
 {
   physic.set_velocity( (direction == Direction::LEFT) ? -100.0f : 100.0f, -400.0f);
   if (direction == Direction::DOWN) // this causes the doll to drop when opened with a butt-jump

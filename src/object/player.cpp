@@ -17,6 +17,8 @@
 
 #include "object/player.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
 #include "control/input_manager.hpp"
@@ -202,7 +204,7 @@ Player::Player(PlayerStatus& player_status, std::string const& name_, int player
   m_second_growup_sound_timer(),
   m_growing(false),
   m_backflip_timer(),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_visible(true),
   m_grabbed_object(nullptr),
   m_grabbed_object_remove_listener(new GrabListener(*this)),

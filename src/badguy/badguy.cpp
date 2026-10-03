@@ -16,6 +16,8 @@
 
 #include "badguy/badguy.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "badguy/dispenser.hpp"
 #include "math/random.hpp"
@@ -45,7 +47,7 @@ BadGuy::BadGuy(Vector const& pos, Direction direction, std::string const& sprite
                std::string const& light_sprite_name, std::string const& ice_sprite_name) :
   MovingSprite(pos, sprite_name_, layer_, COLGROUP_DISABLED),
   ExposedObject<BadGuy, scripting::BadGuy>(this),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_countMe(true),
   m_is_initialized(false),
   m_start_position(m_col.m_bbox.p1()),
@@ -79,7 +81,7 @@ BadGuy::BadGuy(ReaderMapping const& reader, std::string const& sprite_name_, int
                std::string const& light_sprite_name, std::string const& ice_sprite_name) :
   MovingSprite(reader, sprite_name_, layer_, COLGROUP_DISABLED),
   ExposedObject<BadGuy, scripting::BadGuy>(this),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_countMe(true),
   m_is_initialized(false),
   m_start_position(m_col.m_bbox.p1()),

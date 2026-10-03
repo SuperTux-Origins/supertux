@@ -19,6 +19,8 @@
 
 #include "object/unstable_tile.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "object/explosion.hpp"
 #include "object/player.hpp"
 #include "supertux/constants.hpp"
@@ -31,7 +33,7 @@ static const float DELAY_IF_TUX = 0.001f;
 
 UnstableTile::UnstableTile(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/objects/unstable_tile/snow.sprite", LAYER_TILES, COLGROUP_STATIC),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   state(STATE_NORMAL),
   slowfall_timer(),
   m_revive_timer(),

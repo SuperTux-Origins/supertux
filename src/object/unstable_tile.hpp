@@ -51,7 +51,7 @@ private:
   void revive();
 
 private:
-  Physic physic;
+  Physic& physic;
   State state;
   float slowfall_timer;
 

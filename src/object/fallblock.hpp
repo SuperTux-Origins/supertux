@@ -47,7 +47,7 @@ protected:
 private:
   State state;
 
-  Physic physic;
+  Physic& physic;
   Timer timer;
 
   bool found_victim_down() const;

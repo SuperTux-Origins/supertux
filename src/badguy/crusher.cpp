@@ -17,6 +17,8 @@
 
 #include "badguy/crusher.hpp"
 
+#include "ecs/registry.hpp"
+
 
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
@@ -43,7 +45,7 @@ Crusher::Crusher(ReaderMapping const& reader) :
   m_state(IDLE),
   m_ic_size(NORMAL),
   m_start_position(get_bbox().p1()),
-  m_physic(),
+  m_physic(ecs::emplace<Physic>(get_entity())),
   m_cooldown_timer(0.0),
   m_sideways(),
   m_side_dir(),

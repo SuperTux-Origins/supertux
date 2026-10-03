@@ -16,6 +16,8 @@
 
 #include "object/rock.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
 #include "badguy/crusher.hpp"
@@ -36,7 +38,7 @@ static const float GROUND_FRICTION = 0.1f; // Amount of friction to apply while 
 Rock::Rock(Vector const& pos, std::string const& spritename) :
   MovingSprite(pos, spritename),
   ExposedObject<Rock, scripting::Rock>(this),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   on_ground(false),
   last_movement(0.0f, 0.0f),
   on_grab_script(),
@@ -49,7 +51,7 @@ Rock::Rock(Vector const& pos, std::string const& spritename) :
 Rock::Rock(ReaderMapping const& reader) :
   MovingSprite(reader, "images/objects/rock/rock.sprite"),
   ExposedObject<Rock, scripting::Rock>(this),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   on_ground(false),
   last_movement(0.0f, 0.0f),
   on_grab_script(),
@@ -64,7 +66,7 @@ Rock::Rock(ReaderMapping const& reader) :
 Rock::Rock(ReaderMapping const& reader, std::string const& spritename) :
   MovingSprite(reader, spritename),
   ExposedObject<Rock, scripting::Rock>(this),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   on_ground(false),
   last_movement(0.0f, 0.0f),
   on_grab_script(),

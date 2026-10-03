@@ -75,7 +75,7 @@ private:
   CrusherState m_state;
   CrusherSize m_ic_size;
   Vector m_start_position;
-  Physic m_physic;
+  Physic& m_physic;
   float m_cooldown_timer;
   bool m_sideways;
   Direction m_side_dir;

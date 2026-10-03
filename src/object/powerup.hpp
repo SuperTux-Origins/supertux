@@ -37,7 +37,7 @@ private:
   virtual void initialize();
 
 private:
-  Physic physic;
+  Physic& physic;
   std::string script;
   bool no_physics;
   SpritePtr lightsprite;

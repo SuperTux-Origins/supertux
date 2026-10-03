@@ -32,7 +32,7 @@ public:
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;
 
 private:
-  Physic physic;
+  Physic& physic;
   SpritePtr lightsprite;
 };
 

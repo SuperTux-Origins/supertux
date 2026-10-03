@@ -43,7 +43,7 @@ public:
   virtual void add_wind_velocity(Vector const& velocity, Vector const& end_speed);
 
 protected:
-  Physic physic;
+  Physic& physic;
   bool on_ground;
   Vector last_movement;
   std::string on_grab_script;

@@ -16,6 +16,8 @@
 
 #include "object/powerup.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "math/random.hpp"
 #include "object/player.hpp"
@@ -26,7 +28,7 @@
 
 PowerUp::PowerUp(ReaderMapping const& mapping) :
   MovingSprite(mapping, "images/powerups/egg/egg.sprite", LAYER_OBJECTS, COLGROUP_MOVING),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   script(),
   no_physics(),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite"))
@@ -38,7 +40,7 @@ PowerUp::PowerUp(ReaderMapping const& mapping) :
 
 PowerUp::PowerUp(Vector const& pos, std::string const& sprite_name_) :
   MovingSprite(pos, sprite_name_, LAYER_OBJECTS, COLGROUP_MOVING),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   script(),
   no_physics(false),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite"))

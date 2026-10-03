@@ -16,6 +16,8 @@
 
 #include "object/water_drop.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "math/random.hpp"
 #include "object/sprite_particle.hpp"
@@ -23,7 +25,7 @@
 
 WaterDrop::WaterDrop(Vector const& pos, std::string const& sprite_path_, Vector const& velocity) :
   MovingSprite(pos, sprite_path_, LAYER_OBJECTS - 1, COLGROUP_MOVING_ONLY_STATIC),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   wd_state(WDS_FALLING),
   sprite_path(sprite_path_)
 {

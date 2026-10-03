@@ -50,7 +50,7 @@ public:
 
 private:
   Player& m_player;
-  Physic physic;
+  Physic& physic;
   int life_count;
   SpritePtr sprite;
   SpritePtr lightsprite;

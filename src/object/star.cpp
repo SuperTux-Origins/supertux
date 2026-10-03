@@ -16,6 +16,8 @@
 
 #include "object/star.hpp"
 
+#include "ecs/registry.hpp"
+
 #include "math/random.hpp"
 #include "object/player.hpp"
 #include "object/sprite_particle.hpp"
@@ -28,7 +30,7 @@ static const float JUMPSTAR_SPEED = -300;
 
 Star::Star(Vector const& pos, Direction direction) :
   MovingSprite(pos, "images/powerups/star/star.sprite", LAYER_OBJECTS, COLGROUP_MOVING),
-  physic(),
+  physic(ecs::emplace<Physic>(get_entity())),
   lightsprite(SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite"))
 {
   physic.set_velocity((direction == Direction::LEFT) ? -STAR_SPEED : STAR_SPEED, INITIALJUMP);
