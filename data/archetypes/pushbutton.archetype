@@ -1,0 +1,10 @@
+; Runs its script once when stepped on. Levels set script and upside-down.
+(supertux-archetype
+  (name "pushbutton")
+  (base "object")
+  (properties
+    (sprite "images/objects/pushbutton/pushbutton.sprite")
+    (layer "backgroundtiles+1")
+    (colgroup "moving"))
+  (components
+    (pushbutton)))

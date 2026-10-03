@@ -36,7 +36,6 @@
 #include "object/portable_object.hpp"
 #include "object/bumper.hpp"
 #include "object/camera.hpp"
-#include "object/candle.hpp"
 #include "object/circleplatform.hpp"
 #include "object/cloud_particle_system.hpp"
 #include "object/custom_particle_system_file.hpp"
@@ -46,13 +45,11 @@
 #include "object/ghost_particle_system.hpp"
 #include "object/gradient.hpp"
 #include "object/invisible_wall.hpp"
-#include "object/ispy.hpp"
 #include "object/lantern.hpp"
 #include "object/level_time.hpp"
 #include "object/lit_object.hpp"
 #include "object/music_object.hpp"
 #include "object/pneumatic_platform.hpp"
-#include "object/pushbutton.hpp"
 #include "object/rain_particle_system.hpp"
 #include "object/rublight.hpp"
 #include "object/scripted_object.hpp"
@@ -65,7 +62,6 @@
 #include "object/textscroller.hpp"
 #include "object/thunderstorm.hpp"
 #include "object/tilemap.hpp"
-#include "object/torch.hpp"
 #include "object/wind.hpp"
 #include "ecs/archetype.hpp"
 #include "supertux/level.hpp"
@@ -158,7 +154,6 @@ GameObjectFactory::init_factories()
   add_factory<BicyclePlatform>("bicycle-platform");
   add_factory<Bumper>("bumper");
   add_factory<Camera>("camera");
-  add_factory<Candle>("candle");
   add_factory<CirclePlatform>("circleplatform");
   add_factory<CloudParticleSystem>("particles-clouds");
   add_factory<CustomParticleSystem>("particles-custom");
@@ -169,14 +164,12 @@ GameObjectFactory::init_factories()
   add_factory<GhostParticleSystem>("particles-ghosts");
   add_factory<Gradient>("gradient");
   add_factory<InvisibleWall>("invisible_wall");
-  add_factory<Ispy>("ispy");
   add_factory<Lantern>("lantern", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<LevelTime>("leveltime");
   add_factory<LitObject>("lit-object");
   add_factory<MusicObject>("music");
   add_factory<ParticleZone>("particle-zone");
   add_factory<PneumaticPlatform>("pneumatic-platform");
-  add_factory<PushButton>("pushbutton");
   add_factory<RainParticleSystem>("particles-rain");
   add_factory<RubLight>("rublight");
   add_factory<ScriptedObject>("scriptedobject");
@@ -187,7 +180,6 @@ GameObjectFactory::init_factories()
   add_factory<TextScroller>("textscroller");
   add_factory<TextArrayObject>("text-array");
   add_factory<Thunderstorm>("thunderstorm");
-  add_factory<Torch>("torch");
   add_factory<Wind>("wind");
   add_factory<TextArea>("text-area");
 

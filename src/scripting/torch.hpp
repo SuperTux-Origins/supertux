@@ -21,14 +21,14 @@
 #ifndef SCRIPTING_API
 #include "scripting/game_object.hpp"
 
-class Torch;
+class ArchetypeObject;
 #endif
 
 namespace scripting {
 
 class Torch final
 #ifndef SCRIPTING_API
-  : public GameObject<::Torch>
+  : public GameObject<::ArchetypeObject>
 #endif
 {
 public:

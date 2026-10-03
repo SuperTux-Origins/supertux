@@ -33,6 +33,10 @@ template<> ObjectBehavior const& object_behavior_of<InvisibleBlock>();
 template<> ObjectBehavior const& object_behavior_of<InfoBlock>();
 template<> ObjectBehavior const& object_behavior_of<PathFollower>();
 template<> ObjectBehavior const& object_behavior_of<Platform>();
+template<> ObjectBehavior const& object_behavior_of<Candle>();
+template<> ObjectBehavior const& object_behavior_of<Torch>();
+template<> ObjectBehavior const& object_behavior_of<PushButton>();
+template<> ObjectBehavior const& object_behavior_of<Ispy>();
 template<> ObjectBehavior const& object_behavior_of<Hurting>();
 template<> ObjectBehavior const& object_behavior_of<Coin>();
 template<> ObjectBehavior const& object_behavior_of<HeavyCoin>();
@@ -116,6 +120,20 @@ namespace path_follower {
 PathObject* get(GameObject const& self);
 
 } // namespace path_follower
+
+namespace candle {
+
+bool get_burning(ArchetypeObject const& self);
+void set_burning(ArchetypeObject& self, bool burning);
+
+} // namespace candle
+
+namespace torch {
+
+bool get_burning(ArchetypeObject const& self);
+void set_burning(ArchetypeObject& self, bool burning);
+
+} // namespace torch
 
 namespace platform {
 

@@ -22,7 +22,8 @@
 #include "ecs/badguy_components.hpp"
 #include "object/lit_object.hpp"
 #include "object/portable_object.hpp"
-#include "object/pushbutton.hpp"
+#include "scripting/candle.hpp"
+#include "scripting/torch.hpp"
 #include "scripting/rock.hpp"
 #include "object/path.hpp"
 #include "object/path_walker.hpp"
@@ -1734,7 +1735,7 @@ HitResponse rock_collision(ArchetypeObject& self, GameObject& other, CollisionHi
     return ABORT_MOVE;
   }
 
-  if (dynamic_cast<PushButton*>(&other)) {
+  if (ecs::try_get<PushButton>(other.get_entity())) {
     return ABORT_MOVE;
   }
 
@@ -3628,6 +3629,375 @@ ObjectBehavior const& object_behavior_of<WeakBlock>()
     .update = &weak_block_update,
     .draw = &weak_block_draw,
     .collision = &weak_block_collision,
+  };
+  return behavior;
+}
+
+namespace {
+
+// Candle -------------------------------------------------------------
+
+void candle_set_action(ArchetypeObject& self, bool burning)
+{
+  self.m_sprite->set_action(burning ? "on" : "off");
+}
+
+void candle_puff_smoke(ArchetypeObject& self)
+{
+  Vector ppos = self.m_col.m_bbox.get_middle();
+  Vector pspeed = Vector(0, -150);
+  Vector paccel = Vector(0,0);
+  Sector::get().add<SpriteParticle>("images/particles/smoke.sprite",
+                                    "default",
+                                    ppos, ANCHOR_MIDDLE,
+                                    pspeed, paccel,
+                                    LAYER_BACKGROUNDTILES+2);
+}
+
+void candle_construct(ArchetypeObject& self)
+{
+  Candle& candle = ecs::get<Candle>(self.get_entity());
+  candle.light_1.value = SpriteManager::current()->create("images/objects/candle/candle-light-1.sprite");
+  candle.light_2.value = SpriteManager::current()->create("images/objects/candle/candle-light-2.sprite");
+  self.m_layer = candle.layer;
+
+  //change the light color if defined
+  if (candle.color.size() >= 3) {
+    Color lightcolor(candle.color);
+    for (auto* light : { candle.light_1.value.get(), candle.light_2.value.get() }) {
+      light->set_blend(Blend::ADD);
+      light->set_color(lightcolor);
+      //the following allows the original candle appearance to be preserved
+      light->set_action("white");
+    }
+  }
+
+  candle_set_action(self, candle.burning);
+}
+
+void candle_draw(ArchetypeObject& self, DrawingContext& context)
+{
+  Candle const& candle = ecs::get<Candle>(self.get_entity());
+
+  // draw regular sprite
+  self.default_draw(context);
+
+  // draw on lightmap
+  if (candle.burning) {
+    // draw approx. 1 in 10 frames darker. Makes the candle flicker
+    Sprite& light = (gameRandom.rand(10) != 0 || !candle.flicker) ? *candle.light_1.value : *candle.light_2.value;
+    light.draw(context.light(), self.m_col.m_bbox.get_middle(), self.m_layer);
+  }
+}
+
+void candle_expose(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  expose_object(vm, table_idx, std::make_unique<scripting::Candle>(self.get_uid()), self.get_name());
+}
+
+void candle_unexpose(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  unexpose_object(vm, table_idx, self.get_name());
+}
+
+// Torch --------------------------------------------------------------
+
+void torch_construct(ArchetypeObject& self)
+{
+  Torch& torch = ecs::get<Torch>(self.get_entity());
+  torch.flame.value = SpriteManager::current()->create("images/objects/torch/flame.sprite");
+  torch.flame_glow.value = SpriteManager::current()->create("images/objects/torch/flame_glow.sprite");
+  torch.flame_light.value = SpriteManager::current()->create("images/objects/torch/flame_light.sprite");
+  self.m_layer = torch.layer;
+
+  self.m_col.m_bbox.set_size(static_cast<float>(self.m_sprite->get_width()),
+                             static_cast<float>(self.m_sprite->get_height()));
+  torch.flame_glow.value->set_blend(Blend::ADD);
+  torch.flame_light.value->set_blend(Blend::ADD);
+  if (torch.color.size() >= 3)
+  {
+    torch.light_color = Color(torch.color);
+    torch.flame.value->set_color(torch.light_color);
+    torch.flame_glow.value->set_color(torch.light_color);
+    torch.flame_light.value->set_color(torch.light_color);
+  }
+}
+
+void torch_draw(ArchetypeObject& self, DrawingContext& context)
+{
+  Torch const& torch = ecs::get<Torch>(self.get_entity());
+
+  if (torch.burning)
+  {
+    Vector pos = self.get_pos();
+    if (self.m_flip != NO_FLIP) pos.y -= 24.0f;
+    std::string const action = torch.light_color.greyscale() >= 1.f ? "default" : "greyscale";
+
+    torch.flame.value->draw(context.color(), pos, self.m_layer - 1, self.m_flip);
+    torch.flame.value->set_action(action);
+
+    torch.flame_light.value->draw(context.light(), pos, self.m_layer);
+    torch.flame_light.value->set_action(action);
+
+    torch.flame_glow.value->draw(context.color(), pos, self.m_layer - 1, self.m_flip);
+    torch.flame_glow.value->set_action(action);
+  }
+
+  self.m_sprite->draw(context.color(), self.get_pos(), self.m_layer - 1, self.m_flip);
+}
+
+HitResponse torch_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  Torch& torch = ecs::get<Torch>(self.get_entity());
+  if (dynamic_cast<Player*>(&other) && !torch.burning)
+  {
+    torch.burning = true;
+  }
+  return ABORT_MOVE;
+}
+
+void torch_expose(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  expose_object(vm, table_idx, std::make_unique<scripting::Torch>(self.get_uid()), self.get_name());
+}
+
+void torch_unexpose(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  unexpose_object(vm, table_idx, self.get_name());
+}
+
+// PushButton ---------------------------------------------------------
+
+const std::string BUTTON_SOUND = "sounds/switch.ogg";
+
+void pushbutton_construct(ArchetypeObject& self)
+{
+  SoundManager::current()->preload(BUTTON_SOUND);
+  self.set_action("off", -1);
+  self.m_col.m_bbox.set_size(self.m_sprite->get_current_hitbox_width(), self.m_sprite->get_current_hitbox_height());
+}
+
+HitResponse pushbutton_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& hit)
+{
+  PushButton& button = ecs::get<PushButton>(self.get_entity());
+
+  auto player = dynamic_cast<Player*>(&other);
+  bool const rock = ecs::try_get<Rock>(other.get_entity()) != nullptr;
+  if (!player && !rock)
+    return FORCE_MOVE;
+  if (player)
+  {
+    float vy = player->get_physic().get_velocity_y();
+
+    if (button.upside_down)
+    {
+      if (vy >= 0)
+        return FORCE_MOVE;
+
+      if (hit.bottom)
+        player->get_physic().set_velocity_y(0);
+    }
+    else
+    {
+      if (vy <= 0)
+        return FORCE_MOVE;
+
+      if (hit.top)
+      {
+        player->get_physic().set_velocity_y(0);
+        player->set_on_ground(true);
+      }
+    }
+  }
+
+  if (button.pressed || !(button.upside_down ? hit.bottom : hit.top))
+    return FORCE_MOVE;
+
+  // change appearance
+  button.pressed = true;
+  float old_bbox_height = self.m_col.m_bbox.get_height();
+  self.set_action("on", -1);
+  float new_bbox_height = self.m_col.m_bbox.get_height();
+  Vector delta(0, old_bbox_height - new_bbox_height);
+  self.set_pos(self.get_pos() + delta * (button.upside_down ? 0 : 1.f));
+
+  // play sound
+  SoundManager::current()->play(BUTTON_SOUND, self.get_pos());
+
+  // run script
+  Sector::get().run_script(button.script, "PushButton");
+
+  return FORCE_MOVE;
+}
+
+// Ispy ---------------------------------------------------------------
+
+void ispy_set_action(ArchetypeObject& self, Ispy const& ispy, std::string const& action, int loops = -1)
+{
+  switch (ispy.dir)
+  {
+    case Direction::DOWN:  self.m_sprite->set_action(action + "-down",  loops); break;
+    case Direction::UP:    self.m_sprite->set_action(action + "-up",    loops); break;
+    case Direction::LEFT:  self.m_sprite->set_action(action + "-left",  loops); break;
+    case Direction::RIGHT: self.m_sprite->set_action(action + "-right", loops); break;
+    default: break;
+  }
+}
+
+void ispy_construct(ArchetypeObject& self)
+{
+  Ispy& ispy = ecs::get<Ispy>(self.get_entity());
+  ispy.dir = string_to_dir(ispy.direction);
+
+  if (ispy.dir == Direction::AUTO)
+    log_warning("Setting an Ispy's direction to AUTO is no good idea.");
+
+  ispy_set_action(self, ispy, "idle");
+}
+
+void ispy_update(ArchetypeObject& self, float /*dt_sec*/)
+{
+  Ispy& ispy = ecs::get<Ispy>(self.get_entity());
+  Rectf const& bbox = self.m_col.m_bbox;
+
+  if (ispy.state == Ispy::State::IDLE)
+  {
+    //Check if a player has been spotted
+    Vector eye = bbox.get_middle();
+
+    switch (ispy.dir)
+    {
+      case Direction::DOWN:  eye = Vector(bbox.get_middle().x, bbox.get_bottom());   break;
+      case Direction::UP:    eye = Vector(bbox.get_middle().x, bbox.get_top());      break;
+      case Direction::LEFT:  eye = Vector(bbox.get_left(),     bbox.get_middle().y); break;
+      case Direction::RIGHT: eye = Vector(bbox.get_right(),    bbox.get_middle().y); break;
+      default: break;
+    }
+
+    if (Sector::get().can_see_player(eye))
+    {
+      ispy_set_action(self, ispy, "alert", 1);
+      ispy.state = Ispy::State::ALERT;
+    }
+  }
+  if (ispy.state == Ispy::State::ALERT)
+  {
+    if (self.m_sprite->animation_done())
+    {
+      ispy_set_action(self, ispy, "hiding", 1);
+      ispy.state = Ispy::State::HIDING;
+
+      Sector::get().run_script(ispy.script, "Ispy");
+    }
+  }
+  if (ispy.state == Ispy::State::HIDING)
+  {
+    if (self.m_sprite->animation_done())
+    {
+      ispy_set_action(self, ispy, "showing", 1);
+      ispy.state = Ispy::State::SHOWING;
+    }
+  }
+  if (ispy.state == Ispy::State::SHOWING)
+  {
+    if (self.m_sprite->animation_done())
+    {
+      ispy_set_action(self, ispy, "idle");
+      ispy.state = Ispy::State::IDLE;
+    }
+  }
+}
+
+HitResponse ispy_collision(ArchetypeObject& /*self*/, GameObject& /*other*/, CollisionHit const& /*hit*/)
+{
+  return ABORT_MOVE;
+}
+
+} // namespace
+
+namespace candle {
+
+bool get_burning(ArchetypeObject const& self)
+{
+  return ecs::get<Candle>(self.get_entity()).burning;
+}
+
+void set_burning(ArchetypeObject& self, bool burning)
+{
+  Candle& candle = ecs::get<Candle>(self.get_entity());
+  if (candle.burning == burning) return;
+  candle.burning = burning;
+  candle_set_action(self, burning);
+  //puff smoke for flickering light sources only
+  if (candle.flicker) candle_puff_smoke(self);
+}
+
+} // namespace candle
+
+namespace torch {
+
+bool get_burning(ArchetypeObject const& self)
+{
+  return ecs::get<Torch>(self.get_entity()).burning;
+}
+
+void set_burning(ArchetypeObject& self, bool burning)
+{
+  ecs::get<Torch>(self.get_entity()).burning = burning;
+}
+
+} // namespace torch
+
+template<>
+ObjectBehavior const& object_behavior_of<Candle>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &candle_construct,
+    .expose = &candle_expose,
+    .unexpose = &candle_unexpose,
+    .draw = &candle_draw,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Torch>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &torch_construct,
+    .expose = &torch_expose,
+    .unexpose = &torch_unexpose,
+    .draw = &torch_draw,
+    .collision = &torch_collision,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<PushButton>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &pushbutton_construct,
+    .collision = &pushbutton_collision,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Ispy>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &ispy_construct,
+    .update = &ispy_update,
+    .collision = &ispy_collision,
   };
   return behavior;
 }

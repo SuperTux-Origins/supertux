@@ -33,6 +33,9 @@
 #include "ecs/runtime_state.hpp"
 #include "object/path_object.hpp"
 #include "supertux/moving_object.hpp"
+#include "sprite/sprite.hpp"
+#include "supertux/direction.hpp"
+#include "util/log.hpp"
 
 class Sprite;
 
@@ -489,6 +492,90 @@ struct CrusherRoot
 
 inline void read_component(ReaderMapping const& /*mapping*/, CrusherRoot& /*root*/)
 {
+}
+
+/** A burning candle; scenery that can be lit and put out by scripts
+    (candle). Levels set burning, flicker, color and layer. Scriptable
+    as a Candle. */
+struct Candle
+{
+  bool burning = true;
+  bool flicker = true;
+  std::vector<float> color = {1.0f, 1.0f, 1.0f};
+  int layer = 0;
+
+  // state
+  RuntimeState<SpritePtr> light_1 = {};
+  RuntimeState<SpritePtr> light_2 = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Candle& candle)
+{
+  mapping.read("burning", candle.burning);
+  mapping.read("flicker", candle.flicker);
+  mapping.read("color", candle.color);
+  mapping.read("layer", candle.layer);
+}
+
+/** A torch that a player lights by touching it (torch). Levels set
+    burning, color and layer. Scriptable as a Torch. */
+struct Torch
+{
+  bool burning = true;
+  std::vector<float> color = {1.0f, 1.0f, 1.0f};
+  int layer = 0;
+
+  // state
+  Color light_color = Color(1.0f, 1.0f, 1.0f);
+  RuntimeState<SpritePtr> flame = {};
+  RuntimeState<SpritePtr> flame_glow = {};
+  RuntimeState<SpritePtr> flame_light = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Torch& torch)
+{
+  mapping.read("burning", torch.burning);
+  mapping.read("color", torch.color);
+  mapping.read("layer", torch.layer);
+}
+
+/** Runs its script once when a player or rock lands on it
+    (pushbutton). Levels set script and upside-down. */
+struct PushButton
+{
+  std::string script;
+  bool upside_down = false;
+
+  // state
+  bool pressed = false;
+};
+
+inline void read_component(ReaderMapping const& mapping, PushButton& button)
+{
+  if (!mapping.read("script", button.script)) {
+    log_warning("No script set for pushbutton.");
+  }
+  mapping.read("upside-down", button.upside_down);
+}
+
+/** Watches in its direction and runs its script when it sees a player
+    (ispy). Levels set script and direction. */
+struct Ispy
+{
+  enum class State { IDLE, ALERT, HIDING, SHOWING };
+
+  std::string script;
+  std::string direction = "left";
+
+  // state
+  State state = State::IDLE;
+  Direction dir = Direction::LEFT;
+};
+
+inline void read_component(ReaderMapping const& mapping, Ispy& ispy)
+{
+  mapping.read("script", ispy.script);
+  mapping.read("direction", ispy.direction);
 }
 
 #endif

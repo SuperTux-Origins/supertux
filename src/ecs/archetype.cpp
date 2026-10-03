@@ -112,6 +112,10 @@ std::map<std::string, ComponentType> const& component_types()
     { "infoblock", object_component_type<InfoBlock>() },
     { "path-follower", shared_component_type<PathFollower>() },
     { "platform", object_component_type<Platform>() },
+    { "candle", object_component_type<Candle>() },
+    { "torch", object_component_type<Torch>() },
+    { "pushbutton", object_component_type<PushButton>() },
+    { "ispy", object_component_type<Ispy>() },
     { "hurting", object_component_type<Hurting>() },
     { "coin", object_component_type<Coin>() },
     { "heavy-coin", object_component_type<HeavyCoin>() },
@@ -196,6 +200,8 @@ Archetype::get_layer() const
     return LAYER_FLOATINGOBJECTS + offset;
   } else if (base == "tiles") {
     return LAYER_TILES + offset;
+  } else if (base == "backgroundtiles") {
+    return LAYER_BACKGROUNDTILES + offset;
   } else {
     throw std::runtime_error("archetype '" + m_name + "': unknown layer '" + layer + "'");
   }

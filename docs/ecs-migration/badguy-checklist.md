@@ -124,3 +124,7 @@ Non-badguy objects use the same pattern: `ArchetypeObject` (base
 - [x] powerup — `data/archetypes/powerup.archetype` (3 runs)
 - [x] growup (egg), flowers, star, 1up from bonus blocks — archetypes with spawn helpers in `powerup::` (egg in 2 runs; flowers, star, 1up not exercised)
 - [x] crusher / icecrusher (+ crusher roots) — `data/archetypes/crusher.archetype` (4 targeted runs)
+- [x] candle — `data/archetypes/candle.archetype` (scriptable as before; 6 runs)
+- [x] torch — `data/archetypes/torch.archetype` (scriptable as before; dumps re-baselined for the new sprite action tag only)
+- [x] pushbutton — `data/archetypes/pushbutton.archetype` (pressed in 1 targeted run)
+- [x] ispy — `data/archetypes/ispy.archetype` (alert/hiding/showing in 1 run)

@@ -14,7 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "object/candle.hpp"
+#include "scripting/candle.hpp"
+
+#include "ecs/object_behaviors.hpp"
+#include "object/archetype_object.hpp"
 
 namespace scripting {
 
@@ -22,13 +25,13 @@ bool
 Candle::get_burning() const
 {
   SCRIPT_GUARD_DEFAULT;
-  return object.get_burning();
+  return candle::get_burning(object);
 }
 
 void Candle::set_burning(bool burning)
 {
   SCRIPT_GUARD_VOID;
-  object.set_burning(burning);
+  candle::set_burning(object, burning);
 }
 
 } // namespace scripting
