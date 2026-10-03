@@ -34,7 +34,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] kamikazesnowball
 
 ## Flyers
-- [ ] flyingsnowball
+- [x] flyingsnowball — `data/archetypes/flyingsnowball.archetype`
 - [ ] zeekling
 - [ ] spidermite
 - [ ] owl
@@ -51,9 +51,9 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] crusher
 
 ## Fire/ice elemental & status-effect-carrying
-- [ ] flame
-- [ ] iceflame
-- [ ] ghostflame
+- [x] flame — `data/archetypes/flame.archetype`
+- [x] iceflame — `data/archetypes/iceflame.archetype` (not exercised by golden suite)
+- [x] ghostflame — `data/archetypes/ghostflame.archetype`
 - [ ] livefire
 - [ ] willowisp
 - [ ] ghoul

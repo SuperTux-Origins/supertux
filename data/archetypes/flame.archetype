@@ -1,0 +1,18 @@
+(supertux-archetype
+  (name "flame")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/flame/flame.sprite")
+    (layer "floatingobjects")
+    (light-sprite "images/objects/lightmap_light/lightmap_light-small.sprite")
+    (light-color 0.21 0.13 0.08)
+    (glowing #t)
+    (count-me #f)
+    (colgroup "touchable")
+    (fall-immune #t)
+    (freezable #t)
+    (flammable #f))
+  (components
+    (circler (radius 100) (speed 2))
+    (looping-sound (sound "sounds/flame.wav"))
+    (elemental-fade (trigger "freeze"))))

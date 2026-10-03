@@ -49,6 +49,10 @@ std::map<std::string, ComponentType> const& component_types()
     { "squish-reaction", component_type<SquishReaction>() },
     { "jumper", component_type<Jumper>() },
     { "bouncer", component_type<Bouncer>() },
+    { "circler", component_type<Circler>() },
+    { "flyer", component_type<Flyer>() },
+    { "elemental-fade", component_type<ElementalFade>() },
+    { "looping-sound", component_type<LoopingSound>() },
   };
   return types;
 }

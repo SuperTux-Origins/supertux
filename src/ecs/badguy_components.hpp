@@ -16,10 +16,12 @@
 #ifndef HEADER_SUPERTUX_ECS_BADGUY_COMPONENTS_HPP
 #define HEADER_SUPERTUX_ECS_BADGUY_COMPONENTS_HPP
 
+#include <memory>
 #include <optional>
 #include <string>
 
 #include "math/vector.hpp"
+#include "audio/sound_source.hpp"
 #include "supertux/timer.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -125,6 +127,79 @@ inline void read_component(ReaderMapping const& mapping, Bouncer& bouncer)
   mapping.read("bounce-factor", bouncer.bounce_factor);
 }
 
+/** Orbits its start position (flame). spin rotates the sprite by
+    that many degrees per degree of orbit (iceflame). */
+struct Circler
+{
+  float radius = 100.0f;
+  /** radians per second */
+  float speed = 2.0f;
+  float spin = 0.0f;
+
+  // state
+  float angle = 0.0f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Circler& circler)
+{
+  mapping.read("radius", circler.radius);
+  mapping.read("speed", circler.speed);
+  mapping.read("spin", circler.spin);
+}
+
+/** Flies a fixed up and down curve around its start height, facing the
+    nearest player and puffing smoke (flyingsnowball). */
+struct Flyer
+{
+  float amplitude = 100.0f;
+  float rate = 0.8f;
+  float puff_interval_min = 4.0f;
+  float puff_interval_max = 8.0f;
+
+  // state
+  float elapsed = 0.0f;
+  Timer puff_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Flyer& flyer)
+{
+  mapping.read("amplitude", flyer.amplitude);
+  mapping.read("rate", flyer.rate);
+  mapping.read("puff-interval-min", flyer.puff_interval_min);
+  mapping.read("puff-interval-max", flyer.puff_interval_max);
+}
+
+/** Fizzles out (sizzle, "fade" action, smoke) instead of freezing or
+    burning, depending on trigger: "freeze" (flame) or "ignite"
+    (iceflame). The badguy is removed when the fade animation ends. */
+struct ElementalFade
+{
+  std::string trigger = "freeze";
+};
+
+inline void read_component(ReaderMapping const& mapping, ElementalFade& fade)
+{
+  mapping.read("trigger", fade.trigger);
+}
+
+/** Plays a looping sound at the badguy's position while it is active. */
+struct LoopingSound
+{
+  std::string sound;
+  float gain = 1.0f;
+  float reference_distance = 32.0f;
+
+  // state, shared_ptr keeps the prototype copyable
+  std::shared_ptr<SoundSource> source = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, LoopingSound& sound)
+{
+  mapping.read("sound", sound.sound);
+  mapping.read("gain", sound.gain);
+  mapping.read("reference-distance", sound.reference_distance);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction
@@ -134,7 +209,9 @@ struct SquishReaction
   bool directional = true;
   /** keep the sprite's bottom edge in place when switching action */
   bool anchor_bottom = false;
-  /** stop moving and fall with normal gravity */
+  /** before dying: drop (enable gravity, stop vertical movement) */
+  bool drop = false;
+  /** after dying: stop moving and fall with normal gravity */
   bool stop = false;
   std::string particles;
   int particle_count = 0;
@@ -145,6 +222,7 @@ inline void read_component(ReaderMapping const& mapping, SquishReaction& squish)
   mapping.read("action", squish.action);
   mapping.read("directional", squish.directional);
   mapping.read("anchor-bottom", squish.anchor_bottom);
+  mapping.read("drop", squish.drop);
   mapping.read("stop", squish.stop);
   mapping.read("particles", squish.particles);
   mapping.read("particle-count", squish.particle_count);

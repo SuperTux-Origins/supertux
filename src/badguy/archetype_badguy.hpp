@@ -47,12 +47,18 @@ public:
   bool is_freezable() const override { return m_freezable; }
   bool is_flammable() const override { return m_flammable; }
   void freeze() override;
+  void ignite() override;
+  void kill_fall() override;
+  void stop_looping_sounds() override;
+  void play_looping_sounds() override;
 
   void collision_solid(CollisionHit const& hit) override;
 
   /** The BadGuy implementations, for behaviors that fall back to them */
   void default_collision_solid(CollisionHit const& hit) { BadGuy::collision_solid(hit); }
   bool default_collision_squished(GameObject& object) { return BadGuy::collision_squished(object); }
+  void default_freeze() { BadGuy::freeze(); }
+  void default_ignite() { BadGuy::ignite(); }
 
   // BadGuy state available to behaviors
   using BadGuy::State;
@@ -71,9 +77,11 @@ public:
   using BadGuy::on_ground;
   using BadGuy::update_on_ground_flag;
   using BadGuy::kill_squished;
+  using BadGuy::run_dead_script;
   using MovingSprite::m_sprite;
   using MovingSprite::set_action;
   using MovingObject::m_col;
+  using MovingObject::set_group;
 
 protected:
   /** For hand-written subclasses that add their behaviors in code */
@@ -94,17 +102,21 @@ protected:
   }
 
   void initialize() override;
+  void activate() override;
+  void deactivate() override;
   void active_update(float dt_sec) override;
   HitResponse collision_badguy(BadGuy& other, CollisionHit const& hit) override;
   bool collision_squished(GameObject& object) override;
 
 private:
   void read_properties(Archetype const& archetype);
+  void construct();
 
 private:
   std::vector<BadGuyBehavior const*> m_behaviors;
   bool m_freezable;
   bool m_flammable;
+  bool m_fall_immune;
 
 private:
   ArchetypeBadguy(ArchetypeBadguy const&) = delete;

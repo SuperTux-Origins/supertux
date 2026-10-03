@@ -18,7 +18,11 @@
 #include <assert.h>
 #include <math.h>
 
+#include "audio/sound_manager.hpp"
 #include "badguy/archetype_badguy.hpp"
+#include "math/random.hpp"
+#include "math/util.hpp"
+#include "object/sprite_particle.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
@@ -245,6 +249,12 @@ bool squish_collision_squished(ArchetypeBadguy& self, GameObject& object)
     self.spawn_explosion_sprites(squish.particle_count, squish.particles);
   }
 
+  if (squish.drop) {
+    self.m_physic.enable_gravity(true);
+    self.m_physic.set_acceleration_y(0);
+    self.m_physic.set_velocity_y(0);
+  }
+
   self.kill_squished(object);
 
   if (squish.stop) {
@@ -315,8 +325,9 @@ void jumper_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
     self.m_sprite->set_action(self.m_dir == Direction::LEFT ? "left-down" : "right-down");
 }
 
-void jumper_after_freeze(ArchetypeBadguy& self)
+void jumper_freeze(ArchetypeBadguy& self)
 {
+  self.default_freeze();
   self.m_physic.set_velocity_y(std::max(0.0f, self.m_physic.get_velocity_y()));
 }
 
@@ -386,7 +397,218 @@ HitResponse bouncer_collision_badguy(ArchetypeBadguy& self, BadGuy& /*other*/, C
   return CONTINUE;
 }
 
+// Circler ------------------------------------------------------------
+
+Vector circler_pos(ArchetypeBadguy const& self, Circler const& circler)
+{
+  return Vector(self.m_start_position.x + cosf(circler.angle) * circler.radius,
+                self.m_start_position.y + sinf(circler.angle) * circler.radius);
+}
+
+void circler_construct(ArchetypeBadguy& self)
+{
+  self.m_col.m_bbox.set_pos(circler_pos(self, ecs::get<Circler>(self.get_entity())));
+}
+
+void circler_move(ArchetypeBadguy& self, float dt_sec)
+{
+  Circler& circler = ecs::get<Circler>(self.get_entity());
+  circler.angle = fmodf(circler.angle + dt_sec * circler.speed, math::TAU);
+  self.m_col.set_movement(circler_pos(self, circler) - self.get_pos());
+  if (circler.spin != 0.0f) {
+    self.m_sprite->set_angle(math::degrees(circler.angle) * circler.spin);
+  }
+}
+
+// Flyer --------------------------------------------------------------
+
+void flyer_initialize(ArchetypeBadguy& self)
+{
+  self.m_sprite->set_action(self.m_dir);
+}
+
+void flyer_activate(ArchetypeBadguy& self)
+{
+  Flyer& flyer = ecs::get<Flyer>(self.get_entity());
+  flyer.puff_timer.start(static_cast<float>(gameRandom.randf(flyer.puff_interval_min, flyer.puff_interval_max)));
+}
+
+void flyer_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  if (hit.top || hit.bottom) {
+    self.m_physic.set_velocity_y(0);
+  }
+}
+
+void flyer_move(ArchetypeBadguy& self, float dt_sec)
+{
+  Flyer& flyer = ecs::get<Flyer>(self.get_entity());
+  flyer.elapsed = fmodf(flyer.elapsed + dt_sec, math::TAU / flyer.rate);
+
+  float delta = flyer.elapsed * flyer.rate;
+
+  // Put that function in a graphing calculator :
+  // sin(x)^3 + sin(3(x - pi/3))/3
+  float target_height = std::pow(std::sin(delta), 3.f) +
+                        std::sin(3.f * ((delta - math::PI) / 3.f)) / 3.f;
+  target_height = target_height * flyer.amplitude + self.m_start_position.y;
+  self.m_physic.set_velocity_y(target_height - self.get_pos().y);
+  self.m_col.set_movement(self.m_physic.get_movement(1.f));
+
+  if (auto player = self.get_nearest_player()) {
+    self.m_dir = (player->get_pos().x > self.get_pos().x) ? Direction::RIGHT : Direction::LEFT;
+    self.m_sprite->set_action(self.m_dir);
+  }
+
+  // spawn smoke puffs
+  if (flyer.puff_timer.check()) {
+    Vector ppos = self.m_col.m_bbox.get_middle();
+    Vector pspeed = Vector(gameRandom.randf(-10, 10), 150);
+    Vector paccel = Vector(0,0);
+    Sector::get().add<SpriteParticle>("images/particles/smoke.sprite",
+                                      "default",
+                                      ppos, ANCHOR_MIDDLE, pspeed, paccel,
+                                      LAYER_OBJECTS-1);
+    flyer.puff_timer.start(gameRandom.randf(flyer.puff_interval_min, flyer.puff_interval_max));
+  }
+}
+
+// ElementalFade ------------------------------------------------------
+
+void fade_out(ArchetypeBadguy& self)
+{
+  SoundManager::current()->play("sounds/sizzle.ogg", self.get_pos());
+  self.m_sprite->set_action("fade", 1);
+  Sector::get().add<SpriteParticle>("images/particles/smoke.sprite",
+                                    "default",
+                                    self.m_col.m_bbox.get_middle(), ANCHOR_MIDDLE,
+                                    Vector(0, -150), Vector(0,0), LAYER_BACKGROUNDTILES+2);
+  self.set_group(COLGROUP_DISABLED);
+
+  // start dead-script
+  self.run_dead_script();
+}
+
+void fade_freeze(ArchetypeBadguy& self)
+{
+  if (ecs::get<ElementalFade>(self.get_entity()).trigger == "freeze") {
+    fade_out(self);
+  } else {
+    self.default_freeze();
+  }
+}
+
+void fade_ignite(ArchetypeBadguy& self)
+{
+  if (ecs::get<ElementalFade>(self.get_entity()).trigger == "ignite") {
+    fade_out(self);
+  } else {
+    self.default_ignite();
+  }
+}
+
+void fade_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  if (self.m_sprite->get_action() == "fade" && self.m_sprite->animation_done()) {
+    self.remove_me();
+  }
+}
+
+// LoopingSound -------------------------------------------------------
+
+void sound_construct(ArchetypeBadguy& self)
+{
+  SoundManager::current()->preload(ecs::get<LoopingSound>(self.get_entity()).sound);
+}
+
+void sound_activate(ArchetypeBadguy& self)
+{
+  LoopingSound& sound = ecs::get<LoopingSound>(self.get_entity());
+  sound.source = SoundManager::current()->create_sound_source(sound.sound);
+  sound.source->set_position(self.get_pos());
+  sound.source->set_looping(true);
+  sound.source->set_gain(sound.gain);
+  sound.source->set_reference_distance(sound.reference_distance);
+  sound.source->play();
+}
+
+void sound_deactivate(ArchetypeBadguy& self)
+{
+  ecs::get<LoopingSound>(self.get_entity()).source.reset();
+}
+
+void sound_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  LoopingSound& sound = ecs::get<LoopingSound>(self.get_entity());
+  if (sound.source) {
+    sound.source->set_position(self.get_pos());
+  }
+}
+
+void sound_stop(ArchetypeBadguy& self)
+{
+  LoopingSound& sound = ecs::get<LoopingSound>(self.get_entity());
+  if (sound.source) {
+    sound.source->stop();
+  }
+}
+
+void sound_play(ArchetypeBadguy& self)
+{
+  LoopingSound& sound = ecs::get<LoopingSound>(self.get_entity());
+  if (sound.source) {
+    sound.source->play();
+  }
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Circler>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &circler_construct,
+    .move = &circler_move,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Flyer>()
+{
+  static BadGuyBehavior const behavior = {
+    .initialize = &flyer_initialize,
+    .activate = &flyer_activate,
+    .move = &flyer_move,
+    .collision_solid = &flyer_collision_solid,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<ElementalFade>()
+{
+  static BadGuyBehavior const behavior = {
+    .after_move = &fade_after_move,
+    .freeze = &fade_freeze,
+    .ignite = &fade_ignite,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<LoopingSound>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &sound_construct,
+    .activate = &sound_activate,
+    .deactivate = &sound_deactivate,
+    .after_move = &sound_after_move,
+    .stop_looping_sounds = &sound_stop,
+    .play_looping_sounds = &sound_play,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<Jumper>()
@@ -395,7 +617,7 @@ BadGuyBehavior const& behavior_of<Jumper>()
     .after_move = &jumper_after_move,
     .collision_solid = &jumper_collision_solid,
     .collision_badguy = &jumper_collision_badguy,
-    .after_freeze = &jumper_after_freeze,
+    .freeze = &jumper_freeze,
   };
   return behavior;
 }

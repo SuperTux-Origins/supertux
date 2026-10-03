@@ -25,6 +25,10 @@ template<> BadGuyBehavior const& behavior_of<Patrol>();
 template<> BadGuyBehavior const& behavior_of<SquishReaction>();
 template<> BadGuyBehavior const& behavior_of<Jumper>();
 template<> BadGuyBehavior const& behavior_of<Bouncer>();
+template<> BadGuyBehavior const& behavior_of<Circler>();
+template<> BadGuyBehavior const& behavior_of<Flyer>();
+template<> BadGuyBehavior const& behavior_of<ElementalFade>();
+template<> BadGuyBehavior const& behavior_of<LoopingSound>();
 
 namespace walker {
 

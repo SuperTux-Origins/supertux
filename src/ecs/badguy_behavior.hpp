@@ -23,21 +23,36 @@ class BadGuy;
 class GameObject;
 
 /** Handlers that give a component behavior on an ArchetypeBadguy.
-    Every handler is optional. update and after_move run for all
-    behaviors of an entity, in archetype order, before and after the
-    physics movement. For the other events, the first behavior with a
-    handler replaces the BadGuy default. Handlers fetch their component
-    with ecs::get<T>(self.get_entity()). */
+    Every handler is optional and fetches its component with
+    ecs::get<T>(self.get_entity()).
+
+    "All" handlers run for every behavior of the entity, in archetype
+    order. For "first" handlers, the first behavior that has one
+    replaces the BadGuy default (the ArchetypeBadguy::default_*
+    functions call that default). Per frame: update (all), move (first,
+    default: physics movement), after_move (all). */
 struct BadGuyBehavior
 {
+  /** all: end of construction */
+  void (*construct)(ArchetypeBadguy& self) = nullptr;
+  /** all */
   void (*initialize)(ArchetypeBadguy& self) = nullptr;
+  void (*activate)(ArchetypeBadguy& self) = nullptr;
+  void (*deactivate)(ArchetypeBadguy& self) = nullptr;
   void (*update)(ArchetypeBadguy& self, float dt_sec) = nullptr;
+  /** first */
+  void (*move)(ArchetypeBadguy& self, float dt_sec) = nullptr;
+  /** all */
   void (*after_move)(ArchetypeBadguy& self, float dt_sec) = nullptr;
+  /** first */
   void (*collision_solid)(ArchetypeBadguy& self, CollisionHit const& hit) = nullptr;
   HitResponse (*collision_badguy)(ArchetypeBadguy& self, BadGuy& other, CollisionHit const& hit) = nullptr;
   bool (*collision_squished)(ArchetypeBadguy& self, GameObject& object) = nullptr;
-  /** runs after BadGuy::freeze() for all behaviors */
-  void (*after_freeze)(ArchetypeBadguy& self) = nullptr;
+  void (*freeze)(ArchetypeBadguy& self) = nullptr;
+  void (*ignite)(ArchetypeBadguy& self) = nullptr;
+  /** all */
+  void (*stop_looping_sounds)(ArchetypeBadguy& self) = nullptr;
+  void (*play_looping_sounds)(ArchetypeBadguy& self) = nullptr;
 };
 
 /** The behavior of a component type, specialized in badguy_behaviors.cpp */
