@@ -56,6 +56,9 @@ template<> BadGuyBehavior const& behavior_of<PathFollower>();
 template<> BadGuyBehavior const& behavior_of<Dispenser>();
 template<> BadGuyBehavior const& behavior_of<WillOWisp>();
 template<> BadGuyBehavior const& behavior_of<Yeti>();
+template<> BadGuyBehavior const& behavior_of<GhostTree>();
+template<> BadGuyBehavior const& behavior_of<TreeWillOWisp>();
+template<> BadGuyBehavior const& behavior_of<GhostTreeRoot>();
 template<> BadGuyBehavior const& behavior_of<Diver>();
 template<> BadGuyBehavior const& behavior_of<Haywire>();
 template<> BadGuyBehavior const& behavior_of<GoldBomb>();
@@ -90,6 +93,13 @@ void start_moving(ArchetypeBadguy& self);
 void stop_moving(ArchetypeBadguy& self);
 
 } // namespace willowisp
+
+namespace tree_willowisp {
+
+/** Fade out; the ghost tree forgets it once gone */
+void vanish(ArchetypeBadguy& self);
+
+} // namespace tree_willowisp
 
 namespace walker {
 

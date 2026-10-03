@@ -30,24 +30,11 @@
 #include "supertux/player_status.hpp"
 #include "video/surface_ptr.hpp"
 #include "supertux/info_box_line.hpp"
+#include "ecs/runtime_state.hpp"
 #include "object/path_object.hpp"
 #include "supertux/moving_object.hpp"
 
 class Sprite;
-
-/** State that only exists at runtime and cannot be copied (owned
-    objects). Copies, i.e. archetype prototypes, start out empty. */
-template<typename T>
-struct RuntimeState
-{
-  T value = {};
-
-  RuntimeState() = default;
-  RuntimeState(RuntimeState const&) : value() {}
-  RuntimeState& operator=(RuntimeState const&) { value = T(); return *this; }
-  RuntimeState(RuntimeState&&) = default;
-  RuntimeState& operator=(RuntimeState&&) = default;
-};
 
 /** Shakes, dissolves and falls when a player stands on it or an
     explosion hits it, then fades back in after a while (unstable_tile).

@@ -23,7 +23,10 @@
 
 #include <entt/entity/entity.hpp>
 
+#include "ecs/runtime_state.hpp"
 #include "math/vector.hpp"
+#include "sprite/sprite.hpp"
+#include "util/uid.hpp"
 #include "audio/sound_source.hpp"
 #include "supertux/timer.hpp"
 #include "util/reader_mapping.hpp"
@@ -719,6 +722,73 @@ inline void read_component(ReaderMapping const& mapping, Ghoul& ghoul)
 {
   mapping.read("flyspeed", ghoul.flyspeed);
   mapping.read("track-range", ghoul.track_range);
+}
+
+/** Boss of the ghost tree level: spawns circling TreeWillOWisps, changes
+    color and sucks in the willowisps and lanterns of that color, and
+    dies when it swallows a lantern of a different color (ghosttree). */
+struct GhostTree
+{
+  enum class State { IDLE, SUCKING, SWALLOWING, DYING };
+
+  // state
+  State state = State::IDLE;
+  Timer willowisp_timer = {};
+  Timer colorchange_timer = {};
+  Timer suck_timer = {};
+  Timer root_timer = {};
+  float willo_spawn_y = 0.0f;
+  float willo_radius = 200.0f;
+  float willo_speed = 1.8f;
+  int willo_color = 0;
+  int treecolor = 0;
+  Color suck_lantern_color = {};
+  /** Lantern that is currently being sucked in */
+  UID suck_lantern = {};
+  std::vector<entt::entity> willowisps = {};
+  RuntimeState<SpritePtr> glow_sprite = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, GhostTree& /*tree*/)
+{
+}
+
+/** A willowisp circling its ghost tree until sucked in or vanished
+    (ghosttree-willowisp). Lanterns catch it. */
+struct TreeWillOWisp
+{
+  enum class State { DEFAULT, VANISHING, SUCKED };
+
+  // state
+  State state = State::DEFAULT;
+  entt::entity tree = entt::null;
+  Color color = {};
+  float angle = 0.0f;
+  float radius = 0.0f;
+  float speed = 0.0f;
+  Vector suck_target = {};
+  bool was_sucked = false;
+  std::shared_ptr<SoundSource> sound_source = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, TreeWillOWisp& /*wisp*/)
+{
+}
+
+/** A root the ghost tree grows under the player (ghosttree-root). */
+struct GhostTreeRoot
+{
+  enum class State { APPEARING, HATCHING, GROWING, SHRINKING, VANISHING };
+
+  // state
+  State state = State::APPEARING;
+  RuntimeState<SpritePtr> base_sprite = {};
+  float offset_y = 0.0f;
+  Timer hatch_timer = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, GhostTreeRoot& /*root*/)
+{
 }
 
 /** Boss of the yeti lair: runs between two daises, stomps on them to

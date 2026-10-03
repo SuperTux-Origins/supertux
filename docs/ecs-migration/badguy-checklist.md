@@ -57,7 +57,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] livefire (+ livefire_asleep, livefire_dormant) — `data/archetypes/livefire*.archetype`
 - [x] willowisp — `data/archetypes/willowisp.archetype` (+ path-follower); scriptable; new `collides` hook; lantern catches it by component (lantern catching not exercised by golden suite)
 - [x] ghoul — `data/archetypes/ghoul.archetype` (ghoul + path-follower; 3 runs)
-- [ ] treewillowisp
+- [x] treewillowisp — `ghosttree-willowisp` archetype, linked to its tree by entity
 - [ ] kugelblitz
 
 ## Explosive
@@ -79,14 +79,14 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 
 ## Plants / scenery-enemy
 - [ ] plant
-- [ ] root
+- [x] root — `ghosttree-root` archetype
 - [x] snowman — `data/archetypes/snowman.archetype`
 
 - [x] skydive — `data/archetypes/skydive.archetype`
 
 ## Bosses / unique multi-phase (candidate exceptions per plan §4.4 — confirm each is actually boss-scale before treating it as an exception)
 - [x] yeti — `data/archetypes/yeti.archetype` (+ `yeti-snow-particle`); stalactites stay a code-built shell (YetiStalactite)
-- [ ] ghosttree
+- [x] ghosttree — `data/archetypes/ghosttree.archetype` (+ `ghosttree-willowisp`, `ghosttree-root`); suck/swallow phase not exercised by golden suite (Tux dies before the first color change)
 - [ ] totem — same class as the unused stationary `totem` above (no shipped level uses it)
 - [x] owl — the only owl is the carrier flyer above
 

@@ -20,7 +20,6 @@
 #include "badguy/archetype_badguy.hpp"
 #include "badguy/fish_chasing.hpp"
 #include "badguy/fish_harmless.hpp"
-#include "badguy/ghosttree.hpp"
 #include "badguy/kamikazesnowball.hpp"
 #include "badguy/kugelblitz.hpp"
 #include "badguy/plant.hpp"
@@ -138,7 +137,6 @@ GameObjectFactory::init_factories()
   add_factory<FishChasing>("fish-chasing");
   add_factory<FishHarmless>("fish-harmless");
   add_factory<FishSwimming>("fish-swimming");
-  add_factory<GhostTree>("ghosttree");
   add_factory<KamikazeSnowball>("kamikazesnowball");
   add_factory<Kugelblitz>("kugelblitz");
   add_factory<LeafShot>("leafshot");

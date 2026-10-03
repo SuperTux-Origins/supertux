@@ -23,6 +23,7 @@
 #include "audio/sound_source.hpp"
 #include "badguy/yeti_stalactite.hpp"
 #include "object/camera.hpp"
+#include "sprite/sprite_manager.hpp"
 #include "supertux/globals.hpp"
 #include "supertux/player_status.hpp"
 #include "video/surface.hpp"
@@ -5383,6 +5384,478 @@ BadGuyBehavior const& behavior_of<Yeti>()
     .collision_squished = &yeti_collision_squished,
     .kill_fall = &yeti_kill_fall,
     .draw = &yeti_draw,
+  };
+  return behavior;
+}
+
+namespace {
+
+// GhostTree ----------------------------------------------------------
+
+const size_t GHOSTTREE_WILLOWISP_COUNT = 10;
+const float GHOSTTREE_ROOT_TOP_OFFSET = 64;
+const float GHOSTTREE_WILLOWISP_TOP_OFFSET = -64;
+const Vector GHOSTTREE_SUCK_TARGET_OFFSET = Vector(-16,-16);
+const float GHOSTTREE_SUCK_TARGET_SPREAD = 8;
+const float GHOSTTREE_ROOT_HEIGHT = 87;
+
+Color ghosttree_color(int index)
+{
+  switch (index) {
+    case 0: return Color(1, 0, 0);
+    case 1: return Color(0, 1, 0);
+    case 2: return Color(0, 0, 1);
+    case 3: return Color(1, 1, 0);
+    case 4: return Color(1, 0, 1);
+    case 5: return Color(0, 1, 1);
+    default: assert(false); return Color();
+  }
+}
+
+ArchetypeBadguy* badguy_of(entt::entity entity)
+{
+  return dynamic_cast<ArchetypeBadguy*>(GameObjectManager::get_object_by_entity(entity));
+}
+
+void ghosttree_construct(ArchetypeBadguy& self)
+{
+  GhostTree& tree = ecs::get<GhostTree>(self.get_entity());
+  tree.glow_sprite.value = SpriteManager::current()->create("images/creatures/ghosttree/ghosttree-glow.sprite");
+  self.set_colgroup_active(COLGROUP_TOUCHABLE);
+  SoundManager::current()->preload("sounds/tree_howling.ogg");
+  SoundManager::current()->preload("sounds/tree_suck.ogg");
+}
+
+void ghosttree_die(ArchetypeBadguy& self, GhostTree& tree)
+{
+  tree.state = GhostTree::State::DYING;
+  self.m_sprite->set_action("dying", 1);
+  tree.glow_sprite.value->set_action("dying", 1);
+
+  for (entt::entity willo : tree.willowisps) {
+    if (ArchetypeBadguy* wisp = badguy_of(willo)) {
+      tree_willowisp::vanish(*wisp);
+    }
+  }
+  self.run_dead_script();
+}
+
+void ghosttree_activate(ArchetypeBadguy& self)
+{
+  GhostTree& tree = ecs::get<GhostTree>(self.get_entity());
+  tree.willowisp_timer.start(1.0f, true);
+  tree.colorchange_timer.start(13, true);
+  tree.root_timer.start(5, true);
+}
+
+bool ghosttree_is_color_deadly(GhostTree const& tree, Color color)
+{
+  if (color == Color(0,0,0)) return false;
+  Color my_color = tree.glow_sprite.value->get_color();
+  return ((my_color.red != color.red) || (my_color.green != color.green) || (my_color.blue != color.blue));
+}
+
+void ghosttree_spawn_willowisp(ArchetypeBadguy& self, GhostTree& tree)
+{
+  Rectf const& bbox = self.m_col.m_bbox;
+  Vector pos(bbox.get_width() / 2,
+             bbox.get_height() / 2 + (self.m_flip == NO_FLIP ? (tree.willo_spawn_y + GHOSTTREE_WILLOWISP_TOP_OFFSET) :
+                                                               -(tree.willo_spawn_y + GHOSTTREE_WILLOWISP_TOP_OFFSET + 32.0f)));
+  auto willowisp = ArchetypeBadguy::create("ghosttree-willowisp", self.get_pos() + pos, Direction::LEFT);
+  TreeWillOWisp& wisp = ecs::get<TreeWillOWisp>(willowisp->get_entity());
+  wisp.tree = self.get_entity();
+  wisp.radius = 200 + tree.willo_radius;
+  wisp.speed = tree.willo_speed;
+
+  tree.willo_spawn_y -= 40;
+  if (tree.willo_spawn_y < -160)
+    tree.willo_spawn_y = 0;
+
+  tree.willo_radius += 20;
+  if (tree.willo_radius > 120)
+    tree.willo_radius = 0;
+
+  if (tree.willo_speed == 1.8f) {
+    tree.willo_speed = 1.5f;
+  } else {
+    tree.willo_speed = 1.8f;
+  }
+
+  do {
+    tree.willo_color = (tree.willo_color + 1) % 3;
+  } while(tree.willo_color == tree.treecolor);
+
+  wisp.color = ghosttree_color(tree.willo_color);
+  willowisp->m_sprite->set_color(wisp.color);
+
+  tree.willowisps.push_back(willowisp->get_entity());
+  Sector::get().add_object(std::move(willowisp));
+}
+
+void ghosttree_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  GhostTree& tree = ecs::get<GhostTree>(self.get_entity());
+
+  if (tree.state == GhostTree::State::IDLE) {
+    if (tree.colorchange_timer.check()) {
+      SoundManager::current()->play("sounds/tree_howling.ogg", self.get_pos());
+      tree.suck_timer.start(3);
+      tree.treecolor = (tree.treecolor + 1) % 3;
+      tree.glow_sprite.value->set_color(ghosttree_color(tree.treecolor));
+    }
+
+    if (tree.suck_timer.check()) {
+      Color col = tree.glow_sprite.value->get_color();
+      SoundManager::current()->play("sounds/tree_suck.ogg", self.get_pos());
+      for (entt::entity willo : tree.willowisps) {
+        TreeWillOWisp* wisp = ecs::try_get<TreeWillOWisp>(willo);
+        if (wisp && wisp->color == col) {
+          wisp->state = TreeWillOWisp::State::SUCKED;
+          wisp->suck_target = self.m_col.m_bbox.get_middle() + GHOSTTREE_SUCK_TARGET_OFFSET
+            + Vector(gameRandom.randf(-GHOSTTREE_SUCK_TARGET_SPREAD, GHOSTTREE_SUCK_TARGET_SPREAD),
+                     gameRandom.randf(-GHOSTTREE_SUCK_TARGET_SPREAD, GHOSTTREE_SUCK_TARGET_SPREAD));
+          wisp->was_sucked = true;
+        }
+      }
+      tree.state = GhostTree::State::SUCKING;
+    }
+
+    if (tree.willowisp_timer.check()) {
+      if (tree.willowisps.size() < GHOSTTREE_WILLOWISP_COUNT) {
+        ghosttree_spawn_willowisp(self, tree);
+      }
+    }
+
+    if (tree.root_timer.check()) {
+      /* TODO indicate root with an animation */
+      auto player = self.get_nearest_player();
+      if (player) {
+        Rectf const& bbox = self.m_col.m_bbox;
+        Vector pos(player->get_bbox().get_left(),
+                   (self.m_flip == NO_FLIP ? (bbox.get_bottom() + GHOSTTREE_ROOT_TOP_OFFSET) :
+                                             (bbox.get_top() - GHOSTTREE_ROOT_TOP_OFFSET - GHOSTTREE_ROOT_HEIGHT)));
+        auto root = ArchetypeBadguy::create("ghosttree-root", pos, Direction::LEFT);
+        root->m_flip = self.m_flip;
+        Sector::get().add_object(std::move(root));
+      }
+    }
+  } else if (tree.state == GhostTree::State::SWALLOWING) {
+    if (Lantern* lantern = Sector::get().get_object_by_uid<Lantern>(tree.suck_lantern)) {
+      // suck in lantern
+      Vector pos = lantern->get_pos();
+      Vector delta = self.m_col.m_bbox.get_middle() + GHOSTTREE_SUCK_TARGET_OFFSET - pos;
+      if (glm::length(delta) < 1) {
+        lantern->ungrab(self, Direction::RIGHT);
+        lantern->remove_me();
+        tree.suck_lantern = UID();
+        self.m_sprite->set_action("swallow", 1);
+      } else {
+        pos += glm::normalize(delta);
+        lantern->grab(self, pos, Direction::RIGHT);
+      }
+    } else {
+      // wait until lantern is swallowed
+      if (self.m_sprite->animation_done()) {
+        if (ghosttree_is_color_deadly(tree, tree.suck_lantern_color)) {
+          ghosttree_die(self, tree);
+        } else {
+          self.m_sprite->set_action("normal");
+          tree.state = GhostTree::State::IDLE;
+          Sector::get().add<Lantern>(self.m_col.m_bbox.get_middle() + GHOSTTREE_SUCK_TARGET_OFFSET);
+        }
+      }
+    }
+  }
+}
+
+void ghosttree_draw(ArchetypeBadguy& self, DrawingContext& context)
+{
+  GhostTree const& tree = ecs::get<GhostTree>(self.get_entity());
+
+  self.BadGuy::draw(context);
+
+  context.push_transform();
+  if (tree.state == GhostTree::State::SUCKING) {
+    context.set_alpha(0.5f + fmodf(g_game_time, 0.5f));
+  } else {
+    context.set_alpha(0.5f);
+  }
+  tree.glow_sprite.value->draw(context.light(), self.get_pos(), self.m_layer);
+  context.pop_transform();
+}
+
+bool ghosttree_collides(ArchetypeBadguy const& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  if (ecs::get<GhostTree>(self.get_entity()).state != GhostTree::State::SUCKING) return false;
+  if (dynamic_cast<Lantern*>(&other)) return true;
+  if (dynamic_cast<Player*>(&other)) return true;
+  return false;
+}
+
+HitResponse ghosttree_collision(ArchetypeBadguy& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  GhostTree& tree = ecs::get<GhostTree>(self.get_entity());
+
+  if (tree.state != GhostTree::State::SUCKING) return ABORT_MOVE;
+
+  auto player = dynamic_cast<Player*>(&other);
+  if (player) {
+    player->kill(false);
+  }
+
+  Lantern* lantern = dynamic_cast<Lantern*>(&other);
+  if (lantern) {
+    tree.suck_lantern = lantern->get_uid();
+    lantern->grab(self, lantern->get_pos(), Direction::RIGHT);
+    tree.suck_lantern_color = lantern->get_color();
+    tree.state = GhostTree::State::SWALLOWING;
+  }
+
+  return ABORT_MOVE;
+}
+
+void ghosttree_willowisp_died(entt::entity tree_entity, entt::entity willowisp, bool was_sucked)
+{
+  if (!GameObjectManager::get_object_by_entity(tree_entity))
+    return;
+
+  GhostTree* tree = ecs::try_get<GhostTree>(tree_entity);
+  if (!tree)
+    return;
+
+  if ((tree->state == GhostTree::State::SUCKING) && was_sucked) {
+    tree->state = GhostTree::State::IDLE;
+  }
+  auto it = std::find(tree->willowisps.begin(), tree->willowisps.end(), willowisp);
+  if (it != tree->willowisps.end()) {
+    tree->willowisps.erase(it);
+  }
+}
+
+// TreeWillOWisp ------------------------------------------------------
+
+const std::string TREEWILLOSOUND = "sounds/willowisp.wav";
+
+void tree_willowisp_construct(ArchetypeBadguy& self)
+{
+  SoundManager::current()->preload(TREEWILLOSOUND);
+  self.set_colgroup_active(COLGROUP_MOVING);
+}
+
+void tree_willowisp_activate(ArchetypeBadguy& self)
+{
+  TreeWillOWisp& wisp = ecs::get<TreeWillOWisp>(self.get_entity());
+  wisp.sound_source = SoundManager::current()->create_sound_source(TREEWILLOSOUND);
+  wisp.sound_source->set_position(self.get_pos());
+  wisp.sound_source->set_looping(true);
+  wisp.sound_source->set_gain(1.0f);
+  wisp.sound_source->set_reference_distance(32);
+  wisp.sound_source->play();
+}
+
+bool tree_willowisp_collides(ArchetypeBadguy const& /*self*/, GameObject& other, CollisionHit const& /*hit*/)
+{
+  auto lantern = dynamic_cast<Lantern*>(&other);
+  if (lantern && lantern->is_open())
+    return true;
+  if (dynamic_cast<Player*>(&other))
+    return true;
+
+  return false;
+}
+
+void tree_willowisp_draw(ArchetypeBadguy& self, DrawingContext& context)
+{
+  self.m_sprite->draw(context.color(), self.get_pos(), self.m_layer);
+  self.m_sprite->draw(context.light(), self.get_pos(), self.m_layer);
+}
+
+void tree_willowisp_move(ArchetypeBadguy& self, float dt_sec)
+{
+  TreeWillOWisp& wisp = ecs::get<TreeWillOWisp>(self.get_entity());
+
+  // remove TreeWillOWisp if it has completely vanished
+  if (wisp.state == TreeWillOWisp::State::VANISHING) {
+    if (self.m_sprite->animation_done()) {
+      self.remove_me();
+      ghosttree_willowisp_died(wisp.tree, self.get_entity(), wisp.was_sucked);
+    }
+    return;
+  }
+
+  if (wisp.state == TreeWillOWisp::State::SUCKED) {
+    Vector dir_ = wisp.suck_target - self.get_pos();
+    if (glm::length(dir_) < 5) {
+      tree_willowisp::vanish(self);
+      return;
+    }
+    Vector newpos = self.get_pos() + dir_ * dt_sec;
+    self.m_col.set_movement(newpos - self.get_pos());
+    return;
+  }
+
+  wisp.angle = fmodf(wisp.angle + dt_sec * wisp.speed, math::TAU);
+  Vector newpos(self.m_start_position + Vector(sinf(wisp.angle) * wisp.radius, 0));
+  self.m_col.set_movement(newpos - self.get_pos());
+  float sizemod = cosf(wisp.angle) * 0.8f;
+  /* TODO: modify sprite size */
+
+  if (wisp.sound_source) {
+    wisp.sound_source->set_position(self.get_pos());
+  }
+
+  if (sizemod < 0) {
+    self.m_layer = LAYER_OBJECTS + 5;
+  } else {
+    self.m_layer = LAYER_OBJECTS - 20;
+  }
+}
+
+void tree_willowisp_kill_fall(ArchetypeBadguy& self)
+{
+  tree_willowisp::vanish(self);
+}
+
+void tree_willowisp_stop_looping_sounds(ArchetypeBadguy& self)
+{
+  TreeWillOWisp& wisp = ecs::get<TreeWillOWisp>(self.get_entity());
+  if (wisp.sound_source) {
+    wisp.sound_source->stop();
+  }
+}
+
+void tree_willowisp_play_looping_sounds(ArchetypeBadguy& self)
+{
+  TreeWillOWisp& wisp = ecs::get<TreeWillOWisp>(self.get_entity());
+  if (wisp.sound_source) {
+    wisp.sound_source->play();
+  }
+}
+
+// GhostTreeRoot ------------------------------------------------------
+
+const float ROOT_SPEED_GROW = 256;
+const float ROOT_SPEED_SHRINK = 128;
+const float ROOT_HATCH_TIME = 0.75;
+
+void root_construct(ArchetypeBadguy& self)
+{
+  GhostTreeRoot& root = ecs::get<GhostTreeRoot>(self.get_entity());
+  root.base_sprite.value = SpriteManager::current()->create("images/creatures/ghosttree/root-base.sprite");
+  root.base_sprite.value->set_action("appearing", 1);
+  root.base_sprite.value->set_animation_loops(1); // TODO: necessary because set_action ignores loops for default action
+  self.m_physic.enable_gravity(false);
+  self.set_colgroup_active(COLGROUP_TOUCHABLE);
+}
+
+void root_deactivate(ArchetypeBadguy& self)
+{
+  self.remove_me();
+  //no dead script
+}
+
+bool root_update(ArchetypeBadguy& self, float dt_sec)
+{
+  GhostTreeRoot& root = ecs::get<GhostTreeRoot>(self.get_entity());
+  Sprite& base_sprite = *root.base_sprite.value;
+
+  if (root.state == GhostTreeRoot::State::APPEARING) {
+    if (base_sprite.animation_done()) {
+      root.hatch_timer.start(ROOT_HATCH_TIME);
+      root.state = GhostTreeRoot::State::HATCHING;
+    }
+  }
+  if (root.state == GhostTreeRoot::State::HATCHING) {
+    if (!root.hatch_timer.started()) root.state = GhostTreeRoot::State::GROWING;
+  }
+  else if (root.state == GhostTreeRoot::State::GROWING) {
+    root.offset_y -= dt_sec * ROOT_SPEED_GROW;
+    if (root.offset_y < static_cast<float>(-self.m_sprite->get_height())) {
+      root.offset_y = static_cast<float>(-self.m_sprite->get_height());
+      root.state = GhostTreeRoot::State::SHRINKING;
+    }
+    self.set_pos(self.m_start_position + Vector(0, (self.m_flip == NO_FLIP ? root.offset_y : -root.offset_y)));
+  }
+  else if (root.state == GhostTreeRoot::State::SHRINKING) {
+    root.offset_y += dt_sec * ROOT_SPEED_SHRINK;
+    if (root.offset_y > 0) {
+      root.offset_y = 0;
+      root.state = GhostTreeRoot::State::VANISHING;
+      base_sprite.set_action("vanishing", 2);
+      base_sprite.set_animation_loops(2); // TODO: doesn't seem to work for loops=1
+    }
+    self.set_pos(self.m_start_position + Vector(0, (self.m_flip == NO_FLIP ? root.offset_y : -root.offset_y)));
+  }
+  else if (root.state == GhostTreeRoot::State::VANISHING) {
+    if (base_sprite.animation_done()) self.remove_me();
+  }
+  return true;
+}
+
+void root_draw(ArchetypeBadguy& self, DrawingContext& context)
+{
+  GhostTreeRoot const& root = ecs::get<GhostTreeRoot>(self.get_entity());
+  root.base_sprite.value->draw(context.color(), self.m_start_position, LAYER_TILES+1, self.m_flip);
+  if ((root.state != GhostTreeRoot::State::APPEARING) && (root.state != GhostTreeRoot::State::VANISHING))
+    self.BadGuy::draw(context);
+}
+
+} // namespace
+
+namespace tree_willowisp {
+
+void vanish(ArchetypeBadguy& self)
+{
+  ecs::get<TreeWillOWisp>(self.get_entity()).state = TreeWillOWisp::State::VANISHING;
+  self.m_sprite->set_action("vanishing", 1);
+  self.set_colgroup_active(COLGROUP_DISABLED);
+
+  if (self.get_parent_dispenser() != entt::null)
+  {
+    dispenser::notify_dead(self.get_parent_dispenser());
+  }
+}
+
+} // namespace tree_willowisp
+
+template<>
+BadGuyBehavior const& behavior_of<GhostTree>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &ghosttree_construct,
+    .activate = &ghosttree_activate,
+    .move = &ghosttree_move,
+    .collides = &ghosttree_collides,
+    .collision = &ghosttree_collision,
+    .draw = &ghosttree_draw,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<TreeWillOWisp>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &tree_willowisp_construct,
+    .activate = &tree_willowisp_activate,
+    .move = &tree_willowisp_move,
+    .collides = &tree_willowisp_collides,
+    .kill_fall = &tree_willowisp_kill_fall,
+    .draw = &tree_willowisp_draw,
+    .stop_looping_sounds = &tree_willowisp_stop_looping_sounds,
+    .play_looping_sounds = &tree_willowisp_play_looping_sounds,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<GhostTreeRoot>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &root_construct,
+    .deactivate = &root_deactivate,
+    .update = &root_update,
+    .draw = &root_draw,
   };
   return behavior;
 }

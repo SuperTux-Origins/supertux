@@ -96,6 +96,9 @@ std::map<std::string, ComponentType> const& component_types()
     { "dispenser", component_type<Dispenser>() },
     { "willowisp", component_type<WillOWisp>() },
     { "yeti", component_type<Yeti>() },
+    { "ghosttree", component_type<GhostTree>() },
+    { "ghosttree-willowisp", component_type<TreeWillOWisp>() },
+    { "ghosttree-root", component_type<GhostTreeRoot>() },
 
     // objects
     { "unstable-tile", object_component_type<UnstableTile>() },

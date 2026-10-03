@@ -1,0 +1,11 @@
+; A willowisp circling the ghost tree; spawned by it, not placed in levels.
+(supertux-archetype
+  (name "ghosttree-willowisp")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/willowisp/willowisp.sprite")
+    (layer "objects-20")
+    (freezable #f)
+    (flammable #f))
+  (components
+    (ghosttree-willowisp)))

@@ -19,7 +19,6 @@
 
 #include "audio/sound_manager.hpp"
 #include "ecs/object_behaviors.hpp"
-#include "badguy/treewillowisp.hpp"
 #include "badguy/archetype_badguy.hpp"
 #include "ecs/badguy_behaviors.hpp"
 #include "ecs/badguy_components.hpp"
@@ -101,13 +100,13 @@ HitResponse Lantern::collision(GameObject& other, CollisionHit const& hit) {
     willowisp::vanish(*wow);
   }
 
-  TreeWillOWisp* twow = dynamic_cast<TreeWillOWisp*>(&other);
-  if (twow && (is_open() || twow->get_color().greyscale() == 0.f)) {
+  auto* twow = wow ? ecs::try_get<TreeWillOWisp>(wow->get_entity()) : nullptr;
+  if (twow && (is_open() || twow->color.greyscale() == 0.f)) {
     // collided with TreeWillOWisp while grabbed and unlit
     SoundManager::current()->play("sounds/willocatch.wav", get_pos());
-    lightcolor = twow->get_color();
+    lightcolor = twow->color;
     updateColor();
-    twow->vanish();
+    tree_willowisp::vanish(*wow);
   }
 
   return ArchetypeObject::collision(other, hit);
