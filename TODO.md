@@ -33,6 +33,23 @@ adapted from Pingus and Windstille.
 - [ ] Missing snowball melting textures (`images/creatures/snowball/*melting*`)
       logged on every level load.
 
+## ECS migration (see docs/ecs-migration/kickoff.md, "Current state")
+
+- [x] Badguys used by shipped levels are archetypes (incl. bosses).
+- [x] Blocks, platforms, coins, powerups, crushers, carryables and
+      interactive scenery are object archetypes.
+- [x] Player state in registry components, logic in PlayerSystems.
+- [ ] Sprite-less "area" shell; migrate triggers, climbable, wind.
+- [ ] scriptedobject, spotlight.
+- [ ] Batch behaviors into system passes over component views (needs
+      reviewed re-baselining; update order changes).
+- [ ] Maintainer review of objects no shipped level places (walking_candle,
+      rcrystallo, scrystallo, plant, totem, angrystone, fish-swimming,
+      fish-chasing, fish-harmless, kamikazesnowball, kugelblitz, ...);
+      kamikazesnowball and leafshot are still dispensed by bonus levels.
+- [ ] Android / wasm / R36S / MinGW builds of the ECS branch (Linux only
+      so far).
+
 ## Windows (MinGW)
 
 - [x] Force in-tree squirrel for mingw (USE_SYSTEM_SQUIRREL=OFF + squirrel-src);

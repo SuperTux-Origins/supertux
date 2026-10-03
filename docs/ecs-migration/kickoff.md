@@ -4,6 +4,57 @@ Companion to `plan.md` (long-range target architecture) and `audit.md`
 (verified facts). This file changes the plan's **ordering** based on the
 audit, and lists the concrete first commits.
 
+## Current state (2026-10-04)
+
+The step sections below record how the migration started; where they
+disagree with this section, this section is current.
+
+- **Registry:** EnTT, one global registry (`ecs::registry()`). Every
+  `GameObject` creates its entity in its constructor (with an
+  `ObjectRef` back to the shell) and destroys it in its destructor.
+  Components that shells hold by reference (`Physic`, the player
+  components, `Walker`, ...) set `in_place_delete`.
+- **Badguys:** `ArchetypeBadguy` (base "badguy") dispatches to
+  `BadGuyBehavior` handler tables (`src/ecs/badguy_behaviors.cpp`).
+  All badguys used by shipped levels are archetypes in
+  `data/archetypes/`, including the yeti and ghost tree bosses and
+  their spawns. `WalkingBadguy` is a thin shell that adds the `Walker`
+  behavior in code; `YetiStalactite` stays a code-built shell because
+  its respawn runs outside `active_update()`.
+- **Objects:** `ArchetypeObject` (base "object") and `PortableObject`
+  (base "portable") dispatch to `ObjectBehavior` tables
+  (`src/ecs/object_behaviors.cpp`): blocks, bonus blocks, platforms,
+  coins, powerups, crushers, rocks and trampolines, candles, torches,
+  pushbuttons, ispies. `Lantern` is a code-built `PortableObject`.
+- **Player:** its state lives in registry components
+  (`src/ecs/player_components.hpp`: swim, wall jump, jump, life,
+  movement, appearance), and its per-frame, input and drawing logic in
+  `PlayerSystems` (`src/ecs/player_systems.cpp`). `Player` keeps the
+  script-facing actions, collision handling, bonuses and the grab/climb
+  links.
+- **Cross-object dispatch:** behaviors query components
+  (`ecs::try_get<Rock>(other.get_entity())`) instead of casting to
+  concrete classes; dispenser, ghost tree and willowisp links are
+  entities or UIDs, not raw pointers.
+- **Not migrated yet:**
+  - Sprite-less areas: triggers (door, switch, climbable, script,
+    secret-area and sequence triggers), wind, invisible walls. They
+    need a sprite-less "area" shell; triggers are entangled with Player
+    (`start_climbing(Climbable&)`, remove listeners).
+  - Scripted scenery used by few levels: scriptedobject, spotlight.
+  - Level infrastructure that has no gameplay behavior (camera,
+    backgrounds, gradients, decals, particle systems, music).
+  - Objects no shipped level places; see the checklist. Some are still
+    dispensed by shipped levels (kamikazesnowball, leafshot), so check
+    those before removing them.
+- **Updates still run per object** in `GameObjectManager` order. Batching
+  behaviors into real system passes over component views is a separate,
+  explicitly re-baselined step.
+- **Verification:** the golden suite (144 runs, `tests/golden/`) has been
+  identical across every migration except the torch dumps. Those gained
+  a sprite action tag when the torch became a sprite object and were
+  re-baselined.
+
 ## What changes vs. plan.md
 
 `plan.md` goes horizontally: shadow-mirror physics → collision → render
