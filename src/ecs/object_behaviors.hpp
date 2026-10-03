@@ -39,6 +39,12 @@ template<> ObjectBehavior const& object_behavior_of<HeavyCoin>();
 template<> ObjectBehavior const& object_behavior_of<Rock>();
 template<> ObjectBehavior const& object_behavior_of<Trampoline>();
 template<> ObjectBehavior const& object_behavior_of<RustyTrampoline>();
+template<> ObjectBehavior const& object_behavior_of<Glow>();
+template<> ObjectBehavior const& object_behavior_of<PowerUp>();
+template<> ObjectBehavior const& object_behavior_of<GrowUp>();
+template<> ObjectBehavior const& object_behavior_of<FlowerBonus>();
+template<> ObjectBehavior const& object_behavior_of<Star>();
+template<> ObjectBehavior const& object_behavior_of<OneUp>();
 
 class Crusher;
 class GameObject;
@@ -78,6 +84,21 @@ namespace trampoline {
 std::unique_ptr<PortableObject> create(Vector const& pos, bool portable);
 
 } // namespace trampoline
+
+enum class Direction;
+
+namespace powerup {
+
+std::unique_ptr<ArchetypeObject> create(Vector const& pos, std::string const& sprite);
+std::unique_ptr<ArchetypeObject> create_growup(Vector const& pos, Direction dir);
+std::unique_ptr<ArchetypeObject> create_flower(BonusType bonus);
+std::unique_ptr<ArchetypeObject> create_star(Vector const& pos, Direction dir);
+std::unique_ptr<ArchetypeObject> create_oneup(Vector const& pos, Direction dir);
+
+/** Let an egg jump, e.g. when the block below it is hit */
+void growup_jump(ArchetypeObject& self);
+
+} // namespace powerup
 
 namespace coin {
 

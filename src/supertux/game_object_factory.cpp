@@ -57,7 +57,6 @@
 #include "object/lit_object.hpp"
 #include "object/music_object.hpp"
 #include "object/pneumatic_platform.hpp"
-#include "object/powerup.hpp"
 #include "object/pushbutton.hpp"
 #include "object/rain_particle_system.hpp"
 #include "object/rublight.hpp"
@@ -188,7 +187,6 @@ GameObjectFactory::init_factories()
   add_factory<MusicObject>("music");
   add_factory<ParticleZone>("particle-zone");
   add_factory<PneumaticPlatform>("pneumatic-platform");
-  add_factory<PowerUp>("powerup");
   add_factory<PushButton>("pushbutton");
   add_factory<RainParticleSystem>("particles-rain");
   add_factory<RubLight>("rublight");

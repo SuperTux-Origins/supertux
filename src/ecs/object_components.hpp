@@ -27,6 +27,7 @@
 #include "supertux/timer.hpp"
 #include "util/fade_helper.hpp"
 #include "util/reader_mapping.hpp"
+#include "supertux/player_status.hpp"
 #include "video/surface_ptr.hpp"
 #include "supertux/info_box_line.hpp"
 #include "object/path_object.hpp"
@@ -376,6 +377,91 @@ inline void read_component(ReaderMapping const& mapping, RustyTrampoline& trampo
 {
   mapping.read("portable", trampoline.portable);
   mapping.read("counter", trampoline.counter);
+}
+
+/** Draws a small light of the given color on the light map. */
+struct Glow
+{
+  Color color = Color(0.0f, 0.0f, 0.0f);
+  std::string sprite = "images/objects/lightmap_light/lightmap_light-small.sprite";
+
+  // state
+  std::shared_ptr<Sprite> light = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Glow& glow)
+{
+  std::vector<float> color;
+  if (mapping.read("color", color)) {
+    glow.color = Color(color);
+  }
+  mapping.read("sprite", glow.sprite);
+}
+
+/** A generic powerup placed in a level (powerup): its effect follows
+    from its sprite (egg, flowers, star, 1up, potions) unless the level
+    gives a script. */
+struct PowerUp
+{
+  std::string script;
+  bool no_physics = false;
+
+  // state
+  std::shared_ptr<Sprite> light = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, PowerUp& powerup)
+{
+  mapping.read("script", powerup.script);
+  mapping.read("disable-physics", powerup.no_physics);
+}
+
+/** The egg from a bonus block: rolls along and makes Tux grow. */
+struct GrowUp
+{
+  // state
+  std::shared_ptr<Sprite> shade = {};
+  std::shared_ptr<Sprite> light = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, GrowUp& /*growup*/)
+{
+}
+
+/** A flower rising from a bonus block, giving its bonus (fire, ice,
+    air, earth). */
+struct FlowerBonus
+{
+  BonusType bonus = FIRE_BONUS;
+};
+
+inline void read_component(ReaderMapping const& mapping, FlowerBonus& flower)
+{
+  std::string bonus;
+  if (mapping.read("bonus", bonus)) {
+    if (bonus == "fire") flower.bonus = FIRE_BONUS;
+    else if (bonus == "ice") flower.bonus = ICE_BONUS;
+    else if (bonus == "air") flower.bonus = AIR_BONUS;
+    else if (bonus == "earth") flower.bonus = EARTH_BONUS;
+  }
+}
+
+/** Bounces away and makes Tux invincible (star from a bonus block). */
+struct Star
+{
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, Star& /*star*/)
+{
+}
+
+/** Jumps out and gives 100 coins (1up from a bonus block). */
+struct OneUp
+{
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, OneUp& /*oneup*/)
+{
 }
 
 #endif

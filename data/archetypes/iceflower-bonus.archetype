@@ -1,0 +1,10 @@
+; The ice flower rising from a bonus block.
+(supertux-archetype
+  (name "iceflower-bonus")
+  (base "object")
+  (properties
+    (sprite "images/powerups/iceflower/iceflower.sprite")
+    (colgroup "touchable"))
+  (components
+    (flower-bonus (bonus "ice"))
+    (glow (color 0.0 0.1 0.2))))

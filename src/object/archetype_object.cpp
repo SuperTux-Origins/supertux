@@ -49,8 +49,8 @@ ArchetypeObject::ArchetypeObject(ReaderMapping const& reader, Archetype const& a
   construct();
 }
 
-ArchetypeObject::ArchetypeObject(Vector const& pos, Archetype const& archetype) :
-  MovingSprite(pos, archetype.get_sprite(), archetype.get_layer(), colgroup_of(archetype)),
+ArchetypeObject::ArchetypeObject(Vector const& pos, Archetype const& archetype, std::string const& sprite) :
+  MovingSprite(pos, sprite.empty() ? archetype.get_sprite() : sprite, archetype.get_layer(), colgroup_of(archetype)),
   m_behaviors(archetype.emplace_object_components(get_entity(), nullptr))
 {
   construct();
@@ -75,13 +75,13 @@ ArchetypeObject::~ArchetypeObject()
 }
 
 std::unique_ptr<ArchetypeObject>
-ArchetypeObject::create(std::string const& name, Vector const& pos)
+ArchetypeObject::create(std::string const& name, Vector const& pos, std::string const& sprite)
 {
   Archetype const* archetype = ArchetypeRegistry::instance().get(name);
   if (!archetype) {
     throw std::runtime_error("unknown archetype '" + name + "'");
   }
-  return std::make_unique<ArchetypeObject>(pos, *archetype);
+  return std::make_unique<ArchetypeObject>(pos, *archetype, sprite);
 }
 
 void

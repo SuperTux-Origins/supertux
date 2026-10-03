@@ -32,13 +32,8 @@
 #include "audio/sound_source.hpp"
 #include "object/coin_explode.hpp"
 #include "object/coin_rain.hpp"
-#include "object/flower.hpp"
-#include "object/growup.hpp"
-#include "object/oneup.hpp"
 #include "object/portable.hpp"
-#include "object/powerup.hpp"
 #include "object/specialriser.hpp"
-#include "object/star.hpp"
 #include "supertux/game_object_factory.hpp"
 #include "supertux/level.hpp"
 #include "util/reader_collection.hpp"
@@ -739,8 +734,9 @@ HitResponse block_collision(ArchetypeObject& self, GameObject& other, CollisionH
     }
 
     //Eggs get jumped
-    if (auto growup = dynamic_cast<GrowUp*> (&other)) {
-      growup->do_jump();
+    auto egg = dynamic_cast<ArchetypeObject*>(&other);
+    if (egg && ecs::try_get<GrowUp>(egg->get_entity())) {
+      powerup::growup_jump(*egg);
     }
   }
 
@@ -858,7 +854,7 @@ void bonus_preload_contents(ArchetypeObject& self, BonusBlock& block, int d)
       break;
 
     case 12: // Red potion
-      block.object.value = std::make_unique<PowerUp>(self.get_pos(), "images/powerups/potions/red-potion.sprite");
+      block.object.value = powerup::create(self.get_pos(), "images/powerups/potions/red-potion.sprite");
       break;
 
     default:
@@ -928,11 +924,11 @@ void bonus_raise_growup(ArchetypeObject& self, Player* player, BonusType const& 
   std::unique_ptr<MovingObject> obj;
   if (player->get_status().bonus[player->get_id()] == NO_BONUS)
   {
-    obj = std::make_unique<GrowUp>(self.get_pos(), dir);
+    obj = powerup::create_growup(self.get_pos(), dir);
   }
   else
   {
-    obj = std::make_unique<Flower>(bonus);
+    obj = powerup::create_flower(bonus);
   }
 
   Sector::get().add<SpecialRiser>(self.get_pos(), std::move(obj));
@@ -944,11 +940,11 @@ void bonus_drop_growup(ArchetypeObject& self, Player* player, std::string const&
 {
   if (player->get_status().bonus[player->get_id()] == NO_BONUS)
   {
-    Sector::get().add<GrowUp>(self.get_pos() + Vector(0, 32), dir);
+    Sector::get().add_object(powerup::create_growup(self.get_pos() + Vector(0, 32), dir));
   }
   else
   {
-    Sector::get().add<PowerUp>(self.get_pos() + Vector(0, 32), bonus_sprite_name);
+    Sector::get().add_object(powerup::create(self.get_pos() + Vector(0, 32), bonus_sprite_name));
   }
   SoundManager::current()->play("sounds/upgrade.wav", self.get_pos(), upgrade_sound_gain);
   countdown = true;
@@ -1010,13 +1006,13 @@ void bonus_try_drop(ArchetypeObject& self, Player* player)
       break;
 
     case BonusBlock::Content::STAR:
-      Sector::get().add<Star>(self.get_pos() + Vector(0, 32), direction);
+      Sector::get().add_object(powerup::create_star(self.get_pos() + Vector(0, 32), direction));
       play_upgrade_sound = true;
       countdown = true;
       break;
 
     case BonusBlock::Content::ONEUP:
-      Sector::get().add<OneUp>(self.get_pos(), Direction::DOWN);
+      Sector::get().add_object(powerup::create_oneup(self.get_pos(), Direction::DOWN));
       play_upgrade_sound = true;
       countdown = true;
       break;
@@ -2033,7 +2029,377 @@ bool rusty_is_portable(ArchetypeObject const& self)
   return as_portable(self).Portable::is_portable() && ecs::get<RustyTrampoline>(self.get_entity()).portable;
 }
 
+// Glow ---------------------------------------------------------------
+
+void glow_construct(ArchetypeObject& self)
+{
+  Glow& glow = ecs::get<Glow>(self.get_entity());
+  glow.light = SpriteManager::current()->create(glow.sprite);
+  glow.light->set_blend(Blend::ADD);
+  glow.light->set_color(glow.color);
+}
+
+void glow_draw(ArchetypeObject& self, DrawingContext& context)
+{
+  self.default_draw(context);
+  ecs::get<Glow>(self.get_entity()).light->draw(context.light(), self.m_col.m_bbox.get_middle(), 0);
+}
+
+// PowerUp ------------------------------------------------------------
+
+bool sprite_is(ArchetypeObject const& self, std::string const& name)
+{
+  return self.m_sprite_name == name || self.m_sprite_name == "/" + name;
+}
+
+void spawn_sparkles(ArchetypeObject& self)
+{
+  Rectf const& bbox = self.m_col.m_bbox;
+  if (auto* player = Sector::get().get_nearest_player(bbox)) {
+    float disp_x = player->get_bbox().get_left() - bbox.get_left();
+    float disp_y = player->get_bbox().get_top() - bbox.get_top();
+    if (disp_x*disp_x + disp_y*disp_y <= 256*256)
+    {
+      if (graphicsRandom.rand(0, 2) == 0) {
+        float px = graphicsRandom.randf(bbox.get_left() * 1.0f, bbox.get_right() * 1.0f);
+        float py = graphicsRandom.randf(bbox.get_top() * 1.0f, bbox.get_bottom() * 1.0f);
+        Vector ppos = Vector(px, py);
+        Vector pspeed = Vector(0, 0);
+        Vector paccel = Vector(0, 0);
+        Sector::get().add<SpriteParticle>(
+          "images/particles/sparkle.sprite",
+          // draw bright sparkles when very close to Tux, dark sparkles when slightly further
+          (disp_x*disp_x + disp_y*disp_y <= 128*128) ?
+          // make every other a longer sparkle to make trail a bit fuzzy
+          (size_t(g_game_time*20)%2) ? "small" : "medium" : "dark",
+          ppos, ANCHOR_MIDDLE, pspeed, paccel, LAYER_OBJECTS+1+5);
+      }
+    }
+  }
+}
+
+void powerup_construct(ArchetypeObject& self)
+{
+  PowerUp& powerup = ecs::get<PowerUp>(self.get_entity());
+  Physic& physic = ecs::emplace<Physic>(self.get_entity());
+  powerup.light = SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite");
+
+  physic.enable_gravity(true);
+  SoundManager::current()->preload("sounds/grow.ogg");
+  SoundManager::current()->preload("sounds/fire-flower.wav");
+  SoundManager::current()->preload("sounds/gulp.wav");
+
+  //set default light for glow effect for standard sprites
+  powerup.light->set_blend(Blend::ADD);
+  powerup.light->set_color(Color(0.0f, 0.0f, 0.0f));
+
+  if (sprite_is(self, "images/powerups/egg/egg.sprite")) {
+    powerup.light->set_color(Color(0.2f, 0.2f, 0.0f));
+  } else if (sprite_is(self, "images/powerups/fireflower/fireflower.sprite")) {
+    powerup.light->set_color(Color(0.3f, 0.0f, 0.0f));
+  } else if (sprite_is(self, "images/powerups/iceflower/iceflower.sprite")) {
+    powerup.light->set_color(Color(0.0f, 0.1f, 0.2f));
+  } else if (sprite_is(self, "images/powerups/airflower/airflower.sprite")) {
+    powerup.light->set_color(Color(0.15f, 0.0f, 0.15f));
+  } else if (sprite_is(self, "images/powerups/earthflower/earthflower.sprite")) {
+    powerup.light->set_color(Color(0.0f, 0.3f, 0.0f));
+  } else if (sprite_is(self, "images/powerups/star/star.sprite")) {
+    powerup.light->set_color(Color(0.4f, 0.4f, 0.4f));
+  }
+}
+
+void powerup_collision_solid(ArchetypeObject& self, CollisionHit const& hit)
+{
+  Physic& physic = ecs::get<Physic>(self.get_entity());
+  if (hit.bottom) {
+    physic.set_velocity_y(0);
+  }
+  if (hit.right || hit.left) {
+    physic.set_velocity_x(-physic.get_velocity_x());
+  }
+}
+
+HitResponse powerup_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  PowerUp const& powerup = ecs::get<PowerUp>(self.get_entity());
+
+  Player* player = dynamic_cast<Player*>(&other);
+  if (player == nullptr)
+    return FORCE_MOVE;
+
+  if (sprite_is(self, "images/powerups/potions/blue-potion.sprite") ||
+      sprite_is(self, "images/powerups/potions/red-potion.sprite")) {
+    SoundManager::current()->play("sounds/gulp.wav", self.get_pos());
+  }
+
+  if (!powerup.script.empty()) {
+    Sector::get().run_script(powerup.script, "powerup-script");
+    self.remove_me();
+    return ABORT_MOVE;
+  }
+
+  // some defaults if no script has been set
+  if (sprite_is(self, "images/powerups/egg/egg.sprite")) {
+    if (!player->add_bonus(GROWUP_BONUS, true))
+      return FORCE_MOVE;
+    SoundManager::current()->play("sounds/grow.ogg", self.get_pos());
+  } else if (sprite_is(self, "images/powerups/fireflower/fireflower.sprite")) {
+    if (!player->add_bonus(FIRE_BONUS, true))
+      return FORCE_MOVE;
+    SoundManager::current()->play("sounds/fire-flower.wav", self.get_pos());
+  } else if (sprite_is(self, "images/powerups/iceflower/iceflower.sprite")) {
+    if (!player->add_bonus(ICE_BONUS, true))
+      return FORCE_MOVE;
+    SoundManager::current()->play("sounds/fire-flower.wav", self.get_pos());
+  } else if (sprite_is(self, "images/powerups/airflower/airflower.sprite")) {
+    if (!player->add_bonus(AIR_BONUS, true))
+      return FORCE_MOVE;
+    SoundManager::current()->play("sounds/fire-flower.wav", self.get_pos());
+  } else if (sprite_is(self, "images/powerups/earthflower/earthflower.sprite")) {
+    if (!player->add_bonus(EARTH_BONUS, true))
+      return FORCE_MOVE;
+    SoundManager::current()->play("sounds/fire-flower.wav", self.get_pos());
+  } else if (sprite_is(self, "images/powerups/star/star.sprite")) {
+    player->make_invincible();
+  } else if (sprite_is(self, "images/powerups/1up/1up.sprite")) {
+    player->get_status().add_coins(100);
+  }
+
+  self.remove_me();
+  return ABORT_MOVE;
+}
+
+void powerup_update(ArchetypeObject& self, float dt_sec)
+{
+  if (!ecs::get<PowerUp>(self.get_entity()).no_physics)
+    self.m_col.set_movement(ecs::get<Physic>(self.get_entity()).get_movement(dt_sec));
+
+  //Stars sparkle when close to Tux
+  if (sprite_is(self, "images/powerups/star/star.sprite")) {
+    spawn_sparkles(self);
+  }
+}
+
+void powerup_draw(ArchetypeObject& self, DrawingContext& context)
+{
+  self.m_sprite->draw(context.color(), self.get_pos(), self.m_layer, self.m_flip);
+
+  // Stars are brighter
+  if (sprite_is(self, "images/powerups/star/star.sprite"))
+  {
+    self.m_sprite->draw(context.color(), self.get_pos(), self.m_layer, self.m_flip);
+  }
+
+  ecs::get<PowerUp>(self.get_entity()).light->draw(context.light(), self.m_col.m_bbox.get_middle(), 0);
+}
+
+// GrowUp -------------------------------------------------------------
+
+void growup_construct(ArchetypeObject& self)
+{
+  GrowUp& growup = ecs::get<GrowUp>(self.get_entity());
+  Physic& physic = ecs::emplace<Physic>(self.get_entity());
+  growup.shade = SpriteManager::current()->create("images/powerups/egg/egg.sprite");
+  growup.light = SpriteManager::current()->create("images/objects/lightmap_light/lightmap_light-small.sprite");
+
+  physic.enable_gravity(true);
+  SoundManager::current()->preload("sounds/grow.ogg");
+
+  //shadow to remain in place as egg rolls
+  growup.shade->set_action("shadow");
+
+  //set light for glow effect
+  growup.light->set_blend(Blend::ADD);
+  growup.light->set_color(Color(0.2f, 0.2f, 0.0f));
+}
+
+void growup_update(ArchetypeObject& self, float dt_sec)
+{
+  self.m_col.set_movement(ecs::get<Physic>(self.get_entity()).get_movement(dt_sec));
+}
+
+void growup_draw(ArchetypeObject& self, DrawingContext& context)
+{
+  GrowUp const& growup = ecs::get<GrowUp>(self.get_entity());
+  if (ecs::get<Physic>(self.get_entity()).get_velocity_x() != 0) {
+    self.m_sprite->set_angle(self.get_pos().x * 360.0f / (32.0f * math::PI));
+  }
+  self.default_draw(context);
+  growup.shade->draw(context.color(), self.get_pos(), self.m_layer);
+  growup.light->draw(context.light(), self.get_bbox().get_middle(), 0);
+}
+
+void growup_collision_solid(ArchetypeObject& self, CollisionHit const& hit)
+{
+  Physic& physic = ecs::get<Physic>(self.get_entity());
+  if (hit.top)
+    physic.set_velocity_y(0);
+  if (hit.bottom && physic.get_velocity_y() > 0)
+    physic.set_velocity_y(0);
+  if (hit.left || hit.right) {
+    physic.set_velocity_x(-physic.get_velocity_x());
+  }
+}
+
+HitResponse growup_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& hit)
+{
+  auto player = dynamic_cast<Player*>(&other);
+  if (player != nullptr) {
+    if (!player->add_bonus(GROWUP_BONUS, true)) {
+      // Tux can't grow right now.
+      growup_collision_solid(self, hit);
+      return ABORT_MOVE;
+    }
+
+    SoundManager::current()->play("sounds/grow.ogg", self.get_pos());
+    self.remove_me();
+
+    return ABORT_MOVE;
+  }
+  return FORCE_MOVE;
+}
+
+// FlowerBonus --------------------------------------------------------
+
+void flower_construct(ArchetypeObject& self)
+{
+  self.m_col.m_bbox.set_size(32, 32);
+  SoundManager::current()->preload("sounds/fire-flower.wav");
+}
+
+HitResponse flower_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  Player* player = dynamic_cast<Player*>(&other);
+  if (!player)
+    return ABORT_MOVE;
+
+  if (!player->add_bonus(ecs::get<FlowerBonus>(self.get_entity()).bonus, true))
+    return FORCE_MOVE;
+
+  SoundManager::current()->play("sounds/fire-flower.wav", self.get_pos());
+  self.remove_me();
+  return ABORT_MOVE;
+}
+
+// Star ---------------------------------------------------------------
+
+constexpr float JUMPSTAR_SPEED = -300;
+
+void star_construct(ArchetypeObject& self)
+{
+  ecs::emplace<Physic>(self.get_entity());
+}
+
+void star_update(ArchetypeObject& self, float dt_sec)
+{
+  self.m_col.set_movement(ecs::get<Physic>(self.get_entity()).get_movement(dt_sec));
+  // when near Tux, spawn particles
+  spawn_sparkles(self);
+}
+
+void star_collision_solid(ArchetypeObject& self, CollisionHit const& hit)
+{
+  Physic& physic = ecs::get<Physic>(self.get_entity());
+  if (hit.bottom) {
+    physic.set_velocity_y(JUMPSTAR_SPEED);
+  } else if (hit.top) {
+    physic.set_velocity_y(0);
+  } else if (hit.left || hit.right) {
+    physic.set_velocity_x(-physic.get_velocity_x());
+  }
+}
+
+HitResponse star_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  auto player = dynamic_cast<Player*>(&other);
+  if (player) {
+    player->make_invincible();
+    self.remove_me();
+    return ABORT_MOVE;
+  }
+  return FORCE_MOVE;
+}
+
+// OneUp --------------------------------------------------------------
+
+void oneup_construct(ArchetypeObject& self)
+{
+  ecs::emplace<Physic>(self.get_entity());
+}
+
+void oneup_update(ArchetypeObject& self, float dt_sec)
+{
+  if (!Sector::get().inside(self.m_col.m_bbox))
+    self.remove_me();
+
+  self.m_col.set_movement(ecs::get<Physic>(self.get_entity()).get_movement(dt_sec));
+}
+
+HitResponse oneup_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  auto player = dynamic_cast<Player*>(&other);
+  if (player) {
+    player->get_status().add_coins(100);
+    self.remove_me();
+    return ABORT_MOVE;
+  }
+  return FORCE_MOVE;
+}
+
 } // namespace
+
+namespace powerup {
+
+std::unique_ptr<ArchetypeObject> create(Vector const& pos, std::string const& sprite)
+{
+  return ArchetypeObject::create("powerup", pos, sprite);
+}
+
+std::unique_ptr<ArchetypeObject> create_growup(Vector const& pos, Direction dir)
+{
+  auto object = ArchetypeObject::create("growup", pos);
+  ecs::get<Physic>(object->get_entity()).set_velocity_x((dir == Direction::LEFT) ? -100.0f : 100.0f);
+  return object;
+}
+
+std::unique_ptr<ArchetypeObject> create_flower(BonusType bonus)
+{
+  switch (bonus) {
+    case FIRE_BONUS: return ArchetypeObject::create("fireflower-bonus", Vector(0, 0));
+    case ICE_BONUS: return ArchetypeObject::create("iceflower-bonus", Vector(0, 0));
+    case AIR_BONUS: return ArchetypeObject::create("airflower-bonus", Vector(0, 0));
+    case EARTH_BONUS: return ArchetypeObject::create("earthflower-bonus", Vector(0, 0));
+    default:
+      assert(false);
+      return {};
+  }
+}
+
+std::unique_ptr<ArchetypeObject> create_star(Vector const& pos, Direction dir)
+{
+  constexpr float INITIALJUMP = -400;
+  constexpr float STAR_SPEED = 150;
+  auto object = ArchetypeObject::create("star", pos);
+  ecs::get<Physic>(object->get_entity()).set_velocity((dir == Direction::LEFT) ? -STAR_SPEED : STAR_SPEED, INITIALJUMP);
+  return object;
+}
+
+std::unique_ptr<ArchetypeObject> create_oneup(Vector const& pos, Direction dir)
+{
+  auto object = ArchetypeObject::create("oneup", pos);
+  Physic& physic = ecs::get<Physic>(object->get_entity());
+  physic.set_velocity((dir == Direction::LEFT) ? -100.0f : 100.0f, -400.0f);
+  if (dir == Direction::DOWN) // this causes the doll to drop when opened with a butt-jump
+    physic.set_velocity(0, -100);
+  return object;
+}
+
+void growup_jump(ArchetypeObject& self)
+{
+  ecs::get<Physic>(self.get_entity()).set_velocity_y(-300);
+}
+
+} // namespace powerup
 
 namespace rock {
 
@@ -2234,12 +2600,12 @@ void try_open(ArchetypeObject& self, Player* player)
       break;
 
     case BonusBlock::Content::STAR:
-      Sector::get().add<Star>(self.get_pos() + Vector(0, -32), direction);
+      Sector::get().add_object(powerup::create_star(self.get_pos() + Vector(0, -32), direction));
       play_upgrade_sound = true;
       break;
 
     case BonusBlock::Content::ONEUP:
-      Sector::get().add<OneUp>(self.get_pos(), direction);
+      Sector::get().add_object(powerup::create_oneup(self.get_pos(), direction));
       play_upgrade_sound = true;
       break;
 
@@ -2550,6 +2916,75 @@ ObjectBehavior const& object_behavior_of<RustyTrampoline>()
     .collision = &rusty_collision,
     .is_portable = &rusty_is_portable,
     .ungrab = &rusty_ungrab,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Glow>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &glow_construct,
+    .draw = &glow_draw,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<PowerUp>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &powerup_construct,
+    .update = &powerup_update,
+    .draw = &powerup_draw,
+    .collision = &powerup_collision,
+    .collision_solid = &powerup_collision_solid,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<GrowUp>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &growup_construct,
+    .update = &growup_update,
+    .draw = &growup_draw,
+    .collision = &growup_collision,
+    .collision_solid = &growup_collision_solid,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<FlowerBonus>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &flower_construct,
+    .collision = &flower_collision,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Star>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &star_construct,
+    .update = &star_update,
+    .collision = &star_collision,
+    .collision_solid = &star_collision_solid,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<OneUp>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &oneup_construct,
+    .update = &oneup_update,
+    .collision = &oneup_collision,
   };
   return behavior;
 }

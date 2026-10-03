@@ -121,3 +121,5 @@ Non-badguy objects use the same pattern: `ArchetypeObject` (base
 - [x] rock — `data/archetypes/rock.archetype` (base "portable"; 10 runs; scriptable as before)
 - [x] trampoline, rustytrampoline — archetypes (trampoline + rock; 6 runs)
 - [~] lantern — C++ subclass of PortableObject adding the Rock behavior (willowisp/ghosttree need its type); 6 runs
+- [x] powerup — `data/archetypes/powerup.archetype` (3 runs)
+- [x] growup (egg), flowers, star, 1up from bonus blocks — archetypes with spawn helpers in `powerup::` (egg in 2 runs; flowers, star, 1up not exercised)

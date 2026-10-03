@@ -35,12 +35,13 @@ class ArchetypeObject : public MovingSprite,
 {
 public:
   ArchetypeObject(ReaderMapping const& reader, Archetype const& archetype);
-  /** for objects spawned at runtime */
-  ArchetypeObject(Vector const& pos, Archetype const& archetype);
+  /** for objects spawned at runtime; sprite overrides the archetype's if not empty */
+  ArchetypeObject(Vector const& pos, Archetype const& archetype, std::string const& sprite = {});
   ~ArchetypeObject() override;
 
   /** Spawn the named archetype at runtime */
-  static std::unique_ptr<ArchetypeObject> create(std::string const& name, Vector const& pos);
+  static std::unique_ptr<ArchetypeObject> create(std::string const& name, Vector const& pos,
+                                                 std::string const& sprite = {});
 
   void finish_construction() override;
   void expose(HSQUIRRELVM vm, SQInteger table_idx) override;

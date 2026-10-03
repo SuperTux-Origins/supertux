@@ -1,0 +1,10 @@
+; The air flower rising from a bonus block.
+(supertux-archetype
+  (name "airflower-bonus")
+  (base "object")
+  (properties
+    (sprite "images/powerups/airflower/airflower.sprite")
+    (colgroup "touchable"))
+  (components
+    (flower-bonus (bonus "air"))
+    (glow (color 0.15 0.0 0.15))))
