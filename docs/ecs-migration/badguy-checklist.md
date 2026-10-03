@@ -35,15 +35,15 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 
 ## Flyers
 - [x] flyingsnowball — `data/archetypes/flyingsnowball.archetype`
-- [ ] zeekling
+- [x] zeekling — `data/archetypes/zeekling.archetype`
 - [x] spidermite — `data/archetypes/spidermite.archetype`
 - [ ] owl
 - [x] captainsnowball — `data/archetypes/captainsnowball.archetype`
 
 ## Stationary / turret / trap
 - [ ] angrystone
-- [ ] darttrap
-- [ ] dart
+- [x] darttrap — `data/archetypes/darttrap.archetype`
+- [x] dart — `data/archetypes/dart.archetype`
 - [ ] dispenser  — spawns other archetypes at runtime; sequence AFTER Phase 3's archetype registry lands, not earlier
 - [ ] totem
 - [x] stalactite — `data/archetypes/stalactite.archetype`
@@ -63,7 +63,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 ## Explosive
 - [x] bomb — `data/archetypes/bomb.archetype`
 - [ ] goldbomb
-- [x] short_fuse — `data/archetypes/short_fuse.archetype` (lightly covered by golden suite: 2 runs)
+- [x] short_fuse — `data/archetypes/short_fuse.archetype` (lightly covered by golden suite: 2 runs; the earlier failed targeted probes were caused by stale-binary/new-data mismatch, worth retrying)
 - [ ] haywire
 
 ## Aquatic

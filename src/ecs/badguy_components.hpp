@@ -20,10 +20,14 @@
 #include <optional>
 #include <string>
 
+#include <entt/entity/entity.hpp>
+
 #include "math/vector.hpp"
 #include "audio/sound_source.hpp"
 #include "supertux/timer.hpp"
 #include "util/reader_mapping.hpp"
+
+class MovingObject;
 
 /** Walks along the floor, turning at walls and optionally at ledges. */
 struct Walker
@@ -473,6 +477,69 @@ inline void read_component(ReaderMapping const& mapping, Bobber& bobber)
 {
   mapping.read("speed", bobber.speed);
   mapping.read("fly-time", bobber.fly_time);
+}
+
+/** Stationary trap that periodically shoots darts (darttrap). Its
+    settings are usually given per level object. */
+struct DartShooter
+{
+  std::string dart = "dart";
+  bool enabled = true;
+  float initial_delay = 0.0f;
+  float fire_delay = 2.0f;
+  /** -1 means unlimited */
+  int ammo = -1;
+
+  // state
+  bool loading = false;
+  Timer fire_timer = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, DartShooter& shooter)
+{
+  mapping.read("dart", shooter.dart);
+  mapping.read("enabled", shooter.enabled);
+  mapping.read("initial-delay", shooter.initial_delay);
+  mapping.read("fire-delay", shooter.fire_delay);
+  mapping.read("ammo", shooter.ammo);
+}
+
+/** Flies straight until it hits something, killing badguys other than
+    the one that shot it (dart). */
+struct Dart
+{
+  float speed = 200.0f;
+
+  // state
+  entt::entity parent = entt::null;
+};
+
+inline void read_component(ReaderMapping const& mapping, Dart& dart)
+{
+  mapping.read("speed", dart.speed);
+}
+
+/** Flies back and forth at a random speed and dives at players below
+    it (zeekling). */
+struct Diver
+{
+  float min_speed = 130.0f;
+  float max_speed = 171.0f;
+
+  enum class State { FLYING, DIVING, CLIMBING };
+
+  // state
+  float speed = 0.0f;
+  State state = State::FLYING;
+  MovingObject const* last_player = nullptr; /**< last player we tracked */
+  Vector last_player_pos = {}; /**< position we last spotted the player at */
+  Vector last_self_pos = {}; /**< position we last were at */
+};
+
+inline void read_component(ReaderMapping const& mapping, Diver& diver)
+{
+  mapping.read("min-speed", diver.min_speed);
+  mapping.read("max-speed", diver.max_speed);
 }
 
 /** How the badguy reacts to being stomped. Without this component the

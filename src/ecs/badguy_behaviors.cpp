@@ -2360,7 +2360,321 @@ void bobber_unfreeze(ArchetypeBadguy& self, bool melt)
   bobber_initialize(self);
 }
 
+// DartShooter --------------------------------------------------------
+
+constexpr float MUZZLE_Y = 25; /**< [px] muzzle y-offset from top */
+
+void shooter_construct(ArchetypeBadguy& self)
+{
+  DartShooter& shooter = ecs::get<DartShooter>(self.get_entity());
+  self.m_countMe = false;
+  SoundManager::current()->preload("sounds/dartfire.wav");
+  if (self.m_start_dir == Direction::AUTO) { log_warning("Setting a DartTrap's direction to AUTO is no good idea"); }
+  if (shooter.initial_delay == 0) shooter.initial_delay = 0.1f;
+}
+
+void shooter_initialize(ArchetypeBadguy& self)
+{
+  self.m_sprite->set_action("idle", self.m_dir);
+}
+
+void shooter_activate(ArchetypeBadguy& self)
+{
+  DartShooter& shooter = ecs::get<DartShooter>(self.get_entity());
+  shooter.fire_timer.start(shooter.initial_delay);
+}
+
+HitResponse shooter_collision_player(ArchetypeBadguy& /*self*/, Player& /*player*/, CollisionHit const& /*hit*/)
+{
+  return ABORT_MOVE;
+}
+
+void shooter_fire(ArchetypeBadguy& self, DartShooter& shooter)
+{
+  float px = self.get_pos().x;
+  if (self.m_dir == Direction::RIGHT) px += 5;
+  float py = self.get_pos().y;
+  if (self.m_flip == NO_FLIP)
+    py += MUZZLE_Y;
+  else
+    py += (self.m_col.m_bbox.get_height() - MUZZLE_Y - 7.0f);
+
+  SoundManager::current()->play("sounds/dartfire.wav", self.get_pos());
+  auto dart = ArchetypeBadguy::create(shooter.dart, Vector(px, py), self.m_dir);
+  if (auto* dart_component = ecs::try_get<Dart>(dart->get_entity())) {
+    dart_component->parent = self.get_entity();
+  }
+  Sector::get().add_object(std::move(dart));
+  shooter.loading = false;
+  self.m_sprite->set_action("idle", self.m_dir);
+}
+
+/** stationary: replaces the physics movement */
+void shooter_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  DartShooter& shooter = ecs::get<DartShooter>(self.get_entity());
+  if (!shooter.enabled) {
+    return;
+  }
+
+  if (!shooter.loading) {
+    if ((shooter.ammo != 0) && (shooter.fire_timer.check())) {
+      if (shooter.ammo > 0) shooter.ammo--;
+      shooter.loading = true;
+      self.m_sprite->set_action("loading", self.m_dir, 1);
+      shooter.fire_timer.start(shooter.fire_delay);
+    }
+  } else if (self.m_sprite->animation_done()) {
+    shooter_fire(self, shooter);
+  }
+}
+
+// Dart ---------------------------------------------------------------
+
+void dart_construct(ArchetypeBadguy& self)
+{
+  self.m_physic.enable_gravity(false);
+  self.m_countMe = false;
+  SoundManager::current()->preload("sounds/darthit.wav");
+  SoundManager::current()->preload("sounds/stomp.wav");
+}
+
+void dart_initialize(ArchetypeBadguy& self)
+{
+  float const speed = ecs::get<Dart>(self.get_entity()).speed;
+  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -speed : speed);
+  self.m_sprite->set_action("flying", self.m_dir);
+}
+
+void dart_deactivate(ArchetypeBadguy& self)
+{
+  self.remove_me();
+}
+
+void dart_collision_solid(ArchetypeBadguy& self, CollisionHit const& /*hit*/)
+{
+  SoundManager::current()->play("sounds/darthit.wav", self.get_pos());
+  self.remove_me();
+}
+
+HitResponse dart_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& /*hit*/)
+{
+  // ignore collisions with parent
+  if (badguy.get_entity() == ecs::get<Dart>(self.get_entity()).parent) {
+    return FORCE_MOVE;
+  }
+  SoundManager::current()->play("sounds/stomp.wav", self.get_pos());
+  self.remove_me();
+  badguy.kill_fall();
+  return ABORT_MOVE;
+}
+
+HitResponse dart_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& hit)
+{
+  SoundManager::current()->play("sounds/stomp.wav", self.get_pos());
+  self.remove_me();
+  return self.default_collision_player(player, hit);
+}
+
+// Diver --------------------------------------------------------------
+
+void diver_construct(ArchetypeBadguy& self)
+{
+  Diver& diver = ecs::get<Diver>(self.get_entity());
+  diver.speed = gameRandom.randf(diver.min_speed, diver.max_speed);
+  self.m_physic.enable_gravity(false);
+}
+
+void diver_initialize(ArchetypeBadguy& self)
+{
+  float const speed = ecs::get<Diver>(self.get_entity()).speed;
+  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -speed : speed);
+  self.m_sprite->set_action(self.m_dir);
+}
+
+void diver_bump_horizontal(ArchetypeBadguy& self, Diver& diver)
+{
+  self.m_dir = (self.m_dir == Direction::LEFT ? Direction::RIGHT : Direction::LEFT);
+  self.m_sprite->set_action(self.m_dir);
+  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -diver.speed : diver.speed);
+  if (diver.state == Diver::State::DIVING) {
+    diver.state = Diver::State::FLYING;
+    self.m_physic.set_velocity_y(0);
+  }
+}
+
+void diver_bump_vertical(ArchetypeBadguy& self, Diver& diver)
+{
+  if (self.get_state() == ArchetypeBadguy::STATE_BURNING)
+  {
+    self.m_physic.set_velocity_y(0);
+    self.m_physic.set_velocity_x(0);
+    return;
+  }
+
+  if (diver.state == Diver::State::FLYING) {
+    self.m_physic.set_velocity_y(0);
+  } else if (diver.state == Diver::State::DIVING) {
+    diver.state = Diver::State::CLIMBING;
+    self.m_physic.set_velocity_y(-diver.speed);
+    self.m_sprite->set_action(self.m_dir);
+  } else if (diver.state == Diver::State::CLIMBING) {
+    diver.state = Diver::State::FLYING;
+    self.m_physic.set_velocity_y(0);
+  }
+}
+
+void diver_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Diver& diver = ecs::get<Diver>(self.get_entity());
+
+  if (self.m_frozen)
+    self.default_collision_solid(hit);
+  else
+  {
+    if (self.m_sprite->get_action() == "squished-left" ||
+        self.m_sprite->get_action() == "squished-right")
+    {
+      return;
+    }
+
+    if (hit.top || hit.bottom) {
+      diver_bump_vertical(self, diver);
+    }
+    else if (hit.left || hit.right) {
+      diver_bump_horizontal(self, diver);
+    }
+  }
+}
+
+/** linear prediction of player and badguy positions to decide if we should enter the DIVING state */
+bool diver_should_dive(ArchetypeBadguy& self, Diver& diver)
+{
+  if (self.m_frozen)
+    return false;
+
+  auto const player = self.get_nearest_player();
+  if (player && diver.last_player && (player == diver.last_player)) {
+
+    // get positions, calculate movement
+    Vector const& player_pos = player->get_pos();
+    Vector const player_mov = (player_pos - diver.last_player_pos);
+    Vector const self_pos = self.m_col.m_bbox.p1();
+    Vector const self_mov = (self_pos - diver.last_self_pos);
+
+    // new vertical speed to test with
+    float vy = 2*fabsf(self_mov.x);
+
+    // do not dive if we are not above the player
+    float height = player_pos.y - self_pos.y;
+    if (height <= 0) return false;
+
+    // do not dive if we are too far above the player
+    if (height > 512) return false;
+
+    // do not dive if we would not descend faster than the player
+    float relSpeed = vy - player_mov.y;
+    if (relSpeed <= 0) return false;
+
+    // guess number of frames to descend to same height as player
+    float estFrames = height / relSpeed;
+
+    // guess where the player would be at this time
+    float estPx = (player_pos.x + (estFrames * player_mov.x));
+
+    // guess where we would be at this time
+    float estBx = (self_pos.x + (estFrames * self_mov.x));
+
+    // near misses are OK, too
+    if (fabsf(estPx - estBx) < 8) return true;
+  }
+
+  // update last player tracked, as well as our positions
+  diver.last_player = player;
+  if (player) {
+    diver.last_player_pos = player->get_pos();
+    diver.last_self_pos = self.m_col.m_bbox.p1();
+  }
+
+  return false;
+}
+
+bool diver_update(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  Diver& diver = ecs::get<Diver>(self.get_entity());
+
+  if (diver.state == Diver::State::FLYING) {
+    if (diver_should_dive(self, diver)) {
+      diver.state = Diver::State::DIVING;
+      self.m_physic.set_velocity_y(2*fabsf(self.m_physic.get_velocity_x()));
+      self.m_sprite->set_action("diving", self.m_dir);
+    }
+  } else if (diver.state == Diver::State::CLIMBING) {
+    // stop climbing when we're back at initial height
+    if (self.get_pos().y <= self.m_start_position.y) {
+      diver.state = Diver::State::FLYING;
+      self.m_physic.set_velocity_y(0);
+    }
+  }
+  return true;
+}
+
+void diver_freeze(ArchetypeBadguy& self)
+{
+  self.default_freeze();
+  self.m_physic.enable_gravity(true);
+}
+
+void diver_unfreeze(ArchetypeBadguy& self, bool melt)
+{
+  self.default_unfreeze(melt);
+  self.m_physic.enable_gravity(false);
+  ecs::get<Diver>(self.get_entity()).state = Diver::State::FLYING;
+  diver_initialize(self);
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<DartShooter>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &shooter_construct,
+    .initialize = &shooter_initialize,
+    .activate = &shooter_activate,
+    .move = &shooter_move,
+    .collision_player = &shooter_collision_player,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Dart>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &dart_construct,
+    .initialize = &dart_initialize,
+    .deactivate = &dart_deactivate,
+    .collision_player = &dart_collision_player,
+    .collision_solid = &dart_collision_solid,
+    .collision_badguy = &dart_collision_badguy,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Diver>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &diver_construct,
+    .initialize = &diver_initialize,
+    .update = &diver_update,
+    .collision_solid = &diver_collision_solid,
+    .freeze = &diver_freeze,
+    .unfreeze = &diver_unfreeze,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<JumpingFish>()

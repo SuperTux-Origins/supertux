@@ -137,3 +137,9 @@ data/levels/world1/frozen_bridge.stlv idle 600 8000,480
 data/levels/world1/frozen_bridge.stlv hop 600 8000,480
 data/levels/world1/end_of_tunnel.stlv idle 600 13400,440
 data/levels/world1/end_of_tunnel.stlv hop 600 13400,440
+
+# Targeted: zeekling (beside_bushes, find_big_fish)
+data/levels/world2/beside_bushes.stlv idle 600 4916,420
+data/levels/world2/beside_bushes.stlv hop 600 4916,420
+data/levels/world2/find_big_fish.stlv idle 600 11796,228
+data/levels/world2/find_big_fish.stlv hop 600 11796,228

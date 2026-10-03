@@ -1,0 +1,11 @@
+; Shot by darttrap.
+(supertux-archetype
+  (name "dart")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/dart/dart.sprite")
+    (flammable #f)
+    (hurtable #f))
+  (components
+    (dart (speed 200))
+    (looping-sound (sound "sounds/flame.wav") (gain 0.5))))

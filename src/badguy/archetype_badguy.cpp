@@ -62,6 +62,7 @@ ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, Archetype const& a
   m_freezable(false),
   m_flammable(true),
   m_fall_immune(false),
+  m_hurtable(true),
   m_spawned(false)
 {
   read_properties(archetype);
@@ -76,6 +77,7 @@ ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, Direction dir, Archetype con
   m_freezable(false),
   m_flammable(true),
   m_fall_immune(false),
+  m_hurtable(true),
   m_spawned(false)
 {
   m_spawned = true;
@@ -92,6 +94,7 @@ ArchetypeBadguy::ArchetypeBadguy(ReaderMapping const& reader, std::string const&
   m_freezable(false),
   m_flammable(true),
   m_fall_immune(false),
+  m_hurtable(true),
   m_spawned(false)
 {
 }
@@ -103,6 +106,7 @@ ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, std::string const& sprite_na
   m_freezable(false),
   m_flammable(true),
   m_fall_immune(false),
+  m_hurtable(true),
   m_spawned(false)
 {
 }
@@ -114,6 +118,7 @@ ArchetypeBadguy::ArchetypeBadguy(Vector const& pos, Direction dir, std::string c
   m_freezable(false),
   m_flammable(true),
   m_fall_immune(false),
+  m_hurtable(true),
   m_spawned(false)
 {
 }
@@ -140,6 +145,7 @@ ArchetypeBadguy::read_properties(Archetype const& archetype)
   props.read("freezable", m_freezable);
   props.read("flammable", m_flammable);
   props.read("fall-immune", m_fall_immune);
+  props.read("hurtable", m_hurtable);
   props.read("count-me", m_countMe);
   props.read("glowing", m_glowing);
 
@@ -157,6 +163,8 @@ ArchetypeBadguy::read_properties(Archetype const& archetype)
   if (props.read("colgroup", colgroup)) {
     if (colgroup == "touchable") {
       set_colgroup_active(COLGROUP_TOUCHABLE);
+    } else if (colgroup == "disabled") {
+      set_colgroup_active(COLGROUP_DISABLED);
     } else {
       throw std::runtime_error("archetype '" + archetype.get_name() + "': unknown colgroup '" + colgroup + "'");
     }

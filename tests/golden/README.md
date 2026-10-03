@@ -43,3 +43,12 @@ supertux-origins --record-demo tests/golden/demos/NAME.demo data/levels/world1/L
 
 Play without dying: on death the recorder restarts the demo file with
 a new seed.
+
+## Recording baselines for a migration
+
+Baselines must come from the code *before* a change. Record targeted
+runs with the old build before migrating, or build the old commit in a
+git worktree and record there. Always run a binary with the `data/` of
+its own commit: an older binary rejects newer `data/archetypes` (unknown
+components), which breaks level loading and looks like Tux dying at
+frame 201.

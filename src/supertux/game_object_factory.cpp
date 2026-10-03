@@ -18,8 +18,6 @@
 
 #include "badguy/angrystone.hpp"
 #include "badguy/archetype_badguy.hpp"
-#include "badguy/dart.hpp"
-#include "badguy/darttrap.hpp"
 #include "badguy/dispenser.hpp"
 #include "badguy/fish_chasing.hpp"
 #include "badguy/fish_harmless.hpp"
@@ -43,7 +41,6 @@
 #include "badguy/willowisp.hpp"
 #include "badguy/yeti.hpp"
 #include "badguy/yeti_stalactite.hpp"
-#include "badguy/zeekling.hpp"
 #include "object/ambient_light.hpp"
 #include "object/ambient_sound.hpp"
 #include "object/background.hpp"
@@ -145,8 +142,6 @@ GameObjectFactory::init_factories()
   // badguys
   m_adding_badguys = true;
   add_factory<AngryStone>("angrystone");
-  add_factory<Dart>("dart");
-  add_factory<DartTrap>("darttrap");
   add_factory<Dispenser>("dispenser");
   add_factory<FishChasing>("fish-chasing");
   add_factory<FishHarmless>("fish-harmless");
@@ -174,7 +169,6 @@ GameObjectFactory::init_factories()
   add_factory<WillOWisp>("willowisp");
   add_factory<Yeti>("yeti");
   add_factory<YetiStalactite>("yeti_stalactite");
-  add_factory<Zeekling>("zeekling");
   add_archetypes();
   m_adding_badguys = false;
 

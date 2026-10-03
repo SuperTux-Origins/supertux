@@ -51,6 +51,7 @@ public:
   bool is_spawned() const { return m_spawned; }
 
   bool is_freezable() const override { return m_freezable; }
+  bool is_hurtable() const override { return m_hurtable; }
   bool is_flammable() const override;
   void freeze() override;
   void unfreeze(bool melt = true) override;
@@ -90,6 +91,7 @@ public:
   using BadGuy::STATE_ACTIVE;
   using BadGuy::m_physic;
   using BadGuy::m_dir;
+  using BadGuy::m_start_dir;
   using BadGuy::m_frozen;
   using BadGuy::m_ignited;
   using BadGuy::m_in_water;
@@ -156,6 +158,7 @@ private:
   bool m_freezable;
   bool m_flammable;
   bool m_fall_immune;
+  bool m_hurtable;
   bool m_spawned;
 
 private:

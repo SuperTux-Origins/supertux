@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "zeekling")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/zeekling/zeekling.sprite")
+    (freezable #t))
+  (components
+    (diver (min-speed 130) (max-speed 171))
+    (squish-reaction (action "squished"))))
