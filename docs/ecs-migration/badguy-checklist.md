@@ -114,3 +114,5 @@ Non-badguy objects use the same pattern: `ArchetypeObject` (base
 - [x] brick, heavy-brick — `data/archetypes/brick.archetype`, `heavy-brick.archetype` (3 runs)
 - [x] invisible_block — `data/archetypes/invisible_block.archetype` (not exercised)
 - [x] infoblock — `data/archetypes/infoblock.archetype` (not exercised)
+- [x] platform — `data/archetypes/platform.archetype` (platform + path-follower; 6 golden runs; scriptable as before)
+- [x] hurting_platform — `data/archetypes/hurting_platform.archetype` (not exercised)

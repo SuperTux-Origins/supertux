@@ -51,7 +51,6 @@
 #include "object/fallblock.hpp"
 #include "object/ghost_particle_system.hpp"
 #include "object/gradient.hpp"
-#include "object/hurting_platform.hpp"
 #include "object/invisible_wall.hpp"
 #include "object/ispy.hpp"
 #include "object/lantern.hpp"
@@ -181,7 +180,6 @@ GameObjectFactory::init_factories()
   add_factory<GhostParticleSystem>("particles-ghosts");
   add_factory<Gradient>("gradient");
   add_factory<HeavyCoin>("heavycoin");
-  add_factory<HurtingPlatform>("hurting_platform");
   add_factory<InvisibleWall>("invisible_wall");
   add_factory<Ispy>("ispy");
   add_factory<Lantern>("lantern", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
@@ -189,7 +187,6 @@ GameObjectFactory::init_factories()
   add_factory<LitObject>("lit-object");
   add_factory<MusicObject>("music");
   add_factory<ParticleZone>("particle-zone");
-  add_factory<Platform>("platform");
   add_factory<PneumaticPlatform>("pneumatic-platform");
   add_factory<PowerUp>("powerup");
   add_factory<PushButton>("pushbutton");

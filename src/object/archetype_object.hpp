@@ -21,6 +21,7 @@
 #include "ecs/object_behavior.hpp"
 #include "ecs/registry.hpp"
 #include "object/moving_sprite.hpp"
+#include "squirrel/script_interface.hpp"
 
 class Archetype;
 
@@ -28,12 +29,17 @@ class Archetype;
     with ObjectBehavior handlers (ecs/object_behaviors.cpp), configured
     by data/archetypes/ with base "object". The public section below is
     the state that behavior handlers may use. */
-class ArchetypeObject : public MovingSprite
+class ArchetypeObject : public MovingSprite,
+                        public virtual ScriptInterface
 {
 public:
   ArchetypeObject(ReaderMapping const& reader, Archetype const& archetype);
   ~ArchetypeObject() override;
 
+  void finish_construction() override;
+  void expose(HSQUIRRELVM vm, SQInteger table_idx) override;
+  void unexpose(HSQUIRRELVM vm, SQInteger table_idx) override;
+  void move_to(Vector const& pos) override;
   void update(float dt_sec) override;
   void draw(DrawingContext& context) override;
   HitResponse collision(GameObject& other, CollisionHit const& hit) override;

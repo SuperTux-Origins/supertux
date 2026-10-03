@@ -18,6 +18,10 @@
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
 #include "badguy/crusher.hpp"
+#include "object/path.hpp"
+#include "object/path_walker.hpp"
+#include "scripting/platform.hpp"
+#include "squirrel/squirrel_util.hpp"
 #include "object/bouncy_coin.hpp"
 #include "object/coin.hpp"
 #include "object/coin_explode.hpp"
@@ -1412,7 +1416,175 @@ void info_draw(ArchetypeObject& self, DrawingContext& context)
   context.pop_transform();
 }
 
+// PathFollower -------------------------------------------------------
+
+void path_read(ArchetypeObject& self, ReaderMapping const& mapping)
+{
+  PathFollower& follower = ecs::get<PathFollower>(self.get_entity());
+  follower.path.value = std::make_unique<PathObject>();
+  follower.path.value->init_path(mapping, follower.running);
+}
+
+void path_move_to(ArchetypeObject& self, Vector const& pos)
+{
+  Vector shift = pos - self.m_col.m_bbox.p1();
+  if (PathObject* path = path_follower::get(self); path && path->get_path()) {
+    path->get_path()->move_by(shift);
+  }
+  self.set_pos(pos);
+}
+
+// Platform -----------------------------------------------------------
+
+void platform_read(ArchetypeObject& self, ReaderMapping const& mapping)
+{
+  Platform& platform = ecs::get<Platform>(self.get_entity());
+
+  bool running = true;
+  mapping.read("running", running);
+  if ((self.get_name().empty()) && (!running)) {
+    platform.automatic = true;
+  }
+  platform.starting_node = static_cast<int>(mapping.get("starting-node", 0.f));
+}
+
+void platform_finish_construction(ArchetypeObject& self)
+{
+  Platform& platform = ecs::get<Platform>(self.get_entity());
+  PathObject& path = *path_follower::get(self);
+
+  if (!path.get_path())
+  {
+    // If no path is given, make a one-node dummy path
+    path.init_path_pos(self.m_col.m_bbox.p1(), false);
+  }
+
+  if (platform.starting_node >= static_cast<int>(path.get_path()->get_nodes().size()))
+    platform.starting_node = static_cast<int>(path.get_path()->get_nodes().size()) - 1;
+
+  path.get_walker()->jump_to_node(platform.starting_node);
+
+  self.m_col.m_bbox.set_pos(path.get_path_handle().get_pos(self.m_col.m_bbox.get_size(),
+                                                           path.get_path()->get_nodes()[platform.starting_node].position));
+}
+
+HitResponse platform_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  if (dynamic_cast<Player*>(&other)) {
+    ecs::get<Platform>(self.get_entity()).player_contact = true;
+  }
+  return FORCE_MOVE;
+}
+
+void platform_update(ArchetypeObject& self, float dt_sec)
+{
+  Platform& platform = ecs::get<Platform>(self.get_entity());
+  PathObject& path = *path_follower::get(self);
+
+  if (!path.get_path()) return;
+  if (!path.get_path()->is_valid()) return;
+
+  // check if Platform should automatically pick a destination
+  if (platform.automatic)
+  {
+    if (!platform.player_contact && !path.get_walker()->is_running()) {
+      // Player doesn't touch platform and Platform is not moving
+
+      // Travel to node nearest to nearest player
+      if (auto* player = Sector::get().get_nearest_player(self.m_col.m_bbox)) {
+        int nearest_node_id = path.get_path()->get_nearest_node_no(player->get_bbox().p2());
+        if (nearest_node_id != -1) {
+          platform::goto_node(self, nearest_node_id);
+        }
+      }
+    }
+
+    if (platform.player_contact && !platform.last_player_contact && !path.get_walker()->is_running()) {
+      // Player touched platform, didn't touch last frame and Platform is not moving
+
+      // Travel to node farthest from current position
+      int farthest_node_id = path.get_path()->get_farthest_node_no(self.get_pos());
+      if (farthest_node_id != -1) {
+        platform::goto_node(self, farthest_node_id);
+      }
+    }
+
+    // Clear player_contact flag set by collision() method
+    platform.last_player_contact = platform.player_contact;
+    platform.player_contact = false;
+  }
+
+  path.get_walker()->update(dt_sec);
+  Vector movement = path.get_walker()->get_pos(self.m_col.m_bbox.get_size(), path.get_path_handle()) - self.get_pos();
+  self.m_col.set_movement(movement);
+  self.m_col.propagate_movement(movement);
+  platform.speed = movement / dt_sec;
+}
+
+void platform_expose(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  expose_object(vm, table_idx, std::make_unique<scripting::Platform>(self.get_uid()), self.get_name());
+}
+
+void platform_unexpose(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx)
+{
+  if (self.get_name().empty())
+    return;
+  unexpose_object(vm, table_idx, self.get_name());
+}
+
+// Hurting ------------------------------------------------------------
+
+HitResponse hurting_collision(ArchetypeObject& /*self*/, GameObject& other, CollisionHit const& /*hit*/)
+{
+  auto player = dynamic_cast<Player*>(&other);
+  if (player) {
+    if (player->is_invincible()) {
+      return ABORT_MOVE;
+    }
+    player->kill(false);
+  }
+
+  auto badguy = dynamic_cast<BadGuy*>(&other);
+  if (badguy) {
+    badguy->kill_fall();
+  }
+
+  return FORCE_MOVE;
+}
+
 } // namespace
+
+namespace path_follower {
+
+PathObject* get(ArchetypeObject const& self)
+{
+  auto* follower = ecs::try_get<PathFollower>(self.get_entity());
+  return follower ? follower->path.value.get() : nullptr;
+}
+
+} // namespace path_follower
+
+namespace platform {
+
+void goto_node(ArchetypeObject& self, int node_no)
+{
+  path_follower::get(self)->get_walker()->goto_node(node_no);
+}
+
+void start_moving(ArchetypeObject& self)
+{
+  path_follower::get(self)->get_walker()->start_moving();
+}
+
+void stop_moving(ArchetypeObject& self)
+{
+  path_follower::get(self)->get_walker()->stop_moving();
+}
+
+} // namespace platform
 
 namespace block {
 
@@ -1703,6 +1875,39 @@ ObjectBehavior const& object_behavior_of<InfoBlock>()
     .draw = &info_draw,
     .collision = &info_collision,
     .hit = &info_hit,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<PathFollower>()
+{
+  static ObjectBehavior const behavior = {
+    .read = &path_read,
+    .move_to = &path_move_to,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Platform>()
+{
+  static ObjectBehavior const behavior = {
+    .read = &platform_read,
+    .finish_construction = &platform_finish_construction,
+    .expose = &platform_expose,
+    .unexpose = &platform_unexpose,
+    .update = &platform_update,
+    .collision = &platform_collision,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Hurting>()
+{
+  static ObjectBehavior const behavior = {
+    .collision = &hurting_collision,
   };
   return behavior;
 }

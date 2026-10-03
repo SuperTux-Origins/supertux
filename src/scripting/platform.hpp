@@ -20,14 +20,14 @@
 #ifndef SCRIPTING_API
 #include "scripting/game_object.hpp"
 
-class Platform;
+class ArchetypeObject;
 #endif
 
 namespace scripting {
 
 class Platform final
 #ifndef SCRIPTING_API
-  : public GameObject<::Platform>
+  : public GameObject<::ArchetypeObject>
 #endif
 {
 #ifndef SCRIPTING_API

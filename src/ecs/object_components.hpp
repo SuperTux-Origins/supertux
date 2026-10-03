@@ -28,6 +28,7 @@
 #include "util/reader_mapping.hpp"
 #include "video/surface_ptr.hpp"
 #include "supertux/info_box_line.hpp"
+#include "object/path_object.hpp"
 #include "supertux/moving_object.hpp"
 
 class Sprite;
@@ -256,6 +257,49 @@ inline void read_component(ReaderMapping const& mapping, InfoBlock& block)
   }
   mapping.read("roundness", block.roundness);
   mapping.read("fadetransition", block.fadetransition);
+}
+
+/** Follows a path given in the level object: (path ...) inline or
+    (path-ref "NAME"). running is the default when the level object
+    does not set "running". */
+struct PathFollower
+{
+  bool running = true;
+
+  // state
+  RuntimeState<std::unique_ptr<PathObject>> path = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, PathFollower& /*follower*/)
+{
+}
+
+/** Moves along its path (PathFollower), or automatically between the
+    nodes nearest and farthest from the player if unnamed and not
+    running (platform). Scriptable as a Platform. */
+struct Platform
+{
+  // state
+  int starting_node = 0;
+  bool automatic = false;
+  /** a Player touched the platform during the last round of collisions */
+  bool player_contact = false;
+  /** ... during the round before */
+  bool last_player_contact = false;
+  Vector speed = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, Platform& /*platform*/)
+{
+}
+
+/** Kills players and badguys touching it (hurting_platform). */
+struct Hurting
+{
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, Hurting& /*hurting*/)
+{
 }
 
 #endif

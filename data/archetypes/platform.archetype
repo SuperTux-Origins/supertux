@@ -1,0 +1,11 @@
+; Levels give a (path ...) or (path-ref "NAME"); unnamed platforms that
+; are not running move automatically towards and away from the player.
+(supertux-archetype
+  (name "platform")
+  (base "object")
+  (properties
+    (sprite "images/objects/flying_platform/flying_platform.sprite")
+    (colgroup "static"))
+  (components
+    (platform)
+    (path-follower (running #t))))

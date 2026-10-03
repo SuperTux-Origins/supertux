@@ -16,6 +16,9 @@
 
 #include "object/path_gameobject.hpp"
 
+#include "ecs/object_components.hpp"
+#include "ecs/registry.hpp"
+
 
 #include "gui/menu_manager.hpp"
 #include "object/path_object.hpp"
@@ -160,18 +163,31 @@ PathGameObject::draw(DrawingContext& context)
   }
 }
 
+bool
+PathGameObject::is_referenced() const
+{
+  for (auto const& path_obj : Sector::get().get_objects_by_type<PathObject>())
+    if (path_obj.get_path_gameobject() == this)
+      return true;
+
+  // objects that follow a path through their PathFollower component
+  for (auto const& object : Sector::get().get_objects()) {
+    if (auto* follower = ecs::try_get<PathFollower>(object->get_entity())) {
+      if (follower->path.value && follower->path.value->get_path_gameobject() == this)
+        return true;
+    }
+  }
+
+  return false;
+}
+
 void
 PathGameObject::remove_me()
 {
-  auto const& path_objects = Sector::get().get_objects_by_type<PathObject>();
-
-  for (auto const& path_obj : path_objects)
+  if (is_referenced())
   {
-    if (path_obj.get_path_gameobject() == this)
-    {
-      log_warning("Attempt to delete path {} while bound to object", get_name());
-      return;
-    }
+    log_warning("Attempt to delete path {} while bound to object", get_name());
+    return;
   }
 
   GameObject::remove_me();
@@ -193,11 +209,8 @@ PathGameObject::check_references()
   if (MenuManager::instance().is_active())
     return;
 
-  auto const& path_objects = Sector::get().get_objects_by_type<PathObject>();
-
-  for (auto const& path_obj : path_objects)
-    if (path_obj.get_path_gameobject() == this)
-      return;
+  if (is_referenced())
+    return;
 
   remove_me();
 }

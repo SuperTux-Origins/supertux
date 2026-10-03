@@ -29,6 +29,9 @@ template<> ObjectBehavior const& object_behavior_of<BonusBlock>();
 template<> ObjectBehavior const& object_behavior_of<Brick>();
 template<> ObjectBehavior const& object_behavior_of<InvisibleBlock>();
 template<> ObjectBehavior const& object_behavior_of<InfoBlock>();
+template<> ObjectBehavior const& object_behavior_of<PathFollower>();
+template<> ObjectBehavior const& object_behavior_of<Platform>();
+template<> ObjectBehavior const& object_behavior_of<Hurting>();
 
 class Crusher;
 class GameObject;
@@ -52,6 +55,21 @@ void try_break(ArchetypeObject& self, Player* player);
 void break_for_crusher(ArchetypeObject& self, Crusher& crusher);
 
 } // namespace brick
+
+namespace path_follower {
+
+/** The path object of the entity, or nullptr */
+PathObject* get(ArchetypeObject const& self);
+
+} // namespace path_follower
+
+namespace platform {
+
+void goto_node(ArchetypeObject& self, int node_no);
+void start_moving(ArchetypeObject& self);
+void stop_moving(ArchetypeObject& self);
+
+} // namespace platform
 
 namespace weak_block {
 

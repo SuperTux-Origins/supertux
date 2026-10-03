@@ -16,7 +16,10 @@
 #ifndef HEADER_SUPERTUX_ECS_OBJECT_BEHAVIOR_HPP
 #define HEADER_SUPERTUX_ECS_OBJECT_BEHAVIOR_HPP
 
+#include <squirrel.h>
+
 #include "collision/collision_hit.hpp"
+#include "math/vector.hpp"
 #include "util/reader_mapping.hpp"
 
 class ArchetypeObject;
@@ -36,6 +39,13 @@ struct ObjectBehavior
   void (*read)(ArchetypeObject& self, ReaderMapping const& mapping) = nullptr;
   /** all: end of construction */
   void (*construct)(ArchetypeObject& self) = nullptr;
+  /** all: the sector is complete, named objects can be resolved */
+  void (*finish_construction)(ArchetypeObject& self) = nullptr;
+  /** all: register a scripting wrapper if the object has a name */
+  void (*expose)(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx) = nullptr;
+  void (*unexpose)(ArchetypeObject& self, HSQUIRRELVM vm, SQInteger table_idx) = nullptr;
+  /** first, default: set_pos(); e.g. move the path along */
+  void (*move_to)(ArchetypeObject& self, Vector const& pos) = nullptr;
   /** all */
   void (*update)(ArchetypeObject& self, float dt_sec) = nullptr;
   /** first, default: draw the sprite */

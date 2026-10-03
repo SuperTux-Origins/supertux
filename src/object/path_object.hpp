@@ -40,6 +40,7 @@ public:
   PathGameObject* get_path_gameobject() const;
   Path* get_path() const;
   PathWalker* get_walker() const { return m_walker.get(); }
+  PathWalker::Handle const& get_path_handle() const { return m_path_handle; }
 
   std::string get_path_ref() const;
 

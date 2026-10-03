@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "hurting_platform")
+  (base "object")
+  (properties
+    (sprite "images/objects/sawblade/sawblade.sprite")
+    (colgroup "touchable"))
+  (components
+    (hurting)
+    (platform)
+    (path-follower (running #t))))

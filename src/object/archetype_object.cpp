@@ -64,6 +64,48 @@ ArchetypeObject::construct()
 }
 
 void
+ArchetypeObject::finish_construction()
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->finish_construction) {
+      behavior->finish_construction(*this);
+    }
+  }
+}
+
+void
+ArchetypeObject::expose(HSQUIRRELVM vm, SQInteger table_idx)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->expose) {
+      behavior->expose(*this, vm, table_idx);
+    }
+  }
+}
+
+void
+ArchetypeObject::unexpose(HSQUIRRELVM vm, SQInteger table_idx)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->unexpose) {
+      behavior->unexpose(*this, vm, table_idx);
+    }
+  }
+}
+
+void
+ArchetypeObject::move_to(Vector const& pos)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->move_to) {
+      behavior->move_to(*this, pos);
+      return;
+    }
+  }
+  MovingSprite::move_to(pos);
+}
+
+void
 ArchetypeObject::update(float dt_sec)
 {
   for (auto const* behavior : m_behaviors) {

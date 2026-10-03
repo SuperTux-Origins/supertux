@@ -51,6 +51,9 @@ private:
   /** Removes the object if the path is not referenced anywhere */
   void check_references();
 
+  /** used by a PathObject or a PathFollower component */
+  bool is_referenced() const;
+
 private:
   std::unique_ptr<Path> m_path;
   PathStyle m_style;
