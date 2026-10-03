@@ -542,6 +542,38 @@ inline void read_component(ReaderMapping const& mapping, Diver& diver)
   mapping.read("max-speed", diver.max_speed);
 }
 
+/** Stomping lights its fuse: it chases the nearest player, jumping
+    over obstacles, and explodes after a while (haywire). Steers its
+    Walker; list it before the walker. */
+struct Haywire
+{
+  float explosion_time = 5.0f;
+  float stomped_time = 1.0f;
+  float stunned_time = 0.5f;
+  float normal_speed = 80.0f;
+  float exploding_speed = 200.0f;
+  int normal_max_drop_height = 16;
+
+  // state
+  bool exploding = false;
+  float time_until_explosion = 0.0f;
+  bool stunned = false;
+  float time_stunned = 0.0f;
+  Timer stomped_timer = {};
+  std::shared_ptr<SoundSource> ticking = {};
+  std::shared_ptr<SoundSource> grunting = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Haywire& haywire)
+{
+  mapping.read("explosion-time", haywire.explosion_time);
+  mapping.read("stomped-time", haywire.stomped_time);
+  mapping.read("stunned-time", haywire.stunned_time);
+  mapping.read("normal-speed", haywire.normal_speed);
+  mapping.read("exploding-speed", haywire.exploding_speed);
+  mapping.read("normal-max-drop-height", haywire.normal_max_drop_height);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction

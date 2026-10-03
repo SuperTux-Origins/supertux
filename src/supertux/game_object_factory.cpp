@@ -24,7 +24,6 @@
 #include "badguy/ghosttree.hpp"
 #include "badguy/ghoul.hpp"
 #include "badguy/goldbomb.hpp"
-#include "badguy/haywire.hpp"
 #include "badguy/kamikazesnowball.hpp"
 #include "badguy/kugelblitz.hpp"
 #include "badguy/livefire.hpp"
@@ -149,7 +148,6 @@ GameObjectFactory::init_factories()
   add_factory<GhostTree>("ghosttree");
   add_factory<Ghoul>("ghoul");
   add_factory<GoldBomb>("goldbomb", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
-  add_factory<Haywire>("haywire");
   add_factory<KamikazeSnowball>("kamikazesnowball");
   add_factory<Kugelblitz>("kugelblitz");
   add_factory<LeafShot>("leafshot");

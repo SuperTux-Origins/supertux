@@ -2633,7 +2633,286 @@ void diver_unfreeze(ArchetypeBadguy& self, bool melt)
   diver_initialize(self);
 }
 
+// Haywire ------------------------------------------------------------
+
+std::shared_ptr<SoundSource> haywire_sound(ArchetypeBadguy& self, std::string const& name)
+{
+  std::shared_ptr<SoundSource> source = SoundManager::current()->create_sound_source(name);
+  source->set_position(self.get_pos());
+  source->set_looping(true);
+  source->set_reference_distance(32);
+  source->play();
+  return source;
+}
+
+void haywire_start_exploding(ArchetypeBadguy& self, Haywire& haywire)
+{
+  Walker& walker = ecs::get<Walker>(self.get_entity());
+  walker.speed = fabsf(haywire.exploding_speed);
+  walker.max_drop_height = -1;
+  haywire.time_until_explosion = haywire.explosion_time;
+  haywire.exploding = true;
+
+  haywire.ticking = haywire_sound(self, "sounds/fizz.wav");
+  haywire.grunting = haywire_sound(self, "sounds/grunts.ogg");
+}
+
+void haywire_stop_exploding(ArchetypeBadguy& self, Haywire& haywire)
+{
+  Walker& walker = ecs::get<Walker>(self.get_entity());
+  walker.left_action = "left";
+  walker.right_action = "right";
+  walker.speed = fabsf(haywire.normal_speed);
+  walker.max_drop_height = haywire.normal_max_drop_height;
+  haywire.time_until_explosion = 0.0f;
+  haywire.exploding = false;
+
+  if (haywire.ticking)
+    haywire.ticking->stop();
+  if (haywire.grunting)
+    haywire.grunting->stop();
+}
+
+void haywire_construct(ArchetypeBadguy& /*self*/)
+{
+  //Prevent stutter when Tux jumps on it
+  SoundManager::current()->preload("sounds/explosion.wav");
+}
+
+bool haywire_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  Haywire& haywire = ecs::get<Haywire>(self.get_entity());
+
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  auto player = dynamic_cast<Player*>(&object);
+  if (player && player->is_invincible()) {
+    player->bounce(self);
+    self.kill_fall();
+    return true;
+  }
+
+  if (haywire.stunned) {
+    if (player)
+      player->bounce(self);
+    return true;
+  }
+
+  if (self.is_frozen()) {
+    self.unfreeze();
+  }
+
+  if (!haywire.exploding) {
+    haywire_start_exploding(self, haywire);
+    haywire.stomped_timer.start(haywire.stomped_time);
+  }
+
+  haywire.time_stunned = haywire.stunned_time;
+  haywire.stunned = true;
+  self.m_physic.set_velocity_x(0.f);
+  self.m_physic.set_acceleration_x(0.f);
+
+  if (player)
+    player->bounce(self);
+
+  return true;
+}
+
+bool haywire_update(ArchetypeBadguy& self, float dt_sec)
+{
+  Haywire& haywire = ecs::get<Haywire>(self.get_entity());
+  Walker& walker = ecs::get<Walker>(self.get_entity());
+
+  auto* player = self.get_nearest_player();
+  if (haywire.exploding) {
+    haywire.ticking->set_position(self.get_pos());
+    haywire.grunting->set_position(self.get_pos());
+    if (dt_sec >= haywire.time_until_explosion) {
+      self.kill_fall();
+      return false;
+    }
+    else
+      haywire.time_until_explosion -= dt_sec;
+  }
+
+  if (haywire.stunned) {
+    if (haywire.time_stunned > dt_sec) {
+      haywire.time_stunned -= dt_sec;
+    }
+    else { /* if (time_stunned <= dt_sec) */
+      haywire.time_stunned = 0.f;
+      haywire.stunned = false;
+    }
+  }
+
+  if (!haywire.exploding) {
+    // move and walk normally
+    return true;
+  }
+
+  Rectf const& bbox = self.m_col.m_bbox;
+  if (self.on_ground() && std::abs(self.m_physic.get_velocity_x()) > 40.f && player)
+  {
+    //jump over 1-tall roadblocks
+    Rectf jump_box = self.get_bbox();
+    jump_box.set_left(bbox.get_left() + (self.m_dir == Direction::LEFT ? -48.f : 38.f));
+    jump_box.set_right(bbox.get_right() + (self.m_dir == Direction::RIGHT ? 48.f : -38.f));
+
+    Rectf exception_box = self.get_bbox();
+    exception_box.set_left(bbox.get_left() + (self.m_dir == Direction::LEFT ? -48.f : 38.f));
+    exception_box.set_right(bbox.get_right() + (self.m_dir == Direction::RIGHT ? 48.f : -38.f));
+    exception_box.set_top(bbox.get_top() - 32.f);
+    exception_box.set_bottom(bbox.get_bottom() - 48.f);
+
+    if (!Sector::get().is_free_of_statics(jump_box) && Sector::get().is_free_of_statics(exception_box))
+    {
+      self.m_physic.set_velocity_y(-325.f);
+    }
+    else
+    {
+      //jump over gaps if Tux isnt below
+      Rectf gap_box = self.get_bbox();
+      gap_box.set_left(bbox.get_left() + (self.m_dir == Direction::LEFT ? -38.f : 26.f));
+      gap_box.set_right(bbox.get_right() + (self.m_dir == Direction::LEFT ? -26.f : 38.f));
+      gap_box.set_top(bbox.get_top());
+      gap_box.set_bottom(bbox.get_bottom() + 28.f);
+
+      if (Sector::get().is_free_of_statics(gap_box)
+          && (player->get_bbox().get_bottom() <= bbox.get_bottom()))
+      {
+        self.m_physic.set_velocity_y(-325.f);
+      }
+    }
+  }
+
+  if (haywire.stomped_timer.get_timeleft() < 0.05f) {
+    self.set_action((self.m_dir == Direction::LEFT) ? "ticking-left" : "ticking-right", /* loops = */ -1);
+    walker.left_action = "ticking-left";
+    walker.right_action = "ticking-right";
+  }
+  else {
+    self.set_action((self.m_dir == Direction::LEFT) ? "active-left" : "active-right", /* loops = */ 1);
+    walker.left_action = "active-left";
+    walker.right_action = "active-right";
+  }
+
+  float target_velocity = 0.f;
+  if (!self.m_frozen)
+  {
+    if (haywire.stomped_timer.get_timeleft() >= 0.05f)
+    {
+      target_velocity = 0.f;
+    }
+    else if (player && haywire.time_stunned == 0.0f)
+    {
+      /* Player is on the right or left*/
+      target_velocity = (player->get_pos().x > self.get_pos().x) ? walker.speed : (-1.f) * walker.speed;
+    }
+  }
+
+  // move, then walk towards the target
+  walker.target_velocity = target_velocity;
+  walker.acceleration = 3.f;
+  return true;
+}
+
+void haywire_stop_sounds(ArchetypeBadguy& self)
+{
+  Haywire& haywire = ecs::get<Haywire>(self.get_entity());
+  if (haywire.ticking) {
+    haywire.ticking->stop();
+  }
+  if (haywire.grunting) {
+    haywire.grunting->stop();
+  }
+}
+
+void haywire_play_sounds(ArchetypeBadguy& self)
+{
+  Haywire& haywire = ecs::get<Haywire>(self.get_entity());
+  if (haywire.exploding) {
+    if (haywire.ticking) {
+      haywire.ticking->play();
+    }
+    if (haywire.grunting) {
+      haywire.grunting->play();
+    }
+  }
+}
+
+void haywire_kill_fall(ArchetypeBadguy& self)
+{
+  Haywire& haywire = ecs::get<Haywire>(self.get_entity());
+  if (haywire.exploding) {
+    haywire.ticking->stop();
+    haywire.grunting->stop();
+  }
+  if (self.is_valid()) {
+    if (self.m_frozen)
+      self.default_kill_fall();
+    else
+    {
+      self.remove_me();
+      explode_at(self);
+      self.run_dead_script();
+    }
+  }
+}
+
+void haywire_ignite(ArchetypeBadguy& self)
+{
+  if (self.m_frozen)
+    self.unfreeze();
+  self.kill_fall();
+}
+
+void haywire_freeze(ArchetypeBadguy& self)
+{
+  Haywire& haywire = ecs::get<Haywire>(self.get_entity());
+  self.default_freeze();
+  if (haywire.exploding) {
+    haywire_stop_exploding(self, haywire);
+  }
+}
+
+HitResponse haywire_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& hit)
+{
+  if (ecs::get<Haywire>(self.get_entity()).exploding)
+  {
+    badguy.kill_fall();
+    return FORCE_MOVE;
+  }
+
+  if (self.m_frozen)
+    return FORCE_MOVE;
+  else
+  {
+    walker::collision_badguy(self, ecs::get<Walker>(self.get_entity()), badguy, hit);
+  }
+
+  return ABORT_MOVE;
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Haywire>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &haywire_construct,
+    .deactivate = &haywire_stop_sounds,
+    .update = &haywire_update,
+    .collision_badguy = &haywire_collision_badguy,
+    .collision_squished = &haywire_collision_squished,
+    .freeze = &haywire_freeze,
+    .ignite = &haywire_ignite,
+    .kill_fall = &haywire_kill_fall,
+    .stop_looping_sounds = &haywire_stop_sounds,
+    .play_looping_sounds = &haywire_play_sounds,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<DartShooter>()

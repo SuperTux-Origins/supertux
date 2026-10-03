@@ -64,7 +64,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] bomb — `data/archetypes/bomb.archetype`
 - [ ] goldbomb
 - [x] short_fuse — `data/archetypes/short_fuse.archetype` (lightly covered by golden suite: 2 runs; the earlier failed targeted probes were caused by stale-binary/new-data mismatch, worth retrying)
-- [ ] haywire
+- [x] haywire — `data/archetypes/haywire.archetype`
 
 ## Aquatic
 - [ ] fish_swimming

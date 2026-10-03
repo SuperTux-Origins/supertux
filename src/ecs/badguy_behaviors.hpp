@@ -47,6 +47,7 @@ template<> BadGuyBehavior const& behavior_of<Bobber>();
 template<> BadGuyBehavior const& behavior_of<DartShooter>();
 template<> BadGuyBehavior const& behavior_of<Dart>();
 template<> BadGuyBehavior const& behavior_of<Diver>();
+template<> BadGuyBehavior const& behavior_of<Haywire>();
 
 namespace stalactite {
 
