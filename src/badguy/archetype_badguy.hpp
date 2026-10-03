@@ -46,6 +46,7 @@ public:
 
   bool is_freezable() const override { return m_freezable; }
   bool is_flammable() const override { return m_flammable; }
+  void freeze() override;
 
   void collision_solid(CollisionHit const& hit) override;
 
@@ -64,6 +65,7 @@ public:
   using BadGuy::m_ignited;
   using BadGuy::m_start_position;
   using BadGuy::get_state;
+  using BadGuy::get_nearest_player;
   using BadGuy::is_active;
   using BadGuy::might_fall;
   using BadGuy::on_ground;

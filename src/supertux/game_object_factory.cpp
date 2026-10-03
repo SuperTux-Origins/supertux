@@ -18,7 +18,6 @@
 
 #include "badguy/angrystone.hpp"
 #include "badguy/archetype_badguy.hpp"
-#include "badguy/bouncing_snowball.hpp"
 #include "badguy/captainsnowball.hpp"
 #include "badguy/dart.hpp"
 #include "badguy/darttrap.hpp"
@@ -34,7 +33,6 @@
 #include "badguy/haywire.hpp"
 #include "badguy/iceflame.hpp"
 #include "badguy/igel.hpp"
-#include "badguy/jumpy.hpp"
 #include "badguy/kamikazesnowball.hpp"
 #include "badguy/kugelblitz.hpp"
 #include "badguy/livefire.hpp"
@@ -49,7 +47,6 @@
 #include "badguy/short_fuse.hpp"
 #include "badguy/skullyhop.hpp"
 #include "badguy/skydive.hpp"
-#include "badguy/smartball.hpp"
 #include "badguy/smartblock.hpp"
 #include "badguy/snail.hpp"
 #include "badguy/snowman.hpp"
@@ -164,7 +161,6 @@ GameObjectFactory::init_factories()
   // badguys
   m_adding_badguys = true;
   add_factory<AngryStone>("angrystone");
-  add_factory<BouncingSnowball>("bouncingsnowball");
   add_factory<CaptainSnowball>("captainsnowball");
   add_factory<Dart>("dart");
   add_factory<DartTrap>("darttrap");
@@ -183,7 +179,6 @@ GameObjectFactory::init_factories()
   add_factory<Haywire>("haywire");
   add_factory<Iceflame>("iceflame");
   add_factory<Igel>("igel");
-  add_factory<Jumpy>("jumpy");
   add_factory<KamikazeSnowball>("kamikazesnowball");
   add_factory<Kugelblitz>("kugelblitz");
   add_factory<LeafShot>("leafshot");
@@ -203,7 +198,6 @@ GameObjectFactory::init_factories()
   add_factory<SSpiky>("sspiky");
   add_factory<SkyDive>("skydive", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<SkullyHop>("skullyhop");
-  add_factory<SmartBall>("smartball");
   add_factory<SmartBlock>("smartblock", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Snail>("snail", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Snowman>("snowman");

@@ -19,6 +19,7 @@
 #include <math.h>
 
 #include "badguy/archetype_badguy.hpp"
+#include "object/player.hpp"
 #include "sprite/sprite.hpp"
 #include "supertux/sector.hpp"
 
@@ -234,8 +235,10 @@ bool squish_collision_squished(ArchetypeBadguy& self, GameObject& object)
   if (squish.anchor_bottom) {
     // MovingSprite::set_action() also adapts the hitbox to the new action
     self.set_action(squish.action + dir_suffix(self.m_dir), /* loops = */ -1, ANCHOR_BOTTOM);
-  } else {
+  } else if (squish.directional) {
     self.m_sprite->set_action(squish.action, self.m_dir);
+  } else {
+    self.m_sprite->set_action(squish.action);
   }
 
   if (!squish.particles.empty()) {
@@ -252,7 +255,162 @@ bool squish_collision_squished(ArchetypeBadguy& self, GameObject& object)
   return true;
 }
 
+// Jumper -------------------------------------------------------------
+
+HitResponse jumper_hit(ArchetypeBadguy& self, CollisionHit const& chit)
+{
+  Jumper& jumper = ecs::get<Jumper>(self.get_entity());
+  if (chit.bottom) {
+    if (!jumper.ground_pos_set)
+    {
+      jumper.ground_pos = self.get_pos();
+      jumper.ground_pos_set = true;
+    }
+
+    self.m_physic.set_velocity_y((self.m_frozen || self.get_state() != ArchetypeBadguy::STATE_ACTIVE) ? 0 : jumper.jump_speed);
+    self.update_on_ground_flag(chit);
+  } else if (chit.top) {
+    self.m_physic.set_velocity_y(0);
+  }
+
+  return CONTINUE;
+}
+
+void jumper_collision_solid(ArchetypeBadguy& self, CollisionHit const& chit)
+{
+  jumper_hit(self, chit);
+
+  if (self.m_frozen)
+    self.default_collision_solid(chit);
+}
+
+HitResponse jumper_collision_badguy(ArchetypeBadguy& self, BadGuy& /*other*/, CollisionHit const& chit)
+{
+  return jumper_hit(self, chit);
+}
+
+void jumper_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  Jumper const& jumper = ecs::get<Jumper>(self.get_entity());
+  if (self.m_frozen)
+    return;
+
+  if (auto player = self.get_nearest_player())
+  {
+    self.m_dir = (player->get_pos().x > self.get_pos().x) ? Direction::RIGHT : Direction::LEFT;
+  }
+
+  if (!jumper.ground_pos_set)
+  {
+    self.m_sprite->set_action("editor", self.m_dir);
+    return;
+  }
+
+  if (self.get_pos().y < (jumper.ground_pos.y - jumper.mid_tolerance))
+    self.m_sprite->set_action(self.m_dir == Direction::LEFT ? "left-up" : "right-up");
+  else if (self.get_pos().y >= (jumper.ground_pos.y - jumper.mid_tolerance) &&
+           self.get_pos().y < (jumper.ground_pos.y - jumper.low_tolerance))
+    self.m_sprite->set_action(self.m_dir == Direction::LEFT ? "left-middle" : "right-middle");
+  else
+    self.m_sprite->set_action(self.m_dir == Direction::LEFT ? "left-down" : "right-down");
+}
+
+void jumper_after_freeze(ArchetypeBadguy& self)
+{
+  self.m_physic.set_velocity_y(std::max(0.0f, self.m_physic.get_velocity_y()));
+}
+
+// Bouncer ------------------------------------------------------------
+
+void bouncer_initialize(ArchetypeBadguy& self)
+{
+  Bouncer const& bouncer = ecs::get<Bouncer>(self.get_entity());
+  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -bouncer.speed : bouncer.speed);
+  self.m_sprite->set_action(self.m_dir);
+}
+
+void bouncer_after_move(ArchetypeBadguy& self, float /*dt_sec*/)
+{
+  if ((self.m_sprite->get_action() == "left-up" || self.m_sprite->get_action() == "right-up") &&
+      self.m_sprite->animation_done())
+  {
+    self.m_sprite->set_action(self.m_dir);
+  }
+
+  Rectf lookbelow = self.get_bbox();
+  lookbelow.set_bottom(lookbelow.get_bottom() + 48);
+  lookbelow.set_top(lookbelow.get_top() + 31);
+  bool const ground_below = !Sector::get().is_free_of_statics(lookbelow);
+  if (ground_below && (self.m_physic.get_velocity_y() >= 64.0f))
+  {
+    self.m_sprite->set_action(self.m_dir == Direction::LEFT ? "left-down" : "right-down");
+  }
+  if (!ground_below && (self.m_sprite->get_action() == "left-down" || self.m_sprite->get_action() == "right-down"))
+  {
+    self.m_sprite->set_action(self.m_dir);
+  }
+}
+
+void bouncer_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Bouncer const& bouncer = ecs::get<Bouncer>(self.get_entity());
+  if (self.m_sprite->get_action() == "squished")
+  {
+    return;
+  }
+
+  if (hit.bottom) {
+    if (self.get_state() == ArchetypeBadguy::STATE_ACTIVE) {
+      float bounce_speed = -self.m_physic.get_velocity_y() * bouncer.bounce_factor;
+      self.m_physic.set_velocity_y(std::min(bouncer.jump_speed, bounce_speed));
+      self.m_sprite->set_action(self.m_dir == Direction::LEFT ? "left-up" : "right-up", /* loops = */ 1);
+    } else {
+      self.m_physic.set_velocity_y(0);
+    }
+  } else if (hit.top) {
+    self.m_physic.set_velocity_y(0);
+  }
+
+  // left or right collision
+  // The direction must correspond, else we got fake bounces on slopes.
+  if ((hit.left && self.m_dir == Direction::LEFT) || (hit.right && self.m_dir == Direction::RIGHT)) {
+    self.m_dir = self.m_dir == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
+    self.m_sprite->set_action(self.m_dir);
+    self.m_physic.set_velocity_x(-self.m_physic.get_velocity_x());
+  }
+}
+
+HitResponse bouncer_collision_badguy(ArchetypeBadguy& self, BadGuy& /*other*/, CollisionHit const& hit)
+{
+  self.collision_solid(hit);
+  return CONTINUE;
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Jumper>()
+{
+  static BadGuyBehavior const behavior = {
+    .after_move = &jumper_after_move,
+    .collision_solid = &jumper_collision_solid,
+    .collision_badguy = &jumper_collision_badguy,
+    .after_freeze = &jumper_after_freeze,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Bouncer>()
+{
+  static BadGuyBehavior const behavior = {
+    .initialize = &bouncer_initialize,
+    .after_move = &bouncer_after_move,
+    .collision_solid = &bouncer_collision_solid,
+    .collision_badguy = &bouncer_collision_badguy,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<Walker>()

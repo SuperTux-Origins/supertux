@@ -18,7 +18,6 @@
 
 
 #include "badguy/fish_jumping.hpp"
-#include "badguy/jumpy.hpp"
 #include "object/background.hpp"
 #include "object/camera.hpp"
 #include "object/gradient.hpp"
@@ -62,9 +61,7 @@ SectorParser::SectorParser(Sector& sector) :
 std::unique_ptr<GameObject>
 SectorParser::parse_object(std::string const& name_, ReaderMapping const& reader)
 {
-  if (name_ == "money") { // for compatibility with old maps
-    return std::make_unique<Jumpy>(reader);
-  } else if (name_ == "fish") { //because the "fish" was renamed to "fish-jumping"
+  if (name_ == "fish") { //because the "fish" was renamed to "fish-jumping"
     return std::make_unique<FishJumping>(reader);
   } else {
     try {

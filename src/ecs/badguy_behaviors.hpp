@@ -23,6 +23,8 @@ template<> BadGuyBehavior const& behavior_of<Walker>();
 template<> BadGuyBehavior const& behavior_of<Floater>();
 template<> BadGuyBehavior const& behavior_of<Patrol>();
 template<> BadGuyBehavior const& behavior_of<SquishReaction>();
+template<> BadGuyBehavior const& behavior_of<Jumper>();
+template<> BadGuyBehavior const& behavior_of<Bouncer>();
 
 namespace walker {
 

@@ -36,6 +36,8 @@ struct BadGuyBehavior
   void (*collision_solid)(ArchetypeBadguy& self, CollisionHit const& hit) = nullptr;
   HitResponse (*collision_badguy)(ArchetypeBadguy& self, BadGuy& other, CollisionHit const& hit) = nullptr;
   bool (*collision_squished)(ArchetypeBadguy& self, GameObject& object) = nullptr;
+  /** runs after BadGuy::freeze() for all behaviors */
+  void (*after_freeze)(ArchetypeBadguy& self) = nullptr;
 };
 
 /** The behavior of a component type, specialized in badguy_behaviors.cpp */

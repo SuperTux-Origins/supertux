@@ -19,6 +19,7 @@
 #include <optional>
 #include <string>
 
+#include "math/vector.hpp"
 #include "supertux/timer.hpp"
 #include "util/reader_mapping.hpp"
 
@@ -83,12 +84,54 @@ inline void read_component(ReaderMapping const& mapping, Patrol& patrol)
   mapping.read("slowdown-action", patrol.slowdown_action);
 }
 
+/** Jumps in place whenever it lands, facing the nearest player
+    (jumpy). Sprite actions: left/right-up, -middle, -down, and "editor"
+    before the first landing. */
+struct Jumper
+{
+  float jump_speed = -600.0f;
+  /** height above the landing position that separates the up, middle
+      and down actions */
+  float mid_tolerance = 4.0f;
+  float low_tolerance = 2.0f;
+
+  // state
+  Vector ground_pos = {};
+  bool ground_pos_set = false;
+};
+
+inline void read_component(ReaderMapping const& mapping, Jumper& jumper)
+{
+  mapping.read("jump-speed", jumper.jump_speed);
+  mapping.read("mid-tolerance", jumper.mid_tolerance);
+  mapping.read("low-tolerance", jumper.low_tolerance);
+}
+
+/** Bounces along the floor, losing some speed per bounce but never
+    jumping lower than jump_speed (bouncingsnowball). Sprite actions:
+    left/right, left/right-up after a bounce, left/right-down before
+    landing. */
+struct Bouncer
+{
+  float speed = 80.0f;
+  float jump_speed = -450.0f;
+  float bounce_factor = 0.8f;
+};
+
+inline void read_component(ReaderMapping const& mapping, Bouncer& bouncer)
+{
+  mapping.read("speed", bouncer.speed);
+  mapping.read("jump-speed", bouncer.jump_speed);
+  mapping.read("bounce-factor", bouncer.bounce_factor);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction
 {
-  /** sprite action, suffixed with -left/-right */
   std::string action = "squished";
+  /** suffix the action with -left/-right */
+  bool directional = true;
   /** keep the sprite's bottom edge in place when switching action */
   bool anchor_bottom = false;
   /** stop moving and fall with normal gravity */
@@ -100,6 +143,7 @@ struct SquishReaction
 inline void read_component(ReaderMapping const& mapping, SquishReaction& squish)
 {
   mapping.read("action", squish.action);
+  mapping.read("directional", squish.directional);
   mapping.read("anchor-bottom", squish.anchor_bottom);
   mapping.read("stop", squish.stop);
   mapping.read("particles", squish.particles);

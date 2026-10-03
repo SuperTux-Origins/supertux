@@ -102,6 +102,22 @@ ArchetypeBadguy::read_properties(Archetype const& archetype)
   ReaderMapping const& props = archetype.get_properties();
   props.read("freezable", m_freezable);
   props.read("flammable", m_flammable);
+
+  std::string initial_action;
+  if (props.read("initial-action", initial_action)) {
+    m_sprite->set_action(initial_action);
+  }
+}
+
+void
+ArchetypeBadguy::freeze()
+{
+  BadGuy::freeze();
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->after_freeze) {
+      behavior->after_freeze(*this);
+    }
+  }
 }
 
 void

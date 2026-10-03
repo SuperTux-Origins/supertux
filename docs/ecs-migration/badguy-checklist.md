@@ -10,7 +10,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 
 ## Ground walkers / patrollers
 - [x] snowball — `data/archetypes/snowball.archetype`
-- [ ] bouncing_snowball
+- [x] bouncing_snowball — `data/archetypes/bouncingsnowball.archetype`
 - [ ] mriceblock
 - [x] spiky — `data/archetypes/spiky.archetype`
 - [ ] sspiky
@@ -28,7 +28,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [ ] mole
 
 ## Jumpers
-- [ ] jumpy
+- [x] jumpy — `data/archetypes/jumpy.archetype`
 - [ ] skullyhop
 - [ ] mrbomb
 - [ ] kamikazesnowball
@@ -74,7 +74,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 
 ## Rolling / physical projectile-like
 - [ ] mole_rock
-- [ ] smartball
+- [x] smartball — `data/archetypes/smartball.archetype`
 - [ ] smartblock
 
 ## Plants / scenery-enemy
