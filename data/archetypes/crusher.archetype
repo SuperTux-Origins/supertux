@@ -1,0 +1,11 @@
+; Levels pick the sprite (ice, rock, moss, root crushers) and may set
+; (sideways #t).
+(supertux-archetype
+  (name "crusher")
+  (aliases "icecrusher") ; old name
+  (base "object")
+  (properties
+    (sprite "images/creatures/crusher/krush_ice.sprite")
+    (colgroup "moving-static"))
+  (components
+    (crusher)))

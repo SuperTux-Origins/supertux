@@ -118,6 +118,8 @@ std::map<std::string, ComponentType> const& component_types()
     { "flower-bonus", object_component_type<FlowerBonus>() },
     { "star", object_component_type<Star>() },
     { "oneup", object_component_type<OneUp>() },
+    { "crusher", object_component_type<Crusher>() },
+    { "crusher-root", object_component_type<CrusherRoot>() },
     { "diver", component_type<Diver>() },
     { "haywire", component_type<Haywire>() },
     { "goldbomb", component_type<GoldBomb>() },

@@ -36,7 +36,6 @@
 #include "object/ambient_sound.hpp"
 #include "object/background.hpp"
 #include "object/bicycle_platform.hpp"
-#include "badguy/crusher.hpp"
 #include "object/archetype_object.hpp"
 #include "object/portable_object.hpp"
 #include "object/bumper.hpp"
@@ -170,8 +169,6 @@ GameObjectFactory::init_factories()
   add_factory<Candle>("candle");
   add_factory<CirclePlatform>("circleplatform");
   add_factory<CloudParticleSystem>("particles-clouds");
-  add_factory<Crusher>("icecrusher"); // backward compatibility
-  add_factory<Crusher>("crusher");
   add_factory<CustomParticleSystem>("particles-custom");
   add_factory<CustomParticleSystemFile>("particles-custom-file");
   add_factory<Decal>("decal");

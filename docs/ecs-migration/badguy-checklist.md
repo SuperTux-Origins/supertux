@@ -123,3 +123,4 @@ Non-badguy objects use the same pattern: `ArchetypeObject` (base
 - [~] lantern — C++ subclass of PortableObject adding the Rock behavior (willowisp/ghosttree need its type); 6 runs
 - [x] powerup — `data/archetypes/powerup.archetype` (3 runs)
 - [x] growup (egg), flowers, star, 1up from bonus blocks — archetypes with spawn helpers in `powerup::` (egg in 2 runs; flowers, star, 1up not exercised)
+- [x] crusher / icecrusher (+ crusher roots) — `data/archetypes/crusher.archetype` (4 targeted runs)

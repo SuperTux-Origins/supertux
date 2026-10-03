@@ -154,3 +154,9 @@ data/levels/world1/between_glaciers.stlv idle 600 8096,600
 data/levels/world1/entrance_cave.stlv idle 600 2560,600
 data/levels/world1/fork_in_the_road.stlv idle 600 7136,632
 data/levels/world1/into_stars.stlv idle 600 8608,1368
+
+# Targeted: crushers dropping on Tux
+data/levels/world1/end_of_tunnel.stlv idle 600 9888,392
+data/levels/world1/frozen_bridge.stlv idle 600 2592,456
+data/levels/world1/ice_in_the_hole.stlv idle 600 10016,360
+data/levels/world1/living_inside_fridge.stlv idle 600 10464,392

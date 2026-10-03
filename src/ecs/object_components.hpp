@@ -464,6 +464,46 @@ inline void read_component(ReaderMapping const& /*mapping*/, OneUp& /*oneup*/)
 {
 }
 
+/** Drops (or slides sideways) onto players below it, then recovers
+    (icecrusher). Its sprite decides ice/rock sounds, eyes and roots;
+    big sprites make a large crusher. */
+struct Crusher
+{
+  enum class State { IDLE, CRUSHING, RECOVERING };
+  enum class Direction { DOWN, LEFT, RIGHT };
+  enum class Size { NORMAL, LARGE };
+
+  bool sideways = false;
+
+  // state
+  State state = State::IDLE;
+  Size size = Size::NORMAL;
+  Vector start_position = {};
+  float cooldown_timer = 0.f;
+  Direction side_dir = Direction::DOWN;
+  std::shared_ptr<Sprite> lefteye = {};
+  std::shared_ptr<Sprite> righteye = {};
+  std::shared_ptr<Sprite> whites = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, Crusher& crusher)
+{
+  mapping.read("sideways", crusher.sideways);
+}
+
+/** A root growing out of the ground where a root crusher hit. */
+struct CrusherRoot
+{
+  // state
+  Vector original_pos = {};
+  Crusher::Direction direction = Crusher::Direction::DOWN;
+  float delay_remaining = 0.f;
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, CrusherRoot& /*root*/)
+{
+}
+
 #endif
 
 /* EOF */

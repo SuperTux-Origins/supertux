@@ -45,8 +45,9 @@ template<> ObjectBehavior const& object_behavior_of<GrowUp>();
 template<> ObjectBehavior const& object_behavior_of<FlowerBonus>();
 template<> ObjectBehavior const& object_behavior_of<Star>();
 template<> ObjectBehavior const& object_behavior_of<OneUp>();
+template<> ObjectBehavior const& object_behavior_of<Crusher>();
+template<> ObjectBehavior const& object_behavior_of<CrusherRoot>();
 
-class Crusher;
 class GameObject;
 class Player;
 
@@ -65,7 +66,7 @@ void try_open(ArchetypeObject& self, Player* player);
 namespace brick {
 
 void try_break(ArchetypeObject& self, Player* player);
-void break_for_crusher(ArchetypeObject& self, Crusher& crusher);
+void break_for_crusher(ArchetypeObject& self, ArchetypeObject& crusher);
 
 } // namespace brick
 
