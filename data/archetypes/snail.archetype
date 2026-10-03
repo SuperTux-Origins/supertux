@@ -1,0 +1,9 @@
+(supertux-archetype
+  (name "snail")
+  (base "badguy")
+  (properties
+    (sprite "images/creatures/snail/snail.sprite")
+    (freezable #t))
+  (components
+    (snail (kick-speed 500) (kick-speed-y -500) (max-squishes 10) (flat-time 4))
+    (walker (speed 80) (max-drop-height 600))))

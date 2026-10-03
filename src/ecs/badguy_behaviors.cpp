@@ -1456,7 +1456,406 @@ HitResponse shy_collision_bullet(ArchetypeBadguy& self, Bullet& bullet, Collisio
   return FORCE_MOVE;
 }
 
+// Firecracker --------------------------------------------------------
+
+void firecracker_explode(ArchetypeBadguy& self)
+{
+  if (!self.is_valid())
+    return;
+
+  if (self.m_frozen)
+    self.default_kill_fall();
+  else
+  {
+    auto& explosion = Sector::get().add<Explosion>(self.get_bbox().get_middle(),
+                                                   EXPLOSION_STRENGTH_NEAR, 8);
+    explosion.hurts(false);
+    self.run_dead_script();
+    self.remove_me();
+  }
+}
+
+void firecracker_construct(ArchetypeBadguy& /*self*/)
+{
+  SoundManager::current()->preload("sounds/firecracker.ogg");
+}
+
+bool firecracker_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  if (!self.is_valid())
+    return true;
+
+  if (auto player = dynamic_cast<Player*>(&object))
+    player->bounce(self);
+
+  firecracker_explode(self);
+  return true;
+}
+
+HitResponse firecracker_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& /*hit*/)
+{
+  if (!self.m_frozen)
+  {
+    player.bounce(self);
+    firecracker_explode(self);
+  }
+  return FORCE_MOVE;
+}
+
+void firecracker_freeze(ArchetypeBadguy& self)
+{
+  self.m_col.m_bbox.move(Vector(0.f, -100.f));
+  self.default_freeze();
+}
+
+void firecracker_ignite(ArchetypeBadguy& self)
+{
+  if (self.m_frozen)
+    self.unfreeze();
+  self.kill_fall();
+}
+
+// Snail --------------------------------------------------------------
+
+void snail_be_normal(ArchetypeBadguy& self, Snail& snail)
+{
+  if (snail.state == Snail::State::NORMAL) return;
+
+  snail.state = Snail::State::NORMAL;
+  walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+}
+
+void snail_be_flat(ArchetypeBadguy& self, Snail& snail)
+{
+  snail.state = Snail::State::FLAT;
+  self.m_sprite->set_action("flat", self.m_dir, /* loops = */ -1);
+
+  self.m_physic.set_velocity_x(0);
+  self.m_physic.set_velocity_y(0);
+
+  snail.flat_timer.start(snail.flat_time);
+}
+
+void snail_be_grabbed(ArchetypeBadguy& self, Snail& snail)
+{
+  snail.state = Snail::State::GRABBED;
+  self.m_sprite->set_action("flat", self.m_dir, /* loops = */ -1);
+}
+
+void snail_be_kicked(ArchetypeBadguy& self, Snail& snail, bool upwards)
+{
+  if (upwards)
+    snail.state = Snail::State::KICKED_DELAY;
+  else
+    snail.state = Snail::State::KICKED;
+  self.m_sprite->set_action("flat", self.m_dir, /* loops = */ -1);
+
+  self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -snail.kick_speed : snail.kick_speed);
+  self.m_physic.set_velocity_y(0);
+
+  // start a timer to delay addition of upward movement until we are (hopefully) out from under the player
+  if (upwards)
+    snail.kicked_delay_timer.start(0.05f);
+}
+
+void snail_wake_up(ArchetypeBadguy& self, Snail& snail)
+{
+  snail.state = Snail::State::WAKING;
+  self.m_sprite->set_action(self.m_dir == Direction::LEFT ? "waking-left" : "waking-right", /* loops = */ 1);
+}
+
+void snail_construct(ArchetypeBadguy& /*self*/)
+{
+  SoundManager::current()->preload("sounds/iceblock_bump.wav");
+  SoundManager::current()->preload("sounds/stomp.wav");
+  SoundManager::current()->preload("sounds/kick.wav");
+}
+
+void snail_initialize(ArchetypeBadguy& self)
+{
+  walker::initialize(self, ecs::get<Walker>(self.get_entity()));
+  snail_be_normal(self, ecs::get<Snail>(self.get_entity()));
+}
+
+bool snail_can_break(ArchetypeBadguy const& self)
+{
+  return ecs::get<Snail>(self.get_entity()).state == Snail::State::KICKED;
+}
+
+bool snail_update(ArchetypeBadguy& self, float dt_sec)
+{
+  Snail& snail = ecs::get<Snail>(self.get_entity());
+
+  if (snail.state == Snail::State::GRABBED || self.is_grabbed())
+    return false;
+
+  if (self.m_frozen)
+  {
+    self.default_move(dt_sec);
+    return false;
+  }
+
+  switch (snail.state) {
+    case Snail::State::NORMAL:
+      // move and walk
+      return true;
+
+    case Snail::State::FLAT:
+      if (snail.flat_timer.check())
+        snail_wake_up(self, snail);
+      break;
+
+    case Snail::State::WAKING:
+      if (self.m_sprite->animation_done())
+        snail_be_normal(self, snail);
+      break;
+
+    case Snail::State::KICKED_DELAY:
+      if (snail.kicked_delay_timer.check()) {
+        self.m_physic.set_velocity_x(self.m_dir == Direction::LEFT ? -snail.kick_speed : snail.kick_speed);
+        self.m_physic.set_velocity_y(snail.kick_speed_y);
+        snail.state = Snail::State::KICKED;
+      }
+      break;
+
+    case Snail::State::KICKED:
+      self.m_physic.set_velocity_x(self.m_physic.get_velocity_x() * powf(0.99f, dt_sec/0.02f));
+      if (fabsf(self.m_physic.get_velocity_x()) < ecs::get<Walker>(self.get_entity()).speed)
+        snail_be_normal(self, snail);
+      break;
+
+    case Snail::State::GRABBED:
+      break;
+  }
+
+  self.default_move(dt_sec);
+
+  if (self.m_ignited)
+    self.remove_me();
+
+  return false;
+}
+
+void snail_collision_solid(ArchetypeBadguy& self, CollisionHit const& hit)
+{
+  Snail& snail = ecs::get<Snail>(self.get_entity());
+  Walker& walker = ecs::get<Walker>(self.get_entity());
+
+  if (self.m_frozen)
+  {
+    walker::collision_solid(self, walker, hit);
+    return;
+  }
+
+  switch (snail.state)
+  {
+    case Snail::State::NORMAL:
+      walker::collision_solid(self, walker, hit);
+      return;
+    case Snail::State::KICKED:
+      if (hit.left || hit.right) {
+        SoundManager::current()->play("sounds/iceblock_bump.wav", self.get_pos());
+
+        if ((self.m_dir == Direction::LEFT && hit.left) || (self.m_dir == Direction::RIGHT && hit.right)) {
+          self.m_dir = (self.m_dir == Direction::LEFT) ? Direction::RIGHT : Direction::LEFT;
+          self.m_sprite->set_action("flat", self.m_dir, /* loops = */ -1);
+
+          self.m_physic.set_velocity_x(-self.m_physic.get_velocity_x());
+        }
+      }
+      [[fallthrough]];
+    case Snail::State::FLAT:
+    case Snail::State::KICKED_DELAY:
+    case Snail::State::WAKING:
+      if (hit.top || hit.bottom) {
+        self.m_physic.set_velocity_y(0);
+      }
+      break;
+    case Snail::State::GRABBED:
+      break;
+  }
+
+  self.update_on_ground_flag(hit);
+}
+
+HitResponse snail_collision_badguy(ArchetypeBadguy& self, BadGuy& badguy, CollisionHit const& hit)
+{
+  Snail& snail = ecs::get<Snail>(self.get_entity());
+  Walker& walker = ecs::get<Walker>(self.get_entity());
+
+  if (self.m_frozen)
+    return walker::collision_badguy(self, walker, badguy, hit);
+
+  switch (snail.state) {
+    case Snail::State::NORMAL:
+      return walker::collision_badguy(self, walker, badguy, hit);
+    case Snail::State::FLAT:
+    case Snail::State::KICKED_DELAY:
+    case Snail::State::WAKING:
+      return FORCE_MOVE;
+    case Snail::State::KICKED:
+      badguy.kill_fall();
+      return FORCE_MOVE;
+    default:
+      assert(false);
+  }
+
+  return ABORT_MOVE;
+}
+
+HitResponse snail_collision_player(ArchetypeBadguy& self, Player& player, CollisionHit const& hit)
+{
+  Snail& snail = ecs::get<Snail>(self.get_entity());
+
+  if (self.m_frozen)
+    return self.default_collision_player(player, hit);
+
+  // handle kicks from left or right side
+  if ((snail.state == Snail::State::WAKING || snail.state == Snail::State::FLAT) && (hit.left || hit.right)) {
+    if (hit.left) {
+      self.m_dir = Direction::RIGHT;
+    } else if (hit.right) {
+      self.m_dir = Direction::LEFT;
+    }
+    player.kick();
+    snail_be_kicked(self, snail, false);
+    return FORCE_MOVE;
+  }
+
+  return self.default_collision_player(player, hit);
+}
+
+bool snail_collision_squished(ArchetypeBadguy& self, GameObject& object)
+{
+  Snail& snail = ecs::get<Snail>(self.get_entity());
+
+  if (self.m_frozen)
+    return self.default_collision_squished(object);
+
+  Player* player = dynamic_cast<Player*>(&object);
+  if (player && (player->is_invincible() || player->m_does_buttjump)) {
+    self.kill_fall();
+    player->bounce(self);
+    return true;
+  }
+
+  switch (snail.state) {
+    case Snail::State::NORMAL:
+      [[fallthrough]];
+    case Snail::State::KICKED:
+      snail.squishcount++;
+      if (snail.squishcount >= snail.max_squishes) {
+        self.kill_fall();
+        return true;
+      }
+      SoundManager::current()->play("sounds/stomp.wav", self.get_pos());
+      snail_be_flat(self, snail);
+      break;
+
+    case Snail::State::FLAT:
+    case Snail::State::WAKING:
+      SoundManager::current()->play("sounds/kick.wav", self.get_pos());
+      {
+        MovingObject* movingobject = dynamic_cast<MovingObject*>(&object);
+        if (movingobject && (movingobject->get_pos().x < self.get_pos().x)) {
+          self.m_dir = Direction::RIGHT;
+        } else {
+          self.m_dir = Direction::LEFT;
+        }
+      }
+      snail_be_kicked(self, snail, true);
+      break;
+
+    case Snail::State::GRABBED:
+    case Snail::State::KICKED_DELAY:
+      break;
+  }
+
+  if (player) player->bounce(self);
+  return true;
+}
+
+void snail_grab(ArchetypeBadguy& self, MovingObject& object, Vector const& pos, Direction dir)
+{
+  Snail& snail = ecs::get<Snail>(self.get_entity());
+
+  self.Portable::grab(object, pos, dir);
+  if (self.m_frozen)
+    self.BadGuy::grab(object, pos, dir);
+  self.m_col.set_movement(pos - self.get_pos());
+  self.m_dir = dir;
+  if (!self.m_frozen)
+  {
+    self.set_action(dir == Direction::LEFT ? "flat-left" : "flat-right", /* loops = */ -1);
+    snail_be_grabbed(self, snail);
+    snail.flat_timer.stop();
+  }
+  self.set_colgroup_active(COLGROUP_DISABLED);
+}
+
+void snail_ungrab(ArchetypeBadguy& self, MovingObject& object, Direction dir)
+{
+  Snail& snail = ecs::get<Snail>(self.get_entity());
+
+  if (!self.m_frozen)
+  {
+    if (dir == Direction::UP) {
+      snail_be_flat(self, snail);
+    }
+    else {
+      self.m_dir = dir;
+      snail_be_kicked(self, snail, dynamic_cast<Owl*>(&object) ? false : true);
+    }
+  }
+  else
+    self.BadGuy::ungrab(object, dir);
+
+  self.set_colgroup_active(self.m_frozen ? COLGROUP_MOVING_STATIC : COLGROUP_MOVING);
+  self.Portable::ungrab(object, dir);
+}
+
+bool snail_is_portable(ArchetypeBadguy const& self)
+{
+  return (ecs::get<Snail>(self.get_entity()).state == Snail::State::FLAT || self.m_frozen) && !self.m_ignited;
+}
+
 } // namespace
+
+template<>
+BadGuyBehavior const& behavior_of<Firecracker>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &firecracker_construct,
+    .collision_player = &firecracker_collision_player,
+    .collision_squished = &firecracker_collision_squished,
+    .freeze = &firecracker_freeze,
+    .ignite = &firecracker_ignite,
+    .kill_fall = &firecracker_explode,
+  };
+  return behavior;
+}
+
+template<>
+BadGuyBehavior const& behavior_of<Snail>()
+{
+  static BadGuyBehavior const behavior = {
+    .construct = &snail_construct,
+    .initialize = &snail_initialize,
+    .update = &snail_update,
+    .collision_player = &snail_collision_player,
+    .collision_solid = &snail_collision_solid,
+    .collision_badguy = &snail_collision_badguy,
+    .collision_squished = &snail_collision_squished,
+    .is_portable = &snail_is_portable,
+    .can_break = &snail_can_break,
+    .grab = &snail_grab,
+    .ungrab = &snail_ungrab,
+  };
+  return behavior;
+}
 
 template<>
 BadGuyBehavior const& behavior_of<Boarder>()

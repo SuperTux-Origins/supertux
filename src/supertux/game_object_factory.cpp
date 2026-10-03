@@ -38,10 +38,8 @@
 #include "badguy/plant.hpp"
 #include "badguy/rcrystallo.hpp"
 #include "badguy/scrystallo.hpp"
-#include "badguy/short_fuse.hpp"
 #include "badguy/skullyhop.hpp"
 #include "badguy/skydive.hpp"
-#include "badguy/snail.hpp"
 #include "badguy/snowman.hpp"
 #include "badguy/spidermite.hpp"
 #include "badguy/stumpy.hpp"
@@ -178,10 +176,8 @@ GameObjectFactory::init_factories()
   add_factory<Plant>("plant");
   add_factory<RCrystallo>("rcrystallo");
   add_factory<SCrystallo>("scrystallo");
-  add_factory<ShortFuse>("short_fuse");
   add_factory<SkyDive>("skydive", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<SkullyHop>("skullyhop");
-  add_factory<Snail>("snail", RegisteredObjectParam::OBJ_PARAM_PORTABLE);
   add_factory<Snowman>("snowman");
   add_factory<SpiderMite>("spidermite");
   add_factory<Stumpy>("stumpy");

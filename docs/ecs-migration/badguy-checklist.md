@@ -14,7 +14,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 - [x] mriceblock — `data/archetypes/mriceblock.archetype`
 - [x] spiky — `data/archetypes/spiky.archetype`
 - [x] sspiky — `data/archetypes/sspiky.archetype`
-- [ ] snail
+- [x] snail — `data/archetypes/snail.archetype`
 - [x] crystallo — `data/archetypes/crystallo.archetype` (shatter reaction not covered by golden suite yet)
 - [ ] rcrystallo
 - [ ] scrystallo
@@ -63,7 +63,7 @@ before trusting the cluster**, names are a triage hint, not ground truth:
 ## Explosive
 - [x] bomb — `data/archetypes/bomb.archetype`
 - [ ] goldbomb
-- [ ] short_fuse
+- [x] short_fuse — `data/archetypes/short_fuse.archetype` (lightly covered by golden suite: 2 runs)
 - [ ] haywire
 
 ## Aquatic

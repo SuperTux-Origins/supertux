@@ -331,6 +331,43 @@ inline void read_component(ReaderMapping const& mapping, BulletShy& shy)
   mapping.read("turn-recover-time", shy.turn_recover_time);
 }
 
+/** Explodes harmlessly (pushing things away) when touched, stomped,
+    burnt or falling (short_fuse). */
+struct Firecracker
+{
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, Firecracker& /*firecracker*/)
+{
+}
+
+/** Walks (with its Walker) until stomped; then hides in its shell, can
+    be carried, and kicked to slide (upwards when stomped) killing
+    badguys (snail). List it before the walker. */
+struct Snail
+{
+  float kick_speed = 500.0f;
+  float kick_speed_y = -500.0f;
+  int max_squishes = 10;
+  float flat_time = 4.0f;
+
+  enum class State { NORMAL, FLAT, WAKING, KICKED_DELAY, KICKED, GRABBED };
+
+  // state
+  State state = State::NORMAL;
+  Timer kicked_delay_timer = {};
+  Timer flat_timer = {};
+  int squishcount = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, Snail& snail)
+{
+  mapping.read("kick-speed", snail.kick_speed);
+  mapping.read("kick-speed-y", snail.kick_speed_y);
+  mapping.read("max-squishes", snail.max_squishes);
+  mapping.read("flat-time", snail.flat_time);
+}
+
 /** How the badguy reacts to being stomped. Without this component the
     BadGuy default applies (not squishable). */
 struct SquishReaction
