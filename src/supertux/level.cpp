@@ -19,7 +19,7 @@
 #include "badguy/badguy.hpp"
 #include "ecs/badguy_components.hpp"
 #include "ecs/registry.hpp"
-#include "object/bonus_block.hpp"
+#include "ecs/object_components.hpp"
 #include "object/coin.hpp"
 #include "supertux/sector.hpp"
 #include "trigger/secretarea_trigger.hpp"
@@ -98,17 +98,16 @@ Level::get_total_coins() const
         total_coins++;
         continue;
       }
-      auto block = dynamic_cast<BonusBlock*>(o.get());
-      if (block)
+      if (auto* block = ecs::try_get<BonusBlock>(o->get_entity()))
       {
-        if (block->get_contents() == BonusBlock::Content::COIN)
+        if (block->contents == BonusBlock::Content::COIN)
         {
-          total_coins += block->get_hit_counter();
+          total_coins += block->hit_counter;
           continue;
-        } else if (block->get_contents() == BonusBlock::Content::RAIN ||
-                   block->get_contents() == BonusBlock::Content::EXPLODE)
+        } else if (block->contents == BonusBlock::Content::RAIN ||
+                   block->contents == BonusBlock::Content::EXPLODE)
         {
-          total_coins += 10 * block->get_hit_counter();
+          total_coins += 10 * block->hit_counter;
           continue;
         }
       }

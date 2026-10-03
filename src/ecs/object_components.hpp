@@ -26,8 +26,25 @@
 #include "supertux/timer.hpp"
 #include "util/fade_helper.hpp"
 #include "util/reader_mapping.hpp"
+#include "video/surface_ptr.hpp"
+#include "supertux/info_box_line.hpp"
+#include "supertux/moving_object.hpp"
 
 class Sprite;
+
+/** State that only exists at runtime and cannot be copied (owned
+    objects). Copies, i.e. archetype prototypes, start out empty. */
+template<typename T>
+struct RuntimeState
+{
+  T value = {};
+
+  RuntimeState() = default;
+  RuntimeState(RuntimeState const&) : value() {}
+  RuntimeState& operator=(RuntimeState const&) { value = T(); return *this; }
+  RuntimeState(RuntimeState&&) = default;
+  RuntimeState& operator=(RuntimeState&&) = default;
+};
 
 /** Shakes, dissolves and falls when a player stands on it or an
     explosion hits it, then fades back in after a while (unstable_tile).
@@ -138,6 +155,107 @@ struct ResetPoint
 
 inline void read_component(ReaderMapping const& /*mapping*/, ResetPoint& /*point*/)
 {
+}
+
+/** A block that bounces when hit from below, knocking away badguys,
+    coins and eggs on top; can break into pieces. The block type
+    behavior (bonus-block, brick, ...) is listed before it and handles
+    being hit. */
+struct Block
+{
+  // state
+  bool bouncing = false;
+  bool breaking = false;
+  float bounce_dir = 0.f;
+  float bounce_offset = 0.f;
+  float original_y = -1.f;
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, Block& /*block*/)
+{
+}
+
+/** Releases its contents when hit (bonusblock). The level sets
+    "contents" (or the old numeric "data"), "count" and "script". */
+struct BonusBlock
+{
+  enum class Content {
+    COIN, FIREGROW, ICEGROW, AIRGROW, EARTHGROW, STAR, ONEUP, CUSTOM,
+    SCRIPT, LIGHT, LIGHT_ON, TRAMPOLINE, RAIN, EXPLODE
+  };
+
+  Content contents = Content::COIN;
+  int hit_counter = 1;
+  std::string script;
+
+  // state
+  RuntimeState<std::unique_ptr<MovingObject>> object = {};
+  SurfacePtr lightsprite = {};
+};
+
+inline void read_component(ReaderMapping const& mapping, BonusBlock& block)
+{
+  mapping.read("count", block.hit_counter);
+  mapping.read("script", block.script);
+}
+
+/** Breaks when hit by a big player (else bounces), or gives coins if
+    not breakable (brick). Heavy bricks only break under heavy impact. */
+struct Brick
+{
+  bool breakable = true;
+  bool heavy = false;
+
+  // state
+  int coin_counter = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, Brick& brick)
+{
+  mapping.read("breakable", brick.breakable);
+  mapping.read("heavy", brick.heavy);
+}
+
+/** Invisible and passable until hit from below (invisible_block). */
+struct InvisibleBlock
+{
+  // state
+  bool visible = false;
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, InvisibleBlock& /*block*/)
+{
+}
+
+/** Shows a message box when hit (infoblock). */
+struct InfoBlock
+{
+  std::string message;
+  Color frontcolor = Color(0.6f, 0.7f, 0.8f, 0.5f);
+  Color backcolor = Color(0.f, 0.f, 0.f, 0.f);
+  float roundness = 0.f;
+  bool fadetransition = true;
+
+  // state
+  float shown_pct = 0.f; /**< Value in the range of 0..1, depending on how much of the infobox is currently shown */
+  float dest_pct = 0.f; /**< With each call to update(), shown_pct will slowly transition to this value */
+  RuntimeState<std::vector<std::unique_ptr<InfoBoxLine>>> lines = {}; /**< lines of text (or images) to display */
+  float lines_height = 0.f;
+  float initial_y = 0.f;
+};
+
+inline void read_component(ReaderMapping const& mapping, InfoBlock& block)
+{
+  mapping.read("message", block.message);
+  std::vector<float> color;
+  if (mapping.read("frontcolor", color)) {
+    block.frontcolor = Color(color);
+  }
+  if (mapping.read("backcolor", color)) {
+    block.backcolor = Color(color);
+  }
+  mapping.read("roundness", block.roundness);
+  mapping.read("fadetransition", block.fadetransition);
 }
 
 #endif

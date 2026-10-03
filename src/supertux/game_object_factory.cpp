@@ -37,9 +37,8 @@
 #include "object/ambient_sound.hpp"
 #include "object/background.hpp"
 #include "object/bicycle_platform.hpp"
+#include "badguy/crusher.hpp"
 #include "object/archetype_object.hpp"
-#include "object/bonus_block.hpp"
-#include "object/brick.hpp"
 #include "object/bumper.hpp"
 #include "object/camera.hpp"
 #include "object/candle.hpp"
@@ -53,8 +52,6 @@
 #include "object/ghost_particle_system.hpp"
 #include "object/gradient.hpp"
 #include "object/hurting_platform.hpp"
-#include "object/infoblock.hpp"
-#include "object/invisible_block.hpp"
 #include "object/invisible_wall.hpp"
 #include "object/ispy.hpp"
 #include "object/lantern.hpp"
@@ -168,8 +165,6 @@ GameObjectFactory::init_factories()
   add_factory<Background>("background");
   add_factory<PathGameObject>("path");
   add_factory<BicyclePlatform>("bicycle-platform");
-  add_factory<BonusBlock>("bonusblock");
-  add_factory<Brick>("brick");
   add_factory<Bumper>("bumper");
   add_factory<Camera>("camera");
   add_factory<Candle>("candle");
@@ -185,11 +180,8 @@ GameObjectFactory::init_factories()
   add_factory<FallBlock>("fallblock");
   add_factory<GhostParticleSystem>("particles-ghosts");
   add_factory<Gradient>("gradient");
-  add_factory<HeavyBrick>("heavy-brick");
   add_factory<HeavyCoin>("heavycoin");
   add_factory<HurtingPlatform>("hurting_platform");
-  add_factory<InfoBlock>("infoblock");
-  add_factory<InvisibleBlock>("invisible_block");
   add_factory<InvisibleWall>("invisible_wall");
   add_factory<Ispy>("ispy");
   add_factory<Lantern>("lantern", RegisteredObjectParam::OBJ_PARAM_PORTABLE);

@@ -24,6 +24,35 @@ template<> ObjectBehavior const& object_behavior_of<WeakBlock>();
 template<> ObjectBehavior const& object_behavior_of<MagicBlock>();
 template<> ObjectBehavior const& object_behavior_of<ResetPoint>();
 
+template<> ObjectBehavior const& object_behavior_of<Block>();
+template<> ObjectBehavior const& object_behavior_of<BonusBlock>();
+template<> ObjectBehavior const& object_behavior_of<Brick>();
+template<> ObjectBehavior const& object_behavior_of<InvisibleBlock>();
+template<> ObjectBehavior const& object_behavior_of<InfoBlock>();
+
+class Crusher;
+class GameObject;
+class Player;
+
+namespace block {
+
+void start_bounce(ArchetypeObject& self, GameObject* hitter);
+
+} // namespace block
+
+namespace bonus_block {
+
+void try_open(ArchetypeObject& self, Player* player);
+
+} // namespace bonus_block
+
+namespace brick {
+
+void try_break(ArchetypeObject& self, Player* player);
+void break_for_crusher(ArchetypeObject& self, Crusher& crusher);
+
+} // namespace brick
+
 namespace weak_block {
 
 /** Set a weak block on fire (or melting), e.g. by an explosion */

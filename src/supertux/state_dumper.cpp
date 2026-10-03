@@ -22,7 +22,6 @@
 #include <stdexcept>
 #include <typeinfo>
 
-#include "object/block.hpp"
 #include "object/moving_sprite.hpp"
 #include "object/player.hpp"
 #include "supertux/moving_object.hpp"
@@ -70,8 +69,6 @@ StateDumper::dump(Sector& sector)
     line += std::format(" g:{}", static_cast<int>(moving->get_group()));
     if (auto* sprite = dynamic_cast<MovingSprite*>(moving)) {
       line += " a:" + sprite->get_action();
-    } else if (auto* block = dynamic_cast<Block*>(moving)) {
-      line += " a:" + block->get_action();
     }
 
     auto it = m_last.find(uid);

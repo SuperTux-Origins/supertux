@@ -40,6 +40,9 @@ public:
   void collision_solid(CollisionHit const& hit) override;
   bool collides(GameObject& other, CollisionHit const& hit) const override;
 
+  /** Hit by the player, e.g. a block from below */
+  void hit(Player& player);
+
   /** MovingSprite::draw(), for behaviors that wrap it */
   void default_draw(DrawingContext& context) { MovingSprite::draw(context); }
 

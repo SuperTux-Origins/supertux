@@ -17,9 +17,11 @@
 #define HEADER_SUPERTUX_ECS_OBJECT_BEHAVIOR_HPP
 
 #include "collision/collision_hit.hpp"
+#include "util/reader_mapping.hpp"
 
 class ArchetypeObject;
 class Bullet;
+class Player;
 class DrawingContext;
 class GameObject;
 
@@ -30,6 +32,8 @@ class GameObject;
     the default. */
 struct ObjectBehavior
 {
+  /** all: read instance data from the level object, before construct */
+  void (*read)(ArchetypeObject& self, ReaderMapping const& mapping) = nullptr;
   /** all: end of construction */
   void (*construct)(ArchetypeObject& self) = nullptr;
   /** all */
@@ -42,6 +46,8 @@ struct ObjectBehavior
   void (*collision_solid)(ArchetypeObject& self, CollisionHit const& hit) = nullptr;
   /** first, default: true */
   bool (*collides)(ArchetypeObject const& self, GameObject& other, CollisionHit const& hit) = nullptr;
+  /** first, default: nothing; e.g. a block hit by the player */
+  void (*hit)(ArchetypeObject& self, Player& player) = nullptr;
 };
 
 /** The object behavior of a component type, specialized in object_behaviors.cpp */

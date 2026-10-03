@@ -110,3 +110,7 @@ Non-badguy objects use the same pattern: `ArchetypeObject` (base
 - [x] magicblock — `data/archetypes/magicblock.archetype` (solid/normal switching verified via group+action dump)
 - [x] firefly (checkpoint) — `data/archetypes/firefly.archetype` (ringing not exercised)
 - [ ] invisible_wall — kept: sprite-less static collider without behavior (level geometry)
+- [x] bonusblock — `data/archetypes/bonusblock.archetype` (block + bonus-block components; hit in 14 golden runs)
+- [x] brick, heavy-brick — `data/archetypes/brick.archetype`, `heavy-brick.archetype` (3 runs)
+- [x] invisible_block — `data/archetypes/invisible_block.archetype` (not exercised)
+- [x] infoblock — `data/archetypes/infoblock.archetype` (not exercised)

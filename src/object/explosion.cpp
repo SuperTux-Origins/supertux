@@ -20,8 +20,6 @@
 #include "badguy/archetype_badguy.hpp"
 #include "ecs/badguy_components.hpp"
 #include "math/random.hpp"
-#include "object/bonus_block.hpp"
-#include "object/brick.hpp"
 #include "object/particles.hpp"
 #include "object/player.hpp"
 #include "ecs/object_behaviors.hpp"
@@ -121,18 +119,17 @@ Explosion::explode()
       bool in_break_range = distance <= 60.f;
       bool in_shake_range = distance <= 100.f;
 
-      auto bonusblock = dynamic_cast<BonusBlock*>(obj);
-      if (bonusblock && in_shake_range && hurts()) {
-        bonusblock->start_bounce(this);
-        if (in_break_range)
-          bonusblock->try_open(player);
-      }
-
-      auto brick = dynamic_cast<Brick*>(obj);
-      if (brick && in_shake_range && hurts()) {
-        brick->start_bounce(this);
-        if (in_break_range)
-          brick->try_break(nullptr);
+      auto block_object = dynamic_cast<ArchetypeObject*>(obj);
+      if (block_object && in_shake_range && hurts()) {
+        if (ecs::try_get<BonusBlock>(block_object->get_entity())) {
+          block::start_bounce(*block_object, this);
+          if (in_break_range)
+            bonus_block::try_open(*block_object, player);
+        } else if (ecs::try_get<Brick>(block_object->get_entity())) {
+          block::start_bounce(*block_object, this);
+          if (in_break_range)
+            brick::try_break(*block_object, nullptr);
+        }
       }
 
       auto object = dynamic_cast<ArchetypeObject*>(obj);

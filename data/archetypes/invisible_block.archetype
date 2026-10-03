@@ -1,0 +1,10 @@
+(supertux-archetype
+  (name "invisible_block")
+  (base "object")
+  (properties
+    (sprite "images/objects/bonus_block/invisibleblock.sprite")
+    (layer "objects+1")
+    (colgroup "static"))
+  (components
+    (invisible-block)
+    (block)))

@@ -22,7 +22,8 @@
 
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
-#include "object/brick.hpp"
+#include "ecs/object_behaviors.hpp"
+#include "object/archetype_object.hpp"
 #include "object/camera.hpp"
 #include "object/coin.hpp"
 #include "object/particles.hpp"
@@ -186,8 +187,13 @@ Crusher::update(float dt_sec)
 
   //because this game's physics are so broken, we have to create faux collisions with bricks
 
-  for (auto& brick : Sector::get().get_objects_by_type<Brick>())
+  // plain bricks only, heavy bricks are not crushed this way
+  for (auto& brick : Sector::get().get_objects_by_type<ArchetypeObject>())
   {
+    auto* brick_component = ecs::try_get<Brick>(brick.get_entity());
+    if (!brick_component || brick_component->heavy)
+      continue;
+
     Rectf brickbox = get_bbox().grown(-1);
     brickbox.set_bottom(m_sideways ? get_bbox().get_bottom() - 1.f :
       m_flip == NO_FLIP ? get_bbox().get_bottom() + 9.f : get_bbox().get_bottom() - 1.f);
@@ -200,15 +206,8 @@ Crusher::update(float dt_sec)
 
     if (brickbox.contains(brick.get_bbox()))
     {
-      if (dynamic_cast<HeavyBrick*>(&brick))
-      {
-        brick.break_for_crusher(this);
-      }
-      else
-      {
-        if (is_big()) {
-          brick.break_for_crusher(this);
-        }
+      if (is_big()) {
+        brick::break_for_crusher(brick, *this);
       }
     }
   }

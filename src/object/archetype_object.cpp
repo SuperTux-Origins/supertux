@@ -41,6 +41,11 @@ ArchetypeObject::ArchetypeObject(ReaderMapping const& reader, Archetype const& a
   MovingSprite(reader, archetype.get_sprite(), archetype.get_layer(), colgroup_of(archetype)),
   m_behaviors(archetype.emplace_object_components(get_entity(), &reader))
 {
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->read) {
+      behavior->read(*this, reader);
+    }
+  }
   construct();
 }
 
@@ -100,6 +105,17 @@ ArchetypeObject::collides(GameObject& other, CollisionHit const& hit) const
     }
   }
   return MovingSprite::collides(other, hit);
+}
+
+void
+ArchetypeObject::hit(Player& player)
+{
+  for (auto const* behavior : m_behaviors) {
+    if (behavior->hit) {
+      behavior->hit(*this, player);
+      return;
+    }
+  }
 }
 
 void
