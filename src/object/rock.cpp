@@ -21,7 +21,8 @@
 #include "audio/sound_manager.hpp"
 #include "badguy/badguy.hpp"
 #include "badguy/crusher.hpp"
-#include "object/coin.hpp"
+#include "ecs/object_components.hpp"
+#include "ecs/registry.hpp"
 #include "object/explosion.hpp"
 #include "object/lit_object.hpp"
 #include "object/player.hpp"
@@ -116,8 +117,7 @@ Rock::collision_solid(CollisionHit const& hit)
 HitResponse
 Rock::collision(GameObject& other, CollisionHit const& hit)
 {
-  auto heavy_coin = dynamic_cast<HeavyCoin*> (&other);
-  if (heavy_coin) {
+  if (ecs::try_get<HeavyCoin>(other.get_entity())) {
     return ABORT_MOVE;
   }
 

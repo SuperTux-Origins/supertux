@@ -21,7 +21,8 @@
 #include "ecs/registry.hpp"
 #include "supertux/physic.hpp"
 #include "control/controller.hpp"
-#include "object/coin.hpp"
+#include "ecs/object_components.hpp"
+#include "ecs/registry.hpp"
 #include "object/player.hpp"
 #include "sprite/sprite_manager.hpp"
 #include "util/reader_mapping.hpp"
@@ -77,8 +78,7 @@ Trampoline::update(float dt_sec)
 HitResponse
 Trampoline::collision(GameObject& other, CollisionHit const& hit)
 {
-  auto heavy_coin = dynamic_cast<HeavyCoin*> (&other);
-  if (heavy_coin) {
+  if (ecs::try_get<HeavyCoin>(other.get_entity())) {
     return ABORT_MOVE;
   }
   //Tramponine has to be on ground to work.

@@ -99,6 +99,8 @@ std::map<std::string, ComponentType> const& component_types()
     { "path-follower", object_component_type<PathFollower>() },
     { "platform", object_component_type<Platform>() },
     { "hurting", object_component_type<Hurting>() },
+    { "coin", object_component_type<Coin>() },
+    { "heavy-coin", object_component_type<HeavyCoin>() },
     { "diver", component_type<Diver>() },
     { "haywire", component_type<Haywire>() },
     { "goldbomb", component_type<GoldBomb>() },

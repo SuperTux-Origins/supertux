@@ -16,6 +16,7 @@
 #ifndef HEADER_SUPERTUX_OBJECT_ARCHETYPE_OBJECT_HPP
 #define HEADER_SUPERTUX_OBJECT_ARCHETYPE_OBJECT_HPP
 
+#include <memory>
 #include <vector>
 
 #include "ecs/object_behavior.hpp"
@@ -34,7 +35,12 @@ class ArchetypeObject : public MovingSprite,
 {
 public:
   ArchetypeObject(ReaderMapping const& reader, Archetype const& archetype);
+  /** for objects spawned at runtime */
+  ArchetypeObject(Vector const& pos, Archetype const& archetype);
   ~ArchetypeObject() override;
+
+  /** Spawn the named archetype at runtime */
+  static std::unique_ptr<ArchetypeObject> create(std::string const& name, Vector const& pos);
 
   void finish_construction() override;
   void expose(HSQUIRRELVM vm, SQInteger table_idx) override;

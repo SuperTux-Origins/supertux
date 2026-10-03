@@ -1,0 +1,11 @@
+; Spawned by coin rain and coin explosions.
+(supertux-archetype
+  (name "heavycoin")
+  (base "object")
+  (properties
+    (sprite "images/objects/coin/coin.sprite")
+    (layer "objects-1")
+    (colgroup "moving"))
+  (components
+    (coin)
+    (heavy-coin)))

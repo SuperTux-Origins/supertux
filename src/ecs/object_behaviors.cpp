@@ -23,7 +23,7 @@
 #include "scripting/platform.hpp"
 #include "squirrel/squirrel_util.hpp"
 #include "object/bouncy_coin.hpp"
-#include "object/coin.hpp"
+#include "audio/sound_source.hpp"
 #include "object/coin_explode.hpp"
 #include "object/coin_rain.hpp"
 #include "object/flower.hpp"
@@ -729,8 +729,9 @@ HitResponse block_collision(ArchetypeObject& self, GameObject& other, CollisionH
     }
 
     // Coins get collected
-    if (auto coin = dynamic_cast<Coin*> (&other)) {
-      coin->collect();
+    auto coin_object = dynamic_cast<ArchetypeObject*>(&other);
+    if (coin_object && ecs::try_get<Coin>(coin_object->get_entity())) {
+      coin::collect(*coin_object);
     }
 
     //Eggs get jumped
@@ -1555,7 +1556,172 @@ HitResponse hurting_collision(ArchetypeObject& /*self*/, GameObject& other, Coll
   return FORCE_MOVE;
 }
 
+// Coin ---------------------------------------------------------------
+
+void coin_construct(ArchetypeObject& /*self*/)
+{
+  SoundManager::current()->preload("sounds/coin.wav");
+}
+
+void coin_finish_construction(ArchetypeObject& self)
+{
+  Coin& coin = ecs::get<Coin>(self.get_entity());
+  PathObject* path = path_follower::get(self);
+  if (!path)
+    return;
+
+  if (path->get_path())
+  {
+    if (coin.starting_node >= static_cast<int>(path->get_path()->get_nodes().size()))
+      coin.starting_node = static_cast<int>(path->get_path()->get_nodes().size()) - 1;
+
+    self.set_pos(path->get_path_handle().get_pos(self.m_col.m_bbox.get_size(),
+                                                 path->get_path()->get_nodes()[coin.starting_node].position));
+    path->get_walker()->jump_to_node(coin.starting_node);
+  }
+}
+
+void coin_update(ArchetypeObject& self, float dt_sec)
+{
+  // if we have a path to follow, follow it
+  PathObject* path = path_follower::get(self);
+  if (path && path->get_walker()) {
+    path->get_walker()->update(dt_sec);
+    Vector v = path->get_walker()->get_pos(self.m_col.m_bbox.get_size(), path->get_path_handle());
+
+    if (path->get_path()->is_valid()) {
+      self.m_col.set_movement(v - self.get_pos());
+    }
+  }
+}
+
+HitResponse coin_collision(ArchetypeObject& self, GameObject& other, CollisionHit const& /*hit*/)
+{
+  auto player = dynamic_cast<Player*>(&other);
+  if (player == nullptr)
+    return ABORT_MOVE;
+
+  if (self.m_col.get_bbox().contains(player->get_bbox().grown(-0.1f)))
+    coin::collect(self);
+
+  return ABORT_MOVE;
+}
+
+// HeavyCoin ----------------------------------------------------------
+
+void heavy_coin_construct(ArchetypeObject& self)
+{
+  Physic& physic = ecs::emplace<Physic>(self.get_entity());
+  physic.enable_gravity(true);
+  SoundManager::current()->preload("sounds/coin2.ogg");
+}
+
+void heavy_coin_update(ArchetypeObject& self, float dt_sec)
+{
+  // enable physics
+  self.m_col.set_movement(ecs::get<Physic>(self.get_entity()).get_movement(dt_sec));
+}
+
+void heavy_coin_collision_solid(ArchetypeObject& self, CollisionHit const& hit)
+{
+  HeavyCoin& coin = ecs::get<HeavyCoin>(self.get_entity());
+  Physic& physic = ecs::get<Physic>(self.get_entity());
+
+  float clink_threshold = 100.0f; // sets the minimum speed needed to result in collision noise
+  //TODO: colliding HeavyCoins should have their own unique sound
+
+  if (hit.bottom) {
+    if (physic.get_velocity_y() > clink_threshold && !coin.last_hit.bottom)
+      SoundManager::current()->play("sounds/coin2.ogg", self.get_pos());
+    if (physic.get_velocity_y() > 200) {// lets some coins bounce
+      physic.set_velocity_y(-99);
+    } else {
+      physic.set_velocity_y(0);
+      physic.set_velocity_x(0);
+    }
+  }
+  if (hit.right || hit.left) {
+    if ((physic.get_velocity_x() > clink_threshold ||
+         physic.get_velocity_x() < -clink_threshold) &&
+        hit.right != coin.last_hit.right && hit.left != coin.last_hit.left)
+      SoundManager::current()->play("sounds/coin2.ogg", self.get_pos());
+    physic.set_velocity_x(-physic.get_velocity_x());
+  }
+  if (hit.top) {
+    if (physic.get_velocity_y() < -clink_threshold && !coin.last_hit.top)
+      SoundManager::current()->play("sounds/coin2.ogg", self.get_pos());
+    physic.set_velocity_y(-physic.get_velocity_y());
+  }
+
+  // Only make a sound if the coin wasn't hittin anything last frame (A coin
+  // stuck in solid matter would flood the sound manager - see #1555 on GitHub)
+  coin.last_hit = hit;
+}
+
 } // namespace
+
+namespace coin {
+
+void collect(ArchetypeObject& self)
+{
+  static Timer sound_timer;
+  static int pitch_one = 128;
+  static float last_pitch = 1;
+  float pitch = 1;
+
+  int tile = static_cast<int>(self.get_pos().y / 32);
+
+  if (!sound_timer.started()) {
+    pitch_one = tile;
+    pitch = 1;
+    last_pitch = 1;
+  } else if (sound_timer.get_timegone() < 0.02f) {
+    pitch = last_pitch;
+  } else {
+    switch ((pitch_one - tile) % 7) {
+      case -6: pitch = 1.f/2; break;  // C
+      case -5: pitch = 5.f/8; break;  // E
+      case -4: pitch = 4.f/6; break;  // F
+      case -3: pitch = 3.f/4; break;  // G
+      case -2: pitch = 5.f/6; break;  // A
+      case -1: pitch = 9.f/10; break; // Bb
+      case 0: pitch = 1.f; break;     // c
+      case 1: pitch = 9.f/8; break;   // d
+      case 2: pitch = 5.f/4; break;   // e
+      case 3: pitch = 4.f/3; break;   // f
+      case 4: pitch = 3.f/2; break;   // g
+      case 5: pitch = 5.f/3; break;   // a
+      case 6: pitch = 9.f/5; break;   // bb
+    }
+    last_pitch = pitch;
+  }
+  sound_timer.start(1);
+
+  std::unique_ptr<SoundSource> soundSource = SoundManager::current()->create_sound_source("sounds/coin.wav");
+  soundSource->set_position(self.get_pos());
+  soundSource->set_pitch(pitch);
+  soundSource->play();
+  SoundManager::current()->manage_source(std::move(soundSource));
+
+  Sector::get().get_players()[0]->get_status().add_coins(1, false);
+  Sector::get().add<BouncyCoin>(self.get_pos(), false, self.get_sprite_name());
+  Sector::get().get_level().m_stats.increment_coins();
+  self.remove_me();
+
+  std::string const& collect_script = ecs::get<Coin>(self.get_entity()).collect_script;
+  if (!collect_script.empty()) {
+    Sector::get().run_script(collect_script, "collect-script");
+  }
+}
+
+void spawn_heavy(Vector const& pos, Vector const& velocity)
+{
+  auto object = ArchetypeObject::create("heavycoin", pos);
+  ecs::get<Physic>(object->get_entity()).set_velocity(velocity);
+  Sector::get().add_object(std::move(object));
+}
+
+} // namespace coin
 
 namespace path_follower {
 
@@ -1908,6 +2074,29 @@ ObjectBehavior const& object_behavior_of<Hurting>()
 {
   static ObjectBehavior const behavior = {
     .collision = &hurting_collision,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<Coin>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &coin_construct,
+    .finish_construction = &coin_finish_construction,
+    .update = &coin_update,
+    .collision = &coin_collision,
+  };
+  return behavior;
+}
+
+template<>
+ObjectBehavior const& object_behavior_of<HeavyCoin>()
+{
+  static ObjectBehavior const behavior = {
+    .construct = &heavy_coin_construct,
+    .update = &heavy_coin_update,
+    .collision_solid = &heavy_coin_collision_solid,
   };
   return behavior;
 }

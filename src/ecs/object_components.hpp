@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "collision/collision_hit.hpp"
 #include "math/rectf.hpp"
 #include "math/vector.hpp"
 #include "video/color.hpp"
@@ -299,6 +300,33 @@ struct Hurting
 };
 
 inline void read_component(ReaderMapping const& /*mapping*/, Hurting& /*hurting*/)
+{
+}
+
+/** Collected when the player touches it (coin). May follow a path
+    (PathFollower); the level can set "collect-script" and
+    "starting-node". */
+struct Coin
+{
+  std::string collect_script;
+  int starting_node = 0;
+};
+
+inline void read_component(ReaderMapping const& mapping, Coin& coin)
+{
+  mapping.read("collect-script", coin.collect_script);
+  mapping.read("starting-node", coin.starting_node);
+}
+
+/** A coin that falls and bounces with gravity, e.g. from a coin rain
+    (heavycoin). */
+struct HeavyCoin
+{
+  // state
+  CollisionHit last_hit = {};
+};
+
+inline void read_component(ReaderMapping const& /*mapping*/, HeavyCoin& /*coin*/)
 {
 }
 

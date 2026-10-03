@@ -44,7 +44,6 @@
 #include "object/candle.hpp"
 #include "object/circleplatform.hpp"
 #include "object/cloud_particle_system.hpp"
-#include "object/coin.hpp"
 #include "object/custom_particle_system_file.hpp"
 #include "object/decal.hpp"
 #include "object/explosion.hpp"
@@ -173,13 +172,11 @@ GameObjectFactory::init_factories()
   add_factory<Crusher>("crusher");
   add_factory<CustomParticleSystem>("particles-custom");
   add_factory<CustomParticleSystemFile>("particles-custom-file");
-  add_factory<Coin>("coin");
   add_factory<Decal>("decal");
   add_factory<Explosion>("explosion");
   add_factory<FallBlock>("fallblock");
   add_factory<GhostParticleSystem>("particles-ghosts");
   add_factory<Gradient>("gradient");
-  add_factory<HeavyCoin>("heavycoin");
   add_factory<InvisibleWall>("invisible_wall");
   add_factory<Ispy>("ispy");
   add_factory<Lantern>("lantern", RegisteredObjectParam::OBJ_PARAM_PORTABLE);

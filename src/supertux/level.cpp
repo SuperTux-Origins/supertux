@@ -20,7 +20,6 @@
 #include "ecs/badguy_components.hpp"
 #include "ecs/registry.hpp"
 #include "ecs/object_components.hpp"
-#include "object/coin.hpp"
 #include "supertux/sector.hpp"
 #include "trigger/secretarea_trigger.hpp"
 
@@ -92,8 +91,7 @@ Level::get_total_coins() const
   int total_coins = 0;
   for (auto const& sector : m_sectors) {
     for (auto const& o: sector->get_objects()) {
-      auto coin = dynamic_cast<Coin*>(o.get());
-      if (coin)
+      if (ecs::try_get<Coin>(o->get_entity()))
       {
         total_coins++;
         continue;

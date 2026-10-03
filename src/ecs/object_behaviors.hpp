@@ -32,6 +32,8 @@ template<> ObjectBehavior const& object_behavior_of<InfoBlock>();
 template<> ObjectBehavior const& object_behavior_of<PathFollower>();
 template<> ObjectBehavior const& object_behavior_of<Platform>();
 template<> ObjectBehavior const& object_behavior_of<Hurting>();
+template<> ObjectBehavior const& object_behavior_of<Coin>();
+template<> ObjectBehavior const& object_behavior_of<HeavyCoin>();
 
 class Crusher;
 class GameObject;
@@ -55,6 +57,15 @@ void try_break(ArchetypeObject& self, Player* player);
 void break_for_crusher(ArchetypeObject& self, Crusher& crusher);
 
 } // namespace brick
+
+namespace coin {
+
+void collect(ArchetypeObject& self);
+
+/** Spawn a heavy coin with the given initial velocity */
+void spawn_heavy(Vector const& pos, Vector const& velocity);
+
+} // namespace coin
 
 namespace path_follower {
 

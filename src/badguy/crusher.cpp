@@ -25,7 +25,6 @@
 #include "ecs/object_behaviors.hpp"
 #include "object/archetype_object.hpp"
 #include "object/camera.hpp"
-#include "object/coin.hpp"
 #include "object/particles.hpp"
 #include "object/player.hpp"
 #include "supertux/sector.hpp"
@@ -84,8 +83,7 @@ Crusher::collision(GameObject& other, CollisionHit const& hit)
     badguy->kill_fall();
   }
 
-  auto heavy_coin = dynamic_cast<HeavyCoin*>(&other);
-  if (heavy_coin) {
+  if (ecs::try_get<HeavyCoin>(other.get_entity())) {
     return ABORT_MOVE;
   }
   return FORCE_MOVE;
