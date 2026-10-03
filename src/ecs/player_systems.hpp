@@ -17,12 +17,14 @@
 #ifndef HEADER_SUPERTUX_ECS_PLAYER_SYSTEMS_HPP
 #define HEADER_SUPERTUX_ECS_PLAYER_SYSTEMS_HPP
 
+class DrawingContext;
 class Player;
 
-/** The per-frame steps of Player::update() that work on the player
-    components (ecs/player_components.hpp). Player::update() calls them
-    in its original order. A friend of Player, so the steps can use the
-    remaining Player helpers while the decomposition goes on. */
+/** The per-frame update, input and drawing steps of the Player, working
+    on the player components (ecs/player_components.hpp). Player::update()
+    calls them in its original order. A friend of Player, so the steps
+    can use the remaining Player helpers while the decomposition goes
+    on. */
 struct PlayerSystems
 {
   /** Fade out the multiplayer name tag */
@@ -45,6 +47,38 @@ struct PlayerSystems
   static void spawn_invincible_sparkles(Player& self);
   /** When climbing, animate only while moving */
   static void update_climb_animation(Player& self);
+
+  // input
+  /** Read the controller while swimming */
+  static void handle_input_swimming(Player& self);
+  /** Swim towards (pointx, pointy), boosting if requested */
+  static void swim(Player& self, float pointx, float pointy, bool boost);
+  /** Slow Tux down a little, based on where he is standing */
+  static void apply_friction(Player& self);
+  /** Walk, run and skid */
+  static void handle_horizontal_input(Player& self);
+  /** Cut a jump short when the jump button is released */
+  static void early_jump_apex(Player& self);
+  /** Restore gravity after an early jump apex */
+  static void do_jump_apex(Player& self);
+  /** Jump, buttjump and glide */
+  static void handle_vertical_input(Player& self);
+  /** Read the controller and dispatch to the other input steps */
+  static void handle_input(Player& self);
+  /** Input handling while in ghost mode */
+  static void handle_input_ghost(Player& self);
+  /** Input handling while climbing */
+  static void handle_input_climbing(Player& self);
+  /** Input handling while rolling (stone) */
+  static void handle_input_rolling(Player& self);
+  /** Keep the carried object in Tux' hands */
+  static void position_grabbed_object(Player& self);
+  /** Grab a portable object in front of Tux */
+  static bool try_grab(Player& self);
+
+  // drawing
+  /** Draw Tux, his power-up overlays, light and name tag */
+  static void draw(Player& self, DrawingContext& context);
 };
 
 #endif

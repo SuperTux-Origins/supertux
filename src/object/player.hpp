@@ -227,8 +227,6 @@ public:
   void set_dir(bool right);
   void stop_backflipping();
 
-  void position_grabbed_object();
-  bool try_grab();
 
   /** Boosts Tux in a certain direction, sideways. Useful for bumpers/walljumping. */
   void sideways_push(float delta);
@@ -239,25 +237,14 @@ public:
   int get_ending_direction() const { return m_ending_direction; }
 
 private:
-  void handle_input();
-  void handle_input_ghost(); /**< input handling while in ghost mode */
-  void handle_input_climbing(); /**< input handling while climbing */
-  void handle_input_rolling();
 
-  void handle_input_swimming();
 
-  void handle_horizontal_input();
-  void handle_vertical_input();
 
-  void do_jump_apex();
-  void early_jump_apex();
 
-  void swim(float pointx, float pointy, bool boost);
 
   BonusType string_to_bonus(std::string const& bonus) const;
 
   /** slows Tux down a little, based on where he's standing */
-  void apply_friction();
 
   void check_bounds();
 
